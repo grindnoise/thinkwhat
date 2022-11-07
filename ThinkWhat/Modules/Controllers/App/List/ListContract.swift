@@ -26,6 +26,7 @@ protocol ListViewInput: AnyObject {
     func openUserprofile(_: Userprofile)
     func unsubscribe(from: Userprofile)
     func subscribe(to: Userprofile)
+    func openSettings()
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -60,8 +61,6 @@ protocol ListModelOutput: AnyObject {
 protocol ListControllerOutput: AnyObject {
     var viewInput: ListViewInput? { get set }
     
-    func onDidLayout()
-    func onDidLoad()
     func onDataSourceChanged()
     func onRequestCompleted(_: Result<Bool, Error>)
     func onAddFavoriteCallback(_: Result<Bool,Error>)

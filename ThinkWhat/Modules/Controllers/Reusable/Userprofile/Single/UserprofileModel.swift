@@ -15,5 +15,27 @@ class UserprofileModel {
 
 // MARK: - Controller Input
 extension UserprofileModel: UserprofileControllerInput {
-    // Implement methods
+    func unsubscribe(from userprofile: Userprofile) {
+        Task {
+            try await API.shared.profiles.unsubscribe(from: [userprofile])
+        }
+    }
+    
+    func subscribe(to userprofile: Userprofile) {
+        Task {
+            try await API.shared.profiles.subscribe(at: [userprofile])
+        }
+    }
+    
+    func switchNotifications(userprofile: Userprofile, notify: Bool) {
+        Task {
+            do {
+                try await API.shared.profiles.switchNotifications(userprofile: userprofile, notify: notify)
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+            }
+        }
+    }
 }

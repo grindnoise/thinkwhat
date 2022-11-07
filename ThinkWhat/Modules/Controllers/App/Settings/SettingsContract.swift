@@ -39,9 +39,6 @@ protocol SettingsViewInput: AnyObject {
     func feedback()
 }
 
-/// *Controller* tells the *Model* what to do based on the input
-///
-/// **Model** conforms to this protocol
 protocol SettingsControllerInput: AnyObject {
     
     var modelOutput: SettingsModelOutput? { get set }
@@ -53,9 +50,6 @@ protocol SettingsControllerInput: AnyObject {
 //    func updateUserData()
 }
 
-/// *Model* returns the result to the *Controller*
-///
-/// **Controller** conforms to this protocol
 protocol SettingsModelOutput: AnyObject {
     
 //    var surveyCategory: Survey.SurveyCategory { get }

@@ -37,24 +37,24 @@ class SurveysView: UIView {
     private var tasks: [Task<Void, Never>?] = []
     //UI
     private lazy var collectionView: SurveysCollectionView = {
-        let instance = SurveysCollectionView(delegate: self, topic: viewInput?.topic)
+        let instance = SurveysCollectionView(topic: viewInput?.topic)
         
         //Pagination #1
         let paginationPublisher = instance.paginationPublisher
             .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
-        
+
         paginationPublisher
             .sink { [unowned self] in
                 guard let category = $0 else { return }
-                
+
                 self.viewInput?.onDataSourceRequest(source: category, topic: nil)
             }
             .store(in: &subscriptions)
-        
+
         //Pagination #2
         let paginationByTopicPublisher = instance.paginationByTopicPublisher
             .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
-        
+
         paginationByTopicPublisher
             .sink { [unowned self] in
                 guard let topic = $0 else { return }
@@ -62,46 +62,46 @@ class SurveysView: UIView {
                 self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
             }
             .store(in: &subscriptions)
-        
+
         //Refresh #1
         instance.refreshPublisher
             .sink { [unowned self] in
                 guard let category = $0 else { return }
-                
+
                 self.viewInput?.onDataSourceRequest(source: category, topic: nil)
             }
             .store(in: &subscriptions)
-        
+
         //Refresh #2
         instance.refreshByTopicPublisher
             .sink { [unowned self] in
                 guard let topic = $0 else { return }
-                
+
                 self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
             }
             .store(in: &subscriptions)
-        
+
         //Row selected
         instance.rowPublisher
             .sink { [unowned self] in
                 guard let instance = $0
             else { return }
-                  
+
             self.viewInput?.onSurveyTapped(instance)
         }
             .store(in: &subscriptions)
-        
+
         //Update stats (exclude refs)
         instance.updateStatsPublisher
             .sink { [weak self] in
             guard let self = self,
                   let instances = $0
             else { return }
-                  
+
             self.viewInput?.updateSurveyStats(instances)
         }
             .store(in: &subscriptions)
-        
+
         //Add to watch list
         instance.watchSubject.sink {
             print($0)
@@ -109,48 +109,70 @@ class SurveysView: UIView {
             guard let self = self,
                 let value = $0
             else { return }
-            
+
             self.viewInput?.addFavorite(value)
         }.store(in: &self.subscriptions)
-        
+
         instance.shareSubject.sink {
             print($0)
         } receiveValue: { [weak self] in
             guard let self = self,
                 let value = $0
             else { return }
-            
+
             self.viewInput?.share(value)
         }.store(in: &self.subscriptions)
-        
+
         instance.claimSubject.sink {
             print($0)
         } receiveValue: { [weak self] in
             guard let self = self,
                 let surveyReference = $0
             else { return }
-            
+
             let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
             banner.accessibilityIdentifier = "claim"
             let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
-            
+
             claimContent.claimSubject.sink {
                 print($0)
             } receiveValue: { [weak self] in
                 guard let self = self,
                     let claim = $0
                 else { return }
-                
+
                 self.viewInput?.claim(surveyReference: surveyReference, claim: claim)
             }.store(in: &self.subscriptions)
-            
+
             banner.present(content: claimContent)
-            
+
 //            self.viewInput?.addFavorite(surveyReference: value)
         }.store(in: &self.subscriptions)
         
+        instance.userprofilePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.openUserprofile(userprofile)
+            }
+            .store(in: &self.subscriptions)
+                
+        instance.unsubscribePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.unsubscribe(from: userprofile)
+            }
+            .store(in: &self.subscriptions)
+        
         return instance
     }()
+    
+    
     
     // MARK: - Deinitialization
     deinit {
@@ -163,9 +185,12 @@ class SurveysView: UIView {
 #endif
     }
     
+    
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         setupUI()
     }
     
@@ -198,7 +223,7 @@ private extension SurveysView {
     
     private func setupUI() {
         backgroundColor = .systemGroupedBackground
-        collectionView.addEquallyTo(to: self)
+        collectionView.place(inside: self)
     }
 }
 

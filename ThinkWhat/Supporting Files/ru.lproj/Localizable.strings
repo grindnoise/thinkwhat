@@ -96,8 +96,6 @@
 "third" = "Треть";
 "back" = "Назад";
 "per" = "За";
-"subscribe_to_user_notification" = "Вы подписались на";
-"unsubscribe_from_user_notification" = "Вы отписались от";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";
@@ -159,8 +157,11 @@
 "subscriptions" = "Подписки";
 "publications_per" = "Публикации за:";
 "per_day" = "день";
+"day" = "сутки";
 "per_week" = "неделю";
+"week" = "неделя";
 "per_month" = "месяц";
+"month" = "месяц";
 "all_time" = "все время";
 "cancel_subscription" = "Отказаться от подписки";
 "zero_subscriptions" = "Вы ни на кого не подписаны";
@@ -354,3 +355,10 @@
 "subscribe_for_user" = "Подписаться";
 "remove_subscribers" = "Отписаться";
 "manage_subscriptions" = "Управлять";
+
+//Notifications
+"subscribe_to_user_notification" = "Вы подписались на";
+"unsubscribe_from_user_notification" = "Вы отписались от";
+"user_publication_notification_begin" = "Уведомления от ";
+"user_publication_notification_on" = " включены";
+"user_publication_notification_off" = " выключены";

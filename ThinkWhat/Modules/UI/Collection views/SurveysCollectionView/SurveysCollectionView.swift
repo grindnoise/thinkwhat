@@ -20,9 +20,10 @@ class SurveysCollectionView: UICollectionView {
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>
     
     // MARK: - Public properties
-    public var topic: Topic? {
+    public weak var topic: Topic? {
         didSet {
             guard !topic.isNil else { return }
+            
             category = .Topic
         }
     }
@@ -31,9 +32,11 @@ class SurveysCollectionView: UICollectionView {
             defer {
                 setColors()
             }
-//            guard oldValue != category else { return }
+
             setDataSource(animatingDifferences: (category == .Topic || category == .Search) ? false : true)
+            
             guard !dataItems.isEmpty, !visibleCells.isEmpty else { return }
+            
             scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         }
     }
@@ -42,7 +45,7 @@ class SurveysCollectionView: UICollectionView {
             setDataSource()
         }
     }
-    public var userprofile: Userprofile? {
+    public weak var userprofile: Userprofile? {
         didSet {
             guard !userprofile.isNil else { return }
             
@@ -57,7 +60,6 @@ class SurveysCollectionView: UICollectionView {
     public var refreshColor: UIColor {
         return category == .Topic ? .white : traitCollection.userInterfaceStyle == .dark ? .white : .secondaryLabel
     }
-    
     //Publishers
     public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
@@ -73,6 +75,9 @@ class SurveysCollectionView: UICollectionView {
     public let subscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public let unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public let userprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public let settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -145,15 +150,19 @@ class SurveysCollectionView: UICollectionView {
     
     init(category: Survey.SurveyCategory) {
         self.category = category
+        
         super.init(frame: .zero, collectionViewLayout: .init())
+        
         setupUI()
         setTasks()
     }
     
-    init(delegate: CallbackObservable, topic: Topic?) {
+    init(topic: Topic?) {
         self.topic = topic
         self.category = .Topic
+        
         super.init(frame: .zero, collectionViewLayout: .init())
+        
         setupUI()
         setTasks()
     }
@@ -161,7 +170,9 @@ class SurveysCollectionView: UICollectionView {
     init(items: [SurveyReference]) {
         self.fetchResult = items
         self.category = .Search
+        
         super.init(frame: .zero, collectionViewLayout: .init())
+        
         setupUI()
         setTasks()
     }
@@ -194,16 +205,6 @@ class SurveysCollectionView: UICollectionView {
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-//            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
-//            layoutConfig.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.5)//self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
-//            layoutConfig.showsSeparators = false//true
-//
-//            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-//            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//            sectionLayout.interGroupSpacing = 16
-//            return sectionLayout
-//        }
         refreshControl?.tintColor = refreshColor
         searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
@@ -233,9 +234,9 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         cell.setNeedsLayout()
         cell.layoutIfNeeded()
         
+        guard isScrollingDown else { return }
+        
         let max = source.snapshot().itemIdentifiers.count-1
-        let requestThreshold = max > 5 ? 5 : max-1
-        let triggerRange = max-requestThreshold...max
         
         if max < 10 {
             requestData()
@@ -243,106 +244,18 @@ extension SurveysCollectionView: UICollectionViewDelegate {
             guard !loadingIndicator.isAnimating else { return }
             
             loadingIndicator.startAnimating()
-//        } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
-//            requestData()
-//
-//            guard !loadingIndicator.isAnimating else { return }
-//
-            //            loadingIndicator.startAnimating()
-        } else if isScrollingDown, triggerRange.contains(indexPath.row) {
+        } else if max > 0 {
+            
+            let requestThreshold = max > 5 ? 5 : max-1
+            let triggerRange = max-requestThreshold...max
+            
+            guard triggerRange.contains(indexPath.row) else { return }
+            
             requestData()
             
             guard !loadingIndicator.isAnimating else { return }
             
             loadingIndicator.startAnimating()
-        }
-    }
-    
-//    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
-//        guard !allowsMultipleSelection,
-//              let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
-//          else { return nil }
-//
-//        return UITargetedPreview(view: cell.avatar.imageView)
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-//        guard !allowsMultipleSelection,
-//              let indexPath = indexPaths.first,
-//              let cell = collectionView.cellForItem(at: indexPath) as? SurveyCell
-//        else { return nil }
-//
-//        return UIContextMenuConfiguration(
-//            identifier: "\(indexPath.row)" as NSString,
-//            previewProvider: { self.makePreview(cell.avatar.userprofile) }) { _ in
-//
-//                var actions: [UIAction]!
-//
-//                let subscribe: UIAction = .init(title: "subscribe".localized.capitalized,
-//                                             image: UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-//                                             identifier: nil,
-//                                             discoverabilityTitle: nil,
-//                                              attributes: .init(),
-//                                              state: .off,
-//                                              handler: { [weak self] _ in
-//                    guard let self = self,
-//                          let userprofile = cell.avatar.userprofile
-//                    else { return }
-//
-//                    self.subscribePublisher.send([userprofile])
-//                })
-//
-//                let unsubscribe: UIAction = .init(title: "unsubscribe".localized,
-//                                                   image: UIImage(systemName: "hand.raised.slash.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-//                                                   identifier: nil,
-//                                                   discoverabilityTitle: nil,
-//                                                   attributes: .destructive,
-//                                                   state: .off,
-//                                                   handler: { [weak self] _ in
-//                    guard let self = self,
-//                          let userprofile = cell.avatar.userprofile
-//                    else { return }
-//
-//                    self.unsubscribePublisher.send([userprofile])
-//                })
-//
-//                let profile: UIAction = .init(title: "profile".localized,
-//                                                   image: UIImage(systemName: "person.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-//                                                   identifier: nil,
-//                                                   discoverabilityTitle: nil,
-//                                                   attributes: .init(),
-//                                                   state: .off,
-//                                                   handler: { [weak self] _ in
-//                    guard let self = self else { return }
-//
-//                    self.userprofilePublisher.send([cell.avatar.userprofile])
-//                })
-//
-//                actions = [profile]
-//                if cell.avatar.userprofile.subscribedAt {
-//                    actions.append(unsubscribe)
-//                } else {
-//                    actions.append(subscribe)
-//                }
-//
-//
-//                return UIMenu(title: "", image: nil, identifier: nil, options: .init(), children: actions)
-//            }
-//    }
-}
-
-extension SurveysCollectionView: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let popup = sender as? Popup {
-            popup.removeFromSuperview()
         }
     }
 }
@@ -363,99 +276,85 @@ private extension SurveysCollectionView {
                 self.updateStatsPublisher.send(cells.compactMap { return $0.item })
             }
             .store(in: &subscriptions)
-        
+
         delegate = self
-        
+
         addSubview(loadingIndicator)
-        
+
         NSLayoutConstraint.activate([
             loadingIndicator.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
             loadingIndicator.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8)
 //            layoutGuide.centerXAnchor.constraint(equalTo: loadingIndicator.centerXAnchor),
 //            layoutGuide.bottomAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 10)
         ])
-        
+
         refreshControl = UIRefreshControl()
         setColors()
         refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
-        
+
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-            
+
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
             layoutConfig.backgroundColor = .clear
             layoutConfig.showsSeparators = false//true
-            
+
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
             sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
             sectionLayout.interGroupSpacing = 16
-            
+
             return sectionLayout
         }
-        
+
         contentInset.bottom = category == .Topic ? 80 : 0
-        
+
         let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { [unowned self] cell, indexPath, item in
             cell.item = item
-            
-            
-            
-//            let publisher = Publishers.MergeMany(cell.updatePublisher)
-//                .compactMap { $0 as? SurveyReference }
-//                .collect(.byTime(DispatchQueue.main, 3))
-////                .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
-//                .sink { print($0) }
-//                .store(in: &self.subscriptions)
-            
-//            let paginationPublisher = publisher
-//                .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
-            
-//            Publishers.MergeMany(cell.updatePublisher)
-//                .collect(.byTime(DispatchQueue.main, 5))
-////                .collect(.byTimeOrCount(DispatchQueue.main, .seconds(2), 8))
-//                .sink { val in
-//                    print(val)
-//                    print("")
-////                    print(val.first?.id)
-//                }
-//                .store(in: &self.subscriptions)
-            
+
             cell.subscribePublisher
                 .sink { [weak self] in
                     guard let self = self,
                           let userprofile = $0
                     else { return }
-                    
+
                     self.subscribePublisher.send(userprofile)
                 }
             .store(in: &self.subscriptions)
-            
+
             cell.unsubscribePublisher
                 .sink { [weak self] in
                     guard let self = self,
                           let userprofile = $0
                     else { return }
-                    
+
                     self.unsubscribePublisher.send(userprofile)
                 }
             .store(in: &self.subscriptions)
-            
+
             cell.profileTapPublisher
                 .sink { [weak self] in
                     guard let self = self,
                           let userprofile = $0
                     else { return }
-                    
+
                     self.userprofilePublisher.send(userprofile)
                 }
             .store(in: &self.subscriptions)
-            
+
+            cell.settingsTapPublisher
+                .sink { [weak self] in
+                    guard let self = self else { return }
+
+                    self.settingsTapPublisher.send($0)
+                }
+            .store(in: &self.subscriptions)
+
             //Add to watchlist
             cell.watchSubject
                 .sink { [weak self] in
                     guard let self = self,
                           !$0.isNil
                     else { return }
-                
+
                 guard $0!.isComplete else {
                     showBanner(bannerDelegate: self, text: "finish_poll".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
                     return
@@ -463,82 +362,71 @@ private extension SurveysCollectionView {
 
                 self.watchSubject.send($0)
             }.store(in: &self.subscriptions)
-            
+
             //Share
             cell.shareSubject
                 .sink { [weak self] in
                     guard let self = self,
                           !$0.isNil
                     else { return }
-                    
+
                     self.shareSubject.send($0)
                 }
                 .store(in: &self.subscriptions)
-            
+
             //Claim
             cell.claimSubject
                 .sink { [weak self] in
                     guard let self = self,
                           !$0.isNil
                     else { return }
-                    
+
                     self.claimSubject.send($0)
                 }
                 .store(in: &self.subscriptions)
-            
+
             var config = UIBackgroundConfiguration.listPlainCell()
             config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
             cell.backgroundConfiguration = config
             cell.automaticallyUpdatesBackgroundConfiguration = false
         }
-        
+
         source = UICollectionViewDiffableDataSource<Section, SurveyReference>(collectionView: self) {
             collectionView, indexPath, identifier -> UICollectionViewCell? in
-            //            guard let self = self else { return UICollectionViewCell() }
-            //            guard self.category == .Subscriptions else {
-            //                return collectionView.dequeueConfiguredReusableCell(using: surveyCellRegistration,
-            //                                                                    for: indexPath,
-            //                                                                    item: identifier)
-            //            }
             let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
-            //            cell.item = identifier
             return cell
         }
-        
-        setDataSource(animatingDifferences: true)
-//        var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
-//        snapshot.appendSections([.main])
-//        snapshot.appendItems(dataItems, toSection: .main)
-//        source.apply(snapshot, animatingDifferences: false)
+
+        setDataSource(animatingDifferences: false)
     }
     
     func setTasks() {
-        
         Timer.publish(every: 5, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 guard let self = self,
-                      self.source.snapshot().itemIdentifiers.count != self.dataItems.count
+                      self.category != .Userprofile,
+                      self.source.snapshot().itemIdentifiers.count != self.filterByPeriod(self.dataItems).count
                 else { return }
-                
+
                 var snap = Snapshot()
                 snap.appendSections([.main])
                 snap.appendItems(self.dataItems)
                 self.source.apply(snap, animatingDifferences: true)
             }
             .store(in: &subscriptions)
-        
+
         //Empty received
         tasks.append(Task {@MainActor [weak self] in
             for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.EmptyReceived) {
                 guard let self = self else { return }
-                
+
                 self.loadingIndicator.stopAnimating()
             }
         })
-        
+
         //Survey claimed by user
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Claim) {
@@ -546,14 +434,14 @@ private extension SurveysCollectionView {
                       let instance = notification.object as? SurveyReference,
                       self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.deleteItems([instance])
                 self.source.apply(snap, animatingDifferences: true)
                 //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
-        
+
         //Survey banned on server
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Ban) {
@@ -561,15 +449,15 @@ private extension SurveysCollectionView {
                       let instance = notification.object as? SurveyReference,
                       self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.deleteItems([instance])
                 self.source.apply(snap, animatingDifferences: true)
                 //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
-        
-        
+
+
         //Subscriptions added
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SubscriptionAppend) {
@@ -578,14 +466,14 @@ private extension SurveysCollectionView {
                       let instance = notification.object as? SurveyReference,
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
                 self.loadingIndicator.stopAnimating()
             }
         })
-        
+
         //By userprofile added
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.AppendReference) {
@@ -596,14 +484,14 @@ private extension SurveysCollectionView {
                       instance.owner == userprofile,
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
                 self.loadingIndicator.stopAnimating()
             }
         })
-        
+
         //By userprofile removed
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.RemoveReference) {
@@ -614,13 +502,13 @@ private extension SurveysCollectionView {
                       instance.owner == userprofile,
                       self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.deleteItems([instance])
                 self.source.apply(snap, animatingDifferences: true)
             }
         })
-        
+
         //New added
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.NewAppend) {
@@ -629,7 +517,7 @@ private extension SurveysCollectionView {
                       let instance = notification.object as? SurveyReference,
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
@@ -637,7 +525,7 @@ private extension SurveysCollectionView {
                 //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
-        
+
         //Top added
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopAppend) {
@@ -646,7 +534,7 @@ private extension SurveysCollectionView {
                       let instance = notification.object as? SurveyReference,
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
@@ -654,7 +542,7 @@ private extension SurveysCollectionView {
                 //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
-        
+
         //Own added
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.OwnAppend) {
@@ -663,14 +551,14 @@ private extension SurveysCollectionView {
                       let instance = notification.object as? SurveyReference,
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
                 //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
-        
+
         //Favorite added
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
@@ -678,14 +566,14 @@ private extension SurveysCollectionView {
                       self.category == .Favorite,
                       let instance = notification.object as? SurveyReference
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
                 self.loadingIndicator.stopAnimating()
             }
         })
-        
+
         //Favorite toggle
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteRemove) {
@@ -693,13 +581,13 @@ private extension SurveysCollectionView {
                       self.category == .Favorite,
                       let instance = notification.object as? SurveyReference
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.deleteItems([instance])
                 self.source.apply(snap, animatingDifferences: true)
             }
         })
-        
+
         //Topic added
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
@@ -708,7 +596,7 @@ private extension SurveysCollectionView {
                       let instance = notification.object as? SurveyReference,
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
-                
+
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
@@ -716,7 +604,7 @@ private extension SurveysCollectionView {
                 //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
-        
+
         //Subscribed at added
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
@@ -726,7 +614,7 @@ private extension SurveysCollectionView {
                       self.userprofile.isNil,//Current user
                       let userprofile = dict.values.first
                 else { return }
-                
+
                 //Append, sort
                 var snap = self.source.snapshot()
                 var items = snap.itemIdentifiers
@@ -734,14 +622,14 @@ private extension SurveysCollectionView {
                     .filter({ $0.owner == userprofile })
                     .filter({ !items.contains($0) })
                 items += difference
-                
+
                 var newSnap = Snapshot()
                 newSnap.appendSections([.main])
                 newSnap.appendItems(items.uniqued().sorted { $0.startDate > $1.startDate })
                 self.source.apply(newSnap)
             }
         })
-        
+
         //Subscribed at removed
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
@@ -751,7 +639,7 @@ private extension SurveysCollectionView {
                       self.userprofile.isNil//Current user
 //                      let owner = dict.values.first
                 else { return }
-                
+
                 var snap = Snapshot()
                 snap.appendSections([.main])
                 snap.appendItems(self.dataItems)
@@ -794,22 +682,16 @@ private extension SurveysCollectionView {
         }
     }
     
-    @objc
-    func onRemove(_ notification: Notification) {
+//    @objc
+//    func onRemove(_ notification: Notification) {
 ////        setDataSource()
 //        let instance = notification.object as? SurveyReference ?? Surveys.shared.rejected.last?.reference ?? Surveys.shared.banned.last?.reference
 //        var snapshot = source.snapshot()
 //        guard !instance.isNil, snapshot.itemIdentifiers.contains(instance!) else { return }
 //        snapshot.deleteItems([instance!])
 //        source.apply(snapshot, animatingDifferences: true)
-    }
-    
-//    @objc
-//    private func onPagination() {
-//        endRefreshing()
-//        appendToDataSource()
 //    }
-
+    
     func appendToDataSource() {
         var snapshot = source.snapshot()
         guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }
@@ -817,33 +699,36 @@ private extension SurveysCollectionView {
         source.apply(snapshot, animatingDifferences: true)
     }
     
-    func setDataSource(animatingDifferences: Bool = true) {
-        func filterByPeriod(_ items: [SurveyReference]) -> [SurveyReference] {
-            guard category != .Userprofile else { return items }
-            guard let date = period.date() else { return items }
-     
-            return items.filter {
-                $0.startDate >= date
-            }
+    func filterByPeriod(_ items: [SurveyReference]) -> [SurveyReference] {
+        guard category != .Userprofile,
+              let date = period.date()
+        else { return items }
+
+        return items.filter {
+            $0.startDate >= date
         }
-        
-        //TODO: Add filtering
+    }
+    
+    func setDataSource(animatingDifferences: Bool = true) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
         snapshot.appendSections([.main])
         snapshot.appendItems(filterByPeriod(dataItems), toSection: .main)
         source.apply(snapshot, animatingDifferences: animatingDifferences)
     }
+}
+
+extension SurveysCollectionView: BannerObservable {
+    func onBannerWillAppear(_ sender: Any) {}
     
-//    func makePreview(_ userprofile: Userprofile) -> UIViewController {
-//        let viewController = UIViewController()
-//        let imageView = UIImageView(image: userprofile.image)
-//        imageView.contentMode = .scaleAspectFit
-//        viewController.view = imageView
-//        imageView.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
-////        imageView.translatesAutoresizingMaskIntoConstraints = false
-//        viewController.preferredContentSize = imageView.frame.size
-////        viewController.view.cornerRadius = 50
-//        
-//        return viewController
-//    }
+    func onBannerWillDisappear(_ sender: Any) {}
+    
+    func onBannerDidAppear(_ sender: Any) {}
+    
+    func onBannerDidDisappear(_ sender: Any) {
+        if let banner = sender as? Banner {
+            banner.removeFromSuperview()
+        } else if let popup = sender as? Popup {
+            popup.removeFromSuperview()
+        }
+    }
 }

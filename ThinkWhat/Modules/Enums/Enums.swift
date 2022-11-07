@@ -64,9 +64,13 @@ enum UserprofilesViewMode: String {
 }
 
 enum Period: String {
-    case PerDay     = "per_day"
-    case PerWeek    = "per_week"
-    case PerMonth   = "per_month"
+//    case PerDay     = "per_day"
+//    case PerWeek    = "per_week"
+//    case PerMonth   = "per_month"
+//    case AllTime    = "all_time"
+    case PerDay     = "day"
+    case PerWeek    = "week"
+    case PerMonth   = "month"
     case AllTime    = "all_time"
     
     func date() -> Date? {

@@ -11,8 +11,6 @@ import Combine
 
 class ListController: UIViewController {
     
-    
-    
     // MARK: - Public properties
     var controllerOutput: ListControllerOutput?
     var controllerInput: ListControllerInput?
@@ -22,6 +20,7 @@ class ListController: UIViewController {
     public private(set) var category: Survey.SurveyCategory = .New {
         didSet {
             controllerOutput?.onDataSourceChanged()
+            setTitle()
         }
     }
     
@@ -33,8 +32,48 @@ class ListController: UIViewController {
     private var tasks: [Task<Void, Never>?] = []
     //UI
     private var isOnScreen = true
+    private lazy var titleStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [
+            titleLabel,
+            listSwitch
+        ])
+        instance.axis = .horizontal
+        instance.spacing = 0
+        
+        return instance
+    }()
     private lazy var listSwitch: ListSwitch = {
-        return ListSwitch(callbackDelegate: self)
+        let instance = ListSwitch()
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4).isActive = true
+        instance.statePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let state = $0
+                else { return }
+                
+                switch state {
+                case .New:
+                    self.category = .New
+                case .Top:
+                    self.category = .Top
+                case .Watching:
+                    self.category = .Favorite
+                case .Own:
+                    self.category = .Own
+                }
+            }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
+    private lazy var titleLabel: UILabel = {
+       let instance = UILabel()
+        instance.font = UIFont(name: Fonts.Bold,
+                               size: 32)
+        instance.textAlignment = .left
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+        
+        return instance
     }()
     
 
@@ -53,10 +92,8 @@ class ListController: UIViewController {
             .modelOutput = self
         
         ProtocolSubscriptions.subscribe(self)
-        navigationItem.title = "new".localized
         setupUI()
         setTasks()
-        controllerOutput?.onDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -65,18 +102,20 @@ class ListController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = false//true
         navigationItem.largeTitleDisplayMode = .never//.always
         
-        listSwitch.alpha = 1
+        titleStack.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        controllerOutput?.onDidLayout()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        listSwitch.alpha = 0
+        
+        titleStack.alpha = 0
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
     }
 }
 
@@ -84,6 +123,10 @@ class ListController: UIViewController {
 
 // MARK: - View Input
 extension ListController: ListViewInput {
+    func openSettings() {
+        tabBarController?.selectedIndex = 4
+    }
+    
     func unsubscribe(from userprofile: Userprofile) {
         controllerInput?.unsubscribe(from: userprofile)
     }
@@ -190,18 +233,62 @@ private extension ListController {
         })
     }
     
+    @MainActor
     func setupUI() {
-//        listSwitch = ListSwitch(callbackDelegate: self)
+        navigationItem.title = ""
         navigationController?.navigationBar.prefersLargeTitles = false//deviceType == .iPhoneSE ? false : true
+        
         guard let navigationBar = self.navigationController?.navigationBar else { return }
-        navigationBar.addSubview(listSwitch)
-        listSwitch.translatesAutoresizingMaskIntoConstraints = false
+        
+        navigationBar.addSubview(titleStack)
+        titleStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            listSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            listSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-            listSwitch.heightAnchor.constraint(equalToConstant: 40),
-            listSwitch.widthAnchor.constraint(equalTo: listSwitch.heightAnchor, multiplier: 4)
+            titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
+            titleStack.heightAnchor.constraint(equalToConstant: 40),
+            titleStack.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
+            titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
         ])
+        
+        //-10 is card padding
+        setTitle(animated: false)
+        
+        //        titleStack.place(inside: navigationBar,
+        //        insets: UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10))
+    }
+    
+    @MainActor
+    func setTitle(animated: Bool = true) {
+        var text = ""
+        
+        switch category {
+        case .New:
+            text =  "new".localized
+        case .Top:
+            text = "top".localized
+        case .Favorite:
+            text = "watching".localized
+        case .Own:
+            text = "own".localized
+        default:
+#if DEBUG
+            print("")
+#endif
+        }
+        
+        guard animated else {
+            titleLabel.text = text
+            return
+        }
+
+        
+        UIView.transition(with: titleLabel,
+                          duration: 0.15,
+                          options: .transitionCrossDissolve) { [weak self] in
+            guard let self = self else { return }
+            
+            self.titleLabel.text = text
+        }
+        
     }
 }
 
@@ -227,27 +314,5 @@ extension ListController: ListModelOutput {
 extension ListController: DataObservable {
     func onDataLoaded() {
         navigationController?.setNavigationBarHidden(false, animated: true)
-        controllerOutput?.onDidLoad()
-    }
-}
-
-extension ListController: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-        if let state = sender as? ListSwitch.State {
-            switch state {
-            case .New:
-                category = .New
-                navigationItem.title = "new".localized
-            case .Top:
-                category = .Top
-                navigationItem.title = "top".localized
-            case .Watching:
-                category = .Favorite
-                navigationItem.title = "watching".localized
-            case .Own:
-                category = .Own
-                navigationItem.title = "own".localized
-            }
-        }
     }
 }

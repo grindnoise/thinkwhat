@@ -26,6 +26,8 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         didSet {
             guard oldValue != mode else { return }
             
+            setTitle()
+            
             switch mode {
             case .Settings:
                 controllerOutput?.onAppSettings()
@@ -43,8 +45,42 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     private var tasks: [Task<Void, Never>?] = []
     //UI
     private var isOnScreen = true
+    private lazy var logo: UIView = {
+       let instance = UIView()
+        instance.backgroundColor = .clear
+        
+        return instance
+    }()
+    private lazy var titleStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [
+            titleLabel,
+            settingsSwitch
+        ])
+        stack.axis = .horizontal
+        
+        let instance = UIStackView(arrangedSubviews: [
+            logo,
+            stack
+        ])
+        instance.axis = .vertical
+        instance.distribution = .fillEqually
+        instance.spacing = 0
+        
+        return instance
+    }()
+    private lazy var titleLabel: UILabel = {
+       let instance = UILabel()
+        instance.font = UIFont(name: Fonts.Bold,
+                               size: 32)
+        instance.textAlignment = .left
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+        instance.text = ""
+        
+        return instance
+    }()
     private lazy var settingsSwitch: SettingsSwitch = {
         let instance = SettingsSwitch()
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 2.1).isActive = true
         instance.statePublisher
             .sink { [weak self] in
                 guard let self = self,
@@ -52,7 +88,6 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
                 else { return }
                 
                 self.mode = state
-                self.navigationItem.title = state.rawValue.localized
             }
             .store(in: &subscriptions)
         
@@ -95,6 +130,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
             .modelOutput = self
         
         navigationItem.title = "profile".localized
+        
         setupUI()
         setTasks()
     }
@@ -102,27 +138,32 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        navigationController?.navigationBar.overrideUserInterfaceStyle = .unspecified
-        navigationController?.navigationBar.tintColor = .label
-        
+        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
-        
-        settingsSwitch.alpha = 1
-        settingsSwitch.transform = .identity
-        
-        guard let navigationBar = self.navigationController?.navigationBar else { return }
-        
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.shadowColor = nil
-        
-        navigationBar.standardAppearance = appearance
-        navigationBar.scrollEdgeAppearance = appearance
+        titleStack.alpha = 1
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
+        
+//        guard let navigationBar = self.navigationController?.navigationBar else { return }
+//
+//        let appearance = UINavigationBarAppearance()
+//        appearance.configureWithOpaqueBackground()
+//        appearance.titleTextAttributes = [
+//            .foregroundColor: UIColor.clear//traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.label
+//        ]
+//        appearance.largeTitleTextAttributes = [
+//            .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.label
+//        ]
+//        appearance.shadowColor = nil
+//
+//        navigationBar.standardAppearance = appearance
+//        navigationBar.scrollEdgeAppearance = appearance
+//
+//        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationItem.largeTitleDisplayMode = .always
     }
-    
+
 //    override func viewDidAppear(_ animated: Bool) {
 //        super.viewDidAppear(animated)
 //
@@ -141,30 +182,30 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-            guard let self = self else { return }
-
-            self.settingsSwitch.alpha = 0
-            self.settingsSwitch.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        }
+            self.titleStack.alpha = 0
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
     }
 }
 
 private extension SettingsController {
+    @MainActor
     func setupUI() {
         navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = ""
+        
         guard let navigationBar = self.navigationController?.navigationBar else { return }
-        navigationBar.addSubview(settingsSwitch)
-        settingsSwitch.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            settingsSwitch.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            settingsSwitch.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-//            settingsSwitch.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState * 0.97),
-            settingsSwitch.heightAnchor.constraint(equalToConstant: 40),
-            settingsSwitch.widthAnchor.constraint(equalTo: settingsSwitch.heightAnchor, multiplier: 2.1)
-        ])
+        
+        titleStack.place(inside: navigationBar,
+                         insets: UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10))
+        setTitle()
     }
     
+    @MainActor
     func setTasks() {
         tasks.append(Task { @MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
@@ -175,6 +216,22 @@ private extension SettingsController {
                 self.isOnScreen = tab == .Settings
             }
         })
+    }
+    
+    @MainActor
+    func setTitle(animated: Bool = true) {
+        guard animated else {
+            titleLabel.text = mode.rawValue.localized
+            return
+        }
+
+        UIView.transition(with: titleLabel,
+                          duration: 0.15,
+                          options: .transitionCrossDissolve) { [weak self] in
+            guard let self = self else { return }
+            
+            self.titleLabel.text = self.mode.rawValue.localized
+        }
     }
 }
 

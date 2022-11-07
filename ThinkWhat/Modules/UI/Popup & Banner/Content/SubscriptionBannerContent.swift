@@ -1,5 +1,5 @@
 //
-//  SubscriptionBannerContent.swift
+//  UserNotificationContent.swift
 //  ThinkWhat
 //
 //  Created by Pavel Bukharov on 28.10.2022.
@@ -9,11 +9,30 @@
 import UIKit
 import Combine
 
-class SubscriptionBannerContent: UIView {
+class UserNotificationContent: UIView {
     
-    enum Mode {
-        case Subscribe, Unsubscribe
+    enum Mode: String {
+        case Subscribe = "subscribe_to_user_notification"
+        case Unsubscribe = "unsubscribe_from_user_notification"
+        case NotifyOnPublication = "user_publication_notification_on"
+        case DontNotifyOnPublication = "user_publication_notification_off"
+        
+        func localizedDescription(userprofile: Userprofile) -> String {
+            switch self {
+            case .Subscribe:
+                return self.rawValue.localized + " " + userprofile.name + " ✅"
+            case .Unsubscribe:
+                return self.rawValue.localized + " " + userprofile.name + " ⛔️"
+            case .NotifyOnPublication:
+                return "user_publication_notification_begin".localized + userprofile.name + self.rawValue.localized + " 🔔"
+            case .DontNotifyOnPublication:
+                return "user_publication_notification_begin".localized + userprofile.name + self.rawValue.localized + " 🔕"
+            }
+        }
     }
+    
+    
+    
     // MARK: - Overridden properties
     
     
@@ -46,9 +65,10 @@ class SubscriptionBannerContent: UIView {
     private lazy var label: UILabel = {
         let instance = UILabel()
         instance.textColor = textColor
-        instance.textAlignment = .center
+        instance.numberOfLines = 0
         instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline)
-        instance.text = (mode == .Subscribe ? "subscribe_to_user_notification" : "unsubscribe_from_user_notification").localized + " \(userprofile.name) \(mode == .Subscribe ? "✅" : "⛔️")"
+        instance.text = mode.localizedDescription(userprofile: userprofile)
+        instance.textAlignment = instance.numberOfTotatLines == 1 ? .center : .left
         
         return instance
     }()
@@ -59,7 +79,7 @@ class SubscriptionBannerContent: UIView {
        ])
         instance.axis = .horizontal
         instance.alignment = .center
-        instance.spacing = 4
+        instance.spacing = 8
         
         return instance
     }()
@@ -108,7 +128,7 @@ class SubscriptionBannerContent: UIView {
     }
 }
 
-private extension SubscriptionBannerContent {
+private extension UserNotificationContent {
     func setupUI() {
         backgroundColor = .clear
         stack.place(inside: self)

@@ -87,6 +87,13 @@ class ListSwitch: UIView {
             own.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
         }
     }
+
+    
+    
+    // MARK: - Private properties
+    public let statePublisher = CurrentValueSubject<State?, Never>(nil)
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -96,7 +103,8 @@ class ListSwitch: UIView {
     private var state: ListSwitch.State = .New {
         didSet {
             guard state != oldValue else { return }
-            callbackDelegate?.callbackReceived(state)
+            
+            statePublisher.send(state)
             
             var imageName: String!
             var newView: UIView!
@@ -192,14 +200,25 @@ class ListSwitch: UIView {
         
         return instance
     }()
-    private weak var callbackDelegate: CallbackObservable?
+//    private weak var callbackDelegate: CallbackObservable?
     
+    
+    
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
     
     
     
     // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable) {
-        self.callbackDelegate = callbackDelegate
+    init() {
         super.init(frame: .zero)
         
         setupUI()

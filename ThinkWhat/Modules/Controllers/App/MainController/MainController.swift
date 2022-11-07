@@ -15,8 +15,6 @@ import Combine
 
 class MainController: UITabBarController {//}, StorageProtocol {
     
-    
-    
     // MARK: - Overridden properties
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return selectedViewController?.preferredStatusBarStyle ?? .lightContent
@@ -24,6 +22,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
     override var childForStatusBarStyle: UIViewController? {
         return selectedViewController
     }
+    
+    
     
     // MARK: - Public properties
     public private(set) var currentTab: Tab = .Hot {
@@ -33,6 +33,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
             NotificationCenter.default.post(name: Notifications.System.Tab, object: currentTab)
         }
     }
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -90,6 +92,22 @@ class MainController: UITabBarController {//}, StorageProtocol {
 
 private extension MainController {
     func setTasks() {
+        //Subscription push notifications
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
+                guard let self = self,
+                      let userprofile = notification.object as? Userprofile,
+                      let notify = userprofile.notifyOnPublication
+                else { return }
+                
+                let banner = Banner(bannerDelegate: self,
+//                                    backgroundColor: self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray,
+                                    fadeBackground: false)
+                banner.present(content: UserNotificationContent(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication,
+                                                                userprofile: userprofile),
+                               dismissAfter: 0.75)
+            }
+        })
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
                 guard let self = self,
@@ -98,11 +116,10 @@ private extension MainController {
                 else { return }
                 
                 let banner = Banner(bannerDelegate: self,
-                                    backgroundColor: self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray2,
+//                                    backgroundColor: self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray,
                                     fadeBackground: false)
-                banner.present(content: SubscriptionBannerContent(mode: .Subscribe,
-                                                                  userprofile: userprofile,
-                                                                  textColor: .white),
+                banner.present(content: UserNotificationContent(mode: .Subscribe,
+                                                                  userprofile: userprofile),
                                dismissAfter: 0.75)
                 
             }
@@ -115,11 +132,10 @@ private extension MainController {
                 else { return }
                 
                 let banner = Banner(bannerDelegate: self,
-                                    backgroundColor: self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray2,
+//                                    backgroundColor: self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray,
                                     fadeBackground: false)
-                banner.present(content: SubscriptionBannerContent(mode: .Unsubscribe,
-                                                                  userprofile: userprofile,
-                                                                  textColor: .white),
+                banner.present(content: UserNotificationContent(mode: .Unsubscribe,
+                                                                  userprofile: userprofile),
                                dismissAfter: 0.75)
             }
         })

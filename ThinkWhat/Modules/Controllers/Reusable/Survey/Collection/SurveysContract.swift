@@ -24,11 +24,11 @@ protocol SurveysViewInput: AnyObject {
     func addFavorite(_: SurveyReference)
     func share(_: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
+    func openUserprofile(_: Userprofile)
+    func unsubscribe(from: Userprofile)
+    func subscribe(to: Userprofile)
 }
 
-/// *Controller* tells the *Model* what to do based on the input
-///
-/// **Model** conforms to this protocol
 protocol SurveysControllerInput: AnyObject {
     
     var modelOutput: SurveysModelOutput? { get set }
@@ -37,18 +37,14 @@ protocol SurveysControllerInput: AnyObject {
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(surveyReference: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)
+    func unsubscribe(from: Userprofile)
+    func subscribe(to: Userprofile)
 }
 
-/// *Model* returns the result to the *Controller*
-///
-/// **Controller** conforms to this protocol
 protocol SurveysModelOutput: AnyObject {
     func onRequestCompleted(_: Result<Bool, Error>)
 }
 
-/// *Controller* returns a UI-representable result to the *View*
-///
-/// **View** conforms to this protocol
 protocol SurveysControllerOutput: AnyObject {
     var viewInput: SurveysViewInput? { get set }
     

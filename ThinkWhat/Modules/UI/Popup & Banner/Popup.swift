@@ -12,6 +12,10 @@ import Combine
 class Popup: UIView {
     
     // MARK: - Public properties
+    public let willAppearPublisher = PassthroughSubject<Bool, Never>()
+    public let didAppearPublisher = PassthroughSubject<Bool, Never>()
+    public let willDisappearPublisher = PassthroughSubject<Bool, Never>()
+    public let didDisappearPublisher = PassthroughSubject<Bool, Never>()
 
     
     

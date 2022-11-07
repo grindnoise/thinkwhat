@@ -16,16 +16,35 @@ class SurveysController: UIViewController {
         return mode == .Topic ? .lightContent : .default
     }
     
+    
+    
     // MARK: - Public properties
     var controllerOutput: SurveysControllerOutput?
     var controllerInput: SurveysControllerInput?
     public private(set) var topic: Topic?
     public private(set) var mode: Survey.SurveyCategory
     
+    
+    
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    //UI
+    private lazy var titleLabel: UILabel = {
+        let instance = UILabel()
+        instance.font = UIFont(name: Fonts.Bold,
+                               size: 32)
+//        instance.text = topic?.localized
+        instance.textAlignment = .left
+        instance.adjustsFontSizeToFitWidth = true
+        instance.minimumScaleFactor = 0.4
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+
+        return instance
+    }()
+    
+    
     
     // MARK: - Deinitialization
     deinit {
@@ -59,11 +78,6 @@ class SurveysController: UIViewController {
     // MARK: - Private methods
     
     // MARK: - Overridden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
        
@@ -78,24 +92,74 @@ class SurveysController: UIViewController {
             .modelOutput = self
         
         self.view = view as UIView
+        
         setupUI()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        setNavigationBarAppearance(largeTitleColor: mode == .Topic ? .white : .label, smallTitleColor: mode == .Topic ? .white : .label)
-//        setRightBarButton()
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+            guard let self = self else { return }
+
+            self.titleLabel.alpha = 0
+            self.titleLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        }
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+
+        navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.setNeedsLayout()
+        navigationItem.largeTitleDisplayMode = .never
+//        tabBarController?.setTabBarVisible(visible: true, animated: true)
+        
+        titleLabel.alpha = 1
+        titleLabel.transform = .identity
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        titleLabel.removeFromSuperview()
+    }
+
+    override func willMove(toParent parent: UIViewController?) {
+        super.willMove(toParent: parent)
+        print(isMovingToParent)
+        print(isMovingFromParent)
+//        guard parent.isNil else { return }
+
+//        clearNavigationBar(clear: true)
+//        tabBarController?.setTabBarVisible(visible: true, animated: true)
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
     }
 }
 
 extension SurveysController: SurveysViewInput {
+    func openUserprofile(_ userprofile: Userprofile) {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        navigationItem.backBarButtonItem = backItem
+        
+        navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
+//        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    func unsubscribe(from userprofile: Userprofile) {
+        controllerInput?.unsubscribe(from: userprofile)
+    }
+    
+    func subscribe(to userprofile: Userprofile) {
+        controllerInput?.subscribe(to: userprofile)
+    }
+    
     func share(_ surveyReference: SurveyReference) {
         // Setting description
         let firstActivityItem = surveyReference.title
@@ -160,7 +224,7 @@ extension SurveysController: SurveysViewInput {
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem
         navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
-        tabBarController?.setTabBarVisible(visible: false, animated: true)
+//        tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
     func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
@@ -182,7 +246,8 @@ private extension SurveysController {
         case .Topic:
             guard let topic = topic else { return }
             
-            title = topic.localized
+            title = ""//topic.localized
+            titleLabel.text = topic.localized
         case .Own:
             title = "my_publications".localized
         case .Favorite:
@@ -196,7 +261,31 @@ private extension SurveysController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
         
         //Setup nav bar
-        setNavigationBarAppearance(largeTitleColor: mode == .Topic ? .white : .label, smallTitleColor: .clear)
+        navigationItem.title = ""
+        
+        guard let navigationBar = self.navigationController?.navigationBar else { return }
+        
+        navigationBar.addSubview(titleLabel)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            titleLabel.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -2),
+            titleLabel.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 2),
+            titleLabel.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -(44+10)),
+            titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 44+10)
+        ])
+//        setNavigationBarAppearance(largeTitleColor: mode == .Topic ? .white : .label, smallTitleColor: .clear)
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.shadowColor = nil
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.prefersLargeTitles = false
+        
+        if #available(iOS 15.0, *) {
+            navigationBar.compactScrollEdgeAppearance = appearance
+        }
+        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
     }
     
     @objc

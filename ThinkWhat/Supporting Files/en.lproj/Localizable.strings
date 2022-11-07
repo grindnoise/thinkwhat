@@ -96,8 +96,6 @@
 "third" = "Third";
 "back" = "Back";
 "per" = "Per";
-"subscribe_to_user_notification" = "You subscribed to";
-"unsubscribe_from_user_notification" = "You unsubscribed from";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";
@@ -159,8 +157,11 @@
 "subscriptions" = "Subscriptions";
 "publications_per" = "Publications per:";
 "per_day" = "day";
+"day" = "day";
 "per_week" = "week";
+"week" = "week";
 "per_month" = "month";
+"month" = "month";
 "all_time" = "all time";
 "cancel_subscription" = "Cancel subscription";
 "zero_subscriptions" = "You haven't subscribed to anybody";
@@ -354,3 +355,10 @@
 "subscribe_for_user" = "Subscribe";
 "remove_subscribers" = "Unsubscribe";
 "manage_subscriptions" = "Manage";
+
+//Notifications
+"subscribe_to_user_notification" = "You subscribed to";
+"unsubscribe_from_user_notification" = "You unsubscribed from";
+"user_publication_notification_begin" = "Notifications from ";
+"user_publication_notification_on" = " are on";
+"user_publication_notification_off" = "are off";

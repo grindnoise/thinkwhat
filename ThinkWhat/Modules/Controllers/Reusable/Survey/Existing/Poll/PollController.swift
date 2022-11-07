@@ -167,6 +167,7 @@ class PollController: UIViewController {
         
         isNavBarReadyInstalled = true
         navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
+        navigationBar.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
         
         titleView.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
         titleView.ovalBg.strokeStart = 0
@@ -716,7 +717,7 @@ class PollController: UIViewController {
         self.navigationController?.navigationBar.standardAppearance = appearance
         self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationController?.navigationBar.overrideUserInterfaceStyle = .unspecified
-        navigationController?.navigationBar.tintColor = .label
+        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
 //        setNeedsStatusBarAppearanceUpdate()
 
         navigationController?.navigationBar.prefersLargeTitles = hidesLargeTitle ? false : true
@@ -732,6 +733,7 @@ class PollController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
         setupUI()
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0.1, options: .curveEaseInOut, animations: {
             self.avatar.transform = .identity
@@ -794,8 +796,7 @@ class PollController: UIViewController {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
-        //        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
+
         
         if let indicator = stackView.get(all: CircleButton.self).first {
 //            indicator.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)

@@ -85,6 +85,4 @@ extension ListModel: ListControllerInput {
             }
         }
     }
-    
-    // Implement methods
 }

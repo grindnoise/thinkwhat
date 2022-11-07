@@ -981,11 +981,11 @@ class API {
         request(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
     }
     
-    public func subsribeToUser(subscribe: Bool, user: Userprofile, completion: @escaping(Result<JSON, Error>)->()) {
-        guard let url = API_URLS.Profiles.subscribe else { completion(.failure(APIError.invalidURL)); return }
-        let parameters: Parameters = ["userprofile_id": user.id]
-        request(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
-    }
+//    public func subsribeToUser(subscribe: Bool, user: Userprofile, completion: @escaping(Result<JSON, Error>)->()) {
+//        guard let url = API_URLS.Profiles.subscribe else { completion(.failure(APIError.invalidURL)); return }
+//        let parameters: Parameters = ["userprofile_id": user.id]
+//        request(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
+//    }
     
     class Auth {
         weak var parent: API! = nil
@@ -1139,6 +1139,7 @@ class API {
                     }
                 }
             } catch let error {
+                NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)
 #endif
@@ -1184,6 +1185,7 @@ class API {
                     }
                 }
             } catch let error {
+                NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)
 #endif

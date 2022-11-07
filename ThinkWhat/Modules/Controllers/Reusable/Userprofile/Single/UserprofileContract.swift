@@ -8,38 +8,33 @@
 
 import UIKit
 
-/// *View* sends user actions to the *Controller*.
-///
-/// **Controller** conforms to this protocol
-protocol UserprofileViewInput: class {
+protocol UserprofileViewInput: AnyObject {
     
     var controllerOutput: UserprofileControllerOutput? { get set }
     var controllerInput: UserprofileControllerInput? { get set }
     var userprofile: Userprofile { get }
-    // View input methods here
+    
+    func unsubscribe()
+    func subscribe()
+    func openImage(_: UIImage)
+    func openURL(_: URL)
+    func onTopicSelected(_: Topic)
 }
 
-/// *Controller* tells the *Model* what to do based on the input
-///
-/// **Model** conforms to this protocol
-protocol UserprofileControllerInput: class {
+protocol UserprofileControllerInput: AnyObject {
     
     var modelOutput: UserprofileModelOutput? { get set }
     
-    // Controller input methods here
+    func switchNotifications(userprofile: Userprofile, notify: Bool)
+    func unsubscribe(from: Userprofile)
+    func subscribe(to: Userprofile)
 }
 
-/// *Model* returns the result to the *Controller*
-///
-/// **Controller** conforms to this protocol
-protocol UserprofileModelOutput: class {
+protocol UserprofileModelOutput: AnyObject {
     // Model output methods here
 }
 
-/// *Controller* returns a UI-representable result to the *View*
-///
-/// **View** conforms to this protocol
-protocol UserprofileControllerOutput: class {
+protocol UserprofileControllerOutput: AnyObject {
     var viewInput: UserprofileViewInput? { get set }
     
     // Controller output methods here

@@ -33,6 +33,40 @@ class UserprofileView: UIView {
     //UI
     private lazy var collectionView: UserprofileCollectionView = {
         let instance = UserprofileCollectionView()
+        instance.imagePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let image = $0
+                else { return }
+                
+                self.viewInput?.openImage(image)
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.subscriptionPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let value = $0 else { return }
+                
+                value ? {self.viewInput?.subscribe()}() : {self.viewInput?.unsubscribe()}()
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.urlPublisher
+            .sink { [weak self] in
+                guard let self = self else { return }
+                
+                self.viewInput?.openURL($0)
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.topicPublisher
+            .sink { [weak self] in
+                guard let self = self else { return }
+                
+                self.viewInput?.onTopicSelected($0)
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()

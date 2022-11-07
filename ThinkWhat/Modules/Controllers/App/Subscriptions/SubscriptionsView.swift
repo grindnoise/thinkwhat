@@ -304,7 +304,7 @@ class SubscriptionsView: UIView {
         instance.addTarget(self, action: #selector(self.onProfileButtonTapped), for: .touchUpInside)
         
         if #available(iOS 15, *) {
-            var config = UIButton.Configuration.plain()
+            var config = UIButton.Configuration.filled()
             config.title = "open_userprofile".localized.uppercased()
             config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [unowned self] incoming in
                 var outgoing = incoming
@@ -312,21 +312,19 @@ class SubscriptionsView: UIView {
                 outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
                 return outgoing
             }
+            config.baseBackgroundColor = traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR.withAlphaComponent(0.15) : .systemBlue.withAlphaComponent(0.15)
+            config.cornerStyle = .small
             config.buttonSize = .mini
+            config.contentInsets.leading = 4
             config.contentInsets.top = 0
             config.contentInsets.bottom = 0
-            config.contentInsets.leading = 0
+            config.contentInsets.trailing = 4
             config.imagePlacement = .trailing
             config.imagePadding = 4.0
             config.imageColorTransformer = UIConfigurationColorTransformer { [unowned self] _ in return self.traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue }
-            config.image = UIImage(systemName: "arrow.turn.down.right",
+            config.image = UIImage(systemName: "person.fill",
                                    withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
             instance.configuration = config
-            instance.publisher(for: \.bounds, options: .new)
-                .sink { rect in
-                    instance.cornerRadius = rect.height/2.25
-                }
-                .store(in: &subscriptions)
         } else {
             let attrString = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
                 NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline) as Any,
@@ -334,7 +332,7 @@ class SubscriptionsView: UIView {
             ])
         instance.setAttributedTitle(attrString, for: .normal)
         instance.semanticContentAttribute = .forceRightToLeft
-        instance.setImage(UIImage(systemName: "arrow.turn.down.right",
+        instance.setImage(UIImage(systemName: "person.fill",
                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                           for: .normal)
         instance.tintColor = traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
@@ -348,7 +346,7 @@ class SubscriptionsView: UIView {
         instance.addTarget(self, action: #selector(self.unsubscribe), for: .touchUpInside)
         
         if #available(iOS 15, *) {
-            var config = UIButton.Configuration.plain()
+            var config = UIButton.Configuration.filled()
             config.title = "unsubscribe".localized.uppercased()
             config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
                 var outgoing = incoming
@@ -356,10 +354,13 @@ class SubscriptionsView: UIView {
                 outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
                 return outgoing
             }
+            config.baseBackgroundColor = .systemRed.withAlphaComponent(0.15)
+            config.cornerStyle = .small
             config.buttonSize = .mini
-            config.contentInsets.leading = 0
+            config.contentInsets.leading = 4
             config.contentInsets.top = 0
             config.contentInsets.bottom = 0
+            config.contentInsets.trailing = 4
             config.imagePlacement = .trailing
             config.imagePadding = 4.0
             config.activityIndicatorColorTransformer = UIConfigurationColorTransformer { _ in return .systemRed }
@@ -367,11 +368,11 @@ class SubscriptionsView: UIView {
             config.image = UIImage(systemName: "hand.raised.slash.fill",
                                    withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
             instance.configuration = config
-            instance.publisher(for: \.bounds, options: .new)
-                .sink { rect in
-                    instance.cornerRadius = rect.height/2.25
-                }
-                .store(in: &subscriptions)
+//            instance.publisher(for: \.bounds, options: .new)
+//                .sink { rect in
+//                    instance.cornerRadius = rect.height/2.25
+//                }
+//                .store(in: &subscriptions)
         } else {
             let attrString = NSMutableAttributedString(string: "unsubscribe".localized.uppercased(), attributes: [
                 NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline) as Any,
@@ -587,6 +588,26 @@ private extension SubscriptionsView {
                     self.feedCollectionView.removeItem(userprofile)
                     self.feedCollectionView.alpha = 1
                     self.userView.alpha = 0
+                }
+            }
+        })
+        
+        tasks.append(Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
+                guard let self = self,
+                      let userprofile = notification.object as? Userprofile,
+                      self.userprofile == userprofile
+                else { return }
+                
+                if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
+                    self.subscriptionButton.configuration!.showsActivityIndicator = false
+                } else {
+                    guard let imageView = self.subscriptionButton.imageView,
+                          let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+                    else { return }
+                    
+                    indicator.removeFromSuperview()
+                    imageView.tintColor = .systemRed
                 }
             }
         })

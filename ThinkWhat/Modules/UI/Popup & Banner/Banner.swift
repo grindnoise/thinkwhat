@@ -21,14 +21,15 @@ class Banner: UIView {
             shadowView.accessibilityIdentifier = "shadow"
             guard shadowed else { return }
             shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-            shadowView.layer.shadowRadius = 5
+            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
+            shadowView.layer.shadowRadius = 10
             shadowView.layer.shadowOffset = .zero
             shadowView.publisher(for: \.bounds, options: .new)
                 .sink { [weak self] in
                     guard let self = self else { return }
                     
-                    self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.035).cgPath
+                    self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0,
+                                                                    cornerRadius: $0.width*0.025).cgPath
                 }
                 .store(in: &subscriptions)
         }
@@ -46,7 +47,7 @@ class Banner: UIView {
     }
     @IBOutlet weak var body: UIView! {
         didSet {
-            body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .white
+            body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemGray6
         }
     }
     @IBOutlet weak var container: UIView!
@@ -57,6 +58,16 @@ class Banner: UIView {
         }
     }
     
+    
+    
+    // MARK: - Public properties
+    public let willAppearPublisher = PassthroughSubject<Bool, Never>()
+    public let didAppearPublisher = PassthroughSubject<Bool, Never>()
+    public let willDisappearPublisher = PassthroughSubject<Bool, Never>()
+    public let didDisappearPublisher = PassthroughSubject<Bool, Never>()
+    
+    
+    
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
@@ -65,7 +76,7 @@ class Banner: UIView {
     private let fadeBackground: Bool
     ///Geometry
     private var heightDivisor:  CGFloat = .zero
-    private let topMargin:      CGFloat = 8
+    private let topMargin:      CGFloat = 0
     private var yOrigin:        CGFloat = 0
     private var height:         CGFloat = 0 {
         didSet {
@@ -107,12 +118,12 @@ class Banner: UIView {
     
     init(frame: CGRect = UIScreen.main.bounds,
          callbackDelegate: CallbackObservable? = nil,
-         bannerDelegate: BannerObservable?,
+         bannerDelegate: BannerObservable? = nil,
          backgroundColor: UIColor = .clear,
          heightDivisor _heightDivisor: CGFloat = 6,
          fadeBackground: Bool,
          shadowed: Bool = true) {
-        
+
         self.fadeBackground = fadeBackground
         self.shadowed = shadowed
         
@@ -148,7 +159,7 @@ class Banner: UIView {
         layoutIfNeeded()
         let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:)))
         body.addGestureRecognizer(gestureRecognizer)
-        body.cornerRadius = body.frame.width * 0.035
+        body.cornerRadius = body.frame.width * 0.025
     }
     
     
@@ -167,6 +178,8 @@ class Banner: UIView {
         }
 
         bannerDelegate?.onBannerWillAppear(self)
+        willAppearPublisher.send(true)
+        
         alpha = 1
         UIView.animate(
             withDuration: 0.5,
@@ -174,13 +187,16 @@ class Banner: UIView {
             usingSpringWithDamping: 0.7,
             initialSpringVelocity: 0.4,
             options: [.curveEaseInOut],
-            animations: {
+            animations: { [weak self] in
+                guard let self = self else { return }
+                
                 self.setNeedsLayout()
                 self.topConstraint.constant = self.topMargin
                 self.layoutIfNeeded()
         }) {
             _ in
             self.bannerDelegate?.onBannerDidAppear(self)
+            self.didAppearPublisher.send(true)
         }
         
         UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
@@ -190,14 +206,20 @@ class Banner: UIView {
     
     func dismiss() {
         bannerDelegate?.onBannerWillDisappear(self)
-        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+        willDisappearPublisher.send(true)
+
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: { [weak self] in
+            guard let self = self else { return }
+            
             self.setNeedsLayout()
             self.topConstraint.constant = self.yOrigin
             self.layoutIfNeeded()
             self.background.alpha = 0
-        }) {
-            _ in
+        }) { [weak self] _ in
+            guard let self = self else { return }
+            
             self.bannerDelegate?.onBannerDidDisappear(self)
+            self.didDisappearPublisher.send(true)
         }
     }
     
@@ -231,16 +253,22 @@ class Banner: UIView {
         let distance = abs(yOrigin) - abs(yPoint)
         if yVelocity < -500 {
             bannerDelegate?.onBannerWillDisappear(self)
+            willDisappearPublisher.send(true)
+            
             let time = TimeInterval(distance/abs(yVelocity)*2.5)
             let duration: TimeInterval = time < 0.08 ? 0.08 : time
-            UIView.animate(withDuration: duration, delay: 0, options: [.curveLinear], animations: {
+            UIView.animate(withDuration: duration, delay: 0, options: [.curveLinear], animations: { [weak self] in
+                guard let self = self else { return }
+                
                 self.setNeedsLayout()
                 self.topConstraint.constant = self.yOrigin
                 self.layoutIfNeeded()
                 self.background.alpha = 0
-            }) {
-                _ in
+            }) { [weak self] _ in
+                guard let self = self else { return }
+                
                 self.bannerDelegate?.onBannerDidDisappear(self)
+                self.didDisappearPublisher.send(true)
             }
         } else if background.alpha > 0.33 {
             UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
@@ -251,14 +279,21 @@ class Banner: UIView {
             })
         } else {
             bannerDelegate?.onBannerWillDisappear(self)
-            UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
+            willDisappearPublisher.send(true)
+
+            
+            UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: { [weak self] in
+                guard let self = self else { return }
+                
                 self.setNeedsLayout()
                 self.topConstraint.constant = self.yOrigin
                 self.layoutIfNeeded()
                 self.background.alpha = 0
-            }) {
-                _ in
+            }) { [weak self] _ in
+                guard let self = self else { return }
+                
                 self.bannerDelegate?.onBannerDidDisappear(self)
+                self.didDisappearPublisher.send(true)
             }
         }
     }

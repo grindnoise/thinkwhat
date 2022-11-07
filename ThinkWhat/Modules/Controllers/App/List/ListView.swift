@@ -147,6 +147,16 @@ class ListView: UIView {
             }
             .store(in: &self.subscriptions)
         
+        instance.settingsTapPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      !$0.isNil
+                else { return }
+                
+                self.viewInput?.openSettings()
+            }
+            .store(in: &self.subscriptions)
+        
         instance.subscribePublisher
             .sink { [weak self] in
                 guard let self = self,
@@ -286,12 +296,6 @@ extension ListView: ListControllerOutput {
         guard let category = viewInput?.surveyCategory else { return }
         collectionView.category = category
     }
-    
-    func onDidLoad() {
-//        collectionView.reload()
-    }
-    
-    func onDidLayout() {}
 }
 
 // MARK: - UI Setup

@@ -39,6 +39,7 @@ class InterestCell: UICollectionViewCell {
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleTap))
         recognizer.numberOfTapsRequired = 1
         instance.addGestureRecognizer(recognizer)
+        instance.clipsToBounds = true
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
                 instance.cornerRadius = rect.height/2.25

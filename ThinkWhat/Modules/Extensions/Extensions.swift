@@ -108,14 +108,16 @@ extension UIView {
         NSLayoutConstraint.activate([horizontalConstraint, verticalConstraint, widthConstraint, heightConstraint])
     }
     
-    func place(inside parent: UIView, insets: UIEdgeInsets = .uniform(size: 0)) {
+    func place(inside parent: UIView, insets: UIEdgeInsets = .uniform(size: 0), bottomPriority: UILayoutPriority = .required) {
         parent.addSubview(self)
         translatesAutoresizingMaskIntoConstraints = false
         
         leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: insets.left).isActive = true
         topAnchor.constraint(equalTo: parent.topAnchor, constant: insets.top).isActive = true
         trailingAnchor.constraint(equalTo: parent.trailingAnchor, constant: -insets.right).isActive = true
-        bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -insets.bottom).isActive = true
+        let constraint = bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -insets.bottom)
+        constraint.priority = bottomPriority
+        constraint.isActive = true
     }
     
     func addEquallyTo(to view: UIView, multiplier: CGFloat) {
@@ -650,7 +652,7 @@ extension UITabBarController {
             movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY + bottomSafeArea)
             self.view.frame = self.movedFrameView!
             tabBar.isHidden = false
-            UIView.animate(withDuration: animated ? 0.2 : 0.0) {
+            UIView.animate(withDuration: animated ? 0.25 : 0.0) {
                 //restore form or frames
                 self.view.frame = self.orgFrameView!
                 //errase the stored locations so that...
@@ -670,7 +672,7 @@ extension UITabBarController {
             let offsetY = self.tabBar.frame.size.height
             movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY - bottomSafeArea)
             //animate
-            UIView.animate(withDuration: animated ? 0.2 : 0.0, animations: {
+            UIView.animate(withDuration: animated ? 0.25 : 0.0, animations: {
                 self.tabBar.alpha = 0
                 self.view.frame = self.movedFrameView!
                 self.view.setNeedsDisplay()

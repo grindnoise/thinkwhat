@@ -16,25 +16,9 @@ class SurveyCell: UICollectionViewListCell {
         didSet {
             guard let item = item else { return }
             
-            //            self.updatePublisher.send(self.item)
-            
-            //            Timer
-            //                .publish(every: 1, on: .main, in: .common)
-            //                .autoconnect()
-            //                .sink { [weak self] seconds in
-            //                    guard let self = self else { return }
-            //
-            //                    self.updatePublisher.send(self.item)
-            //                }
-            //                .store(in: &subscriptions)
-            
-            
-            //            sourcePublisher.send(Date())
-            
             Timer
                 .publish(every: 3, on: .current, in: .common)
                 .autoconnect()
-    //            .delay(for: .seconds(2), scheduler: DispatchQueue.main)
                 .sink { [weak self] seconds in
                     guard let self = self,
                           let item = self.item,
@@ -249,20 +233,24 @@ class SurveyCell: UICollectionViewListCell {
     public private(set) var profileTapPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public private(set) var subscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public private(set) var unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public private(set) var settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
     //UI
     public private(set) lazy var avatar: Avatar = {
         let instance = Avatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.isUserInteractionEnabled = true
         instance.tapPublisher
-            .sink { [weak self]  in
+            .sink { [weak self] in
                 guard let self = self,
                       let userprofile = $0,
                       userprofile != Userprofile.anonymous
                 else { return }
                 
-                
-                self.profileTapPublisher.send(userprofile)
+                if userprofile == Userprofiles.shared.current {
+                    self.settingsTapPublisher.send(true)
+                } else {
+                    self.profileTapPublisher.send(userprofile)
+                }
             }
             .store(in: &subscriptions)
         
@@ -275,10 +263,6 @@ class SurveyCell: UICollectionViewListCell {
     private var observers: [NSKeyValueObservation] = []
     public var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-//    private lazy var eventEmitter: EventEmitter = {
-//        return EventEmitter()
-//    }()
-    private var animTask: Task<Void, Never>?
     private lazy var titleLabel: UILabel = {
         let instance = UILabel()
         instance.textAlignment = .left
@@ -713,6 +697,7 @@ class SurveyCell: UICollectionViewListCell {
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         commonInit()
     }
     
@@ -847,9 +832,7 @@ class SurveyCell: UICollectionViewListCell {
         profileTapPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
         subscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
         unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
-        
-//        eventEmitter.task?.cancel()
-        animTask?.cancel()
+        settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
         
         icon.backgroundColor = self.item.topic.tagColor//traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
         icon.setIconColor(.white)
@@ -1147,36 +1130,9 @@ private extension SurveyCell {
         topicLabel.frame.origin = .zero
 //        avatar.imageView.image = UIImage(systemName: "face.smiling.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: avatar.bounds.size.height*0.5, weight: .regular, scale: .medium))
     }
-    
+
     @objc
-    func updateViewsCount(notification: Notification) {
-        guard let item = item else { return }
-        viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-    }
-    
-    @objc
-    func switchFavorite(notification: Notification) {
-        guard let item = item else { return }
-        ratingLabel.text = String(describing: item.rating)
-    }
-    
-    @objc
-    func setCompleted(notification: Notification) {
-        guard let item = item else { return }
-        ratingLabel.text = String(describing: item.rating)
-    }
-    
-    @objc
-    func switchHot(notification: Notification) {
-        guard let item = item else { return }
-        ratingLabel.text = String(describing: item.rating)
-    }
-    
-    @objc
-    func handleTap() {
-//        menuButton.showsMenuAsPrimaryAction = true
-//        menuButton.menu = menu
-    }
+    func handleTap() {}
     
     func prepareMenu() -> UIMenu {
         let shareAction : UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in

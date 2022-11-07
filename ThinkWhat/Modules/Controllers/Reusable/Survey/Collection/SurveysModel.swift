@@ -23,8 +23,17 @@ class SurveysModel {
 
 // MARK: - Controller Input
 extension SurveysModel: SurveysControllerInput {
+    func unsubscribe(from userprofile: Userprofile) {
+        Task {
+            try await API.shared.profiles.unsubscribe(from: [userprofile])
+        }
+    }
     
-    
+    func subscribe(to userprofile: Userprofile) {
+        Task {
+            try await API.shared.profiles.subscribe(at: [userprofile])
+        }
+    }
     
     func claim(surveyReference: SurveyReference, claim: Claim) {
         Task {
