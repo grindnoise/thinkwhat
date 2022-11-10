@@ -47,7 +47,7 @@ class SubscriptionsController: UIViewController {
             guard oldValue != period else { return }
             
             controllerOutput?.setPeriod(period)
-            setTitle()
+//            setTitle()
 //            navigationItem.title = "subscriptions".localized + (period == .AllTime ? "" : " " + "per".localized.lowercased() + " \(period.rawValue.localized.lowercased())")
             
             guard let button = navigationItem.rightBarButtonItem else { return }
@@ -77,7 +77,23 @@ class SubscriptionsController: UIViewController {
         
         return instance
     }()
-    
+    private lazy var logo: AppLogoWithText = {
+        let instance = AppLogoWithText(color: Colors.Logo.LightSteelBlue.main,
+                                       minusToneColor: Colors.Logo.LightSteelBlue.minusTone)
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 6/1).isActive = true
+        instance.isOpaque = false
+        
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
+        constraint.isActive = true
+        
+        navigationController?.navigationBar.publisher(for: \.bounds)
+            .sink { rect in
+                constraint.constant = rect.height * 0.75
+            }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
     
     
     // MARK: - Overridden properties
@@ -169,6 +185,7 @@ private extension SubscriptionsController {
     @MainActor
     func setupUI() {
         navigationItem.title = ""
+        navigationItem.titleView = logo
         setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
         
         guard let navigationBar = self.navigationController?.navigationBar else { return }
@@ -187,7 +204,7 @@ private extension SubscriptionsController {
         constraint.isActive = true
         
         setBarItems()
-        setTitle(animated: false)
+//        setTitle(animated: false)
     }
     
     @MainActor
@@ -427,7 +444,7 @@ private extension SubscriptionsController {
         }
         
         setBarItems()
-        setTitle()
+//        setTitle()
     }
     
     func getGradientColors() -> [CGColor] {

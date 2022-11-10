@@ -40,10 +40,10 @@ class MainController: UITabBarController {//}, StorageProtocol {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    
     private let profileUpdater = PassthroughSubject<Date, Never>()
     private var loadingIndicator: LoadingIndicator?
     private var apiUnavailableView: APIUnavailableView?
+    
     
     // MARK: - Deinitialization
     deinit {

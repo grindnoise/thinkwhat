@@ -101,6 +101,14 @@ let K_COLOR_INDIAN_YELLOW                       = UIColor(red: 0.859, green: 0.6
 let K_COLOR_DARK_RURPLE                         = UIColor(red: 0.161, green: 0.024, blue: 0.157, alpha: 1.000)
 
 struct Colors {
+    struct Logo {
+        static let Flame            = (main: UIColor(hexString: "#e4572e"), minusTone: UIColor(hexString: "#e76945"))
+        static let LightSteelBlue   = (main: UIColor(hexString: "#AFC2D5"), minusTone: UIColor(hexString: "#afbfd5"))
+        static let Marigold         = (main: UIColor(hexString: "#F3A712"), minusTone: UIColor(hexString: "#f4b02a"))
+        static let Olivine          = (main: UIColor(hexString: "#A8C686"), minusTone: UIColor(hexString: "#b4ce97"))
+        static let AirBlue          = (main: UIColor(hexString: "#669BBC"), minusTone: UIColor(hexString: "#78a7c4"))
+    }
+    
     struct Banner {
         static let Error             = UIColor(hexString: "#DD1C1A")
         static let Warning           = UIColor(hexString: "#FE7F2D")//UIColor(hexString: "#FCCA46")

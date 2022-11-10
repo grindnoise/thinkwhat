@@ -45,25 +45,12 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     private var tasks: [Task<Void, Never>?] = []
     //UI
     private var isOnScreen = true
-    private lazy var logo: UIView = {
-       let instance = UIView()
-        instance.backgroundColor = .clear
-        
-        return instance
-    }()
     private lazy var titleStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [
+        let instance = UIStackView(arrangedSubviews: [
             titleLabel,
             settingsSwitch
         ])
-        stack.axis = .horizontal
-        
-        let instance = UIStackView(arrangedSubviews: [
-            logo,
-            stack
-        ])
-        instance.axis = .vertical
-        instance.distribution = .fillEqually
+        instance.axis = .horizontal
         instance.spacing = 0
         
         return instance
@@ -140,49 +127,31 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         
         setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
-        titleStack.alpha = 1
+//        titleStack.alpha = 1
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
-        
-//        guard let navigationBar = self.navigationController?.navigationBar else { return }
-//
-//        let appearance = UINavigationBarAppearance()
-//        appearance.configureWithOpaqueBackground()
-//        appearance.titleTextAttributes = [
-//            .foregroundColor: UIColor.clear//traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.label
-//        ]
-//        appearance.largeTitleTextAttributes = [
-//            .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.label
-//        ]
-//        appearance.shadowColor = nil
-//
-//        navigationBar.standardAppearance = appearance
-//        navigationBar.scrollEdgeAppearance = appearance
-//
-//        navigationController?.navigationBar.prefersLargeTitles = true
-//        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .never
     }
 
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//
-//        guard settingsSwitch.alpha == 0 else { return }
-//
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        guard titleStack.alpha == 0 else { return }
+
 //        settingsSwitch.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-//
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-//            guard let self = self else { return }
-//
-//            self.settingsSwitch.alpha = 1
+
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+            guard let self = self else { return }
+
+            self.titleStack.alpha = 1
 //            self.settingsSwitch.transform = .identity
-//        }
-//    }
-//
+        }
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-            self.titleStack.alpha = 0
+            titleStack.alpha = 0
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -195,13 +164,20 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
 private extension SettingsController {
     @MainActor
     func setupUI() {
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.title = ""
         
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         
-        titleStack.place(inside: navigationBar,
-                         insets: UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10))
+        navigationBar.addSubview(titleStack)
+        titleStack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
+            titleStack.heightAnchor.constraint(equalToConstant: 40),
+            titleStack.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
+            titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
+        ])
+        
         setTitle()
     }
     

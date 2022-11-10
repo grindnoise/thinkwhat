@@ -2124,8 +2124,8 @@
             filePath = "ThinkWhat/Modules/Extensions/Extensions.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "624"
-            endingLineNumber = "624"
+            startingLineNumber = "633"
+            endingLineNumber = "633"
             landmarkName = "setTabBarVisible(visible:animated:)"
             landmarkType = "7">
          </BreakpointContent>

@@ -120,6 +120,15 @@ extension UIView {
         constraint.isActive = true
     }
     
+    func placeInCenter(of parent: UIView, heightMultiplier: CGFloat = 1) {
+        parent.addSubview(self)
+        translatesAutoresizingMaskIntoConstraints = false
+        
+        centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
+        centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
+        heightAnchor.constraint(equalTo: parent.heightAnchor, multiplier: heightMultiplier).isActive = true
+    }
+    
     func addEquallyTo(to view: UIView, multiplier: CGFloat) {
         
         self.translatesAutoresizingMaskIntoConstraints = false
