@@ -35,7 +35,6 @@ class MainController: UITabBarController {//}, StorageProtocol {
     }
     
     
-    
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
@@ -43,7 +42,58 @@ class MainController: UITabBarController {//}, StorageProtocol {
     private let profileUpdater = PassthroughSubject<Date, Never>()
     private var loadingIndicator: LoadingIndicator?
     private var apiUnavailableView: APIUnavailableView?
-    
+    private lazy var logoIcon: Icon = {
+        let instance = Icon(category: Icon.Category.Logo)
+        instance.iconColor = Colors.Logo.Flame.main
+        instance.isRounded = false
+        instance.clipsToBounds = false
+        instance.scaleMultiplicator = 1.2
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+
+        return instance
+    }()
+    private lazy var logoText: Icon = {
+        let instance = Icon(category: Icon.Category.LogoText)
+        instance.iconColor = Colors.Logo.Flame.main
+        instance.isRounded = false
+        instance.clipsToBounds = false
+        instance.scaleMultiplicator = 1.1
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 5).isActive = true
+
+        return instance
+    }()
+    private lazy var logoStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [
+            logoIcon,
+            logoText
+        ])
+        instance.axis = .horizontal
+        instance.spacing = 0
+        instance.clipsToBounds = false
+        instance.layer.zPosition = 100
+        view.addSubview(instance)
+        
+        return instance
+    }()
+//    private lazy var logo: AppLogoWithText = {
+//        let instance = AppLogoWithText(color: Colors.Logo.Flame.main,
+//                                       minusToneColor: Colors.Logo.Flame.minusTone)
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 6/1).isActive = true
+//        instance.isOpaque = false
+//        instance.layer.zPosition = 100
+//        view.addSubview(instance)
+//
+////        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
+////        constraint.isActive = true
+////
+////        navigationController?.navigationBar.publisher(for: \.bounds)
+////            .sink { rect in
+////                constraint.constant = rect.height * 0.75
+////            }
+////            .store(in: &subscriptions)
+//
+//        return instance
+//    }()
     
     // MARK: - Deinitialization
     deinit {
@@ -59,8 +109,63 @@ class MainController: UITabBarController {//}, StorageProtocol {
     // MARK: - Initialization
     
     // MARK: - Public methods
+    func setLogoInitialFrame(size: CGSize, y: CGFloat) {
+        logoStack.translatesAutoresizingMaskIntoConstraints = false
+        logoStack.heightAnchor.constraint(equalToConstant: size.height * 0.75).isActive = true
+//        logo.alpha = 0
+        logoStack.alpha = 0
+        
+        let leading = logoStack.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        leading.identifier = "leading"
+        leading.isActive = true
+        
+        let top = logoStack.topAnchor.constraint(equalTo: view.topAnchor)
+        top.identifier = "top"
+        top.isActive = true
+        
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+        
+        view.setNeedsLayout()
+        top.constant = -logoStack.bounds.height
+        leading.constant = (view.bounds.width - logoStack.bounds.width)/2
+        view.layoutIfNeeded()
+        
+//        delayAsync(delay: 1) {
+//            self.setLogoCentered(animated: true)
+            UIView.animate(withDuration: 0.15) { [unowned self] in
+                self.view.setNeedsLayout()
+                self.logoStack.alpha = 1
+                top.constant = y
+                self.view.layoutIfNeeded()
+            }
+//        }
+    }
     
-    // MARK: - Private methods
+    func setLogoOrigin(point: CGPoint) {
+        
+    }
+    
+    func setLogoCentered(animated: Bool = false) {
+        guard let leading = logoStack.getConstraint(identifier: "leading") else { return }
+
+        let constant = (view.bounds.width - logoStack.bounds.width)/2
+        
+        view.setNeedsLayout()
+        if animated {
+            UIView.animate(withDuration: 0.2,
+                           delay: 0,
+                           options: .curveEaseInOut)  { [unowned self] in
+                leading.constant = constant
+                self.view.layoutIfNeeded()
+            }
+        } else {
+            leading.constant = constant
+            view.layoutIfNeeded()
+        }
+    }
+    
+    
     
     // MARK: - Overridden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -77,7 +182,6 @@ class MainController: UITabBarController {//}, StorageProtocol {
         setupUI()
         loadData()
     }
-
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -237,6 +341,9 @@ private extension MainController {
         loadingIndicator = LoadingIndicator()//CGSize(width: view.frame.width, height: container.frame.height)))
         loadingIndicator!.alpha = 0
         setTabBarVisible(visible: false, animated: false)
+        
+//        view.addSubview(logo)
+//        logo.layer.zPosition = 100
     }
     
     func onServerUnavailable() {
@@ -313,6 +420,7 @@ extension MainController: UITabBarControllerDelegate {
             switch controller.self {
             case is HotController:
                 currentTab = .Hot
+//                logo.
             case is SubscriptionsController:
                 currentTab = .Subscriptions
             case is ListController:

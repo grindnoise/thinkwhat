@@ -27,23 +27,23 @@ class HotController: UIViewController {
     //UI
     private var isOnScreen = true
     private var isViewLayedOut = false
-    private lazy var logo: AppLogoWithText = {
-        let instance = AppLogoWithText(color: Colors.Logo.Flame.main,
-                                       minusToneColor: Colors.Logo.Flame.minusTone)
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 6/1).isActive = true
-        instance.isOpaque = false
-        
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
-        constraint.isActive = true
-        
-        navigationController?.navigationBar.publisher(for: \.bounds)
-            .sink { rect in
-                constraint.constant = rect.height * 0.75
-            }
-            .store(in: &subscriptions)
-        
-        return instance
-    }()
+//    private lazy var logo: AppLogoWithText = {
+//        let instance = AppLogoWithText(color: Colors.Logo.Flame.main,
+//                                       minusToneColor: Colors.Logo.Flame.minusTone)
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 6/1).isActive = true
+//        instance.isOpaque = false
+//
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
+//        constraint.isActive = true
+//
+//        navigationController?.navigationBar.publisher(for: \.bounds)
+//            .sink { rect in
+//                constraint.constant = rect.height * 0.75
+//            }
+//            .store(in: &subscriptions)
+//
+//        return instance
+//    }()
 //    private lazy var gradient: CAGradientLayer = {
 //        let instance = CAGradientLayer()
 //        instance.type = .radial
@@ -224,10 +224,9 @@ class HotController: UIViewController {
 
 private extension HotController {
     private func setupUI() {
-//        guard let navigationBar = navigationController?.navigationBar else { return }
         
         navigationItem.title = ""
-        navigationItem.titleView = logo
+//        navigationItem.titleView = logo
         setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
         navigationItem.setRightBarButton(UIBarButtonItem(title: nil,
                                                          image: UIImage(systemName: "megaphone.fill",
@@ -244,7 +243,28 @@ private extension HotController {
                                                          menu: nil),
                                          animated: true)
 //        titleStack.place(inside: navigationBar,
-//                         insets: UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10))
+        //                         insets: UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10))
+//        guard let navigationBar = navigationController?.navigationBar,
+//              let tabBarController = tabBarController as? MainController
+//        else { return }
+//
+////        guard let keyWindow = UIApplication.shared.connectedScenes
+////            .filter({$0.activationState == .foregroundActive})
+////            .compactMap({$0 as? UIWindowScene})
+////            .first?.windows
+////            .filter({$0.isKeyWindow}).first,
+////              let instance = keyWindow.viewByClassName(className: "_UIBarBackground")
+////        guard let window = appDelegate.window,
+////              let instance = window.viewByClassName(className: "_UIBarBackground")
+////        else {
+////            tabBarController.setLogoInitialFrame(size: navigationBar.bounds.size,
+////                                                 y: 59)
+////
+////            return
+////        }
+////
+//        tabBarController.setLogoInitialFrame(size: navigationBar.bounds.size,
+//                                             y: 59)//abs(navigationBar.convert(navigationBar.center, to: UIScreen.main as! UICoordinateSpace).y))
     }
     
 //    @objc
@@ -339,6 +359,13 @@ extension HotController: DataObservable {
                                                selector: #selector(HotController.populateStack),
                                                name: Notifications.Surveys.SwitchHot,
                                                object: nil)
+        
+        guard let navigationBar = navigationController?.navigationBar,
+              let tabBarController = tabBarController as? MainController
+        else { return }
+        
+        tabBarController.setLogoInitialFrame(size: navigationBar.bounds.size,
+                                             y: 59)
     }
 }
 
