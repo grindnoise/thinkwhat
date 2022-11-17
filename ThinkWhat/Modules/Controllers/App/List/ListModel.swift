@@ -42,18 +42,18 @@ extension ListModel: ListControllerInput {
                 guard let value = json["status"].string else { throw "Unknown error" }
                 guard value == "ok" else {
                     guard let error = json["error"].string else { throw "Unknown error" }
-                    await MainActor.run {
-                        modelOutput?.onAddFavoriteCallback(.failure(error))
-                    }
+//                    await MainActor.run {
+//                        modelOutput?.onAddFavoriteCallback(.failure(error))
+//                    }
                     return
                 }
-                await MainActor.run {
-                    modelOutput?.onAddFavoriteCallback(.success(true))
-                }
+//                await MainActor.run {
+//                    modelOutput?.onAddFavoriteCallback(.success(true))
+//                }
             } catch {
-                await MainActor.run {
-                    modelOutput?.onAddFavoriteCallback(.failure(error))
-                }
+//                await MainActor.run {
+//                    modelOutput?.onAddFavoriteCallback(.failure(error))
+//                }
             }
         }
     }

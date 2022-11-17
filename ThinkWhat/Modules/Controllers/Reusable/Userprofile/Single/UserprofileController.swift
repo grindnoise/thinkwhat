@@ -92,6 +92,12 @@ class UserprofileController: UIViewController {
         setTasks()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.alpha = 1
+    }
+    
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
@@ -103,6 +109,7 @@ private extension UserprofileController {
     @MainActor
     func setupUI() {
         setBarItems()
+//        navigationController?.navigationBar.alpha = 1
     }
     
     func setTasks() {

@@ -220,6 +220,7 @@
 		AB54F47D285B127400C620B3 /* ChoiceEditingPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB54F47C285B127400C620B3 /* ChoiceEditingPopup.swift */; };
 		AB54F47F285B189900C620B3 /* ChoiceEditingPopup.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB54F47E285B189900C620B3 /* ChoiceEditingPopup.xib */; };
 		AB5768EA2853B9B800D55439 /* ChoiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5768E92853B9B800D55439 /* ChoiceProvider.swift */; };
+		AB5787F729228AD2009C1DBF /* TintColorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5787F629228AD2009C1DBF /* TintColorable.swift */; };
 		AB58F64428D23854002CB987 /* UserSettingsCityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB58F64328D23854002CB987 /* UserSettingsCityCell.swift */; };
 		AB592E212906C3140082EE13 /* UserprofileCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB592E202906C3140082EE13 /* UserprofileCollectionView.swift */; };
 		AB592E242906C8180082EE13 /* UserCredentialsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB592E232906C8180082EE13 /* UserCredentialsCell.swift */; };
@@ -808,6 +809,7 @@
 		AB54F47C285B127400C620B3 /* ChoiceEditingPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceEditingPopup.swift; sourceTree = "<group>"; };
 		AB54F47E285B189900C620B3 /* ChoiceEditingPopup.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChoiceEditingPopup.xib; sourceTree = "<group>"; };
 		AB5768E92853B9B800D55439 /* ChoiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceProvider.swift; sourceTree = "<group>"; };
+		AB5787F629228AD2009C1DBF /* TintColorable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TintColorable.swift; sourceTree = "<group>"; };
 		AB58F64328D23854002CB987 /* UserSettingsCityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsCityCell.swift; sourceTree = "<group>"; };
 		AB592E202906C3140082EE13 /* UserprofileCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserprofileCollectionView.swift; sourceTree = "<group>"; };
 		AB592E232906C8180082EE13 /* UserCredentialsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCredentialsCell.swift; sourceTree = "<group>"; };
@@ -1288,6 +1290,7 @@
 				AB913F762806C8DF00609D51 /* ProtocolSubscriptions.swift */,
 				AB4054F528783156000F7768 /* UIPropertyListener.swift */,
 				AB4054F72878375F000F7768 /* ThinkWhatProtocols.swift */,
+				AB5787F629228AD2009C1DBF /* TintColorable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -3846,6 +3849,7 @@
 				AB99A95424C6CCE800814F96 /* UserLogoHeader.swift in Sources */,
 				ABEDC4E32450168D00FA9128 /* User.swift in Sources */,
 				AB10030D27BF762400338EE4 /* String.swift in Sources */,
+				AB5787F729228AD2009C1DBF /* TintColorable.swift in Sources */,
 				AB21970326BC2EEF005A7BA8 /* delBanner.swift in Sources */,
 				AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */,
 				AB3A47D4283F59D200106407 /* PollCreationModel.swift in Sources */,

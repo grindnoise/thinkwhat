@@ -58,7 +58,7 @@ class UserInterestsCell: UICollectionViewListCell {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
         instance.text = "interests".localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
         
         let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
         heightConstraint.identifier = "height"

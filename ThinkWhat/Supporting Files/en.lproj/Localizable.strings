@@ -156,13 +156,14 @@
 //Subscriptions VC
 "subscriptions" = "Subscriptions";
 "publications_per" = "Publications per:";
-"per_day" = "day";
+"per_day" = "per day";
 "day" = "day";
-"per_week" = "week";
+"per_week" = "per week";
 "week" = "week";
-"per_month" = "month";
+"per_month" = "per month";
 "month" = "month";
 "all_time" = "all time";
+"per_all_time" = "of all time";
 "cancel_subscription" = "Cancel subscription";
 "zero_subscriptions" = "You haven't subscribed to anybody";
 
@@ -171,7 +172,7 @@
 "own" = "Own";
 "top" = "Popular";
 "new" = "New";
-"watching" = "Watchlist";
+"watching" = "Tracked";
 
 //Topics VC
 "topics" = "Topics";

@@ -45,7 +45,7 @@ class PollTitleCell: UICollectionViewCell {
     }()
     private let ratingView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "star.fill"))
-        instance.tintColor = Colors.Tags.HoneyYellow
+        instance.tintColor = Colors.Tag.HoneyYellow.rawValue
         instance.contentMode = .scaleAspectFit
         instance.translatesAutoresizingMaskIntoConstraints = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true

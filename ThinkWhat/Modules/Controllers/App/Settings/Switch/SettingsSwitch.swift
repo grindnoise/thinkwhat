@@ -123,6 +123,16 @@ class SettingsSwitch: UIView {
             } completion: { _ in }
         }
     }
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            gradient.colors = getGradientColors()
+        }
+    }
+    
+    
+    
+    
 //    private weak var callbackDelegate: CallbackObservable?
     private lazy var mark: UIView = {
         let instance = UIView()
@@ -303,9 +313,12 @@ private extension SettingsSwitch {
     
     func getGradientColors() -> [CGColor] {
         return [
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+            color.cgColor,
+            color.cgColor,
+            color.lighter(0.15).cgColor,
+//            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+//            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+//            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
         ]
     }
 }

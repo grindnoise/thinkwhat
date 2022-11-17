@@ -9,21 +9,26 @@
 import UIKit
 import Combine
 
-class ListController: UIViewController {
+class ListController: UIViewController, TintColorable {
     
     // MARK: - Public properties
     var controllerOutput: ListControllerOutput?
     var controllerInput: ListControllerInput?
-    var surveyCategory: Survey.SurveyCategory {
-        return category
-    }
+//    var surveyCategory: Survey.SurveyCategory {
+//        return category
+//    }
     public private(set) var category: Survey.SurveyCategory = .New {
         didSet {
             controllerOutput?.onDataSourceChanged()
-            setTitle()
+//            setTitle()
         }
     }
-    
+    public var tintColor: UIColor = .clear {
+        didSet {
+//            setNavigationBarTintColor(tintColor)
+            listSwitch.color = tintColor
+        }
+    }
     
     
     // MARK: - Private properties
@@ -33,13 +38,16 @@ class ListController: UIViewController {
     //UI
     private var isOnScreen = true
     private lazy var titleStack: UIStackView = {
+        let opaque = UIView()
+        opaque.backgroundColor = .clear
+        
         let instance = UIStackView(arrangedSubviews: [
-            titleLabel,
+            opaque,
             listSwitch
         ])
         instance.axis = .horizontal
         instance.spacing = 0
-        
+
         return instance
     }()
     private lazy var listSwitch: ListSwitch = {
@@ -66,15 +74,15 @@ class ListController: UIViewController {
         
         return instance
     }()
-    private lazy var titleLabel: UILabel = {
-       let instance = UILabel()
-        instance.font = UIFont(name: Fonts.Bold,
-                               size: 32)
-        instance.textAlignment = .left
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-        
-        return instance
-    }()
+//    private lazy var titleLabel: UILabel = {
+//       let instance = UILabel()
+//        instance.font = UIFont(name: Fonts.Bold,
+//                               size: 32)
+//        instance.textAlignment = .left
+//        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+//
+//        return instance
+//    }()
     
 
     
@@ -102,21 +110,28 @@ class ListController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = false//true
         navigationItem.largeTitleDisplayMode = .never//.always
         
+        setNavigationBarTintColor(tintColor)
         titleStack.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
+        
+        guard let main = tabBarController as? MainController else { return }
+        
+        main.toggleLogo(on: true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
-        titleStack.alpha = 0
+
+        UIView.animate(withDuration: 0.1) {
+            self.titleStack.alpha = 0
+        }
     }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-    }
+//
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        super.traitCollectionDidChange(previousTraitCollection)
+//
+//        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+//    }
 }
 
 
@@ -211,6 +226,10 @@ extension ListController: ListViewInput {
             navigationItem.backBarButtonItem = backItem
         navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
+        
+        guard let main = tabBarController as? MainController else { return }
+        
+        main.toggleLogo(on: false)
     }
     
     func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
@@ -239,7 +258,7 @@ private extension ListController {
         navigationController?.navigationBar.prefersLargeTitles = false//deviceType == .iPhoneSE ? false : true
         
         guard let navigationBar = self.navigationController?.navigationBar else { return }
-        
+
         navigationBar.addSubview(titleStack)
         titleStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -248,54 +267,54 @@ private extension ListController {
             titleStack.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
             titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
         ])
-        
-        //-10 is card padding
-        setTitle(animated: false)
-        
-        //        titleStack.place(inside: navigationBar,
-        //        insets: UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10))
+//
+//        //-10 is card padding
+//        setTitle(animated: false)
+//
+//        //        titleStack.place(inside: navigationBar,
+//        //        insets: UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10))
     }
     
-    @MainActor
-    func setTitle(animated: Bool = true) {
-        var text = ""
-        
-        switch category {
-        case .New:
-            text =  "new".localized
-        case .Top:
-            text = "top".localized
-        case .Favorite:
-            text = "watching".localized
-        case .Own:
-            text = "own".localized
-        default:
-#if DEBUG
-            print("")
-#endif
-        }
-        
-        guard animated else {
-            titleLabel.text = text
-            return
-        }
-
-        
-        UIView.transition(with: titleLabel,
-                          duration: 0.15,
-                          options: .transitionCrossDissolve) { [weak self] in
-            guard let self = self else { return }
-            
-            self.titleLabel.text = text
-        }
-        
-    }
+//    @MainActor
+//    func setTitle(animated: Bool = true) {
+//        var text = ""
+//
+//        switch category {
+//        case .New:
+//            text =  "new".localized
+//        case .Top:
+//            text = "top".localized
+//        case .Favorite:
+//            text = "watching".localized
+//        case .Own:
+//            text = "own".localized
+//        default:
+//#if DEBUG
+//            print("")
+//#endif
+//        }
+//
+//        guard animated else {
+//            titleLabel.text = text
+//            return
+//        }
+//
+//
+//        UIView.transition(with: titleLabel,
+//                          duration: 0.15,
+//                          options: .transitionCrossDissolve) { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.titleLabel.text = text
+//        }
+//
+//    }
 }
 
 extension ListController: ListModelOutput {
-    func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
-        controllerOutput?.onAddFavoriteCallback(result)
-    }
+//    func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
+//        controllerOutput?.onAddFavoriteCallback(result)
+//    }
     
     func onRequestCompleted(_ result: Result<Bool, Error>) {
         controllerOutput?.onRequestCompleted(result)

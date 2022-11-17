@@ -34,6 +34,7 @@ struct Animations {
         anim.autoreverses = autoreverses
         anim.delegate = delegate
         anim.isRemovedOnCompletion = isRemovedOnCompletion
+//        anim.fillMode = .forwards
         return anim
         
     }

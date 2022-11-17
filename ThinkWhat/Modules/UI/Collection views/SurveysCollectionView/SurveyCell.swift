@@ -317,7 +317,7 @@ class SurveyCell: UICollectionViewListCell {
     }()
     private lazy var ratingView: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "star.fill", withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.caption2, scale: .medium)))
-        instance.tintColor = Colors.Tags.HoneyYellow
+        instance.tintColor = Colors.System.Red.rawValue//Colors.Tags.HoneyYellow
         instance.contentMode = .center
         return instance
     }()

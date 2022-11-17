@@ -92,7 +92,12 @@ class ListSwitch: UIView {
     
     // MARK: - Private properties
     public let statePublisher = CurrentValueSubject<State?, Never>(nil)
-    
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            gradient.colors = getGradientColors()
+        }
+    }
     
     
     // MARK: - Private properties
@@ -141,7 +146,6 @@ class ListSwitch: UIView {
             } completion: { _ in }
         }
     }
-    
     private lazy var mark: UIView = {
         let instance = UIView()
         instance.layer.zPosition = 10
@@ -172,7 +176,7 @@ class ListSwitch: UIView {
         innerView.clipsToBounds = false
         innerView.accessibilityIdentifier = "innerView"
         innerView.contentMode = .center
-        innerView.image = UIImage(systemName: "binoculars.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: innerView.bounds.height * 0.45, weight: .semibold, scale: .medium))
+        innerView.image = UIImage(systemName: "tag.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: innerView.bounds.height * 0.45, weight: .semibold, scale: .medium))
         innerView.addEquallyTo(to: instance)
         innerView.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         innerView.tintColor = .white
@@ -271,9 +275,12 @@ private extension ListSwitch {
     
     func getGradientColors() -> [CGColor] {
         return [
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+            color.cgColor,
+            color.cgColor,
+            color.lighter(0.15).cgColor,
+//            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+//            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+//            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
         ]
     }
     

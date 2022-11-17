@@ -12,59 +12,18 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SubscriptionsView" customModule="ThinkWhat" customModuleProvider="target">
             <connections>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Pgm-6r-hSr"/>
-                <outlet property="shadowView" destination="WXd-xw-6Wt" id="m0J-2h-vpY"/>
-                <outlet property="upperContainer" destination="OwL-Ha-6XN" id="cZn-lg-cDY"/>
-                <outlet property="upperContainerHeightConstraint" destination="NDq-Y8-pXZ" id="PM2-PK-6Vz"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view clipsSubviews="YES" contentMode="scaleToFill" id="iN0-l3-epB">
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-            <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="it0-Bp-Kmq">
-                    <rect key="frame" x="0.0" y="48" width="414" height="0.0"/>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    <constraints>
-                        <constraint firstAttribute="height" id="eZf-9L-HUK"/>
-                    </constraints>
-                </view>
-                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OwL-Ha-6XN">
-                    <rect key="frame" x="0.0" y="48" width="414" height="100"/>
-                    <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="100" id="NDq-Y8-pXZ"/>
-                    </constraints>
-                </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WXd-xw-6Wt">
-                    <rect key="frame" x="10" y="158" width="394" height="694"/>
-                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="boolean" keyPath="shadow" value="YES"/>
-                    </userDefinedRuntimeAttributes>
-                </view>
-            </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-            <constraints>
-                <constraint firstAttribute="trailing" secondItem="it0-Bp-Kmq" secondAttribute="trailing" id="34c-Am-G6C"/>
-                <constraint firstItem="it0-Bp-Kmq" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="JaO-Sh-hrC"/>
-                <constraint firstItem="it0-Bp-Kmq" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="V2n-Tt-AvD"/>
-                <constraint firstItem="WXd-xw-6Wt" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="cAq-r6-QBi"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="WXd-xw-6Wt" secondAttribute="trailing" constant="10" id="eEp-Jp-MwN"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="WXd-xw-6Wt" secondAttribute="bottom" constant="10" id="l8Q-xK-jnq"/>
-                <constraint firstItem="OwL-Ha-6XN" firstAttribute="top" secondItem="it0-Bp-Kmq" secondAttribute="bottom" id="lPC-Sa-2jP"/>
-                <constraint firstItem="OwL-Ha-6XN" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="ngT-dr-8px"/>
-                <constraint firstItem="OwL-Ha-6XN" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="nzZ-Zk-AIp"/>
-                <constraint firstItem="WXd-xw-6Wt" firstAttribute="top" secondItem="OwL-Ha-6XN" secondAttribute="bottom" constant="10" id="wqo-rn-hrH"/>
-            </constraints>
             <point key="canvasLocation" x="137.68115942028987" y="81.696428571428569"/>
         </view>
     </objects>
     <resources>
-        <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -115,7 +115,7 @@ private extension UserprofileView {
     
     func setupUI() {
         backgroundColor = .systemBackground
-        collectionView.addEquallyTo(to: self)
+        collectionView.place(inside: self)
     }
     
     func setTasks() {

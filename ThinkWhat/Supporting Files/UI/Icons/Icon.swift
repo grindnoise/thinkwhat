@@ -18,6 +18,19 @@ import UIKit
 
 class Icon: UIView {
     
+    func replicate() -> Icon {
+        let instance = Icon()
+        instance.frame = frame
+        instance.scaleMultiplicator = scaleMultiplicator
+        instance.isRounded = isRounded
+        instance.backgroundColor = backgroundColor
+        instance.iconColor = iconColor
+        instance.tintColor = tintColor
+        instance.category = category
+        
+        return instance
+    }
+    
     init(frame: CGRect = .zero, category: Category, scaleMultiplicator: CGFloat = .zero, iconColor: UIColor = .black) {
         super.init(frame: frame)
         self.iconColor = iconColor

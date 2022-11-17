@@ -129,6 +129,15 @@ extension UIView {
         heightAnchor.constraint(equalTo: parent.heightAnchor, multiplier: heightMultiplier).isActive = true
     }
     
+    func placeInCenter(of parent: UIView, widthMultiplier: CGFloat = 1, xOffset: CGFloat = 0, yOffset: CGFloat = 0) {
+        parent.addSubview(self)
+        translatesAutoresizingMaskIntoConstraints = false
+        
+        centerYAnchor.constraint(equalTo: parent.centerYAnchor, constant: yOffset).isActive = true
+        centerXAnchor.constraint(equalTo: parent.centerXAnchor, constant: xOffset).isActive = true
+        widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: widthMultiplier).isActive = true
+    }
+    
     func addEquallyTo(to view: UIView, multiplier: CGFloat) {
         
         self.translatesAutoresizingMaskIntoConstraints = false

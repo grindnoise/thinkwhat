@@ -106,7 +106,7 @@ class ChoiceCollectionView: UICollectionView {
             //            }
             cell.mode = self.mode
             //            guard self.shouldChangeColor else { return }
-            cell.color = Colors.tags()[indexPath.row]
+            cell.color = Colors.Tag.all()[indexPath.row]
             cell.index = indexPath.row + 1
             
             self.modeSubject.sink {

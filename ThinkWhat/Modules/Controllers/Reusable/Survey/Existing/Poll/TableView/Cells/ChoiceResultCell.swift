@@ -76,7 +76,7 @@ class SurveyVoteCell: UITableViewCell {
         didSet {
             claimIcon.backgroundColor = .clear
             claimIcon.isRounded = false
-            claimIcon.iconColor = Colors.Tags.OrangeSoda
+            claimIcon.iconColor = Colors.System.Red.rawValue//Colors.Tags.OrangeSoda
             claimIcon.scaleMultiplicator = 1.35
             claimIcon.category = .Caution
         }

@@ -15,7 +15,21 @@ class ListView: UIView {
     public let subscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
     public let unsubscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
     public let userprofilePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
-    public weak var viewInput: ListViewInput?
+    public weak var viewInput: (ListViewInput & TintColorable)? {
+        didSet {
+            guard let viewInput = viewInput else { return }
+            
+            setTitle(category: viewInput.category, animated: false)
+            
+            if #available(iOS 15, *) {
+                if !periodButton.configuration.isNil {
+                    periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return viewInput.tintColor }
+                }
+            } else {
+                periodButton.imageView?.tintColor = viewInput.tintColor
+            }
+        }
+    }
     
     
     
@@ -24,6 +38,109 @@ class ListView: UIView {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
+    private lazy var filterView: UIView = {
+       let instance = UIView()
+        instance.backgroundColor = .clear
+        
+        let stack = UIStackView(arrangedSubviews: [
+            titleLabel,
+            periodButton
+        ])
+        stack.axis = .horizontal
+        stack.spacing = 4
+        
+        instance.addSubview(stack)
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: instance.topAnchor),
+            stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
+        ])
+        
+        return instance
+    }()
+    private lazy var titleLabel: UILabel = {
+       let instance = UILabel()
+        instance.numberOfLines = 1
+        instance.textAlignment = .center
+        instance.numberOfLines = 1
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
+        instance.adjustsFontSizeToFitWidth = true
+        
+//        if let viewInput = viewInput {
+//            setTitle(category: viewInput.category, animated: false)
+//        }
+        
+        let constraint = instance.widthAnchor.constraint(equalToConstant: 0)
+        constraint.identifier = "width"
+        constraint.isActive = true
+        
+        return instance
+    }()
+    private lazy var periodButton: UIButton = {
+        let instance = UIButton()
+        instance.titleLabel?.numberOfLines = 1
+        instance.showsMenuAsPrimaryAction = true
+        instance.menu = prepareMenu()
+        
+        if #available(iOS 15, *) {
+            var config = UIButton.Configuration.filled()
+            config.cornerStyle = .medium
+            config.image = UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+            config.imagePlacement = .trailing
+            config.imagePadding = 6
+            config.contentInsets.leading = 4
+            config.contentInsets.trailing = 4
+            config.contentInsets.top = 2
+            config.contentInsets.bottom = 2
+            config.title = "per_\(period.rawValue.lowercased())".localized.lowercased()
+            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                var outcoming = incoming
+                outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+                outcoming.foregroundColor = UIColor.secondaryLabel
+                return outcoming
+            }
+//            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+//                guard let self = self,
+//                      let viewIput = self.viewInput
+//                else { return .systemGray }
+//
+//                return viewIput.tintColor
+//            }
+            config.buttonSize = .large
+            config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+            config.baseForegroundColor = .label
+
+            instance.configuration = config
+        } else {
+            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
+                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
+            ])
+            instance.setAttributedTitle(attrString, for: .normal)
+            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+            instance.imageView?.contentMode = .scaleAspectFit
+            instance.imageEdgeInsets.left = 10
+            instance.imageEdgeInsets.top = 2
+            instance.imageEdgeInsets.bottom = 2
+            instance.imageEdgeInsets.right = 2
+            instance.semanticContentAttribute = .forceRightToLeft
+            instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+
+            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
+            constraint.identifier = "width"
+            constraint.isActive = true
+        }
+        
+        instance.publisher(for: \.bounds, options: .new).sink { rect in
+            instance.cornerRadius = rect.height * 0.15
+        }.store(in: &subscriptions)
+        
+        return instance
+    }()
     private lazy var collectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(category: .New)
         
@@ -203,12 +320,31 @@ class ListView: UIView {
 //        return instance
 //    }()
 //    private var hMaskLayer: CAGradientLayer!
+    private lazy var shadowView: UIView = {
+        let instance = UIView()
+        instance.layer.masksToBounds = false
+        instance.clipsToBounds = false
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "shadow"
+        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+        instance.layer.shadowRadius = 5
+        instance.layer.shadowOffset = .zero
+        instance.publisher(for: \.bounds)
+            .sink { rect in
+                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+            }
+            .store(in: &subscriptions
+            )
+        background.addEquallyTo(to: instance)
+        
+        return instance
+    }()
     private lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = false
         instance.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.75)
-        //        collectionView.addEquallyTo(to: instance)
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
@@ -218,27 +354,26 @@ class ListView: UIView {
         
         return instance
     }()
-
+    //Logic
+    private var period: Period = .AllTime {
+        didSet {
+            guard oldValue != period,
+                  let category = viewInput?.category
+            else { return }
+            
+            collectionView.period = period
+            
+            periodButton.menu = prepareMenu()
+            setTitle(category: category, animated: true)
+        }
+    }
+    
+    
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var shadowView: UIView! {
-        didSet {
-            shadowView.layer.masksToBounds = false
-            shadowView.clipsToBounds = false
-            shadowView.backgroundColor = .clear
-            shadowView.accessibilityIdentifier = "shadow"
-            shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-            shadowView.layer.shadowRadius = 5
-            shadowView.layer.shadowOffset = .zero
-            observers.append(shadowView.observe(\UIView.bounds, options: .new) { view, change in
-                guard let newValue = change.newValue else { return }
-                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
-            })
-            background.addEquallyTo(to: shadowView)
-        }
-    }
+    
+    
     
     // MARK: - Destructor
     deinit {
@@ -254,6 +389,7 @@ class ListView: UIView {
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         setupUI()
     }
     
@@ -263,37 +399,188 @@ class ListView: UIView {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        
         setupUI()
     }
-    
-    private func setupUI() {
+}
+
+private extension ListView {
+    @MainActor
+    func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        
         addSubview(contentView)
+        contentView.addSubview(filterView)
+        contentView.addSubview(shadowView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        filterView.translatesAutoresizingMaskIntoConstraints = false
+        shadowView.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 10),
+            filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
+            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
 //        featheredView.layer.mask = featheredLayer
+    }
+    
+    @MainActor
+    func setTitle(category: Survey.SurveyCategory, animated: Bool = true) {
+        guard let constraint = titleLabel.getConstraint(identifier: "width") else { return }
+        
+        var text = ""
+        
+        switch category {
+        case .New: text =  "new".localized
+        case .Top: text = "top".localized
+        case .Favorite: text = "watching".localized
+        case .Own: text = "own".localized
+        default: print("")
+        }
+        
+//        let attrString = NSMutableAttributedString(string: text,
+//                                                   attributes: [
+//                                                    .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3) as Any
+//                                                   ])
+//        attrString.append(NSAttributedString(string: " " + "per".localized.lowercased() + " ",
+//                                             attributes: [
+//                                                .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any
+//                                             ]))
+//
+//        text += " " + "per".localized.lowercased() + " " //+ "publications".localized.lowercased() + " "
+        let constant = text.width(withConstrainedHeight: 100, font: titleLabel.font)
+        setNeedsLayout()
+        
+        guard animated else {
+//            titleLabel.attributedText = attrString
+            titleLabel.text = text
+            constraint.constant = constant
+            layoutIfNeeded()
+            
+            return
+        }
+        
+        UIView.transition(with: titleLabel,
+                          duration: 0.15,
+                          options: .transitionCrossDissolve) { [weak self] in
+            guard let self = self else { return }
+            
+            constraint.constant = constant
+            self.titleLabel.text = text//titleLabel.attributedText = attrString
+            self.layoutIfNeeded()
+        }
+        
+        let buttonText = "per_\(period.rawValue.lowercased())".localized.lowercased()
+        
+        if #available(iOS 15, *) {
+            if !periodButton.configuration.isNil {
+                periodButton.configuration?.title = buttonText
+            }
+        } else {
+            let attrString = NSMutableAttributedString(string: buttonText,
+                                                       attributes: [
+                                                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
+                                                        NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
+                                                       ])
+            periodButton.setAttributedTitle(attrString, for: .normal)
+            //            periodButton.setTitle("per_\(period.rawValue.lowercased())".localized.lowercased(), for: .normal)
+            guard let constraint = periodButton.getConstraint(identifier: "width") else { return }
+            
+            setNeedsLayout()
+            UIView.animate(withDuration: 0.15, delay: 0) { [weak self] in
+                guard let self = self else { return }
+                
+                constraint.constant = buttonText.width(withConstrainedHeight: 100,
+                                                       font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
+                self.layoutIfNeeded()
+            }
+        }
+    }
+    
+    @MainActor
+    func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
+        let perDay: UIAction = .init(title: "per_\(Period.PerDay.rawValue)".localized.lowercased(),
+                                     image: nil,
+                                     identifier: nil,
+                                     discoverabilityTitle: nil,
+                                     attributes: .init(),
+                                     state: period == .PerDay ? .on : .off,
+                                     handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.period = .PerDay
+        })
+        
+        let perWeek: UIAction = .init(title: "per_\(Period.PerWeek.rawValue)".localized.lowercased(),
+                                      image: nil,
+                                      identifier: nil,
+                                      discoverabilityTitle: nil,
+                                      attributes: .init(),
+                                      state: period == .PerWeek ? .on : .off,
+                                      handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.period = .PerWeek
+        })
+        
+        let perMonth: UIAction = .init(title: "per_\(Period.PerMonth.rawValue)".localized.lowercased(),
+                                       image: nil,
+                                       identifier: nil,
+                                       discoverabilityTitle: nil,
+                                       attributes: .init(),
+                                       state: period == .PerMonth ? .on : .off,
+                                       handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.period = .PerMonth
+        })
+        
+        let allTime: UIAction = .init(title: "per_\(Period.AllTime.rawValue)".localized.lowercased(),
+                                      image: nil,
+                                      identifier: nil,
+                                      discoverabilityTitle: nil,
+                                      attributes: .init(),
+                                      state: period == .AllTime ? .on : .off,
+                                      handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.period = .AllTime
+        })
+        
+        return UIMenu(title: "",//"publications_per".localized,
+                      image: nil,
+                      identifier: nil,
+                      options: .init(),
+                      children: [
+                        perDay,
+                        perWeek,
+                        perMonth,
+                        allTime
+                      ])
     }
 }
 
 // MARK: - Controller Output
 extension ListView: ListControllerOutput {
-    func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
-#if DEBUG
-      print(result)
-#endif
-    }
-    
+//    func setPeriod(_ period: Period) {
+//        collectionView.period = period
+//    }
     func onRequestCompleted(_ result: Result<Bool, Error>) {
         collectionView.endRefreshing()
     }
     
     func onDataSourceChanged() {
-        guard let category = viewInput?.surveyCategory else { return }
+        guard let category = viewInput?.category else { return }
+        
+        setTitle(category: category, animated: true)
         collectionView.category = category
     }
 }
@@ -302,7 +589,11 @@ extension ListView: ListControllerOutput {
 extension ListView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
 //        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        if #available(iOS 15, *) {
+            periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        }
     }
 }
 

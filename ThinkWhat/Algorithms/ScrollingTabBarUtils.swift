@@ -24,7 +24,7 @@ class ScrollingTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioni
     var lastIndex = 0
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return 0.3
+        return 0.35
     }
     
     init(tabBarController: UITabBarController, lastIndex: Int) {
@@ -49,7 +49,7 @@ class ScrollingTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioni
         
         toViewController!.view.transform = CGAffineTransform(translationX: viewWidth, y: 0)
         
-        UIView.animate(withDuration: self.transitionDuration(using: (self.transitionContext)), delay: 0.0, usingSpringWithDamping: 1.2, initialSpringVelocity: 2.5, options: .overrideInheritedOptions, animations: {
+        UIView.animate(withDuration: self.transitionDuration(using: (self.transitionContext)), delay: 0.0, usingSpringWithDamping: 1.2, initialSpringVelocity: 2.5, options: .curveEaseInOut, animations: {
             toViewController!.view.transform = CGAffineTransform.identity
             fromViewController!.view.transform = CGAffineTransform(translationX: -viewWidth, y: 0)
         }, completion: { _ in

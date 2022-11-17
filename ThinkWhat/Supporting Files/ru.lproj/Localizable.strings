@@ -156,13 +156,14 @@
 //Subscriptions VC
 "subscriptions" = "Подписки";
 "publications_per" = "Публикации за:";
-"per_day" = "день";
+"per_day" = "за день";
 "day" = "сутки";
-"per_week" = "неделю";
+"per_week" = "за неделю";
 "week" = "неделя";
-"per_month" = "месяц";
+"per_month" = "за месяц";
 "month" = "месяц";
 "all_time" = "все время";
+"per_all_time" = "за все время";
 "cancel_subscription" = "Отказаться от подписки";
 "zero_subscriptions" = "Вы ни на кого не подписаны";
 
@@ -171,7 +172,7 @@
 "own" = "Мои";
 "top" = "Топ";
 "new" = "Новые";
-"watching" = "Избранное";
+"watching" = "Отслеживаемые";
 
 //Topics VC
 "topics" = "Темы";

@@ -24,7 +24,7 @@ class VotesFormula: UIView, BannerContent {
     @IBOutlet weak var topView: UIView!
     @IBOutlet weak var icon: Icon! {
         didSet {
-            icon.backgroundColor = Colors.UpperButtons.Avocado
+            icon.backgroundColor = Colors.System.Red.rawValue//Colors.UpperButtons.Avocado
             icon.iconColor = .white
             icon.category = .Balance
         }
@@ -45,7 +45,7 @@ class VotesFormula: UIView, BannerContent {
         }
     }
 
-    var color: UIColor = Colors.UpperButtons.VioletBlueCrayola
+    var color: UIColor = Colors.System.Red.rawValue//Colors.UpperButtons.VioletBlueCrayola
     var votes = 0 {
         didSet {
             cost = votes * price

@@ -59,11 +59,9 @@ protocol SubsciptionsModelOutput: AnyObject {
 ///
 /// **View** conforms to this protocol
 protocol SubsciptionsControllerOutput: AnyObject {
-    var viewInput: SubscriptionsViewInput? { get set }
+    var viewInput: (SubscriptionsViewInput & TintColorable)? { get set }
     
-    func onUpperContainerShown(_: Bool)
     func onWillAppear()
     func onRequestCompleted(_: Result<Bool, Error>)
-    func setPeriod(_: Period)
     func setDefaultFilter(_: Closure?)
 }

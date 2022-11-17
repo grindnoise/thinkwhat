@@ -9,7 +9,9 @@
 import UIKit
 import Combine
 
-class HotController: UIViewController {
+
+
+class HotController: UIViewController, TintColorable {
 
     
     
@@ -17,7 +19,11 @@ class HotController: UIViewController {
     var controllerOutput: HotControllerOutput?
     var controllerInput: HotControllerInput?
     var shouldSkipCurrentCard = false
-    
+    var tintColor: UIColor = .clear {
+        didSet {
+            setNavigationBarTintColor(tintColor)
+        }
+    }
     
     
     // MARK: - Private properties
@@ -164,6 +170,7 @@ class HotController: UIViewController {
         
 //        titleStack.alpha = 1
         
+        self.navigationController?.navigationBar.alpha = 1
         navigationItem.largeTitleDisplayMode = .never
         view.setNeedsLayout()
         view.layoutIfNeeded()
@@ -182,17 +189,24 @@ class HotController: UIViewController {
                 self.shouldSkipCurrentCard = false
             }
         }
+        
+        guard let navigationBar = navigationController?.navigationBar,
+              let tabBarController = tabBarController as? MainController
+        else { return }
+
+        tabBarController.setLogoInitialFrame(size: navigationBar.bounds.size,
+                                             y: abs(navigationBar.center.y))
     }
     
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//
-//        UIView.animate(withDuration: 0.15) { [weak self] in
-//            guard let self = self else { return }
-//
-//            self.titleStack.alpha = 0
-//        }
-//    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.1, delay: 0) { [weak self] in
+            guard let self = self else { return }
+
+            self.navigationController?.navigationBar.alpha = 0
+        }
+    }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -200,14 +214,14 @@ class HotController: UIViewController {
         stopTimer()
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-
-        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
-//        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-//        gradient.colors = getGradientColors()
-//        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-    }
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        super.traitCollectionDidChange(previousTraitCollection)
+//
+//        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray)
+////        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+////        gradient.colors = getGradientColors()
+////        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+//    }
     
     
     
@@ -227,7 +241,7 @@ private extension HotController {
         
         navigationItem.title = ""
 //        navigationItem.titleView = logo
-        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
+//        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray)
         navigationItem.setRightBarButton(UIBarButtonItem(title: nil,
                                                          image: UIImage(systemName: "megaphone.fill",
                                                                         withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
@@ -359,13 +373,6 @@ extension HotController: DataObservable {
                                                selector: #selector(HotController.populateStack),
                                                name: Notifications.Surveys.SwitchHot,
                                                object: nil)
-        
-        guard let navigationBar = navigationController?.navigationBar,
-              let tabBarController = tabBarController as? MainController
-        else { return }
-        
-        tabBarController.setLogoInitialFrame(size: navigationBar.bounds.size,
-                                             y: 59)
     }
 }
 

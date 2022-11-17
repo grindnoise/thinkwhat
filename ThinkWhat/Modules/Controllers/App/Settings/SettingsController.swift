@@ -10,7 +10,7 @@ import UIKit
 import SafariServices
 import Combine
 
-class SettingsController: UIViewController, UINavigationControllerDelegate {
+class SettingsController: UIViewController, UINavigationControllerDelegate, TintColorable {
     
     enum Mode: String {
         case Profile = "profile"
@@ -26,7 +26,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         didSet {
             guard oldValue != mode else { return }
             
-            setTitle()
+//            setTitle()
             
             switch mode {
             case .Settings:
@@ -34,6 +34,12 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
             case .Profile:
                 controllerOutput?.onUserSettings()
             }
+        }
+    }
+    public var tintColor: UIColor = .clear {
+        didSet {
+            setNavigationBarTintColor(tintColor)
+            settingsSwitch.color = tintColor
         }
     }
     
@@ -46,8 +52,11 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     //UI
     private var isOnScreen = true
     private lazy var titleStack: UIStackView = {
+        let opaque = UIView()
+        opaque.backgroundColor = .clear
+        
         let instance = UIStackView(arrangedSubviews: [
-            titleLabel,
+            opaque,
             settingsSwitch
         ])
         instance.axis = .horizontal
@@ -55,16 +64,16 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
         
         return instance
     }()
-    private lazy var titleLabel: UILabel = {
-       let instance = UILabel()
-        instance.font = UIFont(name: Fonts.Bold,
-                               size: 32)
-        instance.textAlignment = .left
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-        instance.text = ""
-        
-        return instance
-    }()
+//    private lazy var titleLabel: UILabel = {
+//       let instance = UILabel()
+//        instance.font = UIFont(name: Fonts.Bold,
+//                               size: 32)
+//        instance.textAlignment = .left
+//        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+//        instance.text = ""
+//
+//        return instance
+//    }()
     private lazy var settingsSwitch: SettingsSwitch = {
         let instance = SettingsSwitch()
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 2.1).isActive = true
@@ -125,39 +134,31 @@ class SettingsController: UIViewController, UINavigationControllerDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
+//        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
         tabBarController?.setTabBarVisible(visible: true, animated: true)
-//        titleStack.alpha = 1
+        titleStack.alpha = 1
+        self.navigationController?.navigationBar.alpha = 1
         
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
-        guard titleStack.alpha == 0 else { return }
-
-//        settingsSwitch.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
 
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
             guard let self = self else { return }
 
-            self.titleStack.alpha = 1
+            self.titleStack.alpha = 0
+            self.navigationController?.navigationBar.alpha = 0
 //            self.settingsSwitch.transform = .identity
         }
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-            titleStack.alpha = 0
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+//        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
     }
 }
 
@@ -178,7 +179,7 @@ private extension SettingsController {
             titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
         ])
         
-        setTitle()
+//        setTitle()
     }
     
     @MainActor
@@ -194,21 +195,21 @@ private extension SettingsController {
         })
     }
     
-    @MainActor
-    func setTitle(animated: Bool = true) {
-        guard animated else {
-            titleLabel.text = mode.rawValue.localized
-            return
-        }
-
-        UIView.transition(with: titleLabel,
-                          duration: 0.15,
-                          options: .transitionCrossDissolve) { [weak self] in
-            guard let self = self else { return }
-            
-            self.titleLabel.text = self.mode.rawValue.localized
-        }
-    }
+//    @MainActor
+//    func setTitle(animated: Bool = true) {
+//        guard animated else {
+//            titleLabel.text = mode.rawValue.localized
+//            return
+//        }
+//
+//        UIView.transition(with: titleLabel,
+//                          duration: 0.15,
+//                          options: .transitionCrossDissolve) { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.titleLabel.text = self.mode.rawValue.localized
+//        }
+//    }
 }
 
 // MARK: - View Input

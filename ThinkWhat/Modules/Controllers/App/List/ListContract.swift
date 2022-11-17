@@ -15,7 +15,8 @@ protocol ListViewInput: AnyObject {
     
     var controllerOutput: ListControllerOutput? { get set }
     var controllerInput: ListControllerInput? { get set }
-    var surveyCategory: Survey.SurveyCategory { get }
+//    var surveyCategory: Survey.SurveyCategory { get }
+    var category: Survey.SurveyCategory { get }
     
     func onSurveyTapped(_: SurveyReference)
     func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
@@ -49,19 +50,19 @@ protocol ListControllerInput: AnyObject {
 /// **Controller** conforms to this protocol
 protocol ListModelOutput: AnyObject {
     // Model output methods here
-    var surveyCategory: Survey.SurveyCategory { get }
+    var category: Survey.SurveyCategory { get }
     
     func onRequestCompleted(_: Result<Bool, Error>)
-    func onAddFavoriteCallback(_: Result<Bool,Error>)
+//    func onAddFavoriteCallback(_: Result<Bool,Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
 protocol ListControllerOutput: AnyObject {
-    var viewInput: ListViewInput? { get set }
+    var viewInput: (ListViewInput & TintColorable)? { get set }
     
     func onDataSourceChanged()
     func onRequestCompleted(_: Result<Bool, Error>)
-    func onAddFavoriteCallback(_: Result<Bool,Error>)
+//    func onAddFavoriteCallback(_: Result<Bool,Error>)
 }

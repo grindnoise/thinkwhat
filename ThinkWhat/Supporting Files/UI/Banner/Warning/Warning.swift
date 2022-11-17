@@ -15,13 +15,13 @@ class Warning: UIView, BannerContent {
         func color() -> UIColor {
             switch self {
             case .Info:
-                return Colors.Banner.Info
+                return Colors.System.Red.rawValue//Colors.Banner.Info
             case .Success:
-                return Colors.Banner.Success
+                return Colors.System.Red.rawValue//Colors.Banner.Success
             case .Warning:
-                return Colors.Banner.Warning
+                return Colors.System.Red.rawValue//Colors.Banner.Warning
             case .Error:
-                return Colors.Banner.Error
+                return Colors.System.Red.rawValue//Colors.Banner.Error
             }
         }
         func category() -> Icon.Category {

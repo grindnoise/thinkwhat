@@ -17,7 +17,7 @@ class NavigationController: UINavigationController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationBar.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        navigationBar.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
         navigationBar.largeTitleTextAttributes = [
             .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.label
         ]
@@ -29,7 +29,7 @@ class NavigationController: UINavigationController {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        navigationBar.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        navigationBar.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
         navigationBar.largeTitleTextAttributes = [
             .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.label
         ]

@@ -57,7 +57,7 @@ class ThumbUp: AnimatedIcon, CAAnimationDelegate {
     
     func setupProperties(){
         self.inactive = UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1)
-        self.active = Colors.UpperButtons.VioletBlueCrayola//Colors.UpperButtons.HoneyYellow//K_COLOR_RED//UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
+        self.active = Colors.System.Red.rawValue//Colors.UpperButtons.VioletBlueCrayola//Colors.UpperButtons.HoneyYellow//K_COLOR_RED//UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
     }
     
     func setupLayers(){

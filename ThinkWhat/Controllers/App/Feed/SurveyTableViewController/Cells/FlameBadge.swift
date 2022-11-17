@@ -31,8 +31,7 @@ public class FlameStyleKit : NSObject {
         
         
         //// Color Declarations
-        let fillColor = Colors.UpperButtons.MaximumRed.withAlphaComponent(0.65)//UIColor(red: 0.000, green: 0.000, blue: 0.000, alpha: 1.000)
-        
+        let fillColor = Colors.System.Red.rawValue//Colors.UpperButtons.MaximumRed.withAlphaComponent(0.65)//UIColor(red: 0.000, green: 0.000, blue: 0.000, alpha: 1.000)
         //// Group 2
         //// Bezier Drawing
         let bezierPath = UIBezierPath()

@@ -710,8 +710,8 @@ class PollController: UIViewController {
         super.viewWillAppear(animated)
         
         isDisappearing = false
-        
-//        setupUI()
+            
+        navigationController?.navigationBar.alpha = 1
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         self.navigationController?.navigationBar.standardAppearance = appearance

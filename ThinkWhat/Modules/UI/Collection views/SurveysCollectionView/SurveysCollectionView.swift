@@ -413,7 +413,7 @@ private extension SurveysCollectionView {
 
                 var snap = Snapshot()
                 snap.appendSections([.main])
-                snap.appendItems(self.dataItems)
+                snap.appendItems(self.filterByPeriod(self.dataItems))//self.dataItems)
                 self.source.apply(snap, animatingDifferences: true)
             }
             .store(in: &subscriptions)
@@ -464,7 +464,9 @@ private extension SurveysCollectionView {
                 guard let self = self,
                       self.category == .Subscriptions,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                      !self.source.snapshot().itemIdentifiers.contains(instance),
+                      let dateFilter = self.period.date(),
+                      instance.startDate >= dateFilter
                 else { return }
 
                 var snap = self.source.snapshot()
@@ -482,7 +484,9 @@ private extension SurveysCollectionView {
                       let userprofile = self.userprofile,
                       let instance = notification.object as? SurveyReference,
                       instance.owner == userprofile,
-                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                      !self.source.snapshot().itemIdentifiers.contains(instance),
+                      let dateFilter = self.period.date(),
+                      instance.startDate >= dateFilter
                 else { return }
 
                 var snap = self.source.snapshot()
@@ -515,8 +519,13 @@ private extension SurveysCollectionView {
                 guard let self = self,
                       self.category == .New,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance)
-                else { return }
+                      !self.source.snapshot().itemIdentifiers.contains(instance),
+                      let dateFilter = self.period.date(),
+                      instance.startDate >= dateFilter
+                else {
+                    if let self = self { self.loadingIndicator.stopAnimating() }
+                    return
+                }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
@@ -532,7 +541,9 @@ private extension SurveysCollectionView {
                 guard let self = self,
                       self.category == .Top,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                      !self.source.snapshot().itemIdentifiers.contains(instance),
+                      let dateFilter = self.period.date(),
+                      instance.startDate >= dateFilter
                 else { return }
 
                 var snap = self.source.snapshot()
@@ -549,7 +560,9 @@ private extension SurveysCollectionView {
                 guard let self = self,
                       self.category == .Own,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                      !self.source.snapshot().itemIdentifiers.contains(instance),
+                      let dateFilter = self.period.date(),
+                      instance.startDate >= dateFilter
                 else { return }
 
                 var snap = self.source.snapshot()
@@ -564,7 +577,9 @@ private extension SurveysCollectionView {
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
                 guard let self = self,
                       self.category == .Favorite,
-                      let instance = notification.object as? SurveyReference
+                      let instance = notification.object as? SurveyReference,
+                      let dateFilter = self.period.date(),
+                      instance.startDate >= dateFilter
                 else { return }
 
                 var snap = self.source.snapshot()
@@ -594,7 +609,9 @@ private extension SurveysCollectionView {
                 guard let self = self,
                       self.category == .Topic,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                      !self.source.snapshot().itemIdentifiers.contains(instance),
+                      let dateFilter = self.period.date(),
+                      instance.startDate >= dateFilter
                 else { return }
 
                 var snap = self.source.snapshot()
@@ -625,7 +642,7 @@ private extension SurveysCollectionView {
 
                 var newSnap = Snapshot()
                 newSnap.appendSections([.main])
-                newSnap.appendItems(items.uniqued().sorted { $0.startDate > $1.startDate })
+                newSnap.appendItems(self.filterByPeriod(items.uniqued().sorted { $0.startDate > $1.startDate }))
                 self.source.apply(newSnap)
             }
         })
@@ -700,9 +717,10 @@ private extension SurveysCollectionView {
     }
     
     func filterByPeriod(_ items: [SurveyReference]) -> [SurveyReference] {
-        guard category != .Userprofile,
-              let date = period.date()
-        else { return items }
+//        guard category != .Userprofile,
+//              let date = period.date()
+//        else { return items }
+        guard let date = period.date() else { return items }
 
         return items.filter {
             $0.startDate >= date

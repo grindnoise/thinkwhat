@@ -38,7 +38,7 @@ class TotalCost: UIView, BannerContent {
         }
     }
     weak var delegate: CallbackObservable?
-    var color: UIColor = Colors.UpperButtons.VioletBlueCrayola
+    var color: UIColor = Colors.System.Red.rawValue//Colors.UpperButtons.VioletBlueCrayola
     var balance = 0 {
         didSet {
             if oldValue != balance, balanceLabel != nil {
