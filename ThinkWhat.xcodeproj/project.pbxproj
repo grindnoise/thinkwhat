@@ -221,6 +221,7 @@
 		AB54F47F285B189900C620B3 /* ChoiceEditingPopup.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB54F47E285B189900C620B3 /* ChoiceEditingPopup.xib */; };
 		AB5768EA2853B9B800D55439 /* ChoiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5768E92853B9B800D55439 /* ChoiceProvider.swift */; };
 		AB5787F729228AD2009C1DBF /* TintColorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5787F629228AD2009C1DBF /* TintColorable.swift */; };
+		AB5787F929267EEF009C1DBF /* UIBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5787F829267EEF009C1DBF /* UIBarButtonItem.swift */; };
 		AB58F64428D23854002CB987 /* UserSettingsCityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB58F64328D23854002CB987 /* UserSettingsCityCell.swift */; };
 		AB592E212906C3140082EE13 /* UserprofileCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB592E202906C3140082EE13 /* UserprofileCollectionView.swift */; };
 		AB592E242906C8180082EE13 /* UserCredentialsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB592E232906C8180082EE13 /* UserCredentialsCell.swift */; };
@@ -810,6 +811,7 @@
 		AB54F47E285B189900C620B3 /* ChoiceEditingPopup.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChoiceEditingPopup.xib; sourceTree = "<group>"; };
 		AB5768E92853B9B800D55439 /* ChoiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceProvider.swift; sourceTree = "<group>"; };
 		AB5787F629228AD2009C1DBF /* TintColorable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TintColorable.swift; sourceTree = "<group>"; };
+		AB5787F829267EEF009C1DBF /* UIBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBarButtonItem.swift; sourceTree = "<group>"; };
 		AB58F64328D23854002CB987 /* UserSettingsCityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsCityCell.swift; sourceTree = "<group>"; };
 		AB592E202906C3140082EE13 /* UserprofileCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserprofileCollectionView.swift; sourceTree = "<group>"; };
 		AB592E232906C8180082EE13 /* UserCredentialsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCredentialsCell.swift; sourceTree = "<group>"; };
@@ -1319,6 +1321,7 @@
 				ABF2756B280D62710023CD1F /* UITableView.swift */,
 				ABA448D327E331B000F8E00D /* UIView.swift */,
 				AB913F782806FADF00609D51 /* UIViewController.swift */,
+				AB5787F829267EEF009C1DBF /* UIBarButtonItem.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3618,6 +3621,7 @@
 				AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */,
 				AB4054FF28785A66000F7768 /* CommentsCollectionView.swift in Sources */,
 				AB234F4228D6687E00204EC8 /* TagCellLayout.swift in Sources */,
+				AB5787F929267EEF009C1DBF /* UIBarButtonItem.swift in Sources */,
 				AB0F1E79283D2E550044BA97 /* SurveyCreationController.swift in Sources */,
 				ABF2758F28151EE50023CD1F /* UINavigationController.swift in Sources */,
 				AB39F4182847A96400DEE0ED /* delImageSelectionHeader.swift in Sources */,

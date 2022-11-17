@@ -24,6 +24,7 @@ class SubscriptionsView: UIView {
                 }
             } else {
                 periodButton.imageView?.tintColor = viewInput.tintColor
+                periodButton.tintColor = viewInput.tintColor
             }
         }
     }
@@ -553,7 +554,7 @@ class SubscriptionsView: UIView {
         instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
         instance.layer.shadowRadius = 5
         instance.layer.shadowOffset = .zero
-        instance.alpha = 0
+        instance.alpha = 1
         instance.place(inside: topView,
                        insets: UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10))
         instance.publisher(for: \.bounds)
@@ -577,6 +578,7 @@ class SubscriptionsView: UIView {
         avatar.translatesAutoresizingMaskIntoConstraints = false
         
         let opaque = UIView()
+        opaque.accessibilityIdentifier = "opaque"
         opaque.clipsToBounds = true
         backgroundView.addSubview(opaque)
         opaque.backgroundColor = .clear
@@ -588,7 +590,7 @@ class SubscriptionsView: UIView {
             avatar.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 8),
             avatar.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 8),
             avatar.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -8),
-            opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16),
+//            opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16),
             opaque.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 6),
             opaque.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -6),
             opaque.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor),
@@ -596,6 +598,10 @@ class SubscriptionsView: UIView {
             userStack.trailingAnchor.constraint(equalTo: opaque.trailingAnchor),
             userStack.centerYAnchor.constraint(equalTo: opaque.centerYAnchor),
         ])
+        
+        let constraint = opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16)
+        constraint.identifier = "trailing"
+        constraint.isActive = true
         
         return instance
     }()
@@ -808,7 +814,7 @@ private extension SubscriptionsView {
             shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
             shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
-        
+        userView.alpha = 0
 //        let constraint = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 0)
 //        constraint.identifier = "filterTop"
 //        constraint.isActive = true
@@ -816,16 +822,37 @@ private extension SubscriptionsView {
     
     @MainActor
     func onUserSelected(userprofile: Userprofile) {
-        topView.setNeedsLayout()
-        avatar.updateConstraints()
-        topView.layoutIfNeeded()
+        func animateStackView() {
+            delayAsync(delay: 0.075) { [weak self] in
+                guard let self = self else { return }
+                
+                self.userStack.arrangedSubviews.enumerated().forEach { index, item in
+                    item.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+                    
+                    UIView.animate(
+                        withDuration: 0.3,
+                        delay: Double(index)*0.045,
+                        usingSpringWithDamping: 0.8,
+                        initialSpringVelocity: 0.3,
+                        options: [.curveEaseInOut],
+                        animations: {
+                            item.alpha = 1
+                            item.transform = .identity
+                        }) { _ in }
+                }
+            }
+        }
+//        userView.setNeedsLayout()
+//        avatar.updateConstraints()
+//        userView.layoutIfNeeded()
         
         guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell//,
 //              let constraint = filterView.getConstraint(identifier: "filterTop")
         else { return }
         
-        setNeedsLayout()
+//        setNeedsLayout()
         avatar.userprofile = userprofile
+        avatar.alpha = 0
 //        usernameLabel.text = userprofile.name
 //        usernameLabel.setConstraints()
 //        notifyButton.setImage(UIImage(systemName: "bell.and.waves.left.and.right.fill",
@@ -843,6 +870,9 @@ private extension SubscriptionsView {
         let destinationFrame = CGRect(origin: userView.convert(avatar.frame.origin, to: topView),
                                       size: avatar.bounds.size)
         
+        userView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+        userStack.arrangedSubviews.forEach { $0.alpha = 0 }
+        
         UIView.animate(
             withDuration: 0.3,
             delay: 0,
@@ -852,12 +882,12 @@ private extension SubscriptionsView {
             animations: { [weak self] in
                 guard let self = self else { return }
                 
-//                constraint.constant = 10
                 temp.frame = destinationFrame
                 temp.cornerRadius = destinationFrame.height/2
                 self.feedCollectionView.alpha = 0
                 self.userView.alpha = 1
-//                self.layoutIfNeeded()
+                self.userView.transform = .identity
+                animateStackView()
             }) { [weak self] _ in
                 guard let self = self else { return }
                 let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
@@ -998,9 +1028,10 @@ private extension SubscriptionsView {
 }
 
 extension SubscriptionsView: SubsciptionsControllerOutput {
-    func setDefaultFilter(_ completion: Closure? = nil) {
+    func hideUserCard(_ completion: Closure? = nil) {
         guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
-//              let constraint = filterView.getConstraint(identifier: "filterTop"),
+              let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
+              let constraint = subview.getConstraint(identifier: "trailing"),
               let userprofile = userprofile
         else {
 #if DEBUG
@@ -1023,27 +1054,36 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
         let destinationFrame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: topView),
                                       size: cell.avatar.imageView.bounds.size)
         
-//        setNeedsLayout()
+        userView.setNeedsLayout()
 //        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
 //                                                       delay: 0,
 //                                                       options: .curveEaseInOut,
 //                                                       animations: { [weak self] in
-//            guard let self = self else { return }
+        //            guard let self = self else { return }
         UIView.animate(
-            withDuration: 0.3,
+            withDuration: 0.15,
             delay: 0,
-            usingSpringWithDamping: 0.8,
-            initialSpringVelocity: 0.3,
+//            usingSpringWithDamping: 0.8,
+//            initialSpringVelocity: 0.3,
             options: [.curveEaseInOut],
             animations: { [weak self] in
                 guard let self = self else { return }
-            temp.frame = destinationFrame
-            temp.cornerRadius = cell.avatar.bounds.height/2
-            self.feedCollectionView.alpha = 1
-            self.userView.alpha = 0
-//            constraint.constant = 0
-//            self.layoutIfNeeded()
-        }) { _ in
+                
+                temp.frame = destinationFrame
+                temp.cornerRadius = cell.avatar.bounds.height/2
+                self.feedCollectionView.alpha = 1
+                self.userView.alpha = 0
+                self.userView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
+                subview.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                //                self.userStack.spacing = 100
+                constraint.constant = self.userView.bounds.width/3
+                self.userView.layoutIfNeeded()
+            }) { _ in
+                subview.transform = .identity
+                self.userView.transform = .identity
+                constraint.constant = 16
+//            self.userStack.spacing = 4
+            
             UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
                 cell.avatar.alpha = 1
             }) { _ in

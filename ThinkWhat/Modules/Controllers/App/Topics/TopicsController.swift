@@ -21,40 +21,8 @@ class TopicsController: UIViewController, TintColorable {
     var mode: Mode = .Default {
         didSet {
             guard oldValue != mode else { return }
-//            guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
-            var imageName = ""
-            switch mode {
-            case .Search:
-                navigationItem.title = ""
-                let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
-                view.addGestureRecognizer(touch)
-                searchField.text = ""
-                searchField.becomeFirstResponder()
-                controllerOutput?.onSearchMode()
-                //Clear previous fetch request
-                controllerOutput?.onSearchCompleted([])
-                imageName = "arrow.backward"
-            case .Topic:
-                guard let topic = topic else { return }
-//                controllerOutput?.onTopicMode(topic)
-                imageName = "arrow.backward"
-//                navigationItem.title = topic.localized
-            default:
-                if let recognizer = view.gestureRecognizers?.first {
-                    view.removeGestureRecognizer(recognizer)
-                }
-//                navigationItem.title = "topics".localized
-                searchField.text = ""
-                searchField.resignFirstResponder()
-                controllerOutput?.onDefaultMode()
-                imageName = "magnifyingglass"
-            }
-//            UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
-//                let largeConfig = UIImage.SymbolConfiguration(pointSize: button.bounds.height * 0.55, weight: .semibold, scale: .medium)
-//                let image = UIImage(systemName: imageName, withConfiguration: largeConfig)
-//                self.searchField.alpha = self.mode == .Search ? 1 : 0
-//                button.setImage(image, for: .normal)
-//            } completion: { _ in }
+
+            onModeChanged()
         }
     }
     public var tintColor: UIColor = .clear {
@@ -73,6 +41,7 @@ class TopicsController: UIViewController, TintColorable {
     private var topic: Topic? {
         didSet {
             guard !topic.isNil else { return }
+            
             mode = .Topic
         }
     }
@@ -93,60 +62,6 @@ class TopicsController: UIViewController, TintColorable {
         
         return instance
     }()
-//    private lazy var barButton: UIView = {
-//        let instance = UIView()
-//        instance.layer.masksToBounds = false
-//        instance.clipsToBounds = false
-//        instance.backgroundColor = .clear
-//        instance.accessibilityIdentifier = "shadow"
-//        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-//        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-//        instance.layer.shadowRadius = 7
-//        instance.layer.shadowOffset = .zero
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-//        instance.layer.addSublayer(gradient)
-//        instance.publisher(for: \.bounds, options: .new)
-//            .sink { rect in
-//                instance.layer.shadowPath = UIBezierPath(ovalIn: rect).cgPath
-//
-//                guard rect != .zero,
-//                      let layer = instance.layer.getSublayer(identifier: "radialGradient"),
-//                      layer.bounds != rect
-//                else { return }
-//
-//                layer.frame = rect
-//            }
-//            .store(in: &subscriptions)
-//
-//        let button = UIButton()
-//        button.publisher(for: \.bounds, options: .new)
-//            .sink { [weak self] rect in
-//                guard let self = self else { return }
-//
-//                var imageName = ""
-//                switch self.mode {
-//                case .Search:
-//                    imageName = "arrow.backward"
-//                default:
-//                    imageName = "magnifyingglass"
-//                }
-//
-//                button.cornerRadius = rect.height/2
-//                let largeConfig = UIImage.SymbolConfiguration(pointSize: rect.height * 0.45, weight: .semibold, scale: .medium)
-//                let image = UIImage(systemName: imageName, withConfiguration: largeConfig)
-//                button.setImage(image, for: .normal)
-//            }
-//            .store(in: &subscriptions)
-//
-//        button.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
-//        button.accessibilityIdentifier = "button"
-//        button.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-////        button.imageView?.contentMode = .center
-//        button.imageView?.tintColor = .white
-//        button.addEquallyTo(to: instance)
-//
-//        return instance
-//    }()
     private lazy var searchField: InsetTextField = {
         let instance = InsetTextField()
         instance.placeholder = "search".localized
@@ -236,24 +151,25 @@ class TopicsController: UIViewController, TintColorable {
 }
 
 private extension TopicsController {
+    @MainActor
     func setupUI() {
         navigationItem.title = ""
-//        navigationController?.navigationBar.prefersLargeTitles = deviceType == .iPhoneSE ? false : true
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         
-//        navigationBar.addSubview(barButton)
         navigationBar.addSubview(searchField)
-//        barButton.translatesAutoresizingMaskIntoConstraints = false
         searchField.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
                 searchField.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
                 searchField.heightAnchor.constraint(equalToConstant: 40),
                 searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
-                searchField.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
+//                searchField.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -(10+44))
         ])
+        let constraint = searchField.widthAnchor.constraint(equalToConstant: 20)
+        constraint.identifier = "width"
+        constraint.isActive = true
+        
         setBarItems()
-//        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray)
     }
     
     @objc
@@ -283,38 +199,115 @@ private extension TopicsController {
         switch mode {
         case .Default:
             rightButton = UIBarButtonItem(title: nil,
-                                          image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                          primaryAction: nil,
+                                          image: UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                          primaryAction: {
+                let action = UIAction { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    self.mode = .Search
+                }
+                
+                return action
+            }(),
                                           menu: nil)
             navigationItem.setRightBarButton(rightButton, animated: true)
             navigationItem.setLeftBarButton(nil, animated: true)
             
-            //            guard let leading = titleLabel.getConstraint(identifier: "leading") else { return }
-            //
-            //            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
-            //                                                                   delay: 0) { [weak self] in
-            //                guard let self = self,
-            //                      let navigationBar = self.navigationController?.navigationBar
-            //                else { return }
-            //
-            //                navigationBar.setNeedsLayout()
-            //                leading.constant = 10
-            //                navigationBar.layoutIfNeeded()
-            //            }
         case .Search:
             rightButton = UIBarButtonItem(title: nil,
-                                          image: UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                          primaryAction: nil,
+                                          image: UIImage(systemName: "arrow.counterclockwise", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                          primaryAction: {
+                let action = UIAction { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    self.mode = .Default
+                }
+                
+                return action
+            }(),
                                           menu: nil)
             navigationItem.setRightBarButton(rightButton, animated: true)
             navigationItem.setLeftBarButton(nil, animated: true)
-        default:
+            
+        case .Topic:
             rightButton = UIBarButtonItem(title: nil,
                                           image: UIImage(systemName: "arrow.counterclockwise", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                          primaryAction: nil,
+                                          primaryAction: {
+                let action = UIAction { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    self.mode = .Default
+                }
+                
+                return action
+            }(),
                                           menu: nil)
             navigationItem.setRightBarButton(rightButton, animated: true)
             navigationItem.setLeftBarButton(nil, animated: true)
+        }
+    }
+    
+    @MainActor
+    func onModeChanged() {
+        func toggleSearchField(on: Bool) {
+            guard let navigationBar = navigationController?.navigationBar,
+                  let constraint = searchField.getConstraint(identifier: "width")
+            else { return }
+            
+            navigationBar.setNeedsLayout()
+            searchField.text = ""
+            
+            if on {
+                let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
+                view.addGestureRecognizer(touch)
+                
+                let _ = searchField.becomeFirstResponder()
+                controllerOutput?.onSearchMode()
+                
+                //Clear previous fetch request
+                controllerOutput?.onSearchCompleted([])
+                
+            } else {
+                if let recognizer = view.gestureRecognizers?.first {
+                    view.removeGestureRecognizer(recognizer)
+                }
+                
+                let _ = searchField.resignFirstResponder()
+                controllerOutput?.onDefaultMode()
+            }
+            navigationItem.title = ""
+            
+            UIView.animate(
+                withDuration: 0.3,
+                delay: 0,
+                usingSpringWithDamping: 0.8,
+                initialSpringVelocity: 0.3,
+                options: [.curveEaseInOut],
+                animations: { [weak self] in
+                    guard let self = self else { return }
+
+                    self.searchField.alpha = on ? 1 : 0
+                    constraint.constant = on ? navigationBar.frame.width - (10*2 + 44 + 4) : 20
+                    navigationBar.layoutIfNeeded()
+                }) { _ in }
+        }
+        
+        setBarItems()
+        
+        guard let mainController = tabBarController as? MainController else { return }
+        
+        switch mode {
+        case .Search:
+            mainController.toggleLogo(on: false)
+            toggleSearchField(on: true)
+        case .Topic:
+//            guard let topic = topic else { return }
+            mainController.toggleLogo(on: false)
+            
+//            toggleSearchField(on: true)
+        default:
+            mainController.toggleLogo(on: true)
+            toggleSearchField(on: false)
         }
     }
 }

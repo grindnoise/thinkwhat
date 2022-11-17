@@ -47,7 +47,7 @@ class Banner: UIView {
     }
     @IBOutlet weak var body: UIView! {
         didSet {
-            body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemGray6
+            body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBackground : .tertiarySystemBackground
         }
     }
     @IBOutlet weak var container: UIView!
@@ -120,7 +120,7 @@ class Banner: UIView {
          callbackDelegate: CallbackObservable? = nil,
          bannerDelegate: BannerObservable? = nil,
          backgroundColor: UIColor = .clear,
-         heightDivisor _heightDivisor: CGFloat = 6,
+         heightDivisor _heightDivisor: CGFloat = 5,
          fadeBackground: Bool,
          shadowed: Bool = true) {
 

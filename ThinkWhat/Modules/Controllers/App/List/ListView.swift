@@ -27,6 +27,7 @@ class ListView: UIView {
                 }
             } else {
                 periodButton.imageView?.tintColor = viewInput.tintColor
+                periodButton.tintColor = viewInput.tintColor
             }
         }
     }
@@ -96,10 +97,14 @@ class ListView: UIView {
             config.contentInsets.top = 2
             config.contentInsets.bottom = 2
             config.title = "per_\(period.rawValue.lowercased())".localized.lowercased()
-            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [weak self] incoming in
+                guard let self = self,
+                      let viewInput = self.viewInput
+                else { return incoming }
+                
                 var outcoming = incoming
                 outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
-                outcoming.foregroundColor = UIColor.secondaryLabel
+                outcoming.foregroundColor = viewInput.tintColor//UIColor.secondaryLabel
                 return outcoming
             }
 //            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in

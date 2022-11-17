@@ -66,7 +66,7 @@ class UserNotificationContent: UIView {
         let instance = UILabel()
         instance.textColor = textColor
         instance.numberOfLines = 0
-        instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline)
+        instance.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline)
         instance.text = mode.localizedDescription(userprofile: userprofile)
         instance.textAlignment = instance.numberOfTotatLines == 1 ? .center : .left
         

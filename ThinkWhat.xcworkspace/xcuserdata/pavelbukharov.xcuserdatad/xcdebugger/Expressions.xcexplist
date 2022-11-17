@@ -2395,6 +2395,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "TopicsController.setupUI():TopicsController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "navigationItem.rightBarButtonItem?.value(forKey: &quot;view&quot;)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "CreateNewSurveyViewController.moveToNextStage(completionBlock:):CreateNewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -3374,6 +3382,12 @@
       <ContextState
          contextName = "SubscriptionsView.onUserSelected(userprofile:):SubscriptionsView.swift">
          <PersistentStrings>
+            <PersistentString
+               value = "userView.frame">
+            </PersistentString>
+            <PersistentString
+               value = "topView.frame">
+            </PersistentString>
             <PersistentString
                value = "avatar.frame">
             </PersistentString>
@@ -7830,6 +7844,14 @@
          <PersistentStrings>
             <PersistentString
                value = "children">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Banner.setupUI():Banner.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "height">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

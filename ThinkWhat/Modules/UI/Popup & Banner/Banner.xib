@@ -31,16 +31,16 @@
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AB7-J0-o3H">
-                    <rect key="frame" x="10" y="56" width="394" height="80"/>
+                    <rect key="frame" x="10" y="56" width="394" height="100"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="k0P-Na-v1c">
-                            <rect key="frame" x="0.0" y="0.0" width="394" height="80"/>
+                            <rect key="frame" x="0.0" y="0.0" width="394" height="100"/>
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mop-7n-f8J">
-                                    <rect key="frame" x="0.0" y="0.0" width="394" height="80"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="394" height="100"/>
                                     <subviews>
                                         <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rar-ub-moY">
-                                            <rect key="frame" x="8" y="8" width="378" height="64"/>
+                                            <rect key="frame" x="8" y="8" width="378" height="84"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </view>
                                     </subviews>
@@ -66,7 +66,7 @@
                     <constraints>
                         <constraint firstItem="k0P-Na-v1c" firstAttribute="top" secondItem="AB7-J0-o3H" secondAttribute="top" id="9Ys-hY-IqS"/>
                         <constraint firstItem="k0P-Na-v1c" firstAttribute="leading" secondItem="AB7-J0-o3H" secondAttribute="leading" id="AxY-UE-xdQ"/>
-                        <constraint firstAttribute="height" constant="80" id="QWB-Lr-CVo"/>
+                        <constraint firstAttribute="height" constant="100" id="QWB-Lr-CVo"/>
                         <constraint firstAttribute="trailing" secondItem="k0P-Na-v1c" secondAttribute="trailing" id="am7-ir-txu"/>
                         <constraint firstAttribute="bottom" secondItem="k0P-Na-v1c" secondAttribute="bottom" id="fix-Yl-1su"/>
                     </constraints>

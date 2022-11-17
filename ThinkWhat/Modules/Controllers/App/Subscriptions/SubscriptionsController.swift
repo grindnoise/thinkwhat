@@ -246,8 +246,9 @@ private extension SubscriptionsController {
         
         switch mode {
         case .Default:
-            rightButton = UIBarButtonItem(title: "actions".localized.capitalized,
-                                          image: UIImage(systemName: "person.3.sequence.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+            rightButton = UIBarButtonItem(title: "subscribers".localized.capitalized,
+                                          image: UIImage(systemName: "person.3.sequence.fill",
+                                                         withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                           primaryAction: {
                 let action = UIAction { [weak self] _ in
                     guard let self = self else { return }
@@ -304,6 +305,7 @@ private extension SubscriptionsController {
                                                          withConfiguration: UIImage.SymbolConfiguration(weight: .regular)),
                                           primaryAction: notifyAction,
                                           menu: nil)
+            rightButton.tintColor = notify ? tintColor : .secondaryLabel
 
             let action = UIAction { [weak self] _ in
                 guard let self = self else { return }
@@ -461,7 +463,7 @@ private extension SubscriptionsController {
     @MainActor
     func onModeChanged() {
         if mode == .Default {//, isOnScreen {
-            controllerOutput?.setDefaultFilter(nil)
+            controllerOutput?.hideUserCard(nil)
         }
         
         setBarItems()
