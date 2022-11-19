@@ -70,11 +70,11 @@ extension ListModel: ListControllerInput {
         }
     }
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
+    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
 
         Task {
             do {
-                try await API.shared.surveys.surveyReferences(category: source, topic: topic)
+                try await API.shared.surveys.surveyReferences(category: source, dateFilter: dateFilter, topic: topic)
                 await MainActor.run {
                     modelOutput?.onRequestCompleted(.success(true))
                 }

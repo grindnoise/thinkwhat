@@ -46,7 +46,7 @@ protocol TopicsModelOutput: AnyObject {
 ///
 /// **View** conforms to this protocol
 protocol TopicsControllerOutput: AnyObject {
-    var viewInput: TopicsViewInput? { get set }
+    var viewInput: (TopicsViewInput & UIViewController)? { get set }
     
     func onDefaultMode()
     func onSearchMode()

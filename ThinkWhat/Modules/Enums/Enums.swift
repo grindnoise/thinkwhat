@@ -82,7 +82,7 @@ enum Period: String {
         case .PerMonth:
             return Calendar.current.date(byAdding: .month, value: -1, to: Date())
         case .AllTime:
-            return nil
+            return Calendar.current.date(byAdding: .year, value: -999, to: Date())
         }
     }
 }

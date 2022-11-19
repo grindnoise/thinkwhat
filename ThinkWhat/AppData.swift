@@ -18,18 +18,26 @@ class AppData {
     public var locales: [String] = []
     
     class func loadData(_ json: JSON) throws {
-        guard let apiVersion = json["api_version"].double,
+        guard let supportedAPI = json["api_version"].double,
               let fieldProperties = json["field_properties"] as? JSON,
               let pricelist = json["pricelist"] as? JSON,
               let topics = json["categories"] as? JSON,
               let claims = json["claim_categories"] as? JSON,
               let settings = json["client_settings"].dictionary,
-              let locales = json["locales"].arrayObject as? [String]
+              let locales = json["locales"].arrayObject as? [String],
+              let value = Bundle.main.object(forInfoDictionaryKey: "ApiVersion") as? String,
+              let currentAPI = Double(value) as? Double
         else { throw AppError.server }
+        
+        //Check current API supported version and compare with backend
+        if currentAPI.rounded(toPlaces: 1) < supportedAPI.rounded(toPlaces: 1) {
+            throw AppError.apiNotSupported
+        }
         
         do {
             shared.locales = locales
-            UserDefaults.App.minAPIVersion = apiVersion
+            UserDefaults.App.minAPIVersion = supportedAPI
+             
             ModelProperties.shared.importJson(fieldProperties)
             PriceList.shared.importJson(pricelist)
             try Topics.shared.load(topics.rawData())

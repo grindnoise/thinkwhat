@@ -46,29 +46,29 @@ class TopicsController: UIViewController, TintColorable {
         }
     }
     //UI
-    private lazy var gradient: CAGradientLayer = {
-        let instance = CAGradientLayer()
-        instance.type = .radial
-        instance.colors = getGradientColors()
-        instance.locations = [0, 0.5, 1.15]
-        instance.setIdentifier("radialGradient")
-        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
-        instance.endPoint = CGPoint(x: 1, y: 1)
-        instance.publisher(for: \.bounds)
-            .sink { rect in
-                instance.cornerRadius = rect.height/2
-            }
-            .store(in: &subscriptions)
-        
-        return instance
-    }()
+//    private lazy var gradient: CAGradientLayer = {
+//        let instance = CAGradientLayer()
+//        instance.type = .radial
+//        instance.colors = getGradientColors()
+//        instance.locations = [0, 0.5, 1.15]
+//        instance.setIdentifier("radialGradient")
+//        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+//        instance.endPoint = CGPoint(x: 1, y: 1)
+//        instance.publisher(for: \.bounds)
+//            .sink { rect in
+//                instance.cornerRadius = rect.height/2
+//            }
+//            .store(in: &subscriptions)
+//
+//        return instance
+//    }()
     private lazy var searchField: InsetTextField = {
         let instance = InsetTextField()
         instance.placeholder = "search".localized
         instance.alpha = 0
         instance.delegate = self
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
+        instance.backgroundColor = .secondarySystemBackground//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        instance.tintColor = tintColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
         instance.addTarget(self, action: #selector(TopicsController.textFieldDidChange(_:)), for: .editingChanged)
         instance.returnKeyType = .done
         instance.publisher(for: \.bounds, options: .new)
@@ -142,10 +142,10 @@ class TopicsController: UIViewController, TintColorable {
         super.traitCollectionDidChange(previousTraitCollection)
         
 //        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        searchField.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
-        searchField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//        searchField.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
+//        searchField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
 //        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        gradient.colors = getGradientColors()
+//        gradient.colors = getGradientColors()
 //        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray)
     }
 }
@@ -280,8 +280,8 @@ private extension TopicsController {
             UIView.animate(
                 withDuration: 0.3,
                 delay: 0,
-                usingSpringWithDamping: 0.8,
-                initialSpringVelocity: 0.3,
+                usingSpringWithDamping: 0.9,
+                initialSpringVelocity: 0.2,
                 options: [.curveEaseInOut],
                 animations: { [weak self] in
                     guard let self = self else { return }
@@ -300,12 +300,12 @@ private extension TopicsController {
         case .Search:
             mainController.toggleLogo(on: false)
             toggleSearchField(on: true)
-        case .Topic:
-//            guard let topic = topic else { return }
-            mainController.toggleLogo(on: false)
             
-//            toggleSearchField(on: true)
+        case .Topic:
+            mainController.toggleLogo(on: false)
+
         default:
+            setNavigationBarTintColor(tintColor)
             mainController.toggleLogo(on: true)
             toggleSearchField(on: false)
         }
@@ -323,40 +323,20 @@ extension TopicsController: TopicsViewInput {
     }
     
     func onSurveyTapped(_ instance: SurveyReference) {
-//        if let nav = navigationController as? CustomNavigationController {
-//            nav.transitionStyle = .Default
-//            nav.duration = 0.5
-////            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
-//        }
+        //        if let nav = navigationController as? CustomNavigationController {
+        //            nav.transitionStyle = .Default
+        //            nav.duration = 0.5
+        ////            nav.isShadowed = traitCollection.userInterfaceStyle == .light ? true : false
+        //        }
         let backItem = UIBarButtonItem()
-            backItem.title = ""
-            navigationItem.backBarButtonItem = backItem
+        backItem.title = ""
+        navigationItem.backBarButtonItem = backItem
         navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
     func onDataSourceRequest(_ topic: Topic) {
         controllerInput?.onDataSourceRequest(topic)
-    }
-    
-    private func onChildMode() {
-        setBarItems()
-//        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
-//        UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
-//            let largeConfig = UIImage.SymbolConfiguration(pointSize: self.barButton.bounds.height * 0.55, weight: .semibold, scale: .medium)
-//            let image = UIImage(systemName: "arrow.backward", withConfiguration: largeConfig)
-//            button.setImage(image, for: .normal)
-//        } completion: { _ in }
-    }
-    
-    private func onParentMode() {
-        setBarItems()
-//        guard let button = barButton.getSubview(type: UIButton.self, identifier: "button") else { return }
-//        UIView.transition(with: barButton, duration: 0.2, options: .transitionCrossDissolve) {
-//            let largeConfig = UIImage.SymbolConfiguration(pointSize: self.barButton.bounds.height * 0.55, weight: .semibold, scale: .medium)
-//            let image = UIImage(systemName: "magnifyingglass", withConfiguration: largeConfig)
-//            button.setImage(image, for: .normal)
-//        } completion: { _ in }
     }
 }
 

@@ -40,6 +40,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     private let profileUpdater = PassthroughSubject<Date, Never>()
+    private var shouldTerminate = false
 //    private var loadingIndicator: LoadingIndicator?
     //UI
     private var logoCenterY: CGFloat = .zero
@@ -196,6 +197,9 @@ class MainController: UITabBarController {//}, StorageProtocol {
     func toggleLogo(on: Bool, animated: Bool = true) {
         guard let constraint = logoStack.getConstraint(identifier: "top") else { return }
         
+        if on, constraint.constant > 0 { return }
+        if !on, constraint.constant < 0 { return }
+        
         view.setNeedsLayout()
         
         guard animated else {
@@ -346,7 +350,24 @@ private extension MainController {
                               let userData = json["user_data"] as? JSON
                         else { throw AppError.server }
                         
-                        try AppData.loadData(appData)
+                        do {
+                            try AppData.loadData(appData)
+                        } catch {
+                            shouldTerminate = true
+                            switch error {
+                            case AppError.apiNotSupported:
+                                let alert = UIAlertController(title: nil, message: error.localizedDescription, preferredStyle: .alert)
+                                present(alert, animated: true)
+                            default:
+                                print(error.localizedDescription)
+#if DEBUG
+      fatalError()
+#endif
+                            }
+                        }
+                        
+                        guard !shouldTerminate else { return }
+                        
                         try Userprofiles.loadUserData(userData)
                         Surveys.shared.load(surveys)
 
@@ -360,19 +381,10 @@ private extension MainController {
                         error.printLocalized(class: type(of: self), functionName: #function)
     #endif
                     }
-    //                requestAttempt = 0
                 }
             } catch {
-                throw error
+                loadData()
             }
-//            do {
-//                try await appLaunch()
-//                setTasks()
-//            } catch {
-//                await MainActor.run {
-//                    onServerUnavailable()
-//                }
-//            }
         }
     }
     
@@ -426,14 +438,8 @@ private extension MainController {
     func setupUI() {
         view.isUserInteractionEnabled = false
         tabBar.backgroundColor = .systemBackground
-        tabBar.tintColor = UIColor { traitCollection in
-            switch traitCollection.userInterfaceStyle {
-            case .dark:
-                return .white
-            default:
-                return K_COLOR_TABBAR
-            }
-        }
+        tabBar.tintColor = Colors.Logo.Flame.rawValue
+
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 11)], for: .normal)
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11)], for: .selected)
 
@@ -636,7 +642,8 @@ extension MainController: UITabBarControllerDelegate {
     }
     
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        func setLogoColor(_ color: UIColor) {
+        func setColors(_ color: UIColor) {
+            tabBar.tintColor = color
             let logoColorAnim = Animations.get(property: .FillColor,
                                                fromValue: logoIcon.iconColor.cgColor as Any,
                                                toValue: color.cgColor as Any,
@@ -669,23 +676,32 @@ extension MainController: UITabBarControllerDelegate {
             switch controller.self {
             case is HotController:
                 currentTab = .Hot
-                setLogoColor(Colors.Logo.Flame.rawValue)
+                setColors(Colors.Logo.Flame.rawValue)
                 setLogoCentered(animated: true)
+                toggleLogo(on: true)
             case is SubscriptionsController:
-                setLogoColor(Colors.Logo.CoolGray.rawValue)
+                setColors(Colors.Logo.CoolGray.rawValue)
                 setLogoCentered(animated: true)
+                toggleLogo(on: true)
             case is ListController:
                 currentTab = .Feed
-                setLogoColor(Colors.Logo.GreenMunshell.rawValue)
+                setColors(Colors.Logo.GreenMunshell.rawValue)
                 setLogoLeading(constant: 10, animated: true)
+                toggleLogo(on: true)
             case is TopicsController:
                 currentTab = .Topics
-                setLogoColor(Colors.Logo.Marigold.rawValue)
+                setColors(Colors.Logo.Marigold.rawValue)
                 setLogoCentered(animated: true)
+                guard let instance = controller as? TopicsController,
+                      (instance.mode == .Search || instance.mode == .Topic)
+                else { return }
+                
+                toggleLogo(on: false)
             case is SettingsController:
                 currentTab = .Settings
-                setLogoColor(Colors.Logo.AirBlue.rawValue)
+                setColors(Colors.Logo.AirBlue.rawValue)
                 setLogoLeading(constant: 10, animated: true)
+                toggleLogo(on: true)
             default:
                 print("")
 #if DEBUG

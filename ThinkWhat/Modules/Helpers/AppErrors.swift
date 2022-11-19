@@ -9,6 +9,7 @@
 import Foundation
 
 enum AppError: Error {
+    case apiNotSupported
     case webContent
     case tikTokContent
     case imageDownload
@@ -47,6 +48,8 @@ extension AppError: LocalizedError {
             return "minimum_limits".localized
         case .insufficientBalance:
             return "insufficient_balance".localized
+        case .apiNotSupported:
+            return "api_not_supported".localized
         }
     }
 }

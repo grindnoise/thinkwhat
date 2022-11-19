@@ -45,9 +45,11 @@ class SurveysView: UIView {
 
         paginationPublisher
             .sink { [unowned self] in
-                guard let category = $0 else { return }
+                guard let source = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
 
-                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+                self.viewInput?.onDataSourceRequest(source: source, topic: nil)
             }
             .store(in: &subscriptions)
 

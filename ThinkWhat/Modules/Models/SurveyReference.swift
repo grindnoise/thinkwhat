@@ -10,7 +10,7 @@ import Foundation
 import SwiftyJSON
 
 class SurveyReference: Decodable {// NSObject,
-
+    
     private enum CodingKeys: String, CodingKey {
         case id, type, title, category, likes, views, progress, rating, description, share_link,
              startDate = "start_date",
@@ -26,19 +26,19 @@ class SurveyReference: Decodable {// NSObject,
              media = "media_preview"
     }
     
-//    //NS
-//    override var hash: Int {
-//        var hasher = Hasher()
-//        hasher.combine(title)
-//        hasher.combine(id)
-//        hasher.combine(topic)
-//        return hasher.finalize()
-//    }
+    //    //NS
+    //    override var hash: Int {
+    //        var hasher = Hasher()
+    //        hasher.combine(title)
+    //        hasher.combine(id)
+    //        hasher.combine(topic)
+    //        return hasher.finalize()
+    //    }
     
     var id: Int
     var title: String
-//    @objc dynamic var title: String
-//    public let titleKeyPath = \SurveyReference.title
+    //    @objc dynamic var title: String
+    //    public let titleKeyPath = \SurveyReference.title
     var startDate: Date
     
     var topic: Topic
@@ -47,7 +47,7 @@ class SurveyReference: Decodable {// NSObject,
     var rating: Double {
         didSet {
             guard oldValue != rating else { return }
-//            Notification.send(names: [Notifications.Surveys.Rating])
+            //            Notification.send(names: [Notifications.Surveys.Rating])
             NotificationCenter.default.post(name: Notifications.Surveys.Rating, object: self)
             guard let survey = survey else { return }
             survey.rating = rating
@@ -56,7 +56,7 @@ class SurveyReference: Decodable {// NSObject,
     var likes: Int {
         didSet {
             guard oldValue != likes else { return }
-//            Notification.send(names: [Notifications.Surveys.Likes])
+            //            Notification.send(names: [Notifications.Surveys.Likes])
             NotificationCenter.default.post(name: Notifications.Surveys.Likes, object: self)
             guard let survey = survey else { return }
             survey.likes = likes
@@ -65,7 +65,7 @@ class SurveyReference: Decodable {// NSObject,
     var views: Int {
         didSet {
             guard oldValue != views else { return }
-//            Notification.send(names: [Notifications.Surveys.Views])
+            //            Notification.send(names: [Notifications.Surveys.Views])
             NotificationCenter.default.post(name: Notifications.Surveys.Views, object: self)
             guard let survey = survey else { return }
             survey.views = views
@@ -84,7 +84,7 @@ class SurveyReference: Decodable {// NSObject,
         didSet {
             guard oldValue != isHot else { return }
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchHot, object: self)
-//            Notification.send(names: [Notifications.Surveys.SwitchHot])
+            //            Notification.send(names: [Notifications.Surveys.SwitchHot])
         }
     }
     var isFavorite: Bool {
@@ -122,16 +122,16 @@ class SurveyReference: Decodable {// NSObject,
             survey?.isClaimed = isClaimed
         }
     }
-//    var isFavorite: Bool {
-//        didSet {
-//            guard oldValue != isFavorite else { return }
-//            if isFavorite, Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).isEmpty {
-//                Surveys.shared.favoriteReferences[self] = Date()
-//            } else if !isFavorite, let instance = Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).first {
-//                Surveys.shared.favoriteReferences[instance] = nil
-//            }
-//        }
-//    }
+    //    var isFavorite: Bool {
+    //        didSet {
+    //            guard oldValue != isFavorite else { return }
+    //            if isFavorite, Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).isEmpty {
+    //                Surveys.shared.favoriteReferences[self] = Date()
+    //            } else if !isFavorite, let instance = Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).first {
+    //                Surveys.shared.favoriteReferences[instance] = nil
+    //            }
+    //        }
+    //    }
     var owner: Userprofile
     var votesTotal: Int
     var commentsTotal: Int {
@@ -178,8 +178,8 @@ class SurveyReference: Decodable {// NSObject,
             truncatedDescription = try container.decode(String.self, forKey: .description)
             topic   = _topic
             type    = _type
-//            let _owner  = try container.decode(Userprofile.self, forKey: .owner)
-//            owner       = Userprofiles.shared.all.filter({ $0.id == _owner.id }).first ?? _owner
+            //            let _owner  = try container.decode(Userprofile.self, forKey: .owner)
+            //            owner       = Userprofiles.shared.all.filter({ $0.id == _owner.id }).first ?? _owner
             likes       = try container.decode(Int.self, forKey: .likes)
             views       = try container.decode(Int.self, forKey: .views)
             votesLimit  = try container.decode(Int.self, forKey: .votesLimit)
@@ -205,9 +205,9 @@ class SurveyReference: Decodable {// NSObject,
             }
             //NS
             //            super.init()
-//            if SurveyReferences.shared.all.filter({ $0.isEqual(self) }).isEmpty {
-//                SurveyReferences.shared.all.append(self)
-//            }
+            //            if SurveyReferences.shared.all.filter({ $0.isEqual(self) }).isEmpty {
+            //                SurveyReferences.shared.all.append(self)
+            //            }
         } catch {
 #if DEBUG
             print(error.localizedDescription)
@@ -253,7 +253,7 @@ class SurveyReference: Decodable {// NSObject,
         self.votesTotal              = votesTotal
         self.commentsTotal           = commentsTotal
         self.votesLimit              = votesLimit
-//        survey                  = _survey
+        //        survey                  = _survey
         self.owner                   = owner
         self.isAnonymous             = isAnonymous
         self.truncatedDescription    = description
@@ -264,64 +264,21 @@ class SurveyReference: Decodable {// NSObject,
         if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {
             SurveyReferences.shared.all.append(self)
         }
-//        //NSObject
-//        super.init()
-//        if SurveyReferences.shared.all.filter({ $0.isEqual(self) }).isEmpty {
-//            SurveyReferences.shared.all.append(self)
-//        }
+        //        //NSObject
+        //        super.init()
+        //        if SurveyReferences.shared.all.filter({ $0.isEqual(self) }).isEmpty {
+        //            SurveyReferences.shared.all.append(self)
+        //        }
     }
-//    //    var survey
-//    //    var hashValue: Int {
-//    //        return ObjectIdentifier(self).hashValue
-//    //    }
-//
-    //    init(id _id: Int, title _title: String, startDate _startDate: Date, category _category: SurveyCategory, completionPercentage _completionPercentage: Int, type _type: SurveyType) {//}, likes _likes: Int) {
     
-//
-//    init?(_ json: JSON) {
-//        if  let _ID                     = json["id"].intValue as? Int,
-//            let _title                  = json["title"].stringValue as? String,
-//            let _categoryID             = json["category"].intValue as? Int,
-//            let _category               = Topics.shared[_categoryID],
-//            let _startDate              = Date(dateTimeString: (json["start_date"].stringValue as? String)!) as? Date,
-//            //            let _completionPercentage   = json["vote_capacity"].intValue as? Int,
-//            let _likes                  = json["likes"].intValue as? Int,
-//            let _views                  = json["views"].intValue as? Int,
-//            let _isOwn                  = json["is_own"].boolValue as? Bool,
-//            let _isComplete             = json["is_complete"].boolValue as? Bool,
-//            let _isFavorite             = json["is_favorite"].boolValue as? Bool,
-//            let _type                   = json["type"].stringValue as? String {
-//            id                      = _ID
-//            title                   = _title
-//            category                = _category
-//            //            completionPercentage    = _completionPercentage
-//            startDate               = _startDate
-//            likes                   = _likes
-//            views                   = _views
-//            isOwn                   = _isOwn
-//            isComplete              = _isComplete
-//            isFavorite              = _isFavorite
-//            type                    = Survey.SurveyType(rawValue: _type)!
-//        } else {
-//            return nil
-//        }
-//    }
+    
+    //MARK: - Public methods
+    public func isValid(byBeriod period: Period) -> Bool {
+        guard let dateBound = period.date() else { return false }
+        
+        return startDate >= dateBound
+    }
 }
-
-//extension SurveyReference {
-////    static func == (lhs: SurveyReference, rhs: SurveyReference) -> Bool {
-//    //        return lhs.hashValue == rhs.hashValue
-//    //    }
-//
-//    override func isEqual(_ object: Any?) -> Bool {
-//        guard let other = object as? SurveyReference else {
-//            return false
-//        }
-//        return title == other.title && id == other.id && topic == other.topic
-//    }
-//
-//
-//}
 extension SurveyReference: Hashable {
     static func == (lhs: SurveyReference, rhs: SurveyReference) -> Bool {
         return lhs.hashValue == rhs.hashValue

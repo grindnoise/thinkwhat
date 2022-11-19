@@ -27,6 +27,7 @@
 "pseudonym" = "Аноним#";
 "pseudonym_placeholder" = "Ваш псевдоним";
 "add_pseudonym" = "Ввeдите псевдоним";
+"api_not_supported" = "Вы используете устаревшую версию приложения. Пожалуйста, обновите Thinkwhat";
 
 //Common
 "all" = "Все";

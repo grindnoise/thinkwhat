@@ -20,6 +20,7 @@ class ListView: UIView {
             guard let viewInput = viewInput else { return }
             
             setTitle(category: viewInput.category, animated: false)
+            collectionView.color = viewInput.tintColor
             
             if #available(iOS 15, *) {
                 if !periodButton.configuration.isNil {
@@ -155,9 +156,11 @@ class ListView: UIView {
         
         paginationPublisher
             .sink { [unowned self] in
-                guard let category = $0 else { return }
+                guard let source = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
                 
-                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+                self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil)
             }
             .store(in: &subscriptions)
         
@@ -169,7 +172,8 @@ class ListView: UIView {
             .sink { [unowned self] in
                 guard let topic = $0 else { return }
 
-                self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+                fatalError()
+                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: nil, topic: topic)
             }
             .store(in: &subscriptions)
         
@@ -178,7 +182,8 @@ class ListView: UIView {
             .sink { [unowned self] in
                 guard let category = $0 else { return }
                 
-                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+                fatalError()
+                self.viewInput?.onDataSourceRequest(source: category, dateFilter: nil, topic: nil)
             }
             .store(in: &subscriptions)
         
@@ -187,7 +192,8 @@ class ListView: UIView {
             .sink { [unowned self] in
                 guard let topic = $0 else { return }
                 
-                self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+                fatalError()
+                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: nil, topic: topic)
             }
             .store(in: &subscriptions)
         
@@ -434,7 +440,6 @@ private extension ListView {
             shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
             shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
-//        featheredView.layer.mask = featheredLayer
     }
     
     @MainActor

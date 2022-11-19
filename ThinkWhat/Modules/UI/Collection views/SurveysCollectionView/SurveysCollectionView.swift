@@ -22,9 +22,10 @@ class SurveysCollectionView: UICollectionView {
     // MARK: - Public properties
     public weak var topic: Topic? {
         didSet {
-            guard !topic.isNil else { return }
+            guard let topic = topic else { return }
             
             category = .Topic
+            color = topic.tagColor
         }
     }
     public var category: Survey.SurveyCategory {
@@ -32,7 +33,8 @@ class SurveysCollectionView: UICollectionView {
             defer {
                 setColors()
             }
-
+            
+            setRefreshControl()
             setDataSource(animatingDifferences: (category == .Topic || category == .Search) ? false : true)
             
             guard !dataItems.isEmpty, !visibleCells.isEmpty else { return }
@@ -57,14 +59,12 @@ class SurveysCollectionView: UICollectionView {
             setDataSource()
         }
     }
-    public var refreshColor: UIColor {
-        return category == .Topic ? .white : traitCollection.userInterfaceStyle == .dark ? .white : .secondaryLabel
-    }
+    
     //Publishers
     public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-    public var paginationPublisher = CurrentValueSubject<Survey.SurveyCategory?, Never>(nil)
+    public var paginationPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
     public var paginationByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
     public var paginationByUserprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public var refreshPublisher = CurrentValueSubject<Survey.SurveyCategory?, Never>(nil)
@@ -76,6 +76,14 @@ class SurveysCollectionView: UICollectionView {
     public let unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public let userprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public let settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    //UI
+    public var color: UIColor = .secondaryLabel {
+        didSet {
+            guard oldValue != color else { return }
+            
+            setColors()
+        }
+    }
     
     
     
@@ -148,16 +156,18 @@ class SurveysCollectionView: UICollectionView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(category: Survey.SurveyCategory) {
+    init(category: Survey.SurveyCategory, color: UIColor? = nil) {
         self.category = category
         
         super.init(frame: .zero, collectionViewLayout: .init())
         
         setupUI()
         setTasks()
+        guard let color = color else { return }
+        self.color = color
     }
     
-    init(topic: Topic?) {
+    init(topic: Topic?, color: UIColor? = nil) {
         self.topic = topic
         self.category = .Topic
         
@@ -165,9 +175,11 @@ class SurveysCollectionView: UICollectionView {
         
         setupUI()
         setTasks()
+        guard let color = color else { return }
+        self.color = color
     }
 
-    init(items: [SurveyReference]) {
+    init(items: [SurveyReference], color: UIColor? = nil) {
         self.fetchResult = items
         self.category = .Search
         
@@ -175,6 +187,8 @@ class SurveysCollectionView: UICollectionView {
         
         setupUI()
         setTasks()
+        guard let color = color else { return }
+        self.color = color
     }
     
     
@@ -205,7 +219,9 @@ class SurveysCollectionView: UICollectionView {
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        refreshControl?.tintColor = refreshColor
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+//        refreshControl?.tintColor = color
         searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
 }
@@ -234,7 +250,7 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         cell.setNeedsLayout()
         cell.layoutIfNeeded()
         
-        guard isScrollingDown else { return }
+        guard category != .Search, isScrollingDown else { loadingIndicator.stopAnimating(); return }
         
         let max = source.snapshot().itemIdentifiers.count-1
         
@@ -261,6 +277,7 @@ extension SurveysCollectionView: UICollectionViewDelegate {
 }
 
 private extension SurveysCollectionView {
+    @MainActor
     func setupUI() {
         
         Timer
@@ -288,9 +305,8 @@ private extension SurveysCollectionView {
 //            layoutGuide.bottomAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 10)
         ])
 
-        refreshControl = UIRefreshControl()
+        setRefreshControl()
         setColors()
-        refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
 
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
 
@@ -417,6 +433,17 @@ private extension SurveysCollectionView {
                 self.source.apply(snap, animatingDifferences: true)
             }
             .store(in: &subscriptions)
+        
+        Timer.publish(every: 5, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self,
+                      self.visibleCells.count < 4
+                else { return }
+
+                self.requestData()
+            }
+            .store(in: &subscriptions)
 
         //Empty received
         tasks.append(Task {@MainActor [weak self] in
@@ -464,10 +491,14 @@ private extension SurveysCollectionView {
                 guard let self = self,
                       self.category == .Subscriptions,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance),
-                      let dateFilter = self.period.date(),
-                      instance.startDate >= dateFilter
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
+                
+                //Check by date filter
+                guard instance.isValid(byBeriod: self.period) else {
+                    self.loadingIndicator.stopAnimating()
+                    return
+                }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
@@ -484,10 +515,14 @@ private extension SurveysCollectionView {
                       let userprofile = self.userprofile,
                       let instance = notification.object as? SurveyReference,
                       instance.owner == userprofile,
-                      !self.source.snapshot().itemIdentifiers.contains(instance),
-                      let dateFilter = self.period.date(),
-                      instance.startDate >= dateFilter
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
+                
+                //Check by date filter
+                guard instance.isValid(byBeriod: self.period) else {
+                    self.loadingIndicator.stopAnimating()
+                    return
+                }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
@@ -519,11 +554,12 @@ private extension SurveysCollectionView {
                 guard let self = self,
                       self.category == .New,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance),
-                      let dateFilter = self.period.date(),
-                      instance.startDate >= dateFilter
-                else {
-                    if let self = self { self.loadingIndicator.stopAnimating() }
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
+                else { return }
+                
+                //Check by date filter
+                guard instance.isValid(byBeriod: self.period) else {
+                    self.loadingIndicator.stopAnimating()
                     return
                 }
 
@@ -531,7 +567,6 @@ private extension SurveysCollectionView {
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
                 self.loadingIndicator.stopAnimating()
-                //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
 
@@ -541,10 +576,14 @@ private extension SurveysCollectionView {
                 guard let self = self,
                       self.category == .Top,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance),
-                      let dateFilter = self.period.date(),
-                      instance.startDate >= dateFilter
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
+                
+                //Check by date filter
+                guard instance.isValid(byBeriod: self.period) else {
+                    self.loadingIndicator.stopAnimating()
+                    return
+                }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
@@ -560,10 +599,14 @@ private extension SurveysCollectionView {
                 guard let self = self,
                       self.category == .Own,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance),
-                      let dateFilter = self.period.date(),
-                      instance.startDate >= dateFilter
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
+                
+                //Check by date filter
+                guard instance.isValid(byBeriod: self.period) else {
+                    self.loadingIndicator.stopAnimating()
+                    return
+                }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
@@ -577,10 +620,14 @@ private extension SurveysCollectionView {
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
                 guard let self = self,
                       self.category == .Favorite,
-                      let instance = notification.object as? SurveyReference,
-                      let dateFilter = self.period.date(),
-                      instance.startDate >= dateFilter
+                      let instance = notification.object as? SurveyReference
                 else { return }
+                
+                //Check by date filter
+                guard instance.isValid(byBeriod: self.period) else {
+                    self.loadingIndicator.stopAnimating()
+                    return
+                }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
@@ -606,14 +653,19 @@ private extension SurveysCollectionView {
         //Topic added
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
-                guard let self = self,
-                      self.category == .Topic,
+                guard let self = self else { return }
+
+                guard self.category == .Topic,
                       let instance = notification.object as? SurveyReference,
-                      !self.source.snapshot().itemIdentifiers.contains(instance),
-                      let dateFilter = self.period.date(),
-                      instance.startDate >= dateFilter
+                      !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
 
+                //Check by date filter
+                guard instance.isValid(byBeriod: self.period) else {
+                    self.loadingIndicator.stopAnimating()
+                    return
+                }
+                
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
@@ -633,7 +685,7 @@ private extension SurveysCollectionView {
                 else { return }
 
                 //Append, sort
-                var snap = self.source.snapshot()
+                let snap = self.source.snapshot()
                 var items = snap.itemIdentifiers
                 let difference = SurveyReferences.shared.all
                     .filter({ $0.owner == userprofile })
@@ -644,12 +696,13 @@ private extension SurveysCollectionView {
                 newSnap.appendSections([.main])
                 newSnap.appendItems(self.filterByPeriod(items.uniqued().sorted { $0.startDate > $1.startDate }))
                 self.source.apply(newSnap)
+                self.loadingIndicator.stopAnimating()
             }
         })
 
         //Subscribed at removed
         tasks.append(Task {@MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+            for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
                 guard let self = self,
                       self.category == .Subscriptions,
 //                      let dict = notification.object as? [Userprofile: Userprofile],
@@ -670,12 +723,24 @@ private extension SurveysCollectionView {
         })
     }
     
+    @MainActor
+    func setRefreshControl() {
+        if category == .Search {
+            refreshControl = nil
+            loadingIndicator.stopAnimating()
+        } else {
+            refreshControl = UIRefreshControl()
+            refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
+        }
+    }
+    
+    @MainActor
     func setColors() {
 //        refreshControl?.attributedTitle = NSAttributedString(string: "updating_data".localized, attributes: [
 //            .foregroundColor: refreshColor as Any,
 //            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
 //        ])
-        refreshControl?.tintColor = refreshColor
+        refreshControl?.tintColor = color
     }
     
     @objc
@@ -695,7 +760,7 @@ private extension SurveysCollectionView {
         } else if category == .Userprofile, let userprofile = userprofile {
             paginationByUserprofilePublisher.send(userprofile)
         } else {
-            paginationPublisher.send(category)
+            paginationPublisher.send([category: period])
         }
     }
     
@@ -717,13 +782,8 @@ private extension SurveysCollectionView {
     }
     
     func filterByPeriod(_ items: [SurveyReference]) -> [SurveyReference] {
-//        guard category != .Userprofile,
-//              let date = period.date()
-//        else { return items }
-        guard let date = period.date() else { return items }
-
         return items.filter {
-            $0.startDate >= date
+            $0.isValid(byBeriod: period)
         }
     }
     

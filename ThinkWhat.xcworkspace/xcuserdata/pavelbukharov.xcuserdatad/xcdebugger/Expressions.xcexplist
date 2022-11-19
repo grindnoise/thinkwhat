@@ -244,7 +244,7 @@
          contextName = "closure #8 in SurveysCollectionView.setTasks():SurveysCollectionView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "instance.startDate">
+               value = "self.period">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -5700,7 +5700,7 @@
                value = "entry.dictionaryValue[&quot;timestamp&quot;]?.rawString())!">
             </PersistentString>
             <PersistentString
-               value = "json.dictionary">
+               value = "newReferences">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -7694,6 +7694,9 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "API.Polls.surveyReferences(category:dateFilter:topic:userprofile:):APIManager.swift">
+      </ContextState>
+      <ContextState
          contextName = "VotersViewController.filtered.didset:VotersViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -8079,7 +8082,7 @@
          contextName = "static AppData.loadData(_:):AppData.swift">
          <PersistentStrings>
             <PersistentString
-               value = "shared.locales">
+               value = "Double(value)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

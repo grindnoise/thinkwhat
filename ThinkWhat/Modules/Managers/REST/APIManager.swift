@@ -1360,7 +1360,7 @@ class API {
             }
         }
         
-        public func surveyReferences(category: Survey.SurveyCategory, topic: Topic? = nil, userprofile: Userprofile? = nil) async throws {
+        public func surveyReferences(category: Survey.SurveyCategory, dateFilter: Period? = nil, topic: Topic? = nil, userprofile: Userprofile? = nil) async throws {
             guard let url = category.url else { throw APIError.invalidURL }
             var parameters: Parameters!
             if category == .Topic, !topic.isNil {
@@ -1370,7 +1370,11 @@ class API {
                 parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
                 parameters["userprofile_id"] = userprofile.id
             } else {
-                parameters  = ["exclude_ids": category.dataItems().map { $0.id }]
+                parameters = ["exclude_ids": category.dataItems().map { $0.id }]
+            }
+            
+            if let dateFilter = dateFilter, let date = dateFilter.date() {
+                parameters["date_filter"] = date.toDateString()
             }
             
             do {

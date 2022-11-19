@@ -19,7 +19,7 @@ protocol ListViewInput: AnyObject {
     var category: Survey.SurveyCategory { get }
     
     func onSurveyTapped(_: SurveyReference)
-    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
+    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?)
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(_: SurveyReference)
     func share(_: SurveyReference)
@@ -37,7 +37,7 @@ protocol ListControllerInput: AnyObject {
     
     var modelOutput: ListModelOutput? { get set }
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?)
+    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?)
     func updateSurveyStats(_: [SurveyReference])
     func addFavorite(surveyReference: SurveyReference)
     func claim(surveyReference: SurveyReference, claim: Claim)

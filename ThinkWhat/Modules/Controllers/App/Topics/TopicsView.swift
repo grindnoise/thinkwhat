@@ -12,7 +12,7 @@ import Combine
 class TopicsView: UIView {
     
     // MARK: - Public properties
-    weak var viewInput: TopicsViewInput?
+    weak var viewInput: (TopicsViewInput & UIViewController)?
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -36,13 +36,12 @@ class TopicsView: UIView {
             else { return }
             
             self.viewInput?.onTopicSelected(topic)
-//            let location = instance.convert(point, to: self)
-
+            self.viewInput?.setNavigationBarTintColor(topic.tagColor)
             self.touchLocation = point
             self.surveysCollectionView.topic = topic
             self.surveysCollectionView.alpha = 1
             self.surveysCollectionView.backgroundColor = self.background.backgroundColor
-            self.reveal(present: true, location: point, view: self.surveysCollectionView, fadeView: self.collectionView, duration: 0.5)//, animateOpacity: false)
+            self.reveal(present: true, location: point, view: self.surveysCollectionView, fadeView: self.collectionView, duration: 0.4)//, animateOpacity: false)
         }.store(in: &subscriptions)
         
         return instance
@@ -52,13 +51,35 @@ class TopicsView: UIView {
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = true
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        //        instance.addEquallyTo(to: shadowView)
+        instance.publisher(for: \.bounds)
+            .sink { rect in
+                instance.cornerRadius = rect.width * 0.05
+            }
+            .store(in: &subscriptions)
+        
         collectionView.addEquallyTo(to: instance)
         surveysCollectionView.addEquallyTo(to: instance)
-        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-            guard let value = change.newValue else { return }
-            view.cornerRadius = value.width * 0.05
-        })
+        
+        return instance
+    }()
+    private lazy var shadowView: UIView = {
+        let instance = UIView()
+        instance.layer.masksToBounds = false
+        instance.clipsToBounds = false
+        instance.backgroundColor = .clear
+        instance.accessibilityIdentifier = "shadow"
+        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+        instance.layer.shadowRadius = 5
+        instance.layer.shadowOffset = .zero
+        instance.publisher(for: \.bounds)
+            .sink { rect in
+                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+            }
+            .store(in: &subscriptions
+            )
+        background.place(inside: instance)
+        
         return instance
     }()
     
@@ -66,23 +87,6 @@ class TopicsView: UIView {
     
     // MARK: - IB outlets
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var shadowView: UIView! {
-        didSet {
-            shadowView.layer.masksToBounds = false
-            shadowView.clipsToBounds = false
-            shadowView.backgroundColor = .clear
-            shadowView.accessibilityIdentifier = "shadow"
-            shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-            shadowView.layer.shadowRadius = 5
-            shadowView.layer.shadowOffset = .zero
-            observers.append(shadowView.observe(\UIView.bounds, options: .new) { view, change in
-                guard let newValue = change.newValue else { return }
-                view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
-            })
-            background.addEquallyTo(to: shadowView)
-        }
-    }
     
     // MARK: - Destructor
     deinit {
@@ -98,113 +102,47 @@ class TopicsView: UIView {
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
+        
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        commonInit()
+        
+        setupUI()
     }
     
     // MARK: - Private methods
-    private func commonInit() {
-        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-        addSubview(contentView)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-        ])
-        setupUI()
-    }
-        
     private func setupUI() {
-//        featheredView.layer.mask = featheredLayer
+        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        
+        let zeroSized = UIView()
+        zeroSized.backgroundColor = .clear
+        zeroSized.heightAnchor.constraint(equalToConstant: 0).isActive = true
+        
+        addSubview(contentView)
+        contentView.addSubview(zeroSized)
+        contentView.addSubview(shadowView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        zeroSized.translatesAutoresizingMaskIntoConstraints = false
+        shadowView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+            zeroSized.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            zeroSized.topAnchor.constraint(equalTo: contentView.topAnchor),
+            zeroSized.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            shadowView.topAnchor.constraint(equalTo: zeroSized.bottomAnchor, constant: 10),
+            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
+        ])
     }
-    
-//    private func reveal(unfold: Bool = true, view animatedView: UIView, duration: TimeInterval, completionBlocks: [Closure] = []) {
-//
-//        let circlePathLayer = CAShapeLayer()
-//        var _completionBlocks = completionBlocks
-//        var circleFrameTopCenter: CGRect {
-//            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
-//            let circlePathBounds = circlePathLayer.bounds
-//            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
-//            circleFrame.origin.y = circlePathBounds.minY - circleFrame.minY
-//            return circleFrame
-//        }
-//
-//        var circleFrameTop: CGRect {
-//            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
-//            let circlePathBounds = circlePathLayer.bounds
-//            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
-//            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
-//            return circleFrame
-//        }
-//
-//        var circleFrameTopLeft: CGRect {
-//            return CGRect.zero
-//        }
-//
-//        var circleFrameCenter: CGRect {
-//            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
-//            let circlePathBounds = circlePathLayer.bounds
-//            circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
-//            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
-//            return circleFrame
-//        }
-//
-//        func circlePath(_ rect: CGRect) -> UIBezierPath {
-//            return UIBezierPath(ovalIn: rect)
-//        }
-//
-//        circlePathLayer.frame = animatedView.bounds
-//        circlePathLayer.path = circlePath(circleFrameCenter).cgPath
-//        animatedView.layer.mask = circlePathLayer
-//
-//        let center = (x: animatedView.bounds.midX, y: animatedView.bounds.midY)
-//
-//        let finalRadius = sqrt((center.x*center.x) + (center.y*center.y))
-//
-//        let radiusInset = finalRadius
-//
-//        let outerRect = circleFrameCenter.insetBy(dx: -radiusInset, dy: -radiusInset)
-//
-//        let toPath = UIBezierPath(ovalIn: outerRect).cgPath
-//
-//        let fromPath = circlePathLayer.path
-//
-//        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
-//
-//        maskLayerAnimation.fromValue = unfold ? fromPath : toPath
-//        maskLayerAnimation.toValue = !unfold ? fromPath : toPath
-//        maskLayerAnimation.duration = duration
-//        maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-//        maskLayerAnimation.isRemovedOnCompletion = true
-//        _completionBlocks.append(
-//            {
-////                guard unfold else {
-////                    circlePathLayer.path = circlePathLayer.path
-////                    return
-////                }
-//                animatedView.layer.mask = nil
-//                if !unfold {
-//                    animatedView.layer.opacity = 0
-//                }
-//            }
-//        )
-//        maskLayerAnimation.delegate = self
-//        maskLayerAnimation.setValue(_completionBlocks, forKey: "maskCompletionBlocks")
-//        circlePathLayer.add(maskLayerAnimation, forKey: "path")
-//        if unfold {
-//            circlePathLayer.path = toPath
-//        } else {
-//            circlePathLayer.path = fromPath
-//        }
-//    }
-    private func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, fadeView: UIView, duration: TimeInterval, animateOpacity: Bool = true) {
+   
+    func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, fadeView: UIView, duration: TimeInterval, animateOpacity: Bool = true) {
 
         let circlePathLayer = CAShapeLayer()
 
@@ -246,8 +184,8 @@ class TopicsView: UIView {
         circlePathLayer.path = !present ? fromPath : toPath
         
         let grayLayer = CALayer()
-        grayLayer.frame = fadeView.layer.frame
-        grayLayer.backgroundColor = UIColor.systemGray.cgColor
+        grayLayer.frame = fadeView.layer.bounds
+        grayLayer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.systemGray.cgColor
         grayLayer.opacity = present ? 0 : 1
         
         fadeView.layer.addSublayer(grayLayer)
@@ -265,14 +203,6 @@ class TopicsView: UIView {
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     }
-    
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        let touch = touches.first
-//        guard let point = touch?.location(in: contentView) else { return }
-//
-//        lastPoint = point
-//        super.touchesBegan(touches, with: event)
-//    }
 }
 
 // MARK: - Controller Output
@@ -295,7 +225,7 @@ extension TopicsView: TopicsControllerOutput {
     func onDefaultMode() {
         surveysCollectionView.alpha = 1
         collectionView.backgroundColor = background.backgroundColor
-        reveal(present: false, location: touchLocation, view: surveysCollectionView, fadeView: collectionView, duration: 0.5)
+        reveal(present: false, location: touchLocation, view: surveysCollectionView, fadeView: collectionView, duration: 0.35)
     }
     
     func onSearchMode() {
@@ -304,7 +234,7 @@ extension TopicsView: TopicsControllerOutput {
 //        surveysCollectionView.layer.mask = nil
         surveysCollectionView.backgroundColor = background.backgroundColor
         touchLocation = CGPoint(x: bounds.maxX, y: bounds.minY)
-        reveal(present: true, location: touchLocation, view: surveysCollectionView, fadeView: collectionView, duration: 0.5)
+        reveal(present: true, location: touchLocation, view: surveysCollectionView, fadeView: collectionView, duration: 0.4)
     }
     
     func onSearchCompleted(_ instances: [SurveyReference]) {

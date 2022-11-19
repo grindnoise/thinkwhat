@@ -27,6 +27,7 @@
 "pseudonym" = "Anonymous#";
 "pseudonym_placeholder" = "Your pseudonym";
 "add_pseudonym" = "Enter pseudonym";
+"api_not_supported" = "App version is outdated. Please update Thinkwhat";
 
 //Common
 "all" = "All";

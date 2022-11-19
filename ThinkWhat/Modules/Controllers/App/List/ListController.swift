@@ -232,10 +232,10 @@ extension ListController: ListViewInput {
         main.toggleLogo(on: false)
     }
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
+    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
         guard isOnScreen else { return }
         
-        controllerInput?.onDataSourceRequest(source: source, topic: topic)
+        controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic)
     }
 }
 
