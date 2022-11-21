@@ -227,8 +227,8 @@ extension SurveysController: SurveysViewInput {
 //        tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
-        controllerInput?.onDataSourceRequest(source: source, topic: topic)
+    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
+        controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic)
     }
 }
 

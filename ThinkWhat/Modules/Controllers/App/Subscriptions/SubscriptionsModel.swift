@@ -46,10 +46,10 @@ extension SubscriptionsModel: SubsciptionsControllerInput {
         }
     }
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?, userprofile: Userprofile?) {
+    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?) {
         Task {
             do {
-                try await API.shared.surveys.surveyReferences(category: source, topic: topic, userprofile: userprofile)
+                try await API.shared.surveys.surveyReferences(category: source, dateFilter: dateFilter, topic: topic, userprofile: userprofile)
                 
                 await MainActor.run {
                     modelOutput?.onRequestCompleted(.success(true))

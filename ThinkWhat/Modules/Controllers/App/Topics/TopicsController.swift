@@ -23,6 +23,18 @@ class TopicsController: UIViewController, TintColorable {
             guard oldValue != mode else { return }
 
             onModeChanged()
+            
+            guard mode == .Default else { return }
+            
+            var color: UIColor!
+            switch oldValue {
+            case .Topic:
+                color = topic!.tagColor
+            default:
+                color = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+            }
+            
+            controllerOutput?.onDefaultMode(color: color)
         }
     }
     public var tintColor: UIColor = .clear {
@@ -86,9 +98,50 @@ class TopicsController: UIViewController, TintColorable {
         
         return instance
     }()
+    private lazy var topicIcon: Icon = {
+        let instance = Icon(category: Icon.Category.Logo)
+        instance.iconColor = Colors.Logo.Flame.rawValue
+        instance.isRounded = false
+        instance.clipsToBounds = false
+        instance.scaleMultiplicator = 1.5
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+
+        return instance
+    }()
+    private lazy var topicTitle: UILabel = {
+        let instance = UILabel()
+        instance.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title1)
+        instance.text = "Test"
+        
+        return instance
+    }()
+    private lazy var topicView: UIView = {
+//        let instance = UIView()
+//        instance.backgroundColor = .clear
+        
+        
+        let instance = UIStackView(arrangedSubviews: [
+            topicIcon,
+            topicTitle
+        ])
+        instance.axis = .horizontal
+        instance.spacing = 8
+        instance.alpha = 0
+        
+//        instance.addSubview(stack)
+//        stack.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            stack.topAnchor.constraint(equalTo: instance.topAnchor),
+//            stack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+//            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
+//        ])
+        
+        return instance
+    }()
     private var textFieldIsSetup = false
     private var isSearching = false //{
-//        didSet {
+    //        didSet {
 //            searchField.isShowingSpinner = isSearching
 //        }
 //    }
@@ -122,6 +175,20 @@ class TopicsController: UIViewController, TintColorable {
             searchField.alpha = 1
         }
     }
+    
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//
+//        //Set topicView width
+//        guard let navigationBar = self.navigationController?.navigationBar,
+//              let constraint = topicView.getConstraint(identifier: "width"),
+//              constraint.constant == 0
+//        else { return }
+//
+//        navigationBar.setNeedsLayout()
+//        constraint.constant = navigationBar.frame.width - (10*2 + 44 + 4)//top + left + right button + spacing
+//        navigationBar.layoutIfNeeded()
+//    }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -157,17 +224,31 @@ private extension TopicsController {
         guard let navigationBar = self.navigationController?.navigationBar else { return }
         
         navigationBar.addSubview(searchField)
+        navigationBar.addSubview(topicView)
         searchField.translatesAutoresizingMaskIntoConstraints = false
+        topicView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
                 searchField.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
                 searchField.heightAnchor.constraint(equalToConstant: 40),
                 searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
-//                searchField.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -(10+44))
+                topicView.heightAnchor.constraint(equalTo: searchField.heightAnchor),
+                topicView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
         ])
         let constraint = searchField.widthAnchor.constraint(equalToConstant: 20)
         constraint.identifier = "width"
         constraint.isActive = true
+        
+        navigationBar.setNeedsLayout()
+        navigationBar.layoutIfNeeded()
+        
+        let leading = topicView.leadingAnchor.constraint(equalTo: searchField.leadingAnchor, constant: -(10 + topicView.bounds.width))
+        leading.identifier = "leading"
+        leading.isActive = true
+        
+//        let width = topicView.widthAnchor.constraint(equalToConstant: 0)
+//        width.identifier = "width"
+//        width.isActive = true
         
         setBarItems()
     }
@@ -273,7 +354,6 @@ private extension TopicsController {
                 }
                 
                 let _ = searchField.resignFirstResponder()
-                controllerOutput?.onDefaultMode()
             }
             navigationItem.title = ""
             
@@ -292,6 +372,36 @@ private extension TopicsController {
                 }) { _ in }
         }
         
+        func toggleTopicView(on: Bool) {
+            guard let topic = topic,
+                  let navigationBar = navigationController?.navigationBar,
+                  let constraint = topicView.getConstraint(identifier: "leading")
+//                  let iconCategory = Icon.Category(rawValue: topic.id)
+            else { return }
+            
+            
+            topicTitle.textColor = topic.tagColor
+            topicTitle.text = topic.title//localizedTitle
+            (topicIcon.icon as! CAShapeLayer).fillColor = topic.tagColor.cgColor
+            topicIcon.iconColor = topic.tagColor
+            topicIcon.category = Icon.Category(rawValue: topic.id) ?? .Null
+            
+            
+            UIView.animate(
+                withDuration: 0.3,
+                delay: 0,
+                usingSpringWithDamping: 0.9,
+                initialSpringVelocity: 0.3,
+                options: [.curveEaseInOut],
+                animations: { [weak self] in
+                    guard let self = self else { return }
+
+                    self.topicView.alpha = on ? 1 : 0
+                    constraint.constant = on ? 0 : -(10 + self.topicView.bounds.width)
+                    navigationBar.layoutIfNeeded()
+                }) { _ in }
+        }
+        
         setBarItems()
         
         guard let mainController = tabBarController as? MainController else { return }
@@ -303,11 +413,13 @@ private extension TopicsController {
             
         case .Topic:
             mainController.toggleLogo(on: false)
-
+            toggleTopicView(on: true)
+                
         default:
             setNavigationBarTintColor(tintColor)
             mainController.toggleLogo(on: true)
             toggleSearchField(on: false)
+            toggleTopicView(on: false)
         }
     }
 }

@@ -55,9 +55,10 @@ class ListView: UIView {
         stack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: instance.topAnchor),
+//            stack.topAnchor.constraint(equalTo: instance.topAnchor),
             stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
+            stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+//            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
         ])
         
         return instance
@@ -92,11 +93,11 @@ class ListView: UIView {
             config.cornerStyle = .medium
             config.image = UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
             config.imagePlacement = .trailing
-            config.imagePadding = 6
+            config.imagePadding = 4
             config.contentInsets.leading = 4
             config.contentInsets.trailing = 4
-            config.contentInsets.top = 2
-            config.contentInsets.bottom = 2
+            config.contentInsets.top = 0
+            config.contentInsets.bottom = 0
             config.title = "per_\(period.rawValue.lowercased())".localized.lowercased()
             config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [weak self] incoming in
                 guard let self = self,
@@ -152,7 +153,7 @@ class ListView: UIView {
         
         //Pagination #1
         let paginationPublisher = instance.paginationPublisher
-            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
         
         paginationPublisher
             .sink { [unowned self] in
@@ -166,34 +167,37 @@ class ListView: UIView {
         
         //Pagination #2
         let paginationByTopicPublisher = instance.paginationByTopicPublisher
-            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
         
         paginationByTopicPublisher
             .sink { [unowned self] in
-                guard let topic = $0 else { return }
+                guard let topic = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
 
-                fatalError()
-                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: nil, topic: topic)
+                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
             }
             .store(in: &subscriptions)
         
         //Refresh #1
         instance.refreshPublisher
             .sink { [unowned self] in
-                guard let category = $0 else { return }
+                guard let category = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
                 
-                fatalError()
-                self.viewInput?.onDataSourceRequest(source: category, dateFilter: nil, topic: nil)
+                self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil)
             }
             .store(in: &subscriptions)
         
         //Refresh #2
         instance.refreshByTopicPublisher
             .sink { [unowned self] in
-                guard let topic = $0 else { return }
+                guard let topic = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
                 
-                fatalError()
-                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: nil, topic: topic)
+                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
             }
             .store(in: &subscriptions)
         
@@ -305,6 +309,14 @@ class ListView: UIView {
             }
             .store(in: &self.subscriptions)
         
+        instance.scrollPublisher
+            .sink { [weak self] in
+                guard let self = self else { return }
+                
+                self.toggleDateFilter(on: !$0)
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
 //    private lazy var featheredView: UIView = {
@@ -365,6 +377,7 @@ class ListView: UIView {
         
         return instance
     }()
+    private lazy var filterViewHeight: CGFloat = .zero
     //Logic
     private var period: Period = .AllTime {
         didSet {
@@ -413,6 +426,22 @@ class ListView: UIView {
         
         setupUI()
     }
+    
+    
+//    override func layoutSubviews() {
+//        super.layoutSubviews()
+//
+//        guard filterView.getConstraint(identifier: "height").isNil,
+//              periodButton.bounds.height != 0
+//        else { return }
+//
+////        setNeedsLayout()
+//        filterViewHeight = periodButton.bounds.height
+//        let constraint = filterView.heightAnchor.constraint(equalToConstant: 0)
+//        constraint.identifier = "height"
+//        constraint.isActive = true
+////        layoutIfNeeded()
+//    }
 }
 
 private extension ListView {
@@ -435,11 +464,21 @@ private extension ListView {
             filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 10),
             filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
+//            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
             shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
             shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
+        let topConstraint = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10)
+        topConstraint.identifier = "top"
+        topConstraint.isActive = true
+        
+        setNeedsLayout()
+        layoutIfNeeded()
+        filterViewHeight = periodButton.bounds.height
+        let constraint = filterView.heightAnchor.constraint(equalToConstant: filterViewHeight)
+        constraint.identifier = "height"
+        constraint.isActive = true
     }
     
     @MainActor
@@ -575,6 +614,24 @@ private extension ListView {
                         perMonth,
                         allTime
                       ])
+    }
+    
+    @MainActor
+    func toggleDateFilter(on: Bool) {
+        guard let heightConstraint = filterView.getConstraint(identifier: "height"),
+              let topConstraint = filterView.getConstraint(identifier: "top")
+        else { return }
+        
+        setNeedsLayout()
+        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
+            guard let self = self else { return }
+        
+            self.filterView.alpha = on ? 1 : 0
+            self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
+            topConstraint.constant = on ? 10 : 0
+            heightConstraint.constant = on ? self.filterViewHeight : 0
+            self.layoutIfNeeded()
+        }
     }
 }
 

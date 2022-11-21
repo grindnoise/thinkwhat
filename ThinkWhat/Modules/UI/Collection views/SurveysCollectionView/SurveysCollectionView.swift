@@ -65,17 +65,18 @@ class SurveysCollectionView: UICollectionView {
     public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var paginationPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
-    public var paginationByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
-    public var paginationByUserprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
-    public var refreshPublisher = CurrentValueSubject<Survey.SurveyCategory?, Never>(nil)
-    public var refreshByTopicPublisher = CurrentValueSubject<Topic?, Never>(nil)
-    public var refreshByUserprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public var paginationByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
+    public var paginationByUserprofilePublisher = PassthroughSubject<[Userprofile: Period], Never>()
+    public var refreshPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
+    public var refreshByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
+    public var refreshByUserprofilePublisher = PassthroughSubject<[Userprofile: Period], Never>()
     public var rowPublisher = CurrentValueSubject<SurveyReference?, Never>(nil)
     public var updateStatsPublisher = CurrentValueSubject<[SurveyReference]?, Never>(nil)
     public let subscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public let unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public let userprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
     public let settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    public var scrollPublisher = PassthroughSubject<Bool, Never>()
     //UI
     public var color: UIColor = .secondaryLabel {
         didSet {
@@ -111,6 +112,12 @@ class SurveysCollectionView: UICollectionView {
             guard oldValue != lastContentOffsetY else { return }
             
             isScrollingDown = lastContentOffsetY > oldValue
+            
+            guard oldValue > 0,
+                  contentSize.height > lastContentOffsetY + bounds.height
+            else { return }
+            
+            scrollPublisher.send(isScrollingDown)
         }
     }
     private var isScrollingDown = true
@@ -746,19 +753,19 @@ private extension SurveysCollectionView {
     @objc
     func refresh() {
         if category == .Topic, let topic = topic {
-            refreshByTopicPublisher.send(topic)
+            refreshByTopicPublisher.send([topic: period])
         } else if category == .Userprofile, let userprofile = userprofile {
-            refreshByUserprofilePublisher.send(userprofile)
+            refreshByUserprofilePublisher.send([userprofile: period])
         } else {
-            refreshPublisher.send(category)
+            refreshPublisher.send([category: period])
         }
     }
     
     func requestData() {
         if category == .Topic, let topic = topic {
-            paginationByTopicPublisher.send(topic)
+            paginationByTopicPublisher.send([topic: period])
         } else if category == .Userprofile, let userprofile = userprofile {
-            paginationByUserprofilePublisher.send(userprofile)
+            paginationByUserprofilePublisher.send([userprofile: period])
         } else {
             paginationPublisher.send([category: period])
         }

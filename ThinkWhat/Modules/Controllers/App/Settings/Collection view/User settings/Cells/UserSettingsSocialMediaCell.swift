@@ -42,7 +42,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         return instance
     }()
     private lazy var facebookTextField: UnderlinedSignTextField = {
-        let instance = UnderlinedSignTextField(lowerTextFieldTopConstant: -4)
+        let instance = UnderlinedSignTextField()//lowerTextFieldTopConstant: -4)
         instance.customRightView = nil
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         instance.clearButtonMode = .always
@@ -97,7 +97,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         return instance
     }()
     private lazy var instagramTextField: UnderlinedSignTextField = {
-        let instance = UnderlinedSignTextField(lowerTextFieldTopConstant: -4)
+        let instance = UnderlinedSignTextField()//lowerTextFieldTopConstant: -4)
         instance.text = ""
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
@@ -140,7 +140,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         return instance
     }()
     private lazy var tiktokTextField: UnderlinedSignTextField = {
-        let instance = UnderlinedSignTextField(lowerTextFieldTopConstant: -8)
+        let instance = UnderlinedSignTextField()//lowerTextFieldTopConstant: -8)
         instance.text = ""
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)

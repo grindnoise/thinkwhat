@@ -69,7 +69,7 @@ class UnderlinedSignTextField: UnderlinedTextField {
     private var warningSign:    Icon!
     private var lowerTextView:  UITextView!
     private var spinner: UIActivityIndicatorView?
-    private var lowerTextFieldTopConstant: CGFloat
+    private var lowerTextFieldTopConstant: CGFloat = 0
 
     private var signSize = CGSize(width: 32, height: 32) {
         didSet {
@@ -114,14 +114,15 @@ class UnderlinedSignTextField: UnderlinedTextField {
 //            }
 //        }
 //    }
-    init(lowerTextFieldTopConstant: CGFloat = 0) {
-        self.lowerTextFieldTopConstant = lowerTextFieldTopConstant
-        super.init(frame: .zero)
-    }
-    
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+//    init(lowerTextFieldTopConstant: CGFloat = 0) {
+//        self.lowerTextFieldTopConstant = lowerTextFieldTopConstant
+//        super.init(frame: .zero)
+//    }
+//
+//    public required init?(coder aDecoder: NSCoder) {
+//        super.init(frame: .zero)
+////        fatalError("init(coder:) has not been implemented")
+//    }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
@@ -129,7 +130,9 @@ class UnderlinedSignTextField: UnderlinedTextField {
         rightViewMode = .always
         rightView = UIView()
         rightView?.frame = rightViewRect(forBounds: frame)
+        
         guard checkSign.isNil || warningSign.isNil || lowerTextView.isNil else  { return }
+        
         checkSign = Icon()
         checkSign.iconColor = color
         checkSign.category = .Success

@@ -48,7 +48,7 @@ protocol TopicsModelOutput: AnyObject {
 protocol TopicsControllerOutput: AnyObject {
     var viewInput: (TopicsViewInput & UIViewController)? { get set }
     
-    func onDefaultMode()
+    func onDefaultMode(color: UIColor?)
     func onSearchMode()
     func onSearchCompleted(_: [SurveyReference])
     func onRequestCompleted(_: Result<Bool, Error>)

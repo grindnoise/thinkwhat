@@ -76,9 +76,10 @@ class SubscriptionsView: UIView {
         stack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: instance.topAnchor),
+//            stack.topAnchor.constraint(equalTo: instance.topAnchor),
             stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
+            stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+//            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
         ])
         
         return instance
@@ -186,7 +187,7 @@ class SubscriptionsView: UIView {
                       let period = $0.values.first
                 else { return }
                 
-                self.viewInput?.onDataSourceRequest(source: source, topic: nil)
+                self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil)
             }
             .store(in: &subscriptions)
         
@@ -196,9 +197,11 @@ class SubscriptionsView: UIView {
         
         paginationByTopicPublisher
             .sink { [unowned self] in
-                guard let topic = $0 else { return }
+                guard let topic = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
 
-                self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
             }
             .store(in: &subscriptions)
         
@@ -208,36 +211,44 @@ class SubscriptionsView: UIView {
         
         paginationByUserprofilePublisher
             .sink { [unowned self] in
-                guard let topic = $0 else { return }
+                guard let topic = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
 
-                self.viewInput?.onDataSourceRequest(userprofile: userprofile)
+                self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
             }
             .store(in: &subscriptions)
         
         //Refresh #1
         instance.refreshPublisher
             .sink { [unowned self] in
-                guard let category = $0 else { return }
+                guard let category = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
                 
-                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+                self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil)
             }
             .store(in: &subscriptions)
         
         //Refresh #2
         instance.refreshByTopicPublisher
             .sink { [unowned self] in
-                guard let topic = $0 else { return }
+                guard let topic = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
                 
-                self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
             }
             .store(in: &subscriptions)
         
         //Refresh #3
         instance.refreshByUserprofilePublisher
             .sink { [unowned self] in
-                guard let userprofile = $0 else { return }
+                guard let userprofile = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
                 
-                self.viewInput?.onDataSourceRequest(userprofile: userprofile)
+                self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
             }
             .store(in: &subscriptions)
         
@@ -328,6 +339,14 @@ class SubscriptionsView: UIView {
                 self.viewInput?.unsubscribe(from: userprofile)
             }
             .store(in: &self.subscriptions)
+        
+        instance.scrollPublisher
+            .sink { [weak self] in
+                guard let self = self else { return }
+                
+                self.toggleDateFilter(on: !$0)
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
@@ -654,15 +673,15 @@ class SubscriptionsView: UIView {
     private lazy var topView: UIView = {
        let instance = UIView()
         instance.backgroundColor = .clear
-        instance.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+        constraint.identifier = "height"
+        constraint.isActive = true
         
         feedCollectionView.place(inside: instance)
         
         return instance
     }()
-    
-    
-    // MARK: - IB outlets
+    private lazy var filterViewHeight: CGFloat = .zero
     @IBOutlet var contentView: UIView!
     
     
@@ -812,15 +831,23 @@ private extension SubscriptionsView {
             filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10),
             filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
+//            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
             shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
             shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
         userView.alpha = 0
-//        let constraint = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 0)
-//        constraint.identifier = "filterTop"
-//        constraint.isActive = true
+        let topConstraint = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10)
+        topConstraint.identifier = "top"
+        topConstraint.isActive = true
+
+
+        setNeedsLayout()
+        layoutIfNeeded()
+        filterViewHeight = periodButton.bounds.height
+        let constraint = filterView.heightAnchor.constraint(equalToConstant: filterViewHeight)
+        constraint.identifier = "height"
+        constraint.isActive = true
     }
     
     @MainActor
@@ -1028,6 +1055,28 @@ private extension SubscriptionsView {
             }
         }
     }
+    
+    @MainActor
+    func toggleDateFilter(on: Bool) {
+        guard let heightConstraint = filterView.getConstraint(identifier: "height"),
+//              let heightConstraint_2 = topView.getConstraint(identifier: "height"),
+              let topConstraint = filterView.getConstraint(identifier: "top")
+        else { return }
+        
+        setNeedsLayout()
+        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
+            guard let self = self else { return }
+        
+            self.filterView.alpha = on ? 1 : 0
+//            self.topView.alpha = on ? 1 : 0
+            self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
+//            self.topView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
+            topConstraint.constant = on ? 10 : 0
+            heightConstraint.constant = on ? self.filterViewHeight : 0
+//            heightConstraint_2.constant = on ? 100 : 0
+            self.layoutIfNeeded()
+        }
+    }
 }
 
 extension SubscriptionsView: SubsciptionsControllerOutput {
@@ -1097,21 +1146,6 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
                 completion()
             }
         }
-        
-//        feedCollectionView.blur(on: false,
-//                                duration: 0.3,
-//                                effectStyle: .systemChromeMaterial,
-//                                withAlphaComponent: true,
-//                                animations: { [weak self] in
-//            guard let self = self else { return }
-//
-//
-//            self.userView.alpha = 0
-//            self.feedCollectionView.alpha = 1
-//            self.setNeedsLayout()
-//            self.upperContainerHeightConstraint.constant -= 20
-//            self.layoutIfNeeded()
-//        }) {}
     }
     
 //    func setPeriod(_ period: Period) {
@@ -1126,18 +1160,6 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
         surveysCollectionView.deselect()
     }
 }
-
-//extension SubsciptionsView: CallbackObservable {
-//    func callbackReceived(_ sender: Any) {
-//        if let instance = sender as? SurveyReference {
-//            viewInput?.onSurveyTapped(instance)
-//        } else if sender is SurveysCollectionView {
-//            viewInput?.onDataSourceRequest()
-//        } else if let instances = sender as? [SurveyReference] {
-//            viewInput?.updateSurveyStats(instances)
-//        }
-//    }
-//}
 
 extension SubscriptionsView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}

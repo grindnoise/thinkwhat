@@ -41,7 +41,7 @@ class SurveysView: UIView {
         
         //Pagination #1
         let paginationPublisher = instance.paginationPublisher
-            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
 
         paginationPublisher
             .sink { [unowned self] in
@@ -49,37 +49,43 @@ class SurveysView: UIView {
                       let period = $0.values.first
                 else { return }
 
-                self.viewInput?.onDataSourceRequest(source: source, topic: nil)
+                self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil)
             }
             .store(in: &subscriptions)
 
         //Pagination #2
         let paginationByTopicPublisher = instance.paginationByTopicPublisher
-            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
-
+            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+        
         paginationByTopicPublisher
             .sink { [unowned self] in
-                guard let topic = $0 else { return }
+                guard let topic = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
 
-                self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
             }
             .store(in: &subscriptions)
 
         //Refresh #1
         instance.refreshPublisher
             .sink { [unowned self] in
-                guard let category = $0 else { return }
+                guard let category = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
 
-                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+                self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil)
             }
             .store(in: &subscriptions)
 
         //Refresh #2
         instance.refreshByTopicPublisher
             .sink { [unowned self] in
-                guard let topic = $0 else { return }
+                guard let topic = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
 
-                self.viewInput?.onDataSourceRequest(source: .Topic, topic: topic)
+                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
             }
             .store(in: &subscriptions)
 

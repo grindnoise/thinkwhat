@@ -505,8 +505,8 @@ extension SubscriptionsController: SubscriptionsViewInput {
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
-    func onDataSourceRequest(userprofile: Userprofile) {
-        controllerInput?.onDataSourceRequest(source: .Userprofile, topic: nil, userprofile: userprofile)
+    func onDataSourceRequest(userprofile: Userprofile, dateFilter: Period?) {
+        controllerInput?.onDataSourceRequest(source: .Userprofile, dateFilter: dateFilter, topic: nil, userprofile: userprofile)
     }
     
     func setUserprofileFilter(_ userprofile: Userprofile) {
@@ -585,8 +585,8 @@ extension SubscriptionsController: SubscriptionsViewInput {
         controller.toggleLogo(on: false)
     }
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, topic: Topic?) {
-        controllerInput?.onDataSourceRequest(source: source, topic: topic, userprofile: nil)
+    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
+        controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic, userprofile: nil)
     }
     
     func onSubscribersTapped() {
