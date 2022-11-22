@@ -27,6 +27,16 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
     public var googlePublisher = CurrentValueSubject<String?, Never>(nil)
     public var twitterPublisher = CurrentValueSubject<String?, Never>(nil)
     public var openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
+    public var keyboardWillAppear = PassthroughSubject<Bool, Never>()
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            setColors()
+            setupButtons()
+        }
+    }
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -172,7 +182,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         let instance =  UIStackView(arrangedSubviews: [tiktokIcon, tiktokTextField, tiktokButton])
         instance.axis = .horizontal
         instance.spacing = 8
-
+        
         
         return instance
     }()
@@ -185,6 +195,8 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         return instance
     }()
     
+    
+    
     // MARK: - Destructor
     deinit {
         observers.forEach { $0.invalidate() }
@@ -195,6 +207,8 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
+    
+    
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -207,8 +221,40 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private methods
-    private func setupUI() {
+    
+    
+    // MARK: - Overriden methods
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        super.traitCollectionDidChange(previousTraitCollection)
+//
+//        facebookTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        instagramTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        tiktokTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//
+//        tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
+//
+//        guard !userprofile.isNil else { return }
+//
+//        setupButtons()
+//    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        facebookPublisher = CurrentValueSubject<String?, Never>(nil)
+        instagramPublisher = CurrentValueSubject<String?, Never>(nil)
+        tiktokPublisher = CurrentValueSubject<String?, Never>(nil)
+        googlePublisher = CurrentValueSubject<String?, Never>(nil)
+        twitterPublisher = CurrentValueSubject<String?, Never>(nil)
+        openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
+    }
+}
+
+    // MARK: - Private
+private extension UserSettingsSocialMediaCell {
+    @MainActor
+    func setupUI() {
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
         clipsToBounds = false
         
@@ -232,17 +278,14 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
 //        constraint.isActive = true
     }
     
-    private func setTasks() {
-//        tasks.append( Task {@MainActor [weak self] in
-//            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.FacebookURL) {
-//                guard let self = self,
-//                      let userprofile = notification.object as? Userprofile,
-//                      userprofile.isCurrent
-//                else { return }
-//
-//                self.isBadgeEnabled = false
-//            }
-//        })
+    func setTasks() {
+        tasks.append( Task {@MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: UIApplication.keyboardWillShowNotification) {
+                guard let self = self else { return }
+
+                self.keyboardWillAppear.send(true)
+            }
+        })
 //        tasks.append( Task {@MainActor [weak self] in
 //            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.InstagramURL) {
 //                guard let self = self,
@@ -267,18 +310,20 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
     }
     
     @objc
-    private func handleIO(_ instance: UnderlinedSearchTextField) {
+    func handleIO(_ instance: UnderlinedSearchTextField) {
 //        guard let text = instance.text, text.count >= 4 else { return }
 //        fatalError()
     }
     
-    private func setupTextFields() {
+    @MainActor
+    func setupTextFields() {
         facebookTextField.text = userprofile.facebookURL?.absoluteString ?? ""
         instagramTextField.text = userprofile.instagramURL?.absoluteString ?? ""
         tiktokTextField.text = userprofile.tiktokURL?.absoluteString ?? ""
     }
     
-    private func setupButtons() {
+    @MainActor
+    func setupButtons() {
 //        if #available(iOS 15, *) {
 //            if !facebookButton.configuration.isNil {
 //                facebookButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
@@ -300,16 +345,16 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
 //
 //                    return self.userprofile.tiktokURL.isNil ? .secondaryLabel : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //                }
-//            }
-//        } else {
-            facebookButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-            instagramButton.tintColor = userprofile.instagramURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-            tiktokView.tintColor = userprofile.tiktokURL.isNil ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//        }
+        //            }
+        //        } else {
+        facebookButton.tintColor = userprofile.facebookURL.isNil ? .secondaryLabel : color//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instagramButton.tintColor = userprofile.instagramURL.isNil ? .secondaryLabel : color//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        tiktokView.tintColor = userprofile.tiktokURL.isNil ? .secondaryLabel : color//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        //        }
     }
     
     @objc
-    private func handleTap(sender: UIButton) {
+    func handleTap(sender: UIButton) {
         if sender === facebookButton, let text = facebookTextField.text, let url = URL(string: text) {
             openURLPublisher.send(url)
         } else if sender === instagramButton, let text = instagramTextField.text, let url = URL(string: text) {
@@ -319,7 +364,8 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         }
     }
     
-    private func toggleButton(on: Bool, button: UIButton) {
+    @MainActor
+    func toggleButton(on: Bool, button: UIButton) {
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, animations: {[weak self] in
             guard let self = self else { return }
             
@@ -339,33 +385,15 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
         }
     }
     
-    // MARK: - Public methods
-    
-    // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
+    @MainActor
+    func setColors() {
+//        facebookButton.tintColor = color
+//        instagramButton.tintColor = color
+//        tiktokButton.tintColor = color
         
-        facebookTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        instagramTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        tiktokTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        
-        tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
-        
-        guard !userprofile.isNil else { return }
-        
-        setupButtons()
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        
-        facebookPublisher = CurrentValueSubject<String?, Never>(nil)
-        instagramPublisher = CurrentValueSubject<String?, Never>(nil)
-        tiktokPublisher = CurrentValueSubject<String?, Never>(nil)
-        googlePublisher = CurrentValueSubject<String?, Never>(nil)
-        twitterPublisher = CurrentValueSubject<String?, Never>(nil)
-        openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
+        facebookTextField.tintColor = color
+        instagramTextField.tintColor = color
+        tiktokTextField.tintColor = color
     }
 }
 

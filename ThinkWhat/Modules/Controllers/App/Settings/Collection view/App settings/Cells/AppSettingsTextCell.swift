@@ -29,6 +29,14 @@ class AppSettingsTextCell: UICollectionViewListCell {
     //Publishers
     public var tapPublisher = CurrentValueSubject<Mode?, Never>(nil)
 //    public var contentLanguagePublisher = CurrentValueSubject<Bool?, Never>(nil)//CurrentValueSubject<[AppSettings: [String: Bool]]?, Never>(nil)
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            disclosure.tintColor = color
+        }
+    }
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -142,7 +150,7 @@ class AppSettingsTextCell: UICollectionViewListCell {
         super.traitCollectionDidChange(previousTraitCollection)
         
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
-        disclosure.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        disclosure.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
     override func prepareForReuse() {

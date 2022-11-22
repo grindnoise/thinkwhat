@@ -12,8 +12,6 @@ import L10n_swift
 
 class AppSettingsLanguageCell: UICollectionViewListCell {
     
-    
-    
     // MARK: - Public properties
     public var mode: AppSettings! {
         didSet {
@@ -25,12 +23,19 @@ class AppSettingsLanguageCell: UICollectionViewListCell {
     //Publishers
     public var appLanguagePublisher = CurrentValueSubject<[AppSettings: String]?, Never>(nil)
     public var contentLanguagePublisher = CurrentValueSubject<Bool?, Never>(nil)//CurrentValueSubject<[AppSettings: [String: Bool]]?, Never>(nil)
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            disclosureButton.tintColor = color
+        }
+    }
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    
     //UI
     private let padding: CGFloat = 8
     private lazy var titleLabel: UILabel = {
@@ -162,7 +167,7 @@ class AppSettingsLanguageCell: UICollectionViewListCell {
         super.traitCollectionDidChange(previousTraitCollection)
         
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
-        disclosureButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        disclosureButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
     override func prepareForReuse() {

@@ -25,15 +25,21 @@ class UserSettingsStatsCell: UICollectionViewListCell {
     public var subscribersPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            setColors()
+        }
+    }
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    
     //UI
     private let padding: CGFloat = 8
-    
     //Balance
     private lazy var balanceTitle: UILabel = {
         let instance = UILabel()
@@ -382,7 +388,7 @@ class UserSettingsStatsCell: UICollectionViewListCell {
         
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
         
-        setColors()
+//        setColors()
     }
     
     override func prepareForReuse() {
@@ -397,7 +403,6 @@ class UserSettingsStatsCell: UICollectionViewListCell {
 }
 
 private extension UserSettingsStatsCell {
-    
     func setTasks() {
         //Balance
         tasks.append( Task {@MainActor [weak self] in
@@ -473,33 +478,35 @@ private extension UserSettingsStatsCell {
         })
     }
     
+    @MainActor
     func setColors() {
         guard let userprofile = userprofile else { return }
         
-        balanceTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        balanceCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        balanceButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .label : K_COLOR_RED
+//        balanceTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        balanceCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        balanceButton.tintColor = color//traitCollection.userInterfaceStyle == .dark ? .label : color
         
-        publicationsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        publicationsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        publicationsButton.tintColor = userprofile.publicationsTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        publicationsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        publicationsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        publicationsButton.tintColor = userprofile.publicationsTotal == 0 ? .secondaryLabel : color
         
-        completeTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        completeCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        completeTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        completeCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         
-        subscribersTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        subscribersCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        subscribersButton.tintColor = userprofile.subscribersTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        subscribersTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        subscribersCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        subscribersButton.tintColor = userprofile.subscribersTotal == 0 ? .secondaryLabel : color
         
-        subscriptionsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        subscriptionsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        subscriptionsButton.tintColor = userprofile.subscriptionsTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        subscriptionsTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        subscriptionsCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        subscriptionsButton.tintColor = userprofile.subscriptionsTotal == 0 ? .secondaryLabel : color
         
-        watchingTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        watchingCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        watchingButton.tintColor = userprofile.favoritesTotal == 0 ? .secondaryLabel : traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        watchingTitle.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        watchingCount.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        watchingButton.tintColor = userprofile.favoritesTotal == 0 ? .secondaryLabel : color
     }
     
+    @MainActor
     func setupUI() {
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
         clipsToBounds = false
@@ -524,6 +531,7 @@ private extension UserSettingsStatsCell {
         constraint.isActive = true
     }
     
+    @MainActor
     func setText() {
         guard let userprofile = Userprofiles.shared.current else { return }
         

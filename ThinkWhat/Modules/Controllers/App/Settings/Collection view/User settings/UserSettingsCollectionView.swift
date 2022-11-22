@@ -38,6 +38,12 @@ class UserSettingsCollectionView: UICollectionView {
     public var subscribersPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            setupUI()
+        }
+    }
     
     
     
@@ -63,8 +69,13 @@ class UserSettingsCollectionView: UICollectionView {
     
     
     // MARK: - Initialization
+    init() {
+        super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
+    }
+    
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
+        
         setupUI()
     }
     
@@ -119,6 +130,7 @@ class UserSettingsCollectionView: UICollectionView {
             config.backgroundColor = .clear
             cell.backgroundConfiguration = config
             cell.automaticallyUpdatesBackgroundConfiguration = false
+            cell.color = self.color
             
             //Name
             cell.namePublisher.sink { [weak self] in
@@ -178,6 +190,8 @@ class UserSettingsCollectionView: UICollectionView {
         
         let cityCellRegistration = UICollectionView.CellRegistration<UserSettingsCityCell, AnyHashable> { [unowned self] cell, indexPath, item in
             
+            cell.color = self.color
+            
             //Fetch
             cell.cityFetchPublisher.sink { [weak self] in
                 guard let self = self,
@@ -211,6 +225,11 @@ class UserSettingsCollectionView: UICollectionView {
         }
         
         let socialCellRegistration = UICollectionView.CellRegistration<UserSettingsSocialMediaCell, AnyHashable> { [unowned self] cell, indexPath, item in
+            cell.keyboardWillAppear
+                .sink { [unowned self] _ in
+                    self.scrollToItem(at: indexPath, at: .top, animated: true)
+                }
+                .store(in: &self.subscriptions)
             
             //Facebook
             cell.facebookPublisher.sink { [weak self] in
@@ -271,6 +290,7 @@ class UserSettingsCollectionView: UICollectionView {
             guard let userprofile = Userprofiles.shared.current else { return }
             
             cell.userprofile = userprofile
+            cell.color = self.color
         }
         
         let interestsCellRegistration = UICollectionView.CellRegistration<UserSettingsInterestsCell, AnyHashable> { [unowned self] cell, indexPath, item in
@@ -350,6 +370,7 @@ class UserSettingsCollectionView: UICollectionView {
             guard let userprofile = Userprofiles.shared.current else { return }
             
             cell.userprofile = userprofile
+            cell.color = self.color
         }
         
         let accountCellRegistration = UICollectionView.CellRegistration<UserSettingsAccountCell, AnyHashable> { [unowned self] cell, indexPath, item in
@@ -361,6 +382,7 @@ class UserSettingsCollectionView: UICollectionView {
                           !$0.isNil
                     else { return }
                     
+                    fatalError()
 //                    self.interestPublisher.send(topic)
                 }
                 .store(in: &subscriptions)
@@ -372,6 +394,7 @@ class UserSettingsCollectionView: UICollectionView {
                           !$0.isNil
                     else { return }
                     
+                    fatalError()
 //                    self.interestPublisher.send(topic)
                 }
                 .store(in: &subscriptions)

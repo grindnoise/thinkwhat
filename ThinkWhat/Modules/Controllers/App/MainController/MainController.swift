@@ -700,7 +700,8 @@ extension MainController: UITabBarControllerDelegate {
             case is SettingsController:
                 currentTab = .Settings
                 setColors(Colors.Logo.AirBlue.rawValue)
-                setLogoLeading(constant: 10, animated: true)
+                setLogoCentered(animated: true)
+//                setLogoLeading(constant: 10, animated: true)
                 toggleLogo(on: true)
             default:
                 print("")

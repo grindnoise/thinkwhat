@@ -12,12 +12,25 @@ import Combine
 class TopicsView: UIView {
     
     // MARK: - Public properties
-    weak var viewInput: (TopicsViewInput & UIViewController)?
+    weak var viewInput: (TopicsViewInput & TintColorable)?
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
-    private var tasks: [Task<Void, Never>?] = []
+    private var tasks: [Task<Void, Never>?] = [] {
+        didSet {
+            guard let viewInput = viewInput else { return }
+            
+            if #available(iOS 15, *) {
+                if !periodButton.configuration.isNil {
+                    periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return viewInput.tintColor }
+                }
+            } else {
+                periodButton.imageView?.tintColor = viewInput.tintColor
+                periodButton.tintColor = viewInput.tintColor
+            }
+        }
+    }
     //UI
     private lazy var filterView: UIView = {
        let instance = UIView()
@@ -52,7 +65,7 @@ class TopicsView: UIView {
         instance.textAlignment = .center
         instance.numberOfLines = 1
         instance.text = "publications".localized.capitalized
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
         instance.adjustsFontSizeToFitWidth = true
         
@@ -158,7 +171,7 @@ class TopicsView: UIView {
             self.touchLocation = point
             self.surveysCollectionView.topic = topic
             self.toggleDateFilter(on: true)
-            self.setBackgroundColor(self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground)
+            self.setBackgroundColor(.secondarySystemBackground)
             self.surveysCollectionView.alpha = 1
             self.surveysCollectionView.backgroundColor = self.background.backgroundColor
             self.reveal(present: true, location: point, view: self.surveysCollectionView, color: self.surveysCollectionView.topic!.tagColor, fadeView: self.collectionView, duration: 0.5)//, animateOpacity: false)
@@ -250,6 +263,12 @@ class TopicsView: UIView {
         collectionView.backgroundColor = .clear
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        
+        if #available(iOS 15, *) {
+            periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        } else {
+            periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        }
     }
 }
 
@@ -277,22 +296,20 @@ private extension TopicsView {
             contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-            filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 10),
             filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-//            zeroSized.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-//            zeroSized.topAnchor.constraint(equalTo: contentView.topAnchor),
-//            zeroSized.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-//            shadowView.topAnchor.constraint(equalTo: zeroSized.bottomAnchor, constant: 10),
-//            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
             shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
             shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
         
-        let topConstraint = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 0)
-        topConstraint.identifier = "top"
-        topConstraint.isActive = true
+        let topConstraint_1 = filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 10)
+        topConstraint_1.identifier = "top_1"
+        topConstraint_1.isActive = true
+        
+        let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 0)
+        topConstraint_2.identifier = "top_2"
+        topConstraint_2.isActive = true
         
         setNeedsLayout()
         layoutIfNeeded()
@@ -361,7 +378,11 @@ private extension TopicsView {
         circlePathLayer.path = !present ? fromPath : toPath
         
         let colorLayer = CALayer()
-        colorLayer.frame = fadeView.layer.bounds
+        if let collectionView = fadeView as? UICollectionView {
+            colorLayer.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 3000))
+        } else {
+            colorLayer.frame = fadeView.layer.bounds
+        }
         colorLayer.backgroundColor = color.cgColor
         colorLayer.opacity = present ? 0 : 1
         
@@ -400,16 +421,20 @@ private extension TopicsView {
     @MainActor
     func toggleDateFilter(on: Bool) {
         guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-              let topConstraint = filterView.getConstraint(identifier: "top")
+              let topConstraint_1 = filterView.getConstraint(identifier: "top_1"),
+              let topConstraint_2 = filterView.getConstraint(identifier: "top_2")
         else { return }
         
         setNeedsLayout()
         UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
-            guard let self = self else { return }
+            guard let self = self,
+            let viewInput = self.viewInput
+            else { return }
         
             self.filterView.alpha = on ? 1 : 0
             self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-            topConstraint.constant = on ? 10 : 0
+            topConstraint_1.constant = on ? viewInput.mode == .Topic ? 20 : 0 : 0
+            topConstraint_2.constant = on ? viewInput.mode == .Topic ? 20 : 0 : 10
             heightConstraint.constant = on ? self.filterViewHeight : 0
             self.layoutIfNeeded()
         }
@@ -509,7 +534,7 @@ extension TopicsView: TopicsControllerOutput {
 //        surveysCollectionView.layer.mask = nil
         surveysCollectionView.backgroundColor = background.backgroundColor
         touchLocation = CGPoint(x: bounds.maxX, y: bounds.minY)
-        reveal(present: true, location: touchLocation, view: surveysCollectionView, color: .white, fadeView: collectionView, duration: 0.5)
+        reveal(present: true, location: touchLocation, view: surveysCollectionView, color: .systemGray.withLuminosity(0.85), fadeView: collectionView, duration: 0.5)
     }
     
     func onSearchCompleted(_ instances: [SurveyReference]) {

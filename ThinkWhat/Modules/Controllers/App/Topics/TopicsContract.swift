@@ -11,7 +11,7 @@ import UIKit
 /// *View* sends user actions to the *Controller*.
 ///
 /// **Controller** conforms to this protocol
-protocol TopicsViewInput: class {
+protocol TopicsViewInput: AnyObject {
     
     var controllerOutput: TopicsControllerOutput? { get set }
     var controllerInput: TopicsControllerInput? { get set }
@@ -46,7 +46,7 @@ protocol TopicsModelOutput: AnyObject {
 ///
 /// **View** conforms to this protocol
 protocol TopicsControllerOutput: AnyObject {
-    var viewInput: (TopicsViewInput & UIViewController)? { get set }
+    var viewInput: (TopicsViewInput & TintColorable)? { get set }
     
     func onDefaultMode(color: UIColor?)
     func onSearchMode()

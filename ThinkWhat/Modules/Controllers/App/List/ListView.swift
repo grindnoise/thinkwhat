@@ -68,7 +68,7 @@ class ListView: UIView {
         instance.numberOfLines = 1
         instance.textAlignment = .center
         instance.numberOfLines = 1
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
         instance.adjustsFontSizeToFitWidth = true
         
@@ -428,20 +428,18 @@ class ListView: UIView {
     }
     
     
-//    override func layoutSubviews() {
-//        super.layoutSubviews()
-//
-//        guard filterView.getConstraint(identifier: "height").isNil,
-//              periodButton.bounds.height != 0
-//        else { return }
-//
-////        setNeedsLayout()
-//        filterViewHeight = periodButton.bounds.height
-//        let constraint = filterView.heightAnchor.constraint(equalToConstant: 0)
-//        constraint.identifier = "height"
-//        constraint.isActive = true
-////        layoutIfNeeded()
-//    }
+    
+    // MARK: - Overridden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+//        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        if #available(iOS 15, *) {
+            periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        } else {
+            periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        }
+    }
 }
 
 private extension ListView {
@@ -461,7 +459,7 @@ private extension ListView {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 10),
+//            filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 20),
             filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
 //            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
@@ -469,9 +467,13 @@ private extension ListView {
             shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
             shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
-        let topConstraint = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10)
-        topConstraint.identifier = "top"
-        topConstraint.isActive = true
+        let topConstraint_1 = filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 20)
+        topConstraint_1.identifier = "top_1"
+        topConstraint_1.isActive = true
+        
+        let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 20)
+        topConstraint_2.identifier = "top_2"
+        topConstraint_2.isActive = true
         
         setNeedsLayout()
         layoutIfNeeded()
@@ -619,7 +621,8 @@ private extension ListView {
     @MainActor
     func toggleDateFilter(on: Bool) {
         guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-              let topConstraint = filterView.getConstraint(identifier: "top")
+              let topConstraint_1 = filterView.getConstraint(identifier: "top_1"),
+              let topConstraint_2 = filterView.getConstraint(identifier: "top_2")
         else { return }
         
         setNeedsLayout()
@@ -628,7 +631,8 @@ private extension ListView {
         
             self.filterView.alpha = on ? 1 : 0
             self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-            topConstraint.constant = on ? 10 : 0
+            topConstraint_1.constant = on ? 20 : 10
+            topConstraint_2.constant = on ? 20 : 0
             heightConstraint.constant = on ? self.filterViewHeight : 0
             self.layoutIfNeeded()
         }
@@ -649,18 +653,6 @@ extension ListView: ListControllerOutput {
         
         setTitle(category: category, animated: true)
         collectionView.category = category
-    }
-}
-
-// MARK: - UI Setup
-extension ListView {
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-//        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        if #available(iOS 15, *) {
-            periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        }
     }
 }
 

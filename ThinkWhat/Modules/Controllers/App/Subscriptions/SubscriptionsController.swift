@@ -586,6 +586,8 @@ extension SubscriptionsController: SubscriptionsViewInput {
     }
     
     func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
+        guard isOnScreen else { return }
+        
         controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic, userprofile: nil)
     }
     

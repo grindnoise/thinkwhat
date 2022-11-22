@@ -61,7 +61,7 @@ protocol SettingsModelOutput: AnyObject {
 ///
 /// **View** conforms to this protocol
 protocol SettingsControllerOutput: AnyObject {
-    var viewInput: (SettingsViewInput & UIViewController)? { get set }
+    var viewInput: (SettingsViewInput & TintColorable)? { get set }
 
     func onError(_: Error)
     func onAppSettings()

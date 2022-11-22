@@ -14,20 +14,21 @@ class delAvatar: UIView {
     private var gender: Gender = .Male
     @MainActor public var image: UIImage? {
         didSet {
-            guard let image = image, !container.isNil else {
-                return
-            }
+            guard let image = image, !container.isNil else { return }
+            
             imageView.image = image
             imageView.addEquallyTo(to: container)
-            let icon = self.container.get(all: Icon.self).first
+            
+            guard let icon = self.container.get(all: Icon.self).first else { return }
+            
             UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, options: .curveEaseOut) { [weak self] in
                 guard let self = self else { return }
+                
                 self.imageView.alpha = 1
                 self.imageView.transform = .identity
-                icon?.alpha = 0
+                icon.alpha = 0
             } completion: { _ in
-                guard !icon.isNil else { return }
-                icon!.removeFromSuperview()
+                icon.removeFromSuperview()
             }
         }
     }
@@ -234,6 +235,11 @@ class Avatar: UIView {
             shadowView.layer.shadowColor = shadowColor.withAlphaComponent(0.4).cgColor
         }
     }
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            button.tintColor = color
+        }
+    }
     public lazy var buttonBgLightColor: UIColor = .systemBackground{
         didSet {
             guard traitCollection.userInterfaceStyle != .dark else { return }
@@ -246,7 +252,6 @@ class Avatar: UIView {
             button.backgroundColor = buttonBgDarkColor
         }
     }
-
     public lazy var background: UIView = {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
@@ -693,7 +698,7 @@ class Avatar: UIView {
         super.traitCollectionDidChange(previousTraitCollection)
         
         shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
-        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
     }
 }

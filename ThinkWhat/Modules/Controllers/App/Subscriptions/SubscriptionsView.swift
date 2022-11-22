@@ -11,6 +11,10 @@ import Combine
 
 class SubscriptionsView: UIView {
     
+    private enum Mode {
+        case User, Default
+    }
+    
     // MARK: - Public properties
     weak var viewInput: (SubscriptionsViewInput & TintColorable)? {
         didSet {
@@ -36,6 +40,20 @@ class SubscriptionsView: UIView {
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
+    //Logic
+    private var mode: Mode = .Default {
+        didSet {
+//            guard let constraint = filterView.getConstraint(identifier: "top_1") else { return }
+            
+//            setNeedsLayout()
+//            UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
+//                guard let self = self else { return }
+//
+//                constraint.constant = self.mode == .User ? 20 : 0
+//                self.layoutIfNeeded()
+//            }
+        }
+    }
     //UI
     private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
     private var userprofile: Userprofile! {
@@ -46,6 +64,7 @@ class SubscriptionsView: UIView {
             surveysCollectionView.userprofile = userprofile
             onUserSelected(userprofile: userprofile)
             usernameLabel.text = userprofile.name
+            mode = .User
         }
     }
     private var period: Period = .AllTime {
@@ -89,7 +108,7 @@ class SubscriptionsView: UIView {
         instance.numberOfLines = 1
         instance.textAlignment = .center
         instance.numberOfLines = 1
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
         instance.text = "publications".localized.capitalized
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
         instance.adjustsFontSizeToFitWidth = true
@@ -707,20 +726,19 @@ class SubscriptionsView: UIView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+//        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
 //        userView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        
-        if #unavailable(iOS 15) {
-//            profileButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_TABBAR
-//            subscriptionButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+        if #available(iOS 15, *) {
+            periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        } else {
+            periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
             let attrString_1 = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
                 NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
                 NSAttributedString.Key.foregroundColor: Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
             ])
             profileButton.setAttributedTitle(attrString_1, for: .normal)
-        } else {
-            periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         }
+        
         userView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
@@ -828,7 +846,7 @@ private extension SubscriptionsView {
             topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             topView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             topView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10),
+//            filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10),
             filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
 //            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
@@ -836,10 +854,16 @@ private extension SubscriptionsView {
             shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
             shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
+        
         userView.alpha = 0
-        let topConstraint = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10)
-        topConstraint.identifier = "top"
-        topConstraint.isActive = true
+        
+        let topConstraint_1 = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10)
+        topConstraint_1.identifier = "top_1"
+        topConstraint_1.isActive = true
+        
+        let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 20)
+        topConstraint_2.identifier = "top_2"
+        topConstraint_2.isActive = true
 
 
         setNeedsLayout()
@@ -1059,8 +1083,8 @@ private extension SubscriptionsView {
     @MainActor
     func toggleDateFilter(on: Bool) {
         guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-//              let heightConstraint_2 = topView.getConstraint(identifier: "height"),
-              let topConstraint = filterView.getConstraint(identifier: "top")
+              let topConstraint_1 = filterView.getConstraint(identifier: "top_1"),
+              let topConstraint_2 = filterView.getConstraint(identifier: "top_2")
         else { return }
         
         setNeedsLayout()
@@ -1068,12 +1092,10 @@ private extension SubscriptionsView {
             guard let self = self else { return }
         
             self.filterView.alpha = on ? 1 : 0
-//            self.topView.alpha = on ? 1 : 0
             self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-//            self.topView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-            topConstraint.constant = on ? 10 : 0
+            topConstraint_1.constant = on ? 20 : self.mode == .Default ? 0 : 10
+            topConstraint_2.constant = on ? 20 : 0
             heightConstraint.constant = on ? self.filterViewHeight : 0
-//            heightConstraint_2.constant = on ? 100 : 0
             self.layoutIfNeeded()
         }
     }
@@ -1092,6 +1114,7 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
             return
         }
         
+        mode = .Default
         surveysCollectionView.category = .Subscriptions
         
         let temp = UIImageView(image: userprofile.image)

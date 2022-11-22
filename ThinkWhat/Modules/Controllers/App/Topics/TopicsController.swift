@@ -31,7 +31,7 @@ class TopicsController: UIViewController, TintColorable {
             case .Topic:
                 color = topic!.tagColor
             default:
-                color = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+                color = .systemGray.withLuminosity(0.85)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
             }
             
             controllerOutput?.onDefaultMode(color: color)
@@ -242,13 +242,13 @@ private extension TopicsController {
         navigationBar.setNeedsLayout()
         navigationBar.layoutIfNeeded()
         
-        let leading = topicView.leadingAnchor.constraint(equalTo: searchField.leadingAnchor, constant: -(10 + topicView.bounds.width))
-        leading.identifier = "leading"
-        leading.isActive = true
+//        let leading = topicView.leadingAnchor.constraint(equalTo: searchField.leadingAnchor, constant: -(10 + topicView.bounds.width))
+//        leading.identifier = "leading"
+//        leading.isActive = true
         
-//        let width = topicView.widthAnchor.constraint(equalToConstant: 0)
-//        width.identifier = "width"
-//        width.isActive = true
+        let centerX = topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor, constant: -(navigationBar.bounds.width - topicView.bounds.width)/2)
+        centerX.identifier = "centerX"
+        centerX.isActive = true
         
         setBarItems()
     }
@@ -375,7 +375,7 @@ private extension TopicsController {
         func toggleTopicView(on: Bool) {
             guard let topic = topic,
                   let navigationBar = navigationController?.navigationBar,
-                  let constraint = topicView.getConstraint(identifier: "leading")
+                  let constraint = topicView.getConstraint(identifier: "centerX")
 //                  let iconCategory = Icon.Category(rawValue: topic.id)
             else { return }
             
@@ -390,14 +390,14 @@ private extension TopicsController {
             UIView.animate(
                 withDuration: 0.3,
                 delay: 0,
-                usingSpringWithDamping: 0.9,
+                usingSpringWithDamping: 0.8,
                 initialSpringVelocity: 0.3,
                 options: [.curveEaseInOut],
                 animations: { [weak self] in
                     guard let self = self else { return }
 
                     self.topicView.alpha = on ? 1 : 0
-                    constraint.constant = on ? 0 : -(10 + self.topicView.bounds.width)
+                    constraint.constant = on ? 0 : -(navigationBar.bounds.width - self.topicView.bounds.width)/2//-(10 + self.topicView.bounds.width)
                     navigationBar.layoutIfNeeded()
                 }) { _ in }
         }

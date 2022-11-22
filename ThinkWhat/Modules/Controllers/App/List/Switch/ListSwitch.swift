@@ -133,8 +133,15 @@ class ListSwitch: UIView {
                                 withConfiguration: UIImage.SymbolConfiguration(pointSize: mark.bounds.size.height * 0.45, weight: .semibold, scale: .medium))
             
             guard let imageView = mark.getSubview(type: UIImageView.self, identifier: "innerView") else { return }
-            UIView.transition(with: imageView, duration: 0.175, options: .transitionCrossDissolve) { [weak self] in
-                guard let self = self,
+//            UIView.transition(with: imageView, duration: 0.175, options: .transitionCrossDissolve) { [weak self] in
+            UIView.animate(
+                withDuration: 0.35,
+                delay: 0,
+                usingSpringWithDamping: 0.85,
+                initialSpringVelocity: 0.3,
+                options: [.curveEaseInOut],
+                animations: { [weak self] in
+            guard let self = self,
                       let constraint = self.mark.getConstraint(identifier: "leading")
                 else { return }
                 
@@ -143,7 +150,7 @@ class ListSwitch: UIView {
                 constraint.constant = newView.frame.origin.x
                 self.layoutIfNeeded()
                 imageView.image = image
-            } completion: { _ in }
+            }) { _ in }
         }
     }
     private lazy var mark: UIView = {

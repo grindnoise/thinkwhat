@@ -23,6 +23,14 @@ class AppSettingsCollectionView: UICollectionView {
     public var appLanguagePublisher = CurrentValueSubject<[AppSettings: String]?, Never>(nil)
     public var contentLanguagePublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var aboutPublisher = CurrentValueSubject<AppSettingsTextCell.Mode?, Never>(nil)
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            setupUI()
+        }
+    }
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -45,9 +53,12 @@ class AppSettingsCollectionView: UICollectionView {
     }
     
     // MARK: - Initialization
+    init() { super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout()) }
+    
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
-        setupUI()
+        
+//        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -117,7 +128,8 @@ class AppSettingsCollectionView: UICollectionView {
             
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .clear
-            cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            
+            cell.color = self.color
             cell.backgroundConfiguration = backgroundConfig
             
             switch indexPath.row {
@@ -138,7 +150,7 @@ class AppSettingsCollectionView: UICollectionView {
         }
         
         let languageCellRegistration = UICollectionView.CellRegistration<AppSettingsLanguageCell, AnyHashable> { [unowned self] cell, indexPath, item in
-            
+            cell.color = self.color
             cell.appLanguagePublisher
                 .sink { [weak self] in
                     guard let self = self,
@@ -165,6 +177,7 @@ class AppSettingsCollectionView: UICollectionView {
         }
         
         let textCellRegistration = UICollectionView.CellRegistration<AppSettingsTextCell, AnyHashable> { cell, indexPath, item in
+            cell.color = self.color
             if indexPath.row == 0 {
                 cell.mode = .TermsOfUse
             } else if indexPath.row == 1 {

@@ -426,6 +426,7 @@ private extension SurveysCollectionView {
     }
     
     func setTasks() {
+        //Filter bug fix
         Timer.publish(every: 5, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
@@ -445,7 +446,8 @@ private extension SurveysCollectionView {
             .autoconnect()
             .sink { [weak self] _ in
                 guard let self = self,
-                      self.visibleCells.count < 4
+                      self.visibleCells.count < 4,
+                      self.dataItems.count < 4
                 else { return }
 
                 self.requestData()

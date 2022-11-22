@@ -28,6 +28,13 @@ class UserSettingsCityCell: UICollectionViewListCell {
     //Publishers
     public var citySelectionPublisher = CurrentValueSubject<City?, Never>(nil)
     public var cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            setColors()
+        }
+    }
+    
     
     
     // MARK: - Private properties
@@ -104,15 +111,35 @@ class UserSettingsCityCell: UICollectionViewListCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private methods
-    private func setupUI() {
+    
+    
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+//        tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        citySelectionPublisher = CurrentValueSubject<City?, Never>(nil)
+        cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
+    }
+}
+    
+    // MARK: - Private
+private extension UserSettingsCityCell {
+    @MainActor
+    func setupUI() {
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
         clipsToBounds = true
         
         contentView.addSubview(textField)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         textField.translatesAutoresizingMaskIntoConstraints = false
-
+        
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -128,17 +155,17 @@ class UserSettingsCityCell: UICollectionViewListCell {
         constraint.isActive = true
     }
     
-    private func setTasks() {
+    func setTasks() {
         //Cities fetch result
         tasks.append( Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Cities.FetchResult) {
                 guard let self = self,
                       let cities = notification.object as? [City]
                 else { return }
-
-//                await MainActor.run {
-                    self.processResults(cities)
-//                }
+                
+                //                await MainActor.run {
+                self.processResults(cities)
+                //                }
             }
         })
         
@@ -146,25 +173,25 @@ class UserSettingsCityCell: UICollectionViewListCell {
         tasks.append( Task {@MainActor [weak self] in
             for await _ in NotificationCenter.default.notifications(for: Notifications.Cities.FetchError) {
                 guard let self = self else { return }
-
-//                await MainActor.run {
-                    self.textField.stopLoadingIndicator()
-                    showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemRed, shadowed: true)
-//                }
+                
+                //                await MainActor.run {
+                self.textField.stopLoadingIndicator()
+                showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemRed, shadowed: true)
+                //                }
             }
         })
     }
     
     @objc
-    private func handleIO(_ instance: UnderlinedSearchTextField) {
+    func handleIO(_ instance: UnderlinedSearchTextField) {
         guard let text = instance.text, text.count >= 4 else { return }
         
         instance.showLoadingIndicator()
         cityFetchPublisher.send(text)
-//        instance.isUserInteractionEnabled = false
+        //        instance.isUserInteractionEnabled = false
     }
     
-    private func processResults(_ cities: [City]) {
+    func processResults(_ cities: [City]) {
         let items: [SearchTextFieldItem] = cities.map { return SearchTextFieldItem(title: $0.name,
                                                                                    subtitle: (!$0.regionName.isNil && !$0.countryName.isNil) ?  "\(String(describing: $0.regionName!)), \(String(describing: $0.countryName!))" : "",
                                                                                    image: nil,
@@ -174,20 +201,17 @@ class UserSettingsCityCell: UICollectionViewListCell {
         textField.isUserInteractionEnabled = true
     }
     
-    // MARK: - Public methods
-    
-    // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-        contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        
-        citySelectionPublisher = CurrentValueSubject<City?, Never>(nil)
-        cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
+    func setColors() {
+        tintColor = color
+        textField.tintColor = color
+        textField.indicator.color = UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return .label
+            default:
+                return K_COLOR_RED
+            }
+        }
     }
 }
 

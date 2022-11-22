@@ -28,12 +28,19 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
     }
     //Publishers
     public var valuePublisher = CurrentValueSubject<[AppSettings: Bool]?, Never>(nil)
+    //UI
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            toggleSwitch.onTintColor = color
+        }
+    }
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
-    
     //UI
     private let padding: CGFloat = 8
     private lazy var titleLabel: UILabel = {
@@ -62,7 +69,7 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
     }()
     private lazy var toggleSwitch: UISwitch = {
         let instance = UISwitch()
-        instance.onTintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        instance.onTintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         instance.addTarget(self, action: #selector(self.toggleSwitch(_:)), for: .valueChanged)
         
         return instance
@@ -83,6 +90,8 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
         
         return instance
     }()
+    
+    
     
     // MARK: - Destructor
     deinit {
@@ -111,16 +120,12 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
     
     
     
-    // MARK: - Public methods
-    
-    
-    
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
         contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
-        toggleSwitch.onTintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//        toggleSwitch.onTintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
     
     override func prepareForReuse() {

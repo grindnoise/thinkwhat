@@ -10,7 +10,7 @@ import UIKit
 import Combine
 
 class UserSettingsCredentialsCell: UICollectionViewListCell {
- 
+    
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {
         didSet {
@@ -28,6 +28,13 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     public var galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
+    public var color: UIColor = Colors.System.Red.rawValue {
+        didSet {
+            setColors()
+        }
+    }
+    
+    
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -86,13 +93,18 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
             }
             config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
                 guard let self = self else { return .systemGray }
-
-                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+                
+                return self.color
             }
+            //            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+            //                guard let self = self else { return .systemGray }
+            //
+            //                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            //            }
             config.buttonSize = .large
             config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
             config.baseForegroundColor = .label
-
+            
             instance.configuration = config
         } else {
             let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
@@ -102,7 +114,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
             instance.setAttributedTitle(attrString, for: .normal)
             instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            instance.imageView?.tintColor = color//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
             instance.imageView?.contentMode = .scaleAspectFit
             instance.imageEdgeInsets.left = 10
             instance.imageEdgeInsets.top = 2
@@ -110,7 +122,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
             instance.imageEdgeInsets.right = 2
             instance.semanticContentAttribute = .forceRightToLeft
             instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-
+            
             let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
             constraint.identifier = "width"
             constraint.isActive = true
@@ -123,7 +135,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
         return instance
     }()
     private lazy var ageButton: UIButton = {
-       let instance = UIButton()
+        let instance = UIButton()
         
         instance.addTarget(self, action: #selector(self.editAge), for: .touchUpInside)
         if #available(iOS 15, *) {
@@ -143,13 +155,18 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
             config.contentInsets.bottom = 2
             config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
                 guard let self = self else { return .systemGray }
-
-                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+                
+                return self.color
             }
+            //            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+            //                guard let self = self else { return .systemGray }
+            //
+            //                return self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            //            }
             config.buttonSize = .large
             config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
             config.baseForegroundColor = .label
-
+            
             instance.configuration = config
         } else {
             let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
@@ -159,11 +176,11 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
             instance.setAttributedTitle(attrString, for: .normal)
             instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             instance.titleEdgeInsets.left = 2
-//            instance.titleEdgeInsets.right = 8
+            //            instance.titleEdgeInsets.right = 8
             instance.titleEdgeInsets.top = 2
             instance.titleEdgeInsets.bottom = 2
             instance.setImage(UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-            instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            instance.imageView?.tintColor = color//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
             instance.imageView?.contentMode = .scaleAspectFit
             instance.imageEdgeInsets.left = 10
             instance.imageEdgeInsets.top = 2
@@ -171,7 +188,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
             instance.imageEdgeInsets.right = 2
             instance.semanticContentAttribute = .forceRightToLeft
             instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-
+            
             let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
             constraint.identifier = "width"
             constraint.isActive = true
@@ -256,19 +273,19 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     private lazy var nestedVerticalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [genderButton, ageButton])
         instance.axis = .vertical
-//        instance.alignment = .center
+        //        instance.alignment = .center
         instance.clipsToBounds = false
         instance.spacing = 8
         instance.distribution = .fillEqually
         
-//        userView.translatesAutoresizingMaskIntoConstraints = false
-//        username.translatesAutoresizingMaskIntoConstraints = false
-//        
-//        NSLayoutConstraint.activate([
-//            userView.widthAnchor.constraint(equalTo: instance.widthAnchor),
-//            userView.heightAnchor.constraint(equalToConstant: 200),
-//            username.widthAnchor.constraint(equalTo: instance.widthAnchor),
-//        ])
+        //        userView.translatesAutoresizingMaskIntoConstraints = false
+        //        username.translatesAutoresizingMaskIntoConstraints = false
+        //
+        //        NSLayoutConstraint.activate([
+        //            userView.widthAnchor.constraint(equalTo: instance.widthAnchor),
+        //            userView.heightAnchor.constraint(equalToConstant: 200),
+        //            username.widthAnchor.constraint(equalTo: instance.widthAnchor),
+        //        ])
         
         return instance
     }()
@@ -284,14 +301,15 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
         
         let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 44))
         toolBar.isTranslucent = true
-        toolBar.tintColor = UIColor { traitCollection in
-            switch traitCollection.userInterfaceStyle {
-            case .dark:
-                return UIColor.systemBlue
-            default:
-                return K_COLOR_RED
-            }
-        }
+        toolBar.accessibilityIdentifier = "toolBar"
+        //        toolBar.tintColor = UIColor { traitCollection in
+        //            switch traitCollection.userInterfaceStyle {
+        //            case .dark:
+        //                return UIColor.systemBlue
+        //            default:
+        //                return K_COLOR_RED
+        //            }
+        //        }
         toolBar.backgroundColor = .tertiarySystemBackground
         toolBar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
         toolBar.superview?.backgroundColor = .tertiarySystemBackground
@@ -313,10 +331,10 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
         instance.datePickerMode = .date
         instance.locale = .current
         instance.preferredDatePickerStyle = .inline
-//        instance.addTarget(self, action: #selector(dateSelected), for: .valueChanged)
+        //        instance.addTarget(self, action: #selector(dateSelected), for: .valueChanged)
         instance.datePickerMode = .date
         instance.backgroundColor = .tertiarySystemBackground
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instance.tintColor = color//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
         
         return instance
     }()
@@ -343,8 +361,66 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private methods
-    private func setupUI() {
+    
+    
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+//        datePicker.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        
+        if #available(iOS 15, *) {
+            if !genderButton.configuration.isNil, !ageButton.configuration.isNil {
+                genderButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+                ageButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+            }
+        } else {
+            genderButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+            ageButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+        }
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        guard let constraint_1 = username.getConstraint(identifier: "height"),
+//              let constraint_2 = gender.getConstraint(identifier: "height"),
+              !username.text.isNil
+        else { return }
+        
+        username.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
+//        gender.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
+//        age.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
+        
+        setNeedsLayout()
+        constraint_1.constant = username.text!.height(withConstrainedWidth: username.bounds.width, font: username.font)
+//        constraint_2.constant = "test".height(withConstrainedWidth: gender.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
+        layoutIfNeeded()
+    }
+    
+    override func updateConstraints() {
+        super.updateConstraints()
+    
+        separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
+        datePublisher = CurrentValueSubject<Date?, Never>(nil)
+        genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
+        galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
+        cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
+        previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
+    }
+}
+
+// MARK: - Private
+private extension UserSettingsCredentialsCell {
+    @MainActor
+    func setupUI() {
         backgroundColor = .clear
         clipsToBounds = true
         
@@ -368,7 +444,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
         constraint.isActive = true
     }
     
-    private func setTasks() {
+    func setTasks() {
         //Hide keyboard
         tasks.append( Task {@MainActor [weak self] in
             for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
@@ -484,7 +560,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     }
     
     @objc
-    private func edit(recognizer: UITapGestureRecognizer) {
+    func edit(recognizer: UITapGestureRecognizer) {
         guard let v = recognizer.view else { return }
         
         if v === username {
@@ -494,7 +570,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     }
     
     @objc
-    private func editAge() {
+    func editAge() {
         Fade.shared.present()
         let _ = ageTextField.becomeFirstResponder()
         guard let date = Userprofiles.shared.current?.birthDate else { return }
@@ -502,11 +578,12 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     }
     
     @objc
-    private func editImage() {
+    func editImage() {
         
     }
     
-    private func setupLabels(animated: Bool = false) {
+    @MainActor
+    func setupLabels(animated: Bool = false) {
         guard let userprofile = Userprofiles.shared.current else { return }
         
         if !userprofile.firstNameSingleWord.isEmpty {
@@ -558,7 +635,8 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
         layoutIfNeeded()
     }
     
-    private func setupButtons(animated: Bool = false) {
+    @MainActor
+    func setupButtons(animated: Bool = false) {
         guard let userprofile = Userprofiles.shared.current else { return }
         
         if #available(iOS 15, *) {
@@ -626,13 +704,13 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     }
     
     @objc
-    private func dateSelected() {
+    func dateSelected() {
         ageTextField.resignFirstResponder()
         Fade.shared.dismiss()
         datePublisher.send(datePicker.date)
     }
     
-    private func prepareMenu() -> UIMenu {
+    func prepareMenu() -> UIMenu {
         var actions: [UIAction]!
         
         let male: UIAction = .init(title: Gender.Male.rawValue.localized.capitalized, image: UIImage(systemName: "mustache.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
@@ -653,57 +731,24 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
         return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
     }
     
-    // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        datePicker.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    func setColors() {
+        avatar.color = color
         
         if #available(iOS 15, *) {
-            if !genderButton.configuration.isNil, !ageButton.configuration.isNil {
-                genderButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-                ageButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+            genderButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+                guard let self = self else { return .systemGray }
+                
+                return self.color
+            }
+            ageButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+                guard let self = self else { return .systemGray }
+                
+                return self.color
             }
         } else {
-            genderButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-            ageButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+            genderButton.imageView?.tintColor = color
+            ageButton.imageView?.tintColor = color
         }
-        
-        //Set dynamic font size
-        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        
-        guard let constraint_1 = username.getConstraint(identifier: "height"),
-//              let constraint_2 = gender.getConstraint(identifier: "height"),
-              !username.text.isNil
-        else { return }
-        
-        username.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
-//        gender.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
-//        age.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
-        
-        setNeedsLayout()
-        constraint_1.constant = username.text!.height(withConstrainedWidth: username.bounds.width, font: username.font)
-//        constraint_2.constant = "test".height(withConstrainedWidth: gender.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
-        layoutIfNeeded()
-    }
-    
-    override func updateConstraints() {
-        super.updateConstraints()
-    
-        separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        
-        namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
-        datePublisher = CurrentValueSubject<Date?, Never>(nil)
-        genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
-        galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
-        cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
-        previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
     }
 }
 

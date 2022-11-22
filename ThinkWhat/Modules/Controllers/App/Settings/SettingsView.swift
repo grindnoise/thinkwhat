@@ -15,7 +15,14 @@ class SettingsView: UIView {
     
     
     // MARK: - Public properties
-    weak var viewInput: (SettingsViewInput & UIViewController)?
+    weak var viewInput: (SettingsViewInput & TintColorable)? {
+        didSet {
+            guard let viewInput = viewInput else { return }
+            
+            userSettingsView.color = viewInput.tintColor
+            appSettingsView.color = viewInput.tintColor
+        }
+    }
     
     
     
@@ -402,16 +409,16 @@ extension SettingsView: SettingsControllerOutput {
     func onAppSettings() {
         appSettingsView.alpha = 1
 //        touchLocation = CGPoint(x: bounds.maxX, y: bounds.minY)
-        reveal(present: true, location: CGPoint(x: bounds.maxX, y: bounds.minY), view: appSettingsView, fadeView: userSettingsView, duration: 0.4)
+        reveal(present: true, location: CGPoint(x: bounds.maxX, y: bounds.minY), view: appSettingsView, fadeView: userSettingsView, color: viewInput?.tintColor ?? .systemGray, duration: 0.4)
     }
     
     func onUserSettings() {
         userSettingsView.alpha = 1
 //        collectionView.backgroundColor = background.backgroundColor
-        reveal(present: false, location: CGPoint(x: bounds.maxX, y: bounds.minY), view: appSettingsView, fadeView: userSettingsView, duration: 0.35)
+        reveal(present: false, location: CGPoint(x: bounds.maxX, y: bounds.minY), view: appSettingsView, fadeView: userSettingsView, color: viewInput?.tintColor ?? .systemGray, duration: 0.35)
     }
     
-    func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, fadeView: UIView, duration: TimeInterval, animateOpacity: Bool = true) {
+    func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, fadeView: UIView, color: UIColor, duration: TimeInterval, animateOpacity: Bool = true) {
 
         let circlePathLayer = CAShapeLayer()
 
@@ -452,18 +459,22 @@ extension SettingsView: SettingsControllerOutput {
         circlePathLayer.add(anim, forKey: "path")
         circlePathLayer.path = !present ? fromPath : toPath
         
-        let grayLayer = CALayer()
-        grayLayer.frame = fadeView.layer.bounds
-        grayLayer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.systemGray.cgColor
-        grayLayer.opacity = present ? 0 : 1
+        let colorLayer = CALayer()
+        if let collectionView = fadeView as? UICollectionView {
+            colorLayer.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 3000))
+        } else {
+            colorLayer.frame = fadeView.layer.bounds
+        }
+        colorLayer.backgroundColor = color.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.systemGray.cgColor
+        colorLayer.opacity = present ? 0 : 1
         
-        fadeView.layer.addSublayer(grayLayer)
+        fadeView.layer.addSublayer(colorLayer)
         
         let opacityAnim = Animations.get(property: .Opacity, fromValue: present ? 0 : 1, toValue: present ? 1 : 0, duration: duration, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, completionBlocks: [{
-            grayLayer.removeFromSuperlayer()
+            colorLayer.removeFromSuperlayer()
         }])
-        grayLayer.add(opacityAnim, forKey: nil)
-        grayLayer.opacity = !present ? 0 : 1
+        colorLayer.add(opacityAnim, forKey: nil)
+        colorLayer.opacity = !present ? 0 : 1
     }
 }
 

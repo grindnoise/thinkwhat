@@ -4910,6 +4910,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in SettingsView.userSettingsView.getter:SettingsView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "viewInput">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in closure #4 in ResultIndicator.setupImages():ResultIndicator.swift">
          <PersistentStrings>
             <PersistentString
@@ -9446,6 +9454,14 @@
             </PersistentString>
             <PersistentString
                value = "votersView.bounds.contains(touch?.location(in: votersView))">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "UserSettingsCollectionView.init(color:):UserSettingsCollectionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "color == Colors.System.Red.rawValue">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
