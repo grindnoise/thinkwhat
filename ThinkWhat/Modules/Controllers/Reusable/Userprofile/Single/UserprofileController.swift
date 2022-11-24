@@ -198,6 +198,10 @@ extension UserprofileController: UserprofileViewInput {
         navigationItem.backBarButtonItem = backItem
         navigationController?.pushViewController(SurveysController(topic), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
+        
+        guard let controller = tabBarController as? MainController else { return }
+        
+        controller.toggleLogo(on: false)
     }
     
     func unsubscribe() {

@@ -145,6 +145,143 @@ class TopicsView: UIView {
         let instance = SurveysCollectionView(category: .Search)
         instance.alpha = 0
         
+        //Pagination #2
+        let paginationByTopicPublisher = instance.paginationByTopicPublisher
+            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+        
+        paginationByTopicPublisher
+            .sink { [unowned self] in
+                guard let topic = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
+
+                self.viewInput?.onDataSourceRequest(dateFilter: period, topic: topic)
+            }
+            .store(in: &subscriptions)
+        
+        //Refresh #2
+        instance.refreshByTopicPublisher
+            .sink { [unowned self] in
+                guard let topic = $0.keys.first,
+                      let period = $0.values.first
+                else { return }
+                
+                self.viewInput?.onDataSourceRequest(dateFilter: period, topic: topic)
+            }
+            .store(in: &subscriptions)
+        
+        //Row selected
+        instance.rowPublisher
+            .sink { [unowned self] in
+                guard let instance = $0
+            else { return }
+                  
+            self.viewInput?.onSurveyTapped(instance)
+        }
+            .store(in: &subscriptions)
+        
+        //Update stats (exclude refs)
+        instance.updateStatsPublisher
+            .sink { [weak self] in
+            guard let self = self,
+                  let instances = $0
+            else { return }
+                  
+            self.viewInput?.updateSurveyStats(instances)
+        }
+            .store(in: &subscriptions)
+        
+        //Add to watch list
+        instance.watchSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                let value = $0
+            else { return }
+            
+            self.viewInput?.addFavorite(value)
+        }.store(in: &self.subscriptions)
+        
+        instance.shareSubject
+            .sink { [weak self] in
+                guard let self = self,
+                      let value = $0
+                else { return }
+                
+                self.viewInput?.share(value)
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.claimSubject.sink {
+            print($0)
+        } receiveValue: { [weak self] in
+            guard let self = self,
+                let surveyReference = $0
+            else { return }
+            
+            let banner = Popup(heightScaleFactor: 0.7)
+            banner.accessibilityIdentifier = "claim"
+            let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
+            
+            claimContent.claimPublisher
+                .sink { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.viewInput?.claim(surveyReference: surveyReference, claim: $0)
+                }
+                .store(in: &self.subscriptions)
+            
+            banner.present(content: claimContent)
+            banner.didDisappearPublisher
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    banner.removeFromSuperview()
+                }
+                .store(in: &self.subscriptions)
+            
+//            self.viewInput?.addFavorite(surveyReference: value)
+        }.store(in: &self.subscriptions)
+        
+        instance.userprofilePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.openUserprofile(userprofile)
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.settingsTapPublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      !$0.isNil
+                else { return }
+                
+                self.viewInput?.openSettings()
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.subscribePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.subscribe(to: userprofile)
+            }
+            .store(in: &self.subscriptions)
+        
+        instance.unsubscribePublisher
+            .sink { [weak self] in
+                guard let self = self,
+                      let userprofile = $0
+                else { return }
+                
+                self.viewInput?.unsubscribe(from: userprofile)
+            }
+            .store(in: &self.subscriptions)
+        
         instance.scrollPublisher
             .sink { [weak self] in
                 guard let self = self else { return }
@@ -157,7 +294,8 @@ class TopicsView: UIView {
     }()
     private var touchLocation: CGPoint = .zero
     private lazy var collectionView: TopicsCollectionView = {
-        let instance = TopicsCollectionView(callbackDelegate: self)
+        let instance = TopicsCollectionView()
+        instance.backgroundColor = .clear
         
         instance.touchSubject.sink { [weak self] in
             guard let self = self,
@@ -222,7 +360,6 @@ class TopicsView: UIView {
             guard oldValue != period else { return }
             
             surveysCollectionView.period = period
-            
             periodButton.menu = prepareMenu()
         }
     }
@@ -509,9 +646,9 @@ extension TopicsView: TopicsControllerOutput {
         surveysCollectionView.beginSearchRefreshing()
     }
     
-    func onRequestCompleted(_ result: Result<Bool, Error>) {
-        surveysCollectionView.endRefreshing()
-    }
+//    func onRequestCompleted(_ result: Result<Bool, Error>) {
+//        surveysCollectionView.endRefreshing()
+//    }
     
 //    func onTopicMode(_ instance: Topic) {
 //        surveysCollectionView.topic = instance
@@ -522,37 +659,23 @@ extension TopicsView: TopicsControllerOutput {
     
     func onDefaultMode(color: UIColor? = nil) {
         surveysCollectionView.alpha = 1
-        collectionView.backgroundColor = background.backgroundColor
-        reveal(present: false, location: touchLocation, view: surveysCollectionView, color: color ?? surveysCollectionView.topic!.tagColor, fadeView: collectionView, duration: 0.3)
-        setBackgroundColor(self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white)
+//        collectionView.backgroundColor = background.backgroundColor
+        reveal(present: false, location: CGPoint(x: bounds.maxX, y: bounds.minY)/*touchLocation*/, view: surveysCollectionView, color: color ?? surveysCollectionView.topic!.tagColor, fadeView: collectionView, duration: 0.3)
+        setBackgroundColor(traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground)//)
         toggleDateFilter(on: false)
     }
     
     func onSearchMode() {
         surveysCollectionView.category = .Search
         surveysCollectionView.alpha = 1
-//        surveysCollectionView.layer.mask = nil
         surveysCollectionView.backgroundColor = background.backgroundColor
         touchLocation = CGPoint(x: bounds.maxX, y: bounds.minY)
-        reveal(present: true, location: touchLocation, view: surveysCollectionView, color: .systemGray.withLuminosity(0.85), fadeView: collectionView, duration: 0.5)
+        reveal(present: true, location: touchLocation, view: surveysCollectionView, color: viewInput!.tintColor, fadeView: collectionView, duration: 0.35)
     }
     
     func onSearchCompleted(_ instances: [SurveyReference]) {
         surveysCollectionView.endSearchRefreshing()
         surveysCollectionView.fetchResult = instances
-    }
-}
-
-// MARK: - CallbackObservable
-extension TopicsView: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-        if let instance = sender as? Topic {
-            viewInput?.onTopicSelected(instance)
-        } else if sender is SurveysCollectionView {
-            viewInput?.onDataSourceRequest()
-        } else if let instance = sender as? SurveyReference {
-            viewInput?.onSurveyTapped(instance)
-        }
     }
 }
 

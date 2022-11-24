@@ -24,7 +24,7 @@ class TopicsCollectionView: UICollectionView {
             return TopicHeaderItem(topic: topic)
         }
     }()
-    private weak var callbackDelegate: CallbackObservable?
+    
     
     // MARK: - Destructor
     deinit {
@@ -38,26 +38,27 @@ class TopicsCollectionView: UICollectionView {
     }
     
     // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable) {
+    init() {
         super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
-        self.callbackDelegate = callbackDelegate
+        
         setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
     
-    // MARK: - Private methods
-    private func setupUI() {
-        delegate = self
-        
-        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+    // MARK: - Private
+private extension TopicsCollectionView {
+    @MainActor
+    func setupUI() {
+        collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
             layoutConfig.headerMode = .firstItemInSection
             layoutConfig.backgroundColor = .clear
             if #available(iOS 14.5, *) {
-                layoutConfig.separatorConfiguration.color = .tertiarySystemFill
+                layoutConfig.separatorConfiguration.color = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
             }
 //            layoutConfig.showsSeparators = true
 //            layoutConfig.footerMode = .supplementary
@@ -72,20 +73,26 @@ class TopicsCollectionView: UICollectionView {
             guard let self = self else { return }
             cell.item = item
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-            backgroundConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.075)
+            backgroundConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.1)
             cell.backgroundConfiguration = backgroundConfig
             
-            cell.touchSubject.sink { [weak self] in
+            cell.touchSubject
+                .sink { [weak self] in
                 guard let self = self,
-                      let dict = $0
+                    let key = $0.keys.first,
+                    let value = $0.values.first
                 else { return }
                 
-                self.touchSubject.send([dict.keys.first!: cell.convert(dict.values.first!, to: self.superview!)])
-            }.store(in: &self.subscriptions)
+                self.touchSubject.send([key: cell.convert(value, to: self.superview!)])
+            }
+                .store(in: &self.subscriptions)
             
-            let accessoryConfig = UICellAccessory.CustomViewConfiguration(customView: UIImageView(image: UIImage(systemName: "chevron.right")), placement: .trailing(displayed: .always, at: {
-                _ in 0
-            }), isHidden: false, reservedLayoutWidth: nil, tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor, maintainsFixedSize: true)
+            let accessoryConfig = UICellAccessory.CustomViewConfiguration(customView: UIImageView(image: UIImage(systemName: "chevron.right")),
+                                                                          placement: .trailing(displayed: .always, at: { _ in 0 }),
+                                                                          isHidden: false,
+                                                                          reservedLayoutWidth: nil,
+                                                                          tintColor: item.topic.tagColor,
+                                                                          maintainsFixedSize: true)
             cell.accessories = [UICellAccessory.customView(configuration: accessoryConfig)]
 //            cell.accessories = [.outlineDisclosure(displayed: .always, options: .init(style: .cell, isHidden: false, reservedLayoutWidth: nil, tintColor: item.topic.tagColor), actionHandler: nil)]//[.outlineDisclosure(options:headerDisclosureOption)
             
@@ -136,7 +143,7 @@ class TopicsCollectionView: UICollectionView {
                 let cell = collectionView.dequeueConfiguredReusableCell(using: headerCellRegistration,
                                                                         for: indexPath,
                                                                         item: headerItem)
-                cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : headerItem.topic.tagColor
+                cell.tintColor = headerItem.topic.tagColor
                 return cell
             
             case .topic(let symbolItem):
@@ -171,19 +178,9 @@ class TopicsCollectionView: UICollectionView {
     }
     
     // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        refreshControl?.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
 //        collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
 //        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-    }
-}
-
-extension TopicsCollectionView: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? TopicCell,
-              let item = cell.item
-        else { return }
-        
-        callbackDelegate?.callbackReceived(item.topic)
-    }
+//    }
 }

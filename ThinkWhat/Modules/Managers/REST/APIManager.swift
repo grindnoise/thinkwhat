@@ -1177,7 +1177,11 @@ class API {
             let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
             
             do {
-                try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                try await parent.requestAsync(url: url,
+                                              httpMethod: .post,
+                                              parameters: parameters,
+                                              encoding: JSONEncoding.default,
+                                              headers: parent.headers())
                 await MainActor.run {
                     userprofiles.forEach {
                         userprofile.subscriptions.remove(object: $0)
@@ -1449,15 +1453,24 @@ class API {
             }
         }
         
-        func markFavoriteAsync(mark: Bool, surveyReference: SurveyReference) async throws -> Data {
-            guard let url = mark ? API_URLS.Surveys.addFavorite : API_URLS.Surveys.removeFavorite else { throw APIError.invalidURL }
-            
-            let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: ["survey_id": surveyReference.id], encoding: JSONEncoding.default, headers: parent.headers())
-            
-            await MainActor.run {
-                surveyReference.isFavorite = mark
+        func markFavorite(mark: Bool, surveyReference: SurveyReference) async {
+            guard let url = mark ? API_URLS.Surveys.addFavorite : API_URLS.Surveys.removeFavorite else {
+                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteRequestFailure,
+                                                object: surveyReference)
+                return
             }
-            return data
+            
+            do {
+                try await parent.requestAsync(url: url,
+                                              httpMethod: .post,
+                                              parameters: ["survey_id": surveyReference.id],
+                                              encoding: JSONEncoding.default,
+                                              headers: parent.headers())
+                surveyReference.isFavorite = mark
+            } catch {
+                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteRequestFailure,
+                                                object: surveyReference)
+            }
         }
         
         func search(substring: String, excludedIds: [Int]) async throws -> [SurveyReference] {
@@ -1477,8 +1490,7 @@ class API {
                 }
                 return {
                     var array: [SurveyReference] = []
-                    instances.forEach { instance in array.append(SurveyReferences.shared.all.filter({ $0 == instance }).first ?? instance)
-                    }
+                    instances.forEach { instance in array.append(SurveyReferences.shared.all.filter({ $0 == instance }).first ?? instance) }
                     return array
                 }()
             } catch let error {

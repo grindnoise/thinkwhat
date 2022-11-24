@@ -26,12 +26,15 @@ class TopicsController: UIViewController, TintColorable {
             
             guard mode == .Default else { return }
             
-            var color: UIColor!
+            var color = UIColor.systemGray
+            
             switch oldValue {
             case .Topic:
-                color = topic!.tagColor
+                if let topic = topic  {
+                    color = topic.tagColor
+                }
             default:
-                color = .systemGray.withLuminosity(0.85)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+                color = tintColor//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
             }
             
             controllerOutput?.onDefaultMode(color: color)
@@ -58,6 +61,7 @@ class TopicsController: UIViewController, TintColorable {
         }
     }
     //UI
+    private var isOnScreen = true
 //    private lazy var gradient: CAGradientLayer = {
 //        let instance = CAGradientLayer()
 //        instance.type = .radial
@@ -100,34 +104,49 @@ class TopicsController: UIViewController, TintColorable {
     }()
     private lazy var topicIcon: Icon = {
         let instance = Icon(category: Icon.Category.Logo)
-        instance.iconColor = Colors.Logo.Flame.rawValue
+        instance.iconColor = .white//Colors.Logo.Flame.rawValue
         instance.isRounded = false
         instance.clipsToBounds = false
-        instance.scaleMultiplicator = 1.5
+        instance.scaleMultiplicator = 1.75
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
 
         return instance
     }()
-    private lazy var topicTitle: UILabel = {
-        let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title1)
+    private lazy var topicTitle: InsetLabel = {
+        let instance = InsetLabel()
+        instance.font = UIFont(name: Fonts.Bold, size: 20)//.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title2)
         instance.text = "Test"
+        instance.textColor = .white
+        instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
         
         return instance
     }()
-    private lazy var topicView: UIView = {
-//        let instance = UIView()
-//        instance.backgroundColor = .clear
-        
-        
+    private lazy var topicDescription: UILabel = {
+        let instance = UILabel()
+        instance.text = "There's gonna be a description of the topic"
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
+        instance.textAlignment = .left
+        instance.numberOfLines = 1
+        instance.lineBreakMode = .byTruncatingTail
+        instance.textColor = .label
+
+        return instance
+    }()
+    private lazy var topicView: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [
             topicIcon,
             topicTitle
         ])
         instance.axis = .horizontal
-        instance.spacing = 8
+        instance.spacing = 2
         instance.alpha = 0
         
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                
+                instance.cornerRadius = rect.height/2.25
+            }
+            .store(in: &subscriptions)
 //        instance.addSubview(stack)
 //        stack.translatesAutoresizingMaskIntoConstraints = false
 //
@@ -160,6 +179,7 @@ class TopicsController: UIViewController, TintColorable {
         
 //        title = "topics".localized
         ProtocolSubscriptions.subscribe(self)
+        setTasks()
         setupUI()
     }
     
@@ -232,7 +252,7 @@ private extension TopicsController {
                 searchField.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
                 searchField.heightAnchor.constraint(equalToConstant: 40),
                 searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
-                topicView.heightAnchor.constraint(equalTo: searchField.heightAnchor),
+                topicView.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)),//searchField.heightAnchor),
                 topicView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
         ])
         let constraint = searchField.widthAnchor.constraint(equalToConstant: 20)
@@ -251,6 +271,18 @@ private extension TopicsController {
         centerX.isActive = true
         
         setBarItems()
+    }
+    
+    func setTasks() {
+        tasks.append(Task { @MainActor [weak self] in
+            for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
+                guard let self = self,
+                      let tab = notification.object as? Tab
+                else { return }
+                
+                self.isOnScreen = tab == .Feed
+            }
+        })
     }
     
     @objc
@@ -380,10 +412,11 @@ private extension TopicsController {
             else { return }
             
             
-            topicTitle.textColor = topic.tagColor
-            topicTitle.text = topic.title//localizedTitle
-            (topicIcon.icon as! CAShapeLayer).fillColor = topic.tagColor.cgColor
-            topicIcon.iconColor = topic.tagColor
+            topicView.backgroundColor = topic.tagColor
+//            topicTitle.textColor = topic.tagColor
+            topicTitle.text = topic.title.uppercased()//localizedTitle
+//            (topicIcon.icon as! CAShapeLayer).fillColor = topic.tagColor.cgColor
+//            topicIcon.iconColor = topic.tagColor
             topicIcon.category = Icon.Category(rawValue: topic.id) ?? .Null
             
             
@@ -425,9 +458,86 @@ private extension TopicsController {
 }
 
 extension TopicsController: TopicsViewInput {
-    func onDataSourceRequest() {
-        guard let topic = topic else { return }
-        controllerInput?.onDataSourceRequest(topic)
+    func unsubscribe(from userprofile: Userprofile) {
+        controllerInput?.unsubscribe(from: userprofile)
+    }
+    
+    func subscribe(to userprofile: Userprofile) {
+        controllerInput?.subscribe(to: userprofile)
+    }
+    
+    func openUserprofile(_ userprofile: Userprofile) {
+        let backItem = UIBarButtonItem()
+        backItem.title = ""
+        navigationItem.backBarButtonItem = backItem
+        
+        navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
+        tabBarController?.setTabBarVisible(visible: false, animated: true)
+    }
+    
+    func share(_ surveyReference: SurveyReference) {
+        // Setting description
+        let firstActivityItem = surveyReference.title
+        
+        // Setting url
+        let queryItems = [URLQueryItem(name: "hash", value: surveyReference.shareHash), URLQueryItem(name: "enc", value: surveyReference.shareEncryptedString)]
+        var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
+        urlComps.queryItems = queryItems
+        
+        let secondActivityItem: URL = urlComps.url!
+        
+        // If you want to use an image
+        let image : UIImage = UIImage(named: "anon")!
+        let activityViewController : UIActivityViewController = UIActivityViewController(
+            activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
+        
+        // This lines is for the popover you need to show in iPad
+        activityViewController.popoverPresentationController?.sourceView = self.view
+        
+        // This line remove the arrow of the popover to show in iPad
+        activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
+        activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
+        
+        // Pre-configuring activity items
+        activityViewController.activityItemsConfiguration = [
+            UIActivity.ActivityType.message
+        ] as? UIActivityItemsConfigurationReading
+        
+        // Anything you want to exclude
+        activityViewController.excludedActivityTypes = [
+            UIActivity.ActivityType.postToWeibo,
+            UIActivity.ActivityType.print,
+            UIActivity.ActivityType.assignToContact,
+            UIActivity.ActivityType.saveToCameraRoll,
+            UIActivity.ActivityType.addToReadingList,
+            UIActivity.ActivityType.postToFlickr,
+            UIActivity.ActivityType.postToVimeo,
+            UIActivity.ActivityType.postToTencentWeibo,
+            UIActivity.ActivityType.postToFacebook
+        ]
+        
+        activityViewController.isModalInPresentation = false
+        self.present(activityViewController,
+                     animated: true,
+                     completion: nil)
+    }
+    
+    func claim(surveyReference: SurveyReference, claim: Claim) {
+        controllerInput?.claim(surveyReference: surveyReference, claim: claim)
+    }
+    
+    func addFavorite(_ surveyReference: SurveyReference) {
+        controllerInput?.addFavorite(surveyReference: surveyReference)
+    }
+    
+    func updateSurveyStats(_ instances: [SurveyReference]) {
+        guard isOnScreen else { return }
+        
+        controllerInput?.updateSurveyStats(instances)
+    }
+    
+    func openSettings() {
+        tabBarController?.selectedIndex = 4
     }
     
     func onTopicSelected(_ instance: Topic) {
@@ -447,23 +557,35 @@ extension TopicsController: TopicsViewInput {
         tabBarController?.setTabBarVisible(visible: false, animated: true)
     }
     
-    func onDataSourceRequest(_ topic: Topic) {
-        controllerInput?.onDataSourceRequest(topic)
+    func onDataSourceRequest(dateFilter: Period, topic: Topic) {
+        guard isOnScreen else { return }
+        
+        controllerInput?.onDataSourceRequest(dateFilter: dateFilter, topic: topic)
+    }
+    
+    @objc
+    func hideKeyboard() {
+        if let recognizer = view.gestureRecognizers?.first {
+            view.removeGestureRecognizer(recognizer)
+        }
+        if mode == .Search {
+            searchField.resignFirstResponder()
+        }
     }
 }
 
 // MARK: - Model Output
 extension TopicsController: TopicsModelOutput {
-    func onRequestCompleted(_ result: Result<Bool, Error>) {
-        switch result {
-        case .success:
-            controllerOutput?.onRequestCompleted(result)
-        case .failure(let error):
-#if DEBUG
-            error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-        }
-    }
+//    func onRequestCompleted(_ result: Result<Bool, Error>) {
+//        switch result {
+//        case .success:
+//            controllerOutput?.onRequestCompleted(result)
+//        case .failure(let error):
+//#if DEBUG
+//            error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//        }
+//    }
     
     func onSearchCompleted(_ instances: [SurveyReference]) {
         controllerOutput?.onSearchCompleted(instances)
@@ -503,15 +625,6 @@ extension TopicsController: UITextFieldDelegate {
         }
         textField.resignFirstResponder()
         return true
-    }
-    
-    @objc private func hideKeyboard() {
-        if let recognizer = view.gestureRecognizers?.first {
-            view.removeGestureRecognizer(recognizer)
-        }
-        if mode == .Search {
-            searchField.resignFirstResponder()
-        }
     }
     
 //    private func setupTextField(textField: UnderlinedSignTextField) {

@@ -30,19 +30,27 @@ class CommentsView: UIView {
                   let surveyReference = comment.survey?.reference
             else { return }
             
-            let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
+            let banner = Popup(heightScaleFactor: 0.7)
             banner.accessibilityIdentifier = "claim"
-            let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
+            let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
             
-            claimContent.claimSubject.sink { [weak self] in
-                guard let self = self,
-                      let reason = $0
-                else { return }
-                
-                self.viewInput?.postClaim(comment: comment, reason: reason)
-            }.store(in: &self.subscriptions)
+            claimContent.claimPublisher
+                .sink { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.viewInput?.postClaim(comment: comment, reason: $0)
+                }
+                .store(in: &self.subscriptions)
             
             banner.present(content: claimContent)
+            
+            banner.didDisappearPublisher
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    banner.removeFromSuperview()
+                }
+                .store(in: &self.subscriptions)
+            
         }.store(in: &subscriptions)
         
 //        instance.commentSubject.sink { [weak self] in

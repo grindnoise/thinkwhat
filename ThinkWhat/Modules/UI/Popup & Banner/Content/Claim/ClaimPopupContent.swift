@@ -13,15 +13,13 @@ import CoreData
 class ClaimPopupContent: UIView {
     
     // MARK: - Public properties
-    public var claimSubject = CurrentValueSubject<Claim?, Never>(nil)
+    public var claimPublisher = PassthroughSubject<Claim, Never>()
     
     // MARK: - Private properties
-    private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     private weak var parent: Popup?
     private weak var surveyReference: SurveyReference?
-    private weak var callbackDelegate: CallbackObservable?
     private lazy var collectionView: ClaimCollectionView = {
         let instance = ClaimCollectionView()
         
@@ -32,18 +30,17 @@ class ClaimPopupContent: UIView {
             }
             .assign(to: &self.$item)
         
-        observers.append(instance.observe(\ClaimCollectionView.contentSize, options: .new) { [weak self] view, change in
-            guard let self = self,
-                  let newValue = change.newValue
-            else { return }
-            
-//            print(newValue.height + self.topContainer.bounds.height + self.bottomContainer.bounds.height)
-            
-            self.parent?.onContainerHeightChange(newValue.height +
-                                                 self.topContainer.bounds.height +
-                                                 self.bottomContainer.bounds.height +
-                                                 self.verticalStackView.spacing * CGFloat(self.verticalStackView.arrangedSubviews.count - 1))
-        })
+        instance.publisher(for: \.contentSize)
+            .filter { $0 != .zero }
+            .sink { [weak self] size in
+                guard let self = self else { return }
+                
+                self.parent?.onContainerHeightChange(size.height +
+                                                     self.topContainer.bounds.height +
+                                                     self.bottomContainer.bounds.height +
+                                                     self.verticalStackView.spacing * CGFloat(self.verticalStackView.arrangedSubviews.count - 1))
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
@@ -106,7 +103,7 @@ class ClaimPopupContent: UIView {
         instance.isRounded = false
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.scaleMultiplicator = 0.8
-        instance.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+        instance.iconColor = .systemRed//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
         instance.category = .ExclamationMark
         
         return instance
@@ -119,11 +116,15 @@ class ClaimPopupContent: UIView {
         instance.addTarget(self, action: #selector(self.close), for: .touchUpInside)
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         
-        observers.append(instance.observe(\UIButton.bounds, options: .new) { view, change in
-            guard let newValue = change.newValue else { return }
+        instance.publisher(for: \.bounds)
+            .sink { rect in
             
-            view.setImage(UIImage(systemName: "xmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .bold)), for: .normal)
-        })
+                instance.setImage(UIImage(systemName: "xmark",
+                                          withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height,
+                                                                                         weight: .bold)),
+                                  for: .normal)
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
@@ -169,13 +170,13 @@ class ClaimPopupContent: UIView {
         
         instance.addTarget(self, action: #selector(self.send), for: .touchUpInside)
         if #available(iOS 15, *) {
-            let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
+            let attrString = AttributedString(self.state.rawValue.localized.uppercased(), attributes: AttributeContainer([
                 NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
                 NSAttributedString.Key.foregroundColor: UIColor.white
             ]))
             var config = UIButton.Configuration.filled()
             config.attributedTitle = attrString
-            config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+            config.baseBackgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
             config.image = UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
             config.imagePlacement = .trailing
             config.imagePadding = 8.0
@@ -185,7 +186,7 @@ class ClaimPopupContent: UIView {
 
             instance.configuration = config
         } else {
-            let attrString = NSMutableAttributedString(string: state.rawValue.localized.uppercased(), attributes: [
+            let attrString = NSMutableAttributedString(string: self.state.rawValue.localized.uppercased(), attributes: [
                 NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
                 NSAttributedString.Key.foregroundColor: UIColor.white
             ])
@@ -199,23 +200,23 @@ class ClaimPopupContent: UIView {
             instance.semanticContentAttribute = .forceRightToLeft
             instance.backgroundColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
 
-            let constraint = instance.widthAnchor.constraint(equalToConstant: state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)!))
+            let constraint = instance.widthAnchor.constraint(equalToConstant: self.state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)!))
             constraint.identifier = "width"
             constraint.isActive = true
         }
         
-        observers.append(instance.observe(\UIButton.bounds, options: .new) { [weak self] view, change in
-            guard let self = self,
-                  let newValue = change.newValue
-            else { return }
+        instance.publisher(for: \.bounds)
+            .sink { [weak self] rect in
+            guard let self = self else { return }
             
-            view.cornerRadius = newValue.height/2.25
+                instance.cornerRadius = rect.height/2.25
             
-            guard let constraint = view.getConstraint(identifier: "width") else { return }
+            guard let constraint = instance.getConstraint(identifier: "width") else { return }
             self.setNeedsLayout()
-            constraint.constant = self.state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (view.imageView?.bounds.width ?? 0) + 60
+            constraint.constant = self.state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (instance .imageView?.bounds.width ?? 0) + 60
             self.layoutIfNeeded()
-        })
+        }
+            .store(in: &subscriptions)
 
         return instance
     }()
@@ -236,7 +237,6 @@ class ClaimPopupContent: UIView {
     
     // MARK: - Destructor
     deinit {
-        observers.forEach { $0.invalidate() }
         tasks.forEach { $0?.cancel() }
         subscriptions.forEach { $0.cancel() }
         NotificationCenter.default.removeObserver(self)
@@ -246,11 +246,12 @@ class ClaimPopupContent: UIView {
     }
     
     // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable, parent: Popup?, surveyReference: SurveyReference?) {
+    init(parent: Popup?, surveyReference: SurveyReference?) {
         super.init(frame: .zero)
-        self.callbackDelegate = callbackDelegate
+        
         self.surveyReference = surveyReference
         self.parent = parent
+        
         setupUI()
         setTasks()
         setSubscriptions()
@@ -275,8 +276,15 @@ class ClaimPopupContent: UIView {
                   !$0.isNil
             else { return }
             
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
-                self.actionButton.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+            UIView.animate(withDuration: 0.2) { [weak self] in
+                guard let self = self else { return
+                    
+                }
+                if #available(iOS 15, *) {
+                    self.actionButton.configuration?.baseBackgroundColor = .systemRed
+                } else {
+                    self.actionButton.backgroundColor = .systemRed
+                }
             }
         }.store(in: &subscriptions)
     }
@@ -332,16 +340,17 @@ class ClaimPopupContent: UIView {
     
     @objc
     private func send() {
-        guard !item.isNil else { return }
-        guard state != .Close else {
+        guard state == .Send,
+              let item = item
+        else {
             parent?.dismiss()
-            return 
+            return
         }
         state = .Sending
         
         actionButton.isUserInteractionEnabled = false
-        claimSubject.send(item!)
-        claimSubject.send(completion: .finished)
+        claimPublisher.send(item)
+        claimPublisher.send(completion: .finished)
         
         if #available(iOS 15, *) {
             if !actionButton.configuration.isNil {
@@ -353,17 +362,6 @@ class ClaimPopupContent: UIView {
                     self.actionButton.configuration!.attributedTitle = attrString
                 }
                 actionButton.configuration!.showsActivityIndicator = true
-                //                let transformer = UIConfigurationTextAttributesTransformer { incoming in
-                //                    var outgoing = incoming
-                //                        outgoing.foregroundColor = UIColor.black
-                //                        outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)
-                //                    return outgoing
-                //                }
-                //                actionButton.configuration!.titleTextAttributesTransformer = transformer
-                
-//                delayAsync(delay: 2) { [weak self] in
-//                    self?.onSuccessCallback()
-//                }
             }
         } else {
             actionButton.setImage(UIImage(), for: .normal)
@@ -377,11 +375,6 @@ class ClaimPopupContent: UIView {
             indicator.color = .white
             indicator.accessibilityIdentifier = "indicator"
             UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
-            
-            //        delayAsync(delay: 2) { [weak self] in
-            ////            self?.onSuccessCallback()
-            //            self?.onFailureCallback()
-            //        }
         }
     }
     
@@ -492,68 +485,68 @@ class ClaimPopupContent: UIView {
 //        parent?.onContainerHeightChange(height + title.bounds.height*2)
     }
     
-    // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-//        closeButton.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
-        icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed)
-        
-        if #available(iOS 15, *) {
-            guard !actionButton.configuration.isNil else { return }
-            actionButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-        } else {
-            actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-        }
-        
-        //Set dynamic font size
-        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        
-        
-//        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
-//                                            forTextStyle: .title1)
-//        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-//                                            forTextStyle: .caption2)
-//        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-//                                            forTextStyle: .caption2)
-//        commentsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-//                                            forTextStyle: .caption2)
-//        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-//                                            forTextStyle: .callout)
-//        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
-//                                            forTextStyle: .footnote)
-////        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-////                                                forTextStyle: .caption2)
-////        lastnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-////                                               forTextStyle: .caption2)
-//        dateLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-//                                               forTextStyle: .caption2)
+//    // MARK: - Overriden methods
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        super.traitCollectionDidChange(previousTraitCollection)
 //
-//        if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
-//            label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
+////        closeButton.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
+////        icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed)
+//
+//        if #available(iOS 15, *) {
+//            guard !actionButton.configuration.isNil else { return }
+//            actionButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+//        } else {
+//            actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
 //        }
 //
+//        //Set dynamic font size
+//        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
 //
-//        guard let constraint_1 = titleLabel.getConstraint(identifier: "height"),
-//              let constraint_2 = statsView.getConstraint(identifier: "height"),
-//              let constraint_3 = descriptionLabel.getConstraint(identifier: "height"),
-//              let constraint_4 = topicView.getConstraint(identifier: "height"),
-////              let constraint_5 = progressView.getConstraint(identifier: "width"),
-//              let item = item
-//        else { return }
 //
-//        setNeedsLayout()
-//        constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
-//                                                  font: titleLabel.font)
-//        constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
-//                                                                       font: ratingLabel.font)
-//        constraint_3.constant = item.truncatedDescription.height(withConstrainedWidth: ratingLabel.bounds.width,
-//                                                                       font: ratingLabel.font)
-//        constraint_4.constant = item.topic.title.height(withConstrainedWidth: ratingLabel.bounds.width,
-//                                                                       font: ratingLabel.font)
-//        layoutIfNeeded()
-//        topicLabel.frame.origin = .zero
-    }
+////        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+////                                            forTextStyle: .title1)
+////        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+////                                            forTextStyle: .caption2)
+////        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+////                                            forTextStyle: .caption2)
+////        commentsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+////                                            forTextStyle: .caption2)
+////        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+////                                            forTextStyle: .callout)
+////        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+////                                            forTextStyle: .footnote)
+//////        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+//////                                                forTextStyle: .caption2)
+//////        lastnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+//////                                               forTextStyle: .caption2)
+////        dateLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+////                                               forTextStyle: .caption2)
+////
+////        if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
+////            label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
+////        }
+////
+////
+////        guard let constraint_1 = titleLabel.getConstraint(identifier: "height"),
+////              let constraint_2 = statsView.getConstraint(identifier: "height"),
+////              let constraint_3 = descriptionLabel.getConstraint(identifier: "height"),
+////              let constraint_4 = topicView.getConstraint(identifier: "height"),
+//////              let constraint_5 = progressView.getConstraint(identifier: "width"),
+////              let item = item
+////        else { return }
+////
+////        setNeedsLayout()
+////        constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
+////                                                  font: titleLabel.font)
+////        constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
+////                                                                       font: ratingLabel.font)
+////        constraint_3.constant = item.truncatedDescription.height(withConstrainedWidth: ratingLabel.bounds.width,
+////                                                                       font: ratingLabel.font)
+////        constraint_4.constant = item.topic.title.height(withConstrainedWidth: ratingLabel.bounds.width,
+////                                                                       font: ratingLabel.font)
+////        layoutIfNeeded()
+////        topicLabel.frame.origin = .zero
+//    }
 }
 
 

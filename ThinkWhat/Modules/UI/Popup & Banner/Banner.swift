@@ -179,6 +179,7 @@ class Banner: UIView {
 
         bannerDelegate?.onBannerWillAppear(self)
         willAppearPublisher.send(true)
+        willAppearPublisher.send(completion: .finished)
         
         alpha = 1
         UIView.animate(
@@ -197,6 +198,7 @@ class Banner: UIView {
             _ in
             self.bannerDelegate?.onBannerDidAppear(self)
             self.didAppearPublisher.send(true)
+            self.didAppearPublisher.send(completion: .finished)
         }
         
         UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
@@ -207,6 +209,7 @@ class Banner: UIView {
     func dismiss() {
         bannerDelegate?.onBannerWillDisappear(self)
         willDisappearPublisher.send(true)
+        willDisappearPublisher.send(completion: .finished)
 
         UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: { [weak self] in
             guard let self = self else { return }
@@ -220,6 +223,7 @@ class Banner: UIView {
             
             self.bannerDelegate?.onBannerDidDisappear(self)
             self.didDisappearPublisher.send(true)
+            self.didDisappearPublisher.send(completion: .finished)
         }
     }
     
@@ -254,6 +258,7 @@ class Banner: UIView {
         if yVelocity < -500 {
             bannerDelegate?.onBannerWillDisappear(self)
             willDisappearPublisher.send(true)
+            willDisappearPublisher.send(completion: .finished)
             
             let time = TimeInterval(distance/abs(yVelocity)*2.5)
             let duration: TimeInterval = time < 0.08 ? 0.08 : time
@@ -269,6 +274,7 @@ class Banner: UIView {
                 
                 self.bannerDelegate?.onBannerDidDisappear(self)
                 self.didDisappearPublisher.send(true)
+                self.didDisappearPublisher.send(completion: .finished)
             }
         } else if background.alpha > 0.33 {
             UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
@@ -280,6 +286,7 @@ class Banner: UIView {
         } else {
             bannerDelegate?.onBannerWillDisappear(self)
             willDisappearPublisher.send(true)
+            willDisappearPublisher.send(completion: .finished)
 
             
             UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: { [weak self] in
@@ -294,6 +301,7 @@ class Banner: UIView {
                 
                 self.bannerDelegate?.onBannerDidDisappear(self)
                 self.didDisappearPublisher.send(true)
+                self.didDisappearPublisher.send(completion: .finished)
             }
         }
     }
@@ -359,12 +367,12 @@ func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: Ban
 //}
 
 
-func showPopup<C: UIView>(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: C, isModal: Bool = true, shouldDismissAfter: TimeInterval = .infinity, accessibilityIdentifier: String = "") where C:CallbackCallable {
-    let banner = Popup(callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
-    banner.accessibilityIdentifier = accessibilityIdentifier
-    subview.callbackDelegate = banner
-    banner.present(content: subview)
-}
+//func showPopup<C: UIView>(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: C, isModal: Bool = true, shouldDismissAfter: TimeInterval = .infinity, accessibilityIdentifier: String = "") where C:CallbackCallable {
+//    let banner = Popup(callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
+//    banner.accessibilityIdentifier = accessibilityIdentifier
+//    subview.callbackDelegate = banner
+//    banner.present(content: subview)
+//}
 
 func showTip(delegate: BannerObservable, identifier: String, force: Bool = false, timeout: TimeInterval = 2) {
     guard  force || UserDefaults.App.hasSeenAppIntroduction.isNil else { return }

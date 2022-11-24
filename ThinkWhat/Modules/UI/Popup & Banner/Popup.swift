@@ -29,14 +29,7 @@ class Popup: UIView {
     }
     @IBOutlet weak var body: UIView! {
         didSet {
-            body.backgroundColor = UIColor { traitCollection in
-                switch traitCollection.userInterfaceStyle {
-                case .dark:
-                    return .secondarySystemBackground
-                default:
-                    return .systemBackground
-                }
-            }
+            body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
         }
     }
     @IBOutlet weak var container: UIView!
@@ -50,8 +43,8 @@ class Popup: UIView {
     public var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     private let heightScaleFactor: CGFloat
-    private var yOrigin:    CGFloat = 0
-    private var height:     CGFloat = 0 {
+    private var yOrigin: CGFloat = 0
+    private var height: CGFloat = 0 {
         didSet {
             if oldValue != height {
                 yOrigin = -(UIScreen.main.bounds.height/2 + height/2)
@@ -62,7 +55,6 @@ class Popup: UIView {
     private var padding: CGFloat = 16
     private var isDismissing = false
     private var lastHeight: CGFloat = 0
-    
     //Use for auto dismiss
     private var timer:  Timer?
     private var timeElapsed: TimeInterval = 0
@@ -81,6 +73,10 @@ class Popup: UIView {
     
     // MARK: - Destructor
     deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
@@ -89,7 +85,7 @@ class Popup: UIView {
     
     
     // MARK: - Initialization
-    init(callbackDelegate: CallbackObservable?, bannerDelegate: BannerObservable?, heightScaleFactor: CGFloat = 0.7) {
+    init(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable? = nil, heightScaleFactor: CGFloat = 0.7) {
         self.heightScaleFactor = heightScaleFactor
         
         super.init(frame: UIScreen.main.bounds)
@@ -97,7 +93,7 @@ class Popup: UIView {
         self.callbackDelegate = callbackDelegate
         self.bannerDelegate = bannerDelegate
         
-        commonInit()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -108,7 +104,7 @@ class Popup: UIView {
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+        body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
     }
     
     
@@ -130,6 +126,9 @@ class Popup: UIView {
         body.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
 
         bannerDelegate?.onBannerWillAppear(self)
+        willAppearPublisher.send(true)
+        willAppearPublisher.send(completion: .finished)
+        
         alpha = 1
         UIView.animate(
             withDuration: 0.45,
@@ -145,6 +144,8 @@ class Popup: UIView {
         }) {
             _ in
             self.bannerDelegate?.onBannerDidAppear(self)
+            self.didAppearPublisher.send(true)
+            self.didAppearPublisher.send(completion: .finished)
         }
         
         UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
@@ -152,16 +153,24 @@ class Popup: UIView {
         })
     }
     
-    public func dismiss(_ sender: Optional<Any> = nil) {
+    public func dismiss() {//_ sender: Optional<Any> = nil) {
         subscriptions.forEach { $0.cancel() }
         isDismissing = true
         bannerDelegate?.onBannerWillDisappear(self)
-        UIView.animate(withDuration: 0.35, delay: 0, options: [.curveLinear], animations: {
+        willDisappearPublisher.send(true)
+        willDisappearPublisher.send(completion: .finished)
+        
+        UIView.animate(withDuration: 0.35, delay: 0, options: [.curveLinear], animations: { [weak self] in
+            guard let self = self else { return }
+            
             self.background.alpha = 0
-        }) {
-            _ in
-            self.accessibilityIdentifier = sender as? String
+        }) {[weak self] _ in
+            guard let self = self else { return }
+            
+//            self.accessibilityIdentifier = sender as? String
             self.bannerDelegate?.onBannerDidDisappear(self)
+            self.didDisappearPublisher.send(true)
+            self.didDisappearPublisher.send(completion: .finished)
         }
         UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
             self.setNeedsLayout()
@@ -195,7 +204,8 @@ class Popup: UIView {
 }
 
 private extension Popup {
-    func commonInit() {
+    @MainActor
+    func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         
         backgroundColor             = .clear
@@ -231,56 +241,57 @@ private extension Popup {
     func updateTimer() {
         timeElapsed -= 0.5
         if timeElapsed <= 0 {
+            stopTimer()
             dismiss()
         }
     }
 }
 
-extension Popup: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-        if sender is VoteMessage {
-            dismiss("vote")
-        } else if let btn = sender as? UIButton {
-            if btn.accessibilityIdentifier == "unsubscribe" {
-                callbackDelegate?.callbackReceived(btn)
-            }
-            dismiss(btn.accessibilityIdentifier)// == "exit" ? "exit" : nil)
-        } else if sender is Claim {
-            callbackDelegate?.callbackReceived(sender)
-        } else if sender is Topic {
-            callbackDelegate?.callbackReceived(sender)
-            dismiss()
-        } else if let votersFilter = sender as? VotersFilter {
-            callbackDelegate?.callbackReceived(votersFilter.getData())
-            dismiss()
-        } else if let string = sender as? String {
-//            if string == "exit" {
-//
-//            } else if string == "pop" {
-//                accessibilityIdentifier = string
+//extension Popup: CallbackObservable {
+//    func callbackReceived(_ sender: Any) {
+//        if sender is VoteMessage {
+//            dismiss("vote")
+//        } else if let btn = sender as? UIButton {
+//            if btn.accessibilityIdentifier == "unsubscribe" {
+//                callbackDelegate?.callbackReceived(btn)
 //            }
-            dismiss(string)
-        } else if sender is PollCreationController.Option {
-            callbackDelegate?.callbackReceived(sender)
-            dismiss()
-        } else if sender is ImageItem {
-            callbackDelegate?.callbackReceived(sender)
-            dismiss()
-        } else if sender is ChoiceItem {
-            callbackDelegate?.callbackReceived(sender)
-            dismiss()
-        } else if sender is PollCreationController.Comments {
-            callbackDelegate?.callbackReceived(sender)
-            dismiss()
-        } else if sender is Int {
-            callbackDelegate?.callbackReceived(sender)
-            dismiss()
-        } else if sender is PollCreationController.Hot {
-            callbackDelegate?.callbackReceived(sender)
-            dismiss()
-        } else if sender is VoteEducation {
-            dismiss()
-        }
-    }
-}
+//            dismiss(btn.accessibilityIdentifier)// == "exit" ? "exit" : nil)
+//        } else if sender is Claim {
+//            callbackDelegate?.callbackReceived(sender)
+//        } else if sender is Topic {
+//            callbackDelegate?.callbackReceived(sender)
+//            dismiss()
+//        } else if let votersFilter = sender as? VotersFilter {
+//            callbackDelegate?.callbackReceived(votersFilter.getData())
+//            dismiss()
+//        } else if let string = sender as? String {
+////            if string == "exit" {
+////
+////            } else if string == "pop" {
+////                accessibilityIdentifier = string
+////            }
+//            dismiss(string)
+//        } else if sender is PollCreationController.Option {
+//            callbackDelegate?.callbackReceived(sender)
+//            dismiss()
+//        } else if sender is ImageItem {
+//            callbackDelegate?.callbackReceived(sender)
+//            dismiss()
+//        } else if sender is ChoiceItem {
+//            callbackDelegate?.callbackReceived(sender)
+//            dismiss()
+//        } else if sender is PollCreationController.Comments {
+//            callbackDelegate?.callbackReceived(sender)
+//            dismiss()
+//        } else if sender is Int {
+//            callbackDelegate?.callbackReceived(sender)
+//            dismiss()
+//        } else if sender is PollCreationController.Hot {
+//            callbackDelegate?.callbackReceived(sender)
+//            dismiss()
+//        } else if sender is VoteEducation {
+//            dismiss()
+//        }
+//    }
+//}
 

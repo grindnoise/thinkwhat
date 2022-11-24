@@ -318,9 +318,10 @@ extension HotView: CallbackObservable {
     func callbackReceived(_ sender: Any) {
         if let string = sender as? String {
             if string == "claim" {
-                let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
-                banner.accessibilityIdentifier = "claim"
-                banner.present(content: ClaimSelection(callbackDelegate: banner))
+                fatalError()
+//                let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
+//                banner.accessibilityIdentifier = "claim"
+//                banner.present(content: ClaimSelection(callbackDelegate: banner))
             } else if string == "next" {
                 NotificationCenter.default.removeObserver(self)
                 Surveys.shared.rejected.append(currentCard.survey)

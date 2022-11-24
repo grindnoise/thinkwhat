@@ -100,6 +100,7 @@ struct Notifications {
         static let OwnAppend                        = Notification.Name("SurveysOwnAppend")
         static let FavoriteAppend                   = Notification.Name("SurveysFavoriteAppend")
         static let FavoriteRemove                   = Notification.Name("SurveysFavoriteRemove")
+        static let FavoriteRequestFailure           = Notification.Name("Notifications.Surveys.FavoriteRequestFailure")
         static let TopicAppend                      = Notification.Name("SurveysTopicAppend")
         static let Append                           = Notification.Name("Notifications.Surveys.Append")
         static let AppendReference                  = Notification.Name("Notifications.Surveys.AppendReference")

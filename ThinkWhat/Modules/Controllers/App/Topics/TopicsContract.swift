@@ -8,50 +8,51 @@
 
 import UIKit
 
-/// *View* sends user actions to the *Controller*.
-///
-/// **Controller** conforms to this protocol
 protocol TopicsViewInput: AnyObject {
     
     var controllerOutput: TopicsControllerOutput? { get set }
     var controllerInput: TopicsControllerInput? { get set }
     var mode: TopicsController.Mode { get set }
     
+    func openSettings()
     func onSurveyTapped(_: SurveyReference)
-    func onDataSourceRequest()
+    func onDataSourceRequest(dateFilter: Period, topic: Topic)
     func onTopicSelected(_: Topic)
+    func updateSurveyStats(_: [SurveyReference])
+    func addFavorite(_: SurveyReference)
+    func share(_: SurveyReference)
+    func claim(surveyReference: SurveyReference, claim: Claim)
+    func openUserprofile(_: Userprofile)
+    func unsubscribe(from: Userprofile)
+    func subscribe(to: Userprofile)
 }
 
-/// *Controller* tells the *Model* what to do based on the input
-///
-/// **Model** conforms to this protocol
 protocol TopicsControllerInput: AnyObject {
     
     var modelOutput: TopicsModelOutput? { get set }
     
-    func onDataSourceRequest(_: Topic)
+    func onDataSourceRequest(dateFilter: Period, topic: Topic)
     func search(substring: String, excludedIds: [Int])
+    func updateSurveyStats(_: [SurveyReference])
+    func addFavorite(surveyReference: SurveyReference)
+    func claim(surveyReference: SurveyReference, claim: Claim)
+    func unsubscribe(from: Userprofile)
+    func subscribe(to: Userprofile)
 }
 
-/// *Model* returns the result to the *Controller*
-///
-/// **Controller** conforms to this protocol
 protocol TopicsModelOutput: AnyObject {
 //    func onError(_: Error)
     func onSearchCompleted(_: [SurveyReference])
-    func onRequestCompleted(_: Result<Bool, Error>)
+//    func onRequestCompleted(_: Result<Bool, Error>)
 }
 
-/// *Controller* returns a UI-representable result to the *View*
-///
-/// **View** conforms to this protocol
 protocol TopicsControllerOutput: AnyObject {
     var viewInput: (TopicsViewInput & TintColorable)? { get set }
     
     func onDefaultMode(color: UIColor?)
     func onSearchMode()
     func onSearchCompleted(_: [SurveyReference])
-    func onRequestCompleted(_: Result<Bool, Error>)
+//    func onRequestCompleted(_: Result<Bool, Error>)
 //    func onTopicMode(_: Topic)
     func beginSearchRefreshing()
 //    var topic: Topic? { get }

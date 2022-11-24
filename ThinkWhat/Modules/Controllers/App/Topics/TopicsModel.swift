@@ -30,17 +30,44 @@ extension TopicsModel: TopicsControllerInput {
         }
     }
     
-    func onDataSourceRequest(_ topic: Topic) {
+    func onDataSourceRequest(dateFilter: Period, topic: Topic) {
+        Task {
+            try await API.shared.surveys.surveyReferences(category: .Topic, dateFilter: dateFilter, topic: topic)
+        }
+    }
+    
+    func unsubscribe(from userprofile: Userprofile) {
+        Task {
+            try await API.shared.profiles.unsubscribe(from: [userprofile])
+        }
+    }
+    
+    func subscribe(to userprofile: Userprofile) {
+        Task {
+            try await API.shared.profiles.subscribe(at: [userprofile])
+        }
+    }
+    
+    func claim(surveyReference: SurveyReference, claim: Claim) {
+        Task {
+            try await API.shared.surveys.claim(surveyReference: surveyReference, reason: claim)
+        }
+    }
+    
+    func addFavorite(surveyReference: SurveyReference) {
+        Task {
+            await API.shared.surveys.markFavorite(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
+        }
+    }
+    
+    func updateSurveyStats(_ instances: [SurveyReference]) {
         Task {
             do {
-                try await API.shared.surveys.surveyReferences(category: .Topic, topic: topic)
-                await MainActor.run {
-                    modelOutput?.onRequestCompleted(.success(true))
-                }
+                try await API.shared.surveys.updateSurveyStats(instances)
             } catch {
-                await MainActor.run {
-                    modelOutput?.onRequestCompleted(.failure(error))
-                }
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
             }
         }
     }

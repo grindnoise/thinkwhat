@@ -960,8 +960,9 @@ extension PollController: PollModelOutput {
             //Show edu info
 #if DEBUG
             delayAsync(delay: 1) {
-                let popup = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.4)
-                popup.present(content: VoteEducation(topic: .Bankruptcy, color: .systemRed, callbackDelegate: popup))
+                fatalError()
+//                let popup = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.4)
+//                popup.present(content: VoteEducation(topic: .Bankruptcy, color: .systemRed, callbackDelegate: popup))
             }
 #else
             delayAsync(delay: 1) {

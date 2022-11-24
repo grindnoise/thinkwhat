@@ -86,7 +86,7 @@
 "hide_webview" = "Cкрыть веб ссылку";
 "show_webview" = "Показать веб ссылку";
 "sending" = "Отправка";
-"choose_claim_reason" = "Причина жалобы:";
+"choose_claim_reason" = "Выберите причину:";
 "age" = "Возраст";
 "image_uploaded" = "Изображение успешно загружено";
 "actions" = "Действия";

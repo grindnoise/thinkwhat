@@ -86,7 +86,7 @@
 "hide_webview" = "Hide web link";
 "show_webview" = "Show web link";
 "sending" = "Sending";
-"choose_claim_reason" = "Complaint reason:";
+"choose_claim_reason" = "Choose reason:";
 "age" = "Age";
 "image_uploaded" = "Image uploaded successfully";
 "actions" = "Actions";

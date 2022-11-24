@@ -140,19 +140,24 @@ class SurveysView: UIView {
 
             let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
             banner.accessibilityIdentifier = "claim"
-            let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
+            let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
 
-            claimContent.claimSubject.sink {
-                print($0)
-            } receiveValue: { [weak self] in
-                guard let self = self,
-                    let claim = $0
-                else { return }
-
-                self.viewInput?.claim(surveyReference: surveyReference, claim: claim)
-            }.store(in: &self.subscriptions)
+            claimContent.claimPublisher
+                .sink { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.viewInput?.claim(surveyReference: surveyReference, claim: $0)
+                }
+                .store(in: &self.subscriptions)
 
             banner.present(content: claimContent)
+            banner.didDisappearPublisher
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    banner.removeFromSuperview()
+                }
+                .store(in: &self.subscriptions)
 
 //            self.viewInput?.addFavorite(surveyReference: value)
         }.store(in: &self.subscriptions)

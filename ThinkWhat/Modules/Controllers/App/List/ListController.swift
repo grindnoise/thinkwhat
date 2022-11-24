@@ -157,6 +157,10 @@ extension ListController: ListViewInput {
         
         navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
+        
+        guard let controller = tabBarController as? MainController else { return }
+        
+        controller.toggleLogo(on: false)
     }
     
     func share(_ surveyReference: SurveyReference) {
@@ -227,9 +231,9 @@ extension ListController: ListViewInput {
         navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
         
-        guard let main = tabBarController as? MainController else { return }
+        guard let controller = tabBarController as? MainController else { return }
         
-        main.toggleLogo(on: false)
+        controller.toggleLogo(on: false)
     }
     
     func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {

@@ -610,7 +610,7 @@ class SurveyCell: UICollectionViewListCell {
         let instance = UIStackView(arrangedSubviews: [topicLabel])//, progressView])//, dateLabel])
         instance.clipsToBounds = false
         instance.alignment = .center
-        instance.spacing = 4
+        instance.spacing = 6
         
         return instance
     }()
@@ -629,7 +629,7 @@ class SurveyCell: UICollectionViewListCell {
         let instance = UIStackView(arrangedSubviews: [icon, topicVerticalStackView, userView])
         instance.accessibilityIdentifier = "headerTitleHorizontalStackView"
         instance.axis = .horizontal
-        instance.spacing = 4
+        instance.spacing = 6
         
         //        userView.translatesAutoresizingMaskIntoConstraints = false
         //        userView.heightAnchor.constraint(equalTo: icon.heightAnchor).isActive = true
@@ -1238,8 +1238,9 @@ extension SurveyCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
         
         if let sender = interaction.view as? Avatar,
-            let userprofile = sender.userprofile,
-            userprofile != Userprofiles.shared.current {
+           let userprofile = sender.userprofile,
+           userprofile != Userprofile.anonymous,
+           userprofile != Userprofiles.shared.current {
             
             return UIContextMenuConfiguration(
                 identifier: nil,

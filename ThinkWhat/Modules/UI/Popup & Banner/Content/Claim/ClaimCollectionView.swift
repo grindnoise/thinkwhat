@@ -73,19 +73,17 @@ class ClaimCollectionView: UICollectionView, UICollectionViewDelegate {
 //            cell.automaticallyUpdatesBackgroundConfiguration = false
         }
         
-        let headerRegistraition = UICollectionView.SupplementaryRegistration<UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) { [weak self] supplementaryView, elementKind, indexPath in
-            
-            guard let self = self else { return }
+        let headerRegistraition = UICollectionView.SupplementaryRegistration<UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) { supplementaryView, elementKind, indexPath in
             
             var configuration = supplementaryView.defaultContentConfiguration()
             configuration.text = "choose_claim_reason".localized.uppercased()
-            configuration.textProperties.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline)!
-            configuration.textProperties.color = .label
+            configuration.textProperties.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .headline)!
+            configuration.textProperties.color = .secondaryLabel
             configuration.textProperties.alignment = .center
             configuration.directionalLayoutMargins = .init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0)
             
             var config = UIBackgroundConfiguration.listPlainCell()
-            config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+            config.backgroundColor = .clear
             supplementaryView.backgroundConfiguration = config
 //            supplementaryView.automaticallyUpdatesBackgroundConfiguration = false
             supplementaryView.contentConfiguration = configuration
@@ -262,40 +260,40 @@ class ClaimCell: UICollectionViewListCell {
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            horizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+            horizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
             horizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
             horizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
         ])
         
-        let constraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        let constraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -0)
         constraint.priority = .defaultLow
         constraint.isActive = true
     }
     
     private func updateAppearance() {
-        guard let icon = imageContainer.getSubview(type: Icon.self, identifier: "icon"),
-            let destinationPath = (icon.getLayer(isSelected ? .Thumbdown : .Oval) as? CAShapeLayer)?.path,
-            let finalPath = (isSelected ? destinationPath.getScaledPath(size: destinationPath.boundingBox.size, scaleMultiplicator: 0.65) : destinationPath) as? CGPath,
-            let shapeLayer = icon.icon as? CAShapeLayer
+        guard let icon = imageContainer.getSubview(type: Icon.self, identifier: "icon")
+//            let destinationPath = (icon.getLayer(isSelected ? .ExclamationMark : .Oval) as? CAShapeLayer)?.path,
+//            let finalPath = (isSelected ? destinationPath.getScaledPath(size: destinationPath.boundingBox.size, scaleMultiplicator: 0.65) : destinationPath) as? CGPath,
+//            let shapeLayer = icon.icon as? CAShapeLayer
         else { return }
         
-        let pathAnim = Animations.get(property: .Path,
-                                      fromValue: shapeLayer.path as Any,
-                                      toValue: finalPath,
-                                      duration: isSelected ? 0.275 : 0.175,
-                                      delay: 0,
-                                      repeatCount: 0,
-                                      autoreverses: false,
-                                      timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                      delegate: nil,
-                                      isRemovedOnCompletion: true)
-        shapeLayer.add(pathAnim, forKey: nil)
-        shapeLayer.path = finalPath
+//        let pathAnim = Animations.get(property: .Path,
+//                                      fromValue: shapeLayer.path as Any,
+//                                      toValue: finalPath,
+//                                      duration: isSelected ? 0.275 : 0.175,
+//                                      delay: 0,
+//                                      repeatCount: 0,
+//                                      autoreverses: false,
+//                                      timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                      delegate: nil,
+//                                      isRemovedOnCompletion: true)
+//        shapeLayer.add(pathAnim, forKey: nil)
+//        shapeLayer.path = finalPath
         
         let colorAnim = Animations.get(property: .FillColor,
                                              fromValue: icon.iconColor.cgColor as Any,
-                                             toValue: isSelected ? traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : UIColor.systemRed.cgColor : UIColor.systemGray2.cgColor as Any,
-                                             duration: isSelected ? 0.275 : 0.15,
+                                             toValue: isSelected ? UIColor.systemRed.cgColor : UIColor.systemGray2.cgColor as Any,
+                                             duration: 0.15,
                                              delay: 0,
                                              repeatCount: 0,
                                              autoreverses: false,

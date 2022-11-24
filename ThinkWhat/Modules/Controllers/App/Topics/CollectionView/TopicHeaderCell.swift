@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 struct TopicCellHeaderConfiguration: UIContentConfiguration, Hashable {
 
@@ -54,9 +55,9 @@ class TopicCellHeader: UICollectionViewListCell {
         contentConfiguration = newConfiguration
     }
     
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.isNil ? .systemGray : item.topic.tagColor
-    }
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.isNil ? .systemGray : item.topic.tagColor
+//    }
     
 //    override func updateConstraints() {
 //        super.updateConstraints()
@@ -67,7 +68,7 @@ class TopicCellHeader: UICollectionViewListCell {
 }
 
 class TopicCellHeaderContent: UIView, UIContentView {
-
+    
     // MARK: - Public properties
     var configuration: UIContentConfiguration {
         get {
@@ -81,50 +82,57 @@ class TopicCellHeaderContent: UIView, UIContentView {
         }
     }
     
+    
+    
     // MARK: - Private properties
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //UI
     private var currentConfiguration: TopicCellHeaderConfiguration!
-    private var observers: [NSKeyValueObservation] = []
     private lazy var horizontalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [iconContainer, verticalStack, viewsLabel])
+        let instance = UIStackView(arrangedSubviews: [icon, verticalStack])//, viewsLabel])
         instance.axis = .horizontal
-//        instance.distribution = .fillProportionally
-//        instance.isLayoutMarginsRelativeArrangement = true
-//        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
-//        constraint.identifier = "height"
-//        constraint.isActive = true
-
-        instance.spacing = 8
+        
+        instance.spacing = 6
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [titleView, statsView])
+        let instance = UIStackView(arrangedSubviews: [titleView, topicDescription])
         instance.axis = .vertical
-//        instance.distribution = .fillEqually
-        instance.spacing = 8
+//                instance.distribution = .fillEqually
+        instance.spacing = 0
         return instance
     }()
-    private lazy var iconContainer: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.addSubview(icon)
-        icon.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            icon.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-            icon.topAnchor.constraint(equalTo: instance.topAnchor),
-            icon.heightAnchor.constraint(equalTo: instance.heightAnchor),
-//            icon.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
-            icon.widthAnchor.constraint(equalTo: icon.heightAnchor, multiplier: 1/1)
-        ])
-        
-        return instance
-    }()
+//    private lazy var iconContainer: UIView = {
+//        let instance = UIView()
+//        instance.backgroundColor = .clear
+//        instance.addSubview(icon)
+//
+//        icon.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            icon.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+//            icon.topAnchor.constraint(equalTo: instance.topAnchor),
+//            icon.heightAnchor.constraint(equalTo: instance.heightAnchor),
+//            //            icon.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+//            icon.widthAnchor.constraint(equalTo: icon.heightAnchor, multiplier: 1/1)
+//        ])
+//
+//        return instance
+//    }()
     private lazy var icon: Icon = {
         let instance = Icon()
         instance.isRounded = false
-        instance.scaleMultiplicator = 1.3
-//        instance.translatesAutoresizingMaskIntoConstraints = false
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.isNil ? .systemGray : currentConfiguration.topicItem.topic.tagColor
+        instance.scaleMultiplicator = 1.75
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.iconColor = .white
+        
+        instance.publisher(for: \.bounds, options: .new)
+            .sink { rect in
+                
+                instance.cornerRadius = rect.width/3.25
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
@@ -143,7 +151,6 @@ class TopicCellHeaderContent: UIView, UIContentView {
     }()
     private lazy var titleLabel: InsetLabel = {
         let instance = InsetLabel()
-//        instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
         instance.textAlignment = .center
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .headline)
         instance.numberOfLines = 1
@@ -158,140 +165,157 @@ class TopicCellHeaderContent: UIView, UIContentView {
         heightConstraint.identifier = "height"
         heightConstraint.isActive = true
         
-        observers.append(instance.observe(\InsetLabel.bounds, options: [.new]) { view, change in//[weak self] view, change in
-//            guard let self = self,
-//                  let newValue = change.newValue,
-//                  let constraint = view.getConstraint(identifier: "width"),
-//                  let topic = self.currentConfiguration.topicItem.topic as? Topic
-//            else { return }
-//
-////            guard newValue.width != view.bounds.width else { return }
-//
-//            view.insets = UIEdgeInsets(top: 0, left: newValue.height/2.25, bottom: 0, right: newValue.height/2.25)
-//            let width = topic.title.width(withConstrainedHeight: view.bounds.height, font: view.font)
-//
-//            self.setNeedsLayout()
-//            constraint.constant = width + view.insets.right*2 + view.insets.left*2
-//            self.layoutIfNeeded()
-            guard let newValue = change.newValue else { return }
-            view.cornerRadius = newValue.height/2.25
-        })
+        instance.publisher(for: \.bounds)
+            .sink { rect in
+                instance.cornerRadius = rect.height/2.25
+            }
+            .store(in: &subscriptions)
         
         return instance
     }()
-    private let hotCountView: UIImageView = {
-        let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-        instance.tintColor = .systemRed
-        instance.contentMode = .scaleAspectFit
-        instance.translatesAutoresizingMaskIntoConstraints = false
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
-        return instance
-    }()
-    private lazy var hotCountLabel: UILabel = {
+    private lazy var topicDescription: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
-        instance.textAlignment = .center
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-//        observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
-//            guard let self = self,
-//                  let text = view.text else { return }
-//            //            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.8)
-//            guard let constraint = self.statsView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
-//            self.setNeedsLayout()
-//            constraint.constant = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
-//            self.layoutIfNeeded()
-//        })
-        return instance
-    }()
-    private lazy var viewsCountView: UIImageView = {
-        let instance = UIImageView(image: UIImage(systemName: "eye.fill"))
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        instance.contentMode = .scaleAspectFit
-        instance.translatesAutoresizingMaskIntoConstraints = false
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
-        return instance
-    }()
-    private lazy var viewsCountLabel: UILabel = {
-        let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
-        instance.textAlignment = .center
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        instance.text = "There's gonna be a description of the topic"
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.textAlignment = .left
+        instance.numberOfLines = 1
+        instance.lineBreakMode = .byTruncatingTail
+        instance.textColor = .label
 
         return instance
     }()
-    private lazy var statsStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [viewsCountView, viewsCountLabel, hotCountView, hotCountLabel,])
-        instance.alignment = .center
-        instance.spacing = 2
-        return instance
-    }()
-    private lazy var statsView: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.translatesAutoresizingMaskIntoConstraints = false
-        
-//        let heightConstraint = instance.heightAnchor.constraint(equalToConstant: 300)
-//        heightConstraint.identifier = "height"
-//        heightConstraint.isActive = true
-        
-        instance.addSubview(statsStack)
-        statsStack.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            statsStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
-            statsStack.topAnchor.constraint(equalTo: instance.topAnchor),
-            statsStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-        ])
-        
-        return instance
-    }()
-    @MainActor private lazy var viewsLabel: UILabel = {
-        let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .callout)
-        instance.textAlignment = .right
-        instance.textColor = .secondaryLabel
-        
-//        let constraint = instance.widthAnchor.constraint(equalToConstant: 50)
-//        constraint.identifier = "width"
-//        constraint.isActive = true
-
-        return instance
-    }()
+//    private let hotCountView: UIImageView = {
+//        let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+//        instance.tintColor = .systemRed
+//        instance.contentMode = .scaleAspectFit
+//        instance.translatesAutoresizingMaskIntoConstraints = false
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
+//        return instance
+//    }()
+//    private lazy var hotCountLabel: UILabel = {
+//        let instance = UILabel()
+//        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
+//        instance.textAlignment = .center
+//        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//
+//        return instance
+//    }()
+//    private lazy var viewsCountView: UIImageView = {
+//        let instance = UIImageView(image: UIImage(systemName: "eye.fill"))
+//        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        instance.contentMode = .scaleAspectFit
+//        instance.translatesAutoresizingMaskIntoConstraints = false
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
+//        return instance
+//    }()
+//    private lazy var viewsCountLabel: UILabel = {
+//        let instance = UILabel()
+//        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption1)
+//        instance.textAlignment = .center
+//        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//
+//        return instance
+//    }()
+//    private lazy var statsStack: UIStackView = {
+//        let instance = UIStackView(arrangedSubviews: [viewsCountView, viewsCountLabel, hotCountView, hotCountLabel,])
+//        instance.alignment = .center
+//        instance.spacing = 2
+//        return instance
+//    }()
+//    private lazy var statsView: UIView = {
+//        let instance = UIView()
+//        instance.backgroundColor = .clear
+//        instance.translatesAutoresizingMaskIntoConstraints = false
+//        instance.addSubview(statsStack)
+//
+//        statsStack.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            statsStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
+//            statsStack.topAnchor.constraint(equalTo: instance.topAnchor),
+//            statsStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+//        ])
+//
+//        return instance
+//    }()
+//    @MainActor private lazy var viewsLabel: UILabel = {
+//        let instance = UILabel()
+//        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .callout)
+//        instance.textAlignment = .right
+//        instance.textColor = .secondaryLabel
+//
+//        return instance
+//    }()
     private let padding: CGFloat = 10
+    
+    
     
     // MARK: - Initalization
     init(configuration: TopicCellHeaderConfiguration) {
         super.init(frame: .zero)
+        
         setupUI()
-        setObservers()
         apply(configuration: configuration)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    
+    
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+//        viewsCountLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        hotCountLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+        
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+        
+        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                            forTextStyle: .headline)
+        topicDescription.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                  forTextStyle: .caption2)
+//        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+//                                            forTextStyle: .callout)
+//        viewsCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+//                                                 forTextStyle: .caption1)
+//        hotCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+//                                               forTextStyle: .caption1)
+        
+        refreshConstraints()
+    }
+}
 
-    // MARK: - Private methods
-    private func apply(configuration: TopicCellHeaderConfiguration) {
+// MARK: - Private
+private extension TopicCellHeaderContent {
+    func apply(configuration: TopicCellHeaderConfiguration) {
         guard currentConfiguration != configuration else { return }
+        
         currentConfiguration = configuration
         
-        icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.topicItem.topic.tagColor
-        titleLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.topicItem.topic.tagColor
+        let color = currentConfiguration.topicItem.topic.tagColor
+        
+        //icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.topicItem.topic.tagColor
+        icon.backgroundColor = color
+        titleLabel.backgroundColor = color
         icon.category = Icon.Category(rawValue: currentConfiguration.topicItem.topic.id) ?? .Null
         titleLabel.text = currentConfiguration.topicItem.title.uppercased()
-        viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.active.roundedWithAbbreviations)
+//        viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.active.roundedWithAbbreviations)
         
-        if currentConfiguration.topicItem.topic.hotTotal == 0 {
-            statsStack.removeArrangedSubview(hotCountView)
-            statsStack.removeArrangedSubview(hotCountLabel)
-            hotCountView.removeFromSuperview()
-            hotCountLabel.removeFromSuperview()
-        } else {
-            if !statsStack.arrangedSubviews.contains(hotCountView) { statsStack.addArrangedSubview(hotCountView) }
-            if !statsStack.arrangedSubviews.contains(hotCountLabel) { statsStack.addArrangedSubview(hotCountLabel) }
-        }
-        viewsCountLabel.text = String(describing: currentConfiguration.topicItem.topic.viewsTotal.roundedWithAbbreviations)
-        hotCountLabel.text = String(describing: currentConfiguration.topicItem.topic.hotTotal.roundedWithAbbreviations)
+//        if currentConfiguration.topicItem.topic.hotTotal == 0 {
+//            statsStack.removeArrangedSubview(hotCountView)
+//            statsStack.removeArrangedSubview(hotCountLabel)
+//            hotCountView.removeFromSuperview()
+//            hotCountLabel.removeFromSuperview()
+//        } else {
+//            if !statsStack.arrangedSubviews.contains(hotCountView) { statsStack.addArrangedSubview(hotCountView) }
+//            if !statsStack.arrangedSubviews.contains(hotCountLabel) { statsStack.addArrangedSubview(hotCountLabel) }
+//        }
+//        viewsCountLabel.text = String(describing: currentConfiguration.topicItem.topic.viewsTotal.roundedWithAbbreviations)
+//        hotCountLabel.text = String(describing: currentConfiguration.topicItem.topic.hotTotal.roundedWithAbbreviations)
         
         guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
         
@@ -303,33 +327,32 @@ class TopicCellHeaderContent: UIView, UIContentView {
         refreshConstraints()
     }
 
-    private func setupUI() {
+    @MainActor
+    func setupUI() {
         addSubview(horizontalStack)
         horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-        iconContainer.translatesAutoresizingMaskIntoConstraints = false
+        icon.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             horizontalStack.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: padding),
             horizontalStack.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
-            iconContainer.widthAnchor.constraint(equalTo: horizontalStack.widthAnchor, multiplier: 0.15)
-//            horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
-//            icon.widthAnchor.constraint(equalTo: icon.heightAnchor, multiplier: 1/1)
-//            icon.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor),
-//            horizontalStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding)
-//            horizontalStack.widthAnchor.constraint(equalTo: widthAnchor),
+            icon.widthAnchor.constraint(equalTo: horizontalStack.widthAnchor, multiplier: 0.15),
         ])
         
         let constr = horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor)
         constr.priority = .defaultLow
         constr.isActive = true
         
-        let constraint = statsView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -padding)
-        constraint.priority = .defaultLow
-        constraint.isActive = true
+                let constraint = topicDescription.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -padding)
+                constraint.priority = .defaultLow
+                constraint.isActive = true
+        
+//        let constraint = statsView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -padding)
+//        constraint.priority = .defaultLow
+//        constraint.isActive = true
     }
-
-    private func setObservers() {}
     
+    @MainActor
     private func refreshConstraints() {
         guard let constraint = titleLabel.getConstraint(identifier: "width") else { return }
         
@@ -341,14 +364,14 @@ class TopicCellHeaderContent: UIView, UIContentView {
         self.layoutIfNeeded()
         titleLabel.frame.origin = .zero
         
-        statsStack.translatesAutoresizingMaskIntoConstraints = false
-        guard let constraint_2 = statsStack.getConstraint(identifier: "height") else {
-            let constraint_2 = statsStack.heightAnchor.constraint(equalToConstant: "1".height(withConstrainedWidth: 50, font: viewsCountLabel.font))
-            constraint_2.identifier = "height"
-            constraint_2.isActive = true
-            return
-        }
-        constraint_2.constant = "1".height(withConstrainedWidth: 50, font: viewsCountLabel.font)
+//        statsStack.translatesAutoresizingMaskIntoConstraints = false
+//        guard let constraint_2 = statsStack.getConstraint(identifier: "height") else {
+//            let constraint_2 = statsStack.heightAnchor.constraint(equalToConstant: "1".height(withConstrainedWidth: 50, font: viewsCountLabel.font))
+//            constraint_2.identifier = "height"
+//            constraint_2.isActive = true
+//            return
+//        }
+//        constraint_2.constant = "1".height(withConstrainedWidth: 50, font: viewsCountLabel.font)
         
 //        guard let constraint = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
 //              let constraint_2 = descriptionLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
@@ -367,34 +390,5 @@ class TopicCellHeaderContent: UIView, UIContentView {
 //        topicStackView.updateConstraints()
 //        topicLabel.frame.origin = .zero
 //        avatar.imageView.image = UIImage(systemName: "face.smiling.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: avatar.bounds.size.height*0.5, weight: .regular, scale: .medium))
-    }
-
-    // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-        
-        
-        guard let item = currentConfiguration.topicItem else { return }
-        
-        titleLabel.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor
-        viewsCountLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        hotCountLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        
-        (icon.icon as! CAShapeLayer).fillColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : item.topic.tagColor.cgColor
-        
-        //Set dynamic font size
-        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        
-        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
-                                            forTextStyle: .headline)
-        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .callout)
-        viewsCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                            forTextStyle: .caption1)
-        hotCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                            forTextStyle: .caption1)
-        
-        refreshConstraints()
     }
 }

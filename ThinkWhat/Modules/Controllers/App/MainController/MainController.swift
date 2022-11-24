@@ -244,12 +244,20 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
         appDelegate.center.requestAuthorization(options: options) {
             (granted, error) in
             if !granted {
                 print("Something went wrong")
             }
         }
+        
+        let banner = Popup(heightScaleFactor: 0.7)
+        banner.present(content: UIView(), dismissAfter: 1)
+        banner.didDisappearPublisher
+            .sink { _ in banner.removeFromSuperview() }
+            .store(in: &self.subscriptions)
+        
     }
 }
 
@@ -269,12 +277,13 @@ private extension MainController {
                                dismissAfter: 0.75)
                 banner.didDisappearPublisher
                     .sink { _ in banner.removeFromSuperview() }
-                    .store(in: &subscriptions)
+                    .store(in: &self.subscriptions)
             }
         })
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
-                guard let dict = notification.object as? [Userprofile: Userprofile],
+                guard let self = self,
+                      let dict = notification.object as? [Userprofile: Userprofile],
                       let userprofile = dict.values.first
                 else { return }
                 
@@ -284,13 +293,14 @@ private extension MainController {
                                dismissAfter: 0.75)
                 banner.didDisappearPublisher
                     .sink { _ in banner.removeFromSuperview() }
-                    .store(in: &subscriptions)
+                    .store(in: &self.subscriptions)
                 
             }
         })
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
-                guard let dict = notification.object as? [Userprofile: Userprofile],
+                guard let self = self,
+                      let dict = notification.object as? [Userprofile: Userprofile],
                       let userprofile = dict.values.first
                 else { return }
                 
@@ -300,7 +310,7 @@ private extension MainController {
                                dismissAfter: 0.75)
                 banner.didDisappearPublisher
                     .sink { _ in banner.removeFromSuperview() }
-                    .store(in: &subscriptions)
+                    .store(in: &self.subscriptions)
             }
         })
     }
@@ -748,3 +758,19 @@ extension MainController: CAAnimationDelegate {
         }
     }
 }
+
+//extension MainController: BannerObservable {
+//    func onBannerWillAppear(_ sender: Any) {}
+//
+//    func onBannerWillDisappear(_ sender: Any) {}
+//
+//    func onBannerDidAppear(_ sender: Any) {}
+//
+//    func onBannerDidDisappear(_ sender: Any) {
+//        if let banner = sender as? TestBanner {
+//            banner.removeFromSuperview()
+//        } else if let popup = sender as? Popup {
+//            popup.removeFromSuperview()
+//        }
+//    }
+//}

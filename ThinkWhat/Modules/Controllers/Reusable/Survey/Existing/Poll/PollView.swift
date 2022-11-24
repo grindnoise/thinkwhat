@@ -34,23 +34,31 @@ class PollView: UIView {
             //Show popup
             let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
             banner.accessibilityIdentifier = "claim"
-            let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
+            let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
             
-            claimContent.claimSubject.sink { [weak self] in
-                guard let self = self,
-                      let claim = $0
-                else { return }
-                
-                self.viewInput?.onCommentClaim(comment: item, reason: claim)
-            }.store(in: &self.subscriptions)
+            claimContent.claimPublisher
+                .sink { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.viewInput?.onCommentClaim(comment: item, reason: $0)
+                }
+                .store(in: &self.subscriptions)
             
             banner.present(content: claimContent)
+            banner.didDisappearPublisher
+                .sink { [weak self] _ in
+                    guard let self = self else { return }
+                    
+                    banner.removeFromSuperview()
+                }
+                .store(in: &self.subscriptions)
+            
         }.store(in: &subscriptions)
         
         //Subscibe for thread disclosure
         instance.commentThreadSubject.sink { [weak self] in
             guard let self = self,
-                  let comment = $0 as? Comment
+                  let comment = $0
             else { return }
             
             self.viewInput?.openCommentThread(comment)

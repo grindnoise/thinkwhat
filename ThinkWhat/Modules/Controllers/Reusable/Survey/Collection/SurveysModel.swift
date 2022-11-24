@@ -43,22 +43,7 @@ extension SurveysModel: SurveysControllerInput {
     
     func addFavorite(surveyReference: SurveyReference) {
         Task {
-            do {
-                let data = try await API.shared.surveys.markFavoriteAsync(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
-                let json = try JSON(data: data, options: .mutableContainers)
-                guard let value = json["status"].string else { throw "Unknown error" }
-                guard value == "ok" else {
-                    guard let error = json["error"].string else { throw "Unknown error" }
-#if DEBUG
-                    error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-                    return
-                }
-            } catch {
-#if DEBUG
-                error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-            }
+            await API.shared.surveys.markFavorite(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
         }
     }
     

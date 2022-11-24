@@ -30,7 +30,7 @@ extension SubscriptionsModel: SubsciptionsControllerInput {
     
     func addFavorite(surveyReference: SurveyReference) {
         Task {
-            try await API.shared.surveys.markFavoriteAsync(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
+            await API.shared.surveys.markFavorite(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
         }
     }
     

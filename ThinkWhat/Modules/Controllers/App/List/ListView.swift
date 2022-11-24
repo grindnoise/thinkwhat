@@ -243,31 +243,29 @@ class ListView: UIView {
             }
             .store(in: &self.subscriptions)
         
-        instance.claimSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
-            guard let self = self,
-                let surveyReference = $0
-            else { return }
-            
-            let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
-            banner.accessibilityIdentifier = "claim"
-            let claimContent = ClaimPopupContent(callbackDelegate: self, parent: banner, surveyReference: surveyReference)
-            
-            claimContent.claimSubject.sink {
-                print($0)
-            } receiveValue: { [weak self] in
+        instance.claimSubject
+            .sink { [weak self] in
                 guard let self = self,
-                    let claim = $0
+                      let surveyReference = $0
                 else { return }
                 
-                self.viewInput?.claim(surveyReference: surveyReference, claim: claim)
-            }.store(in: &self.subscriptions)
-            
-            banner.present(content: claimContent)
-            
-//            self.viewInput?.addFavorite(surveyReference: value)
-        }.store(in: &self.subscriptions)
+                let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
+                let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
+                
+                claimContent.claimPublisher
+                    .sink { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.viewInput?.claim(surveyReference: surveyReference, claim: $0)
+                    }
+                    .store(in: &self.subscriptions)
+                
+                banner.present(content: claimContent)
+                banner.didDisappearPublisher
+                    .sink { _ in banner.removeFromSuperview() }
+                    .store(in: &self.subscriptions)
+            }
+            .store(in: &self.subscriptions)
         
         instance.userprofilePublisher
             .sink { [weak self] in
