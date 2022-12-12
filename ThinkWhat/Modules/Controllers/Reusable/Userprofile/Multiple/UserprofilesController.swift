@@ -9,7 +9,8 @@
 import UIKit
 import Combine
 
-class UserprofilesController: UIViewController {
+class UserprofilesController: UIViewController, TintColorable {
+    
     enum GridItemSize: CGFloat {
         case half = 0.5
         case third = 0.33333
@@ -23,7 +24,8 @@ class UserprofilesController: UIViewController {
     // MARK: - Public properties
     var controllerOutput: UserprofilesControllerOutput?
     var controllerInput: UserprofilesControllerInput?
-    
+    //UI
+    public var tintColor: UIColor
     //Logic
     public private(set) var mode: UserprofilesViewMode
     public private(set) var userprofile: Userprofile?
@@ -64,9 +66,10 @@ class UserprofilesController: UIViewController {
     
     
     // MARK: - Initialization
-    init(mode: UserprofilesViewMode, userprofile: Userprofile) {
+    init(mode: UserprofilesViewMode, userprofile: Userprofile, color: UIColor = .label) {
         self.mode = mode
         self.userprofile = userprofile
+        self.tintColor = color
         
         super.init(nibName: nil, bundle: nil)
         
@@ -74,10 +77,10 @@ class UserprofilesController: UIViewController {
         setTasks()
     }
     
-    init(mode: UserprofilesViewMode, answer: Answer, color: UIColor) {
-        self.color = color
+    init(mode: UserprofilesViewMode, answer: Answer) {
         self.mode = .Voters
         self.answer = answer
+        self.tintColor = answer.survey?.topic.tagColor ?? .label
         
         super.init(nibName: nil, bundle: nil)
         
@@ -117,10 +120,16 @@ class UserprofilesController: UIViewController {
 //        setNavigationBarAppearance(largeTitleColor: <#UIColor#>, smallTitleColor: <#UIColor#>)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.alpha = 1
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        setNavigationBarAppearance(largeTitleColor: mode == .Voters ? .white : .label, smallTitleColor: mode == .Voters ? .white : .label)
+//        setNavigationBarAppearance(largeTitleColor: mode == .Voters ? .white : .label, smallTitleColor: mode == .Voters ? .white : .label)
         setRightBarButton()
     }
     
@@ -210,33 +219,33 @@ private extension UserprofilesController {
     }
     
     func setNavigationBarAppearance(largeTitleColor: UIColor, smallTitleColor: UIColor) {
+        
         guard let navigationBar = navigationController?.navigationBar else { return }
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.largeTitleTextAttributes = [
-            .foregroundColor: largeTitleColor,
+            .foregroundColor: tintColor,//largeTitleColor,
             .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle) as Any
         ]
         appearance.titleTextAttributes = [
-            .foregroundColor: smallTitleColor,
+            .foregroundColor: tintColor,//smallTitleColor,
             .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3) as Any
         ]
         appearance.shadowColor = nil
         
-        switch mode {
-        case .Voters:
-            appearance.backgroundColor = color
-            navigationBar.tintColor = .white
-            navigationBar.barTintColor = .white
-        default:
-            navigationBar.tintColor = .label
-            navigationBar.barTintColor = .label
-        }
+//        switch mode {
+//        case .Voters:
+//            appearance.backgroundColor = color
+//            navigationBar.tintColor = .white
+//            navigationBar.barTintColor = .white
+//        default:
+//            setNavigationBarTintColor(tintColor)
+//        }
         
         navigationBar.standardAppearance = appearance
         navigationBar.scrollEdgeAppearance = appearance
-        navigationBar.prefersLargeTitles = true
+        navigationBar.prefersLargeTitles = false//true
         
         if #available(iOS 15.0, *) {
             navigationBar.compactScrollEdgeAppearance = appearance

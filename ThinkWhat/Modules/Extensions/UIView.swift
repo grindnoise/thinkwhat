@@ -132,6 +132,10 @@ extension UIView {
         
         return UIView.getAllSuperviews(above: self).filter { $0 is T }.first as? T
     }
+    
+    func addSubviews(_ items: [UIView]) {
+        items.forEach { addSubview($0) }
+    }
 }
 
 //UI

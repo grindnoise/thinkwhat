@@ -305,6 +305,25 @@ private extension HotController {
                 self.isOnScreen = tab == .Hot
             }
         })
+        tasks.append(Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
+                guard let self = self,
+                      self.isOnScreen
+                else { return }
+                
+                self.isOnScreen = false
+            }
+        })
+        tasks.append(Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+                guard let self = self,
+                      let main = self.tabBarController as? MainController,
+                      main.selectedIndex == 0
+                else { return }
+                
+                self.isOnScreen = true
+            }
+        })
     }
     
     func getGradientColors() -> [CGColor] {

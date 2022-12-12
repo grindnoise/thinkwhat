@@ -11,128 +11,75 @@ import SafariServices
 import Combine
 
 class PollController: UIViewController {
-
-    enum Mode {
-        case ReadOnly, Write
-    }
+    
+    enum Mode { case ReadOnly, Write }
     
     // MARK: - Public properties
     var controllerOutput: PollControllerOutput?
     var controllerInput: PollControllerInput?
-    var mode: Mode {
-        return _mode
-    }
+    public private(set) var mode: Mode = .Write
+    public private(set) var survey: Survey?
+    public private(set) var surveyReference: SurveyReference
+//    public private(set) var showNext: Bool = false
+    
+    
     
     // MARK: - Private properties
-    private var _mode: Mode = .Write
     private var userHasVoted = false
-    private var _survey: Survey! {
-        didSet {
-            navigationItem.rightBarButtonItem?.isEnabled = !_survey.isNil
-            guard !_survey.isNil else { return }
-            
-            setBarButtonItem()
-        }
-    }
-    private var _surveyReference: SurveyReference!
-    private var _showNext: Bool = false
-    private var isNavBarReadyInstalled = false
-    private let watchButton: UIImageView = {
-        let v = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32, height: 32)))
-        v.contentMode = .center
-        return v
-    }()
-    private var isAddedToFavorite = false {
-        didSet {
-            if isAddedToFavorite {
-//                watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
-                watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .black
-            } else {
-                watchButton.tintColor = .systemGray
-            }
-        }
-    }
-    private lazy var stackView: UIStackView = {
-        let v = UIStackView()
-        v.accessibilityIdentifier = "stackView"
-        v.spacing = 8
-        observers.append(v.observe(\UIStackView.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
-            guard !self.isNil,
-                  let newValue = change.newValue,
-                  let label = view.arrangedSubviews.filter({ $0.isKind(of: UILabel.self) }).first as? UILabel else { return }
-            label.font = UIFont(name: Fonts.Bold, size: newValue.width * 0.1)
-        })
-        return v
-    }()
-    private lazy var avatar: Avatar = {
-        return Avatar(userprofile: surveyReference.owner)
-//        return Avatar(gender: surveyReference.owner.gender, image: surveyReference.owner.image)
-    }()
-    private lazy var progressIndicator: CircleButton = {
-        let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: true)
-        customTitle.accessibilityIdentifier = "progressIndicator"
-        customTitle.color = .clear
-//        customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-        customTitle.icon.iconColor = surveyReference.topic.tagColor
-        customTitle.icon.backgroundColor = .clear
-        customTitle.layer.masksToBounds = false
-        customTitle.icon.layer.masksToBounds = false
-        customTitle.oval.masksToBounds = false
-        customTitle.icon.scaleMultiplicator = 1.7
-        customTitle.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
-        customTitle.state = .Off
-        customTitle.contentView.backgroundColor = .clear
-//        customTitle.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : surveyReference.topic.tagColor.cgColor
-        customTitle.oval.strokeColor = surveyReference.topic.tagColor.cgColor
-        customTitle.oval.lineCap = .round
-        customTitle.oval.strokeStart = survey.isNil ? 0 : CGFloat(survey!.progress)
-        return customTitle
-    }()
-    private lazy var titleView: CircleButton = {
-        let customTitle = CircleButton(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)), useAutoLayout: false)
-        customTitle.accessibilityIdentifier = "titleView"
-        customTitle.color = .clear
-//        customTitle.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-        customTitle.icon.iconColor = surveyReference.topic.tagColor
-        customTitle.icon.backgroundColor = .clear
-        customTitle.layer.masksToBounds = false
-        customTitle.icon.layer.masksToBounds = false
-        customTitle.oval.masksToBounds = false
-        customTitle.icon.scaleMultiplicator = 1.7
-        customTitle.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
-        customTitle.state = .Off
-        customTitle.contentView.backgroundColor = .clear
-//        customTitle.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
-        customTitle.ovalBg.strokeStart = 0
-//        customTitle.oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : surveyReference.topic.tagColor.cgColor
-        customTitle.oval.strokeColor = surveyReference.topic.tagColor.cgColor
-        customTitle.oval.lineCap = .round
-        customTitle.oval.strokeStart = survey.isNil ? 0 : CGFloat(survey!.progress)
-        return customTitle
-    }()
-//    private lazy var titleView: Icon = {
-//        let icon = Icon(frame: CGRect(origin: .zero, size: CGSize(width: 40, height: 40)))
-//        icon.backgroundColor = .clear
-//        icon.iconColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
-//        icon.isRounded = false
-//        icon.scaleMultiplicator = 1.4
-//        icon.category = Icon.Category(rawValue: self._surveyReference.topic.id) ?? .Null
-//
-//        return icon
-//    }()
     private var observers: [NSKeyValueObservation] = []
     private var tasks: [Task<Void, Never>?] = []
     private var subscriptions = Set<AnyCancellable>()
-    private var hidesLargeTitle: Bool = false
-    private var isDisappearing = false
+    //UI
+    private lazy var avatar: Avatar = { Avatar() }()
+    private lazy var topicIcon: Icon = {
+        let instance = Icon(category: surveyReference.topic.iconCategory)
+        instance.iconColor = .white
+        instance.isRounded = false
+        instance.clipsToBounds = false
+        instance.scaleMultiplicator = 1.65
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+
+        return instance
+    }()
+    private lazy var topicTitle: InsetLabel = {
+        let instance = InsetLabel()
+        instance.font = UIFont(name: Fonts.Bold, size: 20)
+        instance.text = surveyReference.topic.title.uppercased()
+        instance.textColor = .white
+        instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+        
+        return instance
+    }()
+    private lazy var topicView: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [
+            topicIcon,
+            topicTitle
+        ])
+        instance.backgroundColor = surveyReference.topic.tagColor
+        instance.axis = .horizontal
+        instance.spacing = 2
+        instance.alpha = 0
+        instance.publisher(for: \.bounds)
+            .receive(on: DispatchQueue.main)
+            .filter { $0 != .zero}
+            .sink { instance.cornerRadius = $0.height/2.25 }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
+    
+    
     
     // MARK: - Overriden properties
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .default
     }
     
+    
+    
     // MARK: - Destructor
     deinit {
+//        topicView.removeFromSuperview()
         tasks.forEach { $0?.cancel() }
         NotificationCenter.default.removeObserver(self)
         subscriptions.forEach{ $0.cancel() }
@@ -141,246 +88,141 @@ class PollController: UIViewController {
 #endif
     }
     
+    
+    
     // MARK: - Initialization
-    init(surveyReference: SurveyReference, showNext __showNext: Bool = false) {
+    init(surveyReference: SurveyReference, showNext: Bool = false) {
+        self.surveyReference = surveyReference
+        
         super.init(nibName: nil, bundle: nil)
-        self._surveyReference = surveyReference
-        self._survey = surveyReference.survey
-        self._showNext = __showNext
-        self._mode = (surveyReference.isComplete || surveyReference.isOwn) ? .ReadOnly : .Write
-        if !_survey.isNil { self.setBarButtonItem() }
+        
+        self.survey = surveyReference.survey
+//        self.showNext = showNext
+        self.mode = (surveyReference.isComplete || surveyReference.isOwn) ? .ReadOnly : .Write
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    
+    
+    // MARK: - Overriden methods
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let view = PollView()
+        let model = PollModel()
+        
+        self.controllerOutput = view 
+        self.controllerOutput?
+            .viewInput = self
+        self.controllerInput = model
+        self.controllerInput?
+            .modelOutput = self
+        self.view = view as UIView
+        
+        //        setupUI()
+        setTasks()
+        setSubscriptions()
+        setObservers()
+        setUpdaters()
+        
+        performChecks()
+//        navigationController?.delegate = self
+//        navigationController?.navigationBar.alpha = 1
+        
+        setupUI()
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
+//        navigationController?.delegate = appDelegate.transitionCoordinator
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+//        view.setNeedsLayout()
+//        view.layoutIfNeeded()
+        
+//        navigationController?.navigationBar.alpha = 1
+//        delayAsync(delay: 1) {
+//            self.toggleTopicView(on: true)
+//        }
+        avatar.userprofile = surveyReference.owner
+    }
+    
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//        
+//        toggleTopicView(on: false)
+//    }
+    
+    override func willMove(toParent parent: UIViewController?) {
+        super.willMove(toParent: parent)
+        guard parent.isNil else { return }
+        
+//        toggleTopicView(on: false)
+        clearNavigationBar(clear: true)
+//        tabBarController?.setTabBarVisible(visible: true, animated: true)
+        
+        
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        
+    }
+}
 
-    // MARK: - Private methods
-    private func setupUI() {
-        if !_survey.isNil { controllerOutput?.onLoadCallback() }
+// MARK: - Private
+private extension PollController {
+    @MainActor
+    func setupUI() {
+//        edgesForExtendedLayout = [.bottom]
+        if !survey.isNil { controllerOutput?.onLoadCallback() }
         
-//        let appearance = UINavigationBarAppearance()
-//        appearance.configureWithOpaqueBackground()
-//        self.navigationController?.navigationBar.standardAppearance = appearance
-//        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        guard !isNavBarReadyInstalled, let navigationBar = self.navigationController?.navigationBar else { return }
         
-        isNavBarReadyInstalled = true
-        navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-        navigationBar.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        clearNavigationBar(clear: false)
+        setNavigationBarTintColor(surveyReference.topic.tagColor)
+//        navigationItem.title = ""
+        guard let navigationBar = self.navigationController?.navigationBar else { return }
         
-        titleView.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
-        titleView.ovalBg.strokeStart = 0
-        titleView.color = surveyReference.topic.tagColor
-        if surveyReference.isOwn {
-            titleView.oval.opacity = 1
-            titleView.ovalBg.opacity = 1
-        } else if !surveyReference.isComplete {
-            titleView.oval.opacity = 0
-            titleView.ovalBg.opacity = 0
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.shadowColor = nil
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.prefersLargeTitles = false
+        
+        if #available(iOS 15.0, *) {
+            navigationBar.compactScrollEdgeAppearance = appearance
         }
         
-        navigationBar.addSubview(avatar)
-        avatar.translatesAutoresizingMaskIntoConstraints = false
-        navigationItem.rightBarButtonItem?.isEnabled = !_survey.isNil
-        
-        NSLayoutConstraint.activate([
-            avatar.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -UINavigationController.Constants.ImageRightMargin),
-            avatar.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: deviceType == .iPhoneSE ? 0 : -UINavigationController.Constants.ImageBottomMarginForLargeState/2),
-            avatar.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.ImageSizeForLargeState),
-            avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor)
-        ])
-        
-        stackView.axis = .horizontal
-        navigationBar.addSubview(stackView)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            stackView.leftAnchor.constraint(equalTo: navigationBar.leftAnchor, constant: UINavigationController.Constants.ImageRightMargin),
-            stackView.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
-            stackView.heightAnchor.constraint(equalTo: avatar.heightAnchor),
-            stackView.trailingAnchor.constraint(equalTo: avatar.leadingAnchor, constant: -UINavigationController.Constants.ImageBottomMarginForSmallState)
-        ])
-        
-        let indicator = CircleButton(frame: .zero)
-        indicator.accessibilityIdentifier = "progress"
-        indicator.color = surveyReference.topic.tagColor
-        indicator.oval.strokeStart = CGFloat(1) - CGFloat(surveyReference.progress)/100
-        indicator.oval.lineCap = .round
-        indicator.ovalBg.strokeStart = 0
-//        indicator.icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-        indicator.icon.iconColor = surveyReference.topic.tagColor
-        indicator.icon.backgroundColor = .clear
-        indicator.backgroundColor = .clear
-        indicator.icon.scaleMultiplicator = 1.5
-        indicator.category = Icon.Category(rawValue: surveyReference.topic.id) ?? .Null
-        indicator.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
-        if surveyReference.isOwn {
-            indicator.oval.opacity = 1
-            indicator.ovalBg.opacity = 1
-        } else if !surveyReference.isComplete {
-            indicator.oval.opacity = 0
-            indicator.ovalBg.opacity = 0
-        }
-//        stackView.addArrangedSubview(indicator)
-       
-        let titleContainer = UIView()
-        titleContainer.backgroundColor = .clear
-        stackView.addArrangedSubview(titleContainer)
-        
-        let label = InsetLabel()
-//        label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-        label.backgroundColor = surveyReference.topic.tagColor
-        label.textColor = .white
-        label.text = surveyReference.topic.localized.uppercased()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textAlignment = .center
-        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .headline)
-        label.numberOfLines = 1
-        label.accessibilityIdentifier = "label"
-        
-        let width = surveyReference.topic.localized.width(withConstrainedHeight: 100, font: label.font)
-        let height = surveyReference.topic.localized.height(withConstrainedWidth: width, font: label.font)
-        
-        label.insets = UIEdgeInsets(top: 0, left: height/3, bottom: 0, right: height/3)
-        
-        let widthConstraint = label.widthAnchor.constraint(equalToConstant: width + height/2.25*3)
-        widthConstraint.identifier = "width"
-        widthConstraint.isActive = true
-        
-//        let heightConstraint = label.heightAnchor.constraint(equalToConstant: height)
-//        heightConstraint.identifier = "height"
-//        heightConstraint.isActive = true
-        label.cornerRadius = height/2.25
-        
-        let titleStackView = UIStackView()
-        titleStackView.spacing = 4
-        titleContainer.addSubview(titleStackView)
-        titleStackView.accessibilityIdentifier = "titleStackView"
-        
-        let heightConstraint = titleStackView.heightAnchor.constraint(equalToConstant: height)
-        heightConstraint.identifier = "height"
-        heightConstraint.isActive = true
-        
-        let marksStackView = UIStackView()
-        marksStackView.spacing = 4
-        marksStackView.accessibilityIdentifier = "marksStackView"
-        
-        titleStackView.addArrangedSubview(label)
-        titleStackView.addArrangedSubview(marksStackView)
-        
-        if surveyReference.isOwn {
-            let container = UIView()
-            container.backgroundColor = .clear
-            container.accessibilityIdentifier = "isOwn"
-            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-            
-            let instance = UIImageView(image: UIImage(systemName: "figure.wave"))
-//            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-            instance.tintColor = surveyReference.topic.tagColor
-            instance.contentMode = .scaleAspectFit
-            instance.addEquallyTo(to: container)
-            marksStackView.addArrangedSubview(container)
-        } else if surveyReference.isComplete {
-            let container = UIView()
-            container.backgroundColor = .clear
-            container.accessibilityIdentifier = "isComplete"
-            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-            
-            let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill",
-                                                      withConfiguration: UIImage.SymbolConfiguration(pointSize: marksStackView.frame.height, weight: .semibold, scale: .medium)))
-            instance.contentMode = .center
-//            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-            instance.tintColor = surveyReference.topic.tagColor
-            instance.contentMode = .scaleAspectFit
-            instance.addEquallyTo(to: container)
-            marksStackView.addArrangedSubview(container)
-        }
-        if surveyReference.isFavorite {
-            let container = UIView()
-            container.backgroundColor = .clear
-            container.accessibilityIdentifier = "isFavorite"
-            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-            
-            let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-//            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
-            instance.tintColor = traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .darkGray
-            instance.contentMode = .scaleAspectFit
-            instance.addEquallyTo(to: container)
-            marksStackView.addArrangedSubview(container)
-        }
-        if surveyReference.isHot {
-            let container = UIView()
-            container.backgroundColor = .clear
-            container.accessibilityIdentifier = "isHot"
-            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-            
-            let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-            instance.tintColor = .systemRed
-            instance.contentMode = .scaleAspectFit
-            instance.addEquallyTo(to: container)
-            marksStackView.addArrangedSubview(container)
-        }
-        
-        observers.append(label.observe(\InsetLabel.bounds, options: [.new]) { view, change in//[weak self] view, change in
-            guard let newValue = change.newValue else { return }
-            view.cornerRadius = newValue.height/2.25
-        })
-        
-        titleStackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            titleStackView.leadingAnchor.constraint(equalTo: titleContainer.leadingAnchor),
-            titleStackView.centerYAnchor.constraint(equalTo: titleContainer.centerYAnchor)
-        ])
-        
-        indicator.translatesAutoresizingMaskIntoConstraints = false
-        indicator.widthAnchor.constraint(equalTo: indicator.heightAnchor, multiplier: 1.0/1.0).isActive = true
-        
-        self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        self.avatar.alpha = 0
-        self.stackView.alpha = 0
-    }
-    
-    private func setObservers() {
-        guard let navBar = navigationController?.navigationBar else { return }
-        observers.append(navBar.observe(\UINavigationBar.bounds, options: [NSKeyValueObservingOptions.new]) { [weak self] view, change in
-            guard let self = self,
-                  let newValue = change.newValue
-            else { return }
-            
-            if self.hidesLargeTitle, self.navigationItem.titleView.isNil {
-                self.navigationItem.titleView = self.titleView
-//                self.navigationItem.titleView?.alpha = 0
-                self.navigationItem.titleView?.clipsToBounds = false
-                self.titleView.oval.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
-                self.titleView.ovalBg.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
-            }
-            
-            guard !self.isDisappearing else { return }
-            
-            var largeAlpha: CGFloat = CGFloat(1) - max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
-            
-//            if largeAlpha == CGFloat(1) {
-//                self.avatar.alpha = 1
-//                self.stackView.alpha = 1
-//                self.navigationItem.titleView?.alpha = 0
-//                return
-//            }
-            
-//            let smallAlpha: CGFloat = max(CGFloat(UINavigationController.Constants.NavBarHeightLargeState - newValue.height), 0)/52
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: avatar)
 //
-//            print("small: \(smallAlpha)")
-//            print("large: \(largeAlpha)")
-            
-            largeAlpha = largeAlpha < 0.3 ? 0 : largeAlpha
-//            self.navigationItem.titleView?.alpha = largeAlpha > 0.75 ? 0 : smallAlpha
-            self.avatar.alpha = largeAlpha
-            self.stackView.alpha = largeAlpha
-        })
+//        navigationBar.addSubview(topicView)
+//        topicView.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            topicView.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)),
+//            topicView.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
+//        ])
+//
+//        navigationBar.setNeedsLayout()
+//        navigationBar.layoutIfNeeded()
+//
+//        let centerX = topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor)
+//        centerX.identifier = "centerX"
+//        centerX.isActive = true
+        navigationItem.titleView = topicView
+        
     }
     
-    private func setUpdaters() {
+    func setObservers() {
+        
+    }
+    
+    func setUpdaters() {
         guard surveyReference.isComplete else { return }
         
         //Set timer to request stats updates
@@ -391,203 +233,195 @@ class PollController: UIViewController {
             .sink { [weak self] seconds in
                 guard let self = self else { return }
                 
-                self.controllerInput?.updateResultsStats(self._surveyReference)
+                self.controllerInput?.updateResultsStats(self.surveyReference)
             }
             .store(in: &subscriptions)
         
-//        let events = EventEmitter().emit(every: 5)
-//        tasks.append(Task { [weak self] in
-//            for await _ in events {
-//                guard let self = self else { return }
-//
-//                self.controllerInput?.updateResultsStats(self._surveyReference)
-//            }
-//        })
+        //        let events = EventEmitter().emit(every: 5)
+        //        tasks.append(Task { [weak self] in
+        //            for await _ in events {
+        //                guard let self = self else { return }
+        //
+        //                self.controllerInput?.updateResultsStats(self._surveyReference)
+        //            }
+        //        })
     }
     
-    private func setSubscriptions() {
-        //Need to toggle navigationBar.prefersLargeTitles
-        if let controllerOutput = controllerOutput {
-            controllerOutput.scrollOffsetPublisher.sink { [weak self] in
-                guard let self = self else { return }
-                self.hidesLargeTitle = $0 != 0
-                self.navigationController?.navigationBar.prefersLargeTitles = true
-                self.navigationItem.largeTitleDisplayMode = .always
-            }.store(in: &subscriptions)
-        }
+    func setSubscriptions() {
+        
     }
     
-    private func setTasks() {
-        tasks.append(Task { [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
-                guard let self = self,
-                      let instance = notification.object as? SurveyReference,
-                      self._surveyReference == instance
-                else { return }
-
-                await MainActor.run {
-                    self.setBarButtonItem()
-
-                    switch instance.isFavorite {
-                    case true:
-                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isFavorite"}).isEmpty
-                        else { return }
-
-                        let container = UIView()
-                        container.backgroundColor = .clear
-                        container.accessibilityIdentifier = "isFavorite"
-                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-
-                        let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-//                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
-                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .darkGray
-                        instance.contentMode = .scaleAspectFit
-                        instance.addEquallyTo(to: container)
-                        marksStackView.insertArrangedSubview(container,
-                                                             at: marksStackView.arrangedSubviews.isEmpty ? 0 : marksStackView.arrangedSubviews.count > 1 ? marksStackView.arrangedSubviews.count-1 : marksStackView.arrangedSubviews.count)
-                    case false:
-                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isFavorite") else { return }
-                        marksStackView.removeArrangedSubview(mark)
-                        mark.removeFromSuperview()
-                    }
-                }
-            }
-        })
-
-        tasks.append(Task { [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
-                await MainActor.run {
-                    guard let self = self,
-                          let instance = notification.object as? SurveyReference,
-                          self._surveyReference == instance
-                    else { return }
-
-                    switch instance.isComplete {
-                    case true:
-                        let _anim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.5, delegate: nil)
-                        self.titleView.oval.add(_anim, forKey: nil)
-                        self.titleView.ovalBg.add(_anim, forKey: nil)
-                        self.titleView.oval.opacity = 1
-                        self.titleView.ovalBg.opacity = 1
-                
-                        if let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress") {
-                            let anim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.5, delegate: nil)
-                            indicator.oval.add(anim, forKey: nil)
-                            indicator.ovalBg.add(anim, forKey: nil)
-                            indicator.oval.opacity = 1
-                            indicator.ovalBg.opacity = 1
-                        }
-                        
-                        self.setUpdaters()
-
-                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty
-                        else { return }
-
-                        let container = UIView()
-                        container.backgroundColor = .clear
-                        container.accessibilityIdentifier = "isComplete"
-                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-
-                        let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
-                        instance.contentMode = .center
-//                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
-                        instance.tintColor = self._surveyReference.topic.tagColor
-                        instance.contentMode = .scaleAspectFit
-                        instance.addEquallyTo(to: container)
-
-                        marksStackView.insertArrangedSubview(container, at: 0)
-
-                        self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
-                            guard let newValue = change.newValue else { return }
-                            view.cornerRadius = newValue.size.height/2
-                            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
-                            let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
-                            view.image = image
-                        })
-                    case false:
-                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isComplete") else { return }
-                        marksStackView.removeArrangedSubview(mark)
-                        mark.removeFromSuperview()
-                    }
-                }
-            }
-        })
-
-        tasks.append(Task { [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
-                await MainActor.run {
-                    guard let self = self,
-                          let instance = notification.object as? SurveyReference,
-                          self._surveyReference == instance
-                    else { return }
-
-                    switch instance.isHot {
-                    case true:
-                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isHot"}).isEmpty
-                        else { return }
-
-                        let container = UIView()
-                        container.backgroundColor = .clear
-                        container.accessibilityIdentifier = "isHot"
-                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-
-                        let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-                        instance.contentMode = .center
-                        instance.tintColor = .systemRed
-                        instance.contentMode = .scaleAspectFit
-                        instance.addEquallyTo(to: container)
-
-                        marksStackView.insertArrangedSubview(container, at: marksStackView.arrangedSubviews.count == 0 ? 0 : marksStackView.arrangedSubviews.count)
-
-                        self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
-                            guard let newValue = change.newValue else { return }
-                            view.cornerRadius = newValue.size.height/2
-                            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
-                            let image = UIImage(systemName: "flame.fill", withConfiguration: largeConfig)
-                            view.image = image
-                        })
-                    case false:
-                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isHot") else { return }
-                        marksStackView.removeArrangedSubview(mark)
-                        mark.removeFromSuperview()
-                    }
-                }
-            }
-        })
-
-        //Observe progress
-        tasks.append(Task { @MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
-                guard let self = self,
-                      let instance = notification.object as? SurveyReference,
-                      self._surveyReference == instance
-                else { return }
-
-                if let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress") {
-                    indicator.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
-                }
-                self.titleView.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
-            }
-        })
+    func setTasks() {
+        //        tasks.append(Task { [weak self] in
+        //            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
+        //                guard let self = self,
+        //                      let instance = notification.object as? SurveyReference,
+        //                      self._surveyReference == instance
+        //                else { return }
+        //
+        //                await MainActor.run {
+        //                    self.setBarButtonItem()
+        //
+        //                    switch instance.isFavorite {
+        //                    case true:
+        //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+        //                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isFavorite"}).isEmpty
+        //                        else { return }
+        //
+        //                        let container = UIView()
+        //                        container.backgroundColor = .clear
+        //                        container.accessibilityIdentifier = "isFavorite"
+        //                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+        //
+        //                        let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
+        ////                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+        //                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .darkGray
+        //                        instance.contentMode = .scaleAspectFit
+        //                        instance.addEquallyTo(to: container)
+        //                        marksStackView.insertArrangedSubview(container,
+        //                                                             at: marksStackView.arrangedSubviews.isEmpty ? 0 : marksStackView.arrangedSubviews.count > 1 ? marksStackView.arrangedSubviews.count-1 : marksStackView.arrangedSubviews.count)
+        //                    case false:
+        //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+        //                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isFavorite") else { return }
+        //                        marksStackView.removeArrangedSubview(mark)
+        //                        mark.removeFromSuperview()
+        //                    }
+        //                }
+        //            }
+        //        })
+        
+        //        tasks.append(Task { [weak self] in
+        //            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
+        //                await MainActor.run {
+        //                    guard let self = self,
+        //                          let instance = notification.object as? SurveyReference,
+        //                          self._surveyReference == instance
+        //                    else { return }
+        //
+        //                    switch instance.isComplete {
+        //                    case true:
+        //                        let _anim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.5, delegate: nil)
+        //                        self.titleView.oval.add(_anim, forKey: nil)
+        //                        self.titleView.ovalBg.add(_anim, forKey: nil)
+        //                        self.titleView.oval.opacity = 1
+        //                        self.titleView.ovalBg.opacity = 1
+        //
+        //                        if let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress") {
+        //                            let anim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.5, delegate: nil)
+        //                            indicator.oval.add(anim, forKey: nil)
+        //                            indicator.ovalBg.add(anim, forKey: nil)
+        //                            indicator.oval.opacity = 1
+        //                            indicator.ovalBg.opacity = 1
+        //                        }
+        //
+        //                        self.setUpdaters()
+        //
+        //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+        //                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty
+        //                        else { return }
+        //
+        //                        let container = UIView()
+        //                        container.backgroundColor = .clear
+        //                        container.accessibilityIdentifier = "isComplete"
+        //                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+        //
+        //                        let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
+        //                        instance.contentMode = .center
+        ////                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
+        //                        instance.tintColor = self._surveyReference.topic.tagColor
+        //                        instance.contentMode = .scaleAspectFit
+        //                        instance.addEquallyTo(to: container)
+        //
+        //                        marksStackView.insertArrangedSubview(container, at: 0)
+        //
+        //                        self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
+        //                            guard let newValue = change.newValue else { return }
+        //                            view.cornerRadius = newValue.size.height/2
+        //                            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
+        //                            let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
+        //                            view.image = image
+        //                        })
+        //                    case false:
+        //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+        //                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isComplete") else { return }
+        //                        marksStackView.removeArrangedSubview(mark)
+        //                        mark.removeFromSuperview()
+        //                    }
+        //                }
+        //            }
+        //        })
+        
+        //        tasks.append(Task { [weak self] in
+        //            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
+        //                await MainActor.run {
+        //                    guard let self = self,
+        //                          let instance = notification.object as? SurveyReference,
+        //                          self._surveyReference == instance
+        //                    else { return }
+        //
+        //                    switch instance.isHot {
+        //                    case true:
+        //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+        //                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isHot"}).isEmpty
+        //                        else { return }
+        //
+        //                        let container = UIView()
+        //                        container.backgroundColor = .clear
+        //                        container.accessibilityIdentifier = "isHot"
+        //                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+        //
+        //                        let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
+        //                        instance.contentMode = .center
+        //                        instance.tintColor = .systemRed
+        //                        instance.contentMode = .scaleAspectFit
+        //                        instance.addEquallyTo(to: container)
+        //
+        //                        marksStackView.insertArrangedSubview(container, at: marksStackView.arrangedSubviews.count == 0 ? 0 : marksStackView.arrangedSubviews.count)
+        //
+        //                        self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
+        //                            guard let newValue = change.newValue else { return }
+        //                            view.cornerRadius = newValue.size.height/2
+        //                            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
+        //                            let image = UIImage(systemName: "flame.fill", withConfiguration: largeConfig)
+        //                            view.image = image
+        //                        })
+        //                    case false:
+        //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
+        //                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isHot") else { return }
+        //                        marksStackView.removeArrangedSubview(mark)
+        //                        mark.removeFromSuperview()
+        //                    }
+        //                }
+        //            }
+        //        })
+        
+        //        //Observe progress
+        //        tasks.append(Task { @MainActor [weak self] in
+        //            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
+        //                guard let self = self,
+        //                      let instance = notification.object as? SurveyReference,
+        //                      self._surveyReference == instance
+        //                else { return }
+        //
+        //                if let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress") {
+        //                    indicator.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
+        //                }
+        //                self.titleView.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
+        //            }
+        //        })
     }
     
-    private func performChecks() {
+    func performChecks() {
         guard surveyReference.survey.isNil else {
             controllerInput?.addView()
             return
         }
-        //        controllerOutput?.startLoading()
+        
         controllerInput?.loadPoll(surveyReference, incrementViewCounter: true)
     }
     
     @objc
-    private func handleTap(_ recognizer: UITapGestureRecognizer) {
+    func handleTap(_ recognizer: UITapGestureRecognizer) {
         guard let sender = recognizer.view else { return }
         if sender.isKind(of: CircleButton.self) {
             let popup = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.5)
@@ -595,264 +429,123 @@ class PollController: UIViewController {
         }
     }
     
-    private func setBarButtonItem() {
-        var actionButton: UIBarButtonItem!
-        let image =  UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
-        let shareAction : UIAction = .init(title: "share".localized, image: image, identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
-            guard let self = self, !self._survey.isNil else { return }
-            // Setting description
-            let firstActivityItem = self._surveyReference.title
-            
-            // Setting url
-            let queryItems = [URLQueryItem(name: "hash", value: self._survey.shareHash), URLQueryItem(name: "enc", value: self._survey.shareEncryptedString)]
-            var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
-            urlComps.queryItems = queryItems
-            
-            let secondActivityItem: URL = urlComps.url!
-            
-            // If you want to use an image
-            let image : UIImage = UIImage(named: "anon")!
-            let activityViewController : UIActivityViewController = UIActivityViewController(
-                activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
-            
-            // This lines is for the popover you need to show in iPad
-            activityViewController.popoverPresentationController?.sourceView = self.view
-            
-            // This line remove the arrow of the popover to show in iPad
-            activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
-            activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
-            
-            // Pre-configuring activity items
-            activityViewController.activityItemsConfiguration = [
-                UIActivity.ActivityType.message
-            ] as? UIActivityItemsConfigurationReading
-            
-            // Anything you want to exclude
-            activityViewController.excludedActivityTypes = [
-                UIActivity.ActivityType.postToWeibo,
-                UIActivity.ActivityType.print,
-                UIActivity.ActivityType.assignToContact,
-                UIActivity.ActivityType.saveToCameraRoll,
-                UIActivity.ActivityType.addToReadingList,
-                UIActivity.ActivityType.postToFlickr,
-                UIActivity.ActivityType.postToVimeo,
-                UIActivity.ActivityType.postToTencentWeibo,
-                UIActivity.ActivityType.postToFacebook
-            ]
-            
-            activityViewController.isModalInPresentation = false
-            self.present(activityViewController,
-                         animated: true,
-                         completion: nil)
-        })
-        
-        if _survey.isOwn {
-            let image =  UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
-            actionButton = UIBarButtonItem(title: "share".localized, image: image, primaryAction: shareAction, menu: nil)
-            navigationItem.rightBarButtonItem = actionButton
-        } else {
-            let watchAction : UIAction = .init(title: _survey.isFavorite ? "don't_watch".localized : "watch".localized, image: UIImage(systemName: "binoculars.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
-                guard let self = self else { return }
-                guard let instance = self._survey,
-                      instance.isComplete else {
-                    showBanner(bannerDelegate: self, text: "finish_poll".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
-                    return }
-                self.controllerInput?.addFavorite(!instance.isFavorite)
-            })
-            watchAction.accessibilityIdentifier = "watch"
-            
-            let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { (action) in
-                //                    self.addButtonActionPressed(action: .advanced)
-            })
-            
-            let actions = [watchAction, shareAction, claimAction]
-            let menu = UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
-            let image =  UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
-            
-            actionButton = UIBarButtonItem(title: "", image: image, primaryAction: nil, menu: menu)
-        }
-        navigationItem.rightBarButtonItem = actionButton
-    }
-    //    override func viewWillAppear(_ animated: Bool) {
-    //        super.viewWillAppear(animated)
-    ////                navigationController?.navigationBar.prefersLargeTitles = false
-    //        navigationItem.largeTitleDisplayMode = .never
-    //
-    //    }
-    
-    
-    // MARK: - Overriden methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        let model = PollModel()
-        
-        self.controllerOutput = view as? PollView
-        self.controllerOutput?
-            .viewInput = self
-        self.controllerInput = model
-        self.controllerInput?
-            .modelOutput = self
-
-//        setupUI()
-        setTasks()
-        setSubscriptions()
-        setObservers()
-        setUpdaters()
-        
-        performChecks()
-        navigationController?.delegate = self
-        setNavigationBarTintColor(.label)
-        navigationController?.interactivePopGestureRecognizer?.delegate = self
+    func setBarButtonItem() {
+//        var actionButton: UIBarButtonItem!
+//        let image =  UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
+//        let shareAction : UIAction = .init(title: "share".localized, image: image, identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+//            guard let self = self, !self._survey.isNil else { return }
+//            // Setting description
+//            let firstActivityItem = self._surveyReference.title
+//
+//            // Setting url
+//            let queryItems = [URLQueryItem(name: "hash", value: self._survey.shareHash), URLQueryItem(name: "enc", value: self._survey.shareEncryptedString)]
+//            var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
+//            urlComps.queryItems = queryItems
+//
+//            let secondActivityItem: URL = urlComps.url!
+//
+//            // If you want to use an image
+//            let image : UIImage = UIImage(named: "anon")!
+//            let activityViewController : UIActivityViewController = UIActivityViewController(
+//                activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
+//
+//            // This lines is for the popover you need to show in iPad
+//            activityViewController.popoverPresentationController?.sourceView = self.view
+//
+//            // This line remove the arrow of the popover to show in iPad
+//            activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
+//            activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
+//
+//            // Pre-configuring activity items
+//            activityViewController.activityItemsConfiguration = [
+//                UIActivity.ActivityType.message
+//            ] as? UIActivityItemsConfigurationReading
+//
+//            // Anything you want to exclude
+//            activityViewController.excludedActivityTypes = [
+//                UIActivity.ActivityType.postToWeibo,
+//                UIActivity.ActivityType.print,
+//                UIActivity.ActivityType.assignToContact,
+//                UIActivity.ActivityType.saveToCameraRoll,
+//                UIActivity.ActivityType.addToReadingList,
+//                UIActivity.ActivityType.postToFlickr,
+//                UIActivity.ActivityType.postToVimeo,
+//                UIActivity.ActivityType.postToTencentWeibo,
+//                UIActivity.ActivityType.postToFacebook
+//            ]
+//
+//            activityViewController.isModalInPresentation = false
+//            self.present(activityViewController,
+//                         animated: true,
+//                         completion: nil)
+//        })
+//
+//        if _survey.isOwn {
+//            let image =  UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
+//            actionButton = UIBarButtonItem(title: "share".localized, image: image, primaryAction: shareAction, menu: nil)
+//            navigationItem.rightBarButtonItem = actionButton
+//        } else {
+//            let watchAction : UIAction = .init(title: _survey.isFavorite ? "don't_watch".localized : "watch".localized, image: UIImage(systemName: "binoculars.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+//                guard let self = self else { return }
+//                guard let instance = self._survey,
+//                      instance.isComplete else {
+//                    showBanner(bannerDelegate: self, text: "finish_poll".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
+//                    return }
+//                self.controllerInput?.addFavorite(!instance.isFavorite)
+//            })
+//            watchAction.accessibilityIdentifier = "watch"
+//
+//            let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { (action) in
+//                //                    self.addButtonActionPressed(action: .advanced)
+//            })
+//
+//            let actions = [watchAction, shareAction, claimAction]
+//            let menu = UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+//            let image =  UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
+//
+//            actionButton = UIBarButtonItem(title: "", image: image, primaryAction: nil, menu: menu)
+//        }
+//        navigationItem.rightBarButtonItem = actionButton
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        isDisappearing = false
-            
-        navigationController?.navigationBar.alpha = 1
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        self.navigationController?.navigationBar.standardAppearance = appearance
-        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationController?.navigationBar.overrideUserInterfaceStyle = .unspecified
-        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
-//        setNeedsStatusBarAppearanceUpdate()
-
-        navigationController?.navigationBar.prefersLargeTitles = hidesLargeTitle ? false : true
-        navigationItem.largeTitleDisplayMode = hidesLargeTitle ? .never : .always
-        self.navigationItem.titleView = self.titleView
-        guard hidesLargeTitle, navigationItem.titleView.isNil else { return }
-        
-//        self.navigationItem.titleView = self.titleView
-        self.navigationItem.titleView?.clipsToBounds = false
-        self.titleView.oval.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
-        self.titleView.ovalBg.opacity = (self.surveyReference.isComplete || self._surveyReference.isOwn) ? 1 : 0
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        setupUI()
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0.1, options: .curveEaseInOut, animations: {
-            self.avatar.transform = .identity
-            self.stackView.transform = .identity
-            self.avatar.alpha = self.hidesLargeTitle ? 0 : 1
-            self.stackView.alpha = self.hidesLargeTitle ? 0 : 1
-//            self.titleView.alpha = !self.hidesLargeTitle ? 0 : 1
-        }) { _ in }
-
-        guard !hidesLargeTitle else { return }
-//        self.titleView.alpha = 0
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        isDisappearing = true
-        
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
-            self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-//            self.titleView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            self.avatar.alpha = 0
-            self.stackView.alpha = 0
-//            self.titleView.alpha = 0
-        }
-        
-        guard !hidesLargeTitle else { return }
-
-//        self.titleView.alpha = 0
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        navigationItem.titleView = nil
-    }
-    
-    override func willMove(toParent parent: UIViewController?) {
-        super.willMove(toParent: parent)
-        guard parent.isNil else { return }
-        
-        clearNavigationBar(clear: true)
-        tabBarController?.setTabBarVisible(visible: true, animated: true)
-
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) {
-            self.avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            self.stackView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            self.avatar.alpha = 0
-            self.stackView.alpha = 0
-            self.navigationItem.titleView?.alpha = 0
-        } completion: { _ in
-            self.avatar.removeFromSuperview()
-            self.stackView.removeFromSuperview()
-        }
-//        guard parent.isNil else { return }
-//        clearNavigationBar(clear: true)
-//        tabBarController?.setTabBarVisible(visible: true, animated: true)
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-
-        
-        if let indicator = stackView.get(all: CircleButton.self).first {
-//            indicator.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
-            indicator.icon.setIconColor(surveyReference.topic.tagColor)
-        }
-        
-        if let label = stackView.getSubview(type: InsetLabel.self, identifier: "label") {
-//            label.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-            label.backgroundColor = surveyReference.topic.tagColor
-        }
-        
-        if let isComplete = stackView.getSubview(type: UIView.self, identifier: "isComplete"), let imageView = isComplete.getSubview(type: UIImageView.self, identifier: nil) {
-//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-            imageView.tintColor = surveyReference.topic.tagColor
-        }
-        
-        if let isOwn = stackView.getSubview(type: UIView.self, identifier: "isOwn"), let imageView = isOwn.getSubview(type: UIImageView.self, identifier: nil) {
-//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor
-            imageView.tintColor = surveyReference.topic.tagColor
-        }
-        
-        if let isFavorite = stackView.getSubview(type: UIView.self, identifier: "isFavorite"), let imageView = isFavorite.getSubview(type: UIImageView.self, identifier: nil) {
-//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
-            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .darkGray
-        }
-
-        
-        if let icon = navigationItem.titleView as? CircleButton {
-//            icon.icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : surveyReference.topic.tagColor)
-            icon.icon.setIconColor(self.surveyReference.topic.tagColor)
-        }
-        
-        if isAddedToFavorite {
-//            watchButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .black
-            watchButton.tintColor = self.surveyReference.topic.tagColor
-        } else {
-            watchButton.tintColor = .systemGray
-        }
-        
-        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory,
-              let label = stackView.getSubview(type: InsetLabel.self, identifier: "label"),
-              let titleStackView = stackView.getSubview(type: UIStackView.self, identifier: "titleStackView"),
-              let widthConstraint = label.getConstraint(identifier: "width"),
-              let heightConstraint = titleStackView.getConstraint(identifier: "height")
-        else { return }
-        
-        label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
-                                       forTextStyle: .headline)
-        
-        let width = surveyReference.topic.localized.width(withConstrainedHeight: 100, font: label.font)
-        let height = surveyReference.topic.localized.height(withConstrainedWidth: width, font: label.font)
-        label.insets = UIEdgeInsets(top: 0, left: height/3, bottom: 0, right: height/3)
-        widthConstraint.constant =  width + height/2.25*3
-        heightConstraint.constant = height
-    }
+//    func toggleTopicView(on: Bool) {
+//        guard let navigationBar = navigationController?.navigationBar,
+//              let constraint = topicView.getConstraint(identifier: "centerX")
+//        else { return }
+//
+//        topicView.backgroundColor = surveyReference.topic.tagColor
+//        topicTitle.text = surveyReference.topic.title.uppercased()
+//        topicIcon.category = surveyReference.topic.iconCategory
+////        navigationBar.setNeedsLayout()
+//        constraint.constant = -(navigationBar.bounds.width - topicView.bounds.width)/2
+////        navigationBar.layoutIfNeeded()
+////
+////        navigationBar.setNeedsLayout()
+//        UIView.animate(
+//            withDuration: 0.3,
+//            delay: 0,
+//            usingSpringWithDamping: 0.8,
+//            initialSpringVelocity: 0.3,
+//            options: [.curveEaseInOut],
+//            animations: { [weak self] in
+//                guard let self = self else { return }
+//
+//                self.topicView.alpha = on ? 1 : 0
+//                constraint.constant = on ? 0 : -(navigationBar.bounds.width - self.topicView.bounds.width)/2//-(10 + self.topicView.bounds.width)
+//                navigationBar.layoutIfNeeded()
+//            }) { _ in
+//                guard !on else { return }
+//
+//                self.topicView.removeFromSuperview()
+//            }
+//
+//        UIView.animate(withDuration: on ? 0.1 : 0.3,
+//                       delay: 0.1) { [unowned self] in
+//            self.topicView.alpha = on ? 1 : 0
+//        }
+//    }
 }
+
 
 // MARK: - View Input
 extension PollController: PollViewInput {
@@ -877,20 +570,7 @@ extension PollController: PollViewInput {
     }
     
     func onVotersTapped(answer: Answer, color: UIColor) {
-//        let appearance = UINavigationBarAppearance()
-//        appearance.backgroundColor = .black
-//        navigationController?.interactivePopGestureRecognizer?.delegate = self
-//        navigationController?.navigationBar.overrideUserInterfaceStyle = .light
-//        setNeedsStatusBarAppearanceUpdate()
-        if !hidesLargeTitle {
-            navigationItem.titleView = nil
-        }
-        
-        navigationController?.pushViewController(UserprofilesController(mode: .Voters, answer: answer, color: color), animated: true)
-    }
-    
-    var showNext: Bool {
-        return _showNext
+        navigationController?.pushViewController(UserprofilesController(mode: .Voters, answer: answer), animated: true)
     }
     
     func onURLTapped(_ url: URL) {
@@ -915,18 +595,6 @@ extension PollController: PollViewInput {
     
     func onAddFavorite(_ mark: Bool) {
         controllerInput?.addFavorite(mark)
-    }
-    
-    var survey: Survey? {
-        get {
-            return _surveyReference.survey
-        }
-    }
-    
-    var surveyReference: SurveyReference {
-        get {
-            return _surveyReference
-        }
     }
 }
 
@@ -955,7 +623,7 @@ extension PollController: PollModelOutput {
     func onVoteCallback(_ result: Result<Bool, Error>) {
         switch result {
         case .success:
-            _mode = .ReadOnly
+            mode = .ReadOnly
             userHasVoted = true
             //Show edu info
 #if DEBUG
@@ -998,7 +666,7 @@ extension PollController: PollModelOutput {
     func onLoadCallback(_ result: Result<Bool, Error>) {
         switch result {
         case .success:
-            _survey = _surveyReference.survey
+            survey = surveyReference.survey
             controllerOutput?.onLoadCallback()
         case .failure:
             showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark)

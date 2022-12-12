@@ -92,7 +92,7 @@ extension SignupViewController: SignupViewInput {
     
     func onSignup(username: String, email: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
         recaptcha?.stop()
-        API.shared.signup(email: email, password: password, username: username) { completion($0) }
+        API.shared.auth.signup(email: email, password: password, username: username) { completion($0) }
     }
     
     func checkCredentials(username: String, email: String, completion: @escaping (Result<Bool, Error>) -> ()) {
@@ -160,7 +160,7 @@ extension SignupViewController: SignupViewInput {
                         let birthDate = json[0]["bdate"].string
                         if let pictureURL = json[0]["photo_400_orig"].string, let url = URL(string: pictureURL) {
                             do {
-                                providerImage = try await API.shared.downloadImageAsync(from: url)
+                                providerImage = try await API.shared.system.downloadImageAsync(from: url)
                                 return VKWorker.prepareDjangoData(id: id,
                                                                   firstName: firstName,
                                                                   lastName: lastName,
@@ -196,7 +196,7 @@ extension SignupViewController: SignupViewInput {
                               }
                         if let pictureURL = json["picture"]["data"]["url"].string, let url = URL(string: pictureURL) {
                             do {
-                                providerImage = try await API.shared.downloadImageAsync(from: url)
+                                providerImage = try await API.shared.system.downloadImageAsync(from: url)
                                 return FBWorker.prepareDjangoData(id: id,
                                                                   firstName: firstName,
                                                                   lastName: lastName,
@@ -231,7 +231,7 @@ extension SignupViewController: SignupViewInput {
                         var dict = try await GoogleWorker.accountInfoAsync(viewController: self)
                         if let url = dict[DjangoVariables.UserProfile.image] as? URL {
                             do {
-                                providerImage = try await API.shared.downloadImageAsync(from: url)
+                                providerImage = try await API.shared.system.downloadImageAsync(from: url)
                                 dict[DjangoVariables.UserProfile.image] = providerImage
                                 return dict
                             } catch {
@@ -256,7 +256,7 @@ extension SignupViewController: SignupViewInput {
                 //                controllerOutput?.onProviderControllerDisappear(provider: provider)
                 //            }
                 ///2. Login into our API
-                try await API.shared.loginViaProviderAsync(provider: provider, token: providerToken)
+                try await API.shared.auth.loginViaProviderAsync(provider: provider, token: providerToken)
                 
                 ///3. Get profile from API
                 let userData = await API.shared.getUserDataOrNilAsync()
@@ -266,7 +266,7 @@ extension SignupViewController: SignupViewInput {
                     decoder.dateDecodingStrategy = .formatted(.dateTimeFormatter)
                     Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: userData!)
                     guard let url = UserDefaults.Profile.imageURL else { return }
-                    Userprofiles.shared.current?.image = try await API.shared.downloadImageAsync(from: url)
+                    Userprofiles.shared.current?.image = try await API.shared.system.downloadImageAsync(from: url)
                 } catch {
                     ///5. Profile wasn't edited - we need to update it with provider data
                     do {

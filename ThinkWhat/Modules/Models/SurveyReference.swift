@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftyJSON
+import Combine
 
 class SurveyReference: Decodable {// NSObject,
     
@@ -47,7 +48,9 @@ class SurveyReference: Decodable {// NSObject,
     var rating: Double {
         didSet {
             guard oldValue != rating else { return }
-            //            Notification.send(names: [Notifications.Surveys.Rating])
+            
+            ratingPublisher.send(rating)
+            
             NotificationCenter.default.post(name: Notifications.Surveys.Rating, object: self)
             guard let survey = survey else { return }
             survey.rating = rating
@@ -56,7 +59,9 @@ class SurveyReference: Decodable {// NSObject,
     var likes: Int {
         didSet {
             guard oldValue != likes else { return }
-            //            Notification.send(names: [Notifications.Surveys.Likes])
+            
+            likesPublisher.send(likes)
+            
             NotificationCenter.default.post(name: Notifications.Surveys.Likes, object: self)
             guard let survey = survey else { return }
             survey.likes = likes
@@ -65,6 +70,8 @@ class SurveyReference: Decodable {// NSObject,
     var views: Int {
         didSet {
             guard oldValue != views else { return }
+            
+            viewsPublisher.send(views)
             //            Notification.send(names: [Notifications.Surveys.Views])
             NotificationCenter.default.post(name: Notifications.Surveys.Views, object: self)
             guard let survey = survey else { return }
@@ -75,6 +82,8 @@ class SurveyReference: Decodable {// NSObject,
     var isComplete: Bool {
         didSet {
             guard oldValue != isComplete else { return }
+            
+            isCompletePublisher.send(isComplete)
             NotificationCenter.default.post(name: Notifications.Surveys.Completed, object: self)
         }
     }
@@ -83,6 +92,9 @@ class SurveyReference: Decodable {// NSObject,
     var isHot: Bool {
         didSet {
             guard oldValue != isHot else { return }
+            
+            isHotPublisher.send(isHot)
+            
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchHot, object: self)
             //            Notification.send(names: [Notifications.Surveys.SwitchHot])
         }
@@ -90,6 +102,8 @@ class SurveyReference: Decodable {// NSObject,
     var isFavorite: Bool {
         didSet {
             guard oldValue != isFavorite else { return }
+            
+            isFavoritePublisher.send(isFavorite)
             
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: self)
             
@@ -108,30 +122,25 @@ class SurveyReference: Decodable {// NSObject,
             survey.isFavorite = isFavorite
         }
     }
-    
     var isBanned: Bool = false {
         didSet {
             guard isBanned else { return }
+            
+            isBannedPublisher.send(isBanned)
+            
             NotificationCenter.default.post(name: Notifications.Surveys.Ban, object: self)
         }
     }
     var isClaimed: Bool = false {
         didSet {
             guard isClaimed, isClaimed != oldValue else { return }
+            
+            isClaimedPublisher.send(isClaimed)
+            
             NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: self)
             survey?.isClaimed = isClaimed
         }
     }
-    //    var isFavorite: Bool {
-    //        didSet {
-    //            guard oldValue != isFavorite else { return }
-    //            if isFavorite, Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).isEmpty {
-    //                Surveys.shared.favoriteReferences[self] = Date()
-    //            } else if !isFavorite, let instance = Surveys.shared.favoriteReferences.keys.filter({ $0 == self }).first {
-    //                Surveys.shared.favoriteReferences[instance] = nil
-    //            }
-    //        }
-    //    }
     var owner: Userprofile
     var votesTotal: Int
     var commentsTotal: Int {
@@ -155,6 +164,17 @@ class SurveyReference: Decodable {// NSObject,
     var media: Mediafile?
     var shareHash:              String = ""
     var shareEncryptedString:   String = ""
+    //Publishers
+    var ratingPublisher         = PassthroughSubject<Double, Never>()
+    var isFavoritePublisher     = PassthroughSubject<Bool, Never>()
+    var isCompletePublisher     = PassthroughSubject<Bool, Never>()
+    var isClaimedPublisher      = PassthroughSubject<Bool, Never>()
+    var isBannedPublisher       = PassthroughSubject<Bool, Never>()
+    var isHotPublisher          = PassthroughSubject<Bool, Never>()
+    var viewsPublisher          = PassthroughSubject<Int, Never>()
+    var likesPublisher          = PassthroughSubject<Int, Never>()
+    
+    
     
     // MARK: - Initialization
     required init(from decoder: Decoder) throws {

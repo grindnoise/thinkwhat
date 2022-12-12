@@ -364,3 +364,4 @@
 "user_publication_notification_begin" = "Уведомления от ";
 "user_publication_notification_on" = " включены";
 "user_publication_notification_off" = " выключены";
+"watch_survey_notification" = "Вы будете уведомлены о результатах при завершении публикации";

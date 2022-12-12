@@ -51,7 +51,7 @@ class SurveysCollectionView: UICollectionView {
         didSet {
             guard !userprofile.isNil else { return }
             
-            category = .Userprofile
+            category = .ByOwner
         }
     }
     public var fetchResult: [SurveyReference] = [] {
@@ -87,7 +87,6 @@ class SurveysCollectionView: UICollectionView {
     }
     
     
-    
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
@@ -95,7 +94,7 @@ class SurveysCollectionView: UICollectionView {
     private var source: Source!
     private var dataItems: [SurveyReference] {
         var items: [SurveyReference] = []
-        if category == .Userprofile, let userprofile = userprofile {
+        if category == .ByOwner, let userprofile = userprofile {
             items = category.dataItems(nil, userprofile)
         } else if category == .Topic, !topic.isNil {
             items = category.dataItems(topic)
@@ -240,7 +239,7 @@ extension SurveysCollectionView: UIScrollViewDelegate {
 }
 
 extension SurveysCollectionView: UICollectionViewDelegate {
-    
+
     func deselect() {
         guard let indexPath = indexPathsForSelectedItems?.first else { return }
         deselectItem(at: indexPath, animated: false)
@@ -254,8 +253,8 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        cell.setNeedsLayout()
-        cell.layoutIfNeeded()
+//        cell.setNeedsLayout()
+//        cell.layoutIfNeeded()
         
         guard category != .Search, isScrollingDown else { loadingIndicator.stopAnimating(); return }
         
@@ -290,27 +289,57 @@ private extension SurveysCollectionView {
         Timer
             .publish(every: 3, on: .current, in: .common)
             .autoconnect()
+//            .filter { [weak self] _ in
+//                guard let self = self else { return }
+//                
+//                return !self.visibleCells.isEmpty
+//            }
 //            .delay(for: .seconds(2), scheduler: DispatchQueue.main)
             .sink { [weak self] seconds in
                 guard let self = self,
-                      let cells = self.visibleCells as? [SurveyCell],
-                      !cells.isEmpty
+                      let cells = self.visibleCells as? [SurveyCell]
                 else { return }
 
-                self.updateStatsPublisher.send(cells.compactMap { return $0.item })
+                let items = cells.compactMap{ $0.item }
+                self.updateStatsPublisher.send(items)
             }
             .store(in: &subscriptions)
 
         delegate = self
 
-        addSubview(loadingIndicator)
-
-        NSLayoutConstraint.activate([
-            loadingIndicator.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
-            loadingIndicator.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8)
-//            layoutGuide.centerXAnchor.constraint(equalTo: loadingIndicator.centerXAnchor),
-//            layoutGuide.bottomAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 10)
-        ])
+        delayAsync(delay: 0.5) { [weak self] in
+            guard let self = self,
+                  let superview = self.superview
+            else { return }
+            
+            superview.publisher(for: \.bounds)
+                .filter { $0 != .zero }
+                .sink { [weak self] _ in
+                    guard let self = self,
+                          self.loadingIndicator.superview.isNil
+                    else { return }
+                    
+                    self.superview!.addSubview(self.loadingIndicator)
+                    
+                    NSLayoutConstraint.activate([
+                        self.loadingIndicator.centerXAnchor.constraint(equalTo: self.superview!.centerXAnchor),
+                        self.loadingIndicator.bottomAnchor.constraint(equalTo: self.superview!.bottomAnchor, constant: -8)
+                    ])
+                }
+                .store(in: &self.subscriptions)
+        }
+        
+        
+//        if let superview = superview {
+//            superview.addSubview(loadingIndicator)
+//
+//            NSLayoutConstraint.activate([
+//                loadingIndicator.centerXAnchor.constraint(equalTo: superview.centerXAnchor),
+//                loadingIndicator.bottomAnchor.constraint(equalTo: superview.bottomAnchor, constant: -8)
+//                //            layoutGuide.centerXAnchor.constraint(equalTo: loadingIndicator.centerXAnchor),
+//                //            layoutGuide.bottomAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 10)
+//            ])
+//        }
 
         setRefreshControl()
         setColors()
@@ -323,25 +352,24 @@ private extension SurveysCollectionView {
 
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
             sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-            sectionLayout.interGroupSpacing = 16
+            sectionLayout.interGroupSpacing = 20
 
             return sectionLayout
         }
 
+//        contentInsetAdjustmentBehavior = .never
         contentInset.bottom = category == .Topic ? 80 : 0
 
         let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { [unowned self] cell, indexPath, item in
             cell.item = item
-
+            
             cell.subscribePublisher
                 .sink { [weak self] in
-                    guard let self = self,
-                          let userprofile = $0
-                    else { return }
-
-                    self.subscribePublisher.send(userprofile)
+                    guard let self = self else { return }
+                    
+                    self.subscribePublisher.send($0)
                 }
-            .store(in: &self.subscriptions)
+                .store(in: &self.subscriptions)
 
             cell.unsubscribePublisher
                 .sink { [weak self] in
@@ -412,6 +440,8 @@ private extension SurveysCollectionView {
             config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
             cell.backgroundConfiguration = config
             cell.automaticallyUpdatesBackgroundConfiguration = false
+//                    cell.setNeedsLayout()
+//                    cell.layoutIfNeeded()
         }
 
         source = UICollectionViewDiffableDataSource<Section, SurveyReference>(collectionView: self) {
@@ -419,6 +449,9 @@ private extension SurveysCollectionView {
             let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
+            
+//            cell.setNeedsLayout()
+//            cell.layoutIfNeeded()
             return cell
         }
 
@@ -431,7 +464,7 @@ private extension SurveysCollectionView {
             .autoconnect()
             .sink { [weak self] _ in
                 guard let self = self,
-                      self.category != .Userprofile,
+                      self.category != .ByOwner,
                       self.source.snapshot().itemIdentifiers.count != self.filterByPeriod(self.dataItems).count
                 else { return }
 
@@ -520,7 +553,7 @@ private extension SurveysCollectionView {
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.AppendReference) {
                 guard let self = self,
-                      self.category == .Userprofile,
+                      self.category == .ByOwner,
                       let userprofile = self.userprofile,
                       let instance = notification.object as? SurveyReference,
                       instance.owner == userprofile,
@@ -544,7 +577,7 @@ private extension SurveysCollectionView {
         tasks.append(Task {@MainActor [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.RemoveReference) {
                 guard let self = self,
-                      self.category == .Userprofile,
+                      self.category == .ByOwner,
                       let userprofile = self.userprofile,
                       let instance = notification.object as? SurveyReference,
                       instance.owner == userprofile,
@@ -756,7 +789,7 @@ private extension SurveysCollectionView {
     func refresh() {
         if category == .Topic, let topic = topic {
             refreshByTopicPublisher.send([topic: period])
-        } else if category == .Userprofile, let userprofile = userprofile {
+        } else if category == .ByOwner, let userprofile = userprofile {
             refreshByUserprofilePublisher.send([userprofile: period])
         } else {
             refreshPublisher.send([category: period])
@@ -766,7 +799,7 @@ private extension SurveysCollectionView {
     func requestData() {
         if category == .Topic, let topic = topic {
             paginationByTopicPublisher.send([topic: period])
-        } else if category == .Userprofile, let userprofile = userprofile {
+        } else if category == .ByOwner, let userprofile = userprofile {
             paginationByUserprofilePublisher.send([userprofile: period])
         } else {
             paginationPublisher.send([category: period])

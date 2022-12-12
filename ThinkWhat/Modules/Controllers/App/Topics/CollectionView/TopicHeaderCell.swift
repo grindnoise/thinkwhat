@@ -123,14 +123,22 @@ class TopicCellHeaderContent: UIView, UIContentView {
     private lazy var icon: Icon = {
         let instance = Icon()
         instance.isRounded = false
-        instance.scaleMultiplicator = 1.75
+        instance.scaleMultiplicator = 1.65
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.iconColor = .white
+        instance.backgroundColor = .clear
+        instance.layer.addSublayer(iconGradient)
         
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
                 
                 instance.cornerRadius = rect.width/3.25
+                
+                guard let layer = instance.layer.getSublayer(identifier: "radialGradient"),
+                      layer.bounds != rect
+                else { return }
+                
+                layer.frame = rect
             }
             .store(in: &subscriptions)
         
@@ -139,20 +147,20 @@ class TopicCellHeaderContent: UIView, UIContentView {
     private lazy var titleView: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
-        instance.addSubview(titleLabel)
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        instance.addSubview(topicTitle)
+        topicTitle.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-            titleLabel.topAnchor.constraint(equalTo: instance.topAnchor),
-            titleLabel.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            topicTitle.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+            topicTitle.topAnchor.constraint(equalTo: instance.topAnchor),
+            topicTitle.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
         ])
         
         return instance
     }()
-    private lazy var titleLabel: InsetLabel = {
-        let instance = InsetLabel()
+    private lazy var topicLabel: UILabel = {
+        let instance = UILabel()
         instance.textAlignment = .center
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .headline)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
         instance.numberOfLines = 1
         instance.textColor = .white
         instance.translatesAutoresizingMaskIntoConstraints = false
@@ -165,9 +173,25 @@ class TopicCellHeaderContent: UIView, UIContentView {
         heightConstraint.identifier = "height"
         heightConstraint.isActive = true
         
+        return instance
+    }()
+    private lazy var topicTitle: UIView = {
+        let instance = UIView()
+        instance.backgroundColor = .clear
+        instance.layer.addSublayer(titleGradient)
+        
+        topicLabel.place(inside: instance, insets: UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4))
+        
         instance.publisher(for: \.bounds)
+            .filter { $0 != .zero }
             .sink { rect in
                 instance.cornerRadius = rect.height/2.25
+                
+                guard let layer = instance.layer.getSublayer(identifier: "radialGradient"),
+                      layer.bounds != rect
+                else { return }
+                
+                layer.frame = rect
             }
             .store(in: &subscriptions)
         
@@ -176,12 +200,46 @@ class TopicCellHeaderContent: UIView, UIContentView {
     private lazy var topicDescription: UILabel = {
         let instance = UILabel()
         instance.text = "There's gonna be a description of the topic"
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption2)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
         instance.textAlignment = .left
         instance.numberOfLines = 1
         instance.lineBreakMode = .byTruncatingTail
-        instance.textColor = .label
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .darkGray : .label
 
+        return instance
+    }()
+    private lazy var iconGradient: CAGradientLayer = {
+        let instance = CAGradientLayer()
+        instance.type = .radial
+        instance.colors = getGradientColors(color: .systemGray)
+        instance.locations = [0, 0.5, 1.15]
+        instance.setIdentifier("radialGradient")
+        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+        instance.endPoint = CGPoint(x: 1, y: 1)
+        instance.publisher(for: \.bounds)
+            .filter { $0 != .zero }
+            .sink { rect in
+                instance.cornerRadius = rect.height/3.25
+            }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
+    private lazy var titleGradient: CAGradientLayer = {
+        let instance = CAGradientLayer()
+        instance.type = .radial
+        instance.colors = getGradientColors(color: .systemGray)
+        instance.locations = [0, 0.5, 1.15]
+        instance.setIdentifier("radialGradient")
+        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+        instance.endPoint = CGPoint(x: 1, y: 1)
+        instance.publisher(for: \.bounds)
+            .filter { $0 != .zero }
+            .sink { rect in
+                instance.cornerRadius = rect.height/2.25
+            }
+            .store(in: &subscriptions)
+        
         return instance
     }()
 //    private let hotCountView: UIImageView = {
@@ -268,16 +326,18 @@ class TopicCellHeaderContent: UIView, UIContentView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
+//        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .systemGray : .label
 //        viewsCountLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 //        hotCountLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        topicDescription.textColor = traitCollection.userInterfaceStyle == .dark ?  .label : .darkGray
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
                                             forTextStyle: .headline)
         topicDescription.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                                  forTextStyle: .caption2)
+                                                  forTextStyle: .footnote)
 //        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
 //                                            forTextStyle: .callout)
 //        viewsCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
@@ -291,6 +351,14 @@ class TopicCellHeaderContent: UIView, UIContentView {
 
 // MARK: - Private
 private extension TopicCellHeaderContent {
+    func getGradientColors(color: UIColor) -> [CGColor] {
+        return [
+            color.cgColor,
+            color.cgColor,
+            color.lighter(0.05).cgColor,
+        ]
+    }
+    
     func apply(configuration: TopicCellHeaderConfiguration) {
         guard currentConfiguration != configuration else { return }
         
@@ -299,10 +367,13 @@ private extension TopicCellHeaderContent {
         let color = currentConfiguration.topicItem.topic.tagColor
         
         //icon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.topicItem.topic.tagColor
-        icon.backgroundColor = color
-        titleLabel.backgroundColor = color
-        icon.category = Icon.Category(rawValue: currentConfiguration.topicItem.topic.id) ?? .Null
-        titleLabel.text = currentConfiguration.topicItem.title.uppercased()
+//        icon.backgroundColor = color
+//        topicTitle.backgroundColor = color
+        icon.category = currentConfiguration.topicItem.topic.iconCategory
+        topicLabel.text = currentConfiguration.topicItem.title.uppercased()
+        topicDescription.text = currentConfiguration.topicItem.description
+        titleGradient.colors = getGradientColors(color: color)
+        iconGradient.colors = getGradientColors(color: color)
 //        viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.active.roundedWithAbbreviations)
         
 //        if currentConfiguration.topicItem.topic.hotTotal == 0 {
@@ -317,12 +388,11 @@ private extension TopicCellHeaderContent {
 //        viewsCountLabel.text = String(describing: currentConfiguration.topicItem.topic.viewsTotal.roundedWithAbbreviations)
 //        hotCountLabel.text = String(describing: currentConfiguration.topicItem.topic.hotTotal.roundedWithAbbreviations)
         
-        guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
+        guard let constraint = topicLabel.getConstraint(identifier: "height") else { return }
         
-        let height = "test".height(withConstrainedWidth: 100, font: titleLabel.font)
+        let height = "test".height(withConstrainedWidth: 100, font: topicLabel.font)
         constraint.constant = height// + 4
         self.layoutIfNeeded()
-        titleLabel.cornerRadius = titleLabel.bounds.height/2.25
         
         refreshConstraints()
     }
@@ -340,29 +410,25 @@ private extension TopicCellHeaderContent {
         ])
         
         let constr = horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor)
-        constr.priority = .defaultLow
+        constr.priority = .defaultHigh
         constr.isActive = true
         
-                let constraint = topicDescription.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -padding)
-                constraint.priority = .defaultLow
-                constraint.isActive = true
-        
-//        let constraint = statsView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -padding)
-//        constraint.priority = .defaultLow
-//        constraint.isActive = true
+        let constraint = topicDescription.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -padding)
+        constraint.priority = .defaultLow
+        constraint.isActive = true
     }
     
     @MainActor
-    private func refreshConstraints() {
-        guard let constraint = titleLabel.getConstraint(identifier: "width") else { return }
+    func refreshConstraints() {
+        guard let constraint = topicLabel.getConstraint(identifier: "width") else { return }
         
-        titleLabel.insets = UIEdgeInsets(top: 0, left: titleLabel.bounds.height/3, bottom: 0, right: titleLabel.bounds.height/3)
-        let width = currentConfiguration.topicItem.topic.localized.width(withConstrainedHeight: titleLabel.bounds.height, font: titleLabel.font)
+//        topicTitle.insets = UIEdgeInsets(top: 0, left: topicTitle.bounds.height/3, bottom: 0, right: topicTitle.bounds.height/3)
+        let width = currentConfiguration.topicItem.topic.title.width(withConstrainedHeight: topicLabel.bounds.height, font: topicLabel.font)
         
         self.setNeedsLayout()
-        constraint.constant = width + titleLabel.cornerRadius*3
+        constraint.constant = width + topicTitle.cornerRadius*2 //+ topicTitle.insets.left*2
         self.layoutIfNeeded()
-        titleLabel.frame.origin = .zero
+//        topicTitle.frame.origin = .zero
         
 //        statsStack.translatesAutoresizingMaskIntoConstraints = false
 //        guard let constraint_2 = statsStack.getConstraint(identifier: "height") else {
@@ -373,17 +439,17 @@ private extension TopicCellHeaderContent {
 //        }
 //        constraint_2.constant = "1".height(withConstrainedWidth: 50, font: viewsCountLabel.font)
         
-//        guard let constraint = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
+//        guard let constraint = topicTitle.getAllConstraints().filter({$0.identifier == "height"}).first,
 //              let constraint_2 = descriptionLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
 //              let constraint_3 = topicLabel.getAllConstraints().filter({ $0.identifier == "width"}).first
 //        else { return }
 //
-//        let height = item.title.height(withConstrainedWidth: titleLabel.bounds.width, font: titleLabel.font)
+//        let height = item.title.height(withConstrainedWidth: topicTitle.bounds.width, font: topicTitle.font)
 //        let height_2 = item.truncatedDescription.height(withConstrainedWidth: descriptionLabel.bounds.width, font: descriptionLabel.font)
 //        let width = item.topic.title.width(withConstrainedHeight: topicLabel.bounds.height, font: topicLabel.font)
 ////        guard height != constraint.constant else { return }
 //        setNeedsLayout()
-//        constraint.constant = height + titleLabel.insets.top + titleLabel.insets.bottom
+//        constraint.constant = height + topicTitle.insets.top + topicTitle.insets.bottom
 //        constraint_2.constant = height_2 + descriptionLabel.insets.top + descriptionLabel.insets.bottom
 //        constraint_3.constant = width + topicLabel.insets.right*2.5 + topicLabel.insets.left*2.5
 //        layoutIfNeeded()
@@ -392,3 +458,7 @@ private extension TopicCellHeaderContent {
 //        avatar.imageView.image = UIImage(systemName: "face.smiling.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: avatar.bounds.size.height*0.5, weight: .regular, scale: .medium))
     }
 }
+
+
+
+

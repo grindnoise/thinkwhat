@@ -640,9 +640,9 @@ extension UITabBarController {
     func setTabBarVisible(visible:Bool, animated:Bool) {
         
         var bottomSafeArea = CGFloat.zero
-        if let window = UIApplication.shared.windows.first,
-              let bottom = window.safeAreaInsets.bottom as? CGFloat
-         { bottomSafeArea = bottom }
+//        if let window = UIApplication.shared.windows.first,
+//              let bottom = window.safeAreaInsets.bottom as? CGFloat
+//         { bottomSafeArea = bottom }
         
                 
 //                view.backgroundColor =  self.tabBar.barTintColor
@@ -665,21 +665,29 @@ extension UITabBarController {
 
         //we should show it
         if visible {
-            self.tabBar.alpha = 0
+//            self.tabBar.alpha = 0
             let offsetY = self.tabBar.frame.size.height
-            movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY + bottomSafeArea)
+            movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)// + offsetY + bottomSafeArea)
             self.view.frame = self.movedFrameView!
             tabBar.isHidden = false
-            UIView.animate(withDuration: animated ? 0.25 : 0.0) {
+//                            self.view.setNeedsDisplay()
+//            self.view.layoutIfNeeded()
+//            self.view.setNeedsLayout()
+            UIView.animate(withDuration: animated ? 0.225 : 0.0) {
                 //restore form or frames
+                
                 self.view.frame = self.orgFrameView!
                 //errase the stored locations so that...
-                self.tabBar.alpha = 1
+//                self.tabBar.alpha = 1
                 self.orgFrameView = nil
                 self.movedFrameView = nil
                 //...the layoutIfNeeded() does not move them again!
-                self.view.setNeedsDisplay()
-                self.view.layoutIfNeeded()
+//                self.view.layoutSubviews()
+//                self.view.setNeedsDisplay()
+//
+//                self.view.layoutIfNeeded()
+//                self.edgesForExtendedLayout = UIRectEdge.bottom
+//                self.extendedLayoutIncludesOpaqueBars = true
             }
         }
             //we should hide it
@@ -690,15 +698,14 @@ extension UITabBarController {
             let offsetY = self.tabBar.frame.size.height
             movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY - bottomSafeArea)
             //animate
-            UIView.animate(withDuration: animated ? 0.25 : 0.0, animations: {
-                self.tabBar.alpha = 0
+            UIView.animate(withDuration: animated ? 0.225 : 0.0, animations: {
+//                self.tabBar.alpha = 0
                 self.view.frame = self.movedFrameView!
-                self.view.setNeedsDisplay()
-                self.view.layoutIfNeeded()
-            }) {
-                (_) in
+//                self.view.setNeedsDisplay()
+//                self.view.layoutIfNeeded()
+            }) { _ in
                 self.tabBar.isHidden = true
-                self.tabBar.alpha = 1
+//                self.tabBar.alpha = 1
 //                self.movedFrameView = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height + offsetY + 30)
 //                self.view.frame = self.movedFrameView!
 //                self.edgesForExtendedLayout = UIRectEdge.bottom

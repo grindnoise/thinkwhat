@@ -15,11 +15,14 @@ import CoreAudio
 class API {
     static let shared   = API()
     public let auth     = Auth()
+    public let system   = System()
     public let profiles = Profiles()
     public let surveys  = Polls()
+    
     private init() {
         profiles.parent = self
         surveys.parent = self
+        system.parent = self
         auth.parent = self
 //        self.sessionManager.session.configuration.timeoutIntervalForRequest = 10
     }
@@ -139,7 +142,9 @@ class API {
     }
 
     
-    private func headers() -> HTTPHeaders {
+    private func headers() -> HTTPHeaders? {
+        guard let accessToken = KeychainService.loadAccessToken() else { return nil }
+        
         let headers: HTTPHeaders = [
             "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
             "Content-Type": "application/json"
@@ -167,7 +172,6 @@ class API {
         case Top,New,All,Own,Favorite, Hot, HotExcept, User, Topic
 
         func getURL() -> URL? {
-            let url = URL(string: API_URLS.BASE)!//.appendingPathComponent(SERVER_URLS.GET_CONFIRMATION_CODE)
             switch self {
             case .Top:
                 return API_URLS.Surveys.top
@@ -335,140 +339,6 @@ class API {
         }
     }
     
-    func loginViaMail(username: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { completion(.failure(APIError.invalidURL)); return }
-#if DEBUG
-      print(password)
-#endif
-        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
-        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
-            switch response.result {
-            case .success(let value):
-                    guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
-                    guard let data = value else { completion(.failure(APIError.badData)); return }
-                do {
-                    //TODO: Определиться с инициализацией JSON
-                    let json = try JSON(data: data, options: .mutableContainers)
-                    guard 200...299 ~= statusCode else {
-                        completion(.failure(APIError.backend(code: statusCode, description: json.rawString())))
-                        return
-                    }
-                    completion(saveTokenInKeychain(json: json))
-                } catch let error {
-                    completion(.failure(error))
-                }
-            case let .failure(error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
-    ///Email/username auhorization. Store access token if finished successful
-    func loginAsync(username: String, password: String) async throws  {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { throw APIError.invalidURL }
-        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
-        do {
-            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding())
-            let json = try JSON(data: data, options: .mutableContainers)
-            saveTokenInKeychain(json: json)
-        } catch let error {
-            throw error
-        }
-    }
-    
-    ///Third-party auhorization. Store access token if finished successful
-    func loginViaProvider(provider: AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { completion(.failure(APIError.invalidURL)); return }
-        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
-        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding(), headers: nil).response { response in
-            switch response.result {
-            case .success(let value):
-                guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
-                guard let data = value else { completion(.failure(APIError.badData)); return }
-                do {
-                    //TODO: Определиться с инициализацией JSON
-                    let json = try JSON(data: data, options: .mutableContainers)
-                guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
-                    completion(saveTokenInKeychain(json: json))
-                } catch let error {
-                    completion(.failure(error))
-                }
-            case let .failure(error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
-    func loginViaProviderAsync(provider: AuthProvider, token: String) async throws  {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { throw APIError.invalidURL }
-        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
-        do {
-            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding(), accessControl: false)
-            let json = try JSON(data: data, options: .mutableContainers)
-            saveTokenInKeychain(json: json)
-        } catch let error {
-            throw error
-        }
-    }
-    
-    func logout(completion: @escaping (Result<Bool, Error>) -> ()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_REVOKE) else { completion(.failure(APIError.invalidURL)); return }
-        guard let token = KeychainService.loadAccessToken() as String?, !token.isEmpty else {
-            UserDefaults.clear()
-            Surveys.shared.eraseData()
-            Userprofiles.shared.eraseData()
-            SurveyReferences.shared.eraseData()
-            FBWorker.logout()
-            VKWorker.logout()
-            completion(.success(true))
-            return
-        }
-        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "token": token]
-        
-        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default).response { response in
-            switch response.result {
-            case .success(let value):
-                guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
-                UserDefaults.clear()
-                Surveys.shared.eraseData()
-                Userprofiles.shared.eraseData()
-                SurveyReferences.shared.eraseData()
-                FBWorker.logout()
-                VKWorker.logout()
-                completion(.success(true))
-//                if 200...299 ~= statusCode {
-//                    completion(saveTokenInKeychain(json: json))
-//                } else if 400...499 ~= statusCode {
-//                    guard let description = json.rawString() else { completion(.failure(APIError.unexpected(code: statusCode)))}
-//                    completion(.failure(APIError.serverResponse(description: description)))
-//                }
-            case let .failure(error):
-                completion(.failure(self.parseAFError(error)))
-            }
-        }
-    }
-    
-    func signup(email: String, password: String, username: String, completion: @escaping (Result<Bool,Error>) -> ()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SIGNUP) else { completion(.failure(APIError.invalidURL)); return }
-        let parameters = ["client_id": API_URLS.CLIENT_ID, "grant_type": "password", "email": "\(email)", "password": "\(password)", "username": "\(username)"]
-        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default).response { response in
-            switch response.result {
-            case .success(let value):
-                guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
-                guard let data = value else { completion(.failure(APIError.badData)); return }
-                do {
-                    //TODO: Определиться с инициализацией JSON
-                    let json = try JSON(data: data, options: .mutableContainers)
-                    guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
-                    self.loginViaMail(username: username, password: password) { completion($0) }
-                }  catch let error {
-                    completion(.failure(error))
-                }
-            case let .failure(error):
-                completion(.failure(error))
-            }
-        }
-    }
     
     func getProfileNeedsUpdate(completion: @escaping(Result<Bool, Error>)->()) {
         request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.PROFILE_NEEDS_UPDATE), httpMethod: .get) { result in
@@ -512,186 +382,6 @@ class API {
         }
     }
     
-    
-    func updateUserprofile(user: Userprofile, uploadProgress: @escaping(Double) -> (), completion: @escaping(Result<JSON, Error>) -> ()) {
-            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/") else {
-                completion(.failure(APIError.invalidURL))
-                return
-            }
-        //TODO: - encode Userprofile
-        var dict: [String: Any] = [:]// = user.encoded
-
-//            if let image = data["image"] as? UIImage {
-//                dict.removeValue(forKey: "image")
-            if let image = dict.removeValue(forKey: "image") as? UIImage {
-                assert(dict["image"] == nil)
-                let multipartFormData = MultipartFormData()
-                var imgExt: FileFormat = .Unknown
-                var imageData: Data?
-                if let data = image.jpegData(compressionQuality: 1) {
-                    imageData = data
-                    imgExt = .JPEG
-                } else if let data = image.pngData() {
-                    imageData = data
-                    imgExt = .PNG
-                }
-                guard imageData != nil else { completion(.failure(APIError.badData)); return }
-                multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(imgExt.rawValue)", mimeType: "jpg/png")
-                for (key, value) in dict {
-                    if value is String || value is Int {
-                        multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
-                    }
-                }
-                uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) }) { completion($0) }
-            } else {
-                request(url: url, httpMethod: .patch, parameters: dict, encoding: JSONEncoding.default) { completion($0) }
-            }
-            
-            
-            
-            
-            //                self.sessionManager.upload(multipartFormData: { multipartFormData in
-            //
-            //
-            //                    var imgExt: FileFormat = .Unknown
-            //                    var imageData: Data?
-            //                    if let data = image.jpegData(compressionQuality: 1) {
-            //                        imageData = data
-            //                        imgExt = .JPEG
-            //                    } else if let data = image.pngData() {
-            //                        imageData = data
-            //                        imgExt = .PNG
-            //                    }
-            //                    guard imageData != nil else { completion(.failure(APIError.badData)) }
-            //                    multipartFormData.append(imageData!, withName: "image", fileName: "\(String(describing: AppData.shared.profile.id)).\(imgExt.rawValue)", mimeType: "jpg/png")
-            //                    for (key, value) in dict {
-            //                        if value is String || value is Int {
-            //                            multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
-            //                        }
-            //                    }
-            //                }, to: url, method: HTTPMethod.patch, headers: headers()).uploadProgress(queue: .main, closure: { progress in
-            //                    //TODO: - Add completionPercentage closure
-            //                    print("Upload Progress: \(progress.fractionCompleted)")
-            //                }).response { response in
-            //                    switch response.result {
-            //                    case .success(let value):
-            //                        guard let data = value else { completion(.failure(APIError.badData)) }
-            //                        do {
-            //                            //TODO: Определиться с инициализацией JSON
-            //                            let json = try JSON(data: data, options: .mutableContainers)
-            //                            if let statusCode = response.response?.statusCode {
-            //                                if 200...299 ~= statusCode {
-            //                                    print("Upload complete: \(json)")
-            //                                } else if 400...499 ~= statusCode {
-            //                                    guard let description = json.rawString() else { completion(.failure(APIError.unexpected(code: statusCode)))}
-            //                                    completion(.failure(APIError.backend(description: description)))
-            //                                } else {
-            //                                    completion(.failure(APIError.unexpected(code: statusCode)))
-            //                                }
-            //                            }
-            //                        }  catch let error {
-            //                            completion(.failure(error))
-            //                        }
-            //                    case let .failure(error):
-            //                        completion(.failure(error))
-            //                    }
-            //                }
-            //                self.sessionManager.upload(multipartFormData: { multipartFormData in
-            //                    var imgExt: FileFormat = .Unknown
-            //                    var imageData: Data?
-            //                    if let data = image.jpegData(compressionQuality: 1) {
-            //                        imageData = data
-            //                        imgExt = .JPEG
-            //                    } else if let data = image.pngData() {
-            //                        imageData = data
-            //                        imgExt = .PNG
-            //                    }
-            //                    multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.userprofile.ID!).\(imgExt.rawValue)", mimeType: "jpg/png")
-            //                    for (key, value) in dict {
-            //                        if value is String || value is Int {
-            //                            multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
-            //                        }
-            //                    }
-            //                }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: url, method: .patch, headers: headers) {
-            //                    result in
-            //                    switch result {
-            //                    case .failure(let _error):
-            //                        error = _error
-            //                        completion(json, error)
-            //                    case .success(request: let upload, streamingFromDisk: _, streamFileURL: _):
-            //                        upload.uploadProgress(closure: { (progress) in
-            //                            print("Upload Progress: \(progress.fractionCompleted)")
-            //                        })
-            //                        upload.responseJSON(completionHandler: { (response) in
-            //                            if response.result.isFailure {
-            //                                error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: response.result.debugDescription]) as Error
-            //                            }
-            //                            if let _error = response.result.error as? AFError {
-            //                                error = self.parseAFError(_error)
-            //                            } else {
-            //                                if let statusCode  = response.response?.statusCode{
-            //                                    if 200...299 ~= statusCode {
-            //                                        do {
-            //                                            json = try JSON(data: response.data!)
-            //                                        } catch let _error {
-            //                                            error = _error
-            //                                        }
-            //                                    } else if 400...499 ~= statusCode {
-            //                                        do {
-            //                                            let errorJSON = try JSON(data: response.data!)
-            //                                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorJSON.rawString()]) as Error
-            //                                        } catch let _error {
-            //                                            error = _error
-            //                                        }
-            //                                    }
-            //                                }
-            //                                completion(json, error)
-            //                            }
-            //                        })
-            //                    }
-            //                }
-            //            } else {
-            //                _performRequest(url: url, httpMethod: .patch, parameters: data, encoding: JSONEncoding.default, completion: completion)
-            //            }
-        
-    }
-    
-    func updateUserprofile(data: [String: Any], uploadProgress: @escaping(Double) -> (), completion: @escaping(Result<JSON, Error>) -> ()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/") else {
-            completion(.failure(APIError.invalidURL))
-            return
-        }
-        var dict = data
-        //            if let image = data["image"] as? UIImage {
-        //                dict.removeValue(forKey: "image")
-        if let image = dict.removeValue(forKey: "image") as? UIImage {
-            assert(dict["image"] == nil)
-            let multipartFormData = MultipartFormData()
-            var fileFormat: FileFormat = .Unknown
-            var imageData: Data!
-            if let data = image.jpegData(compressionQuality: 1) {
-                imageData = data
-                fileFormat = .JPEG
-            } else if let data = image.pngData() {
-                imageData = data
-                fileFormat = .PNG
-            }
-            guard imageData != nil, fileFormat != .Unknown else { completion(.failure(APIError.badData)); return }
-//            guard imageData != nil else { completion(.failure(APIError.badData)); return }
-            multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(fileFormat)", mimeType: "jpg/png")
-            for (key, value) in dict {
-                if value is String || value is Int {
-                    multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
-                }
-            }
-            uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) }) { completion($0) }
-        } else {
-            request(url: url, httpMethod: .patch, parameters: dict, encoding: JSONEncoding.default) { completion($0) }
-        }
-    }
-    
-    
-    
     func getEmailVerification(completion: @escaping (Result<Bool, Error>) -> ()) {
         request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.GET_EMAIL_VERIFIED), httpMethod: .get) { result in
                     switch result {
@@ -705,83 +395,6 @@ class API {
     
     
     
-    ///Check token expiration time, refresh if needed
-    private func accessControl(completion: @escaping (Result<Bool, Error>) -> ()) {
-        guard let expiryDate = (KeychainService.loadTokenExpireDateTime() as String?)?.toDateTime() else {
-            completion(.failure("Can't retrieve token expiration date from KeychainService"))
-            return
-        }
-        if Date() >= expiryDate {
-            refreshAccessToken { result in
-                completion(result)
-            }
-        } else {
-            completion (.success(true))
-        }
-    }
-    
-    private func accessControlAsync() async throws {
-        func refreshAccessTokenAsync() async throws {
-            guard let refreshToken = (KeychainService.loadRefreshToken() as String?) else {
-                throw "Error occured while retrieving refresh token from KeychainService"
-            }
-            print(refreshToken)
-            let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refreshToken)"]
-            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else {
-                throw APIError.invalidURL
-            }
-            
-            do {
-                let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil, accessControl: false)
-                let json = try JSON(data: data, options: .mutableContainers)
-                saveTokenInKeychain(json: json)
-            } catch {
-                throw error
-            }
-        }
-        
-        guard let string = KeychainService.loadTokenExpireDateTime() as String?,
-              !string.isEmpty,
-              let expiryDate = string.dateTime else {
-            throw "Can't retrieve token expiration date from KeychainService"
-        }
-        guard Date() >= expiryDate else { return }
-        do {
-            try await refreshAccessTokenAsync()
-        } catch {
-            throw error
-        }
-    }
-
-    
-    private func refreshAccessToken(completion: @escaping (Result<Bool, Error>) -> ()) {
-        guard let refreshToken = (KeychainService.loadRefreshToken() as String?) else {
-            completion(.failure("Error occured while retrieving refresh token from KeychainService"))
-            return
-        }
-        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refreshToken)"]
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else {
-            completion(.failure(APIError.invalidURL))
-            return
-        }
-        
-        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
-            switch response.result {
-            case .success(let value):
-                guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
-                guard let data = value else { completion(.failure(APIError.badData)); return }
-                do {
-                    let json = try JSON(data: data, options: .mutableContainers)
-                    guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
-                    completion(saveTokenInKeychain(json: json))
-                } catch let _error {
-                    completion(.failure(_error))
-                }
-            case let .failure(_error):
-                completion(.failure(_error))
-            }
-        }
-    }
     
     func initialLoad(completion: @escaping(Result<JSON,Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else { completion(.failure(APIError.invalidURL)); return }
@@ -790,108 +403,6 @@ class API {
         }
     }
         
-    func appLaunch() async throws -> JSON {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else {
-            throw APIError.notFound
-        }
-        do {
-            let data = try await requestAsync(url: url, httpMethod: .get, parameters: [:], encoding: URLEncoding.default, headers: headers())
-            do {
-                let json = try JSON(data: data, options: .mutableContainers)
-                return json
-            } catch {
-                throw error
-            }
-        } catch let error {
-            throw error
-        }
-    }
-    
-    @discardableResult
-    func requestAsync(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, headers: HTTPHeaders? = nil, accessControl: Bool = true) async throws -> Data {
-        
-        func request() async throws -> Data {
-            try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data,Error>) in
-                self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseData { response in
-                    switch response.result {
-                    case .success(let data):
-                        guard let statusCode = response.response?.statusCode else { continuation.resume(throwing: APIError.httpStatusCodeMissing); return }
-                        do {
-                            let json = try JSON(data: data, options: .mutableContainers)
-                            guard 200...299 ~= statusCode else { continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString())); return }
-                            continuation.resume(returning: data)
-                            return
-                        } catch {
-                            continuation.resume(throwing: error)
-                            return
-                        }
-                    case let .failure(error):
-#if DEBUG
-                        print(error.localizedDescription)
-#endif
-                        continuation.resume(throwing: error)
-                        return
-                    }
-                }
-            }
-        }
-        
-        do {
-            if accessControl {
-                try await accessControlAsync()
-                return try await request()
-            } else {
-                return try await request()
-            }
-        } catch {
-            throw error
-        }
-    }
-    
-    
-    
-
-    
-    
-    
-//    func getSurveyStats(surveyReference: SurveyReference, completion: @escaping(Result<JSON, Error>)->()) {
-//        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS_UPDATE_STATS) else { completion(.failure(APIError.invalidURL)); return }
-//        self.request(url: url, httpMethod: .get, parameters: ["survey_id": surveyReference.id], encoding: URLEncoding.default) { completion($0) }
-//    }
-    
-    func postPoll(survey: Survey, uploadProgress: @escaping(Double)->()?, completion: @escaping(Result<JSON, Error>)->()) {
-        //TODO: - postSurvey replace dict()
-        var dict: [String: AnyObject] = [:]//survey.dict
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS) else { completion(.failure(APIError.invalidURL)); return }
-        request(url: url, httpMethod: .post, parameters: dict, encoding: JSONEncoding.default) { result in
-            switch result {
-            case .success(let json):
-                completion(.success(json))
-                if !survey.images.isEmpty {
-                    for mediafile in survey.mediaWithImagesSortedByOrder {
-                        let multipartFormData = MultipartFormData()
-                        var imgExt: FileFormat = .Unknown
-                        var imageData: Data?
-                        if let data = mediafile.image!.jpegData(compressionQuality: 1) {
-                            imageData = data
-                            imgExt = .JPEG
-                        } else if let data = mediafile.image!.pngData() {
-                            imageData = data
-                            imgExt = .PNG
-                        }
-                        multipartFormData.append(imageData!, withName: "image", fileName: "\(UserDefaults.Profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
-                        multipartFormData.append("\(survey.id)".data(using: .utf8)!, withName: "survey")
-                        multipartFormData.append("\(mediafile.order)".data(using: .utf8)!, withName: "order")
-                        multipartFormData.append("\(mediafile.title)".data(using: .utf8)!, withName: "title")
-                        self.uploadMultipartFormData(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) }) { completion($0) }
-                    }
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
     public func postVote(answer: Answer, completion: @escaping(Result<JSON, Error>)->()) {
         guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SURVEYS) else { completion(.failure(APIError.invalidURL)); return }
         var parameters: [String: Any] = ["survey": answer.survey!.id, "answer": answer.id]
@@ -987,20 +498,212 @@ class API {
 //        request(url: url, httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
 //    }
     
-    class Auth {
+    final class Auth {
         weak var parent: API! = nil
+     
+        public func loginViaMail(username: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { completion(.failure(APIError.invalidURL)); return }
+    #if DEBUG
+          print(password)
+    #endif
+            let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
+            self.parent.sessionManager.request(url,
+                                               method: .post,
+                                               parameters: parameters,
+                                               encoding: URLEncoding.default,
+                                               headers: nil).response { response in
+                switch response.result {
+                case .success(let value):
+                        guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
+                        guard let data = value else { completion(.failure(APIError.badData)); return }
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: data, options: .mutableContainers)
+                        guard 200...299 ~= statusCode else {
+                            completion(.failure(APIError.backend(code: statusCode, description: json.rawString())))
+                            return
+                        }
+                        completion(saveTokenInKeychain(json: json))
+                    } catch let error {
+                        completion(.failure(error))
+                    }
+                case let .failure(error):
+                    completion(.failure(error))
+                }
+            }
+        }
         
+        ///Email/username auhorization. Store access token if finished successful
+        public func loginAsync(username: String, password: String) async throws  {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { throw APIError.invalidURL }
+            let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
+            do {
+                let data = try await parent.requestAsync(url: url,
+                                                  httpMethod: .post,
+                                                  parameters: parameters,
+                                                  encoding: URLEncoding())
+                let json = try JSON(data: data, options: .mutableContainers)
+                let _ = saveTokenInKeychain(json: json)
+            } catch let error {
+                throw error
+            }
+        }
+        
+        ///Third-party auhorization. Store access token if finished successful
+        public func loginViaProvider(provider: AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { completion(.failure(APIError.invalidURL)); return }
+            let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
+            self.parent.sessionManager.request(url,
+                                               method: .post,
+                                               parameters: parameters,
+                                               encoding: URLEncoding(),
+                                               headers: nil).response { response in
+                switch response.result {
+                case .success(let value):
+                    guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
+                    guard let data = value else { completion(.failure(APIError.badData)); return }
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: data, options: .mutableContainers)
+                        guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+                        completion(saveTokenInKeychain(json: json))
+                    } catch let error {
+                        completion(.failure(error))
+                    }
+                case let .failure(error):
+                    completion(.failure(error))
+                }
+            }
+        }
+        
+        public func loginViaProviderAsync(provider: AuthProvider, token: String) async throws  {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { throw APIError.invalidURL }
+            let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
+            do {
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding(), accessControl: false)
+                let json = try JSON(data: data, options: .mutableContainers)
+                let _ = saveTokenInKeychain(json: json)
+            } catch let error {
+                throw error
+            }
+        }
+        
+        public func logout(completion: @escaping (Result<Bool, Error>) -> ()) {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_REVOKE) else { completion(.failure(APIError.invalidURL)); return }
+            guard let token = KeychainService.loadAccessToken() as String?, !token.isEmpty else {
+                UserDefaults.clear()
+                Surveys.shared.eraseData()
+                Userprofiles.shared.eraseData()
+                SurveyReferences.shared.eraseData()
+                FBWorker.logout()
+                VKWorker.logout()
+                completion(.success(true))
+                return
+            }
+            let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "token": token]
+            
+            self.parent.sessionManager.request(url, method: .post,
+                                               parameters: parameters,
+                                               encoding: URLEncoding.default).response { response in
+                switch response.result {
+                case .success(let _):
+                    guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
+                    UserDefaults.clear()
+                    Surveys.shared.eraseData()
+                    Userprofiles.shared.eraseData()
+                    SurveyReferences.shared.eraseData()
+                    FBWorker.logout()
+                    VKWorker.logout()
+                    completion(.success(true))
+    //                if 200...299 ~= statusCode {
+    //                    completion(saveTokenInKeychain(json: json))
+    //                } else if 400...499 ~= statusCode {
+    //                    guard let description = json.rawString() else { completion(.failure(APIError.unexpected(code: statusCode)))}
+    //                    completion(.failure(APIError.serverResponse(description: description)))
+    //                }
+                case let .failure(error):
+                    completion(.failure(self.parent.parseAFError(error)))
+                }
+            }
+        }
+        
+        public func signup(email: String, password: String, username: String, completion: @escaping (Result<Bool,Error>) -> ()) {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SIGNUP) else { completion(.failure(APIError.invalidURL)); return }
+            let parameters = ["client_id": API_URLS.CLIENT_ID, "grant_type": "password", "email": "\(email)", "password": "\(password)", "username": "\(username)"]
+            self.parent.sessionManager.request(url,
+                                               method: .post,
+                                               parameters: parameters,
+                                               encoding: URLEncoding.default).response { response in
+                switch response.result {
+                case .success(let value):
+                    guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
+                    guard let data = value else { completion(.failure(APIError.badData)); return }
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: data, options: .mutableContainers)
+                        guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+                        self.loginViaMail(username: username, password: password) { completion($0) }
+                    }  catch let error {
+                        completion(.failure(error))
+                    }
+                case let .failure(error):
+                    completion(.failure(error))
+                }
+            }
+        }
     }
     
-    class Profiles {
+    final class System {
         weak var parent: API! = nil
+        
+        public func appLaunch() async throws -> JSON {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else {
+                throw APIError.notFound
+            }
+            do {
+                let data = try await parent.requestAsync(url: url,
+                                                         httpMethod: .get,
+                                                         parameters: [:],
+                                                         encoding: URLEncoding.default,
+                                                         headers: parent.headers())
+                do {
+                    let json = try JSON(data: data,
+                                        options: .mutableContainers)
+                    return json
+                } catch {
+                    throw error
+                }
+            } catch let error {
+                throw error
+            }
+        }
+        
+        public func getCountryByIP() {
+            guard let url = URL(string: API_URLS.Geocoding.countryByIP) else { return }
+            
+            parent.request(url: url, httpMethod: .get,
+                           parameters: nil,
+                           encoding: URLEncoding.default,
+                           useHeaders: false,
+                           accessControl: false) { result in
+                switch result {
+                case .success(let json):
+                    guard let code = json["countryCode"].string else { return }
+                    
+                    UserDefaults.App.countryByIP = code
+                case .failure(let error):
+#if DEBUG
+                    print(error)
+#endif
+                }
+            }
+        }
         
         public func updateAppSettings(_ parameters: Parameters) async throws {
             guard let url = API_URLS.Profiles.updateAppSettings else { throw APIError.invalidURL }
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
-                
+                try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
             } catch let error {
     #if DEBUG
                 print(error)
@@ -1009,9 +712,135 @@ class API {
             }
         }
         
-        public func updateUserprofileAsync(data: [String: Any], uploadProgress: @escaping(Double) -> ()) async throws -> Data {
-            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/") else { throw APIError.invalidURL
+        ///Return city `id`
+        public func saveCity(_ parameters: Parameters) async throws -> City {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CREATE_CITY) else {
+                throw APIError.notFound
             }
+            do {
+                let data = try await parent.requestAsync(url: url,
+                                                  httpMethod: .post,
+                                                  parameters: parameters,
+                                                  encoding: JSONEncoding.default,
+                                                  headers: parent.headers())
+                
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                return try decoder.decode(City.self, from: data)
+    //            guard let id = try JSON(data: data, options: .mutableContainers)["id"].int else { throw "City id error" }
+            } catch let error {
+                throw error
+            }
+        }
+        
+        public func downloadImage(url: URL, downloadProgress: @escaping (Double) -> (), completion: @escaping(Result<UIImage, Error>)->()) {
+            parent.accessControl { [unowned self] result in
+                
+                switch result {
+                case .success:
+                    self.parent.sessionManager.download(url)
+                        .downloadProgress { progress in
+                            downloadProgress(progress.fractionCompleted)
+                        }
+                        .responseData { response in
+                            guard let data = response.value else { completion(.failure(APIError.badData)); return }
+                            guard let image = UIImage(data: data) else { completion(.failure(APIError.badImage)); return }
+                            completion(.success(image))
+                        }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
+        
+        public func downloadFile(url: URL, downloadProgress: @escaping (Double) -> (), completion: @escaping(Result<Data, Error>)->()) {
+            parent.accessControl { [unowned self] result in
+                
+                switch result {
+                case .success:
+                    self.parent.sessionManager.download(url)
+                        .downloadProgress { progress in
+                            downloadProgress(progress.fractionCompleted)
+                        }
+                        .responseData { response in
+                            guard let data = response.value else { completion(.failure(APIError.badData)); return }
+                            completion(.success(data))
+                        }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
+        
+        public func downloadImageAsync(from url: URL, timeoutInterval: TimeInterval = 30) async throws -> UIImage {
+    //        if #available(iOS 15.0, *) {
+    //            var request = URLRequest.init(url:url)
+    //            request.timeoutInterval = timeoutInterval
+    //            let (data, response) = try await URLSession.shared.data(for: request)
+    //            guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw APIError.invalidURL }
+    //            guard let image = UIImage(data: data) else {
+    //                throw APIError.badImage
+    //            }
+    //            return image
+    //            //            guard let thumbnail = await maybeImage?.thumbnail else { throw FetchError.badImage }
+    //            //            return  UImage(uiImage: thumbnail)
+    //        } else {
+                try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<UIImage, Error>) in
+                    parent.sessionManager.download(url).responseData { response in
+                        switch response.result {
+                        case .success(let data):
+                            guard let statusCode = response.response?.statusCode else {
+                                continuation.resume(throwing: APIError.httpStatusCodeMissing)
+                                return
+                            }
+                            guard 200...299 ~= statusCode else { continuation.resume(throwing:  APIError.unexpected(code: statusCode)); return }
+                            guard let image = UIImage(data: data) else { continuation.resume(throwing: APIError.badImage); return }
+                            continuation.resume(returning: image)
+                            return
+                        case .failure(let error):
+                            continuation.resume(throwing: error)
+                            return
+                        }
+                    }
+                }
+    //            fatalError("should not get here")
+    //        }
+        }
+        
+        public func sendPasswordResetLink(_ email: String) async throws {
+            do {
+                guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.RESET_PASSWORD) else {
+                    throw APIError.notFound
+                }
+                let parameters: Parameters = ["email": email]
+                let data = try await parent.requestAsync(url: url,
+                                                         httpMethod: .post,
+                                                         parameters: parameters,
+                                                         encoding: URLEncoding.default,
+                                                         headers: nil)
+                guard try JSON(data: data, options: .mutableContainers)["status"] == "OK" else { throw APIError.badData }
+            } catch {
+#if DEBUG
+                error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                throw error
+            }
+        }
+    }
+    
+    final class Profiles {
+        weak var parent: API! = nil
+        var headers: HTTPHeaders? {
+            return parent.headers()
+        }
+        
+        
+        public func updateUserprofileAsync(data: [String: Any], uploadProgress: @escaping(Double) -> ()) async throws -> Data {
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/"),
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             var dict = data
             if let image = dict.removeValue(forKey: "image") as? UIImage {
@@ -1034,7 +863,7 @@ class API {
                     }
                 }
                 do {
-                    return try await parent.uploadMultipartFormDataAsync(url: url, method: .patch, multipartDataForm: multipartFormData, uploadProgress:  { uploadProgress($0) })
+                    return try await parent.uploadMultipartFormDataAsync(url: url, method: .patch, multipartDataForm: multipartFormData, headers: headers, uploadProgress:  { uploadProgress($0) })
                 } catch {
                     throw error
                 }
@@ -1250,23 +1079,27 @@ class API {
         }
     }
     
-    class Polls {
+    final class Polls {
         weak var parent: API! = nil
-        var headers: HTTPHeaders {
+        var headers: HTTPHeaders? {
             return parent.headers()
         }
         
         //Get fullbody surveys
         func getSurveys(type: SurveyType, parameters: Parameters? = nil) async throws -> Data {
-            guard let url = type.getURL() else { throw APIError.invalidURL }
+            guard let url = type.getURL(),
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
-            return try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+            return try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
         }
         
         //Get fullbody by reference ID
         @discardableResult
         func getSurvey(byReference surveyReference: SurveyReference, incrementCounter: Bool = false) async throws -> Survey {
-            guard let url = API_URLS.Surveys.surveyById else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.surveyById,
+                  !headers.isNil
+            else { throw APIError.invalidURL }
             
             var parameters: Parameters = ["survey_id": surveyReference.id]
             if incrementCounter {
@@ -1296,7 +1129,10 @@ class API {
         }
         
         public func reject(survey: Survey) async throws {
-            guard let url = API_URLS.Surveys.reject else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.reject,
+                  !headers.isNil
+            else { throw APIError.invalidURL }
+            
             var parameters: Parameters = ["survey": survey.id]
             if Surveys.shared.hot.count <= MIN_STACK_SIZE {
                 let stackList = Surveys.shared.hot.map { $0.id }
@@ -1331,7 +1167,9 @@ class API {
         }
         
         public func claim(surveyReference: SurveyReference, reason: Claim) async throws  {
-            guard let url = API_URLS.Surveys.claim else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.claim,
+                  !headers.isNil
+            else { throw APIError.invalidURL }
             
             let parameters: Parameters = ["survey_id": surveyReference.id, "claim_id": reason.id]
             
@@ -1349,7 +1187,9 @@ class API {
         }
         
         public func incrementViewCounter(surveyReference: SurveyReference) async throws {
-            guard let url = API_URLS.Surveys.incrementViews else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.incrementViews,
+                  !headers.isNil
+            else { throw APIError.invalidURL }
             
             let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: ["survey_id": surveyReference.id], encoding: JSONEncoding.default, headers: parent.headers())
             let json = try JSON(data: data, options: .mutableContainers)
@@ -1365,12 +1205,15 @@ class API {
         }
         
         public func surveyReferences(category: Survey.SurveyCategory, dateFilter: Period? = nil, topic: Topic? = nil, userprofile: Userprofile? = nil) async throws {
-            guard let url = category.url else { throw APIError.invalidURL }
+            guard let url = category.url,
+                  let headers = headers
+            else { throw APIError.invalidURL }
+            
             var parameters: Parameters!
             if category == .Topic, !topic.isNil {
                 parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
                 parameters["category_id"] = topic?.id
-            } else if category == .Userprofile, let userprofile = userprofile {
+            } else if category == .ByOwner, let userprofile = userprofile {
                 parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
                 parameters["userprofile_id"] = userprofile.id
             } else {
@@ -1382,7 +1225,7 @@ class API {
             }
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 try await MainActor.run {
                     Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
                 }
@@ -1422,13 +1265,21 @@ class API {
         
         
         public func updateSurveyStats(_ instances: [SurveyReference]) async throws {
-            guard let url = API_URLS.Surveys.updateStats else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.updateStats,
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             let parameters: Parameters = ["ids": instances.compactMap { $0.id }]
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
-                let json = try JSON(data: data, options: .mutableContainers)
+                let data = try await parent.requestAsync(url: url,
+                                                         httpMethod: .post,
+                                                         parameters: parameters,
+                                                         encoding: JSONEncoding.default,
+                                                         headers: headers)
+                let json = try JSON(data: data,
+                                    options: .mutableContainers)
+                
                 await MainActor.run {
                     Surveys.shared.updateSurveyStats(json)
                 }
@@ -1438,12 +1289,14 @@ class API {
         }
         
         public func updateResultStats(_ instance: SurveyReference) async throws {
-            guard let url = API_URLS.Surveys.updateResults else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.updateResults,
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             let parameters: Parameters = ["id": instance.id]
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 let json = try JSON(data: data, options: .mutableContainers)
                 await MainActor.run {
                     Surveys.shared.updateResultsStats(json)
@@ -1454,7 +1307,9 @@ class API {
         }
         
         func markFavorite(mark: Bool, surveyReference: SurveyReference) async {
-            guard let url = mark ? API_URLS.Surveys.addFavorite : API_URLS.Surveys.removeFavorite else {
+            guard let url = mark ? API_URLS.Surveys.addFavorite : API_URLS.Surveys.removeFavorite,
+                  let headers = headers
+            else {
                 NotificationCenter.default.post(name: Notifications.Surveys.FavoriteRequestFailure,
                                                 object: surveyReference)
                 return
@@ -1465,7 +1320,7 @@ class API {
                                               httpMethod: .post,
                                               parameters: ["survey_id": surveyReference.id],
                                               encoding: JSONEncoding.default,
-                                              headers: parent.headers())
+                                              headers: headers)
                 surveyReference.isFavorite = mark
             } catch {
                 NotificationCenter.default.post(name: Notifications.Surveys.FavoriteRequestFailure,
@@ -1474,11 +1329,14 @@ class API {
         }
         
         func search(substring: String, excludedIds: [Int]) async throws -> [SurveyReference] {
-            guard let url = API_URLS.Surveys.searchBySubstring else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.searchBySubstring,
+                  let headers = headers
+            else { throw APIError.invalidURL }
+            
             var parameters: Parameters = ["substring": substring]
             if !excludedIds.isEmpty { parameters["exclude_ids"] = excludedIds }
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
                                                            DateFormatter.dateTimeFormatter,
@@ -1502,7 +1360,9 @@ class API {
         }
         
         public func postComment(_ body: String, survey: Survey, replyTo: Comment? = nil, username: String? = nil) async throws -> Comment {
-            guard let url = API_URLS.Surveys.postComment else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.postComment,
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             var parameters: Parameters = ["survey": survey.id, "body": body,]
             
@@ -1515,7 +1375,7 @@ class API {
             }
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
@@ -1547,12 +1407,14 @@ class API {
         }
         
         public func claimComment(comment: Comment, reason: Claim) async throws {
-            guard let url = API_URLS.Surveys.claimComment else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.claimComment,
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             let parameters: Parameters = ["comment_id": comment.id, "claim_id": reason.id]
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 
                 let json = try JSON(data: data, options: .mutableContainers)
                 
@@ -1571,12 +1433,14 @@ class API {
         }
         
         public func deleteComment(comment: Comment) async throws {
-            guard let url = API_URLS.Surveys.deleteComment else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.deleteComment,
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             let parameters: Parameters = ["comment_id": comment.id]
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 
                 guard let json = try JSON(data: data, options: .mutableContainers) as? JSON,
                       let status = json["status"].string,
@@ -1599,7 +1463,9 @@ class API {
 
         
         public func requestRootComments(survey: Survey, excludedComments: [Comment] = []) async throws {
-            guard let url = API_URLS.Surveys.getRootComments else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.getRootComments,
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             var parameters: Parameters = ["survey": survey.id]
             
@@ -1608,7 +1474,7 @@ class API {
             }
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
@@ -1623,7 +1489,9 @@ class API {
         }
         
         public func requestChildComments(rootComment: Comment, excludedComments: [Comment] = []) async throws {
-            guard let url = API_URLS.Surveys.getChildComments else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.getChildComments,
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             var parameters: Parameters = ["root_id": rootComment.id]
             
@@ -1632,7 +1500,7 @@ class API {
             }
             
             do {
-                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
@@ -1648,19 +1516,23 @@ class API {
         
         @discardableResult
         public func getVoters(for answer: Answer) async throws -> Data {
-            guard let url = API_URLS.Surveys.voters else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.voters,
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             let parameters: Parameters = ["survey_id": answer.surveyID, "answer_id": answer.id, "exclude_ids": answer.voters.map({ return $0.id })]
             
             do {
-                return try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+                return try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
             } catch let error {
                 throw error
             }
         }
         
         func post(_ parameters: Parameters) async throws {
-            guard let url = API_URLS.Surveys.root else { throw APIError.invalidURL }
+            guard let url = API_URLS.Surveys.root,
+                  let headers = headers
+            else { throw APIError.invalidURL }
             
             do {
                 if parameters.keys.contains("media") {
@@ -1710,7 +1582,7 @@ class API {
                         }
                     }
                     
-                    let data = try await parent.uploadMultipartFormDataAsync(url: url, method: .post, multipartDataForm: multipartFormData, uploadProgress: {_ in})
+                    let data = try await parent.uploadMultipartFormDataAsync(url: url, method: .post, multipartDataForm: multipartFormData, headers: headers, uploadProgress: {_ in})
                     let json = try JSON(data: data, options: .mutableContainers)
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
@@ -1788,16 +1660,186 @@ class API {
         request(url: url, httpMethod: .get, encoding: URLEncoding.default) { completion($0) }
     }
     
-//    public func getVoters(answer: Answer, users: [Userprofile], completion: @escaping(Result<JSON, Error>)->()) {
-//        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTERS) else { completion(.failure(APIError.invalidURL)); return }
-//        guard let survey = answer.survey else { fatalError("answer.survey is nil") }
-//        let parameters: Parameters = ["survey": survey.id, "answer": answer.id, "voters": users.map { $0.id }]
-//        request(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding()) { completion($0) }
-//    }
+    public func getUserTopPublications(user: Userprofile, completion: @escaping(Result<JSON,Error>)->()) {
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.USER_PROFILE_TOP_PUBS) else { completion(.failure(APIError.invalidURL)); return }
+        let parameters: Parameters = ["userprofile_id": user.id]
+        request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.USER_PROFILE_TOP_PUBS), httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
+    }
     
+    func cancelAllRequests() {
+        self.sessionManager.session.getAllTasks { (tasks) in
+            tasks.forEach { $0.cancel() }
+        }
+        //        self.session.session.getTasksWithCompletionHandler {
+        //            (sessionDataTask, uploadData, downloadData) in
+        //            sessionDataTask.forEach { $0.cancel() }
+        //            uploadData.forEach { $0.cancel() }
+        //            downloadData.forEach { $0.cancel() }
+        //        }
+    }
+}
+
+private extension API {
+    func uploadMultipartFormDataAsync(url: URL, method: HTTPMethod, multipartDataForm: MultipartFormData, headers: HTTPHeaders, uploadProgress: @escaping (Double) -> ()?) async throws -> Data {
+        try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data, Error>) in
+        self.sessionManager.upload(multipartFormData: multipartDataForm, to: url, method: method, headers: headers)
+            .uploadProgress(closure: { prog in
+                uploadProgress(prog.fractionCompleted)
+            }).response { response in
+                switch response.result {
+                case .success(let value):
+                    guard let statusCode = response.response?.statusCode else {
+                        continuation.resume(throwing:APIError.httpStatusCodeMissing)
+                        return
+                    }
+                    guard let data = value else {
+                        continuation.resume(throwing: APIError.badData)
+                        return
+                    }
+                    do {
+                        //TODO: Определиться с инициализацией JSON
+                        let json = try JSON(data: data, options: .mutableContainers)
+                        guard 200...299 ~= statusCode else {
+                            continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString()))
+                            return
+                        }
+                        continuation.resume(returning: data)
+                        return
+                    } catch let error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
+                case let .failure(error):
+                    continuation.resume(throwing: error)
+                    return
+                }
+            }
+        }
+    }
     
+    ///Check token expiration time, refresh if needed
+    func accessControl(completion: @escaping (Result<Bool, Error>) -> ()) {
+        guard let expiryDate = (KeychainService.loadTokenExpireDateTime() as String?)?.toDateTime() else {
+            completion(.failure("Can't retrieve token expiration date from KeychainService"))
+            return
+        }
+        if Date() >= expiryDate {
+            refreshAccessToken { result in
+                completion(result)
+            }
+        } else {
+            completion (.success(true))
+        }
+    }
     
-    public func request(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, useHeaders: Bool = true, accessControl useAccessControl: Bool = true, completion: @escaping(Result<JSON, Error>)->()) {
+    func accessControlAsync() async throws {
+        func refreshAccessTokenAsync() async throws {
+            guard let refreshToken = (KeychainService.loadRefreshToken() as String?) else {
+                throw "Error occured while retrieving refresh token from KeychainService"
+            }
+            //            print(refreshToken)
+            let parameters = [
+                "client_id": API_URLS.CLIENT_ID,
+                "client_secret": API_URLS.CLIENT_SECRET,
+                "grant_type": "refresh_token",
+                "refresh_token": "\(refreshToken)"
+            ]
+            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else {
+                throw APIError.invalidURL
+            }
+            
+            do {
+                let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil, accessControl: false)
+                let json = try JSON(data: data, options: .mutableContainers)
+                saveTokenInKeychain(json: json)
+            } catch {
+                throw error
+            }
+        }
+        
+        guard let nsstring = KeychainService.loadTokenExpireDateTime(),
+              let expiryDate = (nsstring as String).dateTime else {
+            throw "Can't retrieve token expiration date from KeychainService"
+        }
+        guard Date() >= expiryDate else { return }
+        do {
+            try await refreshAccessTokenAsync()
+        } catch {
+            throw error
+        }
+    }
+
+    func refreshAccessToken(completion: @escaping (Result<Bool, Error>) -> ()) {
+        guard let refreshToken = (KeychainService.loadRefreshToken() as String?) else {
+            completion(.failure("Error occured while retrieving refresh token from KeychainService"))
+            return
+        }
+        let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "refresh_token", "refresh_token": "\(refreshToken)"]
+        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else {
+            completion(.failure(APIError.invalidURL))
+            return
+        }
+        
+        self.sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil).response { response in
+            switch response.result {
+            case .success(let value):
+                guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
+                guard let data = value else { completion(.failure(APIError.badData)); return }
+                do {
+                    let json = try JSON(data: data, options: .mutableContainers)
+                    guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+                    completion(saveTokenInKeychain(json: json))
+                } catch let _error {
+                    completion(.failure(_error))
+                }
+            case let .failure(_error):
+                completion(.failure(_error))
+            }
+        }
+    }
+    
+    @discardableResult
+    func requestAsync(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, headers: HTTPHeaders? = nil, accessControl: Bool = true) async throws -> Data {
+        
+        func request() async throws -> Data {
+            try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data,Error>) in
+                self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseData { response in
+                    switch response.result {
+                    case .success(let data):
+                        guard let statusCode = response.response?.statusCode else { continuation.resume(throwing: APIError.httpStatusCodeMissing); return }
+                        do {
+                            let json = try JSON(data: data, options: .mutableContainers)
+                            guard 200...299 ~= statusCode else { continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString())); return }
+                            continuation.resume(returning: data)
+                            return
+                        } catch {
+                            continuation.resume(throwing: error)
+                            return
+                        }
+                    case let .failure(error):
+#if DEBUG
+                        print(error.localizedDescription)
+#endif
+                        continuation.resume(throwing: error)
+                        return
+                    }
+                }
+            }
+        }
+        
+        do {
+            if accessControl {
+                try await accessControlAsync()
+                return try await request()
+            } else {
+                return try await request()
+            }
+        } catch {
+            throw error
+        }
+    }
+    
+    func request(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, useHeaders: Bool = true, accessControl useAccessControl: Bool = true, completion: @escaping(Result<JSON, Error>)->()) {
         if useAccessControl {
             accessControl { result in
                 switch result {
@@ -1876,357 +1918,5 @@ class API {
         //            }
         //            completion(json, error)
         //        }
-    }
-    
-//    private func _performRequest(url: URL, searchString: String, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, completion: @escaping(Bool?, Error?)->()) {
-//        var flag: Bool?
-//        var error: Error?
-//        let headers: HTTPHeaders = [
-//            "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
-//            "Content-Type": "application/json"
-//        ]
-//
-//        self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).response { response in
-//            switch response.result {
-//            case .success(let value):
-//                do {
-//                    //TODO: Определиться с инициализацией JSON
-//                    let json = try JSON(data: value!, options: .mutableContainers)
-//                    if let statusCode = response.response?.statusCode {
-//                        if 200...299 ~= statusCode {
-//                            for attr in json {
-//                                if attr.0 ==  searchString {
-//                                    flag = attr.1.boolValue
-//                                }
-//                                if attr.0 ==  "error" {
-//                                    error = NSError(domain:"", code:404 , userInfo:[ NSLocalizedDescriptionKey: attr.1.stringValue]) as Error
-//                                }
-//                            }
-//                        } else if 400...499 ~= statusCode, let errorDescription = json.rawString() {
-//                            error = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
-//                        }
-//                    }
-//                }  catch let _error {
-//                    error = _error
-//                }
-//            case let .failure(_error):
-//                error = self.parseAFError(_error)
-//                debugPrint(error!)
-//            }
-//            completion(flag, error)
-//        }
-//    }
-    
-    //    @available(iOS 13.0.0, *)
-    //    func downloadAsync(url: URL) async throws -> U {
-    //        guard let url = URL(string: SERVER_URLS.BASE)?.appendingPathComponent(SERVER_URLS.APP_LAUNCH) else {
-    //            throw APIError.notFound
-    //        }
-    //        do {
-    //            let data = try await afRequest(url: url, httpMethod: .get, parameters: [:], encoding: URLEncoding.default, headers: headers())
-    //            do {
-    //                let json = try JSON(data: data, options: .mutableContainers)
-    //                return json
-    //            } catch {
-    //                throw error
-    //            }
-    //        } catch let error {
-    //            throw error
-    //        }
-    //    }
-    
-    public func downloadImage(url: URL, downloadProgress: @escaping (Double) -> (), completion: @escaping(Result<UIImage, Error>)->()) {
-        accessControl { result in
-            switch result {
-            case .success:
-                self.sessionManager.download(url)
-                    .downloadProgress { progress in
-                        downloadProgress(progress.fractionCompleted)
-                    }
-                    .responseData { response in
-                        guard let data = response.value else { completion(.failure(APIError.badData)); return }
-                        guard let image = UIImage(data: data) else { completion(.failure(APIError.badImage)); return }
-                        completion(.success(image))
-                    }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
-    public func downloadFile(url: URL, downloadProgress: @escaping (Double) -> (), completion: @escaping(Result<Data, Error>)->()) {
-        accessControl { result in
-            switch result {
-            case .success:
-                self.sessionManager.download(url)
-                    .downloadProgress { progress in
-                        downloadProgress(progress.fractionCompleted)
-                    }
-                    .responseData { response in
-                        guard let data = response.value else { completion(.failure(APIError.badData)); return }
-                        completion(.success(data))
-                    }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
-//    public func downloadImage(url _url: URL, completion: @escaping (UIImage?, Error?) -> ()) {
-//        var error: Error?
-//
-//        checkForReachability {
-//            reachable in
-//            if reachable == .Reachable {
-//                self.accessControl() {
-//                    success, error in
-//                    if error != nil {
-//                        completion(nil, error)
-//                    } else if success {
-//                        performRequest()
-//                    }
-//                }
-//            } else {
-//                completion(nil, "Server is unreachable")
-//            }
-//        }
-//
-//        func performRequest() {
-//            self.sessionManager.download(_url).responseData { response in
-//                if let data = response.value {
-//                    let image = UIImage(data: data)
-//                    completion(image, nil)
-//                } else {
-//                    completion(nil, "Image initialization failure")
-//                }
-//            }
-//        }
-//    }
-    
-    //progressClosure: @escaping (CGFloat) -> ()
-    public func uploadMultipartFormData(url: URL, method: HTTPMethod, multipartDataForm: MultipartFormData, uploadProgress: @escaping (Double) -> ()?, completion: @escaping(Result<JSON,Error>) -> ()) {
-        self.sessionManager.upload(multipartFormData: multipartDataForm, to: url, method: method, headers: headers())
-            .uploadProgress(closure: { prog in
-                print("Upload Progress: \(prog.fractionCompleted)")
-                uploadProgress(prog.fractionCompleted)
-            })
-            .response { response in
-                switch response.result {
-                case .success(let value):
-                    guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
-                    guard let data = value else { completion(.failure(APIError.badData)); return }
-                    do {
-                        //TODO: Определиться с инициализацией JSON
-                        let json = try JSON(data: data, options: .mutableContainers)
-                        guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
-                        completion(.success(json))
-                    } catch let error {
-                        completion(.failure(error))
-                    }
-                case let .failure(error):
-                    completion(.failure(error))
-                }
-            }
-        
-        
-//        self.sessionManager.upload(multipartFormData: { multipartFormData in
-//            var imgExt: FileFormat = .Unknown
-//            var imageData: Data?
-//            if let data = image.keys.first!.jpegData(compressionQuality: 1) {
-//                imageData = data
-//                imgExt = .JPEG
-//            } else if let data = image.keys.first!.pngData() {
-//                imageData = data
-//                imgExt = .PNG
-//            }
-//            multipartFormData.append(imageData!, withName: "image", fileName: "\(AppData.shared.profile.id!).\(imgExt.rawValue)", mimeType: "jpg/png")
-//            multipartFormData.append("\(surveyID)".data(using: .utf8)!, withName: "survey")
-//            multipartFormData.append("\(index)".data(using: .utf8)!, withName: "order")
-//            if !(image.values.first?.isEmpty)! {
-//                multipartFormData.append(image.values.first!.data(using: .utf8)!, withName: "title")
-//            }
-//        }, to: url, method: HTTPMethod.patch, headers: headers).uploadProgress(queue: .main, closure: { progress in
-//            print("Upload Progress: \(progress.fractionCompleted)")
-//        }).response { response in
-//            switch response.result {
-//            case .success(let value):
-//                do {
-//                    //TODO: Определиться с инициализацией JSON
-//                    json = try JSON(data: value!, options: .mutableContainers)
-//                    if let statusCode = response.response?.statusCode {
-//                        if 200...299 ~= statusCode {
-//                            print("Upload complete: \(String(describing: json))")
-//                        } else if 400...499 ~= statusCode, let errorDescription = json?.rawString() {
-//                            uploadError = NSError(domain:"", code:404, userInfo:[ NSLocalizedDescriptionKey: errorDescription]) as Error
-//                            print(uploadError!)
-//                        }
-//                    }
-//                    completion(json, error)
-//                }  catch let _error {
-//                    uploadError = _error
-//                    print(_error.localizedDescription)
-//                }
-//            case let .failure(_error):
-//                uploadError = _error
-//                completion(nil, error)
-//            }
-//        }
-    }
-    
-    public func uploadMultipartFormDataAsync(url: URL, method: HTTPMethod, multipartDataForm: MultipartFormData, uploadProgress: @escaping (Double) -> ()?) async throws -> Data {
-        try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data, Error>) in
-        self.sessionManager.upload(multipartFormData: multipartDataForm, to: url, method: method, headers: headers())
-            .uploadProgress(closure: { prog in
-                uploadProgress(prog.fractionCompleted)
-            }).response { response in
-                switch response.result {
-                case .success(let value):
-                    guard let statusCode = response.response?.statusCode else {
-                        continuation.resume(throwing:APIError.httpStatusCodeMissing)
-                        return
-                    }
-                    guard let data = value else {
-                        continuation.resume(throwing: APIError.badData)
-                        return
-                    }
-                    do {
-                        //TODO: Определиться с инициализацией JSON
-                        let json = try JSON(data: data, options: .mutableContainers)
-                        guard 200...299 ~= statusCode else {
-                            continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString()))
-                            return
-                        }
-                        continuation.resume(returning: data)
-                        return
-                    } catch let error {
-                        continuation.resume(throwing: error)
-                        return
-                    }
-                case let .failure(error):
-                    continuation.resume(throwing: error)
-                    return
-                }
-            }
-        }
-    }
-    
-    public func downloadImageAsync(from url: URL, timeoutInterval: TimeInterval = 30) async throws -> UIImage {
-//        if #available(iOS 15.0, *) {
-//            var request = URLRequest.init(url:url)
-//            request.timeoutInterval = timeoutInterval
-//            let (data, response) = try await URLSession.shared.data(for: request)
-//            guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw APIError.invalidURL }
-//            guard let image = UIImage(data: data) else {
-//                throw APIError.badImage
-//            }
-//            return image
-//            //            guard let thumbnail = await maybeImage?.thumbnail else { throw FetchError.badImage }
-//            //            return  UImage(uiImage: thumbnail)
-//        } else {
-            try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<UIImage, Error>) in
-                self.sessionManager.download(url).responseData { response in
-                    switch response.result {
-                    case .success(let data):
-                        guard let statusCode = response.response?.statusCode else {
-                            continuation.resume(throwing: APIError.httpStatusCodeMissing)
-                            return
-                        }
-                        guard 200...299 ~= statusCode else { continuation.resume(throwing:  APIError.unexpected(code: statusCode)); return }
-                        guard let image = UIImage(data: data) else { continuation.resume(throwing: APIError.badImage); return }
-                        continuation.resume(returning: image)
-                        return
-                    case .failure(let error):
-                        continuation.resume(throwing: error)
-                        return
-                    }
-                }
-            }
-//            fatalError("should not get here")
-//        }
-    }
-    
-    public func getUserTopPublications(user: Userprofile, completion: @escaping(Result<JSON,Error>)->()) {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.USER_PROFILE_TOP_PUBS) else { completion(.failure(APIError.invalidURL)); return }
-        let parameters: Parameters = ["userprofile_id": user.id]
-        request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.USER_PROFILE_TOP_PUBS), httpMethod: .get, parameters: parameters, encoding: URLEncoding.default) { completion($0) }
-    }
-    
-    public func sendPasswordResetLink(_ email: String) async throws {
-        do {
-            guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.RESET_PASSWORD) else {
-                throw APIError.notFound
-            }
-            let parameters: Parameters = ["email": email]
-            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding.default, headers: nil)
-            guard try JSON(data: data, options: .mutableContainers)["status"] == "OK" else { throw "Email error" }
-        } catch {
-            throw error
-        }
-    }
-    
-    public func getCountryByIP()  {
-        guard let url = URL(string: API_URLS.Geocoding.countryByIP) else {
-            return
-        }
-        request(url: url, httpMethod: .get,
-                parameters: nil,
-                encoding: URLEncoding.default,
-                useHeaders: false,
-                accessControl: false) { result in
-            switch result {
-            case .success(let json):
-                guard let code = json["countryCode"].string else { return }
-                UserDefaults.App.countryByIP = code
-            case .failure(let error):
-#if DEBUG
-                print(error)
-#endif
-            }
-        }
-    }
-//    public func getCountryByIP() async throws {
-//        guard let url = URL(string: API_URLS.Geocoding.countryByIP) else {
-//            throw APIError.notFound
-//        }
-//        do {
-//            let data = try await requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: nil, accessControl: false)
-//            let json = try JSON(data: data, options: .mutableContainers)
-//            print(json)
-//        } catch let error {
-//            throw error
-//        }
-//    }
-    
-    func cancelAllRequests() {
-        self.sessionManager.session.getAllTasks { (tasks) in
-            tasks.forEach { $0.cancel() }
-        }
-        //        self.session.session.getTasksWithCompletionHandler {
-        //            (sessionDataTask, uploadData, downloadData) in
-        //            sessionDataTask.forEach { $0.cancel() }
-        //            uploadData.forEach { $0.cancel() }
-        //            downloadData.forEach { $0.cancel() }
-        //        }
-    }
-}
-
-extension API {
-    ///Return city `id`
-    public func saveCity(_ parameters: Parameters) async throws -> City {
-        guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CREATE_CITY) else {
-            throw APIError.notFound
-        }
-        do {
-            let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers())
-            
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                       DateFormatter.dateTimeFormatter,
-                                                       DateFormatter.dateFormatter ]
-            return try decoder.decode(City.self, from: data)
-//            guard let id = try JSON(data: data, options: .mutableContainers)["id"].int else { throw "City id error" }
-        } catch let error {
-            throw error
-        }
     }
 }

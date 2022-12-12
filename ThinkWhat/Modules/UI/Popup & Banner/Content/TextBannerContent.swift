@@ -1,74 +1,38 @@
 //
-//  UserNotificationContent.swift
+//  TextBannerContent.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 28.10.2022.
+//  Created by Pavel Bukharov on 12.12.2022.
 //  Copyright © 2022 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 import Combine
 
-class UserNotificationContent: UIView {
-    
-    enum Mode: String {
-        case Subscribe = "subscribe_to_user_notification"
-        case Unsubscribe = "unsubscribe_from_user_notification"
-        case NotifyOnPublication = "user_publication_notification_on"
-        case DontNotifyOnPublication = "user_publication_notification_off"
-        
-        func localizedDescription(userprofile: Userprofile) -> String {
-            switch self {
-            case .Subscribe:
-                return self.rawValue.localized + " " + userprofile.name + " ✅"
-            case .Unsubscribe:
-                return self.rawValue.localized + " " + userprofile.name + " ⛔️"
-            case .NotifyOnPublication:
-                return "user_publication_notification_begin".localized + userprofile.name + self.rawValue.localized + " 🔔"
-            case .DontNotifyOnPublication:
-                return "user_publication_notification_begin".localized + userprofile.name + self.rawValue.localized + " 🔕"
-            }
-        }
-    }
-    
-    
-    
-    // MARK: - Overridden properties
-    
-    
-    
-    // MARK: - Public properties
-    
-    
+class TextBannerContent: UIView {
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
-    private let mode: Mode
-    private let textColor: UIColor
     private weak var userprofile: Userprofile!
     private lazy var imageView: UIImageView = {
-        let instance = UIImageView(image: userprofile.image)
-        instance.contentMode = .scaleAspectFill
+        let instance = UIImageView(image: image)
+        instance.contentMode = .scaleAspectFit
         instance.clipsToBounds = true
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-        instance.publisher(for: \.bounds)
-            .sink { rect in
-                instance.cornerRadius = rect.height/2
-            }
-            .store(in: &subscriptions)
+        instance.tintColor = imageTintColor
         
         return instance
     }()
     private lazy var label: UILabel = {
         let instance = UILabel()
-        instance.textColor = textColor
+        instance.textColor = .label
         instance.numberOfLines = 0
         instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline)
-        instance.text = mode.localizedDescription(userprofile: userprofile)
-        instance.textAlignment = .natural//instance.numberOfTotatLines == 1 ? .center : .left
+        instance.text = text.localized
+        instance.textAlignment = .natural
         
         return instance
     }()
@@ -86,6 +50,9 @@ class UserNotificationContent: UIView {
         
         return instance
     }()
+    private let image: UIImage
+    private let text: String
+    private let imageTintColor: UIColor
     
     
     
@@ -103,10 +70,10 @@ class UserNotificationContent: UIView {
     
     
     // MARK: - Initialization
-    init(mode: Mode, userprofile: Userprofile, textColor: UIColor = .label) {
-        self.mode = mode
-        self.userprofile = userprofile
-        self.textColor = textColor
+    init(image: UIImage, text: String, tintColor: UIColor) {
+        self.image = image
+        self.text = text
+        self.imageTintColor = tintColor
         
         super.init(frame: .zero)
         
@@ -118,12 +85,6 @@ class UserNotificationContent: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    
-    // MARK: - Public methods
-    
-    
-    
     // MARK: - Overridden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -131,7 +92,7 @@ class UserNotificationContent: UIView {
     }
 }
 
-private extension UserNotificationContent {
+private extension TextBannerContent {
     func setupUI() {
         backgroundColor = .clear
         stack.place(inside: self)
@@ -147,4 +108,5 @@ private extension UserNotificationContent {
 //        })
     }
 }
+
 

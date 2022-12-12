@@ -9,15 +9,15 @@
 //import UIKit
 //
 //class CustomNavigationController: UINavigationController {
-//    
+//
 //    deinit {
 //        print("CustomNavigationController deinit")
 //        viewControllers.removeAll()
 //    }
-//    
+//
 //    enum TransitionStyle {
 //        case Default, Auth
-//        
+//
 //        func transition(navigationController _nav: UINavigationController, operation: UINavigationController.Operation) -> UIViewControllerAnimatedTransitioning? {
 //            switch self {
 //            case .Auth:
@@ -28,7 +28,7 @@
 //            }
 //        }
 //    }
-//    
+//
 //    var duration: TimeInterval = 0
 //    var isShadowed = false {
 //        didSet {
@@ -59,7 +59,7 @@
 //    }
 //    var category: Topic!
 //    var transitionStyle: TransitionStyle = .Default
-//    
+//
 //    override func viewDidLoad() {
 //        super.viewDidLoad()
 //        delegate = appDelegate.transitionCoordinator
@@ -67,7 +67,7 @@
 //        ]
 //        navigationBar.tintColor = .label
 //    }
-//    
+//
 //    override func present(_ viewControllerToPresent: UIViewController,
 //                            animated flag: Bool,
 //                            completion: (() -> Void)? = nil) {

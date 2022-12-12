@@ -69,6 +69,7 @@ class TopicCell: UICollectionViewListCell {
         
         var newConfiguration = TopicCellConfiguration().updated(for: state)
         newConfiguration.topicItem = item
+        tintColor = item.topic.tagColor
         
         contentConfiguration = newConfiguration
     }
@@ -123,6 +124,8 @@ class TopicCellContent: UIView, UIContentView {
         }
     }
     
+    
+    
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
@@ -148,17 +151,26 @@ class TopicCellContent: UIView, UIContentView {
         
         return instance
     }()
-    private lazy var topicLabel: UIView = {
+    private lazy var topicLabel: UIStackView = {
+        let opaque = UIView()
+        opaque.backgroundColor = .clear
+        opaque.widthAnchor.constraint(equalToConstant: 0).isActive = true
+        
         let instance = UIStackView(arrangedSubviews: [
+            opaque,
             topicIcon,
             topicTitle
         ])
         instance.axis = .horizontal
-        instance.spacing = 2
+        instance.spacing = 4
+        instance.layer.insertSublayer(gradient, at: 0)//(gradient)
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
+                guard let layer = instance.layer.getSublayer(identifier: "radialGradient"),
+                      layer.bounds != rect
+                else { return }
                 
-                instance.cornerRadius = rect.height/2.25
+                layer.frame = rect
             }
             .store(in: &subscriptions)
         
@@ -167,11 +179,11 @@ class TopicCellContent: UIView, UIContentView {
     private lazy var topicDescription: UILabel = {
         let instance = UILabel()
         instance.text = "There's gonna be a description of the topic"
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
         instance.textAlignment = .left
         instance.numberOfLines = 1
         instance.lineBreakMode = .byTruncatingTail
-        instance.textColor = .label
+        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .darkGray : .label
         
         return instance
     }()
@@ -179,7 +191,7 @@ class TopicCellContent: UIView, UIContentView {
         let instance = Icon()
         instance.isRounded = false
         instance.iconColor = .white
-        instance.scaleMultiplicator = 1.75
+        instance.scaleMultiplicator = 1.65
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
 //        instance.iconColor = currentConfiguration.isNil ? .systemGray : currentConfiguration.topicItem.topic.tagColor
         return instance
@@ -215,13 +227,32 @@ class TopicCellContent: UIView, UIContentView {
     }()
     @MainActor private lazy var viewsLabel: UILabel = {
         let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .callout)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
         instance.textAlignment = .right
         instance.textColor = .label
         
         return instance
     }()
+    private lazy var gradient: CAGradientLayer = {
+        let instance = CAGradientLayer()
+        instance.type = .radial
+        instance.colors = getGradientColors(color: .systemGray)
+        instance.locations = [0, 0.5, 1.15]
+        instance.setIdentifier("radialGradient")
+        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+        instance.endPoint = CGPoint(x: 1, y: 1)
+        instance.publisher(for: \.bounds)
+            .filter { $0 != .zero }
+            .sink { rect in
+                instance.cornerRadius = rect.height/2.25
+            }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
     private let padding: CGFloat = 10
+    
+    
     
     // MARK: - Destructor
     deinit {
@@ -233,6 +264,8 @@ class TopicCellContent: UIView, UIContentView {
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
+    
+    
     
     // MARK: - Initalization
     init(configuration: TopicCellConfiguration) {
@@ -259,8 +292,8 @@ class TopicCellContent: UIView, UIContentView {
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        topicTitle.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                            forTextStyle: .title3)
+        topicTitle.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                            forTextStyle: .headline)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .callout)
         
@@ -278,11 +311,16 @@ private extension TopicCellContent {
         guard currentConfiguration != configuration else { return }
         currentConfiguration = configuration
         
+        let color = currentConfiguration.topicItem.topic.tagColor
+        gradient.colors = getGradientColors(color: color)
 //        topicIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.topicItem.topic.tagColor
-        topicIcon.category = Icon.Category(rawValue: currentConfiguration.topicItem.topic.id) ?? .Null
+        topicIcon.category = currentConfiguration.topicItem.topic.iconCategory
         topicTitle.text = currentConfiguration.topicItem.title.uppercased()
+        topicDescription.text = currentConfiguration.topicItem.description
+//        topicDescription.textColor = traitCollection.userInterfaceStyle == .dark ? .darkGray : .label
         viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.active.roundedWithAbbreviations)
-        topicLabel.backgroundColor = currentConfiguration.topicItem.topic.tagColor
+//        viewsLabel.textColor = color
+//        topicLabel.backgroundColor = currentConfiguration.topicItem.topic.tagColor
         
         guard let constraint = topicTitle.getConstraint(identifier: "height") else { return }
         
@@ -301,7 +339,7 @@ private extension TopicCellContent {
         
         NSLayoutConstraint.activate([
             horizontalStack.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: padding/2),
-            horizontalStack.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor, constant: padding),
+            horizontalStack.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor, constant: 0),
             topicLabel.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)),
             //            iconContainer.widthAnchor.constraint(equalTo: horizontalStack.widthAnchor, multiplier: 0.15)
             //            horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
@@ -312,12 +350,20 @@ private extension TopicCellContent {
             //            horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor, constant: padding)
         ])
         
-        let constr = horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor, constant: padding/2)
+        let constr = horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor, constant: 0)
         constr.priority = .defaultHigh
         constr.isActive = true
         
         let constraint = topicDescription.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -padding/2)
         constraint.priority = .defaultLow
         constraint.isActive = true
+    }
+    
+    func getGradientColors(color: UIColor) -> [CGColor] {
+        return [
+            color.cgColor,
+            color.cgColor,
+            color.lighter(0.05).cgColor,
+        ]
     }
 }

@@ -9,16 +9,13 @@
 import UIKit
 import Combine
 
-/// *View* sends user actions to the *Controller*.
-///
-/// **Controller** conforms to this protocol
 protocol PollViewInput: AnyObject {
     
     var controllerOutput: PollControllerOutput? { get set }
     var controllerInput: PollControllerInput? { get set }
     var survey: Survey? { get }
     var surveyReference: SurveyReference { get }
-    var showNext: Bool { get }
+//    var showNext: Bool { get }
     var mode: PollController.Mode { get }
     
     func onClaim(_: Claim)
@@ -37,9 +34,6 @@ protocol PollViewInput: AnyObject {
     func deleteComment(_:Comment)
 }
 
-/// *Controller* tells the *Model* what to do based on the input
-///
-/// **Model** conforms to this protocol
 protocol PollControllerInput: AnyObject {
     
     var modelOutput: PollModelOutput? { get set }
@@ -57,9 +51,6 @@ protocol PollControllerInput: AnyObject {
     func deleteComment(_:Comment)
 }
 
-/// *Model* returns the result to the *Controller*
-///
-/// **Controller** conforms to this protocol
 protocol PollModelOutput: AnyObject {
     var survey: Survey? { get }
     
@@ -70,9 +61,6 @@ protocol PollModelOutput: AnyObject {
     func commentDeleteError()
 }
 
-/// *Controller* returns a UI-representable result to the *View*
-///
-/// **View** conforms to this protocol
 protocol PollControllerOutput: AnyObject {
     var viewInput: (PollViewInput & UIViewController)? { get set }
     var survey: Survey? { get }
@@ -81,7 +69,7 @@ protocol PollControllerOutput: AnyObject {
 //    var showNext: Bool { get }
     var mode: PollController.Mode { get }
 //    @Published var lastContentOffsetY: CGFloat { get }
-    var scrollOffsetPublisher: Published<CGFloat>.Publisher { get }
+//    var scrollOffsetPublisher: Published<CGFloat>.Publisher { get }
     
 //    func onSurveyLoaded()
     func onLoadCallback()

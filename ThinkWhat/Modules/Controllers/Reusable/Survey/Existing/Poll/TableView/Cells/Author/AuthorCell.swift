@@ -82,17 +82,18 @@ class AuthorCell: UITableViewCell {
         } else if let image = survey.owner.image {
             avatar.image = image
         } else {
-            Task {
-                do {
-                    let data = try await survey.owner.downloadImageAsync()
-                    await MainActor.run { avatar.image = data}
-                } catch {}
-            }
+            fatalError()
+//            Task {
+//                do {
+//                    let data = try await survey.owner.downloadImageAsync()
+//                    await MainActor.run { avatar.image = data}
+//                } catch {}
+//            }
         }
         let categoryString = NSMutableAttributedString()
-        categoryString.append(NSAttributedString(string: "\(survey.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.localized.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//        categoryString.append(NSAttributedString(string: "\(survey.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//        categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//        categoryString.append(NSAttributedString(string: "\(survey.topic.parent!.localized.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .white : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topic.attributedText = categoryString
         user.text = survey!.owner.firstName
         var rating = min(Double(survey.votesTotal)*5/Double(survey.views), 5)//.rounded(toPlaces: 1)
@@ -113,16 +114,16 @@ class AuthorCell: UITableViewCell {
         switch traitCollection.userInterfaceStyle {
         case .dark:
             let categoryString = NSMutableAttributedString()
-            categoryString.append(NSAttributedString(string: "\(survey!.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.localized.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//            categoryString.append(NSAttributedString(string: "\(survey!.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//            categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//            categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.localized.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: .white, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
             self.viewsIcon.setIconColor(.systemBlue)
         default:
             let categoryString = NSMutableAttributedString()
-            categoryString.append(NSAttributedString(string: "\(survey!.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-            categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.localized.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//            categoryString.append(NSAttributedString(string: "\(survey!.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//            categoryString.append(NSAttributedString(string: " / ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 12), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//            categoryString.append(NSAttributedString(string: "\(survey!.topic.parent!.localized.uppercased())  ", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11), foregroundColor: survey!.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
             self.topic.attributedText = categoryString
             self.viewsIcon.setIconColor(.black)
         }

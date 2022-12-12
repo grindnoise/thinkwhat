@@ -79,7 +79,7 @@ class LargeCard: UIView, HotCard {
                 slide.image = image//survey!.images![index]?.keys.first
                 slide.progressIndicatorView.alpha = 0
             } else if let url = media.imageURL {
-                API.shared.downloadImage(url: url) { progress in
+                API.shared.system.downloadImage(url: url) { progress in
                     self.slide.progressIndicatorView.progress = progress
                 } completion: { result in
                     switch result {
@@ -100,12 +100,13 @@ class LargeCard: UIView, HotCard {
         }
         
         guard let image = survey.owner.image else {
-            Task {
-                do {
-                    let data = try await survey.owner.downloadImageAsync()
-                    await MainActor.run { avatar.image = data}
-                } catch {}
-            }
+//            fatalError()
+//            Task {
+//                do {
+//                    let data = try await survey.owner.downloadImageAsync()
+//                    await MainActor.run { avatar.image = data}
+//                } catch {}
+//            }
             return
         }
         avatar.image = image
@@ -115,11 +116,11 @@ class LargeCard: UIView, HotCard {
         guard !survey.isNil else { return }
         let fontSize: CGFloat = topicTitle.bounds.width * 0.1
         let topicTitleString = NSMutableAttributedString()
-        topicTitleString.append(NSAttributedString(string: "\(survey.topic.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicTitleString.append(NSAttributedString(string: "\(survey.topic.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topicTitle.attributedText = topicTitleString
         
         let topicSubtitleString = NSMutableAttributedString()
-        topicSubtitleString.append(NSAttributedString(string: "\(survey.topic.parent!.localized.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicSubtitleString.append(NSAttributedString(string: "\(survey.topic.parent!.title.uppercased())", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : survey.topic.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topicSubtitle.attributedText = topicSubtitleString
         
         let firstNameString = NSMutableAttributedString()

@@ -122,7 +122,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
         instance.spacing = 0
         instance.clipsToBounds = false
         instance.layer.zPosition = 100
-        view.addSubview(instance)
+//        view.addSubview(instance)
         
         return instance
     }()
@@ -163,28 +163,28 @@ class MainController: UITabBarController {//}, StorageProtocol {
     // MARK: - Public methods
     func setLogoInitialFrame(size: CGSize, y: CGFloat) {
         
-        guard logoStack.frame == .zero else { return }
-        
-        logoStack.translatesAutoresizingMaskIntoConstraints = false
-        logoStack.heightAnchor.constraint(equalToConstant: size.height * 0.65).isActive = true
-        
-        let leading = logoStack.leadingAnchor.constraint(equalTo: view.leadingAnchor)
-        leading.identifier = "leading"
-        leading.isActive = true
-        
-        let top = logoStack.topAnchor.constraint(equalTo: view.topAnchor)
-        top.identifier = "top"
-        top.isActive = true
-        
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-        
-        logoCenterY = y  - self.logoStack.bounds.height/2
-        
-        view.setNeedsLayout()
-        top.constant = logoCenterY//-logoStack.bounds.height
-        leading.constant = (view.bounds.width - logoStack.bounds.width)/2
-        view.layoutIfNeeded()
+//        guard logoStack.frame == .zero else { return }
+//
+//        logoStack.translatesAutoresizingMaskIntoConstraints = false
+//        logoStack.heightAnchor.constraint(equalToConstant: size.height * 0.65).isActive = true
+//
+//        let leading = logoStack.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+//        leading.identifier = "leading"
+//        leading.isActive = true
+//
+//        let top = logoStack.topAnchor.constraint(equalTo: view.topAnchor)
+//        top.identifier = "top"
+//        top.isActive = true
+//
+//        view.setNeedsLayout()
+//        view.layoutIfNeeded()
+//
+//        logoCenterY = y  - self.logoStack.bounds.height/2
+//
+//        view.setNeedsLayout()
+//        top.constant = logoCenterY//-logoStack.bounds.height
+//        leading.constant = (view.bounds.width - logoStack.bounds.width)/2
+//        view.layoutIfNeeded()
         
 //        UIView.animate(withDuration: 0.15) { [unowned self] in
 //            self.view.setNeedsLayout()
@@ -251,13 +251,6 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 print("Something went wrong")
             }
         }
-        
-        let banner = Popup(heightScaleFactor: 0.7)
-        banner.present(content: UIView(), dismissAfter: 1)
-        banner.didDisappearPublisher
-            .sink { _ in banner.removeFromSuperview() }
-            .store(in: &self.subscriptions)
-        
     }
 }
 
@@ -348,7 +341,7 @@ private extension MainController {
     func loadData() {
         Task {
             do {
-                let json = try await API.shared.appLaunch()
+                let json = try await API.shared.system.appLaunch()
     //            API.shared.setWaitsForConnectivity()
     //            if let balance = json[DjangoVariables.UserProfile.balance].int {
     //                Userprofiles.shared.current!.balance = balance
@@ -412,6 +405,7 @@ private extension MainController {
             navigationController.tabBarItem.selectedImage = selectedImage
             navigationController.navigationBar.prefersLargeTitles = true
             navigationController.setNavigationBarHidden(true, animated: false)
+//            navigationController.delegate = appDelegate.transitionCoordinator
             rootViewController.navigationItem.title = title.localized
             rootViewController.tintColor = color
             
@@ -681,7 +675,7 @@ extension MainController: UITabBarControllerDelegate {
             self.logoText.iconColor = color
         }
         
-        if let nav = viewController as? NavigationController,
+        if let nav = viewController as? UINavigationController,
            let controller = nav.viewControllers.first {
             switch controller.self {
             case is HotController:

@@ -91,6 +91,7 @@ class ListController: UIViewController, TintColorable {
         super.viewDidLoad()
 
         let model = ListModel()
+//        let view = ListView()
                
         self.controllerOutput = view as? ListView
         self.controllerOutput?
@@ -98,6 +99,7 @@ class ListController: UIViewController, TintColorable {
         self.controllerInput = model
         self.controllerInput?
             .modelOutput = self
+//        self.view = view as UIView
         
         ProtocolSubscriptions.subscribe(self)
         setupUI()
@@ -119,12 +121,16 @@ class ListController: UIViewController, TintColorable {
         main.toggleLogo(on: true)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        setSwitchHidden(false)
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        UIView.animate(withDuration: 0.1) {
-            self.titleStack.alpha = 0
-        }
+        setSwitchHidden(true)
     }
 //
 //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -132,6 +138,30 @@ class ListController: UIViewController, TintColorable {
 //
 //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
 //    }
+    
+    // MARK: - Public methods
+    public func setSwitchHidden(_ hidden: Bool, animated: Bool = true) {
+        guard let navigationBar = navigationController?.navigationBar,
+              let constraint = titleStack.getConstraint(identifier: "centerY")
+        else { return }
+        
+        navigationBar.setNeedsLayout()
+        
+        titleStack.alpha = hidden ? 1 : 0
+        
+        guard animated else {
+            titleStack.alpha = !hidden ? 1 : 0
+            constraint.constant = hidden ? -100 : 0
+            navigationBar.layoutIfNeeded()
+            return
+        }
+        
+        UIView.animate(withDuration: 0.2) { [unowned self] in
+            self.titleStack.alpha = !hidden ? 1 : 0
+            constraint.constant = hidden ? -100 : 0
+            navigationBar.layoutIfNeeded()
+        }
+    }
 }
 
 
@@ -228,6 +258,7 @@ extension ListController: ListViewInput {
         let backItem = UIBarButtonItem()
             backItem.title = ""
             navigationItem.backBarButtonItem = backItem
+//        navigationController?.pushViewController(TestViewController(), animated: true)
         navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
         
@@ -254,7 +285,27 @@ private extension ListController {
                 self.isOnScreen = tab == .Feed
             }
         })
+        tasks.append(Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
+                guard let self = self,
+                      self.isOnScreen
+                else { return }
+                
+                self.isOnScreen = false
+            }
+        })
+        tasks.append(Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+                guard let self = self,
+                      let main = self.tabBarController as? MainController,
+                      main.selectedIndex == 2
+                else { return }
+                
+                self.isOnScreen = true
+            }
+        })
     }
+    
     
     @MainActor
     func setupUI() {
@@ -266,11 +317,21 @@ private extension ListController {
         navigationBar.addSubview(titleStack)
         titleStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
+//            titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
             titleStack.heightAnchor.constraint(equalToConstant: 40),
             titleStack.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
             titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
         ])
+        
+        let constraint = titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor, constant: -100)
+        constraint.identifier = "centerY"
+        constraint.isActive = true
+        
+//        navigationBar.setNeedsLayout()
+//        navigationBar.layoutIfNeeded()
+        
+        
+//        constraint.constant = -100
 //
 //        //-10 is card padding
 //        setTitle(animated: false)

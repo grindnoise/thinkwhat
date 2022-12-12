@@ -247,7 +247,7 @@ private extension SurveysController {
             guard let topic = topic else { return }
             
             title = ""//topic.localized
-            titleLabel.text = topic.localized
+            titleLabel.text = topic.title
         case .Own:
             title = "my_publications".localized
         case .Favorite:

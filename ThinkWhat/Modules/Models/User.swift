@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftyJSON
+import Combine
 
 class Userprofiles {
 
@@ -30,6 +31,7 @@ class Userprofiles {
     var current: Userprofile? {
         didSet {
             guard shouldImportUserDefaults, !current.isNil else { return }
+            
             UserDefaults.Profile.importData(from: current!)
         }
     }
@@ -251,22 +253,34 @@ class Userprofile: Decodable {
             }
         }
     }
+    public var imagePublisher = PassthroughSubject<UIImage, Error>()
+
+    @Published
     var image: UIImage? {
         didSet {
-            guard let imageData = image?.jpeg else { return }
-            do {
-                UserDefaults.Profile.imagePath = try FileIOController.write(data: imageData,
-                                                                            toPath: .Profiles,
-                                                                            ofType: .Images,
-                                                                            id: String(id),
-                                                                            toDocumentNamed: "avatar.jpg").absoluteString
-                guard !isCurrent else { return }
-                NotificationCenter.default.post(name: Notifications.Userprofiles.ImageDownloaded, object: self)
-            } catch {
-#if DEBUG
-                print(error.localizedDescription)
-#endif
-            }
+            guard !image.isNil else { return }
+                imagePublisher.send(image!)
+            
+//#if DEBUG
+//            print("image for \(id)", image)
+//#endif
+            isDownloading = false
+            
+//            guard let imageData = image.jpeg else { return }
+//
+//            do {
+//                UserDefaults.Profile.imagePath = try FileIOController.write(data: imageData,
+//                                                                            toPath: .Profiles,
+//                                                                            ofType: .Images,
+//                                                                            id: String(id),
+//                                                                            toDocumentNamed: "avatar.jpg").absoluteString
+//                guard !isCurrent else { return }
+//                NotificationCenter.default.post(name: Notifications.Userprofiles.ImageDownloaded, object: self)
+//            } catch {
+//#if DEBUG
+//                print(error.localizedDescription)
+//#endif
+//            }
         }
     }
     var completeTotal: Int = 0 {
@@ -412,13 +426,13 @@ class Userprofile: Decodable {
         }
         return components.first!
     }
-    var isCurrent: Bool {
-        guard let current = Userprofiles.shared.current,
-              current.id == id
-        else { return false }
-        
-        return true
-    }
+//    var isCurrent: Bool {
+//        guard let current = Userprofiles.shared.current,
+//              current.id == id
+//        else { return false }
+//        
+//        return true
+//    }
     var hasSocialMedia: Bool {
         guard !facebookURL.isNil || !instagramURL.isNil || !tiktokURL.isNil else {
             return false
@@ -441,7 +455,11 @@ class Userprofile: Decodable {
             NotificationCenter.default.post(name: Notifications.Userprofiles.NotifyOnPublications, object: self)
         }
     }
+    var isCurrent: Bool { Userprofiles.shared.current == self }
 //    var contentLocales: [String] = []
+    
+    // MARK: - Private properties
+    private var isDownloading = false
     
     init?() {
         guard let _id = UserDefaults.Profile.id,
@@ -468,7 +486,7 @@ class Userprofile: Decodable {
         } else {
             if let url = imageURL {
                 Task {
-                    image = try await API.shared.downloadImageAsync(from: url)
+                    image = try await API.shared.system.downloadImageAsync(from: url)
 //                    await MainActor.run { image = data }
                 }
             }
@@ -616,19 +634,38 @@ class Userprofile: Decodable {
             completion(.failure("Image URL is nil"))
             return
         }
-        API.shared.downloadImage(url: url) { downloadProgress($0) } completion: { completion($0) }
+        API.shared.system.downloadImage(url: url) { downloadProgress($0) } completion: { completion($0) }
     }
     
-    func downloadImageAsync() async throws -> UIImage {
-        do {
-            guard let url =  imageURL else { throw AppError.invalidURL }
-            
-            let _image = try await API.shared.downloadImageAsync(from: url)
-            await MainActor.run {
-                self.image = _image
+    func downloadImage() {
+        guard image.isNil, !isDownloading, let url = imageURL else { return }
+        
+        isDownloading = true
+        Task {
+//#if DEBUG
+//            print(self.id, "\(String(describing: self)).\(#function)")
+//#endif
+            do {
+                image = try await API.shared.system.downloadImageAsync(from: url)
+            } catch {
+                imagePublisher.send(completion: .failure(error))
             }
-            return image!
+        }
+    }
+    
+    func downloadImageAsync() async throws {
+        do {
+            guard image.isNil, !isDownloading else { return }
+            
+            guard let url =  imageURL else { throw AppError.invalidURL }
+//#if DEBUG
+//            print(self.id, "\(String(describing: self)).\(#function)")
+//#endif
+            isDownloading = true
+            image = try await API.shared.system.downloadImageAsync(from: url)
         } catch {
+            isDownloading = false
+            imagePublisher.send(completion: .failure(error))
             throw error
 #if DEBUG
             error.printLocalized(class: type(of: self), functionName: #function)

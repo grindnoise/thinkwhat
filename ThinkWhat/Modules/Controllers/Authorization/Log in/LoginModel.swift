@@ -18,21 +18,16 @@ extension LoginModel: LoginControllerInput {
     func performLogin(username: String, password: String) {
         Task {
             do {
-                try await API.shared.loginAsync(username: username, password: password)
+                try await API.shared.auth.loginAsync(username: username, password: password)
                 let userData = try await API.shared.getUserDataAsync()
 #if DEBUG
                 print(JSON(userData))
 #endif
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                               DateFormatter.dateTimeFormatter,
-                                                               DateFormatter.dateFormatter ]
-                    Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: userData)
-                } catch {
-                    UserDefaults.clear()
-                    modelOutput?.onError(error)
-                }
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                           DateFormatter.dateTimeFormatter,
+                                                           DateFormatter.dateFormatter ]
+                Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: userData)
                 modelOutput?.onSuccess()
             } catch {
                 UserDefaults.clear()

@@ -25,7 +25,7 @@ extension FillUserModel: FillUserControllerInput {
 #if DEBUG
                 print(dict)
 #endif
-                let instance = try await API.shared.saveCity(dict)
+                let instance = try await API.shared.system.saveCity(dict)
                 city.id = instance.id
             } catch {
 #if DEBUG

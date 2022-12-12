@@ -107,7 +107,7 @@ class TopicsController: UIViewController, TintColorable {
         instance.iconColor = .white//Colors.Logo.Flame.rawValue
         instance.isRounded = false
         instance.clipsToBounds = false
-        instance.scaleMultiplicator = 1.75
+        instance.scaleMultiplicator = 1.65
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
 
         return instance
@@ -121,17 +121,6 @@ class TopicsController: UIViewController, TintColorable {
         
         return instance
     }()
-    private lazy var topicDescription: UILabel = {
-        let instance = UILabel()
-        instance.text = "There's gonna be a description of the topic"
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
-        instance.textAlignment = .left
-        instance.numberOfLines = 1
-        instance.lineBreakMode = .byTruncatingTail
-        instance.textColor = .label
-
-        return instance
-    }()
     private lazy var topicView: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [
             topicIcon,
@@ -141,11 +130,10 @@ class TopicsController: UIViewController, TintColorable {
         instance.spacing = 2
         instance.alpha = 0
         
-        instance.publisher(for: \.bounds, options: .new)
-            .sink { rect in
-                
-                instance.cornerRadius = rect.height/2.25
-            }
+        instance.publisher(for: \.bounds)
+            .receive(on: DispatchQueue.main)
+            .filter { $0 != .zero}
+            .sink { instance.cornerRadius = $0.height/2.25 }
             .store(in: &subscriptions)
 //        instance.addSubview(stack)
 //        stack.translatesAutoresizingMaskIntoConstraints = false
@@ -185,30 +173,17 @@ class TopicsController: UIViewController, TintColorable {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
 //        barButton.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
         self.navigationController?.navigationBar.alpha = 1
         navigationController?.navigationBar.prefersLargeTitles = false//true
         navigationItem.largeTitleDisplayMode = .never//.always
-//        controllerOutput?.onWillAppear()
+
         if mode == .Search {
             searchField.alpha = 1
         }
     }
-    
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//
-//        //Set topicView width
-//        guard let navigationBar = self.navigationController?.navigationBar,
-//              let constraint = topicView.getConstraint(identifier: "width"),
-//              constraint.constant == 0
-//        else { return }
-//
-//        navigationBar.setNeedsLayout()
-//        constraint.constant = navigationBar.frame.width - (10*2 + 44 + 4)//top + left + right button + spacing
-//        navigationBar.layoutIfNeeded()
-//    }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -281,6 +256,25 @@ private extension TopicsController {
                 else { return }
                 
                 self.isOnScreen = tab == .Feed
+            }
+        })
+        tasks.append(Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
+                guard let self = self,
+                      self.isOnScreen
+                else { return }
+                
+                self.isOnScreen = false
+            }
+        })
+        tasks.append(Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+                guard let self = self,
+                      let main = self.tabBarController as? MainController,
+                      main.selectedIndex == 3
+                else { return }
+                
+                self.isOnScreen = true
             }
         })
     }
@@ -417,7 +411,7 @@ private extension TopicsController {
             topicTitle.text = topic.title.uppercased()//localizedTitle
 //            (topicIcon.icon as! CAShapeLayer).fillColor = topic.tagColor.cgColor
 //            topicIcon.iconColor = topic.tagColor
-            topicIcon.category = Icon.Category(rawValue: topic.id) ?? .Null
+            topicIcon.category = topic.iconCategory//Icon.Category(rawValue: topic.id) ?? .Null
             
             
             UIView.animate(
@@ -433,6 +427,11 @@ private extension TopicsController {
                     constraint.constant = on ? 0 : -(navigationBar.bounds.width - self.topicView.bounds.width)/2//-(10 + self.topicView.bounds.width)
                     navigationBar.layoutIfNeeded()
                 }) { _ in }
+            
+            UIView.animate(withDuration: on ? 0.1 : 0.3,
+                           delay: 0.1) { [unowned self] in
+                self.topicView.alpha = on ? 1 : 0
+            }
         }
         
         setBarItems()
@@ -552,9 +551,14 @@ extension TopicsController: TopicsViewInput {
         //        }
         let backItem = UIBarButtonItem()
         backItem.title = ""
+        
         navigationItem.backBarButtonItem = backItem
         navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
+        
+        guard let main = tabBarController as? MainController else { return }
+        
+        main.toggleLogo(on: false)
     }
     
     func onDataSourceRequest(dateFilter: Period, topic: Topic) {

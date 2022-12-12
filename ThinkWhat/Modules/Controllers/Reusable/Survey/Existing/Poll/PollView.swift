@@ -107,12 +107,15 @@ class PollView: UIView {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
         
         addSubview(contentView)
-        contentView.frame = self.bounds
-        contentView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        self.addSubview(contentView)
-        setTasks()
-        guard !survey.isNil else { return }
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
         
+        setTasks()
         setupUI()
     }
     
@@ -184,9 +187,9 @@ extension PollView: PollControllerOutput {
         loadingIndicator!.addEnableAnimation()
     }
     
-    var showNext: Bool {
-        return viewInput?.showNext ?? false
-    }
+//    var showNext: Bool {
+//        return viewInput?.showNext ?? false
+//    }
     
     func onVoteCallback(_ result: Result<Bool, Error>) {
         isUserInteractionEnabled = true
@@ -225,7 +228,7 @@ extension PollView: PollControllerOutput {
 // MARK: - UI Setup
 extension PollView {
     private func setupUI() {
-        
+        backgroundColor = .systemBackground
     }
     
     private func updateResults() {

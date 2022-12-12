@@ -16,7 +16,7 @@ class InterestCell: UICollectionViewCell {
         didSet {
             guard let item = item else { return }
             
-            label.text = item.localized.uppercased()
+            label.text = item.title.uppercased()
             label.backgroundColor = item.tagColor
         }
     }

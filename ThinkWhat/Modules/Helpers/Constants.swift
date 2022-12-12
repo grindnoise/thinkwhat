@@ -308,6 +308,7 @@ struct VK_IDS {
 
 //MARK: - Methods
 
+@discardableResult
 func saveTokenInKeychain(json: JSON) -> Result<Bool, Error> {//}, tokenState: inout TokenState) {
     var success = false
     for attr in json {

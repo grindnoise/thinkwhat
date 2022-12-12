@@ -98,7 +98,7 @@ class Topics {
 
 class Topic: Decodable {
     private enum CodingKeys: String, CodingKey {
-        case id, title, parent, children, localized
+        case id, title, description, parent, children
         case createdAt          = "created_at"
         case ageRestriction     = "age_restriction"
         case tagColor           = "tag_color"
@@ -108,10 +108,14 @@ class Topic: Decodable {
         case activeAndFavorite  = "active_favorite_count"
         case viewsTotal         = "views_total"
         case hotTotal           = "hot_total"
+        case imageId            = "image_id"
+        case isOther            = "is_other"
     }
     
     let id: Int
+    let imageId: Int
     let title: String
+    let description: String
     var parent: Topic? {
         return Topics.shared.all.filter({ $0.children.contains(self) }).first
     }
@@ -133,18 +137,16 @@ class Topic: Decodable {
     var isParentNode: Bool {
         return !children.isEmpty
     }
-    var localizedTitle: String?
-    var localized: String {
-        guard let localizedTitle = localizedTitle, !localizedTitle.isEmpty else { return title }
-        
-        return localizedTitle
-    }
+    var isOther: Bool
+    var iconCategory: Icon.Category { Icon.Category(rawValue: imageId) ?? .Null }
     
     required init(from decoder: Decoder) throws {
         do {
             let container   = try decoder.container(keyedBy: CodingKeys.self)
             id              = try container.decode(Int.self, forKey: .id)
+            imageId         = try container.decode(Int.self, forKey: .imageId)
             title           = try container.decode(String.self, forKey: .title)
+            description     = try container.decode(String.self, forKey: .description)
             tagColor        = try container.decode(String.self, forKey: .tagColor).hexColor ?? K_COLOR_GRAY
             ageRestriction  = (try? container.decode(Int.self, forKey: .ageRestriction)) ?? 0
             children        = (try? container.decode([Topic].self, forKey: .children)) ?? []
@@ -154,7 +156,7 @@ class Topic: Decodable {
             active          = try container.decode(Int.self, forKey: .active)
             viewsTotal      = try container.decodeIfPresent(Int.self, forKey: .viewsTotal) ?? 0
             hotTotal        = try container.decode(Int.self, forKey: .hotTotal)
-            localizedTitle  = try container.decodeIfPresent(String.self, forKey: .localized)
+            isOther         = try container.decode(Bool.self, forKey: .isOther)
             if Topics.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
                 Topics.shared.all.append(self)
             }
@@ -168,6 +170,7 @@ extension Topic: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(title)
         hasher.combine(id)
+        hasher.combine(description)
     }
     static func == (lhs: Topic, rhs: Topic) -> Bool {
         return lhs.hashValue == rhs.hashValue

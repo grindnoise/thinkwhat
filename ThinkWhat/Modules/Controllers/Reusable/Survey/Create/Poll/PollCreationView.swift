@@ -1710,7 +1710,7 @@ extension PollCreationView {
         topicStaticLabel.attributedText = topicStaticString
         
         let topicString = NSMutableAttributedString()
-        topicString.append(NSAttributedString(string: topic.isNil ? "" : topic.localized.localized.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .label/*color*/, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+        topicString.append(NSAttributedString(string: topic.isNil ? "" : topic.title.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .label/*color*/, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         topicLabel.attributedText = topicString
         
         ///Options

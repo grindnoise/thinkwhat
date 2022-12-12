@@ -37,6 +37,7 @@ class Shimmer: UIView {
                 animation.repeatCount = 100//.greatestFiniteMagnitude
                 gradient.add(animation, forKey: "shimmering")
             } else {
+                self.gradient.removeAllAnimations()
                 self.gradient.removeAnimation(forKey: "shimmering")
                 self.gradient.opacity = 0
                 self.gradient.removeFromSuperlayer()
@@ -63,13 +64,15 @@ class Shimmer: UIView {
     }
     
     public func startShimmering(lightColor: UIColor? = nil, darkColor: UIColor? = nil) {
+        guard !isShimmering else { return }
+        
         if let lightColor = lightColor, let darkColor = darkColor {
             gradient.colors = [darkColor, lightColor, darkColor]
         }
         
         isShimmering = true
         
-        publisher(for: \.bounds, options: .new)
+        publisher(for: \.bounds)
             .sink { [weak self] in
                 guard let self = self else { return }
                 
@@ -78,9 +81,32 @@ class Shimmer: UIView {
             .store(in: &subscriptions)
     }
 
-    func stopShimmering() {
+    func stopShimmering(animated: Bool = false) {
         isShimmering = false
         subscriptions.forEach { $0.cancel() }
+        
+        func stopShimmering(animated: Bool = false) {
+            isShimmering = false
+            subscriptions.forEach { $0.cancel() }
+            
+            guard animated else {
+                gradient.removeAllAnimations()
+                gradient.removeFromSuperlayer()
+                removeFromSuperview()
+                
+                return
+            }
+            
+            UIView.animate(withDuration: 0.25, delay: 0, animations: { [weak self] in
+                guard let self = self else { return }
+                
+                self.alpha = 0
+            }) { _ in
+                self.gradient.removeAllAnimations()
+                self.gradient.removeFromSuperlayer()
+                self.removeFromSuperview()
+            }
+        }
     }
     
     // MARK: - Overriden methods

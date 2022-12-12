@@ -11,7 +11,7 @@ import SwiftyJSON
 
 class Survey: Decodable {
     enum SurveyCategory: String, CaseIterable {
-        case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic, Search, Userprofile
+        case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic, Search, ByOwner
         
         func dataItems(_ topic: Topic? = nil, _ userprofile: Userprofile? = nil) -> [SurveyReference] {
             switch self {
@@ -45,7 +45,7 @@ class Survey: Decodable {
 //                }
 //                return all
                 return SurveyReferences.shared.all.filter({ $0.topic == topic! }).uniqued().filter { !$0.isClaimed && !$0.isBanned }
-            case .Userprofile:
+            case .ByOwner:
                 guard let userprofile = userprofile else { return [] }
                 
                 return SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned }
@@ -96,7 +96,7 @@ class Survey: Decodable {
                 return API_URLS.Surveys.byTopic
             case .Search:
                 return API_URLS.Surveys.searchBySubstring
-            case .Userprofile:
+            case .ByOwner:
                 return API_URLS.Surveys.byUserprofile
             }
         }
@@ -651,6 +651,7 @@ class Surveys {
 //                    return
 //                }
 //            }
+            
             for (key, value) in json {
                 if key == Category.Hot.rawValue {
                     let instances = try decoder.decode([Survey].self, from: value.rawData())

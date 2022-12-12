@@ -352,11 +352,10 @@ class ListView: UIView {
         instance.layer.shadowRadius = 5
         instance.layer.shadowOffset = .zero
         instance.publisher(for: \.bounds)
-            .sink { rect in
-                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+            .sink { [unowned self] rect in
+                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*(self.filterView.alpha == 0 ? 0.035 : 0.05)).cgPath
             }
-            .store(in: &subscriptions
-            )
+            .store(in: &subscriptions)
         background.addEquallyTo(to: instance)
         
         return instance
@@ -365,7 +364,7 @@ class ListView: UIView {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = false
-        instance.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.75)
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
         observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
             guard let value = change.newValue else { return }
             view.cornerRadius = value.width * 0.05
@@ -431,7 +430,7 @@ class ListView: UIView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
 //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-//        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
         if #available(iOS 15, *) {
             periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         } else {
@@ -458,19 +457,33 @@ private extension ListView {
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
 //            filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 20),
-            filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8),
+            filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8),
 //            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
-            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
+//            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
+//            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+//            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
-        let topConstraint_1 = filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 20)
+        
+        let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8)
+        shadowLeading.identifier = "leading"
+        shadowLeading.isActive = true
+        
+        let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8)
+        shadowTrailing.identifier = "trailing"
+        shadowTrailing.isActive = true
+        
+        let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8)
+        shadowBottom.identifier = "bottom"
+        shadowBottom.isActive = true
+        
+        let topConstraint_1 = filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16)
         topConstraint_1.identifier = "top_1"
+        topConstraint_1.priority = .defaultHigh
         topConstraint_1.isActive = true
         
-        let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 20)
-        topConstraint_2.identifier = "top_2"
+        let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 16)
+        topConstraint_2.identifier = "top"
         topConstraint_2.isActive = true
         
         setNeedsLayout()
@@ -619,18 +632,18 @@ private extension ListView {
     @MainActor
     func toggleDateFilter(on: Bool) {
         guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-              let topConstraint_1 = filterView.getConstraint(identifier: "top_1"),
-              let topConstraint_2 = filterView.getConstraint(identifier: "top_2")
+              let constraint1 = filterView.getConstraint(identifier: "top_1"),
+              let constraint2 = filterView.getConstraint(identifier: "top")
         else { return }
         
         setNeedsLayout()
-        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
             guard let self = self else { return }
         
             self.filterView.alpha = on ? 1 : 0
             self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-            topConstraint_1.constant = on ? 20 : 10
-            topConstraint_2.constant = on ? 20 : 0
+            constraint1.constant = on ? 16 : 0
+            constraint2.constant = on ? 16 : 8
             heightConstraint.constant = on ? self.filterViewHeight : 0
             self.layoutIfNeeded()
         }
@@ -650,6 +663,7 @@ extension ListView: ListControllerOutput {
         guard let category = viewInput?.category else { return }
         
         setTitle(category: category, animated: true)
+        toggleDateFilter(on: true)
         collectionView.category = category
     }
 }

@@ -18,7 +18,7 @@ extension RecoverModel: RecoverControllerInput {
     func sendEmail(_ email: String) {
         Task {
             do {
-                try await API.shared.sendPasswordResetLink(email)
+                try await API.shared.system.sendPasswordResetLink(email)
                 await modelOutput?.onEmailSent(.success(true))
             } catch {
 #if DEBUG

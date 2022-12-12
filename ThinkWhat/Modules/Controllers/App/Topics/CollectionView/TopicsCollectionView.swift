@@ -53,15 +53,17 @@ class TopicsCollectionView: UICollectionView {
 private extension TopicsCollectionView {
     @MainActor
     func setupUI() {
-        collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
+//        delegate = self
+        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
             layoutConfig.headerMode = .firstItemInSection
             layoutConfig.backgroundColor = .clear
-            if #available(iOS 14.5, *) {
-                layoutConfig.separatorConfiguration.color = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-            }
-//            layoutConfig.showsSeparators = true
-//            layoutConfig.footerMode = .supplementary
+            layoutConfig.showsSeparators = false
+//            if #available(iOS 14.5, *) {
+//                layoutConfig.separatorConfiguration.color = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+//            }
+////            layoutConfig.showsSeparators = true
+////            layoutConfig.footerMode = .supplementary
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
 //            sectionLayout.interGroupSpacing = 20
@@ -87,13 +89,16 @@ private extension TopicsCollectionView {
             }
                 .store(in: &self.subscriptions)
             
-            let accessoryConfig = UICellAccessory.CustomViewConfiguration(customView: UIImageView(image: UIImage(systemName: "chevron.right")),
-                                                                          placement: .trailing(displayed: .always, at: { _ in 0 }),
-                                                                          isHidden: false,
-                                                                          reservedLayoutWidth: nil,
-                                                                          tintColor: item.topic.tagColor,
-                                                                          maintainsFixedSize: true)
-            cell.accessories = [UICellAccessory.customView(configuration: accessoryConfig)]
+//            let headerDisclosureOption = UICellAccessory.DisclosureIndicatorOptions()// OutlineDisclosureOptions(style: .header)
+            cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: item.topic.tagColor))]//.outlineDisclosure(options:headerDisclosureOption)]
+//            let accessoryConfig = UICellAccessory.CustomViewConfiguration(customView: UIImageView(image: UIImage(systemName: "arrow.right",
+//                                                                                                                 withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
+//                                                                          placement: .trailing(displayed: .always, at: { _ in 0 }),
+//                                                                          isHidden: false,
+//                                                                          reservedLayoutWidth: nil,
+//                                                                          tintColor: item.topic.tagColor,
+//                                                                          maintainsFixedSize: true)
+//            cell.accessories = [UICellAccessory.customView(configuration: accessoryConfig)]
 //            cell.accessories = [.outlineDisclosure(displayed: .always, options: .init(style: .cell, isHidden: false, reservedLayoutWidth: nil, tintColor: item.topic.tagColor), actionHandler: nil)]//[.outlineDisclosure(options:headerDisclosureOption)
             
 //            cell.callback = {
@@ -150,6 +155,7 @@ private extension TopicsCollectionView {
                 let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
                                                                         for: indexPath,
                                                                         item: symbolItem)
+                cell.tintColor = symbolItem.topic.tagColor
                 return cell
             }
         }
@@ -184,3 +190,10 @@ private extension TopicsCollectionView {
 //        layoutConfig.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
 //    }
 }
+
+//extension TopicsCollectionView: UICollectionViewDelegate {
+//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        cell.setNeedsLayout()
+//        cell.layoutIfNeeded()
+//    }
+//}

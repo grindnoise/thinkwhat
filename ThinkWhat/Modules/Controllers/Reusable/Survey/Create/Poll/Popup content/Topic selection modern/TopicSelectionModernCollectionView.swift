@@ -10,12 +10,14 @@ import UIKit
 
 struct TopicHeaderItem: Hashable {
     let title: String
+    let description: String
     let topic: Topic
     let topics: [TopicItem]
     
     init(topic: Topic) {
         self.topic = topic
-        self.title = topic.localized
+        self.title = topic.title
+        self.description = topic.description
         self.topics = topic.children.map {
             return TopicItem(topic: $0)
         }
@@ -24,11 +26,13 @@ struct TopicHeaderItem: Hashable {
 
 struct TopicItem: Hashable {
     let title: String
+    let description: String
     let topic: Topic
     
     init(topic: Topic) {
         self.topic = topic
-        self.title = topic.localized
+        self.title = topic.title
+        self.description = topic.description
     }
 }
 

@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftyJSON
+import Combine
 
 class Mediafile: Decodable {
     private enum CodingKeys: String, CodingKey {
@@ -17,7 +18,15 @@ class Mediafile: Decodable {
     var title: String
     var url: URL?
     var imageURL: URL?
-    var image: UIImage?
+    var image: UIImage? {
+        didSet {
+            guard let image = image else { return }
+            
+            imagePublisher.send(image)
+            imagePublisher.send(completion: .finished)
+            isDownloading = false
+        }
+    }
     var fileURL: URL?
     var file: Data?
     var surveyID: Int
@@ -26,6 +35,9 @@ class Mediafile: Decodable {
     }
     var order: Int
     private let tempId = 999999
+    private var isDownloading = false
+    
+    public var imagePublisher = PassthroughSubject<UIImage, Error>()
     
     required init(from decoder: Decoder) throws {
         do {
@@ -55,12 +67,28 @@ class Mediafile: Decodable {
         file        = _file
     }
     
+    func downloadImage() {
+        guard image.isNil, !isDownloading, let url = imageURL else { return }
+        
+        isDownloading = true
+        Task {
+//#if DEBUG
+//            print(self.id, "\(String(describing: self)).\(#function)")
+//#endif
+            do {
+                image = try await API.shared.system.downloadImageAsync(from: url)
+            } catch {
+                imagePublisher.send(completion: .failure(error))
+            }
+        }
+    }
+    
     func downloadImage(downloadProgress: @escaping(Double)->(), completion: @escaping (Result<UIImage, Error>) -> ()) {
         guard let url = imageURL else {
             completion(.failure("Image URL is nil"))
             return
         }
-        API.shared.downloadImage(url: url) { downloadProgress($0) } completion: { [weak self] in
+        API.shared.system.downloadImage(url: url) { downloadProgress($0) } completion: { [weak self] in
             guard let self = self else { completion(.failure(APIError.unexpected(code: 500))); return }
             switch $0 {
             case.success(let image):
@@ -72,10 +100,15 @@ class Mediafile: Decodable {
         }
     }
     
+    @discardableResult
     func downloadImageAsync(timeoutInterval: TimeInterval = 30) async throws -> UIImage {
         do {
             guard let url =  imageURL else { throw AppError.invalidURL }
-            image = try await API.shared.downloadImageAsync(from: url, timeoutInterval: timeoutInterval)
+            
+#if DEBUG
+            print("\(String(describing: self)).\(#function)")
+#endif
+            image = try await API.shared.system.downloadImageAsync(from: url, timeoutInterval: timeoutInterval)
             return image!
         } catch {
             throw error

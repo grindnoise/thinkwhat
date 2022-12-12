@@ -22,7 +22,7 @@ let deviceType = UIDevice().type
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-//    let transitionCoordinator   = TransitionCoordinator()
+    let transitionCoordinator   = TransitionCoordinator()
 //    let container               = Container()
     let center                  = UNUserNotificationCenter.current()
     let notificationDelegate    = CustomNotificationDelegate()
@@ -31,7 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         var rootViewController: UIViewController!
         
-        API.shared.getCountryByIP() 
+        API.shared.system.getCountryByIP()
+        
         do {
             try UserDefaults.Profile.authorize()
             rootViewController = MainController()
@@ -47,6 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
 //        Settings.shared.isAdvertiserTrackingEnabled = false
 //        NetworkReachability.shared.startNetworkMonitoring()
+        
         return true
     }
 

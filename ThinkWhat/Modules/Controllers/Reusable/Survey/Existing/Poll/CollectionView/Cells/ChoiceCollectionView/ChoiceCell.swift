@@ -489,7 +489,7 @@ class ChoiceCell: UICollectionViewCell {
                 else { return }
 
                 var users: Set<Userprofile>    = Set(instance.voters)
-                let avatars: Set<Userprofile>  = Set(self.avatars.map { $0.userprofile })
+                let avatars: Set<Userprofile>  = Set(self.avatars.map { $0.userprofile! })
                 
                 users.subtract(avatars)
                 
@@ -700,12 +700,14 @@ class ChoiceCell: UICollectionViewCell {
         }
 
         voters.enumerated().forEach { index, userprofile in
-            let avatar = Avatar(userprofile: userprofile, isBordered: true)//, borderColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : self.isChosen ? self.color.withAlphaComponent(0.4) : .systemBackground)
+//            let avatar = Avatar(userprofile: userprofile)
+            let avatar = Avatar(isBordered: true)
+//            let avatar = Avatar(userprofile: userprofile, isBordered: true)
             avatar.layer.zPosition = 10 - CGFloat(index)
             avatars.append(avatar)
             votersView.addSubview(avatar)
             avatar.translatesAutoresizingMaskIntoConstraints = false
-
+            avatar.userprofile = userprofile
             avatar.heightAnchor.constraint(equalTo: votersView.heightAnchor).isActive = true
             avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1/1).isActive = true
 

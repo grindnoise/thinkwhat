@@ -129,12 +129,12 @@ class PollCollectionView: UICollectionView {
         }
         
         let descriptionCellRegistration = UICollectionView.CellRegistration<PollDescriptionCell, AnyHashable> { [weak self] cell, indexPath, item in
-            cell.layer.masksToBounds = false
+//            cell.layer.masksToBounds = false
             guard let self = self else { return }
 //            guard let self = self, cell.item.isNil else { return }
 //            cell.collectionView = self
             cell.item = self.poll
-            cell.isFoldable = cell.item.isOwn || cell.item.isComplete
+//            cell.isFoldable = cell.item.isOwn || cell.item.isComplete
         }
         imageCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [weak self] cell, indexPath, item in
             guard let self = self, cell.item.isNil else { return }

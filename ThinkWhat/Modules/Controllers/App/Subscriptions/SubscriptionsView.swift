@@ -661,11 +661,11 @@ class SubscriptionsView: UIView {
         instance.layer.shadowRadius = 5
         instance.layer.shadowOffset = .zero
         instance.publisher(for: \.bounds)
-            .sink { rect in
-                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+            .sink { [unowned self] rect in
+                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*(self.filterView.alpha == 0 ? 0.035 : 0.05)).cgPath
             }
-            .store(in: &subscriptions
-            )
+            .store(in: &subscriptions)
+        
         background.place(inside: instance)
         
         return instance
@@ -674,7 +674,7 @@ class SubscriptionsView: UIView {
         let instance = UIView()
         instance.accessibilityIdentifier = "bg"
         instance.layer.masksToBounds = true
-        instance.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.75)
+        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground//.secondarySystemBackground.withAlphaComponent(0.75)
         //        instance.addEquallyTo(to: shadowView)
         surveysCollectionView.place(inside: instance)
         instance.publisher(for: \.bounds)
@@ -745,7 +745,7 @@ class SubscriptionsView: UIView {
         
         userView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
         
         guard let background = userView.getSubview(type: UIView.self, identifier: "background") else { return }
         
@@ -854,19 +854,31 @@ private extension SubscriptionsView {
             filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
 //            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
-            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
+//            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
+//            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+//            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
         
         userView.alpha = 0
+        
+        let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10)
+        shadowLeading.identifier = "leading"
+        shadowLeading.isActive = true
+        
+        let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10)
+        shadowTrailing.identifier = "trailing"
+        shadowTrailing.isActive = true
+        
+        let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10)
+        shadowBottom.identifier = "bottom"
+        shadowBottom.isActive = true
         
         let topConstraint_1 = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10)
         topConstraint_1.identifier = "top_1"
         topConstraint_1.isActive = true
         
         let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 20)
-        topConstraint_2.identifier = "top_2"
+        topConstraint_2.identifier = "top"
         topConstraint_2.isActive = true
 
 
@@ -900,15 +912,16 @@ private extension SubscriptionsView {
                 }
             }
         }
-//        userView.setNeedsLayout()
-//        avatar.updateConstraints()
-//        userView.layoutIfNeeded()
+        //        userView.setNeedsLayout()
+        //        avatar.updateConstraints()
+        //        userView.layoutIfNeeded()
         
-        guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell//,
-//              let constraint = filterView.getConstraint(identifier: "filterTop")
+        guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
+              let constraint = shadowView.getConstraint(identifier: "top"),
+              let constraint1 = filterView.getConstraint(identifier: "top_1")
         else { return }
         
-//        setNeedsLayout()
+        setNeedsLayout()
         avatar.userprofile = userprofile
         avatar.alpha = 0
 //        usernameLabel.text = userprofile.name
@@ -945,6 +958,9 @@ private extension SubscriptionsView {
                 self.feedCollectionView.alpha = 0
                 self.userView.alpha = 1
                 self.userView.transform = .identity
+                constraint.constant = self.filterView.alpha == 1 ? 20 : 10
+                constraint1.constant = 10
+                self.layoutIfNeeded()
                 animateStackView()
             }) { [weak self] _ in
                 guard let self = self else { return }
@@ -1087,18 +1103,26 @@ private extension SubscriptionsView {
     @MainActor
     func toggleDateFilter(on: Bool) {
         guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-              let topConstraint_1 = filterView.getConstraint(identifier: "top_1"),
-              let topConstraint_2 = filterView.getConstraint(identifier: "top_2")
+              let constraint1 = filterView.getConstraint(identifier: "top_1"),
+              let constraint2 = shadowView.getConstraint(identifier: "top"),
+              let constraint3 = shadowView.getConstraint(identifier: "leading"),
+              let constraint4 = shadowView.getConstraint(identifier: "trailing"),
+              let constraint5 = shadowView.getConstraint(identifier: "bottom")
         else { return }
         
         setNeedsLayout()
-        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
             guard let self = self else { return }
         
+            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
+            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
             self.filterView.alpha = on ? 1 : 0
             self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-            topConstraint_1.constant = on ? 20 : self.mode == .Default ? 0 : 10
-            topConstraint_2.constant = on ? 20 : 0
+            constraint1.constant = on ? 20 : self.mode == .Default ? 0 : 10
+            constraint2.constant = on ? 20 : 0
+            constraint3.constant = on ? 10 : 5
+            constraint4.constant = on ? -10 : -5
+            constraint5.constant = on ? -10 : -5
             heightConstraint.constant = on ? self.filterViewHeight : 0
             self.layoutIfNeeded()
         }

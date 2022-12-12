@@ -27,7 +27,7 @@ extension LanguageListModel: LanguageListControllerInput {
             do {
                 var parameters = ["locales": [[language.code: use]]]
                 
-                try await API.shared.profiles.updateAppSettings(parameters)
+                try await API.shared.system.updateAppSettings(parameters)
                 
                 if use, !UserDefaults.App.contentLanguages.contains(language.code) {
                     UserDefaults.App.contentLanguages.append(language.code)

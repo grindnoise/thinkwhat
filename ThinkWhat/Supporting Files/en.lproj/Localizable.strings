@@ -364,3 +364,4 @@
 "user_publication_notification_begin" = "Notifications from ";
 "user_publication_notification_on" = " are on";
 "user_publication_notification_off" = "are off";
+"watch_survey_notification" = "You'll be notified about the results when publication finishes";

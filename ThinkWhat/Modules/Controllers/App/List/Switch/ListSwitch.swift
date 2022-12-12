@@ -166,16 +166,15 @@ class ListSwitch: UIView {
         instance.layer.addSublayer(gradient)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.publisher(for: \.bounds, options: .new)
+            .filter { $0 != .zero }
             .sink { rect in
                 instance.cornerRadius = rect.height/2
                 
-                guard rect != .zero,
-                      let layer = instance.layer.getSublayer(identifier: "radialGradient"),
+                guard let layer = instance.layer.getSublayer(identifier: "radialGradient"),
                       layer.bounds != rect
                 else { return }
                 
                 layer.frame = rect
-                
             }
             .store(in: &subscriptions)
         

@@ -195,12 +195,13 @@ class ResultIndicator: UIView {
                     if answer.voters[i].image != nil {
                         avatar.image = answer.voters[i].image!
                     } else {
-                        Task {
-                            do {
-                                let data = try await answer.voters[i].downloadImageAsync()
-                                await MainActor.run { avatar.image = data}
-                            } catch {}
-                        }
+                        fatalError()
+//                        Task {
+//                            do {
+//                                let data = try await answer.voters[i].downloadImageAsync()
+//                                await MainActor.run { avatar.image = data}
+//                            } catch {}
+//                        }
                     }
                 }
                 if answer.totalVotes > 5 {

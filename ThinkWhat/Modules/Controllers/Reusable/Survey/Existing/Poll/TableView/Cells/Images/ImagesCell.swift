@@ -112,7 +112,7 @@ class ImagesCell: UITableViewCell, UIScrollViewDelegate {
                         slide.imageView.image = image//survey!.images![index]?.keys.first
                         slide.imageView.progressIndicatorView.alpha = 0
                     } else if let url = media.imageURL {
-                        API.shared.downloadImage(url: url) { progress in
+                        API.shared.system.downloadImage(url: url) { progress in
                             self.slides[index].imageView.progressIndicatorView.progress = progress
                         } completion: { result in
                             switch result {

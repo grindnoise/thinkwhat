@@ -143,6 +143,7 @@ class TopicsView: UIView {
     }()
     private lazy var surveysCollectionView: SurveysCollectionView = {
         let instance = SurveysCollectionView(category: .Search)
+        instance.backgroundColor = .clear
         instance.alpha = 0
         
         //Pagination #2
@@ -309,9 +310,9 @@ class TopicsView: UIView {
             self.touchLocation = point
             self.surveysCollectionView.topic = topic
             self.toggleDateFilter(on: true)
-            self.setBackgroundColor(.secondarySystemBackground)
+            self.setBackgroundColor()//.secondarySystemBackground)
             self.surveysCollectionView.alpha = 1
-            self.surveysCollectionView.backgroundColor = self.background.backgroundColor
+//            self.surveysCollectionView.backgroundColor = self.background.backgroundColor
             self.reveal(present: true, location: point, view: self.surveysCollectionView, color: self.surveysCollectionView.topic!.tagColor, fadeView: self.collectionView, duration: 0.5)//, animateOpacity: false)
         }.store(in: &subscriptions)
         
@@ -323,8 +324,10 @@ class TopicsView: UIView {
         instance.layer.masksToBounds = true
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         instance.publisher(for: \.bounds)
-            .sink { rect in
-                instance.cornerRadius = rect.width * 0.05
+            .sink { [unowned self] rect in
+                guard self.filterView.alpha != 0 else { return }
+                
+                instance.cornerRadius = rect.width *  0.05
             }
             .store(in: &subscriptions)
         
@@ -344,8 +347,8 @@ class TopicsView: UIView {
         instance.layer.shadowRadius = 5
         instance.layer.shadowOffset = .zero
         instance.publisher(for: \.bounds)
-            .sink { rect in
-                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+            .sink { [unowned self] rect in
+                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*(self.filterView.alpha == 0 ? 0.035 : 0.05)).cgPath
             }
             .store(in: &subscriptions
             )
@@ -399,13 +402,20 @@ class TopicsView: UIView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         collectionView.backgroundColor = .clear
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         
         if #available(iOS 15, *) {
             periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         } else {
             periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         }
+        
+        setBackgroundColor()
+//        guard let viewInput = viewInput, viewInput.mode == .Topic  else {
+//            background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+//            return
+//        }
+//
+//        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
     }
 }
 
@@ -435,17 +445,29 @@ private extension TopicsView {
             contentView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
             filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
             filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
+//            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
+//            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+//            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
         ])
+        
+        let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10)
+        shadowLeading.identifier = "leading"
+        shadowLeading.isActive = true
+        
+        let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10)
+        shadowTrailing.identifier = "trailing"
+        shadowTrailing.isActive = true
+        
+        let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10)
+        shadowBottom.identifier = "bottom"
+        shadowBottom.isActive = true
         
         let topConstraint_1 = filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 10)
         topConstraint_1.identifier = "top_1"
         topConstraint_1.isActive = true
         
         let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 0)
-        topConstraint_2.identifier = "top_2"
+        topConstraint_2.identifier = "top"
         topConstraint_2.isActive = true
         
         setNeedsLayout()
@@ -525,7 +547,7 @@ private extension TopicsView {
         
         fadeView.layer.addSublayer(colorLayer)
         
-        let opacityAnim = Animations.get(property: .Opacity, fromValue: present ? 0 : 1, toValue: present ? 1 : 0, duration: duration, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, completionBlocks: [{
+        let opacityAnim = Animations.get(property: .Opacity, fromValue: present ? 0 : 1, toValue: present ? 1 : 0, duration: duration*(present ? 1.15 : 1.35), timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, completionBlocks: [{
             colorLayer.removeFromSuperlayer()
         }])
         colorLayer.add(opacityAnim, forKey: nil)
@@ -547,31 +569,51 @@ private extension TopicsView {
         }
     }
     
-    func setBackgroundColor(_ color: UIColor) {
+    func setBackgroundColor() {//_ color: UIColor) {
+        
         UIView.animate(withDuration: 0.15) { [weak self] in
             guard let self = self else { return }
             
+            guard let viewInput = self.viewInput, viewInput.mode == .Topic  else {
+                let color: UIColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+                self.background.backgroundColor = color
+                self.surveysCollectionView.backgroundColor = color
+                return
+            }
+            
+            let color: UIColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
             self.background.backgroundColor = color
+            self.surveysCollectionView.backgroundColor = color
+//            self.background.backgroundColor = color
         }
     }
     
     @MainActor
     func toggleDateFilter(on: Bool) {
         guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-              let topConstraint_1 = filterView.getConstraint(identifier: "top_1"),
-              let topConstraint_2 = filterView.getConstraint(identifier: "top_2")
+              let constraint1 = filterView.getConstraint(identifier: "top_1"),
+              let constraint2 = filterView.getConstraint(identifier: "top"),
+              let constraint3 = shadowView.getConstraint(identifier: "leading"),
+              let constraint4 = shadowView.getConstraint(identifier: "trailing"),
+              let constraint5 = shadowView.getConstraint(identifier: "bottom")
         else { return }
         
+        
         setNeedsLayout()
-        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
             guard let self = self,
             let viewInput = self.viewInput
             else { return }
         
+            self.shadowView.layer.shadowRadius = on ? 5 : viewInput.mode == .Default ? 5 : 2.5
+            self.background.cornerRadius = self.background.bounds.width*(on ? viewInput.mode == .Topic ? 0.05 : 0.035 : viewInput.mode == .Default ? 0.05 : 0.035)
             self.filterView.alpha = on ? 1 : 0
             self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-            topConstraint_1.constant = on ? viewInput.mode == .Topic ? 20 : 0 : 0
-            topConstraint_2.constant = on ? viewInput.mode == .Topic ? 20 : 0 : 10
+            constraint1.constant = on ? viewInput.mode == .Topic ? 20 : 0 : 0
+            constraint2.constant = on ? viewInput.mode == .Topic ? 20 : 0 : 10
+            constraint3.constant = on ? viewInput.mode == .Topic ? 10 : 0 : viewInput.mode == .Default ? 10 : 5
+            constraint4.constant = on ? viewInput.mode == .Topic ? -10 : 0 : viewInput.mode == .Default ? -10 : -5
+            constraint5.constant = on ? viewInput.mode == .Topic ? -10 : 0 : viewInput.mode == .Default ? -10 : -5
             heightConstraint.constant = on ? self.filterViewHeight : 0
             self.layoutIfNeeded()
         }
@@ -661,7 +703,7 @@ extension TopicsView: TopicsControllerOutput {
         surveysCollectionView.alpha = 1
 //        collectionView.backgroundColor = background.backgroundColor
         reveal(present: false, location: CGPoint(x: bounds.maxX, y: bounds.minY)/*touchLocation*/, view: surveysCollectionView, color: color ?? surveysCollectionView.topic!.tagColor, fadeView: collectionView, duration: 0.3)
-        setBackgroundColor(traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground)//)
+        setBackgroundColor()//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground)//)
         toggleDateFilter(on: false)
     }
     

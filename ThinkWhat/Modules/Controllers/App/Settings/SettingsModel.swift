@@ -39,7 +39,7 @@ extension SettingsModel: SettingsControllerInput {
                     parameters = ["notifications": dict]
                 }
                 
-                try await API.shared.profiles.updateAppSettings(parameters)
+                try await API.shared.system.updateAppSettings(parameters)
                 
                 settings.forEach { key, value in
                     switch key {
@@ -108,7 +108,7 @@ extension SettingsModel: SettingsControllerInput {
                 
                 guard let dict = JSON(data).dictionaryObject else { return }
                 
-                let instance = try await API.shared.saveCity(dict)
+                let instance = try await API.shared.system.saveCity(dict)
                 city.id = instance.id
                 city.localized = instance.localized
                 city.countryID = instance.countryID
