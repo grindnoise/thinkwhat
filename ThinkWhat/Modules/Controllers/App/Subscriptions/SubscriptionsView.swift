@@ -851,8 +851,8 @@ private extension SubscriptionsView {
             topView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             topView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
 //            filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10),
-            filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8),
+            filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8),
 //            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
 //            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
 //            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
@@ -861,23 +861,23 @@ private extension SubscriptionsView {
         
         userView.alpha = 0
         
-        let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10)
+        let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8)
         shadowLeading.identifier = "leading"
         shadowLeading.isActive = true
         
-        let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10)
+        let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8)
         shadowTrailing.identifier = "trailing"
         shadowTrailing.isActive = true
         
-        let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10)
+        let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8)
         shadowBottom.identifier = "bottom"
         shadowBottom.isActive = true
         
-        let topConstraint_1 = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10)
+        let topConstraint_1 = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 8)
         topConstraint_1.identifier = "top_1"
         topConstraint_1.isActive = true
         
-        let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 20)
+        let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 16)
         topConstraint_2.identifier = "top"
         topConstraint_2.isActive = true
 
@@ -958,8 +958,8 @@ private extension SubscriptionsView {
                 self.feedCollectionView.alpha = 0
                 self.userView.alpha = 1
                 self.userView.transform = .identity
-                constraint.constant = self.filterView.alpha == 1 ? 20 : 10
-                constraint1.constant = 10
+                constraint.constant = self.filterView.alpha == 1 ? 16 : 8
+                constraint1.constant = self.filterView.alpha == 1 ? 16 : 8//8
                 self.layoutIfNeeded()
                 animateStackView()
             }) { [weak self] _ in
@@ -1118,11 +1118,11 @@ private extension SubscriptionsView {
             self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
             self.filterView.alpha = on ? 1 : 0
             self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-            constraint1.constant = on ? 20 : self.mode == .Default ? 0 : 10
-            constraint2.constant = on ? 20 : 0
-            constraint3.constant = on ? 10 : 5
-            constraint4.constant = on ? -10 : -5
-            constraint5.constant = on ? -10 : -5
+            constraint1.constant = on ? 16 : self.mode == .Default ? 0 : 10
+            constraint2.constant = on ? 16 : 0
+            constraint3.constant = on ? 8 : 4
+            constraint4.constant = on ? -8 : -4
+            constraint5.constant = on ? -8 : -4
             heightConstraint.constant = on ? self.filterViewHeight : 0
             self.layoutIfNeeded()
         }

@@ -116,15 +116,19 @@ class ListController: UIViewController, TintColorable {
         titleStack.alpha = 1
         tabBarController?.setTabBarVisible(visible: true, animated: true)
         
-        guard let main = tabBarController as? MainController else { return }
-        
-        main.toggleLogo(on: true)
+//        guard let main = tabBarController as? MainController else { return }
+//
+//        main.toggleLogo(on: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         setSwitchHidden(false)
+        
+        guard let main = tabBarController as? MainController else { return }
+        
+        main.toggleLogo(on: true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -155,8 +159,12 @@ class ListController: UIViewController, TintColorable {
             navigationBar.layoutIfNeeded()
             return
         }
-        
-        UIView.animate(withDuration: 0.2) { [unowned self] in
+        UIView.animate(
+            withDuration: 0.5,
+            delay: 0,
+            usingSpringWithDamping: 0.8,
+            initialSpringVelocity: 0.3,
+            options: [.curveEaseInOut]) { [unowned self] in
             self.titleStack.alpha = !hidden ? 1 : 0
             constraint.constant = hidden ? -100 : 0
             navigationBar.layoutIfNeeded()
@@ -317,7 +325,6 @@ private extension ListController {
         navigationBar.addSubview(titleStack)
         titleStack.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-//            titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
             titleStack.heightAnchor.constraint(equalToConstant: 40),
             titleStack.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
             titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
@@ -326,18 +333,6 @@ private extension ListController {
         let constraint = titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor, constant: -100)
         constraint.identifier = "centerY"
         constraint.isActive = true
-        
-//        navigationBar.setNeedsLayout()
-//        navigationBar.layoutIfNeeded()
-        
-        
-//        constraint.constant = -100
-//
-//        //-10 is card padding
-//        setTitle(animated: false)
-//
-//        //        titleStack.place(inside: navigationBar,
-//        //        insets: UIEdgeInsets(top: 2, left: 10, bottom: 2, right: 10))
     }
     
 //    @MainActor

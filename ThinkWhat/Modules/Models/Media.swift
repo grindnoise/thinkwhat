@@ -73,11 +73,12 @@ class Mediafile: Decodable {
         isDownloading = true
         Task {
 //#if DEBUG
-//            print(self.id, "\(String(describing: self)).\(#function)")
+//            print(SurveyReferences.shared.all.filter { $0.id == self.surveyID }.first?.title, "\(String(describing: self)).\(#function)")
 //#endif
             do {
                 image = try await API.shared.system.downloadImageAsync(from: url)
             } catch {
+                isDownloading = false
                 imagePublisher.send(completion: .failure(error))
             }
         }

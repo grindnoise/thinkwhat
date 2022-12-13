@@ -7,40 +7,56 @@
 //
 
 import UIKit
+import Combine
 
 class PollTitleCell: UICollectionViewCell {
     
     // MARK: - Public properties
     public weak var item: Survey! {
         didSet {
+            guard let item = item else { return }
+            
             titleLabel.text = item.title
             ratingLabel.text = String(describing: item.rating)
             viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-            let constraint = titleLabel.heightAnchor.constraint(equalToConstant: 300)
-            constraint.identifier = "height"
-            constraint.isActive = true
-            setNeedsLayout()
-            layoutIfNeeded()
+            
+            item.reference.viewsPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.viewsLabel.text = $0.roundedWithAbbreviations
+                }
+                .store(in: &subscriptions)
+            
+            item.reference.ratingPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.ratingLabel.text = String(describing: $0)
+                }
+                .store(in: &subscriptions)
+            
+            updateUI()
         }
     }
     
     // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //UI
     private lazy var titleLabel: UILabel = {
         let instance = UILabel()
         instance.textAlignment = .center
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .largeTitle)
         instance.numberOfLines = 0
-        instance.textColor = .label
-        observers.append(instance.observe(\UILabel.bounds, options: [.new]) { [weak self] view, _ in
-            guard let self = self,
-                  let text = view.text,
-                  let constraint = view.getAllConstraints().filter({$0.identifier == "height"}).first,
-                  let height = text.height(withConstrainedWidth: view.bounds.width, font: view.font) as? CGFloat,
-                  height != constraint.constant else { return }
-            self.setNeedsLayout()
-            constraint.constant = height
-            self.layoutIfNeeded()
-        })
+        
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
+        constraint.identifier = "height"
+        constraint.isActive = true
+        
         return instance
     }()
     private let ratingView: UIImageView = {
@@ -101,18 +117,18 @@ class PollTitleCell: UICollectionViewCell {
     @MainActor private lazy var shareButton: UIImageView = {
         let instance = UIImageView()
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
-//        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+        //        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
         instance.image = UIImage(systemName: "square.and.arrow.up")
-//        instance.contentMode = .bottom
+        //        instance.contentMode = .bottom
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()
     @MainActor private lazy var claimButton: UIImageView = {
         let instance = UIImageView()
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
-//        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+        //        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
         instance.image = UIImage(systemName: "square.and.arrow.up.trianglebadge.exclamationmark")
-//        instance.contentMode = .bottom
+        //        instance.contentMode = .bottom
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         return instance
     }()
@@ -124,7 +140,7 @@ class PollTitleCell: UICollectionViewCell {
     }()
     @MainActor private lazy var horizontalStack_2: UIStackView = {
         let horizontalStack = UIStackView(arrangedSubviews: [shareButton, claimButton])
-//        horizontalStack.alignment = .bottom
+        //        horizontalStack.alignment = .bottom
         horizontalStack.distribution = .fillEqually
         horizontalStack.spacing = 4
         return horizontalStack
@@ -135,158 +151,35 @@ class PollTitleCell: UICollectionViewCell {
         verticalStack.spacing = 4
         return verticalStack
     }()
-    private var observers: [NSKeyValueObservation] = []
     private let padding: CGFloat = 50
     private var constraint: NSLayoutConstraint!
-    ///Store tasks from NotificationCenter's AsyncStream
-    private var notifications: [Task<Void, Never>?] = []
     
-//    private var steps: AsyncStream<Int>!
-//    private lazy var requestUpdater = AsyncStream<Bool> { [weak self] continuation in
-//        Timer.scheduledTimer(
-//            withTimeInterval: 5.0,
-//            repeats: true
-//        ) { [weak self] timer in
-//            guard !self.isNil else {
-//                timer.invalidate()
-//                continuation.finish()
-//                return
-//            }
-//            continuation.yield(true)
-//        }
-//    }
+    
     
     // MARK: - Destructor
     deinit {
-        ///Destruct notifications
-        notifications.forEach { $0?.cancel() }
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
     
+    
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func commonInit() {
-        setObservers()
-        setupUI()
-    }
-
-    // MARK: - Private methods
-    private func setupUI() {
-        backgroundColor = .clear
-        clipsToBounds = true
-        
-        bottomView.addSubview(horizontalStack)
-//        bottomView_2.addSubview(horizontalStack_2)
-        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-//        horizontalStack_2.translatesAutoresizingMaskIntoConstraints = false
-                NSLayoutConstraint.activate([
-                    horizontalStack.heightAnchor.constraint(equalTo: bottomView.heightAnchor),
-                    horizontalStack.centerXAnchor.constraint(equalTo: bottomView.centerXAnchor),
-                    horizontalStack.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor),
-//                    horizontalStack_2.heightAnchor.constraint(equalTo: bottomView_2.heightAnchor),
-//                    horizontalStack_2.centerXAnchor.constraint(equalTo: bottomView_2.centerXAnchor),
-//                    horizontalStack_2.centerYAnchor.constraint(equalTo: bottomView_2.centerYAnchor),
-                ])
-        contentView.addSubview(verticalStack)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        verticalStack.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-            verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-        ])
-        
-//        constraint = bottomView_2.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -50)
-        constraint.priority = .defaultLow
-        constraint.isActive = true
-        
-    }
     
-    private func setObservers() {
-        if #available(iOS 15, *) {
-            notifications.append(Task { [weak self] in
-                guard !self.isNil else { return }
-                for await _ in await NotificationCenter.default.notifications(for: UIApplication.willResignActiveNotification) {
-                    print("UIApplication.willResignActiveNotification")
-                }
-            })
-            notifications.append(Task { [weak self] in
-                guard !self.isNil else { return }
-                for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-                    print("UIApplication.didBecomeActiveNotification")
-                }
-            })
-            
-            notifications.append(Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
-                    await MainActor.run {
-                        guard let self = self,
-                              let item = self.item,
-                              let object = notification.object as? SurveyReference,
-                              item === object
-                        else { return }
-                        self.viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-                    }
-                }
-            })
-            notifications.append(Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Rating) {
-                    await MainActor.run {
-                        guard let self = self,
-                              let item = self.item,
-                              let object = notification.object as? SurveyReference,
-                              item === object
-                        else { return }
-                        self.ratingLabel.text = String(describing: item.rating)
-                    }
-                }
-            })
-        } else {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.updateViewsCount),
-                                                   name: Notifications.Surveys.Views,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.updateViewsCount),
-                                                   name: Notifications.Surveys.Rating,
-                                                   object: nil)
-        }
-    }
-    
-    @objc
-    private func updateViewsCount(notification: Notification) {
-        guard let item = self.item,
-              let object = notification.object as? SurveyReference,
-              item === object
-        else { return }
-        viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-    }
-    
-    @objc
-    private func updateRating(notification: Notification) {
-        guard let item = self.item,
-              let object = notification.object as? SurveyReference,
-              item === object
-        else { return }
-        ratingLabel.text = String(describing: item.rating)
-    }
     
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -302,7 +195,7 @@ class PollTitleCell: UICollectionViewCell {
         titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
                                             forTextStyle: .largeTitle)
         ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption2)
+                                             forTextStyle: .caption2)
         viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
                                             forTextStyle: .caption2)
         guard let constraint_1 = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
@@ -316,5 +209,54 @@ class PollTitleCell: UICollectionViewCell {
         layoutIfNeeded()
         
     }
+}
+
+// MARK: - Private
+private extension PollTitleCell {
+    @MainActor
+    func setupUI() {
+        backgroundColor = .clear
+        clipsToBounds = true
+        
+        bottomView.addSubview(horizontalStack)
+        //        bottomView_2.addSubview(horizontalStack_2)
+        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+        //        horizontalStack_2.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            horizontalStack.heightAnchor.constraint(equalTo: bottomView.heightAnchor),
+            horizontalStack.centerXAnchor.constraint(equalTo: bottomView.centerXAnchor),
+            horizontalStack.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor),
+            //                    horizontalStack_2.heightAnchor.constraint(equalTo: bottomView_2.heightAnchor),
+            //                    horizontalStack_2.centerXAnchor.constraint(equalTo: bottomView_2.centerXAnchor),
+            //                    horizontalStack_2.centerYAnchor.constraint(equalTo: bottomView_2.centerYAnchor),
+        ])
+        contentView.addSubview(verticalStack)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        verticalStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+            verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+        ])
+        
+        //        constraint = bottomView_2.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -50)
+        constraint.priority = .defaultLow
+        constraint.isActive = true
+        
+    }
     
+    @MainActor
+    func updateUI() {
+        guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
+        
+        setNeedsLayout()
+        constraint.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width, font: titleLabel.font)
+        layoutIfNeeded()
+    }
 }

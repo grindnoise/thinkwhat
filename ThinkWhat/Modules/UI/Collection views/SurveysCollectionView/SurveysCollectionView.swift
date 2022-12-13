@@ -253,8 +253,10 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        cell.setNeedsLayout()
-//        cell.layoutIfNeeded()
+//        cell.contentView.setNeedsLayout()
+//        cell.contentView.layoutIfNeeded()
+        
+//        cell.frame = CGRect(origin: cell.frame.origin, size: CGSize(width: cell.frame.w, height: <#T##CGFloat#>))
         
         guard category != .Search, isScrollingDown else { loadingIndicator.stopAnimating(); return }
         

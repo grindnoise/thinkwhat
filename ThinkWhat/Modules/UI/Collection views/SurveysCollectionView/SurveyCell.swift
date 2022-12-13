@@ -21,6 +21,8 @@ class SurveyCell: UICollectionViewCell {
 //            setNeedsLayout()
 //            layoutIfNeeded()
 //            layoutSubviews()
+//            updateConstraints()
+//            contentView.layoutIfNeeded()
             updateProgress(animated: false)
             setSubscriptions()
         }
@@ -55,7 +57,7 @@ class SurveyCell: UICollectionViewCell {
         
         return instance
     }()
-    
+    var isHeightCalculated: Bool = false
     
     
     // MARK: - Private properties
@@ -65,6 +67,19 @@ class SurveyCell: UICollectionViewCell {
     //UI
     let padding: CGFloat = 8
     //Header
+    private lazy var testView: UIView = {
+        let instance = UIView()
+        instance.addSubview(avatar)
+        avatar.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            avatar.topAnchor.constraint(equalTo: instance.topAnchor),
+            avatar.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+            avatar.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+            avatar.heightAnchor.constraint(equalToConstant: 70),
+        ])
+        
+        return instance
+    }()
     private lazy var headerView: UIStackView = {
         func createStack() -> UIStackView {
             //Topic & progress
@@ -316,23 +331,12 @@ class SurveyCell: UICollectionViewCell {
         let instance = UIView()
         instance.backgroundColor = .clear
         instance.clipsToBounds = true
-        instance.addSubview(imageView)
         instance.clipsToBounds = true
         instance.publisher(for: \.bounds)
             .filter { $0 != .zero }
             .sink { instance.cornerRadius = $0.width*0.025 }
             .store(in: &subscriptions)
         imageView.place(inside: instance)
-        
-        let shimmer = Shimmer()
-        shimmer.backgroundColor = .clear
-        shimmer.translatesAutoresizingMaskIntoConstraints = false
-        shimmer.clipsToBounds = true
-        shimmer.place(inside: instance)
-        shimmer.publisher(for: \.bounds)
-            .filter { $0 != .zero }
-            .sink { shimmer.cornerRadius = $0.width*0.025 }
-            .store(in: &subscriptions)
         
         return instance
     }()
@@ -445,7 +449,7 @@ class SurveyCell: UICollectionViewCell {
                                   withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
                                                                                  scale: .large)),
                           for: .normal)
-        instance.tintColor = .systemGray3
+        instance.tintColor = .systemGray4
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
         
@@ -457,7 +461,7 @@ class SurveyCell: UICollectionViewCell {
                                   withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
                                                                                  scale: .large)),
                           for: .normal)
-        instance.tintColor = .systemGray3
+        instance.tintColor = .systemGray4
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
         
@@ -516,8 +520,8 @@ class SurveyCell: UICollectionViewCell {
         viewsImage.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
         commentsImage.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
         
-        comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray3
-        watchButton.tintColor = item.isFavorite ? traitCollection.userInterfaceStyle == .dark ? .label : .systemGray : .systemGray3
+        comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray4
+        watchButton.tintColor = item.isFavorite ? traitCollection.userInterfaceStyle == .dark ? .label : .systemGray : .systemGray4
     }
 
     override func prepareForReuse() {
@@ -546,6 +550,20 @@ class SurveyCell: UICollectionViewCell {
         imageView.image = nil
     }
     
+//    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+//        //Exhibit A - We need to cache our calculation to prevent a crash.
+//            if !isHeightCalculated {
+//                setNeedsLayout()
+//                layoutIfNeeded()
+//                let size = contentView.systemLayoutSizeFitting(layoutAttributes.size)
+//                var newFrame = layoutAttributes.frame
+//                newFrame.size.width = CGFloat(ceilf(Float(size.width)))
+//                newFrame.size.height = CGFloat(ceilf(Float(size.height)))
+//                layoutAttributes.frame = newFrame
+//                isHeightCalculated = true
+//            }
+//            return layoutAttributes
+//    }
 //    override func updateConfiguration(using state: UICellConfigurationState) {
 //        super.updateConfiguration(using: state)
 //
@@ -553,9 +571,9 @@ class SurveyCell: UICollectionViewCell {
 //        config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
 //        backgroundConfiguration = config
 //    }
-    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-        print("layoutAttributes")
-    }
+//    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+//        print(layoutAttributes)
+//    }
 }
 
 
@@ -630,8 +648,8 @@ private extension SurveyCell {
 //            commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
 //            viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
 //
-//            comleteButton.tintColor = item.isComplete ? .systemGray : .systemGray3
-//            watchButton.tintColor = item.isFavorite ? .systemGray : .systemGray3
+//            comleteButton.tintColor = item.isComplete ? .systemGray : .systemGray4
+//            watchButton.tintColor = item.isFavorite ? .systemGray : .systemGray4
 //        }
 //
 //        updateHeader()
@@ -641,6 +659,8 @@ private extension SurveyCell {
         
         backgroundColor = .clear
         clipsToBounds = true
+        
+//        testView.place(inside: contentView)
 
         let items = [
             headerView,
@@ -651,7 +671,7 @@ private extension SurveyCell {
         contentView.addSubviews(items)
         contentView.translatesAutoresizingMaskIntoConstraints = false
 //        contentView.autoresizingMask = .flexibleHeight
-        
+
         NSLayoutConstraint.activate([
             contentView.topAnchor.constraint(equalTo: topAnchor),
             contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -668,7 +688,7 @@ private extension SurveyCell {
             bottomView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
 //            bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         ])
-        
+
         let constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint.priority = .defaultLow
         constraint.isActive = true
@@ -808,13 +828,15 @@ private extension SurveyCell {
                 guard let self = self else { return }
                 
                 UIView.animate(withDuration: duration) {
-                    self.watchButton.tintColor = flag ? self.traitCollection.userInterfaceStyle == .dark ? .label : .systemGray : .systemGray3
+                    self.watchButton.tintColor = flag ? self.traitCollection.userInterfaceStyle == .dark ? .label : .systemGray : .systemGray4
                 }
                 
                 guard flag else { return }
                 
                 let banner = Banner(fadeBackground: false)
-                banner.present(content: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!, text: "watch_survey_notification", tintColor: .label),
+                banner.present(content: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
+                                                          text: "watch_survey_notification",
+                                                          tintColor: .label),
                                dismissAfter: 0.75)
                 banner.didDisappearPublisher
                     .sink { _ in banner.removeFromSuperview() }
@@ -842,7 +864,7 @@ private extension SurveyCell {
         else { return }
         
         progressIndicator.backgroundColor = item.topic.tagColor
-        progressView.setNeedsLayout()
+//        progressView.setNeedsLayout()
         let progress = progressView.bounds.width * CGFloat(item.progress)*0.01
         
         guard animated else {
@@ -860,7 +882,6 @@ private extension SurveyCell {
             constraint.constant = progress
             self.progressView.layoutIfNeeded()
         } completion: { _ in }
-
     }
     
     @MainActor
@@ -900,27 +921,43 @@ private extension SurveyCell {
             
 //            middleView.setNeedsLayout()
             constraint.constant = item.title.height(withConstrainedWidth: bounds.width, font: titleLabel.font)
+            
             //Media
             if let media = item.media {
                 middleView.addArrangedSubview(imageContainer)
                 
                 guard let image = media.image else {
-                    guard let shimmer = imageContainer.getSubview(type: Shimmer.self) else { return }
+                    let shimmer = Shimmer()
+                    shimmer.backgroundColor = .clear
+                    shimmer.translatesAutoresizingMaskIntoConstraints = false
+                    shimmer.clipsToBounds = true
+                    shimmer.place(inside: imageContainer)
+                    shimmer.publisher(for: \.bounds)
+                        .filter { $0 != .zero }
+                        .sink { shimmer.cornerRadius = $0.width*0.025 }
+                        .store(in: &subscriptions)
                     
                     shimmer.startShimmering()
                     media.imagePublisher
                         .receive(on: DispatchQueue.main)
-                        .sink(receiveCompletion: { error in
-        #if DEBUG
-                            print(error)
-        #endif
+                        .sink(receiveCompletion: { completion in
+                            switch completion {
+                            case .finished:
+#if DEBUG
+                                print("success")
+#endif
+                            case .failure(let error):
+#if DEBUG
+                                print(error)
+#endif
+                            }
                         }, receiveValue: { [weak self] in
                             guard let self = self else { return }
                             
                             UIView.animate(withDuration: 0.15, delay: 0, animations: {
                                 shimmer.alpha = 0
                             }) { _ in
-                                shimmer.stopShimmering()
+                                shimmer.stopShimmering(animated: true)
                                 shimmer.removeFromSuperview()
                             }
                             self.imageView.image = $0
@@ -931,24 +968,6 @@ private extension SurveyCell {
                     return
                 }
                     imageView.image = image
-//                } else if !media.imageURL.isNil {
-//                    guard let shimmer = imageContainer.getSubview(type: Shimmer.self) else { return }
-//
-//                    shimmer.startShimmering()
-                    
-//                    Task { [weak self] in
-//                        guard let self = self else { return }
-//
-//                        try await media.downloadImageAsync()
-//
-//                        media.image.publisher
-//                            .sink {
-//                                self.imageView.image = $0
-//                                shimmer.stopShimmering()
-//                            }
-//                            .store(in: &self.subscriptions)
-//                    }
-//                }
             }
             constraint2.constant = item.truncatedDescription.height(withConstrainedWidth: bounds.width, font: descriptionLabel.font)
 //            middleView.layoutIfNeeded()
@@ -959,8 +978,8 @@ private extension SurveyCell {
             commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
             viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
             
-            comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray3
-            watchButton.tintColor = item.isFavorite ? traitCollection.userInterfaceStyle == .dark ? .label : .systemGray : .systemGray3
+            comleteButton.tintColor = item.isComplete ? .systemGray : .systemGray4
+            watchButton.tintColor = item.isFavorite ? traitCollection.userInterfaceStyle == .dark ? .label : .systemGray : .systemGray4
         }
         
 //#if DEBUG
@@ -978,7 +997,8 @@ private extension SurveyCell {
 //#if DEBUG
 //        print(frame.size)
 //#endif
-//        layoutIfNeeded()
+//        contentView.setNeedsLayout()
+//        contentView.layoutIfNeeded()
     }
 
     @objc

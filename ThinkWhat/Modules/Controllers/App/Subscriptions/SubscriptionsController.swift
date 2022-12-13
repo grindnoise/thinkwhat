@@ -132,11 +132,11 @@ class SubscriptionsController: UIViewController, TintColorable {
         super.viewWillDisappear(animated)
         
 //        titleLabel.alpha = 0
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-            guard let self = self else { return }
-
-            self.navigationController?.navigationBar.alpha = 0
-        }
+//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.navigationController?.navigationBar.alpha = 0
+//        }
     }
     
 //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

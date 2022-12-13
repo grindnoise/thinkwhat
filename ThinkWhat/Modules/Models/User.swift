@@ -253,9 +253,10 @@ class Userprofile: Decodable {
             }
         }
     }
+    
+    //Publishers
     public var imagePublisher = PassthroughSubject<UIImage, Error>()
-
-    @Published
+    
     var image: UIImage? {
         didSet {
             guard !image.isNil else { return }
@@ -646,7 +647,8 @@ class Userprofile: Decodable {
 //            print(self.id, "\(String(describing: self)).\(#function)")
 //#endif
             do {
-                image = try await API.shared.system.downloadImageAsync(from: url)
+                let image = try await API.shared.system.downloadImageAsync(from: url)
+                self.image = image
             } catch {
                 imagePublisher.send(completion: .failure(error))
             }

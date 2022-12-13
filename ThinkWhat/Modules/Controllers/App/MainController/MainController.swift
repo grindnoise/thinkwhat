@@ -112,6 +112,13 @@ class MainController: UITabBarController {//}, StorageProtocol {
 
         return instance
     }()
+    private lazy var passthroughView: PassthroughView = {
+        let instance = PassthroughView(frame: UIScreen.main.bounds)
+        instance.backgroundColor = .clear
+        instance.layer.zPosition = 99
+        
+        return instance
+    }()
     private lazy var logoStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [
             logoIcon,
@@ -121,7 +128,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
         instance.axis = .horizontal
         instance.spacing = 0
         instance.clipsToBounds = false
-        instance.layer.zPosition = 100
+//        instance.layer.zPosition = 100
+        passthroughView.addSubview(instance)
 //        view.addSubview(instance)
         
         return instance
@@ -162,7 +170,35 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     // MARK: - Public methods
     func setLogoInitialFrame(size: CGSize, y: CGFloat) {
+        guard logoStack.frame == .zero else { return }
+
+        logoStack.translatesAutoresizingMaskIntoConstraints = false
+        logoStack.heightAnchor.constraint(equalToConstant: size.height * 0.65).isActive = true
+
+        let leading = logoStack.leadingAnchor.constraint(equalTo: passthroughView.leadingAnchor)
+        leading.identifier = "leading"
+        leading.isActive = true
+
+        let top = logoStack.topAnchor.constraint(equalTo: passthroughView.topAnchor)
+        top.identifier = "top"
+        top.isActive = true
+
+        passthroughView.setNeedsLayout()
+        passthroughView.layoutIfNeeded()
+
+        logoCenterY = y  - self.logoStack.bounds.height/2
+
+        passthroughView.setNeedsLayout()
+        top.constant = logoCenterY//-logoStack.bounds.height
+        leading.constant = (passthroughView.bounds.width - logoStack.bounds.width)/2
+        passthroughView.layoutIfNeeded()
         
+        UIView.animate(withDuration: 0.15) { [unowned self] in
+            self.passthroughView.setNeedsLayout()
+//            self.logoStack.alpha = 1
+            top.constant = y - self.logoStack.bounds.height/2
+            self.passthroughView.layoutIfNeeded()
+        }
 //        guard logoStack.frame == .zero else { return }
 //
 //        logoStack.translatesAutoresizingMaskIntoConstraints = false
@@ -185,7 +221,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
 //        top.constant = logoCenterY//-logoStack.bounds.height
 //        leading.constant = (view.bounds.width - logoStack.bounds.width)/2
 //        view.layoutIfNeeded()
-        
+//
 //        UIView.animate(withDuration: 0.15) { [unowned self] in
 //            self.view.setNeedsLayout()
 //            self.logoStack.alpha = 1
@@ -200,12 +236,12 @@ class MainController: UITabBarController {//}, StorageProtocol {
         if on, constraint.constant > 0 { return }
         if !on, constraint.constant < 0 { return }
         
-        view.setNeedsLayout()
+        passthroughView.setNeedsLayout()
         
         guard animated else {
             constraint.constant = on ? logoCenterY : -logoStack.bounds.height
             logoStack.alpha = on ? 1 : 0
-            view.layoutIfNeeded()
+            passthroughView.layoutIfNeeded()
             
             return
         }
@@ -220,7 +256,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 
                 self.logoStack.alpha = on ? 1 : 0
                 constraint.constant = on ? self.logoCenterY : -self.logoStack.bounds.height
-                self.view.layoutIfNeeded()
+                self.passthroughView.layoutIfNeeded()
             }
     }
     
@@ -251,6 +287,10 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 print("Something went wrong")
             }
         }
+        
+//        delayAsync(delay: 2) {
+            appDelegate.window?.addSubview(self.passthroughView)
+//        }
     }
 }
 
@@ -453,7 +493,9 @@ private extension MainController {
         
         setTabBarVisible(visible: false, animated: false)
         loadingStack.placeInCenter(of: view, widthMultiplier: 0.6, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-        changeLoaderColor(from: Colors.Logo.Flame, to: Colors.Logo.Flame.next())
+        animateLoaderColor(from: Colors.Logo.Flame, to: Colors.Logo.Flame.next())
+        
+//        appDelegate.window?.addSubview(passthroughView)
     }
     
     func onServerUnavailable() {
@@ -563,7 +605,7 @@ private extension MainController {
         }
     }
     
-    func changeLoaderColor(from: Colors.Logo, to: Colors.Logo) {
+    func animateLoaderColor(from: Colors.Logo, to: Colors.Logo) {
         let anim_1 = Animations.get(property: .FillColor,
                                     fromValue: from.rawValue.cgColor as Any,
                                     toValue: to.rawValue.cgColor as Any,
@@ -580,7 +622,7 @@ private extension MainController {
                                             
                                             guard self.isDataLoaded else {
                                                 delayAsync(delay: 0.75) {
-                                                    self.changeLoaderColor(from: to, to: to.next())
+                                                    self.animateLoaderColor(from: to, to: to.next())
                                                 }
                                                 return
                                             }
@@ -606,24 +648,24 @@ private extension MainController {
     func setLogoLeading(constant: CGFloat, animated: Bool = false) {
         guard let leading = logoStack.getConstraint(identifier: "leading") else { return }
         
-        view.setNeedsLayout()
+        passthroughView.setNeedsLayout()
         if animated {
             UIView.animate(withDuration: 0.25,
                            delay: 0,
                            options: .curveEaseInOut)  { [unowned self] in
                 leading.constant = constant
-                self.view.layoutIfNeeded()
+                self.passthroughView.layoutIfNeeded()
             }
         } else {
             leading.constant = constant
-            view.layoutIfNeeded()
+            passthroughView.layoutIfNeeded()
         }
     }
     
     func setLogoCentered(animated: Bool = false) {
         guard let leading = logoStack.getConstraint(identifier: "leading") else { return }
 
-        let constant = (view.bounds.width - logoStack.bounds.width)/2
+        let constant = (passthroughView.bounds.width - logoStack.bounds.width)/2
         
         view.setNeedsLayout()
         if animated {
@@ -631,11 +673,11 @@ private extension MainController {
                            delay: 0,
                            options: .curveEaseInOut)  { [unowned self] in
                 leading.constant = constant
-                self.view.layoutIfNeeded()
+                self.passthroughView.layoutIfNeeded()
             }
         } else {
             leading.constant = constant
-            view.layoutIfNeeded()
+            passthroughView.layoutIfNeeded()
         }
     }
 }

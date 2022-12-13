@@ -19,12 +19,14 @@ class Banner: UIView {
             shadowView.clipsToBounds = false
             shadowView.backgroundColor = .clear
             shadowView.accessibilityIdentifier = "shadow"
+            
             guard shadowed else { return }
             shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.6).cgColor
-            shadowView.layer.shadowRadius = 10
+            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.7).cgColor
+            shadowView.layer.shadowRadius = 16
             shadowView.layer.shadowOffset = .zero
-            shadowView.publisher(for: \.bounds, options: .new)
+            shadowView.publisher(for: \.bounds)
+                .receive(on: DispatchQueue.main)
                 .sink { [weak self] in
                     guard let self = self else { return }
                     
@@ -40,14 +42,14 @@ class Banner: UIView {
             background.alpha = 0
         }
     }
-    @IBOutlet weak var coloredBackround: UIView! {
-        didSet {
-            coloredBackround.backgroundColor = color//traitCollection.userInterfaceStyle == .dark ? .clear : color
-        }
-    }
+//    @IBOutlet weak var coloredBackround: UIView! {
+//        didSet {
+//            coloredBackround.backgroundColor = color//traitCollection.userInterfaceStyle == .dark ? .clear : color
+//        }
+//    }
     @IBOutlet weak var body: UIView! {
         didSet {
-            body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBackground : .tertiarySystemBackground
+            body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .tertiarySystemBackground
         }
     }
     @IBOutlet weak var container: UIView!
@@ -144,12 +146,14 @@ class Banner: UIView {
     // MARK: - Initialization
     private func setupUI() {
         guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+        
         backgroundColor                 = .clear
         bounds                          = UIScreen.main.bounds
         contentView.frame               = bounds
         contentView.autoresizingMask    = [.flexibleHeight, .flexibleWidth]
         appDelegate.window?.addSubview(self)
         addSubview(contentView)
+        self.layer.zPosition = 1000
         
         //Set default height
         setNeedsLayout()

@@ -165,6 +165,7 @@ class SurveyReference: Decodable {// NSObject,
     var shareHash:              String = ""
     var shareEncryptedString:   String = ""
     //Publishers
+    var surveyPublisher         = PassthroughSubject<Survey, Never>()
     var ratingPublisher         = PassthroughSubject<Double, Never>()
     var isFavoritePublisher     = PassthroughSubject<Bool, Never>()
     var isCompletePublisher     = PassthroughSubject<Bool, Never>()

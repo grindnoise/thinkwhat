@@ -13,7 +13,6 @@
             <connections>
                 <outlet property="background" destination="ThP-Hz-SG0" id="3wn-6E-W5c"/>
                 <outlet property="body" destination="k0P-Na-v1c" id="ZqW-hi-aMo"/>
-                <outlet property="coloredBackround" destination="Mop-7n-f8J" id="sgV-VI-5b6"/>
                 <outlet property="container" destination="Rar-ub-moY" id="vFX-2R-8SN"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="vbl-ul-dhk"/>
                 <outlet property="heightConstraint" destination="QWB-Lr-CVo" id="QfU-eX-RIu"/>
@@ -31,34 +30,22 @@
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AB7-J0-o3H">
-                    <rect key="frame" x="10" y="8" width="394" height="100"/>
+                    <rect key="frame" x="10" y="56" width="394" height="100"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="k0P-Na-v1c">
                             <rect key="frame" x="0.0" y="0.0" width="394" height="100"/>
                             <subviews>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mop-7n-f8J">
-                                    <rect key="frame" x="0.0" y="0.0" width="394" height="100"/>
-                                    <subviews>
-                                        <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rar-ub-moY">
-                                            <rect key="frame" x="8" y="8" width="378" height="84"/>
-                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        </view>
-                                    </subviews>
-                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                    <constraints>
-                                        <constraint firstAttribute="bottom" secondItem="Rar-ub-moY" secondAttribute="bottom" constant="8" id="8cM-y2-FIm"/>
-                                        <constraint firstItem="Rar-ub-moY" firstAttribute="leading" secondItem="Mop-7n-f8J" secondAttribute="leading" constant="8" id="X67-tF-Pgq"/>
-                                        <constraint firstItem="Rar-ub-moY" firstAttribute="top" secondItem="Mop-7n-f8J" secondAttribute="top" constant="8" id="aA7-My-oXK"/>
-                                        <constraint firstAttribute="trailing" secondItem="Rar-ub-moY" secondAttribute="trailing" constant="8" id="qHZ-22-Wcf"/>
-                                    </constraints>
+                                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rar-ub-moY">
+                                    <rect key="frame" x="8" y="8" width="378" height="84"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </view>
                             </subviews>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             <constraints>
-                                <constraint firstAttribute="trailing" secondItem="Mop-7n-f8J" secondAttribute="trailing" id="SLU-0h-Z5L"/>
-                                <constraint firstItem="Mop-7n-f8J" firstAttribute="top" secondItem="k0P-Na-v1c" secondAttribute="top" id="epc-7p-hsI"/>
-                                <constraint firstItem="Mop-7n-f8J" firstAttribute="leading" secondItem="k0P-Na-v1c" secondAttribute="leading" id="maN-0j-pnJ"/>
-                                <constraint firstAttribute="bottom" secondItem="Mop-7n-f8J" secondAttribute="bottom" id="nOF-Zy-KV4"/>
+                                <constraint firstAttribute="bottom" secondItem="Rar-ub-moY" secondAttribute="bottom" constant="8" id="AW5-wm-zf8"/>
+                                <constraint firstAttribute="trailing" secondItem="Rar-ub-moY" secondAttribute="trailing" constant="8" id="B1R-jh-PXB"/>
+                                <constraint firstItem="Rar-ub-moY" firstAttribute="top" secondItem="k0P-Na-v1c" secondAttribute="top" constant="8" id="Y7f-4s-77d"/>
+                                <constraint firstItem="Rar-ub-moY" firstAttribute="leading" secondItem="k0P-Na-v1c" secondAttribute="leading" constant="8" id="zLg-z0-gXd"/>
                             </constraints>
                         </view>
                     </subviews>

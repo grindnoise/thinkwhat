@@ -325,6 +325,7 @@ class Avatar: UIView {
     public lazy var imageView: UIImageView = {
         let instance = UIImageView()
         instance.contentMode = .scaleAspectFill
+        instance.alpha = 0
         instance.accessibilityIdentifier = "imageView"
         instance.layer.masksToBounds = true
         instance.backgroundColor = .clear//.systemGray2
@@ -338,7 +339,7 @@ class Avatar: UIView {
                 guard let self = self else { return }
 
                 DispatchQueue.main.async {
-                    instance.alpha = 0
+//                    instance.alpha = 0
                     UIView.animate(withDuration: 0.25, delay: 0, animations: { [weak self] in
                         guard let self = self else { return }
                         
@@ -631,18 +632,13 @@ private extension Avatar {
     
     func setImage(for userprofile: Userprofile) {
         guard let image = userprofile.image else {
-//            print("subscription for", userprofile.id)
             coloredBackground.startShimmering()
             userprofile.downloadImage()
             
             return
         }
-//        Task { @MainActor [weak self] in
-//            guard let self = self else { return }
-            imageView.image = image
-        imageView.alpha = 1
-//            self.imageView.contentMode = .scaleAspectFill
-//        }
+
+        imageView.image = image
     }
     
     func pointOnCircle(center: CGPoint, radius: CGFloat, angleInDegrees: CGFloat) -> CGPoint {

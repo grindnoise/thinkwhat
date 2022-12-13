@@ -249,7 +249,7 @@ class ListView: UIView {
                       let surveyReference = $0
                 else { return }
                 
-                let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
+                let banner = Popup()
                 let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
                 
                 claimContent.claimPublisher
@@ -668,11 +668,11 @@ extension ListView: ListControllerOutput {
     }
 }
 
-extension ListView: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-
-    }
-}
+//extension ListView: CallbackObservable {
+//    func callbackReceived(_ sender: Any) {
+//
+//    }
+//}
 
 extension ListView: BannerObservable {
     func onBannerWillAppear(_ sender: Any) {}

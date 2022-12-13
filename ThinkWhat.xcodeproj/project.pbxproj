@@ -28,6 +28,7 @@
 		AB0B7FD7294384C200941FA1 /* TestViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB0B7FD5294384C200941FA1 /* TestViewController.xib */; };
 		AB0B7FD92944E07A00941FA1 /* ListController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB0B7FD82944E07A00941FA1 /* ListController.xib */; };
 		AB0B7FDB294745DF00941FA1 /* TextBannerContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0B7FDA294745DF00941FA1 /* TextBannerContent.swift */; };
+		AB0B7FDD294788DE00941FA1 /* PassthroughView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0B7FDC294788DE00941FA1 /* PassthroughView.swift */; };
 		AB0BFDF1252DBCD500BD5EFF /* HeartIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF0252DBCD500BD5EFF /* HeartIcon.swift */; };
 		AB0BFDF3252DC9E400BD5EFF /* MegaphoneIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */; };
 		AB0BFDF5252EF20C00BD5EFF /* PieIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */; };
@@ -311,6 +312,7 @@
 		AB7FD68828F96764003F38E4 /* UserprofilesFeedCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7FD68728F96764003F38E4 /* UserprofilesFeedCollectionView.swift */; };
 		AB8238F927A914100061F7C6 /* URLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8238F827A914100061F7C6 /* URLs.swift */; };
 		AB82C368259C826100888C74 /* TrashIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB82C367259C826100888C74 /* TrashIcon.swift */; };
+		AB83A49F2948BDE700903DEA /* PollViewBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB83A49E2948BDE700903DEA /* PollViewBackup.swift */; };
 		AB868A6A23EB04A3008DEB84 /* 1_CategorySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB868A6923EB04A3008DEB84 /* 1_CategorySelectionViewController.swift */; };
 		AB869F2326C3C68E008353B3 /* Warning.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB869F2226C3C68D008353B3 /* Warning.xib */; };
 		AB869F2526C3C69B008353B3 /* Warning.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB869F2426C3C69B008353B3 /* Warning.swift */; };
@@ -612,6 +614,7 @@
 		AB0B7FD5294384C200941FA1 /* TestViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TestViewController.xib; sourceTree = "<group>"; };
 		AB0B7FD82944E07A00941FA1 /* ListController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ListController.xib; sourceTree = "<group>"; };
 		AB0B7FDA294745DF00941FA1 /* TextBannerContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBannerContent.swift; sourceTree = "<group>"; };
+		AB0B7FDC294788DE00941FA1 /* PassthroughView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassthroughView.swift; sourceTree = "<group>"; };
 		AB0BFDF0252DBCD500BD5EFF /* HeartIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF2252DC9E400BD5EFF /* MegaphoneIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MegaphoneIcon.swift; sourceTree = "<group>"; };
 		AB0BFDF4252EF20C00BD5EFF /* PieIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieIcon.swift; sourceTree = "<group>"; };
@@ -904,6 +907,7 @@
 		AB7FD68728F96764003F38E4 /* UserprofilesFeedCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserprofilesFeedCollectionView.swift; sourceTree = "<group>"; };
 		AB8238F827A914100061F7C6 /* URLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLs.swift; sourceTree = "<group>"; };
 		AB82C367259C826100888C74 /* TrashIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashIcon.swift; sourceTree = "<group>"; };
+		AB83A49E2948BDE700903DEA /* PollViewBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollViewBackup.swift; sourceTree = "<group>"; };
 		AB868A6923EB04A3008DEB84 /* 1_CategorySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 1_CategorySelectionViewController.swift; sourceTree = "<group>"; };
 		AB869F2226C3C68D008353B3 /* Warning.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Warning.xib; sourceTree = "<group>"; };
 		AB869F2426C3C69B008353B3 /* Warning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Warning.swift; sourceTree = "<group>"; };
@@ -2484,6 +2488,7 @@
 		AB913F8928097D8A00609D51 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				AB0B7FDC294788DE00941FA1 /* PassthroughView.swift */,
 				ABD2A2B428841AE600591568 /* Collection views */,
 				AB3C6835223FD3EE00B57580 /* Fonts */,
 				ABCDC72228DC76D9003B24F2 /* Labels */,
@@ -2649,6 +2654,7 @@
 				ABA448EE27EE031D00F8E00D /* PollView.swift */,
 				ABA448EF27EE031D00F8E00D /* PollModel.swift */,
 				ABA448F427EE044B00F8E00D /* PollView.xib */,
+				AB83A49E2948BDE700903DEA /* PollViewBackup.swift */,
 			);
 			path = Poll;
 			sourceTree = "<group>";
@@ -3689,6 +3695,7 @@
 				AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
 				AB0AB63227B3DF2B006FD33F /* GoogleWorker.swift in Sources */,
+				AB83A49F2948BDE700903DEA /* PollViewBackup.swift in Sources */,
 				AB1F34CE286B1D080086969E /* URLPasteView.swift in Sources */,
 				AB72964B27DB612000D45B54 /* SettingsView.swift in Sources */,
 				AB0980DC24CF04A100A02405 /* UserActivityCell.swift in Sources */,
@@ -3698,6 +3705,7 @@
 				AB0BFDF3252DC9E400BD5EFF /* MegaphoneIcon.swift in Sources */,
 				AB8F28B027C0DEEB008E4ED0 /* NSLayoutConstraint.swift in Sources */,
 				AB30A4FD272AAEAD00A7DCC0 /* Answer.swift in Sources */,
+				AB0B7FDD294788DE00941FA1 /* PassthroughView.swift in Sources */,
 				AB4054FA28783E81000F7768 /* VoteCell.swift in Sources */,
 				AB3211AE288E810A00C736DE /* TopicHeaderCell.swift in Sources */,
 				AB649E2628A1597800978520 /* CommentSupplementaryCell.swift in Sources */,

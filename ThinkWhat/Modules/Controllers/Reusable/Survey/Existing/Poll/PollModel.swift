@@ -12,6 +12,12 @@ import SwiftyJSON
 class PollModel {
     
     weak var modelOutput: PollModelOutput?
+    var surveyReference: SurveyReference? {
+        return modelOutput?.surveyReference
+    }
+    var survey: Survey? {
+        return modelOutput?.surveyReference.survey
+    }
 }
 
 // MARK: - Controller Input
@@ -169,18 +175,15 @@ extension PollModel: PollControllerInput {
         }
     }
     
-    var survey: Survey? {
-        return modelOutput?.survey
-    }
-    
     func claim(_ reason: Claim) {
         guard let survey = survey else { return }
+        
         Task {
             try await API.shared.surveys.claim(surveyReference: survey.reference, reason: reason)
         }
     }
     
-    func loadPoll(_ reference: SurveyReference, incrementViewCounter: Bool = true) {
+    func load(_ reference: SurveyReference, incrementViewCounter: Bool = true) {
         Task {
             do {
                 try await API.shared.surveys.getSurvey(byReference: reference, incrementCounter: incrementViewCounter)
@@ -195,7 +198,7 @@ extension PollModel: PollControllerInput {
         }
     }
     
-    func addFavorite(_ mark: Bool) {
+    func toggleFavorite(_ mark: Bool) {
         guard !survey.isNil else { modelOutput?.onAddFavoriteCallback(.failure("Survey is nil")); return }
         
         Task {

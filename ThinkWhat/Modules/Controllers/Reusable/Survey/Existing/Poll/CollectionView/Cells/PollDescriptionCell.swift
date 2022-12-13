@@ -14,8 +14,16 @@ class PollDescriptionCell: UICollectionViewCell {
     // MARK: - Public Properties
     public var item: Survey! {
         didSet {
-            guard !item.isNil else { return }
+            guard let item = item else { return }
+            
+//            setNeedsLayout()
+//            layoutIfNeeded()
             textView.text = item.description
+//            let constraint = textView.heightAnchor.constraint(equalToConstant: textView.contentSize.height)
+//            constraint.identifier = "height"
+//            constraint.isActive = true
+                        setNeedsLayout()
+                        layoutIfNeeded()
         }
     }
     
@@ -36,17 +44,20 @@ class PollDescriptionCell: UICollectionViewCell {
         instance.isEditable = false
         instance.isSelectable = false
         
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+        let constraint = instance.heightAnchor.constraint(equalToConstant: 1)
         constraint.identifier = "height"
         constraint.isActive = true
-        
+
         instance.publisher(for: \.contentSize)
-            .filter { $0 != .zero }
+            .receive(on: DispatchQueue.main)
+            .filter { $0 != .zero && $0.height > 0 }
             .sink { [weak self] in
                 guard let self = self else { return }
 
                 self.setNeedsLayout()
-                constraint.constant = $0.height// + self.padding*2
+                print("height", $0.height)
+                constraint.constant = $0.height + self.padding//*2
+                self.setNeedsDisplay()
                 self.layoutIfNeeded()
             }
             .store(in: &subscriptions)
@@ -67,13 +78,11 @@ class PollDescriptionCell: UICollectionViewCell {
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
-
+    
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        clipsToBounds = false
-        layer.masksToBounds = false
-        setObservers()
+
         setupUI()
     }
     
@@ -81,53 +90,15 @@ class PollDescriptionCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private methods
-    private func setupUI() {
-        backgroundColor = .clear
-        clipsToBounds = false
-        layer.masksToBounds = false
-        contentView.layer.masksToBounds = false
-        
-        textView.place(inside: contentView)
-//        contentView.addSubview(textView)
-//        contentView.translatesAutoresizingMaskIntoConstraints = false
-//        textView.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            contentView.topAnchor.constraint(equalTo: topAnchor),
-//            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-//            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-//            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-//            textView.topAnchor.constraint(equalTo: contentView.topAnchor),
-//            textView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-//            textView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
-//        ])
-//
-//        let constraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-//        constraint.priority = .defaultLow
-    }
-    
-    private func setObservers() {
-        tasks.append(Task { [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
-                guard let self = self,
-                      let instance = notification.object as? SurveyReference,
-                      let survey = instance.survey,
-                      survey == self.item
-                else { return }
-            }
-        })
-    }
-    
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-//        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-//        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-//        if let imageView = icon.get(all: UIImageView.self).first {
-//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-//        }
+        //        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        //        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        //        if let imageView = icon.get(all: UIImageView.self).first {
+        //            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        //        }
         
         //Set dynamic font size
         guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
@@ -139,12 +110,42 @@ class PollDescriptionCell: UICollectionViewCell {
         constraint_1.constant = textView.contentSize.height + padding*2
     }
     
-//    override func prepareForReuse() {
-//        super.prepareForReuse()
-//        openConstraint?.isActive = false
-//        closedConstraint?.isActive = true
-//        textView.frame = .zero
-//    }
+}
+
+// MARK: - Private methods
+private extension PollDescriptionCell {
+    @MainActor
+    func setupUI() {
+        backgroundColor = .clear
+        
+        textView.place(inside: contentView, bottomPriority: .defaultLow)
+//        contentView.addSubview(textView)
+//        contentView.translatesAutoresizingMaskIntoConstraints = false
+//        textView.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            contentView.topAnchor.constraint(equalTo: topAnchor),
+//            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+//            textView.topAnchor.constraint(equalTo: contentView.topAnchor),
+//            textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+//            textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+//        ])
+//
+//        let constraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+//        constraint.priority = .defaultLow
+//        constraint.isActive = true
+    }
+    
+    @MainActor
+    func updateUI() {
+//        guard let constraint = textView.getConstraint(identifier: "height") else { return }
+//
+//        setNeedsLayout()
+//        constraint.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width, font: titleLabel.font)
+//        layoutIfNeeded()
+    }
 }
 
 

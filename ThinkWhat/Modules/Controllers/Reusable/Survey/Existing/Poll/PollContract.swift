@@ -15,19 +15,16 @@ protocol PollViewInput: AnyObject {
     var controllerInput: PollControllerInput? { get set }
     var survey: Survey? { get }
     var surveyReference: SurveyReference { get }
-//    var showNext: Bool { get }
     var mode: PollController.Mode { get }
     
     func onClaim(_: Claim)
     func onCommentClaim(comment: Comment, reason: Claim)
     func onAddFavorite(_: Bool)
     func onVote(_: Answer)
-//    func onImageTapped(image: UIImage, title: String)
-//    func onImageTapped(mediafile: Mediafile)
+
     func onURLTapped(_: URL)
     func onExitWithSkip()
-//    func onVotersTapped(answer: Answer, indexPath: IndexPath, color: UIColor)
-    func onVotersTapped(answer: Answer, color: UIColor)
+    func onVotersTapped(answer: Answer)
     func postComment(body: String, replyTo: Comment?, username: String?)
     func requestComments(_:[Comment])
     func openCommentThread(_: Comment)
@@ -39,20 +36,21 @@ protocol PollControllerInput: AnyObject {
     var modelOutput: PollModelOutput? { get set }
     var survey: Survey? { get }
     
-    func loadPoll(_: SurveyReference, incrementViewCounter: Bool)
-    func addFavorite(_: Bool)
+    func load(_: SurveyReference, incrementViewCounter: Bool)
+    func toggleFavorite(_: Bool)
     func claim(_: Claim)
-    func commentClaim(comment: Comment, reason: Claim)
     func vote(_: Answer)
     func addView()
     func updateResultsStats(_: SurveyReference)
     func postComment(body: String, replyTo: Comment?, username: String?)
+    func commentClaim(comment: Comment, reason: Claim)
     func requestComments(_:[Comment])
     func deleteComment(_:Comment)
 }
 
 protocol PollModelOutput: AnyObject {
-    var survey: Survey? { get }
+//    var survey: Survey? { get }
+    var surveyReference: SurveyReference { get }
     
     func onLoadCallback(_: Result<Bool, Error>)
     func onAddFavoriteCallback(_: Result<Bool,Error>)
@@ -63,19 +61,9 @@ protocol PollModelOutput: AnyObject {
 
 protocol PollControllerOutput: AnyObject {
     var viewInput: (PollViewInput & UIViewController)? { get set }
-    var survey: Survey? { get }
-    var surveyReference: SurveyReference { get }
-//    var hasVoted: Bool { get }
-//    var showNext: Bool { get }
-    var mode: PollController.Mode { get }
-//    @Published var lastContentOffsetY: CGFloat { get }
-//    var scrollOffsetPublisher: Published<CGFloat>.Publisher { get }
     
-//    func onSurveyLoaded()
     func onLoadCallback()
     func onVoteCallback(_: Result<Bool,Error>)
-//    func startLoading()
-    func onAddFavoriteCallback()
     func commentPostCallback(_: Result<Comment,Error>)
     func commentDeleteError()
 }
