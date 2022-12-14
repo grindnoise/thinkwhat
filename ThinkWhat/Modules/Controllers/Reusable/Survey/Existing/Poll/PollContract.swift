@@ -13,15 +13,12 @@ protocol PollViewInput: AnyObject {
     
     var controllerOutput: PollControllerOutput? { get set }
     var controllerInput: PollControllerInput? { get set }
-    var survey: Survey? { get }
-    var surveyReference: SurveyReference { get }
-    var mode: PollController.Mode { get }
+    var item: SurveyReference { get }
     
     func onClaim(_: Claim)
     func onCommentClaim(comment: Comment, reason: Claim)
     func onAddFavorite(_: Bool)
     func onVote(_: Answer)
-
     func onURLTapped(_: URL)
     func onExitWithSkip()
     func onVotersTapped(answer: Answer)
@@ -34,7 +31,7 @@ protocol PollViewInput: AnyObject {
 protocol PollControllerInput: AnyObject {
     
     var modelOutput: PollModelOutput? { get set }
-    var survey: Survey? { get }
+    var item: SurveyReference? { get }
     
     func load(_: SurveyReference, incrementViewCounter: Bool)
     func toggleFavorite(_: Bool)
@@ -49,21 +46,22 @@ protocol PollControllerInput: AnyObject {
 }
 
 protocol PollModelOutput: AnyObject {
-//    var survey: Survey? { get }
-    var surveyReference: SurveyReference { get }
+    var item: SurveyReference { get }
     
     func onLoadCallback(_: Result<Bool, Error>)
-    func onAddFavoriteCallback(_: Result<Bool,Error>)
-    func onVoteCallback(_: Result<Bool,Error>)
-    func commentPostCallback(_: Result<Comment,Error>)
+    func onAddFavoriteCallback(_: Result<Bool, Error>)
+    func onVoteCallback(_: Result<Bool, Error>)
+    func commentPostCallback(_: Result<Comment, Error>)
     func commentDeleteError()
 }
 
 protocol PollControllerOutput: AnyObject {
     var viewInput: (PollViewInput & UIViewController)? { get set }
+    var item: Survey? { get set }
     
-    func onLoadCallback()
-    func onVoteCallback(_: Result<Bool,Error>)
-    func commentPostCallback(_: Result<Comment,Error>)
+    func presentView(_: Survey)
+    func onLoadCallback(_: Result<Bool, Error>)
+    func onVoteCallback(_: Result<Bool, Error>)
+    func commentPostCallback(_: Result<Comment, Error>)
     func commentDeleteError()
 }

@@ -353,7 +353,7 @@ class ListView: UIView {
         instance.layer.shadowOffset = .zero
         instance.publisher(for: \.bounds)
             .sink { [unowned self] rect in
-                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*(self.filterView.alpha == 0 ? 0.035 : 0.05)).cgPath
+                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
             }
             .store(in: &subscriptions)
         background.addEquallyTo(to: instance)

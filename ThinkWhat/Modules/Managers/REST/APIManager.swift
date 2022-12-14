@@ -1359,7 +1359,7 @@ class API {
             }
         }
         
-        public func postComment(_ body: String, survey: Survey, replyTo: Comment? = nil, username: String? = nil) async throws -> Comment {
+        public func postComment(_ body: String, survey: SurveyReference, replyTo: Comment? = nil, username: String? = nil) async throws -> Comment {
             guard let url = API_URLS.Surveys.postComment,
                   let headers = headers
             else { throw APIError.invalidURL }
@@ -1394,7 +1394,7 @@ class API {
                     if let rootNode = rootNode {
 //                        await MainActor.run {
                             rootNode.replies += 1
-                            survey.reference.commentsTotal += 1
+                            survey.commentsTotal += 1
                             NotificationCenter.default.post(name: Notifications.Comments.ChildrenCountChange, object: rootNode)
 //                        }
                     }
@@ -1462,7 +1462,7 @@ class API {
         }
 
         
-        public func requestRootComments(survey: Survey, excludedComments: [Comment] = []) async throws {
+        public func requestRootComments(survey: SurveyReference, excludedComments: [Comment] = []) async throws {
             guard let url = API_URLS.Surveys.getRootComments,
                   let headers = headers
             else { throw APIError.invalidURL }

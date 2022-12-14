@@ -251,6 +251,7 @@ class Survey: Decodable {
     var isComplete: Bool {
         didSet {
             guard isComplete else { return }
+            
             reference.isComplete = isComplete
         }
         

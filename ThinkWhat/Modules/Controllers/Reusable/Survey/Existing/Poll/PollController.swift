@@ -17,33 +17,31 @@ class PollController: UIViewController {
     // MARK: - Public properties
     var controllerOutput: PollControllerOutput?
     var controllerInput: PollControllerInput?
-    public private(set) var mode: Mode
-    public private(set) var survey: Survey?
-    public private(set) var surveyReference: SurveyReference {
+    public private(set) var item: SurveyReference {
         didSet {
-            func update() {
-                //Update survey stats every n seconds
-                Timer
-                    .publish(every: 5, on: .current, in: .common)
-                    .autoconnect()
-                    .sink { [weak self] seconds in
-                        guard let self = self else { return }
-                        
-                        self.controllerInput?.updateResultsStats(self.surveyReference)
-                    }
-                    .store(in: &subscriptions)
-            }
-            
-            guard surveyReference.isComplete else {
-                surveyReference.isCompletePublisher
-                    .filter { $0 }
-                    .sink { _ in update() }
-                    .store(in: &subscriptions)
-                
-                return
-            }
-            
-            update()
+            //            func update() {
+            //                //Update survey stats every n seconds
+            //                Timer
+            //                    .publish(every: 5, on: .current, in: .common)
+            //                    .autoconnect()
+            //                    .sink { [weak self] seconds in
+            //                        guard let self = self else { return }
+            //
+            //                        self.controllerInput?.updateResultsStats(self.surveyReference)
+            //                    }
+            //                    .store(in: &subscriptions)
+            //            }
+            //
+            //            guard surveyReference.isComplete else {
+            //                surveyReference.isCompletePublisher
+            //                    .filter { $0 }
+            //                    .sink { _ in update() }
+            //                    .store(in: &subscriptions)
+            //
+            //                return
+            //            }
+            //
+            //            update()
         }
     }
     
@@ -57,19 +55,19 @@ class PollController: UIViewController {
     //UI
     private lazy var avatar: Avatar = { Avatar() }()
     private lazy var topicIcon: Icon = {
-        let instance = Icon(category: surveyReference.topic.iconCategory)
+        let instance = Icon(category: item.topic.iconCategory)
         instance.iconColor = .white
         instance.isRounded = false
         instance.clipsToBounds = false
         instance.scaleMultiplicator = 1.65
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-
+        
         return instance
     }()
     private lazy var topicTitle: InsetLabel = {
         let instance = InsetLabel()
         instance.font = UIFont(name: Fonts.Bold, size: 20)
-        instance.text = surveyReference.topic.title.uppercased()
+        instance.text = item.topic.title.uppercased()
         instance.textColor = .white
         instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
         
@@ -80,7 +78,7 @@ class PollController: UIViewController {
             topicIcon,
             topicTitle
         ])
-        instance.backgroundColor = surveyReference.topic.tagColor
+        instance.backgroundColor = item.topic.tagColor
         instance.axis = .horizontal
         instance.spacing = 2
         instance.alpha = 0
@@ -94,12 +92,12 @@ class PollController: UIViewController {
     }()
     private lazy var loadingIndicator: Icon = {
         let instance = Icon(category: Icon.Category.Logo)
-        instance.iconColor = surveyReference.topic.tagColor
+        instance.iconColor = item.topic.tagColor
         instance.isRounded = false
         instance.clipsToBounds = false
         instance.scaleMultiplicator = 1.2
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-
+        
         return instance
     }()
     
@@ -107,7 +105,7 @@ class PollController: UIViewController {
     
     // MARK: - Destructor
     deinit {
-//        topicView.removeFromSuperview()
+        //        topicView.removeFromSuperview()
         tasks.forEach { $0?.cancel() }
         NotificationCenter.default.removeObserver(self)
         subscriptions.forEach{ $0.cancel() }
@@ -120,12 +118,9 @@ class PollController: UIViewController {
     
     // MARK: - Initialization
     init(surveyReference: SurveyReference, showNext: Bool = false) {
-        self.surveyReference = surveyReference
-        self.mode = (surveyReference.isComplete || surveyReference.isOwn) ? .Read : .Vote
+        self.item = surveyReference
         
         super.init(nibName: nil, bundle: nil)
-        
-        self.survey = surveyReference.survey
     }
     
     required init?(coder: NSCoder) {
@@ -141,7 +136,7 @@ class PollController: UIViewController {
         let view = PollView()
         let model = PollModel()
         
-        self.controllerOutput = view 
+        self.controllerOutput = view
         self.controllerOutput?
             .viewInput = self
         self.controllerInput = model
@@ -152,8 +147,8 @@ class PollController: UIViewController {
         setTasks()
         setupUI()
         loadData()
-    
-//        navigationController?.delegate = appDelegate.transitionCoordinator
+        
+        //        navigationController?.delegate = appDelegate.transitionCoordinator
     }
     
     override func willMove(toParent parent: UIViewController?) {
@@ -175,10 +170,8 @@ class PollController: UIViewController {
 private extension PollController {
     @MainActor
     func setupUI() {
-//        if !survey.isNil { controllerOutput?.onLoadCallback() }
         navigationController?.interactivePopGestureRecognizer?.delegate = self
-        setNavigationBarTintColor(surveyReference.topic.tagColor)
-//        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: avatar)
+        setNavigationBarTintColor(item.topic.tagColor)
         navigationItem.titleView = topicView
         setBarButtonItems()
         
@@ -195,6 +188,42 @@ private extension PollController {
     }
     
     func setTasks() {
+        func updateResultsStats() {
+            //Update survey stats every n seconds
+            Timer
+                .publish(every: 5, on: .current, in: .common)
+                .autoconnect()
+                .sink { [weak self] seconds in
+                    guard let self = self else { return }
+                    
+                    self.controllerInput?.updateResultsStats(self.item)
+                }
+                .store(in: &subscriptions)
+        }
+        
+        item.isFavoritePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                
+                delayAsync(delay: 0.5) {
+                    self.setBarButtonItems()
+                }
+            }
+            .store(in: &subscriptions)
+        
+        guard item.isComplete else {
+            item.isCompletePublisher
+                .filter { $0 }
+                .sink { _ in updateResultsStats() }
+                .store(in: &subscriptions)
+            
+            return
+        }
+        
+        updateResultsStats()
+        
+        
         //        tasks.append(Task { [weak self] in
         //            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
         //                guard let self = self,
@@ -356,15 +385,16 @@ private extension PollController {
     
     func loadData() {
         
-        guard surveyReference.survey.isNil else {
+        guard item.survey.isNil else {
+            controllerOutput?.item = item.survey
             controllerInput?.addView()
             return
         }
         
         navigationController?.setNavigationBarHidden(true, animated: false)
         loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-        controllerInput?.load(surveyReference, incrementViewCounter: true)
-        animateLoaderColor(from: surveyReference.topic.tagColor, to: surveyReference.topic.tagColor.lighter(0.35))
+        controllerInput?.load(item, incrementViewCounter: true)
+        animateLoaderColor(from: item.topic.tagColor, to: item.topic.tagColor.lighter(0.35))
     }
     
     func setBarButtonItems() {
@@ -378,11 +408,11 @@ private extension PollController {
                                           state: .off,
                                           handler: { [unowned self] _ in
             // Setting description
-            let firstActivityItem = self.surveyReference.title
+            let firstActivityItem = self.item.title
             
             // Setting url
-            let queryItems = [URLQueryItem(name: "hash", value: self.surveyReference.shareHash),
-                              URLQueryItem(name: "enc", value: self.surveyReference.shareEncryptedString)]
+            let queryItems = [URLQueryItem(name: "hash", value: self.item.shareHash),
+                              URLQueryItem(name: "enc", value: self.item.shareEncryptedString)]
             var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
             urlComps.queryItems = queryItems
             
@@ -426,15 +456,15 @@ private extension PollController {
         
         var actionButton: UIBarButtonItem!
         
-        guard surveyReference.isOwn else {
-            let watchAction : UIAction = .init(title: surveyReference.isFavorite ? "don't_watch".localized : "watch".localized,
+        guard item.isOwn else {
+            let watchAction : UIAction = .init(title: item.isFavorite ? "don't_watch".localized : "watch".localized,
                                                image: UIImage(systemName: "binoculars.fill"),
                                                identifier: nil,
                                                discoverabilityTitle: nil,
                                                attributes: .init(),
                                                state: .off,
                                                handler: { [unowned self] _ in
-                guard surveyReference.isComplete else {
+                guard item.isComplete else {
                     let banner = Banner(fadeBackground: false)
                     banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
                                                               text: "finish_poll",
@@ -445,7 +475,7 @@ private extension PollController {
                         .store(in: &self.subscriptions)
                     return
                 }
-                self.controllerInput?.toggleFavorite(!self.surveyReference.isFavorite)
+                self.controllerInput?.toggleFavorite(!self.item.isFavorite)
             })
             
             watchAction.accessibilityIdentifier = "watch"
@@ -458,7 +488,7 @@ private extension PollController {
                                                state: .off,
                                                handler: { [unowned self] _ in
                 let banner = Popup()
-                let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
+                let claimContent = ClaimPopupContent(parent: banner, surveyReference: item)
                 
                 claimContent.claimPublisher
                     .sink { [weak self] in
@@ -475,7 +505,7 @@ private extension PollController {
                         
                         
                         guard let self = self,
-                              self.surveyReference.isClaimed
+                              self.item.isClaimed
                         else { return }
                         
                         self.navigationController?.popViewController(animated: true)
@@ -509,27 +539,27 @@ private extension PollController {
     @MainActor
     func animateLoaderColor(from: UIColor, to: UIColor) {
         let anim = Animations.get(property: .FillColor,
-                                    fromValue: from.cgColor as Any,
-                                    toValue: to.cgColor as Any,
+                                  fromValue: from.cgColor as Any,
+                                  toValue: to.cgColor as Any,
                                   duration: 1.5,
-                                    delay: 0,
-                                    repeatCount: 0,
-                                    autoreverses: false,
-                                    timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                    delegate: self,
-                                    isRemovedOnCompletion: false,
-                                    completionBlocks: [
-                                        {[weak self] in
-                                            guard let self = self else { return }
-                                            
-                                            guard !self.survey.isNil else {
-//                                                delayAsync(delay: 0.75) {
-                                                    self.animateLoaderColor(from: to, to: from)
-//                                                }
-                                                return
-                                            }
-//                                            self.launch()
-                                        }])
+                                  delay: 0,
+                                  repeatCount: 0,
+                                  autoreverses: false,
+                                  timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                  delegate: self,
+                                  isRemovedOnCompletion: true,
+                                  completionBlocks: [
+                                    {[weak self] in
+                                        guard let self = self else { return }
+                                        
+                                        guard !self.item.survey.isNil else {
+                                            //                                                delayAsync(delay: 0.75) {
+                                            self.animateLoaderColor(from: to, to: from)
+                                            //                                                }
+                                            return
+                                        }
+                                        //                                            self.launch()
+                                    }])
         
         loadingIndicator.icon.add(anim, forKey: nil)
         loadingIndicator.iconColor = to
@@ -556,15 +586,15 @@ extension PollController: PollViewInput {
     }
     
     func onURLTapped(_: URL) {
-            
+        
     }
     
     func onExitWithSkip() {
-            
+        
     }
     
     func onVotersTapped(answer: Answer) {
-            
+        
     }
     
     func postComment(body: String, replyTo: Comment?, username: String?) {
@@ -595,7 +625,13 @@ extension PollController: PollModelOutput {
                 
                 self.loadingIndicator.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
                 self.loadingIndicator.alpha = 0
-            }) { _ in self.loadingIndicator.removeFromSuperview() }
+            }) { _ in
+                self.loadingIndicator.removeFromSuperview()
+                
+                guard let item = self.item.survey else { return }
+                
+                self.controllerOutput?.presentView(item)
+            }
         case .failure:
             let banner = Banner(fadeBackground: false)
             banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,

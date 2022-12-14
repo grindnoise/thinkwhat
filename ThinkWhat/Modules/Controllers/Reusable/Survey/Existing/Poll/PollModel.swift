@@ -12,11 +12,8 @@ import SwiftyJSON
 class PollModel {
     
     weak var modelOutput: PollModelOutput?
-    var surveyReference: SurveyReference? {
-        return modelOutput?.surveyReference
-    }
-    var survey: Survey? {
-        return modelOutput?.surveyReference.survey
+    var item: SurveyReference? {
+        return modelOutput?.item
     }
 }
 
@@ -50,7 +47,7 @@ extension PollModel: PollControllerInput {
     }
     
     func requestComments(_ comments: [Comment]) {
-        guard let survey = survey else { return }
+        guard let survey = item else { return }
         
         Task {
             do {
@@ -64,7 +61,7 @@ extension PollModel: PollControllerInput {
     }
     
     func postComment(body: String, replyTo: Comment? = nil, username: String? = nil) {
-        guard let survey = survey else { modelOutput?.onVoteCallback(.failure(APIError.badData)); return }
+        guard let survey = item else { modelOutput?.onVoteCallback(.failure(APIError.badData)); return }
 
         Task {
             do {
@@ -85,11 +82,11 @@ extension PollModel: PollControllerInput {
     }
     
     func addView() {
-        guard !survey.isNil else { modelOutput?.onVoteCallback(.failure(APIError.badData)); return }
+        guard let survey = item else { return }
         
         Task {
             do {
-                try await API.shared.surveys.incrementViewCounter(surveyReference: survey!.reference)
+                try await API.shared.surveys.incrementViewCounter(surveyReference: survey)
             } catch {
 #if DEBUG
                 error.printLocalized(class: type(of: self), functionName: #function)
@@ -99,13 +96,8 @@ extension PollModel: PollControllerInput {
     }
     
     func vote(_ answer: Answer) {
-        print(answer.description)
-        guard !survey.isNil else { modelOutput?.onVoteCallback(.failure(APIError.badData)); return }
         Task {
-            struct Failure {
-                var errorFound = false
-            }
-
+            guard let survey = answer.survey else { return }
             do {
                 let json = try await API.shared.vote(answer: answer)
                 let resultDetails = SurveyResult(choice: answer)
@@ -116,8 +108,8 @@ extension PollModel: PollControllerInput {
                                   let timeString = entity.1["timestamp"].string,
                                   let timestamp = Date(dateTimeString: timeString) else { break }
                             await MainActor.run {
-                                survey!.result = [answerId: timestamp]
-                                Surveys.shared.hot.remove(object: self.survey!)
+                                answer.survey?.result = [answerId: timestamp]
+                                Surveys.shared.hot.remove(object: survey)
                                 Userprofiles.shared.current!.balance += 1
                             }
                         }
@@ -136,7 +128,7 @@ extension PollModel: PollControllerInput {
                                 guard let dict = entity.1.dictionary,
                                       let data = try dict["voters"]?.rawData(),
                                       let _answerID = dict["answer"]?.int,
-                                      let answer = self.survey?.answers.filter({ $0.id == _answerID }).first,
+                                      let answer = survey.answers.filter({ $0.id == _answerID }).first,
                                       let _total = dict["total"]?.int else { break }
                                 answer.totalVotes = _total
                                 totalVotes += _total
@@ -148,13 +140,13 @@ extension PollModel: PollControllerInput {
                                 instances.forEach { instance in
                                     answer.voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
                                 }
-//                                print(answer.voters)
+                                //                                print(answer.voters)
                             }
-                            self.survey?.votesTotal = totalVotes
+                            survey.votesTotal = totalVotes
                         } catch let error {
-    #if DEBUG
+#if DEBUG
                             print(error.localizedDescription)
-    #endif
+#endif
                             await MainActor.run {
                                 modelOutput?.onVoteCallback(.failure(error))
                             }
@@ -162,8 +154,8 @@ extension PollModel: PollControllerInput {
                         }
                     }
                 }
-                survey?.resultDetails = resultDetails
-                survey?.isComplete = true
+                answer.survey?.resultDetails = resultDetails
+                answer.survey?.isComplete = true
                 await MainActor.run {
                     modelOutput?.onVoteCallback(.success(true))
                 }
@@ -176,10 +168,10 @@ extension PollModel: PollControllerInput {
     }
     
     func claim(_ reason: Claim) {
-        guard let survey = survey else { return }
+        guard let survey = item else { return }
         
         Task {
-            try await API.shared.surveys.claim(surveyReference: survey.reference, reason: reason)
+            try await API.shared.surveys.claim(surveyReference: survey, reason: reason)
         }
     }
     
@@ -199,10 +191,10 @@ extension PollModel: PollControllerInput {
     }
     
     func toggleFavorite(_ mark: Bool) {
-        guard !survey.isNil else { modelOutput?.onAddFavoriteCallback(.failure("Survey is nil")); return }
+        guard let survey = item else { return }
         
         Task {
-            await API.shared.surveys.markFavorite(mark: mark, surveyReference: survey!.reference)
+            await API.shared.surveys.markFavorite(mark: mark, surveyReference: survey)
         }
     }
     

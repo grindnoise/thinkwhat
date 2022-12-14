@@ -11,7 +11,7 @@
 //import Combine
 //
 //class ChoiceCell: UICollectionViewCell {
-//    
+//
 //    // MARK: - Overriden properties
 //    override var isSelected: Bool {
 //        didSet {
@@ -23,7 +23,7 @@
 //            }
 //        }
 //    }
-//    
+//
 //    // MARK: - Public properties
 //    public var item: Answer! {
 //        didSet {
@@ -40,7 +40,7 @@
 //            if mode == .ReadOnly {
 //                colorSubject.send(completion: .finished)
 //                disclosureIndicator.alpha = 1
-//                
+//
 //                setVoters()
 //                setProgress(animated: oldValue == .Write)
 //                setObservers()
@@ -74,7 +74,7 @@
 //        didSet {
 //            votersCountLabel.textColor = item.totalVotes == 0 ? .secondaryLabel : color
 //            numberLabel.textColor = isChosen ? .white : self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray4 : self.color
-//            
+//
 //            if self.mode == .ReadOnly {
 ////                self.checkmarkIndicator.alpha = 1//self.isChosen ? 1 : 0
 //                self.checkmarkIndicator.tintColor = self.color
@@ -84,7 +84,7 @@
 //                selectionView.backgroundColor = color//.withAlphaComponent(0.65)
 //                self.checkmarkIndicator.tintColor = .systemGray5//self.color//.withAlphaComponent(0.65)
 //            }
-//            
+//
 //            if let imageView = self.horizontalStack.getSubview(type: UIImageView.self, identifier: "chevron") {
 //                imageView.tintColor = self.mode == .Write ? self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color : self.color
 //            }
@@ -96,7 +96,7 @@
 ////    @Published var colorPublisher: UIColor = .clear
 //    public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
 ////    let subject = CurrentValueSubject<Int, Never>(0)
-//    
+//
 //    // MARK: - Private properties
 //    private var subscriptions = Set<AnyCancellable>()
 //    private var notifications: [Task<Void, Never>?] = []
@@ -158,12 +158,12 @@
 //        constraint.identifier = "height"
 ////        constraint.priority = .defaultLow
 //        constraint.isActive = true
-//        
+//
 //        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
 //            guard let newValue = change.newValue else { return }
 //            view.layer.shadowPath = UIBezierPath(roundedRect: newValue, cornerRadius: newValue.width*0.05).cgPath
 //        })
-//        
+//
 //        return instance
 //    }()
 //    private lazy var textView: UITextView = {
@@ -175,7 +175,7 @@
 //        instance.isEditable = false
 //        instance.isSelectable = false
 //        instance.addEquallyTo(to: background)
-//        
+//
 //        observers.append(instance.observe(\UITextView.contentSize, options: .new) { [weak self] view, change in
 //            guard let self = self,
 ////                  let heightConstraint = self.progressStack.getConstraint(identifier: "height"),
@@ -188,21 +188,21 @@
 //                let inset = max(0, space/2)
 //                view.contentInset = UIEdgeInsets(top: inset, left: 8, bottom: inset, right: 8)
 //        })
-//        
+//
 //        observers.append(instance.observe(\UITextView.bounds, options: .new) { [weak self] view, change in
 //            guard let self = self,
 //                  let value = change.newValue else { return }
 //            view.cornerRadius = value.width * 0.05
 //            self.background.cornerRadius = view.cornerRadius
 //        })
-//        
+//
 //        return instance
 //    }()
 //    private lazy var votersView: UIView = {
 //        let instance = UIView()
 //        instance.backgroundColor = .clear
 //        instance.accessibilityIdentifier = "voters"
-//        
+//
 //        let constraint = instance.widthAnchor.constraint(equalToConstant: 100)
 //        constraint.identifier = "width"
 //        constraint.isActive = true
@@ -216,7 +216,7 @@
 //        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
 //        instance.textColor = .secondaryLabel
 //        instance.textAlignment = .right
-//        
+//
 //        return instance
 //    }()
 //    private lazy var votersCountLabel: UILabel = {
@@ -225,14 +225,14 @@
 //        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
 //        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
 //        instance.textAlignment = .right
-//        
+//
 //        return instance
 //    }()
 //    private lazy var disclosureIndicator: UIView = {
 //        let instance = UIView()
 //        instance.backgroundColor = .clear
 //        instance.alpha = 0
-//        
+//
 //        let imageView = UIImageView()
 //        imageView.accessibilityIdentifier = "imageView"
 //        imageView.image = UIImage(systemName: "chevron.right")
@@ -240,7 +240,7 @@
 //        imageView.contentMode = .center
 //        imageView.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .medium)
 //        imageView.translatesAutoresizingMaskIntoConstraints = false
-//        
+//
 //        instance.addSubview(imageView)
 //        NSLayoutConstraint.activate([
 //            imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 1/1),
@@ -248,7 +248,7 @@
 //            imageView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
 //            imageView.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
 //        ])
-//        
+//
 //        return instance
 //    }()
 //    private lazy var leadingContainer: UIView = {
@@ -258,10 +258,10 @@
 //        instance.clipsToBounds = false
 //        instance.addSubview(checkmarkIndicator)
 //        instance.addSubview(numberLabel)
-//        
+//
 //        checkmarkIndicator.translatesAutoresizingMaskIntoConstraints = false
 //        numberLabel.translatesAutoresizingMaskIntoConstraints = false
-//        
+//
 //        NSLayoutConstraint.activate([
 ////            checkmarkIndicator.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
 ////            checkmarkIndicator.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
@@ -272,7 +272,7 @@
 //            numberLabel.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
 //            numberLabel.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
 //        ])
-//        
+//
 //        return instance
 //    }()
 //    private lazy var numberLabel: UILabel = {
@@ -284,13 +284,13 @@
 //        instance.font = UIFont(name: Fonts.Bold, size: 10)
 //        instance.adjustsFontSizeToFitWidth = true
 //        instance.minimumScaleFactor = 0.1
-//        
+//
 //        observers.append(instance.observe(\UILabel.bounds, options: .new) { [weak self] view, change in
 //            guard let self = self,
 //                  let value = change.newValue else { return }
 //            instance.font = UIFont(name: Fonts.Bold, size: value.width / (self.isChosen ? 2.25 : 2))
 //        })
-//        
+//
 //        return instance
 //    }()
 //    private lazy var checkmarkIndicator: UIImageView = {
@@ -313,7 +313,7 @@
 ////            imageView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
 ////            imageView.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
 ////        ])
-//        
+//
 //        return instance
 //    }()
 //    private lazy var doubleDisclosureIndicator: UIImageView = {
@@ -323,7 +323,7 @@
 //        imageView.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
 //        imageView.contentMode = .center
 //        imageView.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .small)
-//        
+//
 //        return imageView
 //    }()
 //    private lazy var progressStack: UIStackView = {
@@ -332,11 +332,11 @@
 ////        imageView.clipsToBounds = true
 ////        imageView.tintColor = mode == .Write ? traitCollection.userInterfaceStyle == .dark ? .systemBlue : color : color
 ////        imageView.contentMode = .center
-//        
+//
 //        let instance = UIStackView(arrangedSubviews: [leadingContainer, shadowView, disclosureIndicator])//imageView
 //        instance.axis = .horizontal
 //        instance.spacing = 2
-//        
+//
 ////        let constraint = instance.heightAnchor.constraint(equalToConstant: 200)
 ////        constraint.identifier = "height"
 ////        constraint.priority = .defaultLow
@@ -357,17 +357,17 @@
 //    private lazy var horizontalStack: UIStackView = {
 //        let spacer = UIView()
 //        spacer.backgroundColor = .clear
-//        
+//
 //        let instance = UIStackView(arrangedSubviews: [votersLabel, votersView, votersCountLabel, doubleDisclosureIndicator, spacer])
 //        instance.axis = .horizontal
 //        instance.clipsToBounds = false
 //        instance.spacing = 4
-//        
+//
 //        votersLabel.translatesAutoresizingMaskIntoConstraints = false
 //        votersView.translatesAutoresizingMaskIntoConstraints = false
 //        doubleDisclosureIndicator.translatesAutoresizingMaskIntoConstraints = false
 //        spacer.translatesAutoresizingMaskIntoConstraints = false
-//        
+//
 //        NSLayoutConstraint.activate([
 //            votersLabel.heightAnchor.constraint(equalTo: instance.heightAnchor),
 //            votersView.heightAnchor.constraint(equalTo: instance.heightAnchor),
@@ -381,7 +381,7 @@
 //    private lazy var votersStack: UIView = {
 //        let instance = UIView()
 //        instance.backgroundColor = .clear
-//        
+//
 //        instance.addSubview(horizontalStack)
 //        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
 //
@@ -391,7 +391,7 @@
 //            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
 //            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
 //        ])
-//        
+//
 //        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
 //        constraint.identifier = "height"
 //        constraint.isActive = true
@@ -404,12 +404,12 @@
 //        instance.alignment = .center
 //        instance.clipsToBounds = false
 //        instance.spacing = 8
-//        
+//
 //        progressStack.translatesAutoresizingMaskIntoConstraints = false
 //        progressStack.widthAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
 //        votersStack.translatesAutoresizingMaskIntoConstraints = false
 //        votersStack.widthAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
-//        
+//
 //        return instance
 //    }()
 //    // Constraints
@@ -417,7 +417,7 @@
 //    private var openConstraint: NSLayoutConstraint!
 //    //Last touch point
 //    private var lastPoint: CGPoint = .zero
-//    
+//
 //    // MARK: - Destructor
 //    deinit {
 //        notifications.forEach { $0?.cancel() }
@@ -427,28 +427,28 @@
 //        print("\(String(describing: type(of: self))).\(#function)")
 //#endif
 //    }
-//    
+//
 //    // MARK: - Initialization
 //    override init(frame: CGRect) {
 //        super.init(frame: frame)
 ////        setObservers()
 //        setupUI()
 //    }
-//    
+//
 //    required init?(coder: NSCoder) {
 //        fatalError("init(coder:) has not been implemented")
 //    }
-//    
+//
 //    // MARK: - Private methods
 //    private func setupUI() {
 //        backgroundColor = .clear
 //        clipsToBounds = true
-//        
+//
 //        contentView.addSubview(verticalStack)
 //        contentView.translatesAutoresizingMaskIntoConstraints = false
 //        verticalStack.translatesAutoresizingMaskIntoConstraints = false
 //        topConstraint = verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor)//, constant: padding)
-//        
+//
 //        NSLayoutConstraint.activate([
 //            contentView.topAnchor.constraint(equalTo: topAnchor),
 //            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -459,24 +459,24 @@
 //            verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),// constant: -padding),
 ////            votersView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
 //        ])
-//        
+//
 //        closedConstraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
 //        closedConstraint.priority = .defaultLow
 //        closedConstraint.isActive = true
-//        
+//
 //        openConstraint = verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
 //        openConstraint.priority = .defaultLow
-//        
+//
 //        observers.append(contentView.observe(\UIView.bounds, options: .new) { view, change in
 //            guard let value = change.newValue else { return }
 //            view.cornerRadius = value.width * 0.05
 //        })
 //    }
-//    
+//
 //    private func setObservers() {
 //        //Only when is complete
 //        guard !item.isNil , let survey = item.survey, survey.isComplete else { return }
-//        
+//
 //        //Observe last voters
 //        notifications.append(Task {@MainActor [weak self] in
 //            for await notification in NotificationCenter.default.notifications(for: Notifications.SurveyAnswers.VotersAppend) {
@@ -490,15 +490,15 @@
 //
 //                var users: Set<Userprofile>    = Set(instance.voters)
 //                let avatars: Set<Userprofile>  = Set(self.avatars.map { $0.userprofile! })
-//                
+//
 //                users.subtract(avatars)
-//                
+//
 //                guard let lastVoter = users.first else { return }
-//                
+//
 //                self.updateVoters(userprofile: lastVoter)
 //            }
 //        })
-//        
+//
 //        //Observe votes count
 //        notifications.append(Task { @MainActor [weak self] in
 //            for await notification in NotificationCenter.default.notifications(for: Notifications.SurveyAnswers.TotalVotes) {
@@ -506,7 +506,7 @@
 //                      let instance = notification.object as? Answer,
 //                      self.item.survey == instance.survey
 //                else { return }
-//                
+//
 //                self.updateProgress()
 //            }
 //        })
@@ -519,21 +519,21 @@
 //            }
 //            return
 //        }
-//        
+//
 //        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
 //            self.selectionView.alpha =  self.isSelected ? 1 : 0
 //            self.checkmarkIndicator.tintColor = self.isSelected ? self.color : .systemGray5
 //        }
-//        
+//
 //        guard isSelected else { return }
-//        
+//
 ////        colorPublisher = color
 //        colorSubject.send(color)
 ////        colorSubject.send(completion: .finished)
-//        
+//
 //        reveal(view: selectionView, duration: 0.2, animateOpacity: true, completionBlocks: [])
 //    }
-//    
+//
 //    /// Updates the views to reflect changes in selection
 //    private func updateAppearance(animated: Bool = true) {
 //        closedConstraint.isActive = !isSelected
@@ -549,13 +549,13 @@
 //            self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
 //        }
 //    }
-//    
+//
 //    private func setProgress(animated: Bool = true) {
-//        
+//
 //        if item.totalVotes != 0 {
 //            votersCountLabel.text = String(describing: item.totalVotes.roundedWithAbbreviations)
 //        }
-//        
+//
 //        if let constraint = selectionView.getConstraint(identifier: "fullWidth"), let superview = selectionView.superview {
 //            if !isChosen {
 //                setNeedsLayout()
@@ -614,19 +614,19 @@
 //            self.checkmarkIndicator.transform = CGAffineTransform(scaleX: 1.22, y: 1.22)
 //        }
 //    }
-//    
+//
 //    private func updateProgress() {
-//        
+//
 //        if item.totalVotes != 0 {
 //            votersCountLabel.text = String(describing: item.totalVotes.roundedWithAbbreviations)
 //            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
 //                self.disclosureIndicator.alpha = 1
 //            }
 //        }
-//        
+//
 //        guard let constraint = selectionView.getConstraint(identifier: "width") else { return }
 //        let width = textView.frame.width * item.percent
-//        
+//
 //        UIView.transition(with: numberLabel, duration: 0.35, options: .transitionCrossDissolve) { [weak self] in
 //            guard let self = self else { return }
 //            self.setNeedsLayout()
@@ -634,7 +634,7 @@
 //            self.layoutIfNeeded()
 //            self.numberLabel.text = "\(Int(round(self.item.percent*100)))" + (self.isChosen ? "" : "%")
 //        } completion: { _ in }
-//        
+//
 ////        guard let constraint = selectionView.getConstraint(identifier: "width") else { return }
 ////        let width = textView.frame.width * item.percent
 ////
@@ -645,7 +645,7 @@
 ////            self.layoutIfNeeded()
 ////        } completion: { _ in }
 //    }
-//    
+//
 //    private func setVoters() {
 //        guard item.totalVotes != 0 else {
 //            votersView.alpha = 0
@@ -654,16 +654,16 @@
 //            votersCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
 //            votersCountLabel.text = "no_votes".localized.uppercased()// + ": \(item.totalVotes)"
 //            votersCountLabel.textColor = .secondaryLabel
-//            
+//
 ////            if let constraint = votersStack.getConstraint(identifier: "height") {
 ////                setNeedsLayout()
 ////                constraint.constant = "test".height(withConstrainedWidth: 1000, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)!)
 ////                layoutIfNeeded()
 ////            }
-//            
+//
 //            return
 //        }
-//        
+//
 //        numberLabel.textColor = isChosen ? .white : self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray4 : self.color
 //        votersCountLabel.textColor = color
 //        votersCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
@@ -684,7 +684,7 @@
 //        }
 //
 //        let voters = Array(_voters.suffix(3))
-//        
+//
 //        if let constraint = votersView.getConstraint(identifier: "width") {
 //            setNeedsLayout()
 //            if voters.count == 0 {
@@ -746,7 +746,7 @@
 //            }
 //        }
 //    }
-//    
+//
 //    //Live voters updates
 //    private func updateVoters(userprofile: Userprofile) {
 //        let avatar = Avatar(userprofile: userprofile, isBordered: true)//, borderColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : self.isChosen ? self.color.withAlphaComponent(0.4) : .systemBackground)
@@ -755,10 +755,10 @@
 //        avatars.forEach{ $0.layer.zPosition -= 1 }
 //        votersView.addSubview(avatar)
 //        avatar.translatesAutoresizingMaskIntoConstraints = false
-//        
+//
 //        avatar.heightAnchor.constraint(equalTo: votersView.heightAnchor).isActive = true
 //        avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1/1).isActive = true
-//        
+//
 //        //Check if it's a first voter
 //        if avatars.isEmpty, let imageView = horizontalStack.getSubview(type: UIImageView.self, identifier: "chevron"), let widthConstraint = votersView.getConstraint(identifier: "width") {
 //            let constraint = avatar.centerXAnchor.constraint(equalTo: votersView.centerXAnchor)
@@ -776,10 +776,10 @@
 //                widthConstraint.constant = self.votersView.bounds.height
 //                self.layoutIfNeeded()
 //            } completion: { _ in }
-//            
+//
 //            return
 //        }
-//        
+//
 //        switch avatars.count {
 //        case 1:
 //            let constraint = avatar.centerXAnchor.constraint(equalTo: votersView.centerXAnchor,
@@ -791,7 +791,7 @@
 //                  let lastConstraint = last.getConstraint(identifier: "centerXAnchor"),
 //                  let widthConstraint = votersView.getConstraint(identifier: "width")
 //            else { return }
-//            
+//
 //            avatar.layer.zPosition = isChosen ? last.layer.zPosition - 1 : 10
 //            last.layer.zPosition = isChosen ? last.layer.zPosition : last.layer.zPosition - 1
 //
@@ -821,14 +821,14 @@
 //                constraint.identifier = "centerXAnchor"
 //                constraint.isActive = true
 //            }
-//         
+//
 //            guard let leading = avatars.first,
 //                  let trailing = avatars.last,
 //                  let leadingConstraint = leading.getConstraint(identifier: "centerXAnchor"),
 //                  let trailingConstraint = trailing.getConstraint(identifier: "centerXAnchor"),
 //                  let widthConstraint = votersView.getConstraint(identifier: "width")
 //            else { return }
-//            
+//
 //            if isChosen {
 //                avatar.layer.zPosition = leading.layer.zPosition - 1
 //                trailing.layer.zPosition -= 1
@@ -868,7 +868,7 @@
 //                constraint.identifier = "centerXAnchor"
 //                constraint.isActive = true
 //            }
-//         
+//
 //            guard let leading = avatars.first,
 //                  let middle = avatars[1] as? Avatar,
 //                  let trailing = avatars.last,
@@ -876,7 +876,7 @@
 //                  let middleConstraint = middle.getConstraint(identifier: "centerXAnchor"),
 //                  let trailingConstraint = trailing.getConstraint(identifier: "centerXAnchor")
 //            else { return }
-//            
+//
 //            if isChosen {
 //                avatar.layer.zPosition = leading.layer.zPosition - 1
 //                middle.layer.zPosition -= 1
@@ -907,9 +907,9 @@
 //            }
 //        }
 //    }
-//    
+//
 //    private func reveal(view animatedView: UIView, duration: TimeInterval, animateOpacity: Bool = true, completionBlocks: [Closure] = []) {
-//        
+//
 //        let circlePathLayer = CAShapeLayer()
 //        var _completionBlocks = completionBlocks
 //        var circleFrameTopCenter: CGRect {
@@ -919,7 +919,7 @@
 //            circleFrame.origin.y = circlePathBounds.minY - circleFrame.minY
 //            return circleFrame
 //        }
-//        
+//
 //        var circleFrameTop: CGRect {
 //            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
 //            let circlePathBounds = circlePathLayer.bounds
@@ -927,15 +927,15 @@
 //            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
 //            return circleFrame
 //        }
-//        
+//
 //        var circleFrameTopLeft: CGRect {
 //            return CGRect.zero
 //        }
-//        
+//
 //        var circleFrameTouchPosition: CGRect {
 //            return CGRect(origin: lastPoint, size: .zero)
 //        }
-//        
+//
 //        var circleFrameCenter: CGRect {
 //            var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
 //            let circlePathBounds = circlePathLayer.bounds
@@ -943,30 +943,30 @@
 //            circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
 //            return circleFrame
 //        }
-//        
+//
 //        func circlePath(_ rect: CGRect) -> UIBezierPath {
 //            return UIBezierPath(ovalIn: rect)
 //        }
-//        
+//
 //        circlePathLayer.frame = animatedView.bounds
 //        circlePathLayer.path = circlePath(circleFrameTouchPosition).cgPath
 //        animatedView.layer.mask = circlePathLayer
-//        
+//
 ////        let center = lastPoint//(x: animatedView.bounds.midX, y: animatedView.bounds.midY)
-//        
+//
 //        let finalRadius = max(abs(animatedView.bounds.width - lastPoint.x),
 //                                  abs(animatedView.bounds.width - (animatedView.bounds.width - lastPoint.x)))//sqrt((center.x*center.x) + (center.y*center.y))
-//        
+//
 //        let radiusInset = finalRadius
-//        
+//
 //        let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
-//        
+//
 //        let toPath = UIBezierPath(ovalIn: outerRect).cgPath
-//        
+//
 //        let fromPath = circlePathLayer.path
-//        
+//
 //        let anim = Animations.get(property: .Path, fromValue: fromPath, toValue: toPath, duration: duration, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: .easeInEaseOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [])
-//                
+//
 //        circlePathLayer.add(anim, forKey: "path")
 //        circlePathLayer.path = toPath
 ////        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
@@ -998,20 +998,20 @@
 //        animatedView.layer.add(opacityAnim, forKey: nil)
 //        animatedView.layer.opacity = 1
 //    }
-//    
+//
 //    // MARK: - Overriden methods
 //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 //        super.traitCollectionDidChange(previousTraitCollection)
-//        
+//
 //        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
 //        numberLabel.textColor = isChosen ? .white : self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray4 : self.color
 //
 //        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray5
 //        self.disclosureIndicator.getSubview(type: UIImageView.self, identifier: "imageView")?.tintColor = self.item.totalVotes == 0 ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemGray5 : self.color
-//        
+//
 //        //Set dynamic font size
 //        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-//        
+//
 //        votersLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
 //        votersCountLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
 //        textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
@@ -1022,11 +1022,11 @@
 //        constraint.constant = max(textView.contentSize.height, 40)
 //        layoutIfNeeded()
 //    }
-//    
+//
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        let touch = touches.first
 //        guard let location = touch?.location(in: contentView) else { return }
-//        
+//
 //        if let point = touch?.location(in: votersView), votersView.bounds.contains(point) {
 //            callbackDelegate?.callbackReceived(self)
 //        } else if let point = touch?.location(in: votersCountLabel), votersCountLabel.bounds.contains(point) {

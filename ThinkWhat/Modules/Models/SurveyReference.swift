@@ -50,6 +50,7 @@ class SurveyReference: Decodable {// NSObject,
             guard oldValue != rating else { return }
             
             ratingPublisher.send(rating)
+//            ratingPublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.Rating, object: self)
             guard let survey = survey else { return }
@@ -61,6 +62,7 @@ class SurveyReference: Decodable {// NSObject,
             guard oldValue != likes else { return }
             
             likesPublisher.send(likes)
+//            likesPublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.Likes, object: self)
             guard let survey = survey else { return }
@@ -72,7 +74,8 @@ class SurveyReference: Decodable {// NSObject,
             guard oldValue != views else { return }
             
             viewsPublisher.send(views)
-            //            Notification.send(names: [Notifications.Surveys.Views])
+//            viewsPublisher.send(completion: .finished)
+            
             NotificationCenter.default.post(name: Notifications.Surveys.Views, object: self)
             guard let survey = survey else { return }
             survey.views = views
@@ -84,6 +87,8 @@ class SurveyReference: Decodable {// NSObject,
             guard oldValue != isComplete else { return }
             
             isCompletePublisher.send(isComplete)
+//            isCompletePublisher.send(completion: .finished)
+            
             NotificationCenter.default.post(name: Notifications.Surveys.Completed, object: self)
         }
     }
@@ -94,6 +99,7 @@ class SurveyReference: Decodable {// NSObject,
             guard oldValue != isHot else { return }
             
             isHotPublisher.send(isHot)
+//            isHotPublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchHot, object: self)
             //            Notification.send(names: [Notifications.Surveys.SwitchHot])
@@ -104,6 +110,7 @@ class SurveyReference: Decodable {// NSObject,
             guard oldValue != isFavorite else { return }
             
             isFavoritePublisher.send(isFavorite)
+//            isFavoritePublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: self)
             
@@ -127,6 +134,7 @@ class SurveyReference: Decodable {// NSObject,
             guard isBanned else { return }
             
             isBannedPublisher.send(isBanned)
+//            isBannedPublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.Ban, object: self)
         }
@@ -136,6 +144,7 @@ class SurveyReference: Decodable {// NSObject,
             guard isClaimed, isClaimed != oldValue else { return }
             
             isClaimedPublisher.send(isClaimed)
+//            isClaimedPublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: self)
             survey?.isClaimed = isClaimed

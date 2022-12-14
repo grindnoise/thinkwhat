@@ -1,14 +1,188 @@
-////
-////  PollCollectionView.swift
-////  ThinkWhat
-////
-////  Created by Pavel Bukharov on 30.06.2022.
-////  Copyright © 2022 Pavel Bukharov. All rights reserved.
-////
 //
-//import UIKit
-//import Combine
+//  PollCollectionView.swift
+//  ThinkWhat
 //
+//  Created by Pavel Bukharov on 30.06.2022.
+//  Copyright © 2022 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+import Combine
+
+class PollCollectionView: UICollectionView {
+
+    enum Section: Int {
+        case title, description, image, youtube, web, question, choices, vote, comments
+        
+        var localized: String {
+            switch self {
+            case .title:
+                return "title".localized
+            case .description:
+                return "description".localized
+            case .image:
+                return "images".localized
+            case .youtube:
+                return "YouTube"
+            case .web:
+                return "web".localized
+            case .question:
+                return "question".localized
+            case .choices:
+                return "poll_choices".localized
+            case .vote:
+                return "vote".localized
+            case .comments:
+                return "comments".localized
+            }
+        }
+    }
+    
+    typealias Source = UICollectionViewDiffableDataSource<Section, Int>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
+
+    
+    
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //Logic
+    private weak var item: Survey?
+    private var source: Source!
+//    private var mode: PollController.Mode {
+//        didSet {
+//            guard oldValue != mode else { return }
+//
+//            print(mode)
+//        }
+//    }
+    
+    
+    
+    // MARK: - Initialization
+    init(item: Survey) {
+        super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
+
+        self.item = item
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    
+    // MARK: - Destructor
+    deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
+#if DEBUG
+        print("\(String(describing: type(of: self))).\(#function)")
+#endif
+    }
+}
+
+private extension PollCollectionView {
+    @MainActor
+    func setupUI() {
+//        delegate = self
+        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+            layoutConfig.backgroundColor = .clear
+            layoutConfig.showsSeparators = false
+            
+            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
+            return sectionLayout
+        }
+        
+        let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [weak self] cell, _, item in
+            guard let self = self else { return }
+            
+            cell.item = self.item
+        }
+        
+        source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
+            guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
+            
+            if section == .title {
+                return collectionView.dequeueConfiguredReusableCell(using: titleCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+                //            } else if section == .description {
+                //                let cell = collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
+                //                                                                        for: indexPath,
+                //                                                                        item: identifier)
+                //                collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
+                //                collectionView.deselectItem(at: indexPath, animated: true)
+                //                cell.layer.masksToBounds = false
+                //                return cell
+                //            } else if section == .image {
+                //                return collectionView.dequeueConfiguredReusableCell(using: self.imageCellRegistration,
+                //                                                                    for: indexPath,
+                //                                                                    item: identifier)
+                //            } else if section == .youtube {
+                //                return collectionView.dequeueConfiguredReusableCell(using: youtubeCellRegistration,
+                //                                                                    for: indexPath,
+                //                                                                    item: identifier)
+                //            } else if section == .web {
+                //                return collectionView.dequeueConfiguredReusableCell(using: linkPreviewRegistration,
+                //                                                                    for: indexPath,
+                //                                                                    item: identifier)
+                //            } else if section == .question {
+                //                return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
+                //                                                                    for: indexPath,
+                //                                                                    item: identifier)
+                //            } else if section == .vote {
+                //                return collectionView.dequeueConfiguredReusableCell(using: voteCellRegistration,
+                //                                                                    for: indexPath,
+                //                                                                    item: identifier)
+                //            }  else if section == .comments {
+                //                return collectionView.dequeueConfiguredReusableCell(using: commentsCellRegistration,
+                //                                                                    for: indexPath,
+                //                                                                    item: identifier)
+            }
+            return UICollectionViewCell()
+        }
+        
+        applyDifferences()
+    }
+    
+    func applyDifferences(toExistingSnapshot: Bool = false, animated: Bool = false) {
+        var snapshot = toExistingSnapshot ? source.snapshot() : Snapshot()
+        snapshot.appendSections([.title])
+        snapshot.appendItems([0], toSection: .title)
+        source.apply(snapshot, animatingDifferences: false)
+        
+        //        snapshot.appendSections([.title, .description,])
+        //        snapshot.appendItems([0], toSection: .title)
+        //        snapshot.appendItems([1], toSection: .description)
+        //        if poll.imagesCount != 0 {
+        //            snapshot.appendSections([.image])
+        //            snapshot.appendItems([2], toSection: .image)
+        //        }
+        //        if let url = poll.url {
+        //            if url.absoluteString.isYoutubeLink {
+        //                snapshot.appendSections([.youtube])
+        //                snapshot.appendItems([3], toSection: .youtube)
+        //            } else {
+        //                snapshot.appendSections([.web])
+        //                snapshot.appendItems([4], toSection: .web)
+        //            }
+        //        }
+        //        snapshot.appendSections([.question])
+        //        snapshot.appendItems([5], toSection: .question)
+        //        ////        snapshot.appendSections([.choices])
+        //        ////        snapshot.appendItems([6], toSection: .choices)
+        //        snapshot.appendSections([.comments])
+        //        snapshot.appendItems([8], toSection: .comments)
+    }
+}
+
 //class PollCollectionView: UICollectionView {
 //
 //    enum Section: Int {

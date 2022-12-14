@@ -375,7 +375,7 @@ class SurveyCell: UICollectionViewCell {
         let instance = UIImageView(image: UIImage(systemName: "star.fill",
                                                   withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
                                                                                                  scale: .large)))
-        instance.tintColor = Colors.Logo.Marigold.rawValue
+        instance.tintColor = .systemGray//Colors.Logo.Marigold.rawValue
         instance.contentMode = .center
         return instance
     }()
@@ -384,12 +384,13 @@ class SurveyCell: UICollectionViewCell {
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
         instance.textAlignment = .center
         instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
-        instance.publisher(for: \.bounds, options: .new)
+        instance.publisher(for: \.bounds)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] rect in
-                
                 guard let self = self,
                       let text = instance.text,
-                      let constraint = instance.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+                      let constraint = instance.getConstraint(identifier: "height")
+                else { return }
                 
                 self.setNeedsLayout()
                 constraint.constant = text.height(withConstrainedWidth: rect.width, font: instance.font) * 1.5
@@ -831,16 +832,16 @@ private extension SurveyCell {
                     self.watchButton.tintColor = flag ? self.traitCollection.userInterfaceStyle == .dark ? .label : .systemGray : .systemGray4
                 }
                 
-                guard flag else { return }
-                
-                let banner = Banner(fadeBackground: false)
-                banner.present(content: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
-                                                          text: "watch_survey_notification",
-                                                          tintColor: .label),
-                               dismissAfter: 0.75)
-                banner.didDisappearPublisher
-                    .sink { _ in banner.removeFromSuperview() }
-                    .store(in: &self.subscriptions)
+//                guard flag else { return }
+//
+//                let banner = Banner(fadeBackground: false)
+//                banner.present(content: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
+//                                                          text: "watch_survey_notification",
+//                                                          tintColor: .label),
+//                               dismissAfter: 0.75)
+//                banner.didDisappearPublisher
+//                    .sink { _ in banner.removeFromSuperview() }
+//                    .store(in: &self.subscriptions)
             }
             .store(in: &subscriptions)
         

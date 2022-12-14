@@ -662,7 +662,7 @@ class SubscriptionsView: UIView {
         instance.layer.shadowOffset = .zero
         instance.publisher(for: \.bounds)
             .sink { [unowned self] rect in
-                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*(self.filterView.alpha == 0 ? 0.035 : 0.05)).cgPath
+                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
             }
             .store(in: &subscriptions)
         
@@ -1104,25 +1104,25 @@ private extension SubscriptionsView {
     func toggleDateFilter(on: Bool) {
         guard let heightConstraint = filterView.getConstraint(identifier: "height"),
               let constraint1 = filterView.getConstraint(identifier: "top_1"),
-              let constraint2 = shadowView.getConstraint(identifier: "top"),
-              let constraint3 = shadowView.getConstraint(identifier: "leading"),
-              let constraint4 = shadowView.getConstraint(identifier: "trailing"),
-              let constraint5 = shadowView.getConstraint(identifier: "bottom")
+              let constraint2 = shadowView.getConstraint(identifier: "top")
+//              let constraint3 = shadowView.getConstraint(identifier: "leading"),
+//              let constraint4 = shadowView.getConstraint(identifier: "trailing")
+//              let constraint5 = shadowView.getConstraint(identifier: "bottom")
         else { return }
         
         setNeedsLayout()
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
             guard let self = self else { return }
         
-            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
-            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
+//            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
+//            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
             self.filterView.alpha = on ? 1 : 0
             self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
             constraint1.constant = on ? 16 : self.mode == .Default ? 0 : 10
             constraint2.constant = on ? 16 : 0
-            constraint3.constant = on ? 8 : 4
-            constraint4.constant = on ? -8 : -4
-            constraint5.constant = on ? -8 : -4
+//            constraint3.constant = on ? 8 : 4
+//            constraint4.constant = on ? -8 : -4
+//            constraint5.constant = on ? -8 : -4
             heightConstraint.constant = on ? self.filterViewHeight : 0
             self.layoutIfNeeded()
         }

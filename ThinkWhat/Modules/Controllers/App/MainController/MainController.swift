@@ -346,6 +346,20 @@ private extension MainController {
                     .store(in: &self.subscriptions)
             }
         })
+        tasks.append(Task {@MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
+                guard let self = self else { return }
+                
+                let banner = Banner(fadeBackground: false)
+                banner.present(content: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
+                                                          text: "watch_survey_notification",
+                                                          tintColor: .label),
+                               dismissAfter: 0.75)
+                banner.didDisappearPublisher
+                    .sink { _ in banner.removeFromSuperview() }
+                    .store(in: &self.subscriptions)
+            }
+        })
     }
     
     func updateUserData() {

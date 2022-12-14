@@ -24,6 +24,7 @@ class Mediafile: Decodable {
             
             imagePublisher.send(image)
             imagePublisher.send(completion: .finished)
+            
             isDownloading = false
         }
     }

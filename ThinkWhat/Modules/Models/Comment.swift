@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftyJSON
+import Combine
 
 class Comments {
     static let shared = Comments()
@@ -102,21 +103,37 @@ class Comment: Decodable {
     var isBanned: Bool = false {
         didSet {
             guard isBanned else { return }
+            
+            isBannedPublisher.send(true)
+            isBannedPublisher.send(completion: .finished)
+            
             NotificationCenter.default.post(name: Notifications.Comments.Ban, object: self)
         }
     }
     var isDeleted: Bool = false {
         didSet {
             guard isDeleted else { return }
+            
+            isDeletedPublisher.send(true)
+            isDeletedPublisher.send(completion: .finished)
+            
             NotificationCenter.default.post(name: Notifications.Comments.Delete, object: self)
         }
     }
     var isClaimed: Bool = false {
         didSet {
             guard isClaimed else { return }
+            
+            isClaimedPublisher.send(true)
+            isClaimedPublisher.send(completion: .finished)
+            
             NotificationCenter.default.post(name: Notifications.Comments.Claim, object: self)
         }
     }
+    //Publishers
+    var isDeletedPublisher      = PassthroughSubject<Bool, Never>()
+    var isClaimedPublisher      = PassthroughSubject<Bool, Never>()
+    var isBannedPublisher       = PassthroughSubject<Bool, Never>()
     
     required init(from decoder: Decoder) throws {
         do {

@@ -44,7 +44,7 @@ extension CommentsModel: CommentsControllerInput {
     }
     
     func postComment(body: String, replyTo: Comment?, username: String?) {
-        guard let survey = replyTo?.replyTo?.survey else { return }
+        guard let survey = replyTo?.replyTo?.survey?.reference else { return }
         Task {
             do {
                 let _ = try await API.shared.surveys.postComment(body, survey: survey, replyTo: replyTo, username: username)

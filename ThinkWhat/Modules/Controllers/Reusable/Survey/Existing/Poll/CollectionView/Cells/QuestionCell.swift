@@ -10,7 +10,7 @@
 //import Combine
 //
 //class QuestionCell: UICollectionViewCell {
-//    
+//
 //    // MARK: - Public properties
 //    public var item: Survey! {
 //        didSet {
@@ -52,7 +52,7 @@
 ////    public var modeSubject = CurrentValueSubject<PollController.Mode?, Never>(nil)
 ////    public var subscriptions = Set<AnyCancellable>()
 ////    public var modeSubject = PassthroughSubject<PollController.Mode, Never>()
-//    
+//
 //    // MARK: - Private properties
 //    private var subscriptions = Set<AnyCancellable>()
 //    private lazy var headerContainer: UIView = {
@@ -60,19 +60,19 @@
 //        instance.backgroundColor = .clear
 //        instance.addSubview(horizontalStack)
 //        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-//        
+//
 //        NSLayoutConstraint.activate([
 //            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
 //            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
 //            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
 //            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
 //        ])
-//        
+//
 //        return instance
 //    }()
 //    private lazy var collectionView: ChoiceCollectionView = {
 //        let instance = ChoiceCollectionView(answerListener: answerListener, callbackDelegate: self)
-//        
+//
 //        instance.colorSubject.sink {
 //#if DEBUG
 //                print("receiveCompletion: \($0)")
@@ -84,12 +84,12 @@
 //            self.colorSubject.send(color)
 ////            self.colorSubject.send(completion: .finished)
 //        }.store(in: &self.subscriptions)
-//        
+//
 ////        instance.$colorPublisher.receive(on: RunLoop.main).sink { [weak self] in
 ////            guard let self = self else { return }
 ////            self.colorPublisher = $0
 ////        }.store(in: &self.subscriptions)
-//        
+//
 //        return instance
 //        }()
 //    private let disclosureLabel: UILabel = {
@@ -97,11 +97,11 @@
 //        instance.textColor = .secondaryLabel
 //        instance.text = "poll_question".localized.uppercased()
 //        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
-//        
+//
 ////        let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
 ////        constraint.identifier = "width"
 ////        constraint.isActive = true
-//        
+//
 //        return instance
 //    }()
 //    private lazy var textView: UITextView = {
@@ -120,13 +120,13 @@
 //        imageView.tintColor = .secondaryLabel
 //        imageView.contentMode = .center
 //        imageView.addEquallyTo(to: instance)
-//        
+//
 //        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
 //            guard let newValue = change.newValue else { return }
-//            
+//
 //            view.image = UIImage(systemName: "questionmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
 //        }))
-//        
+//
 //        return instance
 //    }()
 //    private lazy var horizontalStack: UIStackView = {
@@ -135,30 +135,30 @@
 //        instance.axis = .horizontal
 //        instance.spacing = 4
 //        instance.distribution = .fillProportionally
-//        
-//        
+//
+//
 //        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
 //        constraint.identifier = "height"
 //        constraint.isActive = true
-//        
+//
 //        instance.heightAnchor.constraint(equalTo: disclosureLabel.heightAnchor).isActive = true
-//        
+//
 //        return instance
 //    }()
 //    private lazy var containerView: UIView = {
 //        let instance = UIView()
 //        instance.backgroundColor = .clear
-//        
+//
 ////        let constraint = instance.heightAnchor.constraint(equalToConstant: 200)
 ////        constraint.identifier = "height"
 ////        constraint.isActive = true
-//        
+//
 ////        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
 ////            guard let newValue = change.newValue else { return }
 ////
 ////            view.image = UIImage(systemName: "questionmark", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
 ////        }))
-//        
+//
 ////        collectionView.addEquallyTo(to: instance)
 //        instance.addSubview(collectionView)
 //        collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -173,10 +173,10 @@
 //        constraint.identifier = "bottom"
 ////        constraint.priority = .defaultLow
 //        constraint.isActive = true
-//        
+//
 //        return instance
 //    }()
-//    
+//
 //    private lazy var verticalStack: UIStackView = {
 //        let instance = UIStackView(arrangedSubviews: [headerContainer, textView, containerView/*collectionView*/])
 ////        let instance = UIStackView(arrangedSubviews: [horizontalStack, textView])
@@ -187,7 +187,7 @@
 //    }()
 //    private var observers: [NSKeyValueObservation] = []
 //    private let padding: CGFloat = 0
-//    
+//
 //    // MARK: - Destructor
 //    deinit {
 //        subscriptions.forEach { $0.cancel() }
@@ -195,7 +195,7 @@
 //        print("\(String(describing: type(of: self))).\(#function)")
 //#endif
 //    }
-//    
+//
 //    // MARK: - Initialization
 //    override init(frame: CGRect) {
 //        super.init(frame: frame)
@@ -256,7 +256,7 @@
 //                  let value = change.newValue else { return }//,
 ////                  value.height > view.frame.height else { return }
 //            guard value.height != 0, constraint.constant != value.height else { return }
-//            
+//
 //            if value.height < constraint.constant {
 //                delayAsync(delay: 0.3) {
 //                    self.setNeedsLayout()

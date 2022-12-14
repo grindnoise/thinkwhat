@@ -47,6 +47,139 @@ class PollTitleCell: UICollectionViewCell {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
+    private lazy var avatar: Avatar = {
+        let instance = Avatar(isShadowed: true)
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.isUserInteractionEnabled = true
+//        instance.tapPublisher
+//            .sink { [weak self] in
+//                guard let self = self,
+//                      let userprofile = $0,
+//                      userprofile != Userprofile.anonymous
+//                else { return }
+//
+//                if userprofile == Userprofiles.shared.current {
+//                    self.settingsTapPublisher.send(true)
+//                } else {
+//                    self.profileTapPublisher.send(userprofile)
+//                }
+//            }
+//            .store(in: &subscriptions)
+        
+        return instance
+    }()
+    private lazy var headerView: UIStackView = {
+        let leftStack = UIStackView(arrangedSubviews: [
+            statsStack,
+            buttonsStack
+        ])
+        leftStack.axis = .vertical
+        leftStack.spacing = 2
+        
+        let spacer = UIView()
+        spacer.backgroundColor = .clear
+        let instance = UIStackView(arrangedSubviews: [
+            leftStack,
+            spacer,
+            avatar
+        ])
+        instance.axis = .horizontal
+        instance.spacing = 0
+        
+        return instance
+    }()
+    private lazy var statsStack: UIStackView = {
+        let ratingStack = UIStackView(arrangedSubviews: [ratingImage, ratingLabel])
+        ratingStack.spacing = 2
+        
+        let viewsStack = UIStackView(arrangedSubviews: [viewsImage, viewsLabel])
+        viewsStack.spacing = 2
+        
+        let instance = UIStackView(arrangedSubviews: [ratingStack, viewsStack])
+        instance.spacing = 6
+        instance.alignment = .center
+        
+        return instance
+    }()
+    private lazy var ratingImage: UIImageView = {
+        let instance = UIImageView(image: UIImage(systemName: "star.fill",
+                                                  withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
+                                                                                                 scale: .large)))
+        instance.tintColor = Colors.Logo.Marigold.rawValue
+        instance.contentMode = .center
+        return instance
+    }()
+    private lazy var ratingLabel: UILabel = {
+        let instance = UILabel()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        instance.textAlignment = .center
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+        instance.publisher(for: \.bounds)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] rect in
+                guard let self = self,
+                      let text = instance.text,
+                      let constraint = instance.getConstraint(identifier: "height")
+                else { return }
+                
+                self.setNeedsLayout()
+                constraint.constant = text.height(withConstrainedWidth: rect.width, font: instance.font) * 1.5
+                self.layoutIfNeeded()
+            }
+            .store(in: &subscriptions)
+        
+        return instance
+    }()
+    private lazy var viewsImage: UIImageView = {
+        let instance = UIImageView(image: UIImage(systemName: "eye.fill",
+                                                  withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
+                                                                                                 scale: .large)))
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+        instance.contentMode = .center
+        return instance
+    }()
+    private lazy var viewsLabel: UILabel = {
+        let instance = UILabel()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        instance.textAlignment = .center
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+        
+        return instance
+    }()
+    private lazy var buttonsStack: UIStackView = {
+        let instance = UIStackView(arrangedSubviews: [
+            comleteButton,
+            watchButton,
+        ])
+        instance.spacing = 8
+        instance.alignment = .center
+        
+        return instance
+    }()
+    private lazy var comleteButton: UIButton = {
+        let instance = UIButton()
+        instance.setImage(UIImage(systemName: "checkmark.seal.fill",
+                                  withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
+                                                                                 scale: .large)),
+                          for: .normal)
+        instance.tintColor = .systemGray4
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
+        
+        return instance
+    }()
+    private lazy var watchButton: UIButton = {
+        let instance = UIButton()
+        instance.setImage(UIImage(systemName: "binoculars.fill",
+                                  withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
+                                                                                 scale: .large)),
+                          for: .normal)
+        instance.tintColor = .systemGray4
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
+        
+        return instance
+    }()
     private lazy var titleLabel: UILabel = {
         let instance = UILabel()
         instance.textAlignment = .center
@@ -59,100 +192,101 @@ class PollTitleCell: UICollectionViewCell {
         
         return instance
     }()
-    private let ratingView: UIImageView = {
-        let instance = UIImageView(image: UIImage(systemName: "star.fill"))
-        instance.tintColor = Colors.Tag.HoneyYellow.rawValue
-        instance.contentMode = .scaleAspectFit
-        instance.translatesAutoresizingMaskIntoConstraints = false
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
-        return instance
-    }()
-    private lazy var ratingLabel: UILabel = {
-        let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
-        instance.textAlignment = .center
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
-            guard let self = self,
-                  let text = view.text else { return }
-            //            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.8)
-            guard let constraint = self.bottomView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
-            self.setNeedsLayout()
-            constraint.constant = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
-            self.layoutIfNeeded()
-        })
-        return instance
-    }()
-    @MainActor private lazy var viewsView: UIImageView = {
-        let instance = UIImageView(image: UIImage(systemName: "eye.fill"))
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        instance.contentMode = .scaleAspectFit
-        instance.translatesAutoresizingMaskIntoConstraints = false
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
-        return instance
-    }()
-    @MainActor private lazy var viewsLabel: UILabel = {
-        let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
-        instance.textAlignment = .center
-        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        return instance
-    }()
-    @MainActor private let bottomView: UIView = {
-        let instance = UIView()
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 15)
-        constraint.identifier = "height"
-        constraint.isActive = true
-        instance.backgroundColor = .clear
-        return instance
-    }()
-    @MainActor private let bottomView_2: UIView = {
-        let instance = UIView()
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
-        constraint.identifier = "height"
-        constraint.isActive = true
-        instance.backgroundColor = .clear
-        return instance
-    }()
-    @MainActor private lazy var shareButton: UIImageView = {
-        let instance = UIImageView()
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
-        //        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
-        instance.image = UIImage(systemName: "square.and.arrow.up")
-        //        instance.contentMode = .bottom
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        return instance
-    }()
-    @MainActor private lazy var claimButton: UIImageView = {
-        let instance = UIImageView()
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
-        //        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
-        instance.image = UIImage(systemName: "square.and.arrow.up.trianglebadge.exclamationmark")
-        //        instance.contentMode = .bottom
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        return instance
-    }()
-    @MainActor private lazy var horizontalStack: UIStackView = {
-        let horizontalStack = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
-        horizontalStack.alignment = .center
-        horizontalStack.spacing = 4
-        return horizontalStack
-    }()
-    @MainActor private lazy var horizontalStack_2: UIStackView = {
-        let horizontalStack = UIStackView(arrangedSubviews: [shareButton, claimButton])
-        //        horizontalStack.alignment = .bottom
-        horizontalStack.distribution = .fillEqually
-        horizontalStack.spacing = 4
-        return horizontalStack
-    }()
-    private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [titleLabel, bottomView])//, bottomView_2])
-        verticalStack.axis = .vertical
-        verticalStack.spacing = 4
-        return verticalStack
-    }()
-    private let padding: CGFloat = 50
-    private var constraint: NSLayoutConstraint!
+    
+//    private let ratingView: UIImageView = {
+//        let instance = UIImageView(image: UIImage(systemName: "star.fill"))
+//        instance.tintColor = Colors.Tag.HoneyYellow.rawValue
+//        instance.contentMode = .scaleAspectFit
+//        instance.translatesAutoresizingMaskIntoConstraints = false
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
+//        return instance
+//    }()
+//    private lazy var ratingLabel: UILabel = {
+//        let instance = UILabel()
+//        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+//        instance.textAlignment = .center
+//        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        observers.append(instance.observe(\UILabel.bounds, options: [.new]) {[weak self] view, _ in
+//            guard let self = self,
+//                  let text = view.text else { return }
+//            //            view.font = UIFont(name: Fonts.Regular, size: newValue.height * 0.8)
+//            guard let constraint = self.bottomView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+//            self.setNeedsLayout()
+//            constraint.constant = text.height(withConstrainedWidth: view.bounds.width, font: view.font)
+//            self.layoutIfNeeded()
+//        })
+//        return instance
+//    }()
+//    private lazy var viewsView: UIImageView = {
+//        let instance = UIImageView(image: UIImage(systemName: "eye.fill"))
+//        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        instance.contentMode = .scaleAspectFit
+//        instance.translatesAutoresizingMaskIntoConstraints = false
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1.0/1.0).isActive = true
+//        return instance
+//    }()
+//    private lazy var viewsLabel: UILabel = {
+//        let instance = UILabel()
+//        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+//        instance.textAlignment = .center
+//        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        return instance
+//    }()
+//    private let bottomView: UIView = {
+//        let instance = UIView()
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: 15)
+//        constraint.identifier = "height"
+//        constraint.isActive = true
+//        instance.backgroundColor = .clear
+//        return instance
+//    }()
+//    private let bottomView_2: UIView = {
+//        let instance = UIView()
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
+//        constraint.identifier = "height"
+//        constraint.isActive = true
+//        instance.backgroundColor = .clear
+//        return instance
+//    }()
+//    private lazy var shareButton: UIImageView = {
+//        let instance = UIImageView()
+//        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        //        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+//        instance.image = UIImage(systemName: "square.and.arrow.up")
+//        //        instance.contentMode = .bottom
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        return instance
+//    }()
+//    private lazy var claimButton: UIImageView = {
+//        let instance = UIImageView()
+//        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
+//        //        instance.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+//        instance.image = UIImage(systemName: "square.and.arrow.up.trianglebadge.exclamationmark")
+//        //        instance.contentMode = .bottom
+//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//        return instance
+//    }()
+//    private lazy var horizontalStack: UIStackView = {
+//        let horizontalStack = UIStackView(arrangedSubviews: [ratingView, ratingLabel, viewsView, viewsLabel])
+//        horizontalStack.alignment = .center
+//        horizontalStack.spacing = 4
+//        return horizontalStack
+//    }()
+//    private lazy var horizontalStack_2: UIStackView = {
+//        let horizontalStack = UIStackView(arrangedSubviews: [shareButton, claimButton])
+//        //        horizontalStack.alignment = .bottom
+//        horizontalStack.distribution = .fillEqually
+//        horizontalStack.spacing = 4
+//        return horizontalStack
+//    }()
+//    private lazy var verticalStack: UIStackView = {
+//        let verticalStack = UIStackView(arrangedSubviews: [titleLabel, bottomView])//, bottomView_2])
+//        verticalStack.axis = .vertical
+//        verticalStack.spacing = 4
+//        return verticalStack
+//    }()
+//    private let padding: CGFloat = 50
+//    private var constraint: NSLayoutConstraint!
     
     
     
@@ -185,28 +319,28 @@ class PollTitleCell: UICollectionViewCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        viewsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        ratingLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-        
-        //Set dynamic font size
-        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        
-        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
-                                            forTextStyle: .largeTitle)
-        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                             forTextStyle: .caption2)
-        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                            forTextStyle: .caption2)
-        guard let constraint_1 = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
-              let constraint_2 = bottomView.getAllConstraints().filter({$0.identifier == "height"}).first,
-              let item = item else { return }
-        setNeedsLayout()
-        constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
-                                                  font: titleLabel.font)
-        constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
-                                                                       font: ratingLabel.font)
-        layoutIfNeeded()
+//        viewsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        ratingLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//        viewsView.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//
+//        //Set dynamic font size
+//        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+//
+//        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+//                                            forTextStyle: .largeTitle)
+//        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+//                                             forTextStyle: .caption2)
+//        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+//                                            forTextStyle: .caption2)
+//        guard let constraint_1 = titleLabel.getAllConstraints().filter({$0.identifier == "height"}).first,
+//              let constraint_2 = bottomView.getAllConstraints().filter({$0.identifier == "height"}).first,
+//              let item = item else { return }
+//        setNeedsLayout()
+//        constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
+//                                                  font: titleLabel.font)
+//        constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
+//                                                                       font: ratingLabel.font)
+//        layoutIfNeeded()
         
     }
 }
@@ -216,39 +350,13 @@ private extension PollTitleCell {
     @MainActor
     func setupUI() {
         backgroundColor = .clear
-        clipsToBounds = true
         
-        bottomView.addSubview(horizontalStack)
-        //        bottomView_2.addSubview(horizontalStack_2)
-        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-        //        horizontalStack_2.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            horizontalStack.heightAnchor.constraint(equalTo: bottomView.heightAnchor),
-            horizontalStack.centerXAnchor.constraint(equalTo: bottomView.centerXAnchor),
-            horizontalStack.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor),
-            //                    horizontalStack_2.heightAnchor.constraint(equalTo: bottomView_2.heightAnchor),
-            //                    horizontalStack_2.centerXAnchor.constraint(equalTo: bottomView_2.centerXAnchor),
-            //                    horizontalStack_2.centerYAnchor.constraint(equalTo: bottomView_2.centerYAnchor),
+        let stackView = UIStackView(arrangedSubviews: [
+            headerView,
+            titleLabel
         ])
-        contentView.addSubview(verticalStack)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        verticalStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-            verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-        ])
-        
-        //        constraint = bottomView_2.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -50)
-        constraint.priority = .defaultLow
-        constraint.isActive = true
-        
+        stackView.axis = .vertical
+        stackView.place(inside: contentView, bottomPriority: .defaultLow)
     }
     
     @MainActor

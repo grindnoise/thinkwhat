@@ -409,7 +409,14 @@ private extension SurveysCollectionView {
                     else { return }
 
                 guard $0!.isComplete else {
-                    showBanner(bannerDelegate: self, text: "finish_poll".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
+                    let banner = Banner(fadeBackground: false)
+                    banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.icloud.fill")!,
+                                                              text: "finish_poll",
+                                                              tintColor: .systemOrange),
+                                   dismissAfter: 0.75)
+                    banner.didDisappearPublisher
+                        .sink { _ in banner.removeFromSuperview() }
+                        .store(in: &self.subscriptions)
                     return
                 }
 
