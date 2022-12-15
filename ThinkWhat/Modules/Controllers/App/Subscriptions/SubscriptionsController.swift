@@ -19,7 +19,7 @@ class SubscriptionsController: UIViewController, TintColorable {
     // MARK: - Public properties
     public var controllerOutput: SubsciptionsControllerOutput?
     public var controllerInput: SubsciptionsControllerInput?
-    public private(set) var isOnScreen = true
+    public private(set) var isOnScreen = false
     public var tintColor: UIColor = .clear
     
     // MARK: - Private properties
@@ -128,6 +128,12 @@ class SubscriptionsController: UIViewController, TintColorable {
         main.toggleLogo(on: true)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        isOnScreen = true
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
@@ -137,6 +143,12 @@ class SubscriptionsController: UIViewController, TintColorable {
 //
 //            self.navigationController?.navigationBar.alpha = 0
 //        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        isOnScreen = false
     }
     
 //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -589,6 +601,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
     
     func updateSurveyStats(_ instances: [SurveyReference]) {
         guard isOnScreen else { return }
+        
         controllerInput?.updateSurveyStats(instances)
     }
     

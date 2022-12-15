@@ -53,8 +53,7 @@ class SurveyReference: Decodable {// NSObject,
 //            ratingPublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.Rating, object: self)
-            guard let survey = survey else { return }
-            survey.rating = rating
+            survey?.rating = rating
         }
     }
     var likes: Int {
@@ -65,8 +64,7 @@ class SurveyReference: Decodable {// NSObject,
 //            likesPublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.Likes, object: self)
-            guard let survey = survey else { return }
-            survey.likes = likes
+            survey?.likes = likes
         }
     }
     var views: Int {
@@ -77,8 +75,7 @@ class SurveyReference: Decodable {// NSObject,
 //            viewsPublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.Views, object: self)
-            guard let survey = survey else { return }
-            survey.views = views
+            survey?.views = views
         }
     }
     var type: Survey.SurveyType
@@ -88,7 +85,6 @@ class SurveyReference: Decodable {// NSObject,
             
             isCompletePublisher.send(isComplete)
 //            isCompletePublisher.send(completion: .finished)
-            
             NotificationCenter.default.post(name: Notifications.Surveys.Completed, object: self)
         }
     }
@@ -100,9 +96,7 @@ class SurveyReference: Decodable {// NSObject,
             
             isHotPublisher.send(isHot)
 //            isHotPublisher.send(completion: .finished)
-            
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchHot, object: self)
-            //            Notification.send(names: [Notifications.Surveys.SwitchHot])
         }
     }
     var isFavorite: Bool {
@@ -111,7 +105,6 @@ class SurveyReference: Decodable {// NSObject,
             
             isFavoritePublisher.send(isFavorite)
 //            isFavoritePublisher.send(completion: .finished)
-            
             NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: self)
             
             guard let userprofile = Userprofiles.shared.current else { return }
@@ -124,9 +117,7 @@ class SurveyReference: Decodable {// NSObject,
                 userprofile.favoritesTotal -= 1
             }
             
-            guard let survey = survey else { return }
-            
-            survey.isFavorite = isFavorite
+            survey?.isFavorite = isFavorite
         }
     }
     var isBanned: Bool = false {
@@ -170,7 +161,20 @@ class SurveyReference: Decodable {// NSObject,
             survey?.progress = progress
         }
     }
-    var media: Mediafile?
+    var media: Mediafile? {
+        didSet {
+            guard let media = media,
+                  let survey = survey
+            else { return }
+            
+            if survey.media.isEmpty {
+                survey.media.append(media)
+            } else if let firstMedia = survey.media.first, firstMedia.image.isNil {
+                //Set image to prevent download
+                firstMedia.image = media.image
+            }
+        }
+    }
     var shareHash:              String = ""
     var shareEncryptedString:   String = ""
     //Publishers

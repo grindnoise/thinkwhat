@@ -23,7 +23,7 @@ class Mediafile: Decodable {
             guard let image = image else { return }
             
             imagePublisher.send(image)
-            imagePublisher.send(completion: .finished)
+//            imagePublisher.send(completion: .finished)
             
             isDownloading = false
         }
@@ -69,7 +69,13 @@ class Mediafile: Decodable {
     }
     
     func downloadImage() {
-        guard image.isNil, !isDownloading, let url = imageURL else { return }
+        guard image.isNil,
+                !isDownloading,
+                let url = imageURL
+        else {
+            imagePublisher.send(image!)
+            return
+        }
         
         isDownloading = true
         Task {

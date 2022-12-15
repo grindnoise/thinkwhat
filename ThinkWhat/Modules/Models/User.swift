@@ -457,6 +457,7 @@ class Userprofile: Decodable {
         }
     }
     var isCurrent: Bool { Userprofiles.shared.current == self }
+    var isAnonymous: Bool { Userprofile.anonymous == self }
 //    var contentLocales: [String] = []
     
     // MARK: - Private properties

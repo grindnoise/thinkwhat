@@ -136,7 +136,7 @@ class Survey: Decodable {
              isHot = "is_hot",
              isOwn = "is_own",
              isComplete = "is_complete",
-             share_link
+             shareLink = "share_link"
     }
     
     var active:                 Bool
@@ -147,29 +147,18 @@ class Survey: Decodable {
     var description:            String
     var question:               String
     var rating:                 Double
+    //Media
     var media:                  [Mediafile] = []
-    var mediaSortedByOrder:     [Mediafile] {
-        return media.sorted { $0.order < $1.order }
-    }
-    var images: [UIImage] {
-        return media.filter { $0.image != nil } .map { $0.image! }
-    }
-    var mediaWithImagesSortedByOrder: [Mediafile] {
-        return media.filter { $0.image != nil } .sorted { $0.order < $1.order }
-    }
-    var mediaWithImageURLs: [Mediafile] {
-        return media.filter { $0.imageURL != nil }
-    }
-    var imagesCount: Int {
-        return max(media.filter({ $0.image != nil }).count, media.filter({ $0.imageURL != nil }).count)
-    }
+    var mediaSortedByOrder: [Mediafile] { media.sorted { $0.order < $1.order }}
+    var mediaWithImagesSortedByOrder: [Mediafile] { media.filter { $0.image != nil } .sorted { $0.order < $1.order }}
+    var mediaWithImageURLs: [Mediafile] { media.filter { $0.imageURL != nil }}
+    //Images
+    var images: [UIImage] {media.filter { $0.image != nil } .map { $0.image! }}
+    var imagesCount: Int { max(media.filter({ $0.image != nil }).count, media.filter({ $0.imageURL != nil }).count)}
+    //Answers
     var answers:                [Answer] = []
-    var answersSortedByVotes:   [Answer] {
-        return answers.sorted { $0.totalVotes > $1.totalVotes }
-    }
-    var answersSortedByOrder:   [Answer] {
-        return answers.sorted { $0.order < $1.order }
-    }
+    var answersSortedByVotes:   [Answer] { answers.sorted { $0.totalVotes > $1.totalVotes }}
+    var answersSortedByOrder:   [Answer] { answers.sorted { $0.order < $1.order }}
 //    var comments:               [Comment] = []
     var shareHash:              String = ""
     var shareEncryptedString:   String = ""
@@ -192,16 +181,7 @@ class Survey: Decodable {
             reference.commentsTotal = commentsTotal
         }
     }
-    var commentsSortedByDate: [Comment] {
-        return Comments.shared.all.filter { $0.survey == self && $0.isClaimed == false && $0.isBanned == false }
-//            .sorted { $0.createdAt > $1.createdAt }
-//        let all = Comments.shared.all.filter { $0.survey == self && $0.isClaimed == false && $0.isBanned == false }
-//        //First of all own
-//        let own = all.filter { $0.isOwn }.sorted { $0.createdAt < $1.createdAt }
-//        let other = all.filter { !$0.isOwn }.sorted { $0.createdAt > $1.createdAt }
-//        return own + other
-    }
-    
+    var commentsSortedByDate: [Comment] { Comments.shared.all.filter { $0.survey == self && $0.isClaimed == false && $0.isBanned == false }}
     var watchers:               Int = 0
     var result:                 [Int: Date]? {
         didSet {
@@ -216,25 +196,23 @@ class Survey: Decodable {
     var likes:                  Int = 0 {
         didSet {
             guard oldValue != likes else { return }
+            
             reference.likes = likes
-            Notification.send(names: [Notifications.Surveys.Watchers])
         }
     }
-
     var views:                  Int = 0 {
         didSet {
             guard oldValue != views else { return }
+            
             reference.views = views
-            Notification.send(names: [Notifications.Surveys.Views])
         }
     }
-    var type:                   SurveyType
+    var type: SurveyType
     var isHot: Bool {
         didSet {
             guard oldValue != isHot else { return }
             reference.isHot = isHot
         }
-//        return !Surveys.shared.favoriteReferences.keys.filter({ $0.id == self.id }).isEmpty
     }
     var isBanned: Bool = false {
         didSet {
@@ -316,8 +294,6 @@ class Survey: Decodable {
 //        return _dict
 //    }
     
-    private let tempId = 999999
-    
     required init(from decoder: Decoder) throws {
         do {
             let container   = try decoder.container(keyedBy: CodingKeys.self)
@@ -344,7 +320,6 @@ class Survey: Decodable {
             url                     = URL(string: try container.decode(String.self, forKey: .url))
             question                = try container.decode(String.self, forKey: .question)
             type                    = _type
-            media                   = try container.decode([Mediafile].self, forKey: .media)
             answers                 = try container.decode([Answer].self, forKey: .answers)
             votesLimit              = try container.decode(Int.self, forKey: .voteCapacity)
             votesTotal              = try container.decode(Int.self, forKey: .totalVotes)
@@ -359,12 +334,15 @@ class Survey: Decodable {
             isHot                   = try container.decode(Bool.self, forKey: .isHot)
             isOwn                   = try container.decode(Bool.self, forKey: .isOwn)
             isComplete              = try container.decode(Bool.self, forKey: .isComplete)
-            let shareData           = try container.decode([String].self, forKey: .share_link)
+            let shareData           = try container.decode([String].self, forKey: .shareLink)
             shareHash               = shareData.first ?? ""
             shareEncryptedString    = shareData.last ?? ""
             
+            
+            
             //Import comments
-            try container.decode([Comment].self, forKey: .comments)
+            let _ = try container.decode([Comment].self, forKey: .comments)
+//            comments = try container.decode([Comment].self, forKey: .comments)
             
             if let dict = try container.decodeIfPresent([String: Date].self, forKey: .result), !dict.isEmpty {
                 result = [Int(dict.keys.first!)!: dict.values.first!]
@@ -373,7 +351,18 @@ class Survey: Decodable {
             if Surveys.shared.all.filter({ $0 == self }).isEmpty {
                 Surveys.shared.all.append(self)
             }
-            getReference()
+//            getReference()
+            //Media
+            if let first = reference.media {
+                //Prevent duplicates
+                var imported = try container.decode([Mediafile].self, forKey: .media)
+                if let existing = imported.filter({ $0 == first }).first {
+                    imported.remove(object: existing)
+                }
+                media = [first] + imported
+            } else {
+                media                   = try container.decode([Mediafile].self, forKey: .media)
+            }
 //            if SurveyReferences.shared.all.filter({$0 == self.reference}).isEmpty {
 //                SurveyReferences.shared.all.append(self.reference)
 //            }

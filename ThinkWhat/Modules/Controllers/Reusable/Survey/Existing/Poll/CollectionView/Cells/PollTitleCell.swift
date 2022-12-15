@@ -16,10 +16,6 @@ class PollTitleCell: UICollectionViewCell {
         didSet {
             guard let item = item else { return }
             
-            titleLabel.text = item.title
-            ratingLabel.text = String(describing: item.rating)
-            viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-            
             item.reference.viewsPublisher
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] in
@@ -47,6 +43,7 @@ class PollTitleCell: UICollectionViewCell {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
+    private let padding: CGFloat = 8
     private lazy var avatar: Avatar = {
         let instance = Avatar(isShadowed: true)
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
@@ -70,21 +67,51 @@ class PollTitleCell: UICollectionViewCell {
     }()
     private lazy var headerView: UIStackView = {
         let leftStack = UIStackView(arrangedSubviews: [
+            dateLabel,
             statsStack,
-            buttonsStack
         ])
         leftStack.axis = .vertical
-        leftStack.spacing = 2
+        leftStack.alignment = .leading
+        leftStack.spacing = 4
+        leftStack.distribution = .fillEqually
         
         let spacer = UIView()
         spacer.backgroundColor = .clear
         let instance = UIStackView(arrangedSubviews: [
             leftStack,
             spacer,
+            usernameLabel,
             avatar
         ])
         instance.axis = .horizontal
-        instance.spacing = 0
+        instance.spacing = 4
+        
+        return instance
+    }()
+    private lazy var dateLabel: InsetLabel = {
+        let instance = InsetLabel()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        instance.textAlignment = .left
+        instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+        instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: 100,
+                                                                        font: instance.font)).isActive = true
+#if DEBUG
+        instance.text = "01.02.2013"
+#endif
+        
+        return instance
+    }()
+    private lazy var usernameLabel: UILabel = {
+        let instance = UILabel()
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+                                          forTextStyle: .footnote)
+        instance.textAlignment = .right
+        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+        instance.numberOfLines = 2
+#if DEBUG
+        instance.text = "01.02.2013"
+#endif
         
         return instance
     }()
@@ -97,14 +124,14 @@ class PollTitleCell: UICollectionViewCell {
         
         let instance = UIStackView(arrangedSubviews: [ratingStack, viewsStack])
         instance.spacing = 6
-        instance.alignment = .center
+        instance.alignment = .leading
         
         return instance
     }()
     private lazy var ratingImage: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "star.fill",
                                                   withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
-                                                                                                 scale: .large)))
+                                                                                                 scale: .medium)))
         instance.tintColor = Colors.Logo.Marigold.rawValue
         instance.contentMode = .center
         return instance
@@ -133,7 +160,7 @@ class PollTitleCell: UICollectionViewCell {
     private lazy var viewsImage: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "eye.fill",
                                                   withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
-                                                                                                 scale: .large)))
+                                                                                                 scale: .medium)))
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
         instance.contentMode = .center
         return instance
@@ -356,11 +383,21 @@ private extension PollTitleCell {
             titleLabel
         ])
         stackView.axis = .vertical
-        stackView.place(inside: contentView, bottomPriority: .defaultLow)
+        stackView.spacing = 50
+        stackView.place(inside: contentView,
+                        insets: UIEdgeInsets(top: padding, left: 0, bottom: 50, right: 0),
+                        bottomPriority: .defaultLow)
     }
     
     @MainActor
     func updateUI() {
+        dateLabel.text = item.startDate.timeAgoDisplay()
+        titleLabel.text = item.title
+        ratingLabel.text = String(describing: item.rating)
+        viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
+        usernameLabel.text = item.owner.isAnonymous ? "" : item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n\(item.owner.lastNameSingleWord)")
+        avatar.userprofile = item.owner.isAnonymous ? Userprofile.anonymous : item.owner
+        
         guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
         
         setNeedsLayout()

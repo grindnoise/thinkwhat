@@ -29,6 +29,9 @@ class ListController: UIViewController, TintColorable {
             listSwitch.color = tintColor
         }
     }
+    //UI
+    public private(set) var isOnScreen = false
+    
     
     
     // MARK: - Private properties
@@ -36,7 +39,6 @@ class ListController: UIViewController, TintColorable {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
-    private var isOnScreen = true
     private lazy var titleStack: UIStackView = {
         let opaque = UIView()
         opaque.backgroundColor = .clear
@@ -124,6 +126,7 @@ class ListController: UIViewController, TintColorable {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        isOnScreen = true
         setSwitchHidden(false)
         
         guard let main = tabBarController as? MainController else { return }
@@ -135,6 +138,12 @@ class ListController: UIViewController, TintColorable {
         super.viewWillDisappear(animated)
 
         setSwitchHidden(true)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        isOnScreen = false
     }
 //
 //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

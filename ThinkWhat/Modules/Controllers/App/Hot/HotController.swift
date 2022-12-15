@@ -24,6 +24,9 @@ class HotController: UIViewController, TintColorable {
             setNavigationBarTintColor(tintColor)
         }
     }
+    //UI
+    public private(set) var isOnScreen = true
+    
     
     
     // MARK: - Private properties
@@ -31,7 +34,6 @@ class HotController: UIViewController, TintColorable {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
-    private var isOnScreen = true
     private var isViewLayedOut = false
 //    private lazy var logo: AppLogoWithText = {
 //        let instance = AppLogoWithText(color: Colors.Logo.Flame.main,
@@ -180,6 +182,8 @@ class HotController: UIViewController, TintColorable {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        isOnScreen = true
+        
         controllerOutput?.onDidAppear()
         if shouldSkipCurrentCard {
             delayAsync(delay: 0.3) { [weak self] in
@@ -211,6 +215,7 @@ class HotController: UIViewController, TintColorable {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
+        isOnScreen = false
         stopTimer()
     }
     

@@ -42,6 +42,8 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
             settingsSwitch.color = tintColor
         }
     }
+    //UI
+    public private(set) var isOnScreen = false
     
     
     
@@ -50,7 +52,6 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
-    private var isOnScreen = true
     private lazy var titleStack: UIStackView = {
         let opaque = UIView()
         opaque.backgroundColor = .clear
@@ -142,6 +143,12 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        isOnScreen = true
+    }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -153,6 +160,12 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
             self.navigationController?.navigationBar.alpha = 0
 //            self.settingsSwitch.transform = .identity
         }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        isOnScreen = false
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

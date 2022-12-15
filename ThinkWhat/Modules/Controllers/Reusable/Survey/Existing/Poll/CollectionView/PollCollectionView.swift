@@ -100,11 +100,27 @@ private extension PollCollectionView {
             return sectionLayout
         }
         
-        let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [weak self] cell, _, item in
-            guard let self = self else { return }
+        let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [weak self] cell, _, _ in
+            guard let self = self,
+                  let item = self.item
+            else { return }
             
+            cell.item = item
+        }
+        
+        let descriptionCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AnyHashable> { [unowned self] cell, _, _ in
+            var content = cell.defaultContentConfiguration()
+            content.attributedText  = NSAttributedString(string: self.item!.description,
+                                                         attributes: [
+                                                            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                         ])
+            cell.contentConfiguration = content
+        }
+        
+        let imagesCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [unowned self] cell, _, _ in
             cell.item = self.item
         }
+
         
         source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
             guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
@@ -113,18 +129,14 @@ private extension PollCollectionView {
                 return collectionView.dequeueConfiguredReusableCell(using: titleCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
-                //            } else if section == .description {
-                //                let cell = collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
-                //                                                                        for: indexPath,
-                //                                                                        item: identifier)
-                //                collectionView.selectItem(at: indexPath, animated: false, scrollPosition: [])
-                //                collectionView.deselectItem(at: indexPath, animated: true)
-                //                cell.layer.masksToBounds = false
-                //                return cell
-                //            } else if section == .image {
-                //                return collectionView.dequeueConfiguredReusableCell(using: self.imageCellRegistration,
-                //                                                                    for: indexPath,
-                //                                                                    item: identifier)
+            } else if section == .description {
+                return collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            } else if section == .image {
+                return collectionView.dequeueConfiguredReusableCell(using: imagesCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
                 //            } else if section == .youtube {
                 //                return collectionView.dequeueConfiguredReusableCell(using: youtubeCellRegistration,
                 //                                                                    for: indexPath,
@@ -153,9 +165,16 @@ private extension PollCollectionView {
     }
     
     func applyDifferences(toExistingSnapshot: Bool = false, animated: Bool = false) {
+        guard let item = item else { return }
+        
         var snapshot = toExistingSnapshot ? source.snapshot() : Snapshot()
-        snapshot.appendSections([.title])
+        snapshot.appendSections([.title, .description,])
         snapshot.appendItems([0], toSection: .title)
+        snapshot.appendItems([1], toSection: .description)
+        if item.imagesCount != 0 {
+            snapshot.appendSections([.image])
+            snapshot.appendItems([2], toSection: .image)
+        }
         source.apply(snapshot, animatingDifferences: false)
         
         //        snapshot.appendSections([.title, .description,])

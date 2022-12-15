@@ -45,6 +45,8 @@ class TopicsController: UIViewController, TintColorable {
             setNavigationBarTintColor(tintColor)
         }
     }
+    //UI
+    public private(set) var isOnScreen = false
     
     
     
@@ -60,8 +62,7 @@ class TopicsController: UIViewController, TintColorable {
             mode = .Topic
         }
     }
-    //UI
-    private var isOnScreen = true
+    
 //    private lazy var gradient: CAGradientLayer = {
 //        let instance = CAGradientLayer()
 //        instance.type = .radial
@@ -185,6 +186,12 @@ class TopicsController: UIViewController, TintColorable {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        isOnScreen = true
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 //        barButton.alpha = 0
@@ -198,6 +205,12 @@ class TopicsController: UIViewController, TintColorable {
             searchField.alpha = 0
             searchField.resignFirstResponder()
         }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        isOnScreen = false
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -530,7 +543,7 @@ extension TopicsController: TopicsViewInput {
     }
     
     func updateSurveyStats(_ instances: [SurveyReference]) {
-        guard isOnScreen else { return }
+        guard isOnScreen, mode != .Default else { return }
         
         controllerInput?.updateSurveyStats(instances)
     }
