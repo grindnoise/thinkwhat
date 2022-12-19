@@ -12,6 +12,8 @@ import Combine
 
 class SurveyReference: Decodable {// NSObject,
     
+    static let null: SurveyReference = SurveyReference(id: 0)
+    
     private enum CodingKeys: String, CodingKey {
         case id, type, title, category, likes, views, progress, rating, description, share_link,
              startDate = "start_date",
@@ -250,6 +252,28 @@ class SurveyReference: Decodable {// NSObject,
             throw error
 #endif
         }
+    }
+    
+    init(id: Int) {
+        self.id                      = id
+        self.title                   = ""
+        self.topic                   = Topics.shared.all.first!
+        self.startDate               = Date()
+        self.likes                   = 0
+        self.views                   = 0
+        self.type                    = .Poll
+        self.isOwn                   = true
+        self.isHot                   = true
+        self.isComplete              = true
+        self.isFavorite              = true
+        self.votesTotal              = 0
+        self.commentsTotal           = 0
+        self.votesLimit              = 0
+        self.owner                   = Userprofile.anonymous
+        self.isAnonymous             = true
+        self.truncatedDescription    = ""
+        self.progress                = 0
+        self.rating                  = 0
     }
     
     init(id: Int,

@@ -16,14 +16,15 @@ class SurveyCell: UICollectionViewCell {
         didSet {
             guard !item.isNil else { return }
             
-//            setupUI()
+////            setupUI()
             updateUI()
 //            setNeedsLayout()
 //            layoutIfNeeded()
-//            layoutSubviews()
-//            updateConstraints()
-//            contentView.layoutIfNeeded()
+////            layoutSubviews()
+////            updateConstraints()
+////            contentView.layoutIfNeeded()
             updateProgress(animated: false)
+            
             setSubscriptions()
         }
     }
@@ -57,29 +58,17 @@ class SurveyCell: UICollectionViewCell {
         
         return instance
     }()
-    var isHeightCalculated: Bool = false
+    
     
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
     private var subscriptions = Set<AnyCancellable>()
+    private var itemSubscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
     let padding: CGFloat = 8
     //Header
-    private lazy var testView: UIView = {
-        let instance = UIView()
-        instance.addSubview(avatar)
-        avatar.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            avatar.topAnchor.constraint(equalTo: instance.topAnchor),
-            avatar.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-            avatar.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
-            avatar.heightAnchor.constraint(equalToConstant: 70),
-        ])
-        
-        return instance
-    }()
     private lazy var headerView: UIStackView = {
         func createStack() -> UIStackView {
             //Topic & progress
@@ -280,9 +269,9 @@ class SurveyCell: UICollectionViewCell {
     //Content
     private lazy var middleView: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [
-//            titleLabel,
-//            descriptionLabel,
-//            imageContainer
+            titleLabel,
+            descriptionLabel,
+            imageContainer
         ])
         instance.axis = .vertical
         instance.spacing = 8
@@ -322,7 +311,6 @@ class SurveyCell: UICollectionViewCell {
         instance.clipsToBounds = true
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
         instance.translatesAutoresizingMaskIntoConstraints = false
-        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
         instance.contentMode = .scaleAspectFill
         
         return instance
@@ -331,7 +319,7 @@ class SurveyCell: UICollectionViewCell {
         let instance = UIView()
         instance.backgroundColor = .clear
         instance.clipsToBounds = true
-        instance.clipsToBounds = true
+//        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
         instance.publisher(for: \.bounds)
             .filter { $0 != .zero }
             .sink { instance.cornerRadius = $0.width*0.025 }
@@ -487,6 +475,7 @@ class SurveyCell: UICollectionViewCell {
     deinit {
         observers.forEach { $0.invalidate() }
         tasks.forEach { $0?.cancel() }
+        itemSubscriptions.forEach { $0.cancel() }
         subscriptions.forEach { $0.cancel() }
         NotificationCenter.default.removeObserver(self)
 #if DEBUG
@@ -527,8 +516,9 @@ class SurveyCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-
-//        subscriptions.forEach { $0.cancel() }
+        
+        itemSubscriptions.forEach { $0.cancel() }
+        item = nil
         
         //Reset publishers
         watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
@@ -539,16 +529,15 @@ class SurveyCell: UICollectionViewCell {
         unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
         settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
         
-//        contentView.removeFromSuperview()
-//        contentView.subviews.forEach { $0.removeFromSuperview() }
-        //UI cleanup
-        middleView.removeArrangedSubview(titleLabel)
-        middleView.removeArrangedSubview(descriptionLabel)
-        middleView.removeArrangedSubview(imageContainer)
-        titleLabel.removeFromSuperview()
-        descriptionLabel.removeFromSuperview()
-        imageContainer.removeFromSuperview()
+        //UI clean up
+        descriptionLabel.text = ""
+        titleLabel.text = ""
         imageView.image = nil
+        progressView.alpha = 0
+        
+        guard let constraint = imageContainer.getConstraint(identifier: "imageContainer") else { return }
+        
+        imageContainer.removeConstraint(constraint)
     }
     
 //    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
@@ -583,116 +572,51 @@ class SurveyCell: UICollectionViewCell {
 private extension SurveyCell {
     @MainActor
     func setupUI() {
-//        func updateHeader() {
-//            if item.isComplete { progressView.alpha = 1 }
-//            topicGradient.colors = getGradientColors(color: item.topic.tagColor)
-//            topicIcon.category = item.topic.iconCategory
-//            topicTitle.text = item.topic.title.uppercased()
-//            dateLabel.text = item.startDate.timeAgoDisplay()
-//
-//            if item.isAnonymous {
-//                avatar.userprofile = Userprofile.anonymous
-//            } else if item.owner.isCurrent {
-//                avatar.addInteraction(UIContextMenuInteraction(delegate: self))
-//                avatar.userprofile = Userprofiles.shared.current
-//            } else {
-//                avatar.addInteraction(UIContextMenuInteraction(delegate: self))
-//                avatar.userprofile = item.owner
-//            }
-//        }
-//
-//        func updateMiddle() {
-//            middleView.addArrangedSubview(titleLabel)
-//            middleView.addArrangedSubview(descriptionLabel)
-//
-//            guard let constraint = titleLabel.getConstraint(identifier: "height"),
-//                  let constraint2 = descriptionLabel.getConstraint(identifier: "height")
-//            else { return }
-//
-//            titleLabel.text = item.title
-//            descriptionLabel.text = item.truncatedDescription
-//
-////            middleView.setNeedsLayout()
-//            constraint.constant = item.title.height(withConstrainedWidth: bounds.width, font: titleLabel.font)
-//            //Media
-//            if let media = item.media {
-//                middleView.addArrangedSubview(imageContainer)
-//
-//                if let image = media.image {
-//                    imageView.image = image
-//                } else if !media.imageURL.isNil {
-//                    guard let shimmer = imageContainer.getSubview(type: Shimmer.self) else { return }
-//
-//                    shimmer.startShimmering()
-//                    Task { [weak self] in
-//                        guard let self = self else { return }
-//
-//                        try await media.downloadImageAsync()
-//
-//                        media.image.publisher
-//                            .receive(on: DispatchQueue.main)
-//                            .sink {
-//                                self.imageView.image = $0
-//                                shimmer.stopShimmering()
-//                                shimmer.removeFromSuperview()
-//                            }
-//                            .store(in: &self.subscriptions)
-//                    }
-//                }
-//            }
-//            constraint2.constant = item.truncatedDescription.height(withConstrainedWidth: bounds.width, font: descriptionLabel.font)
-////            middleView.layoutIfNeeded()
-//        }
-//
-//        func updateBottom() {
-//            ratingLabel.text = String(describing: String(describing: item.rating))
-//            commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
-//            viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-//
-//            comleteButton.tintColor = item.isComplete ? .systemGray : .systemGray4
-//            watchButton.tintColor = item.isFavorite ? .systemGray : .systemGray4
-//        }
-//
-//        updateHeader()
-//        updateMiddle()
-//        updateBottom()
-        
-        
         backgroundColor = .clear
         clipsToBounds = true
         
 //        testView.place(inside: contentView)
 
-        let items = [
+//        let items = [
+//            headerView,
+//            middleView,
+//            bottomView
+//        ]
+//        items.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+//        contentView.addSubviews(items)
+//        contentView.translatesAutoresizingMaskIntoConstraints = false
+////        contentView.autoresizingMask = .flexibleHeight
+//
+//        NSLayoutConstraint.activate([
+//            contentView.topAnchor.constraint(equalTo: topAnchor),
+//            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+//            headerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+//            headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+//            headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+////            middleView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: padding*2),
+////            middleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+////            middleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+//            bottomView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: padding*2),
+//            bottomView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+//            bottomView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+////            bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+//        ])
+//
+//        let constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+//        constraint.priority = .defaultLow
+//        constraint.isActive = true
+        
+        let stackView = UIStackView(arrangedSubviews: [
             headerView,
             middleView,
             bottomView
-        ]
-        items.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-        contentView.addSubviews(items)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-//        contentView.autoresizingMask = .flexibleHeight
-
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            headerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-            headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-            headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-            middleView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: padding*2),
-            middleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-            middleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-            bottomView.topAnchor.constraint(equalTo: middleView.bottomAnchor, constant: padding*2),
-            bottomView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-            bottomView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-//            bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         ])
-
-        let constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        constraint.priority = .defaultLow
-        constraint.isActive = true
+        stackView.axis = .vertical
+        stackView.spacing = padding
+        
+        stackView.place(inside: contentView, insets: .uniform(size: 8), bottomPriority: .defaultLow)
     }
     
     func setTasks() {
@@ -843,7 +767,7 @@ private extension SurveyCell {
 //                    .sink { _ in banner.removeFromSuperview() }
 //                    .store(in: &self.subscriptions)
             }
-            .store(in: &subscriptions)
+            .store(in: &itemSubscriptions)
         
         item.viewsPublisher
             .receive(on: DispatchQueue.main)
@@ -854,7 +778,7 @@ private extension SurveyCell {
                     self.viewsLabel.text = String(describing: count)
                 } completion: { _ in }
             }
-            .store(in: &subscriptions)
+            .store(in: &itemSubscriptions)
     }
     
     @MainActor
@@ -863,6 +787,9 @@ private extension SurveyCell {
               let progressLabel = progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
               let constraint = progressIndicator.getConstraint(identifier: "width")
         else { return }
+        
+        progressView.setNeedsLayout()
+        progressView.layoutIfNeeded()
         
         progressIndicator.backgroundColor = item.topic.tagColor
 //        progressView.setNeedsLayout()
@@ -910,9 +837,6 @@ private extension SurveyCell {
         }
         
         func updateMiddle() {
-            middleView.addArrangedSubview(titleLabel)
-            middleView.addArrangedSubview(descriptionLabel)
-            
             guard let constraint = titleLabel.getConstraint(identifier: "height"),
                   let constraint2 = descriptionLabel.getConstraint(identifier: "height")
             else { return }
@@ -920,58 +844,66 @@ private extension SurveyCell {
             titleLabel.text = item.title
             descriptionLabel.text = item.truncatedDescription
             
-//            middleView.setNeedsLayout()
             constraint.constant = item.title.height(withConstrainedWidth: bounds.width, font: titleLabel.font)
+            constraint2.constant = item.truncatedDescription.height(withConstrainedWidth: bounds.width, font: descriptionLabel.font)
             
             //Media
-            if let media = item.media {
-                middleView.addArrangedSubview(imageContainer)
+            guard let media = item.media else {
+                let zeroHeight = imageContainer.heightAnchor.constraint(equalToConstant: 0)
+                zeroHeight.identifier = "imageContainer"
+                zeroHeight.isActive = true
                 
-                guard let image = media.image else {
-                    let shimmer = Shimmer()
-                    shimmer.backgroundColor = .clear
-                    shimmer.translatesAutoresizingMaskIntoConstraints = false
-                    shimmer.clipsToBounds = true
-                    shimmer.place(inside: imageContainer)
-                    shimmer.publisher(for: \.bounds)
-                        .filter { $0 != .zero }
-                        .sink { shimmer.cornerRadius = $0.width*0.025 }
-                        .store(in: &subscriptions)
-                    
-                    shimmer.startShimmering()
-                    media.imagePublisher
-                        .receive(on: DispatchQueue.main)
-                        .sink(receiveCompletion: { completion in
-                            switch completion {
-                            case .finished:
-#if DEBUG
-                                print("success")
-#endif
-                            case .failure(let error):
-#if DEBUG
-                                print(error)
-#endif
-                            }
-                        }, receiveValue: { [weak self] in
-                            guard let self = self else { return }
-                            
-                            UIView.animate(withDuration: 0.15, delay: 0, animations: {
-                                shimmer.alpha = 0
-                            }) { _ in
-                                shimmer.stopShimmering(animated: true)
-                                shimmer.removeFromSuperview()
-                            }
-                            self.imageView.image = $0
-                        })
-                        .store(in: &subscriptions)
-                    media.downloadImage()
-
-                    return
-                }
-                    imageView.image = image
+                return
             }
+            
+            let aspectRatio = imageContainer.heightAnchor.constraint(equalTo: imageContainer.widthAnchor, multiplier: 9/16)
+            aspectRatio.identifier = "imageContainer"
+            aspectRatio.isActive = true
+            
+            guard let image = media.image else {
+                let shimmer = Shimmer()
+                shimmer.backgroundColor = .clear
+                shimmer.translatesAutoresizingMaskIntoConstraints = false
+                shimmer.clipsToBounds = true
+                shimmer.place(inside: imageContainer)
+                shimmer.publisher(for: \.bounds)
+                    .filter { $0 != .zero }
+                    .sink { shimmer.cornerRadius = $0.width*0.025 }
+                    .store(in: &subscriptions)
+                
+                shimmer.startShimmering()
+                media.imagePublisher
+                    .receive(on: DispatchQueue.main)
+                    .sink(receiveCompletion: { completion in
+                        switch completion {
+                        case .finished:
+#if DEBUG
+                            print("success")
+#endif
+                        case .failure(let error):
+#if DEBUG
+                            print(error)
+#endif
+                        }
+                    }, receiveValue: { [weak self] in
+                        guard let self = self else { return }
+                        
+                        UIView.animate(withDuration: 0.15, delay: 0, animations: {
+                            shimmer.alpha = 0
+                        }) { _ in
+                            shimmer.stopShimmering(animated: true)
+                            shimmer.removeFromSuperview()
+                        }
+                        self.imageView.image = $0
+                    })
+                    .store(in: &subscriptions)
+                media.downloadImage()
+                
+                return
+            }
+            imageView.image = image
             constraint2.constant = item.truncatedDescription.height(withConstrainedWidth: bounds.width, font: descriptionLabel.font)
-//            middleView.layoutIfNeeded()
+            //            middleView.layoutIfNeeded()
         }
         
         func updateBottom() {

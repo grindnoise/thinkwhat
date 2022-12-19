@@ -46,7 +46,7 @@ class ImageCell: UICollectionViewCell {
 //            }
         }
     }
-
+    public var imagePublisher = PassthroughSubject<UIImage, Never>()
 
 
     // MARK: - Overriden properties
@@ -130,7 +130,7 @@ class ImageCell: UICollectionViewCell {
         constraint.isActive = true
         instance.spacing = 4
         instance.axis = .horizontal
-        instance.alignment = .leading
+        instance.alignment = .center
         //        instance.distribution = .fillProportionally
         return instance
     }()
@@ -375,6 +375,7 @@ private extension ImageCell {
             let imageView = UIImageView()
             imageView.contentMode = .scaleAspectFill
             imageView.place(inside: container)
+            imageView.isUserInteractionEnabled = false
             imageView.addGestureRecognizer(UITapGestureRecognizer(target: self,
                                                                   action: #selector(self.imageTapped(recognizer:))))
 
@@ -407,10 +408,11 @@ private extension ImageCell {
                         shimmer.removeFromSuperview()
                     }
                     imageView.image = $0
+                    imageView.isUserInteractionEnabled = true
                 })
                 .store(in: &subscriptions)
             media.downloadImage()
-            images.append(container)
+            images.append(imageView)
             imagesStack.addArrangedSubview(container)
             container.heightAnchor.constraint(equalTo: imagesStack.heightAnchor).isActive = true
             container.widthAnchor.constraint(equalTo: imagesStack.widthAnchor).isActive = true
@@ -425,12 +427,11 @@ private extension ImageCell {
 
     @objc
     func imageTapped(recognizer: UITapGestureRecognizer) {
-        guard let slide = recognizer.view as? Slide,
-              let mediafile = slide.mediafile,
-              !mediafile.image.isNil
+        guard let imageView = recognizer.view as? UIImageView,
+              let image = imageView.image
         else { return }
 
-//        callbackDelegate?.callbackReceived(slide.mediafile as AnyObject)
+        imagePublisher.send(image)
     }
 
     func setObservers() {

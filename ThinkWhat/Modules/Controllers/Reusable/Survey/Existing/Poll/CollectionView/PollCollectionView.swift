@@ -89,7 +89,8 @@ class PollCollectionView: UICollectionView {
 private extension PollCollectionView {
     @MainActor
     func setupUI() {
-//        delegate = self
+        delegate = self
+        allowsMultipleSelection = true
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
             layoutConfig.backgroundColor = .clear
@@ -108,19 +109,34 @@ private extension PollCollectionView {
             cell.item = item
         }
         
-        let descriptionCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AnyHashable> { [unowned self] cell, _, _ in
-            var content = cell.defaultContentConfiguration()
-            content.attributedText  = NSAttributedString(string: self.item!.description,
-                                                         attributes: [
-                                                            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
-                                                         ])
-            cell.contentConfiguration = content
+//        let descriptionCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AnyHashable> { [unowned self] cell, _, _ in
+//            var content = cell.defaultContentConfiguration()
+//            content.directionalLayoutMargins = .zero
+//            content.attributedText  = NSAttributedString(string: self.item!.description,
+//                                                         attributes: [
+//                                                            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+//                                                         ])
+//            cell.contentConfiguration = content
+//        }
+        let descriptionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [weak self] cell, _, _ in
+            guard let self = self,
+                  let text = self.item?.description
+            else { return }
+            
+            cell.text = text
         }
         
         let imagesCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [unowned self] cell, _, _ in
             cell.item = self.item
+            
+            cell.imagePublisher
+                .sink {[weak self] in
+                    guard let self = self else { return }
+                    
+                    self.imag
+                }
+                .store(in: &self.subscriptions)
         }
-
         
         source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
             guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
@@ -202,6 +218,55 @@ private extension PollCollectionView {
     }
 }
 
+extension PollCollectionView: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView,
+                        shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        if let cell = cellForItem(at: indexPath) as? CommentsSectionCell {
+            guard cell.item.isComplete else {
+                let banner = Banner(fadeBackground: false)
+                banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                          text: "vote_to_view_comments",
+                                                          tintColor: .systemOrange),
+                               dismissAfter: 0.75)
+                banner.didDisappearPublisher
+                    .sink { _ in banner.removeFromSuperview() }
+                    .store(in: &self.subscriptions)
+                
+                return false
+            }
+            
+            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [.bottom])
+            source.refresh()
+            collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+            return true
+        }
+        //        // Allows for closing an already open cell
+        //        if collectionView.indexPathsForSelectedItems?.contains(indexPath) ?? false {
+        //            collectionView.deselectItem(at: indexPath, animated: true)
+        //        } else {
+        //            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+        //        }
+        //
+        //        source.refresh()
+        //
+        //        return false // The selecting or deselecting is already performed above
+        
+        //        guard let cell = collectionView.cellForItem(at: indexPath), !cell.isSelected else {
+        //            collectionView.deselectItem(at: indexPath, animated: true)
+        //            source.refresh()
+        //            return false
+        //        }
+        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+        source.refresh()
+        return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        source.refresh()
+        return false
+    }
+}
 //class PollCollectionView: UICollectionView {
 //
 //    enum Section: Int {

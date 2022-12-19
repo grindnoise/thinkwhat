@@ -55,6 +55,13 @@ class SubscriptionsView: UIView {
         }
     }
     //UI
+    private var isDateFilterHidden = false {
+        didSet {
+            guard oldValue != isDateFilterHidden else { return }
+            
+            toggleDateFilter(on: !isDateFilterHidden)
+        }
+    }
     private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
     private var userprofile: Userprofile! {
         didSet {
@@ -367,7 +374,8 @@ class SubscriptionsView: UIView {
             .sink { [weak self] in
                 guard let self = self else { return }
                 
-                self.toggleDateFilter(on: !$0)
+                self.isDateFilterHidden = $0
+//                self.toggleDateFilter(on: !$0)
             }
             .store(in: &subscriptions)
         
@@ -1109,11 +1117,11 @@ private extension SubscriptionsView {
 //              let constraint4 = shadowView.getConstraint(identifier: "trailing")
 //              let constraint5 = shadowView.getConstraint(identifier: "bottom")
         else { return }
-        
+
         setNeedsLayout()
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
             guard let self = self else { return }
-        
+
 //            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
 //            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
             self.filterView.alpha = on ? 1 : 0

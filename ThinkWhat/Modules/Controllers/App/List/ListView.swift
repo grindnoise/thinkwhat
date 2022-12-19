@@ -40,6 +40,13 @@ class ListView: UIView {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     //UI
+    private var isDateFilterHidden = false {
+        didSet {
+            guard oldValue != isDateFilterHidden else { return }
+            
+            toggleDateFilter(on: !isDateFilterHidden)
+        }
+    }
     private lazy var filterView: UIView = {
        let instance = UIView()
         instance.backgroundColor = .clear
@@ -311,7 +318,8 @@ class ListView: UIView {
             .sink { [weak self] in
                 guard let self = self else { return }
                 
-                self.toggleDateFilter(on: !$0)
+                self.isDateFilterHidden = $0
+//                self.toggleDateFilter(on: !$0)
             }
             .store(in: &subscriptions)
         
@@ -352,9 +360,9 @@ class ListView: UIView {
         instance.layer.shadowRadius = 5
         instance.layer.shadowOffset = .zero
         instance.publisher(for: \.bounds)
-            .sink { [unowned self] rect in
-                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
-            }
+            .receive(on: DispatchQueue.main)
+            .filter { $0 != .zero }
+            .sink { instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath }
             .store(in: &subscriptions)
         background.addEquallyTo(to: instance)
         
@@ -631,15 +639,16 @@ private extension ListView {
     
     @MainActor
     func toggleDateFilter(on: Bool) {
+        print(on)
         guard let heightConstraint = filterView.getConstraint(identifier: "height"),
               let constraint1 = filterView.getConstraint(identifier: "top_1"),
               let constraint2 = filterView.getConstraint(identifier: "top")
         else { return }
-        
+
         setNeedsLayout()
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
             guard let self = self else { return }
-        
+
             self.filterView.alpha = on ? 1 : 0
             self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
             constraint1.constant = on ? 16 : 0

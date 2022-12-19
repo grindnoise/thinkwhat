@@ -13,7 +13,7 @@ class SurveysCollectionView: UICollectionView {
     
     // MARK: - Enums
     enum Section {
-        case main
+        case main, loader
     }
     
     typealias Source = UICollectionViewDiffableDataSource<Section, SurveyReference>
@@ -105,21 +105,36 @@ class SurveysCollectionView: UICollectionView {
         }
         return items.uniqued().sorted { $0.startDate > $1.startDate }
     }
+    private var isLoading = false {
+        didSet {
+            guard oldValue != isLoading else { return }
+            
+            setLoadingSection(on: isLoading)
+        }
+    }
     //Scroll direction
     private var lastContentOffsetY: CGFloat = 0 {
         didSet {
-            guard oldValue != lastContentOffsetY else { return }
-            
-            isScrollingDown = lastContentOffsetY > oldValue
+            guard abs(oldValue - lastContentOffsetY) > 10 else { return }
             
             guard oldValue > 0,
                   contentSize.height > lastContentOffsetY + bounds.height
             else { return }
             
+            isScrollingDown = lastContentOffsetY > oldValue
+            
+//            guard oldValue > 0,
+//                  contentSize.height > lastContentOffsetY + bounds.height
+//            else { return }
+        }
+    }
+    private var isScrollingDown = false {
+        didSet {
+            guard oldValue != isScrollingDown else { return }
+            
             scrollPublisher.send(isScrollingDown)
         }
     }
-    private var isScrollingDown = true
     private var loadingInProgress = false
     private lazy var loadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
@@ -252,12 +267,8 @@ extension SurveysCollectionView: UICollectionViewDelegate {
         deselect()
     }
     
+    
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        cell.contentView.setNeedsLayout()
-//        cell.contentView.layoutIfNeeded()
-        
-//        cell.frame = CGRect(origin: cell.frame.origin, size: CGSize(width: cell.frame.w, height: <#T##CGFloat#>))
-        
         guard category != .Search, isScrollingDown else { loadingIndicator.stopAnimating(); return }
         
         let max = source.snapshot().itemIdentifiers.count-1
@@ -345,12 +356,16 @@ private extension SurveysCollectionView {
 
         setRefreshControl()
         setColors()
-
+//        let layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+//
+//        collectionViewLayout = UICollectionViewCompositionalLayout.list(using: layoutConfig)
         collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
 
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
             layoutConfig.backgroundColor = .clear
             layoutConfig.showsSeparators = false//true
+//            layoutConfig.footerMode = .supplementary
+        
 
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
             sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
@@ -362,13 +377,17 @@ private extension SurveysCollectionView {
 //        contentInsetAdjustmentBehavior = .never
         contentInset.bottom = category == .Topic ? 80 : 0
 
+//        let cellRegistration = UICollectionView.CellRegistration<SurveyIBCell, SurveyReference> { cell, indexPath, item in
+//            cell.item = item
+//        }
+        
         let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { [unowned self] cell, indexPath, item in
             cell.item = item
-            
+
             cell.subscribePublisher
                 .sink { [weak self] in
                     guard let self = self else { return }
-                    
+
                     self.subscribePublisher.send($0)
                 }
                 .store(in: &self.subscriptions)
@@ -410,7 +429,7 @@ private extension SurveysCollectionView {
 
                 guard $0!.isComplete else {
                     let banner = Banner(fadeBackground: false)
-                    banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.icloud.fill")!,
+                    banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
                                                               text: "finish_poll",
                                                               tintColor: .systemOrange),
                                    dismissAfter: 0.75)
@@ -452,17 +471,25 @@ private extension SurveysCollectionView {
 //                    cell.setNeedsLayout()
 //                    cell.layoutIfNeeded()
         }
+        
+        let loaderRegistration = UICollectionView.CellRegistration<SurveyLoadingCell, SurveyReference>{ cell, _, _ in }
 
         source = UICollectionViewDiffableDataSource<Section, SurveyReference>(collectionView: self) {
             collectionView, indexPath, identifier -> UICollectionViewCell? in
-            let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
+            if indexPath.section == 0 {
+                return collectionView.dequeueConfiguredReusableCell(using: cellRegistration,
+                                                                        for: indexPath,
+                                                                        item: identifier)
+            } else {
+                return collectionView.dequeueConfiguredReusableCell(using: loaderRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
-            
-//            cell.setNeedsLayout()
-//            cell.layoutIfNeeded()
-            return cell
+            }
         }
+        
+//        source.supplementaryViewProvider = { collectionView, elementKind, indexPath -> UICollectionReusableView? in
+//            return collectionView.dequeueConfiguredReusableSupplementary(using: loaderRegistration, for: indexPath)
+//        }
 
         setDataSource(animatingDifferences: false)
     }
@@ -501,6 +528,7 @@ private extension SurveysCollectionView {
             for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.EmptyReceived) {
                 guard let self = self else { return }
 
+                self.isLoading = false
                 self.loadingIndicator.stopAnimating()
             }
         })
@@ -545,16 +573,17 @@ private extension SurveysCollectionView {
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
                 
+                self.isLoading = false
+                self.loadingIndicator.stopAnimating()
+                
                 //Check by date filter
                 guard instance.isValid(byBeriod: self.period) else {
-                    self.loadingIndicator.stopAnimating()
                     return
                 }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
-                self.loadingIndicator.stopAnimating()
             }
         })
 
@@ -569,16 +598,17 @@ private extension SurveysCollectionView {
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
                 
+                self.isLoading = false
+                self.loadingIndicator.stopAnimating()
+                
                 //Check by date filter
                 guard instance.isValid(byBeriod: self.period) else {
-                    self.loadingIndicator.stopAnimating()
                     return
                 }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
-                self.loadingIndicator.stopAnimating()
             }
         })
 
@@ -608,16 +638,17 @@ private extension SurveysCollectionView {
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
                 
+                self.isLoading = false
+                self.loadingIndicator.stopAnimating()
+                
                 //Check by date filter
                 guard instance.isValid(byBeriod: self.period) else {
-                    self.loadingIndicator.stopAnimating()
                     return
                 }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
-                self.loadingIndicator.stopAnimating()
             }
         })
 
@@ -630,16 +661,17 @@ private extension SurveysCollectionView {
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
                 
+                self.isLoading = false
+                self.loadingIndicator.stopAnimating()
+                
                 //Check by date filter
                 guard instance.isValid(byBeriod: self.period) else {
-                    self.loadingIndicator.stopAnimating()
                     return
                 }
 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
-                self.loadingIndicator.stopAnimating()
                 //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
@@ -653,9 +685,11 @@ private extension SurveysCollectionView {
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
                 
+                self.isLoading = false
+                self.loadingIndicator.stopAnimating()
+                
                 //Check by date filter
                 guard instance.isValid(byBeriod: self.period) else {
-                    self.loadingIndicator.stopAnimating()
                     return
                 }
 
@@ -674,9 +708,11 @@ private extension SurveysCollectionView {
                       let instance = notification.object as? SurveyReference
                 else { return }
                 
+                self.isLoading = false
+                self.loadingIndicator.stopAnimating()
+                
                 //Check by date filter
                 guard instance.isValid(byBeriod: self.period) else {
-                    self.loadingIndicator.stopAnimating()
                     return
                 }
 
@@ -711,16 +747,17 @@ private extension SurveysCollectionView {
                       !self.source.snapshot().itemIdentifiers.contains(instance)
                 else { return }
 
+                self.isLoading = false
+                self.loadingIndicator.stopAnimating()
+                
                 //Check by date filter
                 guard instance.isValid(byBeriod: self.period) else {
-                    self.loadingIndicator.stopAnimating()
                     return
                 }
                 
                 var snap = self.source.snapshot()
                 snap.appendItems([instance], toSection: .main)
                 self.source.apply(snap, animatingDifferences: true)
-                self.loadingIndicator.stopAnimating()
                 //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
             }
         })
@@ -744,10 +781,11 @@ private extension SurveysCollectionView {
                 items += difference
 
                 var newSnap = Snapshot()
-                newSnap.appendSections([.main])
+                newSnap.appendSections([.main, .loader])
                 newSnap.appendItems(self.filterByPeriod(items.uniqued().sorted { $0.startDate > $1.startDate }))
                 self.source.apply(newSnap)
                 self.loadingIndicator.stopAnimating()
+                self.isLoading = false
             }
         })
 
@@ -762,7 +800,7 @@ private extension SurveysCollectionView {
                 else { return }
 
                 var snap = Snapshot()
-                snap.appendSections([.main])
+                snap.appendSections([.main, .loader])
                 snap.appendItems(self.dataItems)
                 self.source.apply(snap)
                 //Append, sort
@@ -811,6 +849,7 @@ private extension SurveysCollectionView {
         } else if category == .ByOwner, let userprofile = userprofile {
             paginationByUserprofilePublisher.send([userprofile: period])
         } else {
+            isLoading = true
             paginationPublisher.send([category: period])
         }
     }
@@ -839,10 +878,39 @@ private extension SurveysCollectionView {
     }
     
     func setDataSource(animatingDifferences: Bool = true) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>()
-        snapshot.appendSections([.main])
+        var snapshot = Snapshot()
+        snapshot.appendSections([.main, .loader])
         snapshot.appendItems(filterByPeriod(dataItems), toSection: .main)
+        if isLoading {
+            snapshot.appendItems([SurveyReference.null], toSection: .loader)
+        }
         source.apply(snapshot, animatingDifferences: animatingDifferences)
+    }
+    
+    func setLoadingSection(on: Bool) {
+        var snapshot = source.snapshot()
+        
+        guard on else {
+            guard snapshot.numberOfSections > 1 else { return }
+            delayAsync(delay: 1) { [weak self] in
+                guard let self = self, let items = snapshot.itemIdentifiers(inSection: .loader) as? [SurveyReference] else { return }
+                
+                snapshot.deleteItems(items)
+                DispatchQueue.main.async {
+                    self.source.apply(snapshot)
+                }
+            }
+            
+            return
+        }
+        if snapshot.numberOfSections == 1 { snapshot.appendSections([.loader]) }
+
+//        guard snapshot.numberOfItems(inSection: .loader) == 0 else { return }
+
+        snapshot.appendItems([SurveyReference.null], toSection: .loader)
+        DispatchQueue.main.async {
+            self.source.apply(snapshot)
+        }
     }
 }
 
