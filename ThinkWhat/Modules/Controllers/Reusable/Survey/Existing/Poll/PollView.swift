@@ -31,11 +31,29 @@ class PollView: UIView {
         }
     //UI
     private lazy var collectionView: PollCollectionView = {
-            let instance = PollCollectionView(item: item!)
-            instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
-            instance.layer.masksToBounds = false
-            instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: 100, right: instance.contentInset.right)
-
+        let instance = PollCollectionView(item: item!)
+        instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
+        instance.layer.masksToBounds = false
+        instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: 100, right: instance.contentInset.right)
+        instance.imagePublisher
+            .sink {[weak self] in
+                guard let self = self,
+                      let survey = self.item,
+                      let controller = self.viewInput
+                else { return }
+                
+                let images = survey.media.sorted { $0.order < $1.order }.compactMap {$0.image}
+                let agrume = Agrume(images: images, startIndex: $0.order, background: .colored(.black))
+                let helper = self.makeHelper()
+                agrume.onLongPress = helper.makeSaveToLibraryLongPressGesture
+                agrume.show(from: controller)
+                guard images.count > 1 else { return }
+                agrume.didScroll = { [weak self] index in
+                    guard let self = self else { return }
+                    self.collectionView.onImageScroll(index)
+                }
+            }
+            .store(in: &subscriptions)
     //        //Claim
     //        instance.claimSubject.sink { [unowned self] in
     //            guard let item = $0 else { return }
@@ -114,6 +132,19 @@ private extension PollView {
     
     func setTasks() {
 
+    }
+    
+    func makeHelper() -> AgrumePhotoLibraryHelper {
+        let saveButtonTitle = "save_image".localized
+        let cancelButtonTitle = "cancel".localized
+        let helper = AgrumePhotoLibraryHelper(saveButtonTitle: saveButtonTitle, cancelButtonTitle: cancelButtonTitle) { error in
+            guard error == nil else {
+                print("Could not save your photo")
+                return
+            }
+            print("Photo has been saved to your library")
+        }
+        return helper
     }
 }
 

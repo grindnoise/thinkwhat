@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 import LinkPresentation
 
 class LinkPreviewCell: UICollectionViewCell {
@@ -27,136 +28,96 @@ class LinkPreviewCell: UICollectionViewCell {
             }
         }
     }
-    public weak var callbackDelegate: CallbackObservable?
+    public var tapPublisher = PassthroughSubject<URL, Never>()
     
-    // MARK: - Private Properties
-    private lazy var headerContainer: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.addSubview(horizontalStack)
-        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            horizontalStack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 10),
-//            horizontalStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -10),
-            horizontalStack.topAnchor.constraint(equalTo: instance.topAnchor),
-            horizontalStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -10),
-        ])
-        
-        return instance
-    }()
-    private lazy var background: UIView = {
-        let instance = UIView()
-        instance.accessibilityIdentifier = "bg"
-        instance.layer.masksToBounds = false
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-        instance.addEquallyTo(to: shadowView)
-        observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-            guard let value = change.newValue else { return }
-            view.cornerRadius = max(value.height, value.width) * 0.05
-        })
-        return instance
-    }()
+    // MARK: - Private properties
+    private var observers: [NSKeyValueObservation] = []
+    private var subscriptions = Set<AnyCancellable>()
+    private var tasks: [Task<Void, Never>?] = []
+    //UI
     private lazy var disclosureLabel: UILabel = {
         let instance = UILabel()
-        instance.text = "web_link".localized.uppercased()
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
         instance.textColor = .secondaryLabel
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
+        instance.text = "web_link".localized.uppercased()
         
         let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
         constraint.identifier = "width"
         constraint.isActive = true
-//        instance.addEquallyTo(to: shadowView)
-//                let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
-//                constraint.identifier = "height"
-//                constraint.isActive = true
+        
         return instance
     }()
-    private var observers: [NSKeyValueObservation] = []
     private lazy var disclosureIndicator: UIImageView = {
-        let disclosureIndicator = UIImageView()
-        disclosureIndicator.image = UIImage(systemName: "chevron.down")
-        disclosureIndicator.tintColor = .secondaryLabel
-        disclosureIndicator.contentMode = .center
-//        disclosureIndicator.widthAnchor.constraint(equalTo: disclosureIndicator.heightAnchor, multiplier: 1/1).isActive = true
-        disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
-        return disclosureIndicator
+        let instance = UIImageView()
+        instance.image = UIImage(systemName: "chevron.down")
+        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+        instance.tintColor = .secondaryLabel
+        instance.contentMode = .center
+        instance.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
+        
+        return instance
     }()
     private lazy var icon: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         let imageView = UIImageView(image: UIImage(systemName: "link"))
         imageView.tintColor = .secondaryLabel
         imageView.contentMode = .center
-        imageView.addEquallyTo(to: instance)
+        imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 1/1).isActive = true
+        imageView.publisher(for: \.bounds)
+            .filter { $0 != .zero }
+            .sink {
+                imageView.image = UIImage(systemName: "link",
+                                          withConfiguration: UIImage.SymbolConfiguration(pointSize: $0.height*0.75))
+            }
+            .store(in: &subscriptions)
         
-        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
-            guard let newValue = change.newValue else { return }
-            
-            view.image = UIImage(systemName: "link", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
-        }))
-        
-        return instance
+        return imageView
     }()
-    // Stacks
     private lazy var horizontalStack: UIStackView = {
-        let rootStack = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
-        rootStack.alignment = .center
-//        rootStack.distribution = .fillProportionally
-        rootStack.spacing = 4
-        
-        let constraint = rootStack.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
+        let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
+        instance.alignment = .center
+        let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
         constraint.identifier = "height"
         constraint.isActive = true
-       
-        return rootStack
+        instance.spacing = 4
+        instance.axis = .horizontal
+        instance.alignment = .center
+        return instance
     }()
     private lazy var verticalStack: UIStackView = {
-        let verticalStack = UIStackView(arrangedSubviews: [headerContainer, shadowView])//, browserButton])
+        let opaque = UIView()
+        opaque.backgroundColor = .clear
+        opaque.addSubview(horizontalStack)
+        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+        horizontalStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor, constant: padding).isActive = true
+        horizontalStack.topAnchor.constraint(equalTo: opaque.topAnchor).isActive = true
+        horizontalStack.bottomAnchor.constraint(equalTo: opaque.bottomAnchor).isActive = true
+        
+        let verticalStack = UIStackView(arrangedSubviews: [opaque, linkPreview])
         verticalStack.axis = .vertical
-        verticalStack.spacing = 0
+        verticalStack.spacing = padding
         return verticalStack
     }()
     // Constraints
-    private var closedConstraint: NSLayoutConstraint?
-    private var openConstraint: NSLayoutConstraint?
-    private lazy var shadowView: UIView = {
-        let instance = UIView()
-        instance.layer.masksToBounds = false
-        instance.clipsToBounds = false
-        instance.backgroundColor = .clear
-        instance.accessibilityIdentifier = "shadow"
-        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.2).cgColor
-        instance.layer.shadowRadius = 4
-        instance.layer.shadowOffset = .zero
-        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
-        observers.append(instance.observe(\UIView.bounds, options: [NSKeyValueObservingOptions.new]) { view, change in
-            guard let value = change.newValue else { return }
-            view.layer.shadowPath = UIBezierPath(roundedRect: value, cornerRadius: value.width*0.05).cgPath
-        })
-        return instance
-    }()
-    @MainActor private lazy var linkPreview: LPLinkView = {
+    private var closedConstraint: NSLayoutConstraint!
+    private var openConstraint: NSLayoutConstraint!
+    private lazy var linkPreview: LPLinkView = {
         let instance = LPLinkView()
-        instance.addEquallyTo(to: background)
-        opaqueView.addEquallyTo(to: background)
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
+        instance.publisher(for: \.bounds)
+            .filter { $0 != .zero }
+            .sink { instance.cornerRadius = $0.width*0.025 }
+            .store(in: &subscriptions)
+        
         return instance
     }()
-    private lazy var opaqueView: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.layer.zPosition = 10
-        instance.accessibilityIdentifier = "opaqueView"
-        let recognizer = UITapGestureRecognizer(target: self, action: #selector(self.openURL))
-        instance.addGestureRecognizer(recognizer)
-        return instance
-    }()
-    private let padding: CGFloat = 10
+    private let padding: CGFloat = 8
     
     // MARK: - Destructor
     deinit {
+        observers.forEach { $0.invalidate() }
+        tasks.forEach { $0?.cancel() }
+        subscriptions.forEach { $0.cancel() }
+        NotificationCenter.default.removeObserver(self)
 #if DEBUG
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
@@ -165,7 +126,7 @@ class LinkPreviewCell: UICollectionViewCell {
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setObservers()
+        
         setupUI()
     }
     
@@ -173,36 +134,64 @@ class LinkPreviewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private methods
-    private func setupUI() {
-        backgroundColor = .clear
-        clipsToBounds = true
-//        horizontalStack.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        disclosureLabel.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor).isActive = true
-        contentView.addSubview(verticalStack)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        verticalStack.translatesAutoresizingMaskIntoConstraints = false
+    // MARK: - Overriden methods
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
         
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 50),
-            verticalStack.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            verticalStack.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.95),
-        ])
+//        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+//        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        if let imageView = icon.get(all: UIImageView.self).first {
+//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+//        }
         
-        closedConstraint = disclosureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-        closedConstraint?.priority = .defaultLow // use low priority so stack stays pinned to top of cell
+        //Set dynamic font size
+        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
         
-        openConstraint = linkPreview.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
-        openConstraint?.priority = .defaultLow
+        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                                 forTextStyle: .caption1)
+        guard let constraint = horizontalStack.getConstraint(identifier: "height"),
+              let constraint_2 = disclosureLabel.getConstraint(identifier: "width")
+        else { return }
         
-//        disclosureLabel.widthAnchor.constraint(equalToConstant: self.disclosureLabel.text!.width(withConstrainedHeight: horizontalStack.frame.height, font: self.disclosureLabel.font)).isActive = true
-
-        updateAppearance(animated: false)
+        setNeedsLayout()
+        constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
+        constraint_2.constant = disclosureLabel.text!.width(withConstrainedHeight: 100, font: disclosureLabel.font)
+        layoutIfNeeded()
     }
+}
+    
+    // MARK: - Private methods
+    private extension LinkPreviewCell {
+        @MainActor
+        func setupUI() {
+            backgroundColor = .clear
+            clipsToBounds = true
+            contentView.addSubview(verticalStack)
+            contentView.translatesAutoresizingMaskIntoConstraints = false
+            verticalStack.translatesAutoresizingMaskIntoConstraints = false
+
+            NSLayoutConstraint.activate([
+                contentView.topAnchor.constraint(equalTo: topAnchor),
+                contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+                contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+                verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+                verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+                verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+            ])
+
+            setNeedsLayout()
+            layoutIfNeeded()
+
+            closedConstraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+            closedConstraint.priority = .defaultLow
+
+            openConstraint = linkPreview.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
+            openConstraint.priority = .defaultLow
+
+            updateAppearance(animated: false)
+        }
     
     /// Updates the views to reflect changes in selection
     private func updateAppearance(animated: Bool = true) {
@@ -220,40 +209,10 @@ class LinkPreviewCell: UICollectionViewCell {
         }
     }
     
-    private func setObservers() {}
-    
     @objc
     private func openURL() {
         guard let url = item.url else { return }
-        callbackDelegate?.callbackReceived(url as Any)
-    }
-    
-    // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
         
-        verticalStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
-            $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        }
-        
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
-//        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-//        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-//        if let imageView = icon.get(all: UIImageView.self).first {
-//            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-//        }
-        
-        //Set dynamic font size
-        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-        
-        disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                                 forTextStyle: .caption1)
-        guard let constraint = horizontalStack.getConstraint(identifier: "height"),
-              let constraint_2 = disclosureLabel.getConstraint(identifier: "width")
-        else { return }
-        setNeedsLayout()
-        constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
-        constraint_2.constant = disclosureLabel.text!.width(withConstrainedHeight: 100, font: disclosureLabel.font)
-        layoutIfNeeded()
+        tapPublisher.send(url)
     }
 }

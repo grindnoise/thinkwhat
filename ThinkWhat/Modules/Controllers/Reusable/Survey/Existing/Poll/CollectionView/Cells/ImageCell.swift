@@ -17,36 +17,9 @@ class ImageCell: UICollectionViewCell {
             guard !item.isNil else { return }
 
             updateUI()
-//            slides.forEach { [weak self] slide in
-//                guard let self = self, let mediafile = slide.mediafile else { return }
-//                guard let image = mediafile.image else {
-//                    mediafile.downloadImage(downloadProgress: { progress in
-//                        slide.imageView.progressIndicatorView.progress = progress
-//                    }) {
-//                        switch $0 {
-//                        case .success:
-//                            slide.imageView.image = mediafile.image
-//                            slide.imageView.progressIndicatorView.reveal()
-//                            slide.showTitle()
-//                            guard self.slides.first == slide else { return }
-//                            self.showPageControl()
-//                        case .failure(let error):
-//#if DEBUG
-//                            error.printLocalized(class: type(of: self), functionName: #function)
-//#endif
-//                            self.callbackDelegate?.callbackReceived(AppError.imageDownload)
-//                        }
-//                    }
-//                    return
-//                }
-//                slide.imageView.image = image
-//                slide.imageView.progressIndicatorView.alpha = 0
-//                slide.showTitle()
-//                self.showPageControl()
-//            }
         }
     }
-    public var imagePublisher = PassthroughSubject<UIImage, Never>()
+    public var imagePublisher = PassthroughSubject<Mediafile, Never>()
 
 
     // MARK: - Overriden properties
@@ -80,47 +53,15 @@ class ImageCell: UICollectionViewCell {
 
         return instance
     }()
-//    private lazy var headerContainer: UIView = {
-//        let instance = UIView()
-//        instance.backgroundColor = .clear
-//
-//        let innerView = UIView()
-//        innerView.backgroundColor = .clear
-//
-//        instance.addSubview(innerView)
-//        innerView.addSubview(horizontalStack)
-//
-//        innerView.translatesAutoresizingMaskIntoConstraints = false
-//        horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            innerView.topAnchor.constraint(equalTo: instance.topAnchor),
-//            innerView.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-//            innerView.widthAnchor.constraint(equalTo: instance.widthAnchor),//, multiplier: 0.95),
-//            innerView.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-//            horizontalStack.topAnchor.constraint(equalTo: innerView.topAnchor),
-//            horizontalStack.bottomAnchor.constraint(equalTo: innerView.bottomAnchor, constant: -padding),
-//            horizontalStack.leadingAnchor.constraint(equalTo: innerView.leadingAnchor)//, constant: padding),
-//            //            horizontalStack.trailingAnchor.constraint(equalTo: innerView.trailingAnchor, constant: -10),
-//        ])
-//
-//        return instance
-//    }()
     private lazy var icon: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        let imageView = UIImageView(image: UIImage(systemName: "photo.fill"))
+        let imageView = UIImageView(image: UIImage(systemName: "photo.fill",
+                                                   withConfiguration: UIImage.SymbolConfiguration(pointSize: "1".height(withConstrainedWidth: 100,
+                                                                                                                        font: disclosureLabel.font)*0.75)))
         imageView.tintColor = .secondaryLabel
         imageView.contentMode = .center
-        imageView.addEquallyTo(to: instance)
-
-        observers.append(imageView.observe(\UIImageView.bounds, options: .new, changeHandler: { view, change in
-            guard let newValue = change.newValue else { return }
-
-            view.image = UIImage(systemName: "photo.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: newValue.height, weight: .light, scale: .medium))
-        }))
-
-        return instance
+        imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 1/1).isActive = true
+        
+        return imageView
     }()
     private lazy var horizontalStack: UIStackView = {
         let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
@@ -131,7 +72,6 @@ class ImageCell: UICollectionViewCell {
         instance.spacing = 4
         instance.axis = .horizontal
         instance.alignment = .center
-        //        instance.distribution = .fillProportionally
         return instance
     }()
     private lazy var verticalStack: UIStackView = {
@@ -151,12 +91,12 @@ class ImageCell: UICollectionViewCell {
     private lazy var imageContainer: UIView = {
         let instance = UIView()
         instance.backgroundColor = .clear
-        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
-//        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1.0/1.0).isActive = true
-//        observers.append(instance.observe(\UITextView.bounds, options: .new, changeHandler: { view, change in
-//            guard let value = change.newValue else { return }
-//            view.cornerRadius = value.width * 0.05
-//        }))
+        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true//9/16).isActive = true
+        instance.publisher(for: \.bounds)
+            .filter { $0 != .zero }
+            .sink { instance.cornerRadius = $0.width*0.025 }
+            .store(in: &subscriptions)
+
         return instance
     }()
     private lazy var scrollView: UIScrollView = {
@@ -180,43 +120,34 @@ class ImageCell: UICollectionViewCell {
             instance.heightAnchor.constraint(equalTo: imageContainer.heightAnchor),
         ])
         instance.distribution = .fillEqually
-        instance.spacing = 0
+        instance.spacing = 0//padding*2
         instance.publisher(for: \.bounds)
             .filter { $0 != .zero }
             .sink { [weak self] in
                 guard let self = self else { return }
 
                 self.scrollView.contentSize.width = $0.width
-//                self.scrollView.contentSize.height = $0.height
             }
             .store(in: &subscriptions)
-//        observers.append(imagesStack.observe(\UIStackView.bounds, options: .new) { [weak self] view, change in
-//            guard let self = self, let value = change.newValue, !self.item.isNil else { return }
-//            self.scrollView.contentSize.width = value.width// + CGFloat(self.item.imagesCount) * view.spacing
-//        })
 
-        let width = instance.widthAnchor.constraint(equalToConstant: 100)
-        width.identifier = "width"
-        width.isActive = true
         return instance
     }()
     private var images: [UIView] = []
     private lazy var pages: UILabel = {
-        let instance = UILabel()
+        let instance = InsetLabel()
+        instance.frame = .zero
+        instance.insets = .uniform(size: 8)
         instance.alpha = 0
-        imageContainer.addSubview(instance)
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .callout)
+        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .footnote)
         instance.backgroundColor = .black.withAlphaComponent(0.8)
         instance.textColor = .white
         instance.textAlignment = .center
+        instance.text = "1"
+        instance.layer.zPosition = 100
+        imageContainer.addSubview(instance)
         instance.translatesAutoresizingMaskIntoConstraints = false
-        instance.layer.zPosition = 10
-        NSLayoutConstraint.activate([
-            instance.widthAnchor.constraint(equalTo: imageContainer.widthAnchor, multiplier: 0.15),
-            instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 3.5/6.0),
-            instance.topAnchor.constraint(equalTo: imageContainer.topAnchor, constant: 20),
-            instance.trailingAnchor.constraint(equalTo: imageContainer.trailingAnchor, constant: -20),
-        ])
+        instance.topAnchor.constraint(equalTo: imageContainer.topAnchor, constant: padding).isActive = true
+        instance.trailingAnchor.constraint(equalTo: imageContainer.trailingAnchor, constant: -padding).isActive = true
         instance.publisher(for: \.bounds)
             .filter { $0 != .zero }
             .sink { instance.cornerRadius = $0.height*0.25 }
@@ -229,14 +160,6 @@ class ImageCell: UICollectionViewCell {
     // Constraints
     private var closedConstraint: NSLayoutConstraint!
     private var openConstraint: NSLayoutConstraint!
-    private var color: UIColor = .systemBlue {
-        didSet {
-            //            disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            //            disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-            //            guard let imageView = icon.get(all: UIImageView.self).first else { return }
-            //            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        }
-    }
 
 
 
@@ -256,7 +179,7 @@ class ImageCell: UICollectionViewCell {
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setObservers()
+        
         setupUI()
     }
 
@@ -292,9 +215,9 @@ class ImageCell: UICollectionViewCell {
 
     // MARK: - Public methods
     public func scrollToImage(at position: Int) {
-        guard let destinationView = imagesStack.get(all: Slide.self).filter({ $0.mediafile?.order == position }).first?.superview else { return  }
+        guard imagesStack.arrangedSubviews.count >= position else { return  }
 
-        scrollView.scrollRectToVisible(destinationView.frame, animated: false)
+        scrollView.scrollRectToVisible(imagesStack.arrangedSubviews[position].frame, animated: false)
     }
 }
 
@@ -322,7 +245,7 @@ private extension ImageCell {
         setNeedsLayout()
         layoutIfNeeded()
 
-        closedConstraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
+        closedConstraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         closedConstraint.priority = .defaultLow
 
         openConstraint = imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
@@ -347,44 +270,92 @@ private extension ImageCell {
         }
     }
 
-    func showPageControl(animated: Bool = true) {
-        guard images.count > 1 else { return }
-        pages.text = "\(pageIndex+1)/\(images.count)"
-        if animated {
-            pages.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-            UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseInOut, animations: {
-                self.pages.alpha = 1
-                self.pages.transform = .identity
-            })
-        } else {
-            pages.alpha = 1
-        }
-    }
-
     func updateUI() {
-        item.media.sorted { $0.order < $1.order}.forEach { media in
+        item.media.sorted { $0.order < $1.order}.enumerated().forEach { index, media in
             let container = UIView()
             container.backgroundColor = .clear
-//            container.heightAnchor.constraint(equalTo: imagesStack.heightAnchor).isActive = true
-//            container.widthAnchor.constraint(equalTo: imagesStack.widthAnchor).isActive = true
-            container.publisher(for: \.bounds)
-                .filter { $0 != .zero }
-                .sink { container.cornerRadius = $0.width*0.025 }
-                .store(in: &subscriptions)
-
+            //            container.heightAnchor.constraint(equalTo: imagesStack.heightAnchor).isActive = true
+            //            container.widthAnchor.constraint(equalTo: imagesStack.widthAnchor).isActive = true
+                        container.publisher(for: \.bounds)
+                            .filter { $0 != .zero }
+                            .sink { container.cornerRadius = $0.width*0.025 }
+                            .store(in: &subscriptions)
+            
             let imageView = UIImageView()
             imageView.contentMode = .scaleAspectFill
             imageView.place(inside: container)
             imageView.isUserInteractionEnabled = false
+            imageView.layer.setValue(media, forKey: "media")
             imageView.addGestureRecognizer(UITapGestureRecognizer(target: self,
                                                                   action: #selector(self.imageTapped(recognizer:))))
-
-//            imageView.place(inside: imageContainer)
+            
+            //            imageView.place(inside: imageContainer)
             let shimmer = Shimmer()
             shimmer.backgroundColor = .clear
             shimmer.place(inside: container)
             shimmer.startShimmering()
-//
+            
+            //Text & button
+            let textView = UITextView()
+            textView.backgroundColor = .black.withAlphaComponent(0.8)
+            textView.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote)
+            textView.textColor = .white
+            textView.alpha = 0
+            textView.text = media.title
+            textView.isEditable = false
+            textView.isSelectable = false
+            textView.publisher(for: \.bounds)
+                .filter { $0 != .zero }
+                .sink { textView.cornerRadius = $0.height*0.25 }
+                .store(in: &subscriptions)
+            imageView.addSubview(textView)
+            textView.translatesAutoresizingMaskIntoConstraints = false
+            textView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -padding).isActive = true
+            textView.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: padding).isActive = true
+            textView.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -padding).isActive = true
+            let textViewConstraint = textView.heightAnchor.constraint(equalToConstant: 1)
+            textViewConstraint.identifier = "height"
+            textViewConstraint.isActive = true
+            
+            let button = UIImageView()
+            button.alpha = 0
+            button.isUserInteractionEnabled = true
+            button.backgroundColor = .black.withAlphaComponent(0.8)
+            button.contentMode = .center
+            button.tintColor = .white
+            button.layer.setValue(false, forKey: "isSelected")
+            button.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.quoteTapped(sender:))))
+            button.publisher(for: \.bounds)
+                .filter { $0 != .zero }
+                .sink {
+                    button.cornerRadius = $0.height*0.25
+                    
+                    guard let isSelected = button.layer.value(forKey: "isSelected") as? Bool else { return }
+                    
+                    button.image = UIImage(systemName: isSelected ? "quote.bubble" : "quote.bubble.fill",
+                                           withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5))
+                }
+                .store(in: &subscriptions)
+            
+            imageView.addSubview(button)
+            
+            
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.heightAnchor.constraint(equalTo: button.widthAnchor, multiplier: 1/1).isActive = true
+            let bottomConstraint = button.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: 0)
+            bottomConstraint.isActive = true
+            bottomConstraint.identifier = "bottom"
+            button.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -padding).isActive = true
+            button.layer.setValue(media, forKey: "media")
+            button.layer.setValue(imageView, forKey: "imageView")
+            
+            let buttonConstraint = button.heightAnchor.constraint(equalToConstant: "1".height(withConstrainedWidth: 100, font: pages.font))
+            buttonConstraint.isActive = true
+            pages.publisher(for: \.bounds)
+                .filter { $0 != .zero }
+                .sink { buttonConstraint.constant = $0.height }
+                .store(in: &subscriptions)
+            
             media.imagePublisher
                 .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { completion in
@@ -400,11 +371,16 @@ private extension ImageCell {
                     }
                 }, receiveValue: { [weak self] in
                     guard let self = self else { return }
-
+                    
                     UIView.animate(withDuration: 0.15, delay: 0, animations: {
                         shimmer.alpha = 0
                     }) { _ in
                         shimmer.stopShimmering(animated: true)
+                        self.showPageControl { _ in
+                            guard !media.title.isEmpty else { return }
+                            
+                            self.showQuoteButton(button, animated: index == 0 ? true : false)
+                        }
                         shimmer.removeFromSuperview()
                     }
                     imageView.image = $0
@@ -415,23 +391,81 @@ private extension ImageCell {
             images.append(imageView)
             imagesStack.addArrangedSubview(container)
             container.heightAnchor.constraint(equalTo: imagesStack.heightAnchor).isActive = true
-            container.widthAnchor.constraint(equalTo: imagesStack.widthAnchor).isActive = true
+            container.widthAnchor.constraint(equalTo: imageContainer.widthAnchor).isActive = true
         }
-
-        guard let constraint = imagesStack.getConstraint(identifier: "width") else { return }
-
-        setNeedsLayout()
-        constraint.constant = imageContainer.frame.width * CGFloat(item.media.count)// + CGFloat(mediafiles.count) * imagesStack.spacing
-        layoutIfNeeded()
     }
 
     @objc
     func imageTapped(recognizer: UITapGestureRecognizer) {
         guard let imageView = recognizer.view as? UIImageView,
-              let image = imageView.image
+              let media = imageView.layer.value(forKey: "media") as? Mediafile
         else { return }
 
-        imagePublisher.send(image)
+        imagePublisher.send(media)
+    }
+    
+    func showPageControl(animated: Bool = true, _ completion: @escaping (Bool) -> ()) {
+        guard pages.alpha == 0 && images.count > 1 else {
+            completion(true)
+            return
+        }
+        
+        pages.text = "\(pageIndex+1)/\(images.count)"
+        if animated {
+            pages.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+            UIView.animate(withDuration: 0.15, delay: 0.15, options: .curveEaseInOut, animations: {[weak self] in
+                guard let self = self else { return }
+                
+                self.pages.alpha = 1
+                self.pages.transform = .identity
+            }) { _ in completion(true) }
+        } else {
+            pages.alpha = 1
+            completion(true)
+        }
+    }
+    
+    @objc
+    func showQuoteButton(_ button: UIImageView, animated: Bool = true) {
+        guard animated else {
+            button.alpha = 1
+            return
+        }
+        
+        button.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        UIView.animate(withDuration: 0.15, delay: 0.15, options: .curveEaseInOut) {
+            button.alpha = 1
+            button.transform = .identity
+        }
+    }
+    
+    
+    @objc
+    func quoteTapped(sender: UITapGestureRecognizer) {
+        guard let button = sender.view as? UIImageView,
+              let _isSelected = button.layer.value(forKey: "isSelected") as? Bool,
+            let imageView = button.layer.value(forKey: "imageView") as? UIImageView,
+            let textView = imageView.getSubview(type: UITextView.self),
+            let bottomConstraint = textView.getConstraint(identifier: "bottom"),
+            let heightConstraint = textView.getConstraint(identifier: "height")
+        else { return }
+        
+        let isSelected = !_isSelected
+        
+        button.layer.setValue(isSelected, forKey: "isSelected")
+        imageView.setNeedsLayout()
+        Animations.changeImageCrossDissolve(imageView: button,
+                                            image: UIImage(systemName: isSelected ? "quote.bubble.fill" : "quote.bubble",
+                                                           withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5))!,
+                                            duration: 0.2,
+                                            animations: [{ [weak self] in
+            guard let self = self else { return }
+            
+            textView.alpha = isSelected ? 1 : 0
+            bottomConstraint.constant = isSelected ? -self.padding : 0
+            heightConstraint.constant = isSelected ? textView.contentSize.height : 0
+            imageView.layoutIfNeeded()
+        }])
     }
 
     func setObservers() {

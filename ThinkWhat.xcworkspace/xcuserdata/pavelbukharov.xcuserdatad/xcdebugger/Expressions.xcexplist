@@ -437,7 +437,7 @@
          contextName = "closure #2 in Surveys.append(object:type:):Survey.swift">
          <PersistentStrings>
             <PersistentString
-               value = "downloadedObjects[2].hashValue">
+               value = "downloadedObjects[1].hashValue">
             </PersistentString>
             <PersistentString
                value = "downloadedObjects[0].hashValue">
@@ -446,10 +446,10 @@
                value = "downloadedObjects[3].hashValue">
             </PersistentString>
             <PersistentString
-               value = "downloadedObjects[1].hashValue">
+               value = "_object.hashValue">
             </PersistentString>
             <PersistentString
-               value = "_object.hashValue">
+               value = "downloadedObjects[2].hashValue">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -847,19 +847,19 @@
                value = "background.frame.height">
             </PersistentString>
             <PersistentString
-               value = "actionView.frame">
+               value = "imageView.frame">
             </PersistentString>
             <PersistentString
                value = "userprofiles.filter({ $0.ID == UserProfiles.shared.own?.ID })">
             </PersistentString>
             <PersistentString
-               value = "actionView.centerYAnchor">
-            </PersistentString>
-            <PersistentString
-               value = "imageView.frame">
+               value = "actionView.frame">
             </PersistentString>
             <PersistentString
                value = "background.cornerRadius">
+            </PersistentString>
+            <PersistentString
+               value = "actionView.centerYAnchor">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -1816,6 +1816,14 @@
          contextName = "closure #1 in closure #1 in CommentCell.setTasks():CommentCell.swift">
       </ContextState>
       <ContextState
+         contextName = "ImageCell.quoteTapped(button:):ImageCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "button.layer.value(forKey: &quot;isSelected&quot;)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "NewSurveyViewController.tableView(_:heightForRowAt:):NewSurveyViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -2015,6 +2023,14 @@
          <PersistentStrings>
             <PersistentString
                value = "selectedLanguage">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ImageCell.scrollToImage(at:):ImageCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "imagesStack.arrangedSubviews.count">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -2667,10 +2683,10 @@
          contextName = "SurveysCollectionView.setDataSource(animatingDifferences:):SurveysCollectionView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "period">
+               value = "dataItems">
             </PersistentString>
             <PersistentString
-               value = "dataItems">
+               value = "period">
             </PersistentString>
             <PersistentString
                value = "filterByPeriod(dataItems)">
@@ -2703,13 +2719,13 @@
                value = "avatarsView.bounds.width - avatarsView.bounds.height">
             </PersistentString>
             <PersistentString
+               value = " avatarsView.bounds.width">
+            </PersistentString>
+            <PersistentString
                value = "avatars">
             </PersistentString>
             <PersistentString
                value = "((avatarsView.bounds.height*3 - avatarsView.bounds.width)/3)/3">
-            </PersistentString>
-            <PersistentString
-               value = " avatarsView.bounds.width">
             </PersistentString>
             <PersistentString
                value = "(avatarsView.bounds.height*count - avatarsView.bounds.width)/count">
@@ -2750,13 +2766,13 @@
          contextName = "SurveyTableViewCell.survey.didset:SurveyTableViewCell.swift">
          <PersistentStrings>
             <PersistentString
-               value = "_SurveyCategoryIcon.CategoryID(rawValue: survey.ID)">
-            </PersistentString>
-            <PersistentString
                value = "survey">
             </PersistentString>
             <PersistentString
                value = "survey.ID">
+            </PersistentString>
+            <PersistentString
+               value = "_SurveyCategoryIcon.CategoryID(rawValue: survey.ID)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -3002,10 +3018,10 @@
                value = "self.tempClaimButton!.center">
             </PersistentString>
             <PersistentString
-               value = "finalPos">
+               value = "claimButton.frame">
             </PersistentString>
             <PersistentString
-               value = "claimButton.frame">
+               value = "finalPos">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -3267,16 +3283,16 @@
                value = "_cell.contentView.alpha">
             </PersistentString>
             <PersistentString
-               value = "_cell.isVisible">
-            </PersistentString>
-            <PersistentString
-               value = "_cell.slides">
+               value = "imageDict.first?.key">
             </PersistentString>
             <PersistentString
                value = "!survey!.images!.isEmpty">
             </PersistentString>
             <PersistentString
-               value = "imageDict.first?.key">
+               value = "_cell.isVisible">
+            </PersistentString>
+            <PersistentString
+               value = "_cell.slides">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -3330,10 +3346,10 @@
          contextName = "Popup.onContainerHeightChange(_:):Popup.swift">
          <PersistentStrings>
             <PersistentString
-               value = "heightConstraint.constant">
+               value = "lastHeight">
             </PersistentString>
             <PersistentString
-               value = "lastHeight">
+               value = "heightConstraint.constant">
             </PersistentString>
             <PersistentString
                value = "min((height + padding*2), UIScreen.main.bounds.height * 0.8)">
@@ -3457,13 +3473,13 @@
          contextName = "SubscriptionsView.onUserSelected(userprofile:):SubscriptionsView.swift">
          <PersistentStrings>
             <PersistentString
+               value = "userView.frame">
+            </PersistentString>
+            <PersistentString
                value = "topView.frame">
             </PersistentString>
             <PersistentString
                value = "avatar.frame">
-            </PersistentString>
-            <PersistentString
-               value = "userView.frame">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -3731,6 +3747,17 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "specialized closure #1 in ImageCell.quoteTapped(sender:):ImageCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "textView.contentSize">
+            </PersistentString>
+            <PersistentString
+               value = "_isSelected">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "SurveysViewController.viewDidLayoutSubviews():SurveysViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -3781,6 +3808,17 @@
          <PersistentStrings>
             <PersistentString
                value = "category">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ImageCell.showQouteButton(_:animated:):ImageCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "button.frame">
+            </PersistentString>
+            <PersistentString
+               value = "pages.bounds.height">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -5622,10 +5660,10 @@
                value = "birthDateTF.text!.toDate()">
             </PersistentString>
             <PersistentString
-               value = "lastNameTF.text!">
+               value = " firstNameTF.text!">
             </PersistentString>
             <PersistentString
-               value = " firstNameTF.text!">
+               value = "lastNameTF.text!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -5650,13 +5688,13 @@
                value = "Array(Surveys.shared.favoriteSurveys.keys).filter( {$0 == surveyLink }).isEmpty">
             </PersistentString>
             <PersistentString
+               value = "likeButton.state">
+            </PersistentString>
+            <PersistentString
                value = "Array(Surveys.shared.favoriteLinks.keys).filter( {$0.ID == surveyLink.ID }).isEmpty">
             </PersistentString>
             <PersistentString
                value = "surveyLink">
-            </PersistentString>
-            <PersistentString
-               value = "likeButton.state">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -5695,6 +5733,14 @@
          <PersistentStrings>
             <PersistentString
                value = "navigationController?.viewControllers">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in ImageCell.updateUI():ImageCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "$0.height">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -7825,10 +7871,10 @@
                value = "customTitle.frame.width * 0.05">
             </PersistentString>
             <PersistentString
-               value = "customTitle.lineWidth">
+               value = "customTitle.oval.lineWidth">
             </PersistentString>
             <PersistentString
-               value = "customTitle.oval.lineWidth">
+               value = "customTitle.lineWidth">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -7977,10 +8023,10 @@
                value = "lastContentOffset">
             </PersistentString>
             <PersistentString
-               value = "scrollView.contentOffset.y">
+               value = "lastContentOffset - scrollView.contentOffset.y">
             </PersistentString>
             <PersistentString
-               value = "lastContentOffset - scrollView.contentOffset.y">
+               value = "scrollView.contentOffset.y">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -8104,13 +8150,13 @@
                value = "anonIcon.icon.alpha">
             </PersistentString>
             <PersistentString
+               value = "upperView.convert(votesSubview.center, to: contentView)">
+            </PersistentString>
+            <PersistentString
                value = "CGPointDistance(from: upperView.convert(votesSubview.center, to: contentView), to: upperView.convert(categorySubview.center, to: contentView))">
             </PersistentString>
             <PersistentString
                value = "categoryIcon.icon.frame">
-            </PersistentString>
-            <PersistentString
-               value = "upperView.convert(votesSubview.center, to: contentView)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -8184,7 +8230,7 @@
          contextName = "ImageCell.updateUI():ImageCell.swift">
          <PersistentStrings>
             <PersistentString
-               value = "imageContainer.frame.width">
+               value = "item.media">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -8604,10 +8650,10 @@
                value = "currentCard">
             </PersistentString>
             <PersistentString
-               value = "currentCard.survey == instance.survey">
+               value = "Surveys.shared.completed">
             </PersistentString>
             <PersistentString
-               value = "Surveys.shared.completed">
+               value = "currentCard.survey == instance.survey">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -8634,13 +8680,13 @@
          contextName = "closure #2 in Userprofile.init(from:):User.swift">
          <PersistentStrings>
             <PersistentString
-               value = "Userprofiles.shared.all">
+               value = "$0.id == self.id">
             </PersistentString>
             <PersistentString
                value = "Topics.shared.all">
             </PersistentString>
             <PersistentString
-               value = "$0.id == self.id">
+               value = "Userprofiles.shared.all">
             </PersistentString>
             <PersistentString
                value = "$0.hashValue">

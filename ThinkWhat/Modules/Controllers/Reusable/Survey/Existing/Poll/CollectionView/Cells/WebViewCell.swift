@@ -99,14 +99,13 @@ class WebViewCell: UICollectionViewCell {
         disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
         return disclosureIndicator
     }()
-    private lazy var icon: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        let imageView = UIImageView(image: UIImage(systemName: "link"))
-        imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        imageView.contentMode = .center
-        imageView.addEquallyTo(to: instance)
+    private lazy var icon: UIImageView = {
+        let instance = UIImageView(image: UIImage(systemName: "link",
+                                                  withConfiguration: UIImage.SymbolConfiguration(pointSize: "1".height(withConstrainedWidth: 100,
+                                                                                                                       font: disclosureLabel.font)*0.75)))
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        instance.contentMode = .center
+        
         return instance
     }()
     // Stacks
@@ -252,7 +251,7 @@ class WebViewCell: UICollectionViewCell {
                 } else if sideAppPreference == nil, tempAppPreference == nil, isTiTokInstalled {
                     
                     let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, fadeBackground: true)
-                    let content = SideApp(app: .TikTok, callbackDelegate: banner)
+                    let content = SideApp(app: .TikTok)//, callbackDelegate: banner)
                     banner.present(content: content, isModal: true)
                 }
             default:
@@ -264,10 +263,6 @@ class WebViewCell: UICollectionViewCell {
     // MARK: - Overriden methods
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
-        verticalStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
-            $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        }
         
         background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
         disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color

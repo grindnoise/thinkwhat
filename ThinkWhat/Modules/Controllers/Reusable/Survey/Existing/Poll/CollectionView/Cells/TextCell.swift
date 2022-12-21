@@ -24,15 +24,10 @@ class TextCell: UICollectionViewCell {
             } else {
                 paragraphStyle.hyphenationFactor = 1
             }
-            
-            textView.attributedText = NSAttributedString(string: text,
-                                                         attributes: [
-                                                            .font: textView.font as Any,
-                                                            .paragraphStyle: paragraphStyle
-                                                         ])
+            textView.attributedText = NSAttributedString(string: text, attributes: attributes)
         }
     }
-    
+    public var attributes: [NSAttributedString.Key: Any] = [:]
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -48,8 +43,6 @@ class TextCell: UICollectionViewCell {
                                              bottom: 0,
                                              right: 0)
         instance.isUserInteractionEnabled = false
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                          forTextStyle: .body)
         instance.backgroundColor = .clear
         instance.isEditable = false
         instance.isSelectable = false

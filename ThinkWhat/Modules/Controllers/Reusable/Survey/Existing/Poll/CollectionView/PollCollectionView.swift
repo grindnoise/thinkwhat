@@ -41,6 +41,9 @@ class PollCollectionView: UICollectionView {
     typealias Source = UICollectionViewDiffableDataSource<Section, Int>
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
 
+    // MARK: - Public properties
+    public var imagePublisher = PassthroughSubject<Mediafile, Never>()
+    public var webPublisher = PassthroughSubject<URL, Never>()
     
     
     // MARK: - Private properties
@@ -84,6 +87,12 @@ class PollCollectionView: UICollectionView {
         print("\(String(describing: type(of: self))).\(#function)")
 #endif
     }
+    
+    // MARK: - Public methods
+    public func onImageScroll(_ index: Int) {
+        guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
+        cell.scrollToImage(at: index)
+    }
 }
 
 private extension PollCollectionView {
@@ -101,12 +110,8 @@ private extension PollCollectionView {
             return sectionLayout
         }
         
-        let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [weak self] cell, _, _ in
-            guard let self = self,
-                  let item = self.item
-            else { return }
-            
-            cell.item = item
+        let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [unowned self] cell, _, _ in
+            cell.item = self.item
         }
         
 //        let descriptionCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AnyHashable> { [unowned self] cell, _, _ in
@@ -118,11 +123,21 @@ private extension PollCollectionView {
 //                                                         ])
 //            cell.contentConfiguration = content
 //        }
-        let descriptionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [weak self] cell, _, _ in
-            guard let self = self,
-                  let text = self.item?.description
-            else { return }
+        let descriptionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
+            guard let text = self.item?.description else { return }
             
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.firstLineHeadIndent = 20
+            paragraphStyle.paragraphSpacing = 20
+            if #available(iOS 15.0, *) {
+                paragraphStyle.usesDefaultHyphenation = true
+            } else {
+                paragraphStyle.hyphenationFactor = 1
+            }
+            cell.attributes = [
+                .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body) as Any,
+                .paragraphStyle: paragraphStyle
+            ]
             cell.text = text
         }
         
@@ -133,9 +148,42 @@ private extension PollCollectionView {
                 .sink {[weak self] in
                     guard let self = self else { return }
                     
-                    self.imag
+                    self.imagePublisher.send($0)
                 }
                 .store(in: &self.subscriptions)
+        }
+        
+        let youtubeCellRegistration = UICollectionView.CellRegistration<YoutubeCell, AnyHashable> { [unowned self] cell, _, _ in
+            cell.item = self.item
+        }
+        
+        let webCellRegistration = UICollectionView.CellRegistration<LinkPreviewCell, AnyHashable> { [unowned self] cell, _, _ in
+            cell.item = self.item
+            cell.tapPublisher
+                .sink {[weak self] in
+                    guard let self = self else { return }
+                    
+                    self.webPublisher.send($0)
+                }
+                .store(in: &self.subscriptions)
+        }
+        
+        let questionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
+            guard let text = self.item?.question else { return }
+            
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.firstLineHeadIndent = 20
+            paragraphStyle.paragraphSpacing = 20
+            if #available(iOS 15.0, *) {
+                paragraphStyle.usesDefaultHyphenation = true
+            } else {
+                paragraphStyle.hyphenationFactor = 1
+            }
+            cell.attributes = [
+                .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body) as Any,
+                .paragraphStyle: paragraphStyle
+            ]
+            cell.text = text
         }
         
         source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
@@ -153,18 +201,18 @@ private extension PollCollectionView {
                 return collectionView.dequeueConfiguredReusableCell(using: imagesCellRegistration,
                                                                     for: indexPath,
                                                                     item: identifier)
-                //            } else if section == .youtube {
-                //                return collectionView.dequeueConfiguredReusableCell(using: youtubeCellRegistration,
-                //                                                                    for: indexPath,
-                //                                                                    item: identifier)
-                //            } else if section == .web {
-                //                return collectionView.dequeueConfiguredReusableCell(using: linkPreviewRegistration,
-                //                                                                    for: indexPath,
-                //                                                                    item: identifier)
-                //            } else if section == .question {
-                //                return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
-                //                                                                    for: indexPath,
-                //                                                                    item: identifier)
+            } else if section == .youtube {
+                return collectionView.dequeueConfiguredReusableCell(using: youtubeCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            } else if section == .web {
+                return collectionView.dequeueConfiguredReusableCell(using: webCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
+            } else if section == .question {
+                return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
+                                                                    for: indexPath,
+                                                                    item: identifier)
                 //            } else if section == .vote {
                 //                return collectionView.dequeueConfiguredReusableCell(using: voteCellRegistration,
                 //                                                                    for: indexPath,
@@ -177,13 +225,13 @@ private extension PollCollectionView {
             return UICollectionViewCell()
         }
         
-        applyDifferences()
+        applySnapshot()
     }
     
-    func applyDifferences(toExistingSnapshot: Bool = false, animated: Bool = false) {
+    func applySnapshot(animated: Bool = false) {
         guard let item = item else { return }
         
-        var snapshot = toExistingSnapshot ? source.snapshot() : Snapshot()
+        var snapshot = Snapshot()
         snapshot.appendSections([.title, .description,])
         snapshot.appendItems([0], toSection: .title)
         snapshot.appendItems([1], toSection: .description)
@@ -191,6 +239,17 @@ private extension PollCollectionView {
             snapshot.appendSections([.image])
             snapshot.appendItems([2], toSection: .image)
         }
+        if let url = item.url {
+            if url.absoluteString.isYoutubeLink {
+                snapshot.appendSections([.youtube])
+                snapshot.appendItems([3], toSection: .youtube)
+            } else {
+                snapshot.appendSections([.web])
+                snapshot.appendItems([4], toSection: .web)
+            }
+        }
+        snapshot.appendSections([.question])
+        snapshot.appendItems([5], toSection: .question)
         source.apply(snapshot, animatingDifferences: false)
         
         //        snapshot.appendSections([.title, .description,])

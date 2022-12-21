@@ -95,7 +95,7 @@ class _YoutubeCell: UITableViewCell, WKYTPlayerViewDelegate, CallbackObservable 
                 playerView.pauseVideo()
                 playerView.stopVideo()
                 banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: self, bannerDelegate: self, fadeBackground: true)
-                banner?.present(content: SideApp(app: .Youtube, callbackDelegate: self), isModal: true)
+                banner?.present(content: SideApp(app: .Youtube))//, callbackDelegate: self), isModal: true)
             } else {
                 if tempAppPreference == .Embedded {
                     playerView.playVideo()

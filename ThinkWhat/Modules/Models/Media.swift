@@ -69,7 +69,10 @@ class Mediafile: Decodable {
     }
     
     func downloadImage() {
-        if let image = image { imagePublisher.send(image); return }
+        if let image = image {
+            imagePublisher.send(image)
+            return
+        }
         
         guard !isDownloading, let url = imageURL else { return }
         
