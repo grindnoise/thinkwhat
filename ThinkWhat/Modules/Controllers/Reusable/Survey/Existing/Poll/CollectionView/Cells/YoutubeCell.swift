@@ -273,10 +273,9 @@ extension YoutubeCell: WKYTPlayerViewDelegate {
         
         guard !sideAppPreference.isNil || !tempAppPreference.isNil else {
             playerView.stopVideo()
-            let banner = Banner(frame: UIScreen.main.bounds,
-                                fadeBackground: true)
-            
-            let content = SideApp(app: .Youtube)
+          
+            let banner = Banner(fadeBackground: true)
+            let content = SelectSideApp(app: .Youtube)
             banner.present(content: content, isModal: true)
             banner.didDisappearPublisher
                 .sink { _ in banner.removeFromSuperview() }

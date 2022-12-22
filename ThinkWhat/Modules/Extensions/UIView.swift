@@ -27,6 +27,13 @@ extension UIView {
               }
         return statusBarManager.statusBarFrame
     }
+  
+  class func opaque() -> UIView {
+    let opaque = UIView()
+    opaque.backgroundColor = .clear
+    
+    return opaque
+  }
     
 //    var statusBarWindow: UIWindow {
 //        guard let window = window,

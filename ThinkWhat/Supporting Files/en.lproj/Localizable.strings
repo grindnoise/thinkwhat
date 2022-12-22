@@ -358,10 +358,13 @@
 "remove_subscribers" = "Unsubscribe";
 "manage_subscriptions" = "Manage";
 
-//Notifications
+//Notifications & Banners
 "subscribe_to_user_notification" = "You subscribed to";
 "unsubscribe_from_user_notification" = "You unsubscribed from";
 "user_publication_notification_begin" = "Notifications from ";
 "user_publication_notification_on" = " are on";
 "user_publication_notification_off" = "are off";
 "watch_survey_notification" = "You'll be notified about the results when publication finishes";
+"open_url_embedded" = "Open in app";
+"open_url_in_app" = "Open in ";
+"save_setting" = "Save";

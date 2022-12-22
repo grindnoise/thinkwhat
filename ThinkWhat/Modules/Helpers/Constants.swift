@@ -135,15 +135,19 @@ enum ThirdPartyApp: String {
     case Youtube    = "Youtube"
     case Null       = ""
     
-    func getIcon() -> UIView {
-        switch self {
-        case .Youtube:
-            return YoutubeLogo()
-        case .TikTok:
-            return TikTokLogo()
-        default:
-            return UIView()
-        }
+    func logo() -> UIView {
+      var instance = UIView()
+      switch self {
+      case .Youtube:
+        instance = YoutubeLogo()
+      case .TikTok:
+        instance = TikTokLogo()
+      default:
+        return UIView()
+      }
+      instance.isOpaque = false
+      
+      return instance
     }
 }
 

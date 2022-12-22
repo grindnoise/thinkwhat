@@ -7,7 +7,7 @@
 //
 import UIKit
 
-class VotesFormula: UIView, BannerContent {
+class VotesFormula: UIView {
     deinit {
         print("VotesFormula banner deinit")
     }

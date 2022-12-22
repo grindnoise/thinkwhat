@@ -287,10 +287,20 @@ class MainController: UITabBarController {//}, StorageProtocol {
                 print("Something went wrong")
             }
         }
-        
-//        delayAsync(delay: 2) {
-            appDelegate.window?.addSubview(self.passthroughView)
-//        }
+      
+      appDelegate.window?.addSubview(self.passthroughView)
+      
+      delayAsync(delay: 2) {
+        let banner = NewBanner(contentView: SelectSideApp(app: .Youtube),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: true,
+                               useShadows: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 2)
+        banner.didDisappearPublisher
+          .sink { _ in banner.removeFromSuperview() }
+          .store(in: &self.subscriptions)
+      }
     }
 }
 

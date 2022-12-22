@@ -42,7 +42,7 @@ class delBanner: UIView {
                 case .Sum:
                     _content = VotesFormula.init(width: container.frame.width)
                 case .SideApp:
-                    _content = SideApp.init(width: container.frame.width)
+                    _content = SelectSideApp.init(width: container.frame.width)
                 default:
                     print("ContentType.None")
                 }

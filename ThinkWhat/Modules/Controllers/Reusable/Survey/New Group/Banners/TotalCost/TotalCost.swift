@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TotalCost: UIView, BannerContent {
+class TotalCost: UIView {
     var minHeigth: CGFloat {
         return topView.frame.height
     }

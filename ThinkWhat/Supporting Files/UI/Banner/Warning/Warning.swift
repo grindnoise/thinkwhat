@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Warning: UIView, BannerContent {
+class Warning: UIView {
     
     enum Level {
         case Info, Warning, Error, Success

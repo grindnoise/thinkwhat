@@ -8,7 +8,7 @@
 
 import UIKit
 
-class InsufficientBalance: UIView, BannerContent {
+class InsufficientBalance: UIView {
     var minHeigth: CGFloat {
         return topView.frame.height
     }

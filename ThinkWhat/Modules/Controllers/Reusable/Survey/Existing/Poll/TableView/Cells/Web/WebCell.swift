@@ -70,7 +70,7 @@ class WebCell: UITableViewCell, WKNavigationDelegate, WKUIDelegate, CallbackObse
                     }
                 } else if sideAppPreference == nil, tempAppPreference == nil, isTiTokInstalled {
                     delBanner.shared.contentType = .SideApp
-                    if let content = delBanner.shared.content as? SideApp {
+                    if let content = delBanner.shared.content as? SelectSideApp {
                         content.app = .TikTok
                         content.delegate = self
                     }

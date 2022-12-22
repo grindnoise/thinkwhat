@@ -358,10 +358,13 @@
 "remove_subscribers" = "Отписаться";
 "manage_subscriptions" = "Управлять";
 
-//Notifications
+//Notifications & Banners
 "subscribe_to_user_notification" = "Вы подписались на";
 "unsubscribe_from_user_notification" = "Вы отписались от";
 "user_publication_notification_begin" = "Уведомления от ";
 "user_publication_notification_on" = " включены";
 "user_publication_notification_off" = " выключены";
 "watch_survey_notification" = "Вы будете уведомлены о результатах при завершении публикации";
+"open_url_embedded" = "Открыть в приложении";
+"open_url_in_app" = "Открыть в ";
+"save_setting" = "Сохранить";
