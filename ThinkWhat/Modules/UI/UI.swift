@@ -365,6 +365,33 @@ enum Colors {
             ]
         }
     }
+  
+  static func getColor(forId id: Int) -> UIColor {
+    let colors = [
+      UIColor(hexString: "#6C4FB2"),
+      UIColor(hexString: "#47A8BD"),
+      UIColor(hexString: "#F0F757"),
+      UIColor(hexString: "#8F5D35"),
+      UIColor(hexString: "#D14C57"),
+      UIColor(hexString: "#72BC71"),
+      UIColor(hexString: "#F2E86D"),
+      UIColor(hexString: "#F8C630"),
+      UIColor(hexString: "#F2542D"),
+      UIColor(hexString: "#4E4187"),
+      UIColor(hexString: "#3083DC"),
+      UIColor(hexString: "#FC9F5B"),
+      UIColor(hexString: "#4E3822"),
+      UIColor(hexString: "#AD343E"),
+      UIColor(hexString: "#4DAA57"),
+      UIColor(hexString: "#FBB02D"),
+      UIColor(hexString: "#7776BC"),
+      UIColor(hexString: "#5C8001"),
+    ]
+    
+    guard (0...colors.count-1).contains(id) else { return .systemGray }
+    
+    return colors[id]
+  }
 }
 
 //extension Color: RawRepresentable {

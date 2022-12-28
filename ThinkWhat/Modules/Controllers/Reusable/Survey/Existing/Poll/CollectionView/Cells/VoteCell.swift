@@ -9,7 +9,7 @@
 import UIKit
 //import Combine
 
-class VoteCell: UICollectionViewCell {
+class VotesCell: UICollectionViewCell {
     
     // MARK: - Public properties
 //    public var color: UIColor! = .clear {

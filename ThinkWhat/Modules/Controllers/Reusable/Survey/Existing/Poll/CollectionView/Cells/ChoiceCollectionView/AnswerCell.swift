@@ -1,16 +1,207 @@
-////
-////  ChoiceCell.swift
-////  ThinkWhat
-////
-////  Created by Pavel Bukharov on 07.07.2022.
-////  Copyright © 2022 Pavel Bukharov. All rights reserved.
-////
 //
+//  ChoiceCell.swift
+//  ThinkWhat
 //
-//import UIKit
-//import Combine
+//  Created by Pavel Bukharov on 07.07.2022.
+//  Copyright © 2022 Pavel Bukharov. All rights reserved.
 //
-//class ChoiceCell: UICollectionViewCell {
+
+
+import UIKit
+import Combine
+
+class AnswerCell: UICollectionViewCell {
+  
+  // MARK: - Public properties
+  public var item: Answer! {
+    didSet {
+      guard !item.isNil,
+            oldValue != item
+      else { return }
+      
+      updateUI()
+    }
+  }
+  //Publishers
+  public let selectionPublisher = PassthroughSubject<Answer, Never>()
+  public let deselectionPublisher = PassthroughSubject<Bool, Never>()
+  //Logic
+  public var isAnswerSelected = false {
+    didSet {
+      guard oldValue != isAnswerSelected,
+            let survey = item.survey
+      else { return }
+      
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.6,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          self.imageView.tintColor = self.isAnswerSelected ? survey.topic.tagColor : .systemGray
+          self.imageView.transform = self.isAnswerSelected ? CGAffineTransform(scaleX: 1.35, y: 1.35) : .identity
+        }) { _ in }
+    }
+  }
+  
+  
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  //UI
+  private let lineSpacing: CGFloat = 4
+  private lazy var stackView: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [
+      textView
+    ])
+    instance.clipsToBounds = false
+    instance.axis = .vertical
+    
+    return instance
+  }()
+  private lazy var textView: UITextView = {
+    let instance = UITextView()
+    instance.textContainerInset = UIEdgeInsets(top: 0,
+                                         left: 0,
+                                         bottom: 0,
+                                         right: 0)
+    instance.backgroundColor = .clear
+    instance.isEditable = false
+    instance.isSelectable = false
+    instance.isUserInteractionEnabled = true
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(sender:))))
+    
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+    constraint.identifier = "height"
+    constraint.isActive = true
+    
+    observers.append(instance.observe(\.contentSize, options: .new) { [weak self] _, change in
+      guard let self = self,
+            let value = change.newValue,
+            value.height > 0,
+            constraint.constant != value.height
+      else { return }
+      
+      self.setNeedsLayout()
+      constraint.constant = value.height
+      self.layoutIfNeeded()
+    })
+    
+    return instance
+  }()
+  private lazy var imageView: UIImageView = {
+    let instance = UIImageView()
+    instance.contentMode = .center
+    instance.tintColor = .systemGray
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+    instance.heightAnchor.constraint(equalToConstant: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!.pointSize + lineSpacing/2).isActive = true
+//    instance.publisher(for: \.bounds)
+    return instance
+  }()
+  
+  
+  
+  // MARK: - Destructor
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
+#if DEBUG
+    print("\(String(describing: type(of: self))).\(#function)")
+#endif
+  }
+  
+  
+  
+  // MARK: - Initialization
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
+    setupUI()
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  
+  
+  // MARK: - Overridden properties
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    setAttributedString()
+  }
+}
+
+private extension AnswerCell {
+  @MainActor
+  func setupUI() {
+    backgroundColor = .clear
+    stackView.place(inside: contentView,
+//                    insets: UIEdgeInsets(top: 0, left: 8, bottom: 8, right: 8),
+                    bottomPriority: .defaultLow)
+    
+    addSubview(imageView)
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.topAnchor.constraint(equalTo: stackView.topAnchor, constant: lineSpacing/2).isActive = true
+    imageView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: lineSpacing/2).isActive = true
+  }
+  
+  @MainActor
+  func updateUI() {
+    setAttributedString()
+    
+    guard let image = UIImage(systemName: "\(item.order+1).circle.fill") else { return }
+    imageView.setImage(image)
+    
+    guard item.survey!.isComplete else { return }
+    
+    imageView.tintColor = Colors.getColor(forId: item.order)
+  }
+  
+  func setAttributedString() {
+    let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.firstLineHeadIndent = font!.pointSize + lineSpacing
+    paragraphStyle.lineSpacing = lineSpacing
+    if #available(iOS 15.0, *) {
+      paragraphStyle.usesDefaultHyphenation = true
+    } else {
+      paragraphStyle.hyphenationFactor = 1
+    }
+    let attributes: [NSAttributedString.Key: Any] = [
+      .font: font as Any,
+      .foregroundColor: UIColor.label,
+      .paragraphStyle: paragraphStyle
+    ]
+    textView.attributedText = NSAttributedString(string: item.description,
+                                                 attributes: attributes)
+  }
+  
+  @objc
+  func handleGesture(sender: UITapGestureRecognizer) {
+    if sender.view == textView {
+      guard !item.survey!.isComplete else { return }
+      
+      isAnswerSelected = !isAnswerSelected
+      switch isAnswerSelected {
+      case true:
+        selectionPublisher.send(item)
+      case false:
+        deselectionPublisher.send(true)
+      }
+    }
+  }
+}
+
+//class oldAnswerCell: UICollectionViewCell {
 //
 //    // MARK: - Overriden properties
 //    override var isSelected: Bool {
@@ -1041,7 +1232,7 @@
 //}
 //
 //// MARK: - CAAnimationDelegate
-//extension ChoiceCell: CAAnimationDelegate {
+//extension oldAnswerCell: CAAnimationDelegate {
 //    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
 //        if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
 //            completionBlocks.forEach{ $0() }

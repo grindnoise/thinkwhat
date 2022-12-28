@@ -10,321 +10,367 @@ import UIKit
 import Combine
 
 class PollCollectionView: UICollectionView {
-
-    enum Section: Int {
-        case title, description, image, youtube, web, question, choices, vote, comments
-        
-        var localized: String {
-            switch self {
-            case .title:
-                return "title".localized
-            case .description:
-                return "description".localized
-            case .image:
-                return "images".localized
-            case .youtube:
-                return "YouTube"
-            case .web:
-                return "web".localized
-            case .question:
-                return "question".localized
-            case .choices:
-                return "poll_choices".localized
-            case .vote:
-                return "vote".localized
-            case .comments:
-                return "comments".localized
-            }
-        }
+  
+  enum Section: Int {
+    case title, description, image, youtube, web, question, answers, vote, comments
+    
+    var localized: String {
+      switch self {
+      case .title:
+        return "title".localized
+      case .description:
+        return "description".localized
+      case .image:
+        return "images".localized
+      case .youtube:
+        return "YouTube"
+      case .web:
+        return "web".localized
+      case .question:
+        return "question".localized
+      case .answers:
+        return "poll_choices".localized
+      case .vote:
+        return "vote".localized
+      case .comments:
+        return "comments".localized
+      }
     }
+  }
+  
+  typealias Source = UICollectionViewDiffableDataSource<Section, Int>
+  typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
+  
+  // MARK: - Public properties
+  //Publishers
+  public let profileTapPublisher = PassthroughSubject<Bool, Never>()
+  public var imagePublisher = PassthroughSubject<Mediafile, Never>()
+  public var webPublisher = PassthroughSubject<URL, Never>()
+//  public let colorPublisher = PassthroughSubject<UIColor, Never>()
+  public let answerSelectionPublisher = PassthroughSubject<Answer, Never>()
+  public let answerDeselectionPublisher = PassthroughSubject<Bool, Never>()
+  
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  //Logic
+  private weak var item: Survey?
+  private var source: Source!
+  //    private var mode: PollController.Mode {
+  //        didSet {
+  //            guard oldValue != mode else { return }
+  //
+  //            print(mode)
+  //        }
+  //    }
+  
+  
+  
+  // MARK: - Initialization
+  init(item: Survey) {
+    super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     
-    typealias Source = UICollectionViewDiffableDataSource<Section, Int>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
-
-    // MARK: - Public properties
-    public var imagePublisher = PassthroughSubject<Mediafile, Never>()
-    public var webPublisher = PassthroughSubject<URL, Never>()
-    
-    
-    // MARK: - Private properties
-    private var observers: [NSKeyValueObservation] = []
-    private var subscriptions = Set<AnyCancellable>()
-    private var tasks: [Task<Void, Never>?] = []
-    //Logic
-    private weak var item: Survey?
-    private var source: Source!
-//    private var mode: PollController.Mode {
-//        didSet {
-//            guard oldValue != mode else { return }
-//
-//            print(mode)
-//        }
-//    }
-    
-    
-    
-    // MARK: - Initialization
-    init(item: Survey) {
-        super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
-
-        self.item = item
-        setupUI()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    
-    
-    // MARK: - Destructor
-    deinit {
-        observers.forEach { $0.invalidate() }
-        tasks.forEach { $0?.cancel() }
-        subscriptions.forEach { $0.cancel() }
-        NotificationCenter.default.removeObserver(self)
+    self.item = item
+    setupUI()
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  
+  
+  // MARK: - Destructor
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
 #if DEBUG
-        print("\(String(describing: type(of: self))).\(#function)")
+    print("\(String(describing: type(of: self))).\(#function)")
 #endif
-    }
-    
-    // MARK: - Public methods
-    public func onImageScroll(_ index: Int) {
-        guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
-        cell.scrollToImage(at: index)
-    }
+  }
+  
+  // MARK: - Public methods
+  public func onImageScroll(_ index: Int) {
+    guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
+    cell.scrollToImage(at: index)
+  }
 }
 
 private extension PollCollectionView {
-    @MainActor
-    func setupUI() {
-        delegate = self
-        allowsMultipleSelection = true
-        collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-            var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
-            layoutConfig.backgroundColor = .clear
-            layoutConfig.showsSeparators = false
-            
-            let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
-            return sectionLayout
-        }
-        
-        let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [unowned self] cell, _, _ in
-            cell.item = self.item
-        }
-        
-//        let descriptionCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AnyHashable> { [unowned self] cell, _, _ in
-//            var content = cell.defaultContentConfiguration()
-//            content.directionalLayoutMargins = .zero
-//            content.attributedText  = NSAttributedString(string: self.item!.description,
-//                                                         attributes: [
-//                                                            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
-//                                                         ])
-//            cell.contentConfiguration = content
-//        }
-        let descriptionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
-            guard let text = self.item?.description else { return }
-            
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.firstLineHeadIndent = 20
-            paragraphStyle.paragraphSpacing = 20
-            if #available(iOS 15.0, *) {
-                paragraphStyle.usesDefaultHyphenation = true
-            } else {
-                paragraphStyle.hyphenationFactor = 1
-            }
-            cell.attributes = [
-                .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body) as Any,
-                .paragraphStyle: paragraphStyle
-            ]
-            cell.text = text
-        }
-        
-        let imagesCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [unowned self] cell, _, _ in
-            cell.item = self.item
-            
-            cell.imagePublisher
-                .sink {[weak self] in
-                    guard let self = self else { return }
-                    
-                    self.imagePublisher.send($0)
-                }
-                .store(in: &self.subscriptions)
-        }
-        
-        let youtubeCellRegistration = UICollectionView.CellRegistration<YoutubeCell, AnyHashable> { [unowned self] cell, _, _ in
-            cell.item = self.item
-        }
-        
-        let webCellRegistration = UICollectionView.CellRegistration<LinkPreviewCell, AnyHashable> { [unowned self] cell, _, _ in
-            cell.item = self.item
-            cell.tapPublisher
-                .sink {[weak self] in
-                    guard let self = self else { return }
-                    
-                    self.webPublisher.send($0)
-                }
-                .store(in: &self.subscriptions)
-        }
-        
-        let questionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
-            guard let text = self.item?.question else { return }
-            
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.firstLineHeadIndent = 20
-            paragraphStyle.paragraphSpacing = 20
-            if #available(iOS 15.0, *) {
-                paragraphStyle.usesDefaultHyphenation = true
-            } else {
-                paragraphStyle.hyphenationFactor = 1
-            }
-            cell.attributes = [
-                .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body) as Any,
-                .paragraphStyle: paragraphStyle
-            ]
-            cell.text = text
-        }
-        
-        source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
-            guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
-            
-            if section == .title {
-                return collectionView.dequeueConfiguredReusableCell(using: titleCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
-            } else if section == .description {
-                return collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
-            } else if section == .image {
-                return collectionView.dequeueConfiguredReusableCell(using: imagesCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
-            } else if section == .youtube {
-                return collectionView.dequeueConfiguredReusableCell(using: youtubeCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
-            } else if section == .web {
-                return collectionView.dequeueConfiguredReusableCell(using: webCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
-            } else if section == .question {
-                return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
-                                                                    for: indexPath,
-                                                                    item: identifier)
-                //            } else if section == .vote {
-                //                return collectionView.dequeueConfiguredReusableCell(using: voteCellRegistration,
-                //                                                                    for: indexPath,
-                //                                                                    item: identifier)
-                //            }  else if section == .comments {
-                //                return collectionView.dequeueConfiguredReusableCell(using: commentsCellRegistration,
-                //                                                                    for: indexPath,
-                //                                                                    item: identifier)
-            }
-            return UICollectionViewCell()
-        }
-        
-        applySnapshot()
+  @MainActor
+  func setupUI() {
+    delegate = self
+    allowsMultipleSelection = true
+    collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+      var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+      layoutConfig.backgroundColor = .clear
+      layoutConfig.showsSeparators = false
+      
+      let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
+      return sectionLayout
     }
     
-    func applySnapshot(animated: Bool = false) {
-        guard let item = item else { return }
-        
-        var snapshot = Snapshot()
-        snapshot.appendSections([.title, .description,])
-        snapshot.appendItems([0], toSection: .title)
-        snapshot.appendItems([1], toSection: .description)
-        if item.imagesCount != 0 {
-            snapshot.appendSections([.image])
-            snapshot.appendItems([2], toSection: .image)
+    let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.item = self.item
+      cell.profileTapPublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.profileTapPublisher.send(true)
         }
-        if let url = item.url {
-            if url.absoluteString.isYoutubeLink {
-                snapshot.appendSections([.youtube])
-                snapshot.appendItems([3], toSection: .youtube)
-            } else {
-                snapshot.appendSections([.web])
-                snapshot.appendItems([4], toSection: .web)
-            }
-        }
-        snapshot.appendSections([.question])
-        snapshot.appendItems([5], toSection: .question)
-        source.apply(snapshot, animatingDifferences: false)
-        
-        //        snapshot.appendSections([.title, .description,])
-        //        snapshot.appendItems([0], toSection: .title)
-        //        snapshot.appendItems([1], toSection: .description)
-        //        if poll.imagesCount != 0 {
-        //            snapshot.appendSections([.image])
-        //            snapshot.appendItems([2], toSection: .image)
-        //        }
-        //        if let url = poll.url {
-        //            if url.absoluteString.isYoutubeLink {
-        //                snapshot.appendSections([.youtube])
-        //                snapshot.appendItems([3], toSection: .youtube)
-        //            } else {
-        //                snapshot.appendSections([.web])
-        //                snapshot.appendItems([4], toSection: .web)
-        //            }
-        //        }
-        //        snapshot.appendSections([.question])
-        //        snapshot.appendItems([5], toSection: .question)
-        //        ////        snapshot.appendSections([.choices])
-        //        ////        snapshot.appendItems([6], toSection: .choices)
-        //        snapshot.appendSections([.comments])
-        //        snapshot.appendItems([8], toSection: .comments)
+        .store(in: &self.subscriptions)
     }
+    
+    //        let descriptionCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AnyHashable> { [unowned self] cell, _, _ in
+    //            var content = cell.defaultContentConfiguration()
+    //            content.directionalLayoutMargins = .zero
+    //            content.attributedText  = NSAttributedString(string: self.item!.description,
+    //                                                         attributes: [
+    //                                                            .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+    //                                                         ])
+    //            cell.contentConfiguration = content
+    //        }
+    let descriptionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
+      guard let text = self.item?.description else { return }
+      
+      let paragraphStyle = NSMutableParagraphStyle()
+      paragraphStyle.firstLineHeadIndent = 20
+      paragraphStyle.paragraphSpacing = 20
+      if #available(iOS 15.0, *) {
+        paragraphStyle.usesDefaultHyphenation = true
+      } else {
+        paragraphStyle.hyphenationFactor = 1
+      }
+      cell.attributes = [
+        .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body) as Any,
+        .foregroundColor: UIColor.label,
+        .paragraphStyle: paragraphStyle
+      ]
+      cell.text = text
+    }
+    
+    let imagesCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.item = self.item
+      
+      cell.imagePublisher
+        .sink {[weak self] in
+          guard let self = self else { return }
+          
+          self.imagePublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+    }
+    
+    let youtubeCellRegistration = UICollectionView.CellRegistration<YoutubeCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.item = self.item
+    }
+    
+    let webCellRegistration = UICollectionView.CellRegistration<LinkPreviewCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.item = self.item
+      cell.tapPublisher
+        .sink {[weak self] in
+          guard let self = self else { return }
+          
+          self.webPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+    }
+    
+    let questionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
+      guard let text = self.item?.question else { return }
+      
+      let paragraphStyle = NSMutableParagraphStyle()
+      paragraphStyle.firstLineHeadIndent = 20
+      paragraphStyle.paragraphSpacing = 20
+      if #available(iOS 15.0, *) {
+        paragraphStyle.usesDefaultHyphenation = true
+      } else {
+        paragraphStyle.hyphenationFactor = 1
+      }
+      cell.attributes = [
+        .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body) as Any,
+        .foregroundColor: UIColor.label,
+        .paragraphStyle: paragraphStyle
+      ]
+      cell.text = text
+    }
+    
+    let answersCellRegistration = UICollectionView.CellRegistration<AnswersCell, AnyHashable> { [weak self] cell, indexPath, item in
+      guard let self = self else { return }
+      
+      cell.item = self.item
+      cell.selectionPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.answerSelectionPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      cell.deselectionPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.answerDeselectionPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
+//      self.colorPublisher
+//        .sink { cell.color = $0 }
+//        .store(in: &self.subscriptions)
+//      self.colorSubject
+//        .sink { [weak self]
+//        guard let color = $0 else { return }
+//        cell.color = color
+//      }
+//      .store(in: &self.subscriptions)
+    }
+    
+    source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
+      guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
+      
+      if section == .title {
+        return collectionView.dequeueConfiguredReusableCell(using: titleCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .description {
+        return collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .image {
+        return collectionView.dequeueConfiguredReusableCell(using: imagesCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .youtube {
+        return collectionView.dequeueConfiguredReusableCell(using: youtubeCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .web {
+        return collectionView.dequeueConfiguredReusableCell(using: webCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .question {
+        return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .answers {
+        return collectionView.dequeueConfiguredReusableCell(using: answersCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+        //            }  else if section == .comments {
+        //                return collectionView.dequeueConfiguredReusableCell(using: commentsCellRegistration,
+        //                                                                    for: indexPath,
+        //                                                                    item: identifier)
+      }
+      return UICollectionViewCell()
+    }
+    
+    applySnapshot()
+  }
+  
+  func applySnapshot(animated: Bool = false) {
+    guard let item = item else { return }
+    
+    var snapshot = Snapshot()
+    snapshot.appendSections([.title, .description,])
+    snapshot.appendItems([0], toSection: .title)
+    snapshot.appendItems([1], toSection: .description)
+    if item.imagesCount != 0 {
+      snapshot.appendSections([.image])
+      snapshot.appendItems([2], toSection: .image)
+    }
+    if let url = item.url {
+      if url.absoluteString.isYoutubeLink {
+        snapshot.appendSections([.youtube])
+        snapshot.appendItems([3], toSection: .youtube)
+      } else {
+        snapshot.appendSections([.web])
+        snapshot.appendItems([4], toSection: .web)
+      }
+    }
+    snapshot.appendSections([.question])
+    snapshot.appendItems([5], toSection: .question)
+    snapshot.appendSections([.answers])
+    snapshot.appendItems([6], toSection: .answers)
+    source.apply(snapshot, animatingDifferences: false)
+    
+    //        snapshot.appendSections([.title, .description,])
+    //        snapshot.appendItems([0], toSection: .title)
+    //        snapshot.appendItems([1], toSection: .description)
+    //        if poll.imagesCount != 0 {
+    //            snapshot.appendSections([.image])
+    //            snapshot.appendItems([2], toSection: .image)
+    //        }
+    //        if let url = poll.url {
+    //            if url.absoluteString.isYoutubeLink {
+    //                snapshot.appendSections([.youtube])
+    //                snapshot.appendItems([3], toSection: .youtube)
+    //            } else {
+    //                snapshot.appendSections([.web])
+    //                snapshot.appendItems([4], toSection: .web)
+    //            }
+    //        }
+    //        snapshot.appendSections([.question])
+    //        snapshot.appendItems([5], toSection: .question)
+    //        ////        snapshot.appendSections([.choices])
+    //        ////        snapshot.appendItems([6], toSection: .choices)
+    //        snapshot.appendSections([.comments])
+    //        snapshot.appendItems([8], toSection: .comments)
+  }
 }
 
 extension PollCollectionView: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView,
-                        shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        if let cell = cellForItem(at: indexPath) as? CommentsSectionCell {
-            guard cell.item.isComplete else {
-                let banner = Banner(fadeBackground: false)
-                banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                          text: "vote_to_view_comments",
-                                                          tintColor: .systemOrange),
-                               dismissAfter: 0.75)
-                banner.didDisappearPublisher
-                    .sink { _ in banner.removeFromSuperview() }
-                    .store(in: &self.subscriptions)
-                
-                return false
-            }
-            
-            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [.bottom])
-            source.refresh()
-            collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
-            return true
-        }
-        //        // Allows for closing an already open cell
-        //        if collectionView.indexPathsForSelectedItems?.contains(indexPath) ?? false {
-        //            collectionView.deselectItem(at: indexPath, animated: true)
-        //        } else {
-        //            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
-        //        }
-        //
-        //        source.refresh()
-        //
-        //        return false // The selecting or deselecting is already performed above
+  func collectionView(_ collectionView: UICollectionView,
+                      shouldSelectItemAt indexPath: IndexPath) -> Bool {
+    if let cell = cellForItem(at: indexPath) as? CommentsSectionCell {
+      guard cell.item.isComplete else {
+        let banner = Banner(fadeBackground: false)
+        banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                  text: "vote_to_view_comments",
+                                                  tintColor: .systemOrange),
+                       dismissAfter: 0.75)
+        banner.didDisappearPublisher
+          .sink { _ in banner.removeFromSuperview() }
+          .store(in: &self.subscriptions)
         
-        //        guard let cell = collectionView.cellForItem(at: indexPath), !cell.isSelected else {
-        //            collectionView.deselectItem(at: indexPath, animated: true)
-        //            source.refresh()
-        //            return false
-        //        }
-        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
-        source.refresh()
-        return true
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
-        collectionView.deselectItem(at: indexPath, animated: true)
-        source.refresh()
         return false
+      }
+      
+      collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [.bottom])
+      source.refresh()
+      collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+      return true
     }
+    //        // Allows for closing an already open cell
+    //        if collectionView.indexPathsForSelectedItems?.contains(indexPath) ?? false {
+    //            collectionView.deselectItem(at: indexPath, animated: true)
+    //        } else {
+    //            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+    //        }
+    //
+    //        source.refresh()
+    //
+    //        return false // The selecting or deselecting is already performed above
+    
+    //        guard let cell = collectionView.cellForItem(at: indexPath), !cell.isSelected else {
+    //            collectionView.deselectItem(at: indexPath, animated: true)
+    //            source.refresh()
+    //            return false
+    //        }
+    collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+    source.refresh()
+    return true
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
+    collectionView.deselectItem(at: indexPath, animated: true)
+    source.refresh()
+    return false
+  }
 }
 //class PollCollectionView: UICollectionView {
 //

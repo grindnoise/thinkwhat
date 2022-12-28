@@ -212,6 +212,7 @@ private extension Popup {
         bounds                      = UIScreen.main.bounds
         contentView.frame               = bounds
         contentView.autoresizingMask    = [.flexibleHeight, .flexibleWidth]
+      layer.zPosition = 2000
         appDelegate.window?.addSubview(self)
         addSubview(contentView)
         

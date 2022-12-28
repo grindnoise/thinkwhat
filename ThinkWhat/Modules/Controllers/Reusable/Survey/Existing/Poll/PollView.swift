@@ -11,49 +11,140 @@ import Agrume
 import Combine
 
 class PollView: UIView {
-    
-    // MARK: - Public properties
-    weak var viewInput: (PollViewInput & UIViewController)?
-    
-    
-    
-    // MARK: - Private properties
-    private var observers: [NSKeyValueObservation] = []
-    private var subscriptions = Set<AnyCancellable>()
-    private var tasks: [Task<Void, Never>?] = []
-    //Logic
-    public weak var item: Survey? {
-            didSet {
-                guard !item.isNil else { return }
-                
-                collectionView.place(inside: self)
-            }
+  
+  // MARK: - Public properties
+  weak var viewInput: (PollViewInput & UIViewController)?
+  //Logic
+  public weak var item: Survey? {
+    didSet {
+      guard let item = item else { return }
+      
+      collectionView.place(inside: self)
+      
+      guard !item.isComplete else { return }
+      
+      addSubview(actionButton)
+      actionButton.translatesAutoresizingMaskIntoConstraints = false
+      actionButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+      
+      let constraint = actionButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)//, constant: -tabBarHeight)
+      constraint.identifier = "top"
+      constraint.isActive = true
+
+      if #available(iOS 15, *) {
+        actionButton.configuration?.baseBackgroundColor = item.topic.tagColor
+      } else {
+        actionButton.backgroundColor = item.topic.tagColor
+      }
+      actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+    }
+  }
+//
+//  lazy var test: UIView = {
+//    let instance = UIView()
+//    instance.backgroundColor = .red
+//    instance.heightAnchor.constraint(equalTo: instanxce.widthAnchor, multiplier: 1/1).isActive = true
+//    instance.heightAnchor.constraint(equalToConstant: 50).isActive = true
+//    instance.layer.zPosition = 2
+//    return instance
+//  }()
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  //Logic
+  private var selectedAnswer: Answer? {
+    didSet {
+      guard oldValue != selectedAnswer,
+            let constraint = actionButton.getConstraint(identifier: "top")
+      else { return }
+      
+      setNeedsLayout()
+      UIView.animate(
+        withDuration: 0.35,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          self.actionButton.transform = self.selectedAnswer.isNil ? CGAffineTransform(scaleX: 0.75, y: 0.75) : .identity
+          self.actionButton.alpha = self.selectedAnswer.isNil ? 0 : 1
+          constraint.constant = self.selectedAnswer.isNil ? 0 : -(self.actionButton.bounds.height + tabBarHeight)
+          self.layoutIfNeeded()
+        }) { _ in }
+    }
+  }
+  //UI
+  private let padding: CGFloat = 8
+  private lazy var collectionView: PollCollectionView = {
+    func makeHelper() -> AgrumePhotoLibraryHelper {
+      let saveButtonTitle = "save_image".localized
+      let cancelButtonTitle = "cancel".localized
+      let helper = AgrumePhotoLibraryHelper(saveButtonTitle: saveButtonTitle, cancelButtonTitle: cancelButtonTitle) { error in
+        guard error == nil else {
+          print("Could not save your photo")
+          return
         }
-    //UI
-    private lazy var collectionView: PollCollectionView = {
-        let instance = PollCollectionView(item: item!)
-        instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
-        instance.layer.masksToBounds = false
-        instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: 100, right: instance.contentInset.right)
-        instance.imagePublisher
-            .sink {[weak self] in
-                guard let self = self,
-                      let survey = self.item,
-                      let controller = self.viewInput
-                else { return }
-                
-                let images = survey.media.sorted { $0.order < $1.order }.compactMap {$0.image}
-                let agrume = Agrume(images: images, startIndex: $0.order, background: .colored(.black))
-                let helper = self.makeHelper()
-                agrume.onLongPress = helper.makeSaveToLibraryLongPressGesture
-                agrume.show(from: controller)
-                guard images.count > 1 else { return }
-                agrume.didScroll = { [weak self] index in
-                    guard let self = self else { return }
-                    self.collectionView.onImageScroll(index)
-                }
-            }
-            .store(in: &subscriptions)
+        print("Photo has been saved to your library")
+      }
+      return helper
+    }
+    
+    let instance = PollCollectionView(item: item!)
+    instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
+    instance.layer.masksToBounds = false
+    instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: 100, right: instance.contentInset.right)
+    instance.imagePublisher
+      .sink {[weak self] in
+        guard let self = self,
+              let survey = self.item,
+              let controller = self.viewInput
+        else { return }
+        
+        let images = survey.media.sorted { $0.order < $1.order }.compactMap {$0.image}
+        let agrume = Agrume(images: images, startIndex: $0.order, background: .colored(.black))
+        let helper = makeHelper()
+        agrume.onLongPress = helper.makeSaveToLibraryLongPressGesture
+        agrume.show(from: controller)
+        guard images.count > 1 else { return }
+        agrume.didScroll = { [weak self] index in
+          guard let self = self else { return }
+          self.collectionView.onImageScroll(index)
+        }
+      }
+      .store(in: &subscriptions)
+    instance.profileTapPublisher
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.viewInput?.openUserprofile()
+      }.store(in: &subscriptions)
+    
+    instance.webPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.openURL($0)
+      }
+      .store(in: &subscriptions)
+    instance.answerSelectionPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.selectedAnswer = $0
+      }
+      .store(in: &subscriptions)
+    instance.answerDeselectionPublisher
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.selectedAnswer = nil
+      }
+      .store(in: &subscriptions)
+    
     //        //Claim
     //        instance.claimSubject.sink { [unowned self] in
     //            guard let item = $0 else { return }
@@ -88,94 +179,165 @@ class PollView: UIView {
     //
     //            self.viewInput?.openCommentThread(comment)
     //        }.store(in: &self.subscriptions)
+    
+    return instance
+  }()
+  private var actionButtonState: ButtonState = .Send
+  private lazy var actionButton: UIButton = {
+    let instance = UIButton()
+    instance.alpha = 0
+    instance.addTarget(self, action: #selector(self.vote), for: .touchUpInside)
+    
+    if #available(iOS 15, *) {
+      let attrString = AttributedString("vote".localized.uppercased(), attributes: AttributeContainer([
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.white
+      ]))
+      var config = UIButton.Configuration.filled()
+      config.attributedTitle = attrString
+      config.baseBackgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+      config.image = UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+      config.imagePlacement = .trailing
+      config.imagePadding = 8.0
+      config.contentInsets.top = 4
+      config.contentInsets.bottom = 4
+      config.contentInsets.leading = 20
+      config.contentInsets.trailing = 20
+      config.buttonSize = .large
 
-            return instance
-        }()
-        
+      instance.configuration = config
+    } else {
+      let attrString = NSMutableAttributedString(string: "vote".localized.uppercased(), attributes: [
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.white
+      ])
+      instance.titleEdgeInsets.left = 20
+      instance.titleEdgeInsets.right = 20
+      instance.setImage(UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+      instance.imageView?.tintColor = .white
+      instance.imageEdgeInsets.left = 8
+      //            instance.imageEdgeInsets.right = 8
+      instance.setAttributedTitle(attrString, for: .normal)
+      instance.semanticContentAttribute = .forceRightToLeft
+      instance.backgroundColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+    instance.translatesAutoresizingMaskIntoConstraints = false
+      
+      let constraint = instance.widthAnchor.constraint(equalToConstant: self.actionButtonState.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)!))
+      constraint.identifier = "width"
+      constraint.isActive = true
+      
+      instance.publisher(for: \.bounds)
+        .sink { [weak self] rect in
+          guard let self = self else { return }
+          
+          instance.cornerRadius = rect.height/3.25
+          
+          guard let constraint = instance.getConstraint(identifier: "width") else { return }
+//          self.setNeedsLayout()
+          constraint.constant = self.actionButtonState.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title1)!) + 40 + (instance .imageView?.bounds.width ?? 0)
+//          self.layoutIfNeeded()
+        }
+        .store(in: &subscriptions)
+    }
     
+//    let shadowView = UIView()
+//    shadowView.clipsToBounds = false
+//    shadowView.backgroundColor = .clear
+//    shadowView.accessibilityIdentifier = "shadow"
+//    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+//    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.7).cgColor
+//    shadowView.layer.shadowRadius = 16
+//    shadowView.layer.shadowOffset = .zero
+//    shadowView.layer.zPosition = 1
+//    shadowView.publisher(for: \.bounds)
+//      .receive(on: DispatchQueue.main)
+//      .sink { [weak self] in
+//        guard let self = self else { return }
+//
+//        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0,
+//                                                   cornerRadius: instance.cornerRadius).cgPath
+//      }
+//      .store(in: &subscriptions)
+//    shadowView.place(inside: instance)
+//    instance.layer.zPosition = 2
     
-    // MARK: - Destructor
-    deinit {
-        observers.forEach { $0.invalidate() }
-        tasks.forEach { $0?.cancel() }
-        subscriptions.forEach { $0.cancel() }
-        NotificationCenter.default.removeObserver(self)
+    return instance
+  }()
+  
+  
+  
+  // MARK: - Destructor
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
 #if DEBUG
-        print("\(String(describing: type(of: self))).\(#function)")
+    print("\(String(describing: type(of: self))).\(#function)")
 #endif
-    }
+  }
+  
+  
+  
+  // MARK: - Initialization
+  override init(frame: CGRect) {
+    super.init(frame: frame)
     
-    
-    
-    // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        setTasks()
-        setupUI()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+    setTasks()
+    setupUI()
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
 }
 
 // MARK: - Private
 private extension PollView {
-    @MainActor
-    func setupUI() {
-        backgroundColor = .systemBackground
-        
-        
-    }
+  @MainActor
+  func setupUI() {
+    backgroundColor = .systemBackground
+  }
+  
+  func setTasks() {
     
-    func setTasks() {
-
-    }
+  }
+  
+  @objc
+  func vote() {
     
-    func makeHelper() -> AgrumePhotoLibraryHelper {
-        let saveButtonTitle = "save_image".localized
-        let cancelButtonTitle = "cancel".localized
-        let helper = AgrumePhotoLibraryHelper(saveButtonTitle: saveButtonTitle, cancelButtonTitle: cancelButtonTitle) { error in
-            guard error == nil else {
-                print("Could not save your photo")
-                return
-            }
-            print("Photo has been saved to your library")
-        }
-        return helper
-    }
+  }
 }
 
 // MARK: - Controller Output
 extension PollView: PollControllerOutput {
-    func presentView(_ item: Survey) {
-        self.item = item
-        collectionView.alpha = 0
-        collectionView.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
-        
-        UIView.animate(withDuration: 0.3) { [weak self] in
-            guard let self = self else { return }
-            
-            self.collectionView.alpha = 1
-            self.collectionView.transform = .identity
-        }
-    }
+  func presentView(_ item: Survey) {
+    self.item = item
+    collectionView.alpha = 0
+    collectionView.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
     
-    func onLoadCallback(_: Result<Bool, Error>) {
-        
+    UIView.animate(withDuration: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      self.collectionView.alpha = 1
+      self.collectionView.transform = .identity
     }
+  }
+  
+  func onLoadCallback(_: Result<Bool, Error>) {
     
-    func onVoteCallback(_: Result<Bool, Error>) {
-        
-    }
+  }
+  
+  func onVoteCallback(_: Result<Bool, Error>) {
     
-    func commentPostCallback(_: Result<Comment, Error>) {
-        
-    }
+  }
+  
+  func commentPostCallback(_: Result<Comment, Error>) {
     
-    func commentDeleteError() {
-        
-    }
+  }
+  
+  func commentDeleteError() {
+    
+  }
 }

@@ -12,7 +12,7 @@ import Combine
 
 class SurveyReference: Decodable {// NSObject,
     
-    static let null: SurveyReference = SurveyReference(id: 0)
+//    static let null: SurveyReference = SurveyReference(id: 0)
     
     private enum CodingKeys: String, CodingKey {
         case id, type, title, category, likes, views, progress, rating, description, share_link,

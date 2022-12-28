@@ -9,6 +9,9 @@
 import Foundation
 import UIKit
 
+var isTabBarHidden = false
+var tabBarHeight = CGFloat.zero
+
 enum EditMode {
     case Create, Edit
 }

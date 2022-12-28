@@ -156,7 +156,8 @@ class ListView: UIView {
         return instance
     }()
     private lazy var collectionView: SurveysCollectionView = {
-        let instance = SurveysCollectionView(category: .New)
+      let instance = SurveysCollectionView(category: .New,
+                                           color: viewInput?.tintColor ?? Colors.System.Red.rawValue)
         
         //Pagination #1
         let paginationPublisher = instance.paginationPublisher

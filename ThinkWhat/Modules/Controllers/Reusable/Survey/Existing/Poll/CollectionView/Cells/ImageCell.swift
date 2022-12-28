@@ -248,7 +248,7 @@ private extension ImageCell {
         closedConstraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         closedConstraint.priority = .defaultLow
 
-        openConstraint = imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)//, constant: -padding)
+        openConstraint = imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         openConstraint.priority = .defaultLow
 
         updateAppearance(animated: false)
@@ -298,7 +298,7 @@ private extension ImageCell {
             //Text & button
             let textView = UITextView()
             textView.backgroundColor = .black.withAlphaComponent(0.8)
-            textView.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote)
+            textView.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline)
             textView.textColor = .white
             textView.alpha = 0
             textView.text = media.title
@@ -332,7 +332,7 @@ private extension ImageCell {
                     
                     guard let isSelected = button.layer.value(forKey: "isSelected") as? Bool else { return }
                     
-                    button.image = UIImage(systemName: isSelected ? "quote.bubble" : "quote.bubble.fill",
+                    button.image = UIImage(systemName: "quote.bubble.fill",//isSelected ? "quote.bubble" : "quote.bubble.fill",
                                            withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5))
                 }
                 .store(in: &subscriptions)

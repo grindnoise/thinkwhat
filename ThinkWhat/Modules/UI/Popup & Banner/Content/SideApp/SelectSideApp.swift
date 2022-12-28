@@ -12,7 +12,8 @@ import Combine
 final class SelectSideApp: UIView {
 
   // MARK: - Public properties
-//  public var framePublisher = PassthroughSubject<>
+  public var inAppPublisher = PassthroughSubject<Bool, Never>()
+  public var sideAppPublisher = PassthroughSubject<Bool, Never>()
   
   
   
@@ -67,6 +68,7 @@ final class SelectSideApp: UIView {
   private lazy var openEmbeddedButton: UIButton = {
     let instance = UIButton()
     instance.backgroundColor = .clear
+    instance.addTarget(self, action: #selector(self.handleEvent(sender:)), for: .touchUpInside)
     instance.setAttributedTitle(NSAttributedString(string: "open_url_embedded".localized, attributes: [
       .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .body) as Any,
       .foregroundColor: UIColor.systemBlue
@@ -87,6 +89,7 @@ final class SelectSideApp: UIView {
   private lazy var openAppButton: UIButton = {
     let instance = UIButton()
     instance.backgroundColor = .clear
+    instance.addTarget(self, action: #selector(self.handleEvent(sender:)), for: .touchUpInside)
     instance.setAttributedTitle(NSAttributedString(string: "open_url_in_app".localized + app.rawValue,
                                                    attributes: [
                                                     .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .body) as Any,
@@ -185,6 +188,43 @@ private extension SelectSideApp {
   @MainActor
   func setupUI() {
     horizontalStack.place(inside: self)
+  }
+  
+  @objc
+  func handleEvent(sender: UIButton) {
+    if sender == openAppButton {
+      sideAppPublisher.send(true)
+      sideAppPublisher.send(completion: .finished)
+      
+      guard saveSwitch.isOn else { return }
+      
+      switch app {
+      case .Youtube:
+        UserDefaults.App.youtubePlay = .App
+      case .TikTok:
+        UserDefaults.App.tiktokPlay = .App
+      default:
+#if DEBUG
+      print("")
+#endif
+      }
+    } else {
+      inAppPublisher.send(true)
+      inAppPublisher.send(completion: .finished)
+      
+      guard saveSwitch.isOn else { return }
+      
+      switch app {
+      case .Youtube:
+        UserDefaults.App.youtubePlay = .Embedded
+      case .TikTok:
+        UserDefaults.App.tiktokPlay = .Embedded
+      default:
+#if DEBUG
+      print("")
+#endif
+      }
+    }
   }
 }
 //8 495 135 15 51

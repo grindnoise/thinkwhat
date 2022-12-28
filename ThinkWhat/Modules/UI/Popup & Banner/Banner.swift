@@ -33,12 +33,26 @@ class NewBanner: UIView {
       dismiss()
     }
   }
+  private var isInteracting = false {
+      didSet {
+        guard isInteracting else { return }
+              
+        subscriptions.forEach { $0.cancel() }
+      }
+  }
   private let padding: CGFloat = 8
   private let contentPadding: UIEdgeInsets
   private let isModal: Bool
   private let contentView: UIView
-  private let useShadows: Bool
+//  private let useShadows: Bool
   private let useContentViewHeight: Bool
+  private lazy var background: UIView = {
+    let instance = UIView()
+    instance.clipsToBounds = false
+    instance.backgroundColor = .clear
+    
+    return instance
+  }()
   private lazy var shadowView: UIView = {
     let instance = UIView()
     instance.clipsToBounds = false
@@ -46,7 +60,7 @@ class NewBanner: UIView {
     instance.accessibilityIdentifier = "shadow"
     body.addEquallyTo(to: instance)
     
-    if useShadows {
+    if !isModal && traitCollection.userInterfaceStyle != .dark {
       instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
       instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.7).cgColor
       instance.layer.shadowRadius = 16
@@ -67,6 +81,7 @@ class NewBanner: UIView {
   private lazy var body: UIView = {
     let instance = UIView()
     instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .tertiarySystemBackground
+    instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:))))
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
       .filter { $0 != .zero }
@@ -95,12 +110,12 @@ class NewBanner: UIView {
   init(contentView: UIView,
        contentPadding: UIEdgeInsets = .uniform(size: 8),
        isModal: Bool,
-       useShadows: Bool = true,
+//       useShadows: Bool = true,
        useContentViewHeight: Bool = false,
        shouldDismissAfter: TimeInterval = .greatestFiniteMagnitude) {
     self.isModal = isModal
     self.contentView = contentView
-    self.useShadows = useShadows
+//    self.useShadows = useShadows
     self.useContentViewHeight = useContentViewHeight
     self.contentPadding = contentPadding
     self.shouldDismissAfter = shouldDismissAfter
@@ -215,6 +230,84 @@ private extension NewBanner {
           }
           .store(in: &self.subscriptions)
       }
+  }
+  
+  @objc
+  func viewPanned(recognizer: UIPanGestureRecognizer) {
+    guard !isModal,
+          let constraint = self.getConstraint(identifier: "top")
+    else { return }
+    
+    isInteracting = true
+    let height = body.bounds.height
+    let yOrigin = -height
+    
+    let minConstant = -(height+statusBarFrame.height)
+    let yTranslation = recognizer.translation(in: contentView).y
+    
+    constraint.constant += yTranslation
+
+    if yTranslation > 0 {
+      constraint.constant = min(constraint.constant, statusBarFrame.height)
+    }
+    constraint.constant = constraint.constant < minConstant ? minConstant : constraint.constant
+
+    recognizer.setTranslation(.zero, in: contentView)
+    var yPoint = convert(body.frame.origin, to: contentView).y + height
+    yPoint = yPoint < 0 ? 0 : yPoint
+    background.alpha = yPoint/(height+statusBarFrame.height)
+
+    guard recognizer.state == .ended else {
+      return
+    }
+
+    let yVelocity = recognizer.velocity(in: contentView).y
+    let distance = abs(yOrigin) - abs(yPoint)
+    if yVelocity < -500 {
+      willDisappearPublisher.send(true)
+      willDisappearPublisher.send(completion: .finished)
+
+      let time = TimeInterval(distance/abs(yVelocity)*2.5)
+      let duration: TimeInterval = time < 0.08 ? 0.08 : time
+      UIView.animate(withDuration: duration, delay: 0, options: [.curveLinear], animations: { [weak self] in
+        guard let self = self else { return }
+
+        self.setNeedsLayout()
+        constraint.constant = yOrigin
+        self.layoutIfNeeded()
+        self.background.alpha = 0
+      }) { [weak self] _ in
+        guard let self = self else { return }
+
+        self.didDisappearPublisher.send(true)
+        self.didDisappearPublisher.send(completion: .finished)
+      }
+    } else if background.alpha > 0.33 {
+      UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseInOut], animations: {
+        self.setNeedsLayout()
+        constraint.constant = self.statusBarFrame.height//self.topMargin
+        self.layoutIfNeeded()
+        self.background.alpha = 1
+      })
+    } else {
+      willDisappearPublisher.send(true)
+      willDisappearPublisher.send(completion: .finished)
+
+
+      UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: { [weak self] in
+        guard let self = self else { return }
+
+        self.setNeedsLayout()
+        constraint.constant = yOrigin
+        self.layoutIfNeeded()
+        self.background.alpha = 0
+      }) { [weak self] _ in
+        guard let self = self else { return }
+
+        self.didDisappearPublisher.send(true)
+        self.didDisappearPublisher.send(completion: .finished)
+      }
+    }
   }
 }
   
