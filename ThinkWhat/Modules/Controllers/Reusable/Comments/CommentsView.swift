@@ -20,16 +20,17 @@ class CommentsView: UIView {
     private var subscriptions = Set<AnyCancellable>()
     private var tasks: [Task<Void, Never>?] = []
     private lazy var collectionView: CommentsCollectionView = {
-        let instance = CommentsCollectionView(rootComment: rootComment, survey: rootComment.survey)
+        let instance = CommentsCollectionView(rootComment: rootComment,
+                                              survey: rootComment.survey)
         
-        instance.claimSubject.sink {
+        instance.claimPublisher.sink {
             print($0)
         } receiveValue: { [weak self] in
             guard let self = self,
-                  let comment = $0,
-                  let surveyReference = comment.survey?.reference
+                  let surveyReference = $0.survey?.reference
             else { return }
             
+            let comment = $0
             let banner = Popup(heightScaleFactor: 0.7)
             banner.accessibilityIdentifier = "claim"
             let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
@@ -61,51 +62,45 @@ class CommentsView: UIView {
 //
 //        }.store(in: &subscriptions)
         
-        instance.replySubject.sink { [weak self] in
+        instance.replyPublisher.sink { [weak self] in
             guard let self = self,
-                  let dict = $0,
-                  let replyObject = dict.keys.first,
-                  let body = dict.values.first
+                  let replyObject = $0.keys.first,
+                  let body = $0.values.first
             else { return }
             
             self.viewInput?.postComment(body: body, replyTo: replyObject, username: nil)
         }.store(in: &subscriptions)
         
-        instance.anonReplySubject.sink { [weak self] in
+        instance.anonReplyPublisher.sink { [weak self] in
             guard let self = self,
-                  let dict = $0,
-                  let innerDict = dict.values.first,
-                  let comment = dict.keys.first,
-                  let username = innerDict.values.first,
-                  let body = innerDict.keys.first
+                  let dict = $0.values.first,
+                  let comment = $0.keys.first,
+                  let username = dict.values.first,
+                  let body = dict.keys.first
             else { return }
             
-            self.viewInput?.postComment(body: body, replyTo: comment, username: username)
+            self.viewInput?.postComment(body: body,
+                                        replyTo: comment,
+                                        username: username)
         }.store(in: &self.subscriptions)
         
-        instance.commentsRequestSubject.sink { [weak self] in
-            guard let self = self,
-                  let comments = $0
-            else { return }
+        instance.paginationPublisher.sink { [weak self] in
+            guard let self = self else { return }
             
-            self.viewInput?.requestComments(exclude: comments)
+            self.viewInput?.requestComments(exclude: $0)
         }.store(in: &subscriptions)
         
-        instance.commentThreadSubject.sink { [weak self] in
-            guard let self = self,
-                  let value = $0
-            else { return }
-            
-            
-        }.store(in: &subscriptions)
+//        instance.threadPublisher.sink { [weak self] in
+//            guard let self = self else { return }
+//
+////          self.viewInput?.
+//        }.store(in: &subscriptions)
         
         //Delete comment
-        instance.deleteSubject.sink { [weak self] in
-            guard let self = self,
-                  let comment = $0
-            else { return }
+        instance.deletePublisher.sink { [weak self] in
+            guard let self = self else { return }
             
-            self.viewInput?.deleteComment(comment)
+            self.viewInput?.deleteComment($0)
         }.store(in: &self.subscriptions)
         
         return instance
@@ -152,28 +147,11 @@ class CommentsView: UIView {
 // MARK: - Controller Output
 extension CommentsView: CommentsControllerOutput {
     func commentDeleteError() {
-        showBanner(bannerDelegate: self, text: "added_to_watch_list".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill")), color: UIColor.white, textColor: .white, dismissAfter: 0.5, backgroundColor: UIColor.systemIndigo.withAlphaComponent(1))
+//        showBanner(bannerDelegate: self, text: "added_to_watch_list".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill")), color: UIColor.white, textColor: .white, dismissAfter: 0.5, backgroundColor: UIColor.systemIndigo.withAlphaComponent(1))
     }
     
     func commentPostFailure() {
-        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark)
-    }
-}
-
-// MARK: - BannerObservable
-extension CommentsView: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let banner = sender as? Popup {
-            banner.removeFromSuperview()
-        }
+//        showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: ImageSigns.exclamationMark)
     }
 }
 

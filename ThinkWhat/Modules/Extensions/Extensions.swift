@@ -86,79 +86,7 @@ extension UIView {
   }
   
   
-  func addShadow(shadowPath: CGPath = CGPath.init(rect: .zero, transform: nil), shadowColor: UIColor = UIColor.black,
-                 shadowOffset: CGSize = CGSize.zero,
-                 shadowOpacity: Float = 0.5,
-                 shadowRadius: CGFloat = 3.0) {
-    layer.shadowPath = shadowPath
-    layer.shadowColor = shadowColor.cgColor
-    layer.shadowOffset = shadowOffset
-    layer.shadowOpacity = shadowOpacity
-    layer.shadowRadius = shadowRadius
-  }
   
-  func addEquallyTo(to view: UIView) {
-    
-    self.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(self)
-    let horizontalConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.centerX, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerX, multiplier: 1, constant: 0)
-    let verticalConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.centerY, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerY, multiplier: 1, constant: 0)
-    let widthConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.width, multiplier: 1, constant: 0)
-    let heightConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.height, multiplier: 1, constant: 0)
-    NSLayoutConstraint.activate([horizontalConstraint, verticalConstraint, widthConstraint, heightConstraint])
-  }
-  
-  func place(inside parent: UIView, insets: UIEdgeInsets = .uniform(size: 0), bottomPriority: UILayoutPriority = .required) {
-    parent.addSubview(self)
-    translatesAutoresizingMaskIntoConstraints = false
-    
-    leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: insets.left).isActive = true
-    topAnchor.constraint(equalTo: parent.topAnchor, constant: insets.top).isActive = true
-    trailingAnchor.constraint(equalTo: parent.trailingAnchor, constant: -insets.right).isActive = true
-    let constraint = bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -insets.bottom)
-    constraint.priority = bottomPriority
-    constraint.isActive = true
-  }
-  
-  func placeInCenter(of parent: UIView, heightMultiplier: CGFloat = 1) {
-    parent.addSubview(self)
-    translatesAutoresizingMaskIntoConstraints = false
-    
-    centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
-    centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
-    heightAnchor.constraint(equalTo: parent.heightAnchor, multiplier: heightMultiplier).isActive = true
-  }
-  
-  func placeInCenter(of parent: UIView, widthMultiplier: CGFloat = 1, xOffset: CGFloat = 0, yOffset: CGFloat = 0) {
-    parent.addSubview(self)
-    translatesAutoresizingMaskIntoConstraints = false
-    
-    centerYAnchor.constraint(equalTo: parent.centerYAnchor, constant: yOffset).isActive = true
-    centerXAnchor.constraint(equalTo: parent.centerXAnchor, constant: xOffset).isActive = true
-    widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: widthMultiplier).isActive = true
-  }
-  
-  func addEquallyTo(to view: UIView, multiplier: CGFloat) {
-    
-    self.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(self)
-    let horizontalConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.centerX, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerX, multiplier: 1, constant: 0)
-    let verticalConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.centerY, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerY, multiplier: 1, constant: 0)
-    let widthConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.width, multiplier: multiplier, constant: 0)
-    let heightConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.height, multiplier: multiplier, constant: 0)
-    NSLayoutConstraint.activate([horizontalConstraint, verticalConstraint, widthConstraint, heightConstraint])
-  }
-  
-  
-  func layoutCentered(in view: UIView, multiplier: CGFloat = 1) {
-    self.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(self)
-    let horizontalConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.centerX, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerX, multiplier: 1, constant: 0)
-    let verticalConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.centerY, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerY, multiplier: 1, constant: 0)
-    let widthConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.width, multiplier: multiplier, constant: 0)
-    let heightConstraint = NSLayoutConstraint(item: self, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self, attribute: NSLayoutConstraint.Attribute.width, multiplier: 1, constant: 0)
-    NSLayoutConstraint.activate([horizontalConstraint, verticalConstraint, widthConstraint, heightConstraint])
-  }
   
   func animateMaskLayer(duration: TimeInterval, completionBlocks: [Closure], completionDelegate: CAAnimationDelegate?) {
     

@@ -22,7 +22,7 @@ protocol PollViewInput: AnyObject {
   func onClaim(_: Claim)
   func onCommentClaim(comment: Comment, reason: Claim)
   func onAddFavorite(_: Bool)
-  func onVote(_: Answer)
+  func vote(_: Answer)
   
   func onExitWithSkip()
   func onVotersTapped(answer: Answer)

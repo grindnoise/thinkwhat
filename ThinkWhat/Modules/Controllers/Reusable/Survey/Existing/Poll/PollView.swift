@@ -23,6 +23,27 @@ class PollView: UIView {
       
       guard !item.isComplete else { return }
       
+      item.reference.isCompletePublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.selectedAnswer = nil
+          
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self = self else { return }
+            
+            let banner = Banner(fadeBackground: false)
+            banner.present(content: TextBannerContent(image: UIImage(systemName: "dollarsign.circle.fill")!,
+                                                      text: "vote_to_view_comments",
+                                                      tintColor: .systemGreen),
+                           dismissAfter: 1.5)
+            banner.didDisappearPublisher
+              .sink { _ in banner.removeFromSuperview() }
+              .store(in: &self.subscriptions)
+          }
+        }
+        .store(in: &subscriptions)
+      
       addSubview(actionButton)
       actionButton.translatesAutoresizingMaskIntoConstraints = false
       actionButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
@@ -39,6 +60,7 @@ class PollView: UIView {
       actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
     }
   }
+  
 //
 //  lazy var test: UIView = {
 //    let instance = UIView()
@@ -53,6 +75,8 @@ class PollView: UIView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
+  //Publishers
+  private let isVotingPublisher = PassthroughSubject<Bool, Never>()
   //Logic
   private var selectedAnswer: Answer? {
     didSet {
@@ -63,7 +87,7 @@ class PollView: UIView {
       setNeedsLayout()
       UIView.animate(
         withDuration: 0.35,
-        delay: 0,
+        delay: 0,//!selectedAnswer.isNil ? 0 : 0.25,
         usingSpringWithDamping: 0.8,
         initialSpringVelocity: 0.3,
         options: [.curveEaseInOut],
@@ -109,9 +133,12 @@ class PollView: UIView {
         let helper = makeHelper()
         agrume.onLongPress = helper.makeSaveToLibraryLongPressGesture
         agrume.show(from: controller)
+        
         guard images.count > 1 else { return }
+        
         agrume.didScroll = { [weak self] index in
           guard let self = self else { return }
+          
           self.collectionView.onImageScroll(index)
         }
       }
@@ -145,6 +172,9 @@ class PollView: UIView {
       }
       .store(in: &subscriptions)
     
+    isVotingPublisher
+      .sink { instance.isVotingSubscriber.send($0) }
+      .store(in: &subscriptions)
     //        //Claim
     //        instance.claimSubject.sink { [unowned self] in
     //            guard let item = $0 else { return }
@@ -190,7 +220,7 @@ class PollView: UIView {
     
     if #available(iOS 15, *) {
       let attrString = AttributedString("vote".localized.uppercased(), attributes: AttributeContainer([
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1) as Any,
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2) as Any,
         NSAttributedString.Key.foregroundColor: UIColor.white
       ]))
       var config = UIButton.Configuration.filled()
@@ -198,9 +228,9 @@ class PollView: UIView {
       config.baseBackgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
       config.image = UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
       config.imagePlacement = .trailing
-      config.imagePadding = 8.0
-      config.contentInsets.top = 4
-      config.contentInsets.bottom = 4
+      config.imagePadding = padding
+      config.contentInsets.top = padding
+      config.contentInsets.bottom = padding
       config.contentInsets.leading = 20
       config.contentInsets.trailing = 20
       config.buttonSize = .large
@@ -208,7 +238,7 @@ class PollView: UIView {
       instance.configuration = config
     } else {
       let attrString = NSMutableAttributedString(string: "vote".localized.uppercased(), attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1) as Any,
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2) as Any,
         NSAttributedString.Key.foregroundColor: UIColor.white
       ])
       instance.titleEdgeInsets.left = 20
@@ -222,7 +252,7 @@ class PollView: UIView {
       instance.backgroundColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
     instance.translatesAutoresizingMaskIntoConstraints = false
       
-      let constraint = instance.widthAnchor.constraint(equalToConstant: self.actionButtonState.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)!))
+      let constraint = instance.widthAnchor.constraint(equalToConstant: self.actionButtonState.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!))
       constraint.identifier = "width"
       constraint.isActive = true
       
@@ -234,7 +264,7 @@ class PollView: UIView {
           
           guard let constraint = instance.getConstraint(identifier: "width") else { return }
 //          self.setNeedsLayout()
-          constraint.constant = self.actionButtonState.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title1)!) + 40 + (instance .imageView?.bounds.width ?? 0)
+          constraint.constant = self.actionButtonState.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (instance .imageView?.bounds.width ?? 0)
 //          self.layoutIfNeeded()
         }
         .store(in: &subscriptions)
@@ -301,17 +331,45 @@ private extension PollView {
   }
   
   func setTasks() {
-    
+    isVotingPublisher
+      .filter { $0 }
+      .sink { [weak self] _ in
+        guard let self = self,
+              let answer = self.selectedAnswer
+        else { return }
+        
+        self.viewInput?.vote(answer)
+      }
+      .store(in: &subscriptions)
   }
   
   @objc
   func vote() {
+    guard actionButtonState == .Send else { return }
+    isVotingPublisher.send(true)
+    actionButtonState = .Sending
+    actionButton.isUserInteractionEnabled = false
     
+    if #available(iOS 15, *) {
+      actionButton.configuration?.showsActivityIndicator = true
+    } else {
+      actionButton.setImage(UIImage(), for: .normal)
+      actionButton.setAttributedTitle(nil, for: .normal)
+      let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                            size: CGSize(width: actionButton.frame.height,
+                                                                         height: actionButton.frame.height)))
+      indicator.alpha = 0
+      indicator.layoutCentered(in: actionButton)
+      indicator.startAnimating()
+      indicator.color = .white
+      indicator.accessibilityIdentifier = "indicator"
+      UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
+    }
   }
 }
-
-// MARK: - Controller Output
-extension PollView: PollControllerOutput {
+  
+  // MARK: - Controller Output
+  extension PollView: PollControllerOutput {
   func presentView(_ item: Survey) {
     self.item = item
     collectionView.alpha = 0

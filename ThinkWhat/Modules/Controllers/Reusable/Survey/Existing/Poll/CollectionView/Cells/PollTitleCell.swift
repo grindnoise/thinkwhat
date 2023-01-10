@@ -300,10 +300,13 @@ private extension PollTitleCell {
     usernameLabel.text = item.owner.isAnonymous ? "" : item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n\(item.owner.lastNameSingleWord)")
     avatar.userprofile = item.owner.isAnonymous ? Userprofile.anonymous : item.owner
     
-    guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
+    guard let constraint = titleLabel.getConstraint(identifier: "height"),
+          let windowScene = window?.windowScene
+    else { return }
     
     setNeedsLayout()
-    constraint.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width, font: titleLabel.font)
+    constraint.constant = item.title.height(withConstrainedWidth: windowScene.screen.bounds.width,
+                                            font: titleLabel.font)
     layoutIfNeeded()
   }
 }

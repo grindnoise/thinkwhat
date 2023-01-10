@@ -194,7 +194,7 @@ private extension LinkPreviewCell {
       contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
       contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
       contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
+      verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
       verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
       verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
     ])

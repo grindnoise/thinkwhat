@@ -30,6 +30,7 @@ class AnswersCollectionView: UICollectionView {
   //Publishers
   public let selectionPublisher = PassthroughSubject<Answer, Never>()
   public let deselectionPublisher = PassthroughSubject<Bool, Never>()
+  public let isVotingPublisher = PassthroughSubject<Bool, Never>()
 //  public var dataItems: [Answer] {
 //    didSet {
 //      reload(sorted: false, animatingDifferences: false)
@@ -127,6 +128,7 @@ private extension AnswersCollectionView {
       guard let self = self else { return }
       
       cell.item = item
+      
       cell.selectionPublisher
         .sink { [unowned self] in
           self.selectionPublisher.send($0)
@@ -143,7 +145,9 @@ private extension AnswersCollectionView {
         .filter { cell.item != $0 }
         .sink { _ in cell.isAnswerSelected = false }
         .store(in: &self.subscriptions)
-      
+      self.isVotingPublisher
+        .sink { cell.isVoting = $0 }
+        .store(in: &self.subscriptions)
       
 //      cell.callbackDelegate = self
 //      //            if cell.item.isNil {
@@ -196,7 +200,7 @@ private extension AnswersCollectionView {
     
     var snapshot = Snapshot()
     snapshot.appendSections([.main,])
-    snapshot.appendItems(item.isComplete ? item.answers.sorted{ $0.totalVotes > $1.totalVotes } : item.answers, toSection: .main)
+    snapshot.appendItems(item.answers.sorted{ $0.order < $1.order }, toSection: .main)
     source.apply(snapshot, animatingDifferences: animated)
   }
   

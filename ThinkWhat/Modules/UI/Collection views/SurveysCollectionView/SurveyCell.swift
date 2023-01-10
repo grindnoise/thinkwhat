@@ -13,20 +13,22 @@ class SurveyCell: UICollectionViewCell {
     
     // MARK: - Public properties
     public weak var item: SurveyReference! {
-        didSet {
-            guard !item.isNil else { return }
+      didSet {
+        guard !item.isNil else { return }
+        
+        updateUI()
+        updateProgress(animated: false)
+        
+        setSubscriptions()
+        
+        item.isCompletePublisher
+          .sink { [weak self] _ in
+            guard let self = self else { return }
             
-////            setupUI()
-            updateUI()
-//            setNeedsLayout()
-//            layoutIfNeeded()
-////            layoutSubviews()
-////            updateConstraints()
-////            contentView.layoutIfNeeded()
-            updateProgress(animated: false)
-            
-            setSubscriptions()
-        }
+            self.comleteButton.tintColor = self.item.isComplete ? self.item.topic.tagColor : .systemGray4
+          }
+          .store(in: &subscriptions)
+      }
     }
     //    public var updatePublisher = PassthroughSubject<SurveyReference, Never>()
     public private(set) var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
@@ -362,8 +364,8 @@ class SurveyCell: UICollectionViewCell {
     private lazy var ratingImage: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "star.fill",
                                                   withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
-                                                                                                 scale: .large)))
-        instance.tintColor = .systemGray//Colors.Logo.Marigold.rawValue
+                                                                                                 scale: .medium)))
+        instance.tintColor = Colors.Logo.Marigold.rawValue//.systemGray//
         instance.contentMode = .center
         return instance
     }()
@@ -391,7 +393,7 @@ class SurveyCell: UICollectionViewCell {
     private lazy var viewsImage: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "eye.fill",
                                                   withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
-                                                                                                 scale: .large)))
+                                                                                                 scale: .medium)))
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
         instance.contentMode = .center
         return instance
@@ -407,7 +409,7 @@ class SurveyCell: UICollectionViewCell {
     private lazy var commentsImage: UIImageView = {
         let instance = UIImageView(image: UIImage(systemName: "bubble.right.fill",
                                                   withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
-                                                                                                 scale: .large)))
+                                                                                                 scale: .medium)))
         instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
         instance.contentMode = .center
         
@@ -911,7 +913,7 @@ private extension SurveyCell {
             commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
             viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
             
-            comleteButton.tintColor = item.isComplete ? .systemGray : .systemGray4
+          comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray4
             watchButton.tintColor = item.isFavorite ? traitCollection.userInterfaceStyle == .dark ? .label : .systemGray : .systemGray4
         }
         

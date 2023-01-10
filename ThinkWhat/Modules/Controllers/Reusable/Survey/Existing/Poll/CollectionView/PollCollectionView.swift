@@ -12,7 +12,7 @@ import Combine
 class PollCollectionView: UICollectionView {
   
   enum Section: Int {
-    case title, description, image, youtube, web, question, answers, vote, comments
+    case title, description, image, youtube, web, question, answers, comments
     
     var localized: String {
       switch self {
@@ -30,8 +30,8 @@ class PollCollectionView: UICollectionView {
         return "question".localized
       case .answers:
         return "poll_choices".localized
-      case .vote:
-        return "vote".localized
+//      case .vote:
+//        return "vote".localized
       case .comments:
         return "comments".localized
       }
@@ -46,9 +46,10 @@ class PollCollectionView: UICollectionView {
   public let profileTapPublisher = PassthroughSubject<Bool, Never>()
   public var imagePublisher = PassthroughSubject<Mediafile, Never>()
   public var webPublisher = PassthroughSubject<URL, Never>()
-//  public let colorPublisher = PassthroughSubject<UIColor, Never>()
+  //  public let colorPublisher = PassthroughSubject<UIColor, Never>()
   public let answerSelectionPublisher = PassthroughSubject<Answer, Never>()
   public let answerDeselectionPublisher = PassthroughSubject<Bool, Never>()
+  public let isVotingSubscriber = PassthroughSubject<Bool, Never>()
   
   
   // MARK: - Private properties
@@ -58,6 +59,7 @@ class PollCollectionView: UICollectionView {
   //Logic
   private weak var item: Survey?
   private var source: Source!
+  private var isFirstAnswerSelection = true
   //    private var mode: PollController.Mode {
   //        didSet {
   //            guard oldValue != mode else { return }
@@ -200,7 +202,7 @@ private extension PollCollectionView {
       cell.text = text
     }
     
-    let answersCellRegistration = UICollectionView.CellRegistration<AnswersCell, AnyHashable> { [weak self] cell, indexPath, item in
+    let answersCellRegistration = UICollectionView.CellRegistration<AnswersCell, AnyHashable> { [weak self] cell, _, _ in
       guard let self = self else { return }
       
       cell.item = self.item
@@ -209,6 +211,11 @@ private extension PollCollectionView {
           guard let self = self else { return }
           
           self.answerSelectionPublisher.send($0)
+          
+          guard self.isFirstAnswerSelection else { return }
+          
+          self.isFirstAnswerSelection = false
+          self.scrollToItem(at: IndexPath(row: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
         }
         .store(in: &self.subscriptions)
       cell.deselectionPublisher
@@ -218,16 +225,119 @@ private extension PollCollectionView {
           self.answerDeselectionPublisher.send($0)
         }
         .store(in: &self.subscriptions)
+      self.isVotingSubscriber
+        .sink {
+          cell.isVotingPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
       
-//      self.colorPublisher
-//        .sink { cell.color = $0 }
-//        .store(in: &self.subscriptions)
-//      self.colorSubject
-//        .sink { [weak self]
-//        guard let color = $0 else { return }
-//        cell.color = color
-//      }
-//      .store(in: &self.subscriptions)
+      //      self.colorPublisher
+      //        .sink { cell.color = $0 }
+      //        .store(in: &self.subscriptions)
+      //      self.colorSubject
+      //        .sink { [weak self]
+      //        guard let color = $0 else { return }
+      //        cell.color = color
+      //      }
+      //      .store(in: &self.subscriptions)
+    }
+    
+    let commentsCellRegistration = UICollectionView.CellRegistration<CommentsSectionCell, AnyHashable> { [weak self] cell, _, _ in
+      guard let self = self else { return }
+      
+      cell.item = self.item
+      
+//      //Claim
+//      cell.claimSubject.sink { [weak self] in
+//        guard let self = self, !$0.isNil else { return }
+//
+//        print($0)
+////        self.claimSubject.send($0)
+//      }.store(in: &self.subscriptions)
+//
+//      //Subscription for commenting
+//      cell.commentSubject.sink { [weak self] in
+//        guard let self = self,
+//              let body = $0
+//        else { return }
+//
+//        fatalError()
+////        self.host.postComment(body: body)
+//      }.store(in: &self.subscriptions)
+//
+//      cell.anonCommentSubject.sink { [weak self] in
+//        guard let self = self,
+//              let dict = $0,
+//              let username = dict.values.first,
+//              let body = dict.keys.first
+//        else { return }
+//
+//        fatalError()
+////        self.host.postComment(body: body, username: username)
+//      }.store(in: &self.subscriptions)
+//
+//      //Subscription for commenting
+//      cell.deleteSubject.sink { [weak self] in
+//        guard let self = self,
+//              let comment = $0
+//        else { return }
+//
+//        fatalError()
+////        self.host.deleteComment(comment)
+//      }.store(in: &self.subscriptions)
+//
+//      //Subscription for reply to comment
+//      cell.replySubject.sink { [weak self] in
+//        guard let self = self,
+//              let dict = $0,
+//              let body = dict.values.first,
+//              let comment = dict.keys.first
+//        else { return }
+//
+//        fatalError()
+////        self.host.postComment(body: body, replyTo: comment)
+//      }.store(in: &self.subscriptions)
+//
+//      cell.anonReplySubject.sink { [weak self] in
+//        guard let self = self,
+//              let dict = $0,
+//              let innerDict = dict.values.first,
+//              let comment = dict.keys.first,
+//              let username = innerDict.values.first,
+//              let body = innerDict.keys.first
+//        else { return }
+//
+//        fatalError()
+////        self.host.postComment(body: body, replyTo: comment, username: username)
+//      }.store(in: &self.subscriptions)
+//
+//      //Subscription for request comments
+//      cell.commentsRequestSubject.sink { [weak self] in
+//        guard let self = self,
+//              let comments = $0 as? [Comment],
+//              comments.count > 0
+//        else { return }
+//
+//        fatalError()
+////        self.host.requestComments(comments)
+//      }.store(in: &self.subscriptions)
+//
+//      //Subscibe for thread disclosure
+//      cell.commentThreadSubject.sink { [weak self] in
+//        guard let self = self,
+//              let comment = $0 as? Comment
+//        else { return }
+//
+//        fatalError()
+////        self.commentThreadSubject.send(comment)
+//      }.store(in: &self.subscriptions)
+//
+////      //Subscibe for posted comment
+////      self.lastPostedComment.sink {
+////        guard let comment = $0 else { return }
+////
+////        cell.lastPostedComment = comment
+////      }.store(in: &self.subscriptions)
     }
     
     source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
@@ -261,10 +371,10 @@ private extension PollCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: answersCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
-        //            }  else if section == .comments {
-        //                return collectionView.dequeueConfiguredReusableCell(using: commentsCellRegistration,
-        //                                                                    for: indexPath,
-        //                                                                    item: identifier)
+      } else if section == .comments {
+        return collectionView.dequeueConfiguredReusableCell(using: commentsCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
       }
       return UICollectionViewCell()
     }
@@ -296,6 +406,8 @@ private extension PollCollectionView {
     snapshot.appendItems([5], toSection: .question)
     snapshot.appendSections([.answers])
     snapshot.appendItems([6], toSection: .answers)
+    snapshot.appendSections([.comments])
+    snapshot.appendItems([7], toSection: .comments)
     source.apply(snapshot, animatingDifferences: false)
     
     //        snapshot.appendSections([.title, .description,])
@@ -328,11 +440,13 @@ extension PollCollectionView: UICollectionViewDelegate {
                       shouldSelectItemAt indexPath: IndexPath) -> Bool {
     if let cell = cellForItem(at: indexPath) as? CommentsSectionCell {
       guard cell.item.isComplete else {
-        let banner = Banner(fadeBackground: false)
-        banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                  text: "vote_to_view_comments",
-                                                  tintColor: .systemOrange),
-                       dismissAfter: 0.75)
+        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                              text: "vote_to_view_comments",
+                                                              tintColor: .systemOrange),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 2)
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)

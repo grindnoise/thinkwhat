@@ -208,24 +208,24 @@ private extension YoutubeCell {
     verticalStack.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      contentView.topAnchor.constraint(equalTo: topAnchor),
-      contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-      verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-      verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+        contentView.topAnchor.constraint(equalTo: topAnchor),
+        contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+        contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+        contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
+        verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+        verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
     ])
-    
+
     setNeedsLayout()
     layoutIfNeeded()
-    
+
     closedConstraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
     closedConstraint.priority = .defaultLow
-    
-    openConstraint = playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+
+    openConstraint = verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
     openConstraint.priority = .defaultLow
-    
+
     updateAppearance(animated: false)
   }
   

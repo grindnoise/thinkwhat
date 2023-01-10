@@ -607,8 +607,8 @@ extension PollController: PollViewInput {
     
   }
   
-  func onVote(_: Answer) {
-    
+  func vote(_ item: Answer) {
+    self.controllerInput?.vote(item)
   }
   
   func openURL(_ url: URL) {

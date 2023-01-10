@@ -7,17 +7,23 @@
 //
 
 import UIKit
+import Combine
 
 class CommentSupplementaryCell: UICollectionReusableView {
     
     // MARK: - Override
 //    override var isSelected: Bool { didSet { updateAppearance() }}
-        
-    // MARK: - Public properties
-    public var callback: (() -> ())?//Closure?//(() -> Void)?
-    
-    // MARK: - Private properties
-    private var observers: [NSKeyValueObservation] = []
+  
+  // MARK: - Public properties
+//  public var callback: (() -> ())?//Closure?//(() -> Void)?
+  public let tapPublisher = PassthroughSubject<Bool, Never>()
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  //UI
+  private let padding: CGFloat = 8
     private lazy var label: UIView = {
         let instance = UIView()
         instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
@@ -80,24 +86,28 @@ class CommentSupplementaryCell: UICollectionReusableView {
     
     // MARK: - Private methods
     private func setupUI() {
-        addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
-            label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
-            label.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-        ])
-        
-        let constraint = bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: 16)
-        constraint.priority = .defaultLow
-        constraint.isActive = true
+      label.place(inside: self,
+                  insets: .uniform(size: padding),
+                  bottomPriority: .defaultLow)
+//        addSubview(label)
+//        label.translatesAutoresizingMaskIntoConstraints = false
+//        translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+//            label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
+//            label.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+//        ])
+//
+//        let constraint = bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: 16)
+//        constraint.priority = .defaultLow
+//        constraint.isActive = true
     }
     
     @objc
     private func onTap() {
-        callback?()
+//        callback?()
+      tapPublisher.send(true)
     }
     
     // MARK: - Overriden methods

@@ -22,7 +22,7 @@ class AnswersCell: UICollectionViewCell {
   //Publishers
   public let selectionPublisher = PassthroughSubject<Answer, Never>()
   public let deselectionPublisher = PassthroughSubject<Bool, Never>()
-  
+  public let isVotingPublisher = PassthroughSubject<Bool, Never>()
   
   
   // MARK: - Private properties
@@ -59,6 +59,9 @@ class AnswersCell: UICollectionViewCell {
         
         self.deselectionPublisher.send($0)
       }
+      .store(in: &subscriptions)
+    isVotingPublisher
+      .sink { instance.isVotingPublisher.send($0) }
       .store(in: &subscriptions)
     
     return instance
