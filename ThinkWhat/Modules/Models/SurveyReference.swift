@@ -145,7 +145,13 @@ class SurveyReference: Decodable {// NSObject,
         }
     }
     var owner: Userprofile
-    var votesTotal: Int
+  var votesTotal: Int {
+    didSet {
+      guard oldValue != votesTotal else { return }
+      
+      votesPublisher.send(votesTotal)
+    }
+  }
     var commentsTotal: Int {
         didSet {
             guard oldValue != commentsTotal else { return }
@@ -190,7 +196,8 @@ class SurveyReference: Decodable {// NSObject,
     var isHotPublisher          = PassthroughSubject<Bool, Never>()
     var viewsPublisher          = PassthroughSubject<Int, Never>()
     var likesPublisher          = PassthroughSubject<Int, Never>()
-    
+    var votesPublisher          = PassthroughSubject<Int, Never>()
+  
     
     
     // MARK: - Initialization

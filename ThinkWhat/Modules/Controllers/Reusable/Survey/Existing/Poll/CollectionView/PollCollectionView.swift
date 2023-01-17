@@ -75,6 +75,17 @@ class PollCollectionView: UICollectionView {
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     
     self.item = item
+    item.reference.isCompletePublisher
+      .filter { $0 }
+      .sink { [weak self] _ in
+        guard let self = self,
+              let source = self.source
+        else { return }
+        
+        source.refresh()
+      }
+      .store(in: &subscriptions)
+    
     setupUI()
   }
   
@@ -129,7 +140,7 @@ private extension PollCollectionView {
     }
     
     //        let descriptionCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AnyHashable> { [unowned self] cell, _, _ in
-    //            var content = cell.defaultContentConfiguration()
+    //            var conte  nt = cell.defaultContentConfiguration()
     //            content.directionalLayoutMargins = .zero
     //            content.attributedText  = NSAttributedString(string: self.item!.description,
     //                                                         attributes: [
@@ -223,6 +234,13 @@ private extension PollCollectionView {
           guard let self = self else { return }
           
           self.answerDeselectionPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      cell.updatePublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.source.refresh()
         }
         .store(in: &self.subscriptions)
       self.isVotingSubscriber

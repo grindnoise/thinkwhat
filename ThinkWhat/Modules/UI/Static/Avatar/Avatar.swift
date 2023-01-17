@@ -258,7 +258,7 @@ class Avatar: UIView {
     public var isBordered: Bool
     public var borderColor: UIColor {
         didSet {
-            coloredBackground.backgroundColor = borderColor
+            shimmer.backgroundColor = borderColor
         }
     }
     public var shadowColor: UIColor = .clear {
@@ -289,32 +289,27 @@ class Avatar: UIView {
         instance.clipsToBounds = true
         instance.backgroundColor = .systemBackground
         
-        coloredBackground.place(inside: instance)
-        if isBordered {
-            imageView.placeInCenter(of: instance, heightMultiplier: 0.85)
-//            imag.translatesAutoresizingMaskIntoConstraints = false
-//            coloredBackground.addSubview(instance)
-//
-//            NSLayoutConstraint.activate([
-//                instance.centerYAnchor.constraint(equalTo: coloredBackground.centerYAnchor),
-//                instance.centerXAnchor.constraint(equalTo: coloredBackground.centerXAnchor),
-//                instance.widthAnchor.constraint(equalTo: coloredBackground.widthAnchor, multiplier: 0.85),
-//            ])
-        } else {
-            imageView.place(inside: instance)
-        }
-        
-        instance.publisher(for: \.bounds)
-            .sink { instance.cornerRadius = $0.height/2 }
-            .store(in: &subscriptions)
-        
+      if isBordered {
+        let coloredBg = UIView()
+        coloredBg.backgroundColor = borderColor
+        coloredBg.place(inside: instance)
+        shimmer.place(inside: coloredBg)
+//        shimmer.placeInCenter(of: instance, heightMultiplier: 0.85)
+        imageView.placeInCenter(of: coloredBg, heightMultiplier: 0.85)
+      } else {
+        shimmer.place(inside: instance)
+        imageView.place(inside: instance)
+      }
+      instance.publisher(for: \.bounds)
+        .sink { instance.cornerRadius = $0.height/2 }
+        .store(in: &subscriptions)
+      
         return instance
     }()
-    public lazy var coloredBackground: Shimmer = {
+    public lazy var shimmer: Shimmer = {
         let instance = Shimmer()
         instance.accessibilityIdentifier = "coloredBackground"
         instance.clipsToBounds = true
-        instance.backgroundColor = borderColor
         instance.publisher(for: \.bounds)
             .filter { $0 != .zero }
             .sink { instance.cornerRadius = $0.height/2 }
@@ -345,7 +340,7 @@ class Avatar: UIView {
                         
                         instance.alpha = 1
                     }) { _ in
-                        self.coloredBackground.stopShimmering()
+                        self.shimmer.stopShimmering()
                     }
                 }
             }
@@ -632,7 +627,7 @@ private extension Avatar {
     
     func setImage(for userprofile: Userprofile) {
         guard let image = userprofile.image else {
-            coloredBackground.startShimmering()
+            shimmer.startShimmering()
             userprofile.downloadImage()
             
             return

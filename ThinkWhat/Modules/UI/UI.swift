@@ -370,7 +370,6 @@ enum Colors {
     let colors = [
       UIColor(hexString: "#6C4FB2"),
       UIColor(hexString: "#47A8BD"),
-      UIColor(hexString: "#F0F757"),
       UIColor(hexString: "#8F5D35"),
       UIColor(hexString: "#D14C57"),
       UIColor(hexString: "#72BC71"),
@@ -386,6 +385,7 @@ enum Colors {
       UIColor(hexString: "#FBB02D"),
       UIColor(hexString: "#7776BC"),
       UIColor(hexString: "#5C8001"),
+      UIColor(hexString: "#F0F757"),
     ]
     
     guard (0...colors.count-1).contains(id) else { return .systemGray }

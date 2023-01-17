@@ -18,6 +18,7 @@ struct Animations {
         case Path            = "path"
         case BackgroundColor = "backgroundColor"
         case StrokeStart     = "strokeStart"
+        case StrokeEnd       = "strokeEnd"
         case StrokeColor     = "strokeColor"
         case LineWidth       = "lineWidth"
         case Opacity         = "opacity"

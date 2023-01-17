@@ -8,11 +8,6 @@
 
 import UIKit
 
-internal class Line {
-    var path = UIBezierPath()
-    var layer = CAShapeLayer()
-}
-
 @IBDesignable
 class UnderlinedTextField: UITextField {
 

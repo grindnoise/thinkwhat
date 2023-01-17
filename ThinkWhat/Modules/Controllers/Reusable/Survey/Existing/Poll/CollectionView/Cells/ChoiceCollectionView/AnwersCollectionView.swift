@@ -24,6 +24,16 @@ class AnswersCollectionView: UICollectionView {
     didSet {
       guard !item.isNil else { return }
       
+//      item.reference.isCompletePublisher
+//        .filter { $0 }
+//        .sink { [weak self] _ in
+//          guard let self = self,
+//                let source = self.source
+//          else { return }
+//
+//          source.refresh()
+//        }
+//        .store(in: &subscriptions)
       setupUI()
     }
   }
@@ -31,6 +41,7 @@ class AnswersCollectionView: UICollectionView {
   public let selectionPublisher = PassthroughSubject<Answer, Never>()
   public let deselectionPublisher = PassthroughSubject<Bool, Never>()
   public let isVotingPublisher = PassthroughSubject<Bool, Never>()
+  public let updatePublisher = PassthroughSubject<Bool, Never>()
 //  public var dataItems: [Answer] {
 //    didSet {
 //      reload(sorted: false, animatingDifferences: false)
@@ -120,7 +131,7 @@ private extension AnswersCollectionView {
       
       let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
       sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 0, trailing: sectionLayout.contentInsets.trailing)
-      sectionLayout.interGroupSpacing = 20
+      sectionLayout.interGroupSpacing = 8
       return sectionLayout
     }
     
@@ -140,6 +151,14 @@ private extension AnswersCollectionView {
           self.deselectionPublisher.send($0)
         }
         .store(in: &self.subscriptions)
+      cell.updatePublisher
+        .sink { [unowned self] in
+          
+          self.source.refresh()
+          self.updatePublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
       //Deselect if other one is selected
       self.selectedAnswerPunblisher
         .filter { cell.item != $0 }
