@@ -73,7 +73,6 @@ class PercentageView: UIView {
                               fromValue: foregroundLine.strokeEnd,
                               toValue: value,
                               duration: 0.75,
-                              //                              delay: 0.3,
                               timingFunction: .easeOut,
                               delegate: self,
                               isRemovedOnCompletion: false,

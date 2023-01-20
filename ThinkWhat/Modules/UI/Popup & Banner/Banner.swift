@@ -110,12 +110,10 @@ class NewBanner: UIView {
   init(contentView: UIView,
        contentPadding: UIEdgeInsets = .uniform(size: 8),
        isModal: Bool,
-//       useShadows: Bool = true,
        useContentViewHeight: Bool = false,
        shouldDismissAfter: TimeInterval = .greatestFiniteMagnitude) {
     self.isModal = isModal
     self.contentView = contentView
-//    self.useShadows = useShadows
     self.useContentViewHeight = useContentViewHeight
     self.contentPadding = contentPadding
     self.shouldDismissAfter = shouldDismissAfter

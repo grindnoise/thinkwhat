@@ -39,11 +39,9 @@ class UserCredentialsCell: UICollectionViewListCell {
         
         instance.buttonBgDarkColor = .secondarySystemBackground
         instance.tapPublisher.sink { [weak self] in
-            guard let self = self,
-                  let image = $0?.image
-            else { return }
+            guard let self = self else { return }
             
-            self.imagePublisher.send(image)
+          self.imagePublisher.send($0.image)
         }.store(in: &subscriptions)
         
         return instance

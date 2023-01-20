@@ -54,7 +54,7 @@ protocol UserprofilesModelOutput: AnyObject {
 ///
 /// **View** conforms to this protocol
 protocol UserprofilesControllerOutput: AnyObject {
-    var viewInput: UserprofilesViewInput? { get set }
+    var viewInput: (UserprofilesViewInput & TintColorable)? { get set }
     var gridItemSizePublisher: CurrentValueSubject<UserprofilesController.GridItemSize?, Never> { get }
     
     func filter()

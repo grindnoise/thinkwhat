@@ -19,6 +19,8 @@ class AnswersCollectionView: UICollectionView {
     case main
   }
   
+  
+  
   // MARK: - Public properties
   public weak var item: Survey! {
     didSet {
@@ -42,38 +44,8 @@ class AnswersCollectionView: UICollectionView {
   public let deselectionPublisher = PassthroughSubject<Bool, Never>()
   public let isVotingPublisher = PassthroughSubject<Bool, Never>()
   public let updatePublisher = PassthroughSubject<Bool, Never>()
-//  public var dataItems: [Answer] {
-//    didSet {
-//      reload(sorted: false, animatingDifferences: false)
-//      //            reload(sorted: mode == .ReadOnly, animatingDifferences: true, shouldChangeColor: mode == .ReadOnly)
-//    }
-//  }
-  //  public weak var answerListener: AnswerListener?
-  //  public weak var boundsListener: BoundsListener?
-  //    public var mode: PollController.Mode = .Write {
-  //        didSet {
-  //            modeSubject.send(mode)
-  //            modeSubject.send(completion: .finished)
-  //            allowsMultipleSelection = mode == .ReadOnly ? true : false
-  //
-  //            if oldValue != mode, mode == .ReadOnly {
-  ////                reload(animatingDifferences: true, shouldChangeColor: true)
-  ////                visibleCells.enumerated().forEach {
-  ////                    guard let cell = $1 as? ChoiceCell else { return }
-  ////                    cell.color = Colors.tags()[$0]
-  ////                    cell.mode = mode
-  ////                }
-  ////                var snapshot = NSDiffableDataSourceSnapshot<Section, Answer>()
-  ////                snapshot.appendSections([.main,])
-  ////                snapshot.appendItems(dataItems, toSection: .main)
-  ////                source.apply(snapshot, animatingDifferences: true)
-  ////                var snap = source.snapshot()
-  ////                snap.reloadSections([.main])
-  //                source.refresh()
-  //            }
-  //        }
-  //    }
-  public var colorSubject = CurrentValueSubject<UIColor?, Never>(nil)
+  public let votersPublisher = PassthroughSubject<Answer, Never>()
+  
   
   
   // MARK: - Private properties
@@ -110,11 +82,14 @@ class AnswersCollectionView: UICollectionView {
   }
   
   
+  
   // MARK: - Public methods
   public func refresh() {
     source.refresh()
   }
 }
+
+
 
 // MARK: - Private
 private extension AnswersCollectionView {
@@ -156,6 +131,13 @@ private extension AnswersCollectionView {
           
           self.source.refresh()
           self.updatePublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
+      cell.votersPublisher
+        .sink {[unowned self] in
+          
+          self.votersPublisher.send($0)
         }
         .store(in: &self.subscriptions)
       

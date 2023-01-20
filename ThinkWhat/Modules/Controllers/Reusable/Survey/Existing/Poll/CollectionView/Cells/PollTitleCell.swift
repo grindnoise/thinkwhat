@@ -38,7 +38,7 @@ class PollTitleCell: UICollectionViewCell {
     }
   }
   //Publishers
-  public let profileTapPublisher = PassthroughSubject<Bool, Never>()
+  public var profileTapPublisher = PassthroughSubject<Bool, Never>()
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -272,6 +272,12 @@ class PollTitleCell: UICollectionViewCell {
     //        layoutIfNeeded()
     
   }
+  
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    
+    profileTapPublisher = PassthroughSubject<Bool, Never>()
+  }
 }
 
 // MARK: - Private
@@ -287,7 +293,7 @@ private extension PollTitleCell {
     stackView.axis = .vertical
     stackView.spacing = 16
     stackView.place(inside: contentView,
-                    insets: UIEdgeInsets(top: padding, left: 0, bottom: 16, right: 0),
+                    insets: .uniform(size: 8),//UIEdgeInsets(top: padding, left: 0, bottom: 16, right: 0),
                     bottomPriority: .defaultLow)
   }
   

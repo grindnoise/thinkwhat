@@ -442,14 +442,20 @@ private extension SurveysCollectionView {
           else { return }
           
           guard $0!.isComplete else {
-            let banner = Banner(fadeBackground: false)
-            banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                      text: "finish_poll",
-                                                      tintColor: .systemOrange),
-                           dismissAfter: 0.75)
+            let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                                  text: "finish_poll",
+                                                                  tintColor: .systemOrange,
+                                                                  fontName: Fonts.Semibold,
+                                                                  textStyle: .headline,
+                                                                  textAlignment: .natural),
+                                   contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                   isModal: false,
+                                   useContentViewHeight: true,
+                                   shouldDismissAfter: 2)
             banner.didDisappearPublisher
               .sink { _ in banner.removeFromSuperview() }
               .store(in: &self.subscriptions)
+
             return
           }
           
@@ -938,22 +944,6 @@ private extension SurveysCollectionView {
     //        snapshot.appendItems([SurveyReference.null], toSection: .loader)
     DispatchQueue.main.async {
       self.source.apply(snapshot)
-    }
-  }
-}
-
-extension SurveysCollectionView: BannerObservable {
-  func onBannerWillAppear(_ sender: Any) {}
-  
-  func onBannerWillDisappear(_ sender: Any) {}
-  
-  func onBannerDidAppear(_ sender: Any) {}
-  
-  func onBannerDidDisappear(_ sender: Any) {
-    if let banner = sender as? Banner {
-      banner.removeFromSuperview()
-    } else if let popup = sender as? Popup {
-      popup.removeFromSuperview()
     }
   }
 }

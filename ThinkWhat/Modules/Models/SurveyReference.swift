@@ -149,12 +149,15 @@ class SurveyReference: Decodable {// NSObject,
     didSet {
       guard oldValue != votesTotal else { return }
       
+      survey?.votesTotal = votesTotal
       votesPublisher.send(votesTotal)
     }
   }
     var commentsTotal: Int {
         didSet {
             guard oldValue != commentsTotal else { return }
+          
+          commentsTotalPublisher.send(commentsTotal)
             NotificationCenter.default.post(name: Notifications.Surveys.CommentsTotal, object: self)
             survey?.commentsTotal = commentsTotal
         }
@@ -197,6 +200,7 @@ class SurveyReference: Decodable {// NSObject,
     var viewsPublisher          = PassthroughSubject<Int, Never>()
     var likesPublisher          = PassthroughSubject<Int, Never>()
     var votesPublisher          = PassthroughSubject<Int, Never>()
+    var commentsTotalPublisher  = PassthroughSubject<Int, Never>()
   
     
     

@@ -371,7 +371,7 @@ class Avatar: UIView {
     public let galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
     public let previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
-    public let tapPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+    public let tapPublisher = PassthroughSubject<Userprofile, Never>()
     public let selectionPublisher = CurrentValueSubject<[Userprofile: Bool]?, Never>(nil)
     
     // MARK: - Private properties

@@ -37,17 +37,8 @@ class AnswerCell: UICollectionViewCell {
           self.updateUI()
         }
         .store(in: &subscriptions)
-      //Update percent
+      //Update stats
       survey.reference.votesPublisher
-        .receive(on: DispatchQueue.main)
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.percentageView.setPercent(value: item.percent, animated: true)
-        }
-        .store(in: &subscriptions)
-      //Votes quantity
-      item.votesPublisher
         .receive(on: DispatchQueue.main)
         .sink { [weak self] _ in
           guard let self = self else { return }
@@ -59,16 +50,13 @@ class AnswerCell: UICollectionViewCell {
           UIView.transition(with: self.votersLabel, duration: 0.15, options: .transitionCrossDissolve) {
             self.votersLabel.text = item.totalVotes == 0 ? "no_votes".localized.uppercased() : item.totalVotes.roundedWithAbbreviations
           } completion: { _ in }
+          
+          self.percentageView.setPercent(value: item.percent, animated: true)
         }
         .store(in: &subscriptions)
       
       //Voters append
       item.votersPublisher
-//        .filter { [weak self] userprofile in
-//          guard let self = self else { return false }
-//
-//          return self.avatars.map({ $0.userprofile}).filter({ $0 == userprofile}).isEmpty
-//        }
         .receive(on: DispatchQueue.main)
         .sink { [weak self] in
           guard let self = self else { return }
@@ -82,6 +70,7 @@ class AnswerCell: UICollectionViewCell {
   public let selectionPublisher = PassthroughSubject<Answer, Never>()
   public let deselectionPublisher = PassthroughSubject<Bool, Never>()
   public let updatePublisher = PassthroughSubject<Bool, Never>()
+  public let votersPublisher = PassthroughSubject<Answer, Never>()
   //Logic
   public var isAnswerSelected = false {
     didSet {
@@ -172,6 +161,8 @@ class AnswerCell: UICollectionViewCell {
     instance.tintColor = .label
     instance.contentMode = .center
     instance.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .small)
+    instance.isUserInteractionEnabled = true
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(sender:))))
     
     let constraint = instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/3)
     constraint.identifier = "widthAnchor"
@@ -219,6 +210,8 @@ class AnswerCell: UICollectionViewCell {
     instance.backgroundColor = .clear
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
     instance.textAlignment = .right
+    instance.isUserInteractionEnabled = true
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(sender:))))
     
     return instance
   }()
@@ -348,14 +341,6 @@ private extension AnswerCell {
     closedConstraint = textView.bottomAnchor.constraint(equalTo: bottomAnchor)
     closedConstraint.priority = .defaultLow
     closedConstraint.isActive = true
-    
-    //    stackView.place(inside: contentView,
-    //                    bottomPriority: .defaultLow)
-//    addSubview(imageView)
-//    imageView.translatesAutoresizingMaskIntoConstraints = false
-//    let inset = padding + lineSpacing/2
-//    imageView.topAnchor.constraint(equalTo: stackView.topAnchor, constant: inset).isActive = true//lineSpacing/2).isActive = true
-//    imageView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: inset).isActive = true//lineSpacing/2).isActive = true
   }
   
   @MainActor
@@ -540,6 +525,15 @@ private extension AnswerCell {
       avatar.userprofile = userprofile.isCurrent ? Userprofiles.shared.current! : userprofile
       avatar.heightAnchor.constraint(equalTo: votersView.heightAnchor).isActive = true
       avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1/1).isActive = true
+      avatar.tapPublisher
+//        .filter { !$0.isNil }
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.votersPublisher.send(self.item)
+        }
+        .store(in: &subscriptions)
+      
       
       //Set layout
       switch voters.count {
@@ -595,7 +589,14 @@ private extension AnswerCell {
     avatars.forEach{ $0.layer.zPosition -= 1 }
     votersView.addSubview(avatar)
     avatar.translatesAutoresizingMaskIntoConstraints = false
-    
+    avatar.tapPublisher
+//      .filter { $0 }
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.votersPublisher.send(self.item)
+      }
+      .store(in: &subscriptions)
     avatar.heightAnchor.constraint(equalTo: votersView.heightAnchor).isActive = true
     avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1/1).isActive = true
     
@@ -766,6 +767,8 @@ private extension AnswerCell {
       case false:
         deselectionPublisher.send(true)
       }
+    } else if let survey = item.survey, survey.isComplete, (sender == disclosureIndicator || sender == votersLabel) {
+      votersPublisher.send(self.item)
     }
   }
 }

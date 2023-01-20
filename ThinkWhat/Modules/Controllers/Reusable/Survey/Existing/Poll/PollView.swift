@@ -28,19 +28,6 @@ class PollView: UIView {
           guard let self = self else { return }
           
           self.selectedAnswer = nil
-          
-          DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            guard let self = self else { return }
-            
-            let banner = Banner(fadeBackground: false)
-            banner.present(content: TextBannerContent(image: UIImage(systemName: "dollarsign.circle.fill")!,
-                                                      text: "vote_to_view_comments",
-                                                      tintColor: .systemGreen),
-                           dismissAfter: 1.5)
-            banner.didDisappearPublisher
-              .sink { _ in banner.removeFromSuperview() }
-              .store(in: &self.subscriptions)
-          }
         }
         .store(in: &subscriptions)
       
@@ -169,6 +156,21 @@ class PollView: UIView {
         guard let self = self else { return }
         
         self.selectedAnswer = nil
+      }
+      .store(in: &subscriptions)
+    instance.votersPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.showVoters(for: $0)
+      }
+      .store(in: &subscriptions)
+    //Comments
+    instance.commentPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.postComment(body: $0, replyTo: nil, username: nil)
       }
       .store(in: &subscriptions)
     

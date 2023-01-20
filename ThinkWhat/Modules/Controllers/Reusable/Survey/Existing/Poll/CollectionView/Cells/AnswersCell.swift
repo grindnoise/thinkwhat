@@ -24,7 +24,7 @@ class AnswersCell: UICollectionViewCell {
   public let deselectionPublisher = PassthroughSubject<Bool, Never>()
   public let isVotingPublisher = PassthroughSubject<Bool, Never>()
   public let updatePublisher = PassthroughSubject<Bool, Never>()
-  
+  public let votersPublisher = PassthroughSubject<Answer, Never>()
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -66,6 +66,13 @@ class AnswersCell: UICollectionViewCell {
         guard let self = self else { return }
         
         self.updatePublisher.send($0)
+      }
+      .store(in: &subscriptions)
+    instance.votersPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.votersPublisher.send($0)
       }
       .store(in: &subscriptions)
     isVotingPublisher

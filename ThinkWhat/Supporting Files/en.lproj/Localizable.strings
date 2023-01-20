@@ -187,9 +187,9 @@
 "no_votes" = "No votes";
 "poll_complete_at" = "Poll is completed at";
 "voted" = "Voted";
-"most_popular_choice" = "Your choice is the most popular now!";
-"extra_points" = "We've topped up your balance with ";
-"points" = " votes";
+"most_popular_choice" = "Your choice is in trend";
+"got_points" = "You got ";
+"points" = " points";
 "support_poll" = "Support poll";
 "next" = "Next";
 "comment_posted" = "Comment posted";
@@ -316,7 +316,7 @@
 "completed" = "Сompleted";
 "preferences" = "My preferences:";
 "my_balance" = "My balance:";
-"points" = "Points";
+//"points" = "Points";
 "top_up" = "Top up";
 "interests" = "Interests";
 "social_media_help" = "Attach a profile on a social network so that other users can communicate with you (optional)";

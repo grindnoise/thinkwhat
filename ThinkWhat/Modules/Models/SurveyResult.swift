@@ -11,7 +11,7 @@ import Foundation
 class SurveyResult {
     let choice: Answer
     var isPopular: Bool = false
-    var points: Int?
+    var points: Int = 1
     
     init(choice: Answer) {
         self.choice = choice

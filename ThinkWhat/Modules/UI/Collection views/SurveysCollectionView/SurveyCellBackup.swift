@@ -240,16 +240,14 @@ class SurveyCellBackup: UICollectionViewListCell {
         instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
         instance.isUserInteractionEnabled = true
         instance.tapPublisher
+        .filter { $0 != Userprofile.anonymous}
             .sink { [weak self] in
-                guard let self = self,
-                      let userprofile = $0,
-                      userprofile != Userprofile.anonymous
-                else { return }
+                guard let self = self else { return }
                 
-                if userprofile == Userprofiles.shared.current {
+              if $0.isCurrent {
                     self.settingsTapPublisher.send(true)
                 } else {
-                    self.profileTapPublisher.send(userprofile)
+                    self.profileTapPublisher.send($0)
                 }
             }
             .store(in: &subscriptions)

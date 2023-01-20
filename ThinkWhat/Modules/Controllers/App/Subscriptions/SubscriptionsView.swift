@@ -10,1234 +10,1232 @@ import UIKit
 import Combine
 
 class SubscriptionsView: UIView {
+  
+  private enum Mode {
+    case User, Default
+  }
+  
+  // MARK: - Public properties
+  weak var viewInput: (SubscriptionsViewInput & TintColorable)? {
+    didSet {
+      guard let viewInput = viewInput else { return }
+      
+      updatePeriodButton()
+      surveysCollectionView.color = viewInput.tintColor
+      
+      if #available(iOS 15, *) {
+        if !periodButton.configuration.isNil {
+          periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return viewInput.tintColor }
+        }
+      } else {
+        periodButton.imageView?.tintColor = viewInput.tintColor
+        periodButton.tintColor = viewInput.tintColor
+      }
+    }
+  }
+  
+  
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  //Logic
+  private var mode: Mode = .Default {
+    didSet {
+      //            guard let constraint = filterView.getConstraint(identifier: "top_1") else { return }
+      
+      //            setNeedsLayout()
+      //            UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
+      //                guard let self = self else { return }
+      //
+      //                constraint.constant = self.mode == .User ? 20 : 0
+      //                self.layoutIfNeeded()
+      //            }
+    }
+  }
+  //UI
+  private var isDateFilterHidden = false {
+    didSet {
+      guard oldValue != isDateFilterHidden else { return }
+      
+      toggleDateFilter(on: !isDateFilterHidden)
+    }
+  }
+  private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
+  private var userprofile: Userprofile! {
+    didSet {
+      guard let userprofile = userprofile else { return }
+      
+      viewInput?.setUserprofileFilter(userprofile)
+      surveysCollectionView.userprofile = userprofile
+      onUserSelected(userprofile: userprofile)
+      usernameLabel.text = userprofile.name
+      mode = .User
+    }
+  }
+  private var period: Period = .AllTime {
+    didSet {
+      guard oldValue != period else { return }
+      
+      surveysCollectionView.period = period
+      
+      updatePeriodButton()
+    }
+  }
+  private var isCollectionViewSetupCompleted = false
+  private var needsAnimation = true
+  private var isRevealed = false
+  //UI
+  private lazy var filterView: UIView = {
+    let instance = UIView()
+    instance.backgroundColor = .clear
     
-    private enum Mode {
-        case User, Default
+    let stack = UIStackView(arrangedSubviews: [
+      titleLabel,
+      periodButton
+    ])
+    stack.axis = .horizontal
+    stack.spacing = 4
+    
+    instance.addSubview(stack)
+    stack.translatesAutoresizingMaskIntoConstraints = false
+    
+    NSLayoutConstraint.activate([
+      //            stack.topAnchor.constraint(equalTo: instance.topAnchor),
+      stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+      stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+      //            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
+    ])
+    
+    return instance
+  }()
+  private lazy var titleLabel: UILabel = {
+    let instance = UILabel()
+    instance.numberOfLines = 1
+    instance.textAlignment = .center
+    instance.numberOfLines = 1
+    instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+    instance.text = "publications".localized.capitalized
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
+    instance.adjustsFontSizeToFitWidth = true
+    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
+    
+    return instance
+  }()
+  private lazy var periodButton: UIButton = {
+    let instance = UIButton()
+    instance.titleLabel?.numberOfLines = 1
+    instance.showsMenuAsPrimaryAction = true
+    instance.menu = prepareMenu()
+    
+    if #available(iOS 15, *) {
+      var config = UIButton.Configuration.filled()
+      config.cornerStyle = .medium
+      config.image = UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+      config.imagePlacement = .trailing
+      config.imagePadding = 6
+      config.contentInsets.leading = 4
+      config.contentInsets.trailing = 4
+      config.contentInsets.top = 2
+      config.contentInsets.bottom = 2
+      config.title = "per_\(period.rawValue.lowercased())".localized.lowercased()
+      config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [weak self] incoming in
+        guard let self = self,
+              let viewInput = self.viewInput
+        else { return incoming }
+        
+        var outcoming = incoming
+        outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+        outcoming.foregroundColor = viewInput.tintColor//UIColor.secondaryLabel
+        return outcoming
+      }
+      //            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+      //                guard let self = self,
+      //                      let viewIput = self.viewInput
+      //                else { return .systemGray }
+      //
+      //                return viewIput.tintColor
+      //            }
+      config.buttonSize = .large
+      config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+      config.baseForegroundColor = .label
+      
+      instance.configuration = config
+    } else {
+      let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
+      ])
+      instance.setAttributedTitle(attrString, for: .normal)
+      instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+      instance.imageView?.contentMode = .scaleAspectFit
+      instance.imageEdgeInsets.left = 10
+      instance.imageEdgeInsets.top = 2
+      instance.imageEdgeInsets.bottom = 2
+      instance.imageEdgeInsets.right = 2
+      instance.semanticContentAttribute = .forceRightToLeft
+      instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+      
+      let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
+      constraint.identifier = "width"
+      constraint.isActive = true
     }
     
-    // MARK: - Public properties
-    weak var viewInput: (SubscriptionsViewInput & TintColorable)? {
-        didSet {
-            guard let viewInput = viewInput else { return }
-            
-            updatePeriodButton()
-            surveysCollectionView.color = viewInput.tintColor
-            
-            if #available(iOS 15, *) {
-                if !periodButton.configuration.isNil {
-                    periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return viewInput.tintColor }
-                }
-            } else {
-                periodButton.imageView?.tintColor = viewInput.tintColor
-                periodButton.tintColor = viewInput.tintColor
-            }
+    instance.publisher(for: \.bounds, options: .new).sink { rect in
+      instance.cornerRadius = rect.height * 0.15
+    }.store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var subscriptionsLabel: UILabel = {
+    let instance = UILabel()
+    instance.font = UIFont.scaledFont(fontName: Fonts.Regular,
+                                      forTextStyle: .headline)
+    instance.text = "zero_subscriptions".localized
+    instance.textColor = .secondaryLabel
+    instance.textAlignment = .center
+    instance.alpha = 0
+    
+    return instance
+  }()
+  private lazy var surveysCollectionView: SurveysCollectionView = {
+    let instance = SurveysCollectionView(category: .Subscriptions)
+    
+    //Pagination #1
+    let paginationPublisher = instance.paginationPublisher
+      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+    
+    paginationPublisher
+      .sink { [unowned self] in
+        guard let source = $0.keys.first,
+              let period = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil)
+      }
+      .store(in: &subscriptions)
+    
+    //Pagination #2
+    let paginationByTopicPublisher = instance.paginationByTopicPublisher
+      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+    
+    paginationByTopicPublisher
+      .sink { [unowned self] in
+        guard let topic = $0.keys.first,
+              let period = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
+      }
+      .store(in: &subscriptions)
+    
+    //Pagination #3
+    let paginationByUserprofilePublisher = instance.paginationByUserprofilePublisher
+      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+    
+    paginationByUserprofilePublisher
+      .sink { [unowned self] in
+        guard let topic = $0.keys.first,
+              let period = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
+      }
+      .store(in: &subscriptions)
+    
+    //Refresh #1
+    instance.refreshPublisher
+      .sink { [unowned self] in
+        guard let category = $0.keys.first,
+              let period = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil)
+      }
+      .store(in: &subscriptions)
+    
+    //Refresh #2
+    instance.refreshByTopicPublisher
+      .sink { [unowned self] in
+        guard let topic = $0.keys.first,
+              let period = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
+      }
+      .store(in: &subscriptions)
+    
+    //Refresh #3
+    instance.refreshByUserprofilePublisher
+      .sink { [unowned self] in
+        guard let userprofile = $0.keys.first,
+              let period = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
+      }
+      .store(in: &subscriptions)
+    
+    //Row selected
+    instance.rowPublisher
+      .sink { [unowned self] in
+        guard let instance = $0
+        else { return }
+        
+        self.viewInput?.onSurveyTapped(instance)
+      }
+      .store(in: &subscriptions)
+    
+    //Update stats (exclude refs)
+    instance.updateStatsPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let instances = $0
+        else { return }
+        
+        self.viewInput?.updateSurveyStats(instances)
+      }
+      .store(in: &subscriptions)
+    
+    //Add to watch list
+    instance.watchSubject.sink {
+      print($0)
+    } receiveValue: { [weak self] in
+      guard let self = self,
+            let value = $0
+      else { return }
+      
+      self.viewInput?.addFavorite(value)
+    }.store(in: &self.subscriptions)
+    
+    instance.shareSubject.sink {
+      print($0)
+    } receiveValue: { [weak self] in
+      guard let self = self,
+            let value = $0
+      else { return }
+      
+      self.viewInput?.share(value)
+    }.store(in: &self.subscriptions)
+    
+    instance.claimSubject.sink {
+      print($0)
+    } receiveValue: { [weak self] in
+      guard let self = self,
+            let surveyReference = $0
+      else { return }
+      
+      let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
+      banner.accessibilityIdentifier = "claim"
+      let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
+      
+      claimContent.claimPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.viewInput?.claim(surveyReference: surveyReference, claim: $0)
         }
+        .store(in: &self.subscriptions)
+      
+      banner.present(content: claimContent)
+      banner.didDisappearPublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          banner.removeFromSuperview()
+        }
+        .store(in: &self.subscriptions)
+      
+      //            self.viewInput?.addFavorite(surveyReference: value)
+    }.store(in: &self.subscriptions)
+    
+    instance.userprofilePublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let userprofile = $0
+        else { return }
+        
+        self.viewInput?.openUserprofile(userprofile)
+      }
+      .store(in: &self.subscriptions)
+    
+    instance.unsubscribePublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let userprofile = $0
+        else { return }
+        
+        self.viewInput?.unsubscribe(from: userprofile)
+      }
+      .store(in: &self.subscriptions)
+    
+    instance.scrollPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.isDateFilterHidden = $0
+        //                self.toggleDateFilter(on: !$0)
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var feedCollectionView: UserprofilesFeedCollectionView = {
+    let instance = UserprofilesFeedCollectionView(userprofile: Userprofiles.shared.current!, mode: .Subscriptions)
+    instance.alwaysBounceHorizontal = true
+    //        instance.clipsToBounds = false
+    instance.isDirectionalLockEnabled = true
+    instance.userPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let dict = $0,
+              let userprofile = dict.keys.first,
+              let indexPath = dict.values.first
+        else { return }
+        
+        
+        self.indexPath = indexPath
+        self.userprofile = userprofile
+      }
+      .store(in: &subscriptions)
+    
+    instance.footerPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let mode = $0
+        else { return }
+        
+        self.viewInput?.onAllUsersTapped(mode: mode)
+      }
+      .store(in: &subscriptions)
+    
+    instance.dataItemsCountPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let isEmpty = $0
+        else { return }
+        
+        self.viewInput?.onSubcriptionsCountEvent(zeroSubscriptions: isEmpty)
+        switch isEmpty {
+        case true:
+          self.subscriptionsLabel.addEquallyTo(to: self.topView)
+          UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
+            self.subscriptionsLabel.alpha = 1
+          }
+        case false:
+          UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
+            self.subscriptionsLabel.alpha = 0
+          }) { _ in
+            self.subscriptionsLabel.removeFromSuperview()
+          }
+        }
+      }
+      .store(in: &subscriptions)
+    //        instance.contentSize.height = 1.0
+    //        instance.publisher(for: \.contentSize, options: .new)
+    //            .sink { [weak self] rect in
+    //                guard let self = self else { return }
+    //
+    //                print(rect.height)
+    //            }
+    //            .store(in: &subscriptions)
+    //        //Pagination #1
+    //        let paginationPublisher = instance.paginationPublisher
+    //            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
+    //
+    //        paginationPublisher
+    //            .sink { [unowned self] in
+    //                guard let category = $0 else { return }
+    //
+    //                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
+    //            }
+    //            .store(in: &subscriptions)
+    //
+    //        instance.shareSubject.sink {
+    //            print($0)
+    //        } receiveValue: { [weak self] in
+    //            guard let self = self,
+    //                let value = $0
+    //            else { return }
+    //
+    //            self.viewInput?.share(value)
+    //        }.store(in: &self.subscriptions)
+    
+    return instance
+  }()
+  //User view on selection
+  private lazy var avatar: Avatar = {
+    guard let userprofile = userprofile else { return Avatar() }
+    
+    let instance = Avatar(userprofile: userprofile, isShadowed: true)
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+    instance.alpha = 0
+    instance.tapPublisher
+      .sink { [unowned self] in
+        self.viewInput?.openUserprofile($0)
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var usernameLabel: UILabel = {
+    let instance = UILabel()
+    //        instance.insets.top = -4
+    instance.textAlignment = .left
+    instance.numberOfLines = 1
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)
+    instance.adjustsFontSizeToFitWidth = true
+    
+    return instance
+  }()
+  private lazy var profileButton: UIButton = {
+    let instance = UIButton()
+    instance.addTarget(self, action: #selector(self.onProfileButtonTapped), for: .touchUpInside)
+    
+    if #available(iOS 15, *) {
+      var config = UIButton.Configuration.filled()
+      config.title = "open_userprofile".localized.uppercased()
+      config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [unowned self] incoming in
+        var outgoing = incoming
+        outgoing.foregroundColor = Colors.System.Purple.rawValue//self.traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
+        outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        return outgoing
+      }
+      config.baseBackgroundColor = Colors.System.Purple.rawValue.withAlphaComponent(0.15)//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR.withAlphaComponent(0.15) : .systemBlue.withAlphaComponent(0.15)
+      config.cornerStyle = .small
+      config.buttonSize = .mini
+      config.contentInsets.leading = 4
+      config.contentInsets.top = 2
+      config.contentInsets.bottom = 2
+      config.contentInsets.trailing = 4
+      config.imagePlacement = .trailing
+      config.imagePadding = 4.0
+      config.imageColorTransformer = UIConfigurationColorTransformer { _ in return Colors.System.Purple.rawValue }//[unowned self] _ in return self.traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue }
+      config.image = UIImage(systemName: "person.fill",
+                             withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
+      instance.configuration = config
+    } else {
+      let attrString = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+        NSAttributedString.Key.foregroundColor: Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
+      ])
+      instance.setAttributedTitle(attrString, for: .normal)
+      instance.semanticContentAttribute = .forceRightToLeft
+      instance.setImage(UIImage(systemName: "person.fill",
+                                withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                        for: .normal)
+      instance.tintColor = Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
+      instance.imageEdgeInsets.left = 4.0
     }
     
+    return instance
+  }()
+  private lazy var subscriptionButton: UIButton = {
+    let instance = UIButton()
+    instance.addTarget(self, action: #selector(self.unsubscribe), for: .touchUpInside)
     
-    
-    // MARK: - Private properties
-    private var observers: [NSKeyValueObservation] = []
-    private var subscriptions = Set<AnyCancellable>()
-    private var tasks: [Task<Void, Never>?] = []
-    //Logic
-    private var mode: Mode = .Default {
-        didSet {
-//            guard let constraint = filterView.getConstraint(identifier: "top_1") else { return }
-            
-//            setNeedsLayout()
-//            UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
-//                guard let self = self else { return }
-//
-//                constraint.constant = self.mode == .User ? 20 : 0
-//                self.layoutIfNeeded()
-//            }
-        }
-    }
-    //UI
-    private var isDateFilterHidden = false {
-        didSet {
-            guard oldValue != isDateFilterHidden else { return }
-            
-            toggleDateFilter(on: !isDateFilterHidden)
-        }
-    }
-    private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
-    private var userprofile: Userprofile! {
-        didSet {
-            guard let userprofile = userprofile else { return }
-            
-            viewInput?.setUserprofileFilter(userprofile)
-            surveysCollectionView.userprofile = userprofile
-            onUserSelected(userprofile: userprofile)
-            usernameLabel.text = userprofile.name
-            mode = .User
-        }
-    }
-    private var period: Period = .AllTime {
-        didSet {
-            guard oldValue != period else { return }
-            
-            surveysCollectionView.period = period
-            
-            updatePeriodButton()
-        }
-    }
-    private var isCollectionViewSetupCompleted = false
-    private var needsAnimation = true
-    private var isRevealed = false
-    //UI
-    private lazy var filterView: UIView = {
-       let instance = UIView()
-        instance.backgroundColor = .clear
-        
-        let stack = UIStackView(arrangedSubviews: [
-            titleLabel,
-            periodButton
-        ])
-        stack.axis = .horizontal
-        stack.spacing = 4
-        
-        instance.addSubview(stack)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-//            stack.topAnchor.constraint(equalTo: instance.topAnchor),
-            stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-            stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-//            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
-        ])
-        
-        return instance
-    }()
-    private lazy var titleLabel: UILabel = {
-       let instance = UILabel()
-        instance.numberOfLines = 1
-        instance.textAlignment = .center
-        instance.numberOfLines = 1
-        instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-        instance.text = "publications".localized.capitalized
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
-        instance.adjustsFontSizeToFitWidth = true
-        instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
-        
-        return instance
-    }()
-    private lazy var periodButton: UIButton = {
-        let instance = UIButton()
-        instance.titleLabel?.numberOfLines = 1
-        instance.showsMenuAsPrimaryAction = true
-        instance.menu = prepareMenu()
-        
-        if #available(iOS 15, *) {
-            var config = UIButton.Configuration.filled()
-            config.cornerStyle = .medium
-            config.image = UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
-            config.imagePlacement = .trailing
-            config.imagePadding = 6
-            config.contentInsets.leading = 4
-            config.contentInsets.trailing = 4
-            config.contentInsets.top = 2
-            config.contentInsets.bottom = 2
-            config.title = "per_\(period.rawValue.lowercased())".localized.lowercased()
-            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [weak self] incoming in
-                guard let self = self,
-                      let viewInput = self.viewInput
-                else { return incoming }
-                
-                var outcoming = incoming
-                outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
-                outcoming.foregroundColor = viewInput.tintColor//UIColor.secondaryLabel
-                return outcoming
-            }
-//            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
-//                guard let self = self,
-//                      let viewIput = self.viewInput
-//                else { return .systemGray }
-//
-//                return viewIput.tintColor
-//            }
-            config.buttonSize = .large
-            config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-            config.baseForegroundColor = .label
-
-            instance.configuration = config
-        } else {
-            let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
-            ])
-            instance.setAttributedTitle(attrString, for: .normal)
-            instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-            instance.imageView?.contentMode = .scaleAspectFit
-            instance.imageEdgeInsets.left = 10
-            instance.imageEdgeInsets.top = 2
-            instance.imageEdgeInsets.bottom = 2
-            instance.imageEdgeInsets.right = 2
-            instance.semanticContentAttribute = .forceRightToLeft
-            instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-
-            let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
-            constraint.identifier = "width"
-            constraint.isActive = true
-        }
-        
-        instance.publisher(for: \.bounds, options: .new).sink { rect in
-            instance.cornerRadius = rect.height * 0.15
-        }.store(in: &subscriptions)
-        
-        return instance
-    }()
-    private lazy var subscriptionsLabel: UILabel = {
-       let instance = UILabel()
-        instance.font = UIFont.scaledFont(fontName: Fonts.Regular,
-                                          forTextStyle: .headline)
-        instance.text = "zero_subscriptions".localized
-        instance.textColor = .secondaryLabel
-        instance.textAlignment = .center
-        instance.alpha = 0
-        
-        return instance
-    }()
-    private lazy var surveysCollectionView: SurveysCollectionView = {
-        let instance = SurveysCollectionView(category: .Subscriptions)
-        
-        //Pagination #1
-        let paginationPublisher = instance.paginationPublisher
-            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-        
-        paginationPublisher
-            .sink { [unowned self] in
-                guard let source = $0.keys.first,
-                      let period = $0.values.first
-                else { return }
-                
-                self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil)
-            }
-            .store(in: &subscriptions)
-        
-        //Pagination #2
-        let paginationByTopicPublisher = instance.paginationByTopicPublisher
-            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-        
-        paginationByTopicPublisher
-            .sink { [unowned self] in
-                guard let topic = $0.keys.first,
-                      let period = $0.values.first
-                else { return }
-
-                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
-            }
-            .store(in: &subscriptions)
-        
-        //Pagination #3
-        let paginationByUserprofilePublisher = instance.paginationByUserprofilePublisher
-            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-        
-        paginationByUserprofilePublisher
-            .sink { [unowned self] in
-                guard let topic = $0.keys.first,
-                      let period = $0.values.first
-                else { return }
-
-                self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
-            }
-            .store(in: &subscriptions)
-        
-        //Refresh #1
-        instance.refreshPublisher
-            .sink { [unowned self] in
-                guard let category = $0.keys.first,
-                      let period = $0.values.first
-                else { return }
-                
-                self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil)
-            }
-            .store(in: &subscriptions)
-        
-        //Refresh #2
-        instance.refreshByTopicPublisher
-            .sink { [unowned self] in
-                guard let topic = $0.keys.first,
-                      let period = $0.values.first
-                else { return }
-                
-                self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
-            }
-            .store(in: &subscriptions)
-        
-        //Refresh #3
-        instance.refreshByUserprofilePublisher
-            .sink { [unowned self] in
-                guard let userprofile = $0.keys.first,
-                      let period = $0.values.first
-                else { return }
-                
-                self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
-            }
-            .store(in: &subscriptions)
-        
-        //Row selected
-        instance.rowPublisher
-            .sink { [unowned self] in
-                guard let instance = $0
-            else { return }
-                  
-            self.viewInput?.onSurveyTapped(instance)
-        }
-            .store(in: &subscriptions)
-        
-        //Update stats (exclude refs)
-        instance.updateStatsPublisher
-            .sink { [weak self] in
-            guard let self = self,
-                  let instances = $0
-            else { return }
-                  
-            self.viewInput?.updateSurveyStats(instances)
-        }
-            .store(in: &subscriptions)
-        
-        //Add to watch list
-        instance.watchSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
-            guard let self = self,
-                let value = $0
-            else { return }
-            
-            self.viewInput?.addFavorite(value)
-        }.store(in: &self.subscriptions)
-        
-        instance.shareSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
-            guard let self = self,
-                let value = $0
-            else { return }
-            
-            self.viewInput?.share(value)
-        }.store(in: &self.subscriptions)
-        
-        instance.claimSubject.sink {
-            print($0)
-        } receiveValue: { [weak self] in
-            guard let self = self,
-                let surveyReference = $0
-            else { return }
-            
-            let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
-            banner.accessibilityIdentifier = "claim"
-            let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
-            
-            claimContent.claimPublisher
-                .sink { [weak self] in
-                    guard let self = self else { return }
-                    
-                    self.viewInput?.claim(surveyReference: surveyReference, claim: $0)
-                }
-                .store(in: &self.subscriptions)
-            
-            banner.present(content: claimContent)
-            banner.didDisappearPublisher
-                .sink { [weak self] _ in
-                    guard let self = self else { return }
-                    banner.removeFromSuperview()
-                }
-                .store(in: &self.subscriptions)
-            
-//            self.viewInput?.addFavorite(surveyReference: value)
-        }.store(in: &self.subscriptions)
-        
-        instance.userprofilePublisher
-            .sink { [weak self] in
-                guard let self = self,
-                      let userprofile = $0
-                else { return }
-                
-                self.viewInput?.openUserprofile(userprofile)
-            }
-            .store(in: &self.subscriptions)
-                
-        instance.unsubscribePublisher
-            .sink { [weak self] in
-                guard let self = self,
-                      let userprofile = $0
-                else { return }
-                
-                self.viewInput?.unsubscribe(from: userprofile)
-            }
-            .store(in: &self.subscriptions)
-        
-        instance.scrollPublisher
-            .sink { [weak self] in
-                guard let self = self else { return }
-                
-                self.isDateFilterHidden = $0
-//                self.toggleDateFilter(on: !$0)
-            }
-            .store(in: &subscriptions)
-        
-        return instance
-    }()
-    private lazy var feedCollectionView: UserprofilesFeedCollectionView = {
-        let instance = UserprofilesFeedCollectionView(userprofile: Userprofiles.shared.current!, mode: .Subscriptions)
-        instance.alwaysBounceHorizontal = true
-//        instance.clipsToBounds = false
-        instance.isDirectionalLockEnabled = true
-        instance.userPublisher
-            .sink { [weak self] in
-                guard let self = self,
-                      let dict = $0,
-                      let userprofile = dict.keys.first,
-                      let indexPath = dict.values.first
-                else { return }
-                
-                
-                self.indexPath = indexPath
-                self.userprofile = userprofile
-            }
-            .store(in: &subscriptions)
-        
-        instance.footerPublisher
-            .sink { [weak self] in
-                guard let self = self,
-                      let mode = $0
-                else { return }
-                
-                self.viewInput?.onAllUsersTapped(mode: mode)
-            }
-            .store(in: &subscriptions)
-        
-        instance.dataItemsCountPublisher
-            .sink { [weak self] in
-                guard let self = self,
-                      let isEmpty = $0
-                else { return }
-                
-                self.viewInput?.onSubcriptionsCountEvent(zeroSubscriptions: isEmpty)
-                switch isEmpty {
-                case true:
-                    self.subscriptionsLabel.addEquallyTo(to: self.topView)
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
-                        self.subscriptionsLabel.alpha = 1
-                    }
-                case false:
-                    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
-                        self.subscriptionsLabel.alpha = 0
-                    }) { _ in
-                        self.subscriptionsLabel.removeFromSuperview()
-                    }
-                }
-            }
-            .store(in: &subscriptions)
-        //        instance.contentSize.height = 1.0
-//        instance.publisher(for: \.contentSize, options: .new)
-//            .sink { [weak self] rect in
-//                guard let self = self else { return }
-//
-//                print(rect.height)
-//            }
-//            .store(in: &subscriptions)
-//        //Pagination #1
-//        let paginationPublisher = instance.paginationPublisher
-//            .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
-//
-//        paginationPublisher
-//            .sink { [unowned self] in
-//                guard let category = $0 else { return }
-//
-//                self.viewInput?.onDataSourceRequest(source: category, topic: nil)
-//            }
-//            .store(in: &subscriptions)
-//
-//        instance.shareSubject.sink {
-//            print($0)
-//        } receiveValue: { [weak self] in
-//            guard let self = self,
-//                let value = $0
-//            else { return }
-//
-//            self.viewInput?.share(value)
-//        }.store(in: &self.subscriptions)
-        
-        return instance
-    }()
-    //User view on selection
-    private lazy var avatar: Avatar = {
-        guard let userprofile = userprofile else { return Avatar() }
-        
-        let instance = Avatar(userprofile: userprofile, isShadowed: true)
-        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-        instance.alpha = 0
-        instance.tapPublisher
-            .sink { [unowned self] in
-                guard let instance = $0 else { return }
-                
-                self.viewInput?.openUserprofile(instance)
-            }
-            .store(in: &subscriptions)
-        
-        return instance
-    }()
-    private lazy var usernameLabel: UILabel = {
-        let instance = UILabel()
-//        instance.insets.top = -4
-        instance.textAlignment = .left
-        instance.numberOfLines = 1
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)
-        instance.adjustsFontSizeToFitWidth = true
-        
-        return instance
-    }()
-    private lazy var profileButton: UIButton = {
-        let instance = UIButton()
-        instance.addTarget(self, action: #selector(self.onProfileButtonTapped), for: .touchUpInside)
-        
-        if #available(iOS 15, *) {
-            var config = UIButton.Configuration.filled()
-            config.title = "open_userprofile".localized.uppercased()
-            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [unowned self] incoming in
-                var outgoing = incoming
-                outgoing.foregroundColor = Colors.System.Purple.rawValue//self.traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
-                outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
-                return outgoing
-            }
-            config.baseBackgroundColor = Colors.System.Purple.rawValue.withAlphaComponent(0.15)//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR.withAlphaComponent(0.15) : .systemBlue.withAlphaComponent(0.15)
-            config.cornerStyle = .small
-            config.buttonSize = .mini
-            config.contentInsets.leading = 4
-            config.contentInsets.top = 2
-            config.contentInsets.bottom = 2
-            config.contentInsets.trailing = 4
-            config.imagePlacement = .trailing
-            config.imagePadding = 4.0
-            config.imageColorTransformer = UIConfigurationColorTransformer { _ in return Colors.System.Purple.rawValue }//[unowned self] _ in return self.traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue }
-            config.image = UIImage(systemName: "person.fill",
-                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
-            instance.configuration = config
-        } else {
-            let attrString = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-                NSAttributedString.Key.foregroundColor: Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
-            ])
-        instance.setAttributedTitle(attrString, for: .normal)
-        instance.semanticContentAttribute = .forceRightToLeft
-        instance.setImage(UIImage(systemName: "person.fill",
-                                  withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                          for: .normal)
-        instance.tintColor = Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
-        instance.imageEdgeInsets.left = 4.0
-        }
-
-        return instance
-    }()
-    private lazy var subscriptionButton: UIButton = {
-        let instance = UIButton()
-        instance.addTarget(self, action: #selector(self.unsubscribe), for: .touchUpInside)
-        
-        if #available(iOS 15, *) {
-            var config = UIButton.Configuration.filled()
-            config.title = "unsubscribe".localized.uppercased()
-            config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-                var outgoing = incoming
-                outgoing.foregroundColor = UIColor.systemRed
-                outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
-                return outgoing
-            }
-            config.baseBackgroundColor = .systemRed.withAlphaComponent(0.15)
-            config.cornerStyle = .small
-            config.buttonSize = .mini
-            config.contentInsets.leading = 4
-            config.contentInsets.top = 2
-            config.contentInsets.bottom = 2
-            config.contentInsets.trailing = 4
-            config.imagePlacement = .trailing
-            config.imagePadding = 4.0
-            config.activityIndicatorColorTransformer = UIConfigurationColorTransformer { _ in return .systemRed }
-            config.imageColorTransformer = UIConfigurationColorTransformer { _ in return .systemRed }
-            config.image = UIImage(systemName: "hand.raised.slash.fill",
-                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
-            instance.configuration = config
-//            instance.publisher(for: \.bounds, options: .new)
-//                .sink { rect in
-//                    instance.cornerRadius = rect.height/2.25
-//                }
-//                .store(in: &subscriptions)
-        } else {
-            let attrString = NSMutableAttributedString(string: "unsubscribe".localized.uppercased(), attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.systemRed
-            ])
-            instance.setAttributedTitle(attrString, for: .normal)
-            instance.semanticContentAttribute = .forceRightToLeft
-            instance.setImage(UIImage(systemName: "hand.raised.slash.fill",
-                                      withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                              for: .normal)
-            instance.tintColor = .systemRed
-            instance.imageEdgeInsets.left = 4.0
-        }
-
-        return instance
-    }()
-    private lazy var userStack: UIStackView = {
-        let opaque = UIView()
-        opaque.backgroundColor = .clear
-        
-        let instance = UIStackView(arrangedSubviews: [
-            usernameLabel,
-            profileButton,
-            subscriptionButton,
-            opaque
-        ])
-        instance.alignment = .leading
-        instance.axis = .vertical
-        instance.spacing = 4
-        instance.accessibilityIdentifier = "userStack"
-        
-        return instance
-    }()
-    private lazy var userView: UIView = {
-        let instance = UIView()
-        instance.layer.masksToBounds = false
-        instance.clipsToBounds = false
-        instance.backgroundColor = .clear
-        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-        instance.layer.shadowRadius = 5
-        instance.layer.shadowOffset = .zero
-        instance.alpha = 1
-        instance.place(inside: topView,
-                       insets: UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10))
-        instance.publisher(for: \.bounds)
-            .sink { rect in
-                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
-            }
-            .store(in: &subscriptions)
-        
-        let backgroundView = UIView()
-        backgroundView.accessibilityIdentifier = "background"
-        backgroundView.clipsToBounds = true
-        backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-        backgroundView.publisher(for: \.bounds)
-            .sink { rect in
-                backgroundView.cornerRadius = rect.width * 0.05
-            }
-            .store(in: &subscriptions)
-        
-        backgroundView.place(inside: instance)
-        backgroundView.addSubview(avatar)
-        avatar.translatesAutoresizingMaskIntoConstraints = false
-        
-        let opaque = UIView()
-        opaque.accessibilityIdentifier = "opaque"
-        opaque.clipsToBounds = true
-        backgroundView.addSubview(opaque)
-        opaque.backgroundColor = .clear
-        userStack.translatesAutoresizingMaskIntoConstraints = false
-        opaque.translatesAutoresizingMaskIntoConstraints = false
-        opaque.addSubview(userStack)
-        
-        NSLayoutConstraint.activate([
-            avatar.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 8),
-            avatar.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 8),
-            avatar.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -8),
-//            opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16),
-            opaque.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 6),
-            opaque.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -6),
-            opaque.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor),
-            userStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor),
-            userStack.trailingAnchor.constraint(equalTo: opaque.trailingAnchor),
-            userStack.centerYAnchor.constraint(equalTo: opaque.centerYAnchor),
-        ])
-        
-        let constraint = opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16)
-        constraint.identifier = "trailing"
-        constraint.isActive = true
-        
-        return instance
-    }()
-    private lazy var shadowView: UIView = {
-        let instance = UIView()
-        instance.layer.masksToBounds = false
-        instance.clipsToBounds = false
-        instance.backgroundColor = .clear
-        instance.accessibilityIdentifier = "shadow"
-        instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-        instance.layer.shadowRadius = 5
-        instance.layer.shadowOffset = .zero
-        instance.publisher(for: \.bounds)
-            .sink { [unowned self] rect in
-                instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
-            }
-            .store(in: &subscriptions)
-        
-        background.place(inside: instance)
-        
-        return instance
-    }()
-    private lazy var background: UIView = {
-        let instance = UIView()
-        instance.accessibilityIdentifier = "bg"
-        instance.layer.masksToBounds = true
-        instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground//.secondarySystemBackground.withAlphaComponent(0.75)
-        //        instance.addEquallyTo(to: shadowView)
-        surveysCollectionView.place(inside: instance)
-        instance.publisher(for: \.bounds)
-            .sink { rect in
-                instance.cornerRadius = rect.width * 0.05
-            }
-            .store(in: &subscriptions)
-        
-        return instance
-    }()
-    private lazy var verticalStack: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [
-            feedCollectionView
-        ])
-        instance.axis = .vertical
-        
-        return instance
-    }()
-    private lazy var topView: UIView = {
-       let instance = UIView()
-        instance.backgroundColor = .clear
-        let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
-        constraint.identifier = "height"
-        constraint.isActive = true
-        
-        feedCollectionView.place(inside: instance)
-        
-        return instance
-    }()
-    private lazy var filterViewHeight: CGFloat = .zero
-    @IBOutlet var contentView: UIView!
-    
-    
-    
-    // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        setTasks()
-        setupUI()
+    if #available(iOS 15, *) {
+      var config = UIButton.Configuration.filled()
+      config.title = "unsubscribe".localized.uppercased()
+      config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+        var outgoing = incoming
+        outgoing.foregroundColor = UIColor.systemRed
+        outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        return outgoing
+      }
+      config.baseBackgroundColor = .systemRed.withAlphaComponent(0.15)
+      config.cornerStyle = .small
+      config.buttonSize = .mini
+      config.contentInsets.leading = 4
+      config.contentInsets.top = 2
+      config.contentInsets.bottom = 2
+      config.contentInsets.trailing = 4
+      config.imagePlacement = .trailing
+      config.imagePadding = 4.0
+      config.activityIndicatorColorTransformer = UIConfigurationColorTransformer { _ in return .systemRed }
+      config.imageColorTransformer = UIConfigurationColorTransformer { _ in return .systemRed }
+      config.image = UIImage(systemName: "hand.raised.slash.fill",
+                             withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
+      instance.configuration = config
+      //            instance.publisher(for: \.bounds, options: .new)
+      //                .sink { rect in
+      //                    instance.cornerRadius = rect.height/2.25
+      //                }
+      //                .store(in: &subscriptions)
+    } else {
+      let attrString = NSMutableAttributedString(string: "unsubscribe".localized.uppercased(), attributes: [
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.systemRed
+      ])
+      instance.setAttributedTitle(attrString, for: .normal)
+      instance.semanticContentAttribute = .forceRightToLeft
+      instance.setImage(UIImage(systemName: "hand.raised.slash.fill",
+                                withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                        for: .normal)
+      instance.tintColor = .systemRed
+      instance.imageEdgeInsets.left = 4.0
     }
     
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        
-        setTasks()
-        setupUI()
+    return instance
+  }()
+  private lazy var userStack: UIStackView = {
+    let opaque = UIView()
+    opaque.backgroundColor = .clear
+    
+    let instance = UIStackView(arrangedSubviews: [
+      usernameLabel,
+      profileButton,
+      subscriptionButton,
+      opaque
+    ])
+    instance.alignment = .leading
+    instance.axis = .vertical
+    instance.spacing = 4
+    instance.accessibilityIdentifier = "userStack"
+    
+    return instance
+  }()
+  private lazy var userView: UIView = {
+    let instance = UIView()
+    instance.layer.masksToBounds = false
+    instance.clipsToBounds = false
+    instance.backgroundColor = .clear
+    instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    instance.layer.shadowRadius = 5
+    instance.layer.shadowOffset = .zero
+    instance.alpha = 1
+    instance.place(inside: topView,
+                   insets: UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10))
+    instance.publisher(for: \.bounds)
+      .sink { rect in
+        instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+      }
+      .store(in: &subscriptions)
+    
+    let backgroundView = UIView()
+    backgroundView.accessibilityIdentifier = "background"
+    backgroundView.clipsToBounds = true
+    backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+    backgroundView.publisher(for: \.bounds)
+      .sink { rect in
+        backgroundView.cornerRadius = rect.width * 0.05
+      }
+      .store(in: &subscriptions)
+    
+    backgroundView.place(inside: instance)
+    backgroundView.addSubview(avatar)
+    avatar.translatesAutoresizingMaskIntoConstraints = false
+    
+    let opaque = UIView()
+    opaque.accessibilityIdentifier = "opaque"
+    opaque.clipsToBounds = true
+    backgroundView.addSubview(opaque)
+    opaque.backgroundColor = .clear
+    userStack.translatesAutoresizingMaskIntoConstraints = false
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    opaque.addSubview(userStack)
+    
+    NSLayoutConstraint.activate([
+      avatar.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 8),
+      avatar.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 8),
+      avatar.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -8),
+      //            opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16),
+      opaque.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 6),
+      opaque.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -6),
+      opaque.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor),
+      userStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor),
+      userStack.trailingAnchor.constraint(equalTo: opaque.trailingAnchor),
+      userStack.centerYAnchor.constraint(equalTo: opaque.centerYAnchor),
+    ])
+    
+    let constraint = opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16)
+    constraint.identifier = "trailing"
+    constraint.isActive = true
+    
+    return instance
+  }()
+  private lazy var shadowView: UIView = {
+    let instance = UIView()
+    instance.layer.masksToBounds = false
+    instance.clipsToBounds = false
+    instance.backgroundColor = .clear
+    instance.accessibilityIdentifier = "shadow"
+    instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    instance.layer.shadowRadius = 5
+    instance.layer.shadowOffset = .zero
+    instance.publisher(for: \.bounds)
+      .sink { [unowned self] rect in
+        instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+      }
+      .store(in: &subscriptions)
+    
+    background.place(inside: instance)
+    
+    return instance
+  }()
+  private lazy var background: UIView = {
+    let instance = UIView()
+    instance.accessibilityIdentifier = "bg"
+    instance.layer.masksToBounds = true
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground//.secondarySystemBackground.withAlphaComponent(0.75)
+    //        instance.addEquallyTo(to: shadowView)
+    surveysCollectionView.place(inside: instance)
+    instance.publisher(for: \.bounds)
+      .sink { rect in
+        instance.cornerRadius = rect.width * 0.05
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var verticalStack: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [
+      feedCollectionView
+    ])
+    instance.axis = .vertical
+    
+    return instance
+  }()
+  private lazy var topView: UIView = {
+    let instance = UIView()
+    instance.backgroundColor = .clear
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+    constraint.identifier = "height"
+    constraint.isActive = true
+    
+    feedCollectionView.place(inside: instance)
+    
+    return instance
+  }()
+  private lazy var filterViewHeight: CGFloat = .zero
+  @IBOutlet var contentView: UIView!
+  
+  
+  
+  // MARK: - Initialization
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
+    setTasks()
+    setupUI()
+  }
+  
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+    
+    setTasks()
+    setupUI()
+  }
+  
+  
+  
+  // MARK: - Overriden methods
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+    //        userView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    if #available(iOS 15, *) {
+      periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    } else {
+      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+      let attrString_1 = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+        NSAttributedString.Key.foregroundColor: Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
+      ])
+      profileButton.setAttributedTitle(attrString_1, for: .normal)
     }
     
+    userView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
     
+    guard let background = userView.getSubview(type: UIView.self, identifier: "background") else { return }
     
-    // MARK: - Overriden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-//        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-//        userView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        if #available(iOS 15, *) {
-            periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        } else {
-            periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-            let attrString_1 = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-                NSAttributedString.Key.foregroundColor: Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
-            ])
-            profileButton.setAttributedTitle(attrString_1, for: .normal)
-        }
-        
-        userView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
-        
-        guard let background = userView.getSubview(type: UIView.self, identifier: "background") else { return }
-        
-        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-    }
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+  }
 }
 
 private extension SubscriptionsView {
-    func setTasks() {
-        //Subscription events
-        tasks.append( Task {@MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
-                guard let self = self,
-                      let dict = notification.object as? [Userprofile: Userprofile],
-                      let owner = dict.keys.first,
-                      owner == Userprofiles.shared.current,
-                      let userprofile = dict.values.first,
-                      let viewInput = self.viewInput
-                else { return }
-
-                if viewInput.isOnScreen {
-                    self.subscriptionButton.isUserInteractionEnabled = true
-                    self.viewInput?.setDefaultMode()
-                    if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
-                        self.subscriptionButton.configuration!.showsActivityIndicator = false
-                    } else {
-                        guard let imageView = self.subscriptionButton.imageView,
-                              let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
-                        else { return }
-                        
-                        indicator.removeFromSuperview()
-                        imageView.tintColor = .systemRed
-                    }
-                    delayAsync(delay: 0.45) {
-                        self.feedCollectionView.removeItem(userprofile)
-                    }
-//                    self.setDefaultFilter { [unowned self] in
-//
-//                        self.subscriptionButton.isUserInteractionEnabled = true
-//                        self.viewInput?.setDefaultMode()
-//                        if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
-//                            self.subscriptionButton.configuration!.showsActivityIndicator = false
-//                        } else {
-//                            guard let imageView = self.subscriptionButton.imageView,
-//                                  let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
-//                            else { return }
-//
-//                            indicator.removeFromSuperview()
-//                            imageView.tintColor = .systemRed
-//                        }
-//                        delayAsync(delay: 0.45) {
-//                            self.feedCollectionView.removeItem(userprofile)
-//                        }
-//                    }
-                } else {
-                    self.feedCollectionView.removeItem(userprofile)
-                    self.feedCollectionView.alpha = 1
-                    self.userView.alpha = 0
-                }
-            }
-        })
-        
-        tasks.append(Task {@MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
-                guard let self = self,
-                      let userprofile = notification.object as? Userprofile,
-                      self.userprofile == userprofile
-                else { return }
-                
-                if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
-                    self.subscriptionButton.configuration!.showsActivityIndicator = false
-                } else {
-                    guard let imageView = self.subscriptionButton.imageView,
-                          let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
-                    else { return }
-                    
-                    indicator.removeFromSuperview()
-                    imageView.tintColor = .systemRed
-                }
-            }
-        })
-    }
-    
-    @MainActor
-    func setupUI() {
-        guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-        
-        addSubview(contentView)
-        contentView.addSubview(topView)
-        contentView.addSubview(filterView)
-        contentView.addSubview(shadowView)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        topView.translatesAutoresizingMaskIntoConstraints = false
-        filterView.translatesAutoresizingMaskIntoConstraints = false
-        shadowView.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            topView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            topView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-//            filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10),
-            filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8),
-            filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8),
-//            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
-//            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-//            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-//            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
-        ])
-        
-        userView.alpha = 0
-        
-        let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8)
-        shadowLeading.identifier = "leading"
-        shadowLeading.isActive = true
-        
-        let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8)
-        shadowTrailing.identifier = "trailing"
-        shadowTrailing.isActive = true
-        
-        let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8)
-        shadowBottom.identifier = "bottom"
-        shadowBottom.isActive = true
-        
-        let topConstraint_1 = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 8)
-        topConstraint_1.identifier = "top_1"
-        topConstraint_1.isActive = true
-        
-        let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 16)
-        topConstraint_2.identifier = "top"
-        topConstraint_2.isActive = true
-
-
-        setNeedsLayout()
-        layoutIfNeeded()
-        filterViewHeight = periodButton.bounds.height
-        let constraint = filterView.heightAnchor.constraint(equalToConstant: filterViewHeight)
-        constraint.identifier = "height"
-        constraint.isActive = true
-    }
-    
-    @MainActor
-    func onUserSelected(userprofile: Userprofile) {
-        func animateStackView() {
-            delayAsync(delay: 0.075) { [weak self] in
-                guard let self = self else { return }
-                
-                self.userStack.arrangedSubviews.enumerated().forEach { index, item in
-                    item.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-                    
-                    UIView.animate(
-                        withDuration: 0.3,
-                        delay: Double(index)*0.045,
-                        usingSpringWithDamping: 0.8,
-                        initialSpringVelocity: 0.3,
-                        options: [.curveEaseInOut],
-                        animations: {
-                            item.alpha = 1
-                            item.transform = .identity
-                        }) { _ in }
-                }
-            }
-        }
-        //        userView.setNeedsLayout()
-        //        avatar.updateConstraints()
-        //        userView.layoutIfNeeded()
-        
-        guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
-              let constraint = shadowView.getConstraint(identifier: "top"),
-              let constraint1 = filterView.getConstraint(identifier: "top_1")
+  func setTasks() {
+    //Subscription events
+    tasks.append( Task {@MainActor [weak self] in
+      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+        guard let self = self,
+              let dict = notification.object as? [Userprofile: Userprofile],
+              let owner = dict.keys.first,
+              owner == Userprofiles.shared.current,
+              let userprofile = dict.values.first,
+              let viewInput = self.viewInput
         else { return }
         
-        setNeedsLayout()
-        avatar.userprofile = userprofile
-        avatar.alpha = 0
-//        usernameLabel.text = userprofile.name
-//        usernameLabel.setConstraints()
-//        notifyButton.setImage(UIImage(systemName: "bell.and.waves.left.and.right.fill",
-//                                      withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),
-//                              for: .normal)
-//        userView.layoutIfNeeded()
+        if viewInput.isOnScreen {
+          self.subscriptionButton.isUserInteractionEnabled = true
+          self.viewInput?.setDefaultMode()
+          if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
+            self.subscriptionButton.configuration!.showsActivityIndicator = false
+          } else {
+            guard let imageView = self.subscriptionButton.imageView,
+                  let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+            else { return }
+            
+            indicator.removeFromSuperview()
+            imageView.tintColor = .systemRed
+          }
+          delayAsync(delay: 0.45) {
+            self.feedCollectionView.removeItem(userprofile)
+          }
+          //                    self.setDefaultFilter { [unowned self] in
+          //
+          //                        self.subscriptionButton.isUserInteractionEnabled = true
+          //                        self.viewInput?.setDefaultMode()
+          //                        if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
+          //                            self.subscriptionButton.configuration!.showsActivityIndicator = false
+          //                        } else {
+          //                            guard let imageView = self.subscriptionButton.imageView,
+          //                                  let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+          //                            else { return }
+          //
+          //                            indicator.removeFromSuperview()
+          //                            imageView.tintColor = .systemRed
+          //                        }
+          //                        delayAsync(delay: 0.45) {
+          //                            self.feedCollectionView.removeItem(userprofile)
+          //                        }
+          //                    }
+        } else {
+          self.feedCollectionView.removeItem(userprofile)
+          self.feedCollectionView.alpha = 1
+          self.userView.alpha = 0
+        }
+      }
+    })
+    
+    tasks.append(Task {@MainActor [weak self] in
+      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
+        guard let self = self,
+              let userprofile = notification.object as? Userprofile,
+              self.userprofile == userprofile
+        else { return }
         
-        let temp = UIImageView(image: userprofile.image)
-        temp.contentMode = .scaleAspectFill
-        temp.frame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: topView), size: cell.avatar.bounds.size)
-        temp.cornerRadius = cell.avatar.bounds.height/2
-        topView.addSubview(temp)
-        cell.avatar.alpha = 0
+        if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
+          self.subscriptionButton.configuration!.showsActivityIndicator = false
+        } else {
+          guard let imageView = self.subscriptionButton.imageView,
+                let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+          else { return }
+          
+          indicator.removeFromSuperview()
+          imageView.tintColor = .systemRed
+        }
+      }
+    })
+  }
+  
+  @MainActor
+  func setupUI() {
+    guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
+    
+    addSubview(contentView)
+    contentView.addSubview(topView)
+    contentView.addSubview(filterView)
+    contentView.addSubview(shadowView)
+    contentView.translatesAutoresizingMaskIntoConstraints = false
+    topView.translatesAutoresizingMaskIntoConstraints = false
+    filterView.translatesAutoresizingMaskIntoConstraints = false
+    shadowView.translatesAutoresizingMaskIntoConstraints = false
+    
+    NSLayoutConstraint.activate([
+      contentView.topAnchor.constraint(equalTo: topAnchor),
+      contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+      topView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+      topView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+      //            filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10),
+      filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8),
+      filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8),
+      //            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
+      //            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
+      //            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
+      //            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
+    ])
+    
+    userView.alpha = 0
+    
+    let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8)
+    shadowLeading.identifier = "leading"
+    shadowLeading.isActive = true
+    
+    let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8)
+    shadowTrailing.identifier = "trailing"
+    shadowTrailing.isActive = true
+    
+    let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8)
+    shadowBottom.identifier = "bottom"
+    shadowBottom.isActive = true
+    
+    let topConstraint_1 = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 8)
+    topConstraint_1.identifier = "top_1"
+    topConstraint_1.isActive = true
+    
+    let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 16)
+    topConstraint_2.identifier = "top"
+    topConstraint_2.isActive = true
+    
+    
+    setNeedsLayout()
+    layoutIfNeeded()
+    filterViewHeight = periodButton.bounds.height
+    let constraint = filterView.heightAnchor.constraint(equalToConstant: filterViewHeight)
+    constraint.identifier = "height"
+    constraint.isActive = true
+  }
+  
+  @MainActor
+  func onUserSelected(userprofile: Userprofile) {
+    func animateStackView() {
+      delayAsync(delay: 0.075) { [weak self] in
+        guard let self = self else { return }
         
-        let destinationFrame = CGRect(origin: userView.convert(avatar.frame.origin, to: topView),
-                                      size: avatar.bounds.size)
-        
-        userView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-        userStack.arrangedSubviews.forEach { $0.alpha = 0 }
-        
-        UIView.animate(
+        self.userStack.arrangedSubviews.enumerated().forEach { index, item in
+          item.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+          
+          UIView.animate(
             withDuration: 0.3,
-            delay: 0,
+            delay: Double(index)*0.045,
             usingSpringWithDamping: 0.8,
             initialSpringVelocity: 0.3,
             options: [.curveEaseInOut],
-            animations: { [weak self] in
-                guard let self = self else { return }
-                
-                temp.frame = destinationFrame
-                temp.cornerRadius = destinationFrame.height/2
-                self.feedCollectionView.alpha = 0
-                self.userView.alpha = 1
-                self.userView.transform = .identity
-                constraint.constant = self.filterView.alpha == 1 ? 16 : 8
-                constraint1.constant = self.filterView.alpha == 1 ? 16 : 8//8
-                self.layoutIfNeeded()
-                animateStackView()
-            }) { [weak self] _ in
-                guard let self = self else { return }
-                let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
-                    self.avatar.alpha = 1
-                }) { _ in
-                    temp.removeFromSuperview()
-                }
-            }
-    }
-    
-    @objc
-    func onProfileButtonTapped() {
-        guard let userprofile = userprofile else { return }
-        
-        viewInput?.openUserprofile(userprofile)
-    }
-    
-    @objc
-    func unsubscribe() {
-        guard let userprofile = userprofile else { return }
-        
-        viewInput?.unsubscribe(from: userprofile)
-        subscriptionButton.isUserInteractionEnabled = false
-        
-        if #available(iOS 15, *), !subscriptionButton.configuration.isNil {
-            subscriptionButton.configuration!.showsActivityIndicator = true
-        } else {
-            guard let imageView = subscriptionButton.imageView else { return }
-            
-            imageView.clipsToBounds = false
-            let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
-                                                                  size: CGSize(width: imageView.bounds.height,
-                                                                               height: imageView.bounds.height)))
-            indicator.layoutCentered(in: imageView)
-            indicator.color = .systemRed
-            indicator.startAnimating()
-            indicator.accessibilityIdentifier = "indicator"
-            UIView.animate(withDuration: 0.2) {
-                indicator.alpha = 1
-                imageView.tintColor = .clear
-            }
+            animations: {
+              item.alpha = 1
+              item.transform = .identity
+            }) { _ in }
         }
+      }
     }
+    //        userView.setNeedsLayout()
+    //        avatar.updateConstraints()
+    //        userView.layoutIfNeeded()
     
-    @MainActor
-    func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
-        let perDay: UIAction = .init(title: "per_\(Period.PerDay.rawValue)".localized.lowercased(),
-                                     image: nil,
-                                     identifier: nil,
-                                     discoverabilityTitle: nil,
-                                     attributes: .init(),
-                                     state: period == .PerDay ? .on : .off,
-                                     handler: { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.period = .PerDay
-        })
-        
-        let perWeek: UIAction = .init(title: "per_\(Period.PerWeek.rawValue)".localized.lowercased(),
-                                      image: nil,
-                                      identifier: nil,
-                                      discoverabilityTitle: nil,
-                                      attributes: .init(),
-                                      state: period == .PerWeek ? .on : .off,
-                                      handler: { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.period = .PerWeek
-        })
-        
-        let perMonth: UIAction = .init(title: "per_\(Period.PerMonth.rawValue)".localized.lowercased(),
-                                       image: nil,
-                                       identifier: nil,
-                                       discoverabilityTitle: nil,
-                                       attributes: .init(),
-                                       state: period == .PerMonth ? .on : .off,
-                                       handler: { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.period = .PerMonth
-        })
-        
-        let allTime: UIAction = .init(title: "per_\(Period.AllTime.rawValue)".localized.lowercased(),
-                                      image: nil,
-                                      identifier: nil,
-                                      discoverabilityTitle: nil,
-                                      attributes: .init(),
-                                      state: period == .AllTime ? .on : .off,
-                                      handler: { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.period = .AllTime
-        })
-        
-        return UIMenu(title: "",//"publications_per".localized,
-                      image: nil,
-                      identifier: nil,
-                      options: .init(),
-                      children: [
-                        perDay,
-                        perWeek,
-                        perMonth,
-                        allTime
-                      ])
-    }
+    guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
+          let constraint = shadowView.getConstraint(identifier: "top"),
+          let constraint1 = filterView.getConstraint(identifier: "top_1")
+    else { return }
     
-    @MainActor
-    func updatePeriodButton() {
+    setNeedsLayout()
+    avatar.userprofile = userprofile
+    avatar.alpha = 0
+    //        usernameLabel.text = userprofile.name
+    //        usernameLabel.setConstraints()
+    //        notifyButton.setImage(UIImage(systemName: "bell.and.waves.left.and.right.fill",
+    //                                      withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),
+    //                              for: .normal)
+    //        userView.layoutIfNeeded()
+    
+    let temp = UIImageView(image: userprofile.image)
+    temp.contentMode = .scaleAspectFill
+    temp.frame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: topView), size: cell.avatar.bounds.size)
+    temp.cornerRadius = cell.avatar.bounds.height/2
+    topView.addSubview(temp)
+    cell.avatar.alpha = 0
+    
+    let destinationFrame = CGRect(origin: userView.convert(avatar.frame.origin, to: topView),
+                                  size: avatar.bounds.size)
+    
+    userView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+    userStack.arrangedSubviews.forEach { $0.alpha = 0 }
+    
+    UIView.animate(
+      withDuration: 0.3,
+      delay: 0,
+      usingSpringWithDamping: 0.8,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut],
+      animations: { [weak self] in
+        guard let self = self else { return }
         
-        periodButton.menu = prepareMenu()
-        
-        let buttonText = "per_\(period.rawValue.lowercased())".localized.lowercased()
-        
-        if #available(iOS 15, *) {
-            if !periodButton.configuration.isNil {
-                periodButton.configuration?.title = buttonText
-            }
-        } else {
-            let attrString = NSMutableAttributedString(string: buttonText,
-                                                       attributes: [
-                                                        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
-                                                        NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
-                                                       ])
-            periodButton.setAttributedTitle(attrString, for: .normal)
-            
-            guard let constraint = periodButton.getConstraint(identifier: "width") else { return }
-            
-            setNeedsLayout()
-            UIView.animate(withDuration: 0.15, delay: 0) { [weak self] in
-                guard let self = self else { return }
-                
-                constraint.constant = buttonText.width(withConstrainedHeight: 100,
-                                                       font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
-                self.layoutIfNeeded()
-            }
+        temp.frame = destinationFrame
+        temp.cornerRadius = destinationFrame.height/2
+        self.feedCollectionView.alpha = 0
+        self.userView.alpha = 1
+        self.userView.transform = .identity
+        constraint.constant = self.filterView.alpha == 1 ? 16 : 8
+        constraint1.constant = self.filterView.alpha == 1 ? 16 : 8//8
+        self.layoutIfNeeded()
+        animateStackView()
+      }) { [weak self] _ in
+        guard let self = self else { return }
+        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
+          self.avatar.alpha = 1
+        }) { _ in
+          temp.removeFromSuperview()
         }
-    }
+      }
+  }
+  
+  @objc
+  func onProfileButtonTapped() {
+    guard let userprofile = userprofile else { return }
     
-    @MainActor
-    func toggleDateFilter(on: Bool) {
-        guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-              let constraint1 = filterView.getConstraint(identifier: "top_1"),
-              let constraint2 = shadowView.getConstraint(identifier: "top")
-//              let constraint3 = shadowView.getConstraint(identifier: "leading"),
-//              let constraint4 = shadowView.getConstraint(identifier: "trailing")
-//              let constraint5 = shadowView.getConstraint(identifier: "bottom")
-        else { return }
-
-        setNeedsLayout()
-        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
-            guard let self = self else { return }
-
-//            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
-//            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
-            self.filterView.alpha = on ? 1 : 0
-            self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-            constraint1.constant = on ? 16 : self.mode == .Default ? 0 : 10
-            constraint2.constant = on ? 16 : 0
-//            constraint3.constant = on ? 8 : 4
-//            constraint4.constant = on ? -8 : -4
-//            constraint5.constant = on ? -8 : -4
-            heightConstraint.constant = on ? self.filterViewHeight : 0
-            self.layoutIfNeeded()
-        }
+    viewInput?.openUserprofile(userprofile)
+  }
+  
+  @objc
+  func unsubscribe() {
+    guard let userprofile = userprofile else { return }
+    
+    viewInput?.unsubscribe(from: userprofile)
+    subscriptionButton.isUserInteractionEnabled = false
+    
+    if #available(iOS 15, *), !subscriptionButton.configuration.isNil {
+      subscriptionButton.configuration!.showsActivityIndicator = true
+    } else {
+      guard let imageView = subscriptionButton.imageView else { return }
+      
+      imageView.clipsToBounds = false
+      let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                            size: CGSize(width: imageView.bounds.height,
+                                                                         height: imageView.bounds.height)))
+      indicator.layoutCentered(in: imageView)
+      indicator.color = .systemRed
+      indicator.startAnimating()
+      indicator.accessibilityIdentifier = "indicator"
+      UIView.animate(withDuration: 0.2) {
+        indicator.alpha = 1
+        imageView.tintColor = .clear
+      }
     }
+  }
+  
+  @MainActor
+  func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
+    let perDay: UIAction = .init(title: "per_\(Period.PerDay.rawValue)".localized.lowercased(),
+                                 image: nil,
+                                 identifier: nil,
+                                 discoverabilityTitle: nil,
+                                 attributes: .init(),
+                                 state: period == .PerDay ? .on : .off,
+                                 handler: { [weak self] _ in
+      guard let self = self else { return }
+      
+      self.period = .PerDay
+    })
+    
+    let perWeek: UIAction = .init(title: "per_\(Period.PerWeek.rawValue)".localized.lowercased(),
+                                  image: nil,
+                                  identifier: nil,
+                                  discoverabilityTitle: nil,
+                                  attributes: .init(),
+                                  state: period == .PerWeek ? .on : .off,
+                                  handler: { [weak self] _ in
+      guard let self = self else { return }
+      
+      self.period = .PerWeek
+    })
+    
+    let perMonth: UIAction = .init(title: "per_\(Period.PerMonth.rawValue)".localized.lowercased(),
+                                   image: nil,
+                                   identifier: nil,
+                                   discoverabilityTitle: nil,
+                                   attributes: .init(),
+                                   state: period == .PerMonth ? .on : .off,
+                                   handler: { [weak self] _ in
+      guard let self = self else { return }
+      
+      self.period = .PerMonth
+    })
+    
+    let allTime: UIAction = .init(title: "per_\(Period.AllTime.rawValue)".localized.lowercased(),
+                                  image: nil,
+                                  identifier: nil,
+                                  discoverabilityTitle: nil,
+                                  attributes: .init(),
+                                  state: period == .AllTime ? .on : .off,
+                                  handler: { [weak self] _ in
+      guard let self = self else { return }
+      
+      self.period = .AllTime
+    })
+    
+    return UIMenu(title: "",//"publications_per".localized,
+                  image: nil,
+                  identifier: nil,
+                  options: .init(),
+                  children: [
+                    perDay,
+                    perWeek,
+                    perMonth,
+                    allTime
+                  ])
+  }
+  
+  @MainActor
+  func updatePeriodButton() {
+    
+    periodButton.menu = prepareMenu()
+    
+    let buttonText = "per_\(period.rawValue.lowercased())".localized.lowercased()
+    
+    if #available(iOS 15, *) {
+      if !periodButton.configuration.isNil {
+        periodButton.configuration?.title = buttonText
+      }
+    } else {
+      let attrString = NSMutableAttributedString(string: buttonText,
+                                                 attributes: [
+                                                  NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
+                                                  NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
+                                                 ])
+      periodButton.setAttributedTitle(attrString, for: .normal)
+      
+      guard let constraint = periodButton.getConstraint(identifier: "width") else { return }
+      
+      setNeedsLayout()
+      UIView.animate(withDuration: 0.15, delay: 0) { [weak self] in
+        guard let self = self else { return }
+        
+        constraint.constant = buttonText.width(withConstrainedHeight: 100,
+                                               font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
+        self.layoutIfNeeded()
+      }
+    }
+  }
+  
+  @MainActor
+  func toggleDateFilter(on: Bool) {
+    guard let heightConstraint = filterView.getConstraint(identifier: "height"),
+          let constraint1 = filterView.getConstraint(identifier: "top_1"),
+          let constraint2 = shadowView.getConstraint(identifier: "top")
+            //              let constraint3 = shadowView.getConstraint(identifier: "leading"),
+            //              let constraint4 = shadowView.getConstraint(identifier: "trailing")
+            //              let constraint5 = shadowView.getConstraint(identifier: "bottom")
+    else { return }
+    
+    setNeedsLayout()
+    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
+      guard let self = self else { return }
+      
+      //            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
+      //            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
+      self.filterView.alpha = on ? 1 : 0
+      self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
+      constraint1.constant = on ? 16 : self.mode == .Default ? 0 : 10
+      constraint2.constant = on ? 16 : 0
+      //            constraint3.constant = on ? 8 : 4
+      //            constraint4.constant = on ? -8 : -4
+      //            constraint5.constant = on ? -8 : -4
+      heightConstraint.constant = on ? self.filterViewHeight : 0
+      self.layoutIfNeeded()
+    }
+  }
 }
 
 extension SubscriptionsView: SubsciptionsControllerOutput {
-    func hideUserCard(_ completion: Closure? = nil) {
-        guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
-              let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
-              let constraint = subview.getConstraint(identifier: "trailing"),
-              let userprofile = userprofile
-        else {
+  func hideUserCard(_ completion: Closure? = nil) {
+    guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
+          let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
+          let constraint = subview.getConstraint(identifier: "trailing"),
+          let userprofile = userprofile
+    else {
 #if DEBUG
       fatalError()
 #endif
-            return
+      return
+    }
+    
+    mode = .Default
+    surveysCollectionView.category = .Subscriptions
+    
+    let temp = UIImageView(image: userprofile.image)
+    temp.contentMode = .scaleAspectFill
+    temp.frame = CGRect(origin: userView.convert(avatar.frame.origin, to: topView),
+                        size: avatar.bounds.size)
+    temp.cornerRadius = temp.bounds.height/2
+    avatar.alpha = 0
+    topView.addSubview(temp)
+    cell.avatar.alpha = 0
+    
+    let destinationFrame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: topView),
+                                  size: cell.avatar.imageView.bounds.size)
+    
+    userView.setNeedsLayout()
+    //        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
+    //                                                       delay: 0,
+    //                                                       options: .curveEaseInOut,
+    //                                                       animations: { [weak self] in
+    //            guard let self = self else { return }
+    UIView.animate(
+      withDuration: 0.15,
+      delay: 0,
+      //            usingSpringWithDamping: 0.8,
+      //            initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut],
+      animations: { [weak self] in
+        guard let self = self else { return }
+        
+        temp.frame = destinationFrame
+        temp.cornerRadius = cell.avatar.bounds.height/2
+        self.feedCollectionView.alpha = 1
+        self.userView.alpha = 0
+        self.userView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
+        subview.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        //                self.userStack.spacing = 100
+        constraint.constant = self.userView.bounds.width/3
+        self.userView.layoutIfNeeded()
+      }) { _ in
+        subview.transform = .identity
+        self.userView.transform = .identity
+        constraint.constant = 16
+        //            self.userStack.spacing = 4
+        
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
+          cell.avatar.alpha = 1
+        }) { _ in
+          temp.removeFromSuperview()
+          
+          guard let completion = completion else { return }
+          
+          completion()
         }
-        
-        mode = .Default
-        surveysCollectionView.category = .Subscriptions
-        
-        let temp = UIImageView(image: userprofile.image)
-        temp.contentMode = .scaleAspectFill
-        temp.frame = CGRect(origin: userView.convert(avatar.frame.origin, to: topView),
-                            size: avatar.bounds.size)
-        temp.cornerRadius = temp.bounds.height/2
-        avatar.alpha = 0
-        topView.addSubview(temp)
-        cell.avatar.alpha = 0
-        
-        let destinationFrame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: topView),
-                                      size: cell.avatar.imageView.bounds.size)
-        
-        userView.setNeedsLayout()
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
-//                                                       delay: 0,
-//                                                       options: .curveEaseInOut,
-//                                                       animations: { [weak self] in
-        //            guard let self = self else { return }
-        UIView.animate(
-            withDuration: 0.15,
-            delay: 0,
-//            usingSpringWithDamping: 0.8,
-//            initialSpringVelocity: 0.3,
-            options: [.curveEaseInOut],
-            animations: { [weak self] in
-                guard let self = self else { return }
-                
-                temp.frame = destinationFrame
-                temp.cornerRadius = cell.avatar.bounds.height/2
-                self.feedCollectionView.alpha = 1
-                self.userView.alpha = 0
-                self.userView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
-                subview.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-                //                self.userStack.spacing = 100
-                constraint.constant = self.userView.bounds.width/3
-                self.userView.layoutIfNeeded()
-            }) { _ in
-                subview.transform = .identity
-                self.userView.transform = .identity
-                constraint.constant = 16
-//            self.userStack.spacing = 4
-            
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
-                cell.avatar.alpha = 1
-            }) { _ in
-                temp.removeFromSuperview()
-                
-                guard let completion = completion else { return }
-                
-                completion()
-            }
-        }
-    }
-    
-//    func setPeriod(_ period: Period) {
-//        surveysCollectionView.period = period
-//    }
-    
-    func onRequestCompleted(_ result: Result<Bool, Error>) {
-        surveysCollectionView.endRefreshing()
-    }
-    
-    func onWillAppear() {
-        surveysCollectionView.deselect()
-    }
+      }
+  }
+  
+  //    func setPeriod(_ period: Period) {
+  //        surveysCollectionView.period = period
+  //    }
+  
+  func onRequestCompleted(_ result: Result<Bool, Error>) {
+    surveysCollectionView.endRefreshing()
+  }
+  
+  func onWillAppear() {
+    surveysCollectionView.deselect()
+  }
 }
 
 extension SubscriptionsView: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let popup = sender as? Popup {
-            popup.removeFromSuperview()
-        }
+  func onBannerWillAppear(_ sender: Any) {}
+  
+  func onBannerWillDisappear(_ sender: Any) {}
+  
+  func onBannerDidAppear(_ sender: Any) {}
+  
+  func onBannerDidDisappear(_ sender: Any) {
+    if let banner = sender as? Banner {
+      banner.removeFromSuperview()
+    } else if let popup = sender as? Popup {
+      popup.removeFromSuperview()
     }
+  }
 }
 
 extension SubscriptionsView: CallbackObservable {
-    func callbackReceived(_ sender: Any) {
-        
-    }
+  func callbackReceived(_ sender: Any) {
+    
+  }
 }

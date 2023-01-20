@@ -17,6 +17,7 @@ class CommentsSectionCell: UICollectionViewCell {
       guard let item = item,
             item.isCommentingAllowed
       else { return }
+      
       updateAppearance()
     }
   }
@@ -25,7 +26,7 @@ class CommentsSectionCell: UICollectionViewCell {
   // MARK: - Public Properties
   var item: Survey! {
     didSet {
-      guard !item.isNil else { return }
+      guard let item = item else { return }
       collectionView.survey = item
       disclosureIndicator.alpha = item.isCommentingAllowed ? 1 : 0
       
@@ -36,17 +37,19 @@ class CommentsSectionCell: UICollectionViewCell {
         closedConstraint.isActive = true
         openConstraint.isActive = false
       }
-      //      let constraint = collectionView.heightAnchor.constraint(equalToConstant: 1)
-      //      constraint.priority = .defaultHigh
-      //      constraint.identifier = "height"
-      //      constraint.isActive = true
-      //
-      //      if let labelConstraint = disclosureLabel.getConstraint(identifier: "width") {
-      //        labelConstraint.constant = disclosureLabel.text!.width(withConstrainedHeight: disclosureLabel.bounds.height, font: disclosureLabel.font)
-      //      }
-      //
-      //      setNeedsLayout()
-      //      layoutIfNeeded()
+      
+      item.reference.commentsTotalPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] count in
+          guard let self = self else { return }
+          
+          self.disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: count)))"
+          guard let constraint = self.disclosureLabel.getConstraint(identifier: "width") else { return }
+          self.horizontalStack.setNeedsLayout()
+          constraint.constant = self.disclosureLabel.text!.width(withConstrainedHeight: 100, font: self.disclosureLabel.font)
+          self.horizontalStack.layoutIfNeeded()
+        }
+        .store(in: &subscriptions)
     }
   }
   //Publishers
@@ -58,6 +61,7 @@ class CommentsSectionCell: UICollectionViewCell {
   public var deletePublisher = PassthroughSubject<Comment, Never>()
   public var threadPublisher = PassthroughSubject<Comment, Never>()
   public var paginationPublisher = PassthroughSubject<[Comment], Never>()
+  public let boundsPublisher = PassthroughSubject<Bool, Never>()
   //Publishers
 //  public let commentSubject = CurrentValueSubject<String?, Never>(nil)
 //  public let anonCommentSubject = CurrentValueSubject<[String: String]?, Never>(nil)
@@ -165,6 +169,7 @@ class CommentsSectionCell: UICollectionViewCell {
       self.setNeedsLayout()
       constraint.constant = value.height
       self.layoutIfNeeded()
+      self.boundsPublisher.send(true)
       //            self.boundsListener?.onBoundsChanged(view.frame)
     })
     
@@ -321,21 +326,21 @@ class CommentsSectionCell: UICollectionViewCell {
   }
   
   private func setTasks() {
-    tasks.append(Task { @MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {
-        guard let self = self,
-              let item = self.item,
-              let object = notification.object as? SurveyReference,
-              item.reference == object
-        else { return }
-        
-        self.disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
-        guard let constraint = self.disclosureLabel.getConstraint(identifier: "width") else { return }
-        self.setNeedsLayout()
-        constraint.constant = self.disclosureLabel.text!.width(withConstrainedHeight: 100, font: self.disclosureLabel.font)
-        self.layoutIfNeeded()
-      }
-    })
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {
+//        guard let self = self,
+//              let item = self.item,
+//              let object = notification.object as? SurveyReference,
+//              item.reference == object
+//        else { return }
+//
+//        self.disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
+//        guard let constraint = self.disclosureLabel.getConstraint(identifier: "width") else { return }
+//        self.setNeedsLayout()
+//        constraint.constant = self.disclosureLabel.text!.width(withConstrainedHeight: 100, font: self.disclosureLabel.font)
+//        self.layoutIfNeeded()
+//      }
+//    })
   }
   
   // MARK: - Overriden methods

@@ -145,10 +145,16 @@ class PollController: UIViewController {
     self.view = view as UIView
     
     setTasks()
-    setupUI()
+//    setupUI()
     loadData()
     
     //        navigationController?.delegate = appDelegate.transitionCoordinator
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    setupUI()
   }
   
   override func willMove(toParent parent: UIViewController?) {
@@ -175,15 +181,36 @@ private extension PollController {
     navigationItem.titleView = topicView
     setBarButtonItems()
     
+//    guard let navigationBar = navigationController?.navigationBar else { return }
+//
+//    let appearance = UINavigationBarAppearance()
+//    appearance.configureWithOpaqueBackground()
+//    appearance.largeTitleTextAttributes = [
+//      .foregroundColor: tintColor,
+//      .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle) as Any
+//    ]
+//    appearance.titleTextAttributes = [
+//      .foregroundColor: tintColor,
+//      .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3) as Any
+//    ]
+//    appearance.shadowColor = nil
+//
+//    navigationBar.standardAppearance = appearance
+//    navigationBar.scrollEdgeAppearance = appearance
+//    navigationBar.prefersLargeTitles = false
+//
+//    if #available(iOS 15.0, *) {
+//      navigationBar.compactScrollEdgeAppearance = appearance
+//    }
     guard let navigationBar = self.navigationController?.navigationBar else { return }
-    
+
     let appearance = UINavigationBarAppearance()
     appearance.configureWithOpaqueBackground()
     appearance.shadowColor = nil
     navigationBar.standardAppearance = appearance
     navigationBar.scrollEdgeAppearance = appearance
     navigationBar.prefersLargeTitles = false
-    
+
     if #available(iOS 15.0, *) { navigationBar.compactScrollEdgeAppearance = appearance }
   }
   
@@ -194,9 +221,11 @@ private extension PollController {
         .publish(every: 5, on: .current, in: .common)
         .autoconnect()
         .sink { [weak self] seconds in
-          guard let self = self else { return }
+          guard let self = self,
+                let survey = self.item.survey
+          else { return }
           
-          self.controllerInput?.updateResultsStats(self.item)
+          self.controllerInput?.updateResultsStats(survey)
         }
         .store(in: &subscriptions)
     }
@@ -393,9 +422,11 @@ private extension PollController {
       .publish(every: 5, on: .current, in: .common)
       .autoconnect()
       .sink { [weak self] seconds in
-        guard let self = self else { return }
+        guard let self = self,
+              let survey = self.item.survey
+        else { return }
         
-        self.controllerInput?.updateResultsStats(self.item)
+        self.controllerInput?.updateResultsStats(survey)
       }
       .store(in: &subscriptions)
   }
@@ -482,14 +513,28 @@ private extension PollController {
                                          state: .off,
                                          handler: { [unowned self] _ in
         guard item.isComplete else {
-          let banner = Banner(fadeBackground: false)
-          banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                    text: "finish_poll",
-                                                    tintColor: .systemOrange),
-                         dismissAfter: 0.75)
+          let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                                text: "finish_poll",
+                                                                tintColor: .systemOrange,
+                                                                fontName: Fonts.Semibold,
+                                                                textStyle: .title3,
+                                                                textAlignment: .natural),
+                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                 isModal: false,
+                                 useContentViewHeight: true,
+                                 shouldDismissAfter: 1)
           banner.didDisappearPublisher
             .sink { _ in banner.removeFromSuperview() }
             .store(in: &self.subscriptions)
+//
+//          let banner = Banner(fadeBackground: false)
+//          banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+//                                                    text: "finish_poll",
+//                                                    tintColor: .systemOrange),
+//                         dismissAfter: 0.75)
+//          banner.didDisappearPublisher
+//            .sink { _ in banner.removeFromSuperview() }
+//            .store(in: &self.subscriptions)
           return
         }
         self.controllerInput?.toggleFavorite(!self.item.isFavorite)
@@ -623,12 +668,17 @@ extension PollController: PollViewInput {
     
   }
   
-  func onVotersTapped(answer: Answer) {
+  func showVoters(for answer: Answer) {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
     
+    navigationController?.pushViewController(UserprofilesController(mode: .Voters, answer: answer), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
   
   func postComment(body: String, replyTo: Comment?, username: String?) {
-    
+    controllerInput?.postComment(body: body, replyTo: replyTo, username: username)
   }
   
   func requestComments(_: [Comment]) {
@@ -663,20 +713,34 @@ extension PollController: PollModelOutput {
         self.controllerOutput?.presentView(item)
       }
     case .failure:
-      let banner = Banner(fadeBackground: false)
-      banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                text: "finish_poll",
-                                                tintColor: .systemOrange),
-                     dismissAfter: 2)
+      let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                            text: "finish_poll",
+                                                            tintColor: .systemOrange,
+                                                            fontName: Fonts.Semibold,
+                                                            textStyle: .title3,
+                                                            textAlignment: .natural),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 1)
       banner.didDisappearPublisher
-        .sink { [weak self] _ in
-          banner.removeFromSuperview()
-          
-          guard let self = self else { return }
-          
-          self.navigationController?.popViewController(animated: true)
-        }
+        .sink { _ in banner.removeFromSuperview() }
         .store(in: &self.subscriptions)
+      
+//      let banner = Banner(fadeBackground: false)
+//      banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+//                                                text: "finish_poll",
+//                                                tintColor: .systemOrange),
+//                     dismissAfter: 2)
+//      banner.didDisappearPublisher
+//        .sink { [weak self] _ in
+//          banner.removeFromSuperview()
+//
+//          guard let self = self else { return }
+//
+//          self.navigationController?.popViewController(animated: true)
+//        }
+//        .store(in: &self.subscriptions)
       return
     }
   }
@@ -685,12 +749,77 @@ extension PollController: PollModelOutput {
     
   }
   
-  func onVoteCallback(_: Result<Bool, Error>) {
-    
+  func onVoteCallback(_ result: Result<Bool, Error>) {
+    switch result {
+    case .success:
+      guard let survey = self.item.survey,
+            let details = survey.resultDetails
+      else { return }
+      
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        guard let self = self else { return }
+        
+        if details.isPopular {
+          let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "dollarsign")!,
+                                                                text: "most_popular_choice".localized + "🚀\n" + "got_points".localized + "\(String(describing: details.points)) " + "\("points".localized) 🥳",
+                                                                tintColor: .systemGreen,
+                                                                fontName: Fonts.Semibold,
+                                                                textStyle: .headline,
+                                                                textAlignment: .center),
+                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                 isModal: false,
+                                 useContentViewHeight: true,
+                                 shouldDismissAfter: 2)
+          banner.didDisappearPublisher
+            .sink { _ in banner.removeFromSuperview() }
+            .store(in: &self.subscriptions)
+        } else {
+          let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "dollarsign")!,
+                                                                text: "got_points".localized + "\(String(describing: details.points)) " + "points".localized,
+                                                                tintColor: .systemGreen,
+                                                                fontName: Fonts.Semibold,
+                                                                textStyle: .headline,
+                                                                textAlignment: .center),
+                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                 isModal: false,
+                                 useContentViewHeight: true,
+                                 shouldDismissAfter: 2)
+          banner.didDisappearPublisher
+            .sink { _ in banner.removeFromSuperview() }
+            .store(in: &self.subscriptions)
+        }
+      }
+    case .failure(let error):
+#if DEBUG
+      error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+    }
   }
   
-  func commentPostCallback(_: Result<Comment, Error>) {
-    
+  func commentPostCallback(_ result: Result<Comment, Error>) {
+    switch result {
+    case .failure(let error):
+#if DEBUG
+      error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+                                                            text: AppError.server.localizedDescription,
+                                                            tintColor: .systemRed,
+                                                            fontName: Fonts.Semibold,
+                                                            textStyle: .title3,
+                                                            textAlignment: .natural),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 1)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
+    default:
+#if DEBUG
+      print("")
+#endif
+    }
   }
   
   func commentDeleteError() {

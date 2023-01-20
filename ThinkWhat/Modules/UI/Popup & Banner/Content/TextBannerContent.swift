@@ -28,11 +28,11 @@ class TextBannerContent: UIView {
   }()
   private lazy var label: UILabel = {
     let instance = UILabel()
-    instance.textColor = .label
+    instance.textColor = textColor
     instance.numberOfLines = 0
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline)
+    instance.font = UIFont.scaledFont(fontName: fontName, forTextStyle: textStyle)
     instance.text = text.localized
-    instance.textAlignment = .center
+    instance.textAlignment = textAlignment
     
     return instance
   }()
@@ -46,13 +46,17 @@ class TextBannerContent: UIView {
     instance.spacing = 8
     
     imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.heightAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.75).isActive = true
+    imageView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.15).isActive = true
     
     return instance
   }()
   private let image: UIImage
   private let text: String
   private let imageTintColor: UIColor
+  private let textColor: UIColor
+  private let textStyle: UIFont.TextStyle
+  private let fontName: String
+  private let textAlignment: NSTextAlignment
   
   
   
@@ -70,10 +74,20 @@ class TextBannerContent: UIView {
   
   
   // MARK: - Initialization
-  init(image: UIImage, text: String, tintColor: UIColor) {
+  init(image: UIImage,
+       text: String,
+       textColor: UIColor = .label,
+       tintColor: UIColor,
+       fontName: String = Fonts.Regular,
+       textStyle: UIFont.TextStyle = .headline,
+       textAlignment: NSTextAlignment = .center) {
+    self.fontName = fontName
     self.image = image
     self.text = text
+    self.textColor = textColor
+    self.textStyle = textStyle
     self.imageTintColor = tintColor
+    self.textAlignment = textAlignment
     
     super.init(frame: .zero)
     

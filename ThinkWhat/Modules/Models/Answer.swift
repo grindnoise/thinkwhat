@@ -31,8 +31,6 @@ class Answer: Decodable {
       //Check for duplicates
       guard let lastInstance = voters.last else { return }
       
-      print("last voter", lastInstance.name)
-      
       guard oldValue.filter({ $0 == lastInstance }).isEmpty else {
         voters.remove(object: lastInstance)
         

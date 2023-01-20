@@ -28,9 +28,17 @@ class Popup: UIView {
         }
     }
     @IBOutlet weak var body: UIView! {
-        didSet {
-            body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-        }
+      didSet {
+        body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+        body.publisher(for: \.bounds)
+          .receive(on: DispatchQueue.main)
+          .sink { [weak self] in
+            guard let self = self else { return }
+            
+            self.body.cornerRadius = $0.width*0.05
+          }
+          .store(in: &subscriptions)
+      }
     }
     @IBOutlet weak var container: UIView!
     @IBOutlet weak var heightConstraint: NSLayoutConstraint!

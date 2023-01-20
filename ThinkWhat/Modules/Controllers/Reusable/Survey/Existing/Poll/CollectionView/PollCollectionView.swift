@@ -30,8 +30,8 @@ class PollCollectionView: UICollectionView {
         return "question".localized
       case .answers:
         return "poll_choices".localized
-//      case .vote:
-//        return "vote".localized
+        //      case .vote:
+        //        return "vote".localized
       case .comments:
         return "comments".localized
       }
@@ -46,10 +46,20 @@ class PollCollectionView: UICollectionView {
   public let profileTapPublisher = PassthroughSubject<Bool, Never>()
   public var imagePublisher = PassthroughSubject<Mediafile, Never>()
   public var webPublisher = PassthroughSubject<URL, Never>()
-  //  public let colorPublisher = PassthroughSubject<UIColor, Never>()
   public let answerSelectionPublisher = PassthroughSubject<Answer, Never>()
   public let answerDeselectionPublisher = PassthroughSubject<Bool, Never>()
   public let isVotingSubscriber = PassthroughSubject<Bool, Never>()
+  public let votersPublisher = PassthroughSubject<Answer, Never>()
+  public var commentPublisher = PassthroughSubject<String, Never>()
+//  public let commentsCellBoundsPublisher = PassthroughSubject<Bool, Never>()
+//  public var anonCommentPublisher = PassthroughSubject<[String: String], Never>()
+//  public var replyPublisher = PassthroughSubject<[Comment: String], Never>()
+//  public var anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
+//  public var commentClaimPublisher = PassthroughSubject<Comment, Never>()
+//  public var deletePublisher = PassthroughSubject<Comment, Never>()
+//  public var threadPublisher = PassthroughSubject<Comment, Never>()
+//  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
+  
   
   
   // MARK: - Private properties
@@ -243,21 +253,18 @@ private extension PollCollectionView {
           self.source.refresh()
         }
         .store(in: &self.subscriptions)
+      cell.votersPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.votersPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
       self.isVotingSubscriber
         .sink {
           cell.isVotingPublisher.send($0)
         }
         .store(in: &self.subscriptions)
-      
-      //      self.colorPublisher
-      //        .sink { cell.color = $0 }
-      //        .store(in: &self.subscriptions)
-      //      self.colorSubject
-      //        .sink { [weak self]
-      //        guard let color = $0 else { return }
-      //        cell.color = color
-      //      }
-      //      .store(in: &self.subscriptions)
     }
     
     let commentsCellRegistration = UICollectionView.CellRegistration<CommentsSectionCell, AnyHashable> { [weak self] cell, _, _ in
@@ -265,25 +272,33 @@ private extension PollCollectionView {
       
       cell.item = self.item
       
-//      //Claim
-//      cell.claimSubject.sink { [weak self] in
-//        guard let self = self, !$0.isNil else { return }
-//
-//        print($0)
-////        self.claimSubject.send($0)
-//      }.store(in: &self.subscriptions)
-//
-//      //Subscription for commenting
-//      cell.commentSubject.sink { [weak self] in
-//        guard let self = self,
-//              let body = $0
-//        else { return }
-//
-//        fatalError()
-////        self.host.postComment(body: body)
-//      }.store(in: &self.subscriptions)
-//
-//      cell.anonCommentSubject.sink { [weak self] in
+      //Claim
+      //      cell.claimPublisher
+      //        .sink { [weak self] in
+      //          guard let self = self else { return }
+      //
+      //          //        self.claimSubject.send($0)
+      //        }
+      //        .store(in: &self.subscriptions)
+      
+      cell.boundsPublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.source.refresh()//commentsCellBoundsPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
+      //Subscription for commenting
+      cell.commentPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.commentPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
+      //      cell.anonCommentSubject.sink { [weak self] in
 //        guard let self = self,
 //              let dict = $0,
 //              let username = dict.values.first,
@@ -291,7 +306,7 @@ private extension PollCollectionView {
 //        else { return }
 //
 //        fatalError()
-////        self.host.postComment(body: body, username: username)
+//        //        self.host.postComment(body: body, username: username)
 //      }.store(in: &self.subscriptions)
 //
 //      //Subscription for commenting
@@ -301,7 +316,7 @@ private extension PollCollectionView {
 //        else { return }
 //
 //        fatalError()
-////        self.host.deleteComment(comment)
+//        //        self.host.deleteComment(comment)
 //      }.store(in: &self.subscriptions)
 //
 //      //Subscription for reply to comment
@@ -313,7 +328,7 @@ private extension PollCollectionView {
 //        else { return }
 //
 //        fatalError()
-////        self.host.postComment(body: body, replyTo: comment)
+//        //        self.host.postComment(body: body, replyTo: comment)
 //      }.store(in: &self.subscriptions)
 //
 //      cell.anonReplySubject.sink { [weak self] in
@@ -326,7 +341,7 @@ private extension PollCollectionView {
 //        else { return }
 //
 //        fatalError()
-////        self.host.postComment(body: body, replyTo: comment, username: username)
+//        //        self.host.postComment(body: body, replyTo: comment, username: username)
 //      }.store(in: &self.subscriptions)
 //
 //      //Subscription for request comments
@@ -337,7 +352,7 @@ private extension PollCollectionView {
 //        else { return }
 //
 //        fatalError()
-////        self.host.requestComments(comments)
+//        //        self.host.requestComments(comments)
 //      }.store(in: &self.subscriptions)
 //
 //      //Subscibe for thread disclosure
@@ -347,15 +362,15 @@ private extension PollCollectionView {
 //        else { return }
 //
 //        fatalError()
-////        self.commentThreadSubject.send(comment)
+//        //        self.commentThreadSubject.send(comment)
 //      }.store(in: &self.subscriptions)
 //
-////      //Subscibe for posted comment
-////      self.lastPostedComment.sink {
-////        guard let comment = $0 else { return }
-////
-////        cell.lastPostedComment = comment
-////      }.store(in: &self.subscriptions)
+//      //      //Subscibe for posted comment
+//      //      self.lastPostedComment.sink {
+//      //        guard let comment = $0 else { return }
+//      //
+//      //        cell.lastPostedComment = comment
+//      //      }.store(in: &self.subscriptions)
     }
     
     source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in

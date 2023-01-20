@@ -17,21 +17,21 @@ class CommentCell: UICollectionViewListCell {
   // MARK: - Public properties
   public var item: Comment! {
     didSet {
-      guard !item.isNil else { return }
+      guard let item = item else { return }
       
       //            setTasks()
       menuButton.menu = prepareMenu()
       menuButton.showsMenuAsPrimaryAction = true
       
-      if !item.isOwn {
+      if item.isOwn {
+        let bottomAnchor = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+        bottomAnchor.priority = .defaultLow
+        bottomAnchor.isActive = true
+      } else {
         verticalStack.addArrangedSubview(repliesView)
         repliesView.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
         let bottomAnchor = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         bottomAnchor.priority = .defaultHigh
-        bottomAnchor.isActive = true
-      } else {
-        let bottomAnchor = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        bottomAnchor.priority = .defaultLow
         bottomAnchor.isActive = true
       }
       
@@ -40,7 +40,11 @@ class CommentCell: UICollectionViewListCell {
       
       replyButton.alpha = item.isOwn ? 0 : 1
       
-      avatar.userprofile = item.userprofile.isNil ? Userprofile.anonymous : item.userprofile!
+      if let userprofile = item.userprofile {
+        avatar.userprofile = userprofile.isCurrent ? Userprofiles.shared.current : userprofile
+      } else {
+        avatar.userprofile = Userprofile.anonymous
+      }
       disclosureButton.alpha = 0
       
       if mode == .Root, item.replies != 0 {
