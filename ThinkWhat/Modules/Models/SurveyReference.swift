@@ -145,7 +145,7 @@ class SurveyReference: Decodable {// NSObject,
         }
     }
     var owner: Userprofile
-  var votesTotal: Int {
+    var votesTotal: Int {
     didSet {
       guard oldValue != votesTotal else { return }
       

@@ -50,13 +50,15 @@ class PollCollectionView: UICollectionView {
   public let answerDeselectionPublisher = PassthroughSubject<Bool, Never>()
   public let isVotingSubscriber = PassthroughSubject<Bool, Never>()
   public let votersPublisher = PassthroughSubject<Answer, Never>()
+  //Comments
   public var commentPublisher = PassthroughSubject<String, Never>()
+  public var commentsUpdateStatsPublisher = PassthroughSubject<[Comment], Never>()
 //  public let commentsCellBoundsPublisher = PassthroughSubject<Bool, Never>()
 //  public var anonCommentPublisher = PassthroughSubject<[String: String], Never>()
-//  public var replyPublisher = PassthroughSubject<[Comment: String], Never>()
+  public var replyPublisher = PassthroughSubject<[Comment: String], Never>()
 //  public var anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
 //  public var commentClaimPublisher = PassthroughSubject<Comment, Never>()
-//  public var deletePublisher = PassthroughSubject<Comment, Never>()
+  public var deletePublisher = PassthroughSubject<Comment, Never>()
 //  public var threadPublisher = PassthroughSubject<Comment, Never>()
 //  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
   
@@ -135,6 +137,7 @@ private extension PollCollectionView {
       
       let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
       sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
+      sectionLayout.interGroupSpacing = 8
       return sectionLayout
     }
     
@@ -217,7 +220,7 @@ private extension PollCollectionView {
       }
       cell.attributes = [
         .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body) as Any,
-        .foregroundColor: UIColor.label,
+        .foregroundColor: UIColor.secondaryLabel,
         .paragraphStyle: paragraphStyle
       ]
       cell.text = text
@@ -289,6 +292,15 @@ private extension PollCollectionView {
         }
         .store(in: &self.subscriptions)
       
+      //Update comments stats (replies count)
+      cell.updateStatsPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.commentsUpdateStatsPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
       //Subscription for commenting
       cell.commentPublisher
         .sink { [weak self] in
@@ -308,30 +320,25 @@ private extension PollCollectionView {
 //        fatalError()
 //        //        self.host.postComment(body: body, username: username)
 //      }.store(in: &self.subscriptions)
-//
-//      //Subscription for commenting
-//      cell.deleteSubject.sink { [weak self] in
-//        guard let self = self,
-//              let comment = $0
-//        else { return }
-//
-//        fatalError()
-//        //        self.host.deleteComment(comment)
-//      }.store(in: &self.subscriptions)
-//
-//      //Subscription for reply to comment
-//      cell.replySubject.sink { [weak self] in
-//        guard let self = self,
-//              let dict = $0,
-//              let body = dict.values.first,
-//              let comment = dict.keys.first
-//        else { return }
-//
-//        fatalError()
-//        //        self.host.postComment(body: body, replyTo: comment)
-//      }.store(in: &self.subscriptions)
-//
-//      cell.anonReplySubject.sink { [weak self] in
+
+      //Subscription for commenting
+      cell.deletePublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.deletePublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
+      //Reply to user
+      cell.replyPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.replyPublisher.send($0)
+        }.store(in: &self.subscriptions)
+      //
+      //      cell.anonReplySubject.sink { [weak self] in
 //        guard let self = self,
 //              let dict = $0,
 //              let innerDict = dict.values.first,

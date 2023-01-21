@@ -631,6 +631,10 @@ private extension PollController {
 
 // MARK: - Input
 extension PollController: PollViewInput {
+  func updateCommentsStats(_ comments: [Comment]) {
+    controllerInput?.updateCommentsStats(comments)
+  }
+  
   func openUserprofile() {
     let backItem = UIBarButtonItem()
     backItem.title = ""
@@ -689,8 +693,8 @@ extension PollController: PollViewInput {
     
   }
   
-  func deleteComment(_: Comment) {
-    
+  func deleteComment(_ comment: Comment) {
+    controllerInput?.deleteComment(comment)
   }
 }
 

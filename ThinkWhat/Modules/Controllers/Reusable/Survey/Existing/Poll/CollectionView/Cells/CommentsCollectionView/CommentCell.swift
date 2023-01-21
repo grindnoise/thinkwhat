@@ -11,56 +11,29 @@ import Combine
 
 class CommentCell: UICollectionViewListCell {
   
-  // MARK: - Override
-  override var isSelected: Bool { didSet { updateAppearance() }}
-  
   // MARK: - Public properties
   public var item: Comment! {
     didSet {
       guard let item = item else { return }
       
-      //            setTasks()
-      menuButton.menu = prepareMenu()
-      menuButton.showsMenuAsPrimaryAction = true
+      updateUI()
       
-      if item.isOwn {
-        let bottomAnchor = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        bottomAnchor.priority = .defaultLow
-        bottomAnchor.isActive = true
-      } else {
-        verticalStack.addArrangedSubview(repliesView)
-        repliesView.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
-        let bottomAnchor = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        bottomAnchor.priority = .defaultHigh
-        bottomAnchor.isActive = true
-      }
-      
-      setHeader()
-      setBody()
-      
-      replyButton.alpha = item.isOwn ? 0 : 1
-      
-      if let userprofile = item.userprofile {
-        avatar.userprofile = userprofile.isCurrent ? Userprofiles.shared.current : userprofile
-      } else {
-        avatar.userprofile = Userprofile.anonymous
-      }
-      disclosureButton.alpha = 0
-      
-      if mode == .Root, item.replies != 0 {
-        disclosureButton.alpha = 1
-        let attrString = NSMutableAttributedString(string: "\(item.replies)", attributes: [
-          NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-          NSAttributedString.Key.foregroundColor: UIColor.systemBlue
-        ])
-        disclosureButton.setAttributedTitle(attrString, for: .normal)
-        
-        //                if let constraint = disclosureButton.getConstraint(identifier: "width") {
-        //                    repliesView.setNeedsLayout()
-        //                    constraint.constant = disclosureButton.titleLabel!.text!.width(withConstrainedHeight: disclosureButton.bounds.height, font: disclosureButton.titleLabel!.font)
-        //                    repliesView.layoutIfNeeded()
-        //                }
-      }
+      item.repliesPublisher
+        .receive(on: DispatchQueue.main)
+        .filter { $0 > 0 }
+        .sink { [weak self] in
+          guard let self = self,
+                self.mode == .Root
+          else { return }
+          
+          self.disclosureButton.alpha = 1
+          let attrString = NSMutableAttributedString(string: String(describing: $0), attributes: [
+            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+            NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+          ])
+          self.disclosureButton.setAttributedTitle(attrString, for: .normal)
+        }
+        .store(in: &subscriptions)
     }
   }
   public var mode: CommentsCollectionView.Mode = .Root {
@@ -86,9 +59,9 @@ class CommentCell: UICollectionViewListCell {
   public var deletePublisher = PassthroughSubject<Comment, Never>()
   public var threadPublisher = PassthroughSubject<Comment, Never>()
   
-//  public var commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
-//  public var claimSubject = CurrentValueSubject<Comment?, Never>(nil)
-//  public var deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
+  //  public var commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
+  //  public var claimSubject = CurrentValueSubject<Comment?, Never>(nil)
+  //  public var deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -147,17 +120,9 @@ class CommentCell: UICollectionViewListCell {
     avatar.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      //            firstnameLabel.topAnchor.constraint(equalTo: instance.topAnchor),
-      //            firstnameLabel.centerYAnchor.constraint(equalTo: lastnameLabel.centerYAnchor),
-      //            firstnameLabel.centerXAnchor.constraint(equalTo: lastnameLabel.centerXAnchor),
-      //            firstnameLabel.widthAnchor.constraint(equalTo: lastnameLabel.widthAnchor),
-      //            lastnameLabel.centerXAnchor.constraint(equalTo: avatar.centerXAnchor),
-      //            lastnameLabel.centerYAnchor.constraint(equalTo: avatar.centerYAnchor),
-      //            lastnameLabel.widthAnchor.constraint(equalTo: avatar.widthAnchor, multiplier: 1.8),
-      ////            avatar.topAnchor.constraint(equalTo: instance.topAnchor),
       avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
-      avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-      avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.75),
+      avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+      avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.9),
     ])
     return instance
   }()
@@ -329,6 +294,8 @@ class CommentCell: UICollectionViewListCell {
   //    private var closedConstraint: NSLayoutConstraint!
   //    private var openConstraint: NSLayoutConstraint!
   
+  
+  
   // MARK: - Destructor
   deinit {
     observers.forEach { $0.invalidate() }
@@ -340,10 +307,12 @@ class CommentCell: UICollectionViewListCell {
 #endif
   }
   
+  
+  
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setTasks()
+//    setTasks()
     setupUI()
   }
   
@@ -351,13 +320,62 @@ class CommentCell: UICollectionViewListCell {
     fatalError("init(coder:) has not been implemented")
   }
   
+  
+  
   // MARK: - Public methods
   public func hideDisclosure() {
     disclosureButton.alpha = 0
   }
   
-  // MARK: - Private methods
-  private func setupUI() {
+  
+  
+  // MARK: - Overriden methods
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+    menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+    setHeader()
+    
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    //Set dynamic font size
+    guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+    textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                      forTextStyle: .footnote)
+    guard let constraint = textView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
+    setNeedsLayout()
+    constraint.constant = textView.contentSize.height
+    layoutIfNeeded()
+  }
+  
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    
+    item = nil
+    //    commentThreadSubject = .init(nil)
+    //    replySubject = .init(nil)
+    //    claimSubject = .init(nil)
+    //    deleteSubject = .init(nil)
+    avatar.clearImage()
+    //        supplementaryStack.removeArrangedSubview(menuButton)
+    //        menuButton.removeFromSuperview()
+    verticalStack.removeArrangedSubview(repliesView)
+    repliesView.removeFromSuperview()
+    //        tasks.forEach { $0?.cancel() }
+    //        setTasks()
+  }
+  
+  override func updateConstraints() {
+    super.updateConstraints()
+    
+    separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -100).isActive = true
+    separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 100).isActive = true
+  }
+}
+
+  // MARK: - Private
+private extension CommentCell {
+  @MainActor
+  func setupUI() {
     backgroundColor = .clear
     clipsToBounds = true
     
@@ -387,58 +405,85 @@ class CommentCell: UICollectionViewListCell {
     //        bottomAnchor.isActive = true
   }
   
-  private func setTasks() {
-    //        guard mode == .Root else { return }
-    //        guard tasks.isEmpty else { return }
-    
-    tasks.append(Task { [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {
-        guard let self = self,
-              let instance = notification.object as? Comment,
-              instance == self.item,
-              self.mode == .Root
-        else { return }
+  @MainActor
+  func updateUI() {
+    func prepareMenu() -> UIMenu {
+      var actions: [UIAction]!
+      if item.isOwn {
+        let deleteAction : UIAction = .init(title: "delete".localized, image: UIImage(systemName: "trash.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
+          guard let self = self,
+                let instance = self.item
+          else { return }
+          
+          self.deletePublisher.send(instance)
+        })
+        actions = [deleteAction]
+      } else {
+        let replyAction : UIAction = .init(title: "reply".localized, image: UIImage(systemName: "arrowshape.turn.up.left.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+          guard let self = self,
+                let instance = self.item
+          else { return }
+          
+          self.replyPublisher.send(instance)
+        })
+        replyAction.accessibilityIdentifier = "reply"
         
-        await MainActor.run {
-          self.disclosureButton.alpha = self.mode == .Root ? 1 : 0
-          let attrString = NSMutableAttributedString(string: "\(instance.replies)", attributes: [
-            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-            NSAttributedString.Key.foregroundColor: UIColor.systemBlue
-          ])
-          self.disclosureButton.setAttributedTitle(attrString, for: .normal)
-        }
+        
+        let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
+          guard let self = self,
+                let instance = self.item
+          else { return }
+          
+          self.claimPublisher.send(instance)
+        })
+        actions = [claimAction, replyAction]
       }
-    })
-  }
-  
-  private func updateAppearance() {
+      
+      return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+    }
     
-  }
-  
-  @objc
-  private func reply() {
-    guard let item = item else { return }
+    menuButton.menu = prepareMenu()
+    menuButton.showsMenuAsPrimaryAction = true
     
-    replyPublisher.send(item)
-  }
-  
-  @objc
-  private func claim() {
-    guard let item = item else { return }
+    if item.isOwn {
+      let bottomAnchor = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+      bottomAnchor.priority = .defaultLow
+      bottomAnchor.isActive = true
+    } else {
+      verticalStack.addArrangedSubview(repliesView)
+      repliesView.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
+      let bottomAnchor = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
+      bottomAnchor.priority = .defaultHigh
+      bottomAnchor.isActive = true
+    }
     
-    claimPublisher.send(item)
-  }
-  
-  @objc
-  private func replies() {
-    guard let item = item,
-          item.replies != 0
-    else { return }
+    setHeader()
+    setBody()
     
-    threadPublisher.send(item)
+    replyButton.alpha = item.isOwn ? 0 : 1
+    
+    if let userprofile = item.userprofile {
+      avatar.userprofile = userprofile.isCurrent ? Userprofiles.shared.current : userprofile
+      if let answer = item.answer,
+         let image = UIImage(systemName: "\(answer.order+1).circle.fill") {
+        avatar.setChoiceBadge(image: image, color: Colors.getColor(forId: answer.order))
+      }
+    } else {
+      avatar.userprofile = Userprofile.anonymous
+    }
+    disclosureButton.alpha = 0
+    
+    if mode == .Root, item.replies != 0 {
+      disclosureButton.alpha = 1
+      let attrString = NSMutableAttributedString(string: "\(item.replies)", attributes: [
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+      ])
+      disclosureButton.setAttributedTitle(attrString, for: .normal)
+    }
   }
   
-  private func setHeader() {
+  func setHeader() {
     let attrString = NSMutableAttributedString()
     if !item.isAnonymous, let userprofile = item.userprofile {
       if !userprofile.firstNameSingleWord.isEmpty {
@@ -471,7 +516,7 @@ class CommentCell: UICollectionViewListCell {
     dateLabel.attributedText = attrString
   }
   
-  private func setBody() {
+  func setBody() {
     if mode == .Tree {
       let attrString = NSMutableAttributedString()
       if let survey = item.survey, survey.isAnonymous, let reply = item.replyTo {
@@ -509,80 +554,26 @@ class CommentCell: UICollectionViewListCell {
     }
   }
   
-  private func prepareMenu() -> UIMenu {
-    var actions: [UIAction]!
-    if item.isOwn {
-      let deleteAction : UIAction = .init(title: "delete".localized, image: UIImage(systemName: "trash.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
-        guard let self = self,
-              let instance = self.item
-        else { return }
-        
-        self.deletePublisher.send(instance)
-      })
-      actions = [deleteAction]
-    } else {
-      let replyAction : UIAction = .init(title: "reply".localized, image: UIImage(systemName: "arrowshape.turn.up.left.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
-        guard let self = self,
-              let instance = self.item
-        else { return }
-        
-        self.replyPublisher.send(instance)
-      })
-      replyAction.accessibilityIdentifier = "reply"
-      
-      
-      let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
-        guard let self = self,
-              let instance = self.item
-        else { return }
-        
-        self.claimPublisher.send(instance)
-      })
-      actions = [claimAction, replyAction]
-    }
+  @objc
+  func reply() {
+    guard let item = item else { return }
     
-    return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+    replyPublisher.send(item)
   }
   
-  // MARK: - Overriden methods
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-    menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-    setHeader()
+  @objc
+  func claim() {
+    guard let item = item else { return }
     
-    super.traitCollectionDidChange(previousTraitCollection)
-    
-    //Set dynamic font size
-    guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-    textView.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                      forTextStyle: .footnote)
-    guard let constraint = textView.getAllConstraints().filter({$0.identifier == "height"}).first else { return }
-    setNeedsLayout()
-    constraint.constant = textView.contentSize.height
-    layoutIfNeeded()
+    claimPublisher.send(item)
   }
   
-  override func prepareForReuse() {
-    super.prepareForReuse()
+  @objc
+  func replies() {
+    guard let item = item,
+          item.replies != 0
+    else { return }
     
-    item = nil
-//    commentThreadSubject = .init(nil)
-//    replySubject = .init(nil)
-//    claimSubject = .init(nil)
-//    deleteSubject = .init(nil)
-    avatar.clearImage()
-    //        supplementaryStack.removeArrangedSubview(menuButton)
-    //        menuButton.removeFromSuperview()
-    verticalStack.removeArrangedSubview(repliesView)
-    repliesView.removeFromSuperview()
-    //        tasks.forEach { $0?.cancel() }
-    //        setTasks()
-  }
-  
-  override func updateConstraints() {
-    super.updateConstraints()
-    
-    separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -100).isActive = true
-    separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 100).isActive = true
+    threadPublisher.send(item)
   }
 }

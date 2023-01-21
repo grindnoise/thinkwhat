@@ -165,7 +165,9 @@ class PollView: UIView {
         self.viewInput?.showVoters(for: $0)
       }
       .store(in: &subscriptions)
+    
     //Comments
+    //New comment
     instance.commentPublisher
       .sink { [weak self] in
         guard let self = self else { return }
@@ -173,6 +175,38 @@ class PollView: UIView {
         self.viewInput?.postComment(body: $0, replyTo: nil, username: nil)
       }
       .store(in: &subscriptions)
+    
+    //Reply
+    instance.replyPublisher
+      .sink { [weak self] in
+        guard let self = self,
+        let replyTo = $0.keys.first,
+        let text = $0.values.first
+        else { return }
+        
+        self.viewInput?.postComment(body: text, replyTo: replyTo, username: nil)
+      }
+      .store(in: &subscriptions)
+    //Reply
+    instance.deletePublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.deleteComment($0)
+      }
+      .store(in: &subscriptions)
+    
+    
+    
+    //Update comments stats (replies)
+    instance.commentsUpdateStatsPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.updateCommentsStats($0)
+      }
+      .store(in: &subscriptions)
+    
     
     isVotingPublisher
       .sink { instance.isVotingSubscriber.send($0) }

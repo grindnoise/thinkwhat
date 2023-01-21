@@ -30,54 +30,66 @@ class CommentsCollectionView: UICollectionView {
     didSet {
       guard let survey = survey else { return }
       
+      reload()
+      
       survey.commentAppendPublisher
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] in
-          guard let self = self else { return }
+        .filter { $0.isParentNode }
+        .sink { [weak self] comment in
+          guard let self = self,
+                !self.source.snapshot().itemIdentifiers.contains(comment)
+          else { return }
           
           var snap = self.source.snapshot()
           
           switch self.mode {
           case .Root:
-            //TODO: - Time sorting
-            guard let firstItem = snap.itemIdentifiers.first else  {
-              snap.appendItems([$0])
+            guard !snap.itemIdentifiers.isEmpty else {
+              //1. Empty
+              snap.appendItems([comment])
+              self.source.apply(snap, animatingDifferences: true)
+              
               return
             }
-            snap.appendItems([$0])
-//            snap.insertItems([$0], beforeItem: firstItem)
+            
+            //2. Compare
+            guard let newest = snap.itemIdentifiers.first,
+                  let oldest = snap.itemIdentifiers.last
+            else { return }
+            
+            //3. If newest comment in collection is older than added comment
+            if comment.createdAt >= newest.createdAt {
+              snap.insertItems([comment], beforeItem: newest)
+            } else if oldest.createdAt >= comment.createdAt  {
+              //4. If oldest comment in collection is newer than added comment
+              snap.appendItems([comment])
+            } else {
+              //5. 
+              if let item = snap.itemIdentifiers.filter({ comment.createdAt >= $0.createdAt }).first {
+                snap.insertItems([comment], beforeItem: item)
+              }
+            }
+            
           case .Tree:
             fatalError()
           }
           self.source.apply(snap, animatingDifferences: true)
         }
-        .store(in: &subscriptions)
+        .store(in: &self.subscriptions)
+     //Delete
+      survey.commentRemovePublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] comment in
+          guard let self = self,
+                self.source.snapshot().itemIdentifiers.contains(comment)
+          else { return }
+          
+          var snap = self.source.snapshot()
+          snap.deleteItems([comment])
+          self.source.apply(snap, animatingDifferences: true)
+        }
+        .store(in: &self.subscriptions)
       
-//      tasks.append( Task { [weak self] in
-//        for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Append) {
-//          guard let self = self,
-//                self.mode == .Root,
-//                let instance = notification.object as? Comment,
-//                !instance.isDeleted,
-//                instance.replyToId.isNil,
-//                instance.survey == self.survey
-//          else { return }
-//
-//          var snap = self.source.snapshot()
-//
-//          if instance.isOwn && abs(instance.createdAt.days(from: Date())) < 1, let firstItem = snap.itemIdentifiers.first, self.mode == .Root {
-//            snap.insertItems([instance], beforeItem: firstItem)
-//          } else {
-//            snap.appendItems([instance], toSection: .main)
-//          }
-//
-//          await MainActor.run {
-//            self.source.apply(snap, animatingDifferences: true)
-//          }
-//        }
-//      })
-      
-      reload()
     }
   }
   public weak var rootComment: Comment? {
@@ -96,6 +108,7 @@ class CommentsCollectionView: UICollectionView {
     return survey.commentsSortedByDate
   }
   //Publishers
+  public var updateStatsPublisher = PassthroughSubject<[Comment], Never>()
   public var commentPublisher = PassthroughSubject<String, Never>()
   public var anonCommentPublisher = PassthroughSubject<[String: String], Never>()
   public var replyPublisher = PassthroughSubject<[Comment: String], Never>()
@@ -162,6 +175,7 @@ class CommentsCollectionView: UICollectionView {
           guard let item = self.replyTo else { return }
           
           self.replyPublisher.send([item: $0.replacingOccurrences(of: self.textField.staticText + " ", with: "")])
+          
           return
         }
         self.commentPublisher.send($0)
@@ -359,6 +373,19 @@ class CommentsCollectionView: UICollectionView {
   }
   
   private func setupUI() {
+    Timer
+      .publish(every: 8, on: .current, in: .common)
+      .autoconnect()
+      .sink { [weak self] seconds in
+        guard let self = self,
+              let cells = self.visibleCells as? [CommentCell]
+        else { return }
+        
+        let items = cells.compactMap{ $0.item }
+        self.updateStatsPublisher.send(items)
+      }
+      .store(in: &subscriptions)
+    
     delegate = self
     //        addSubview(textField)
     collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
@@ -465,7 +492,7 @@ class CommentsCollectionView: UICollectionView {
         }
         .store(in: &self.subscriptions)
       
-      //Claim tap
+      //Delete own
       cell.deletePublisher.sink { [weak self] in
         guard let self = self else { return }
         

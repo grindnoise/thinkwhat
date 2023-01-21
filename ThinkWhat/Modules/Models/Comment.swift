@@ -58,11 +58,24 @@ class Comments {
 #endif
     }
   }
+  
+  func updateStats(_ json: JSON) {
+    guard let array = json.array else { return }
+    
+    array.forEach {
+      guard let id = $0["id"].int,
+            let comment = all.filter({ $0.id == id }).first,
+            let replies = $0["replies"].int
+      else { return }
+      
+      comment.replies = replies
+    }
+  }
 }
 
 class Comment: Decodable {
   private enum CodingKeys: String, CodingKey {
-    case id, survey, parent, children, body, replies
+    case id, survey, parent, children, body, replies, choice
     case userprofile        = "user"
     case anonUsername       = "name"
     case createdAt          = "created_on"
@@ -74,7 +87,13 @@ class Comment: Decodable {
   let body: String
   let surveyId: Int?
   let parentId: Int?
-  var replies: Int
+  var replies: Int {
+    didSet {
+      guard oldValue != replies else { return }
+      
+      repliesPublisher.send(replies)
+    }
+  }
   var survey: Survey? {
     return Surveys.shared.all.filter { $0.id == surveyId }.first
   }
@@ -128,6 +147,10 @@ class Comment: Decodable {
       isDeletedPublisher.send(completion: .finished)
       
       NotificationCenter.default.post(name: Notifications.Comments.Delete, object: self)
+      
+      guard let survey = survey else { return }
+      
+      survey.commentRemovePublisher.send(self)
     }
   }
   var isClaimed: Bool = false {
@@ -140,10 +163,19 @@ class Comment: Decodable {
       NotificationCenter.default.post(name: Notifications.Comments.Claim, object: self)
     }
   }
+  var answer: Answer? {
+    didSet {
+      guard let answer = answer else { return }
+      
+      choicePublisher.send(answer)
+    }
+  }
   //Publishers
   var isDeletedPublisher      = PassthroughSubject<Bool, Never>()
   var isClaimedPublisher      = PassthroughSubject<Bool, Never>()
   var isBannedPublisher       = PassthroughSubject<Bool, Never>()
+  var repliesPublisher        = PassthroughSubject<Int, Never>()
+  var choicePublisher         = PassthroughSubject<Answer, Never>()
   
   required init(from decoder: Decoder) throws {
     do {
@@ -161,6 +193,14 @@ class Comment: Decodable {
       replies         = try container.decode(Int.self, forKey: .replies)
       replyToId       = try container.decodeIfPresent(Int.self, forKey: .replyTo)
       parentId        = try container.decodeIfPresent(Int.self, forKey: .parent)
+      
+      if let choice = try container.decodeIfPresent(Int.self, forKey: .choice),
+         let survey = self.survey,
+         let answer = survey.answers.filter({ $0.id == choice }).first,
+         let userprofile = self.userprofile {
+        userprofile.choices[survey] = answer
+        self.answer = answer
+      }
       
       if Comments.shared.all.filter({ $0 == self }).isEmpty {
         Comments.shared.all.append(self)

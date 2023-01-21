@@ -1288,6 +1288,7 @@ class API {
       }
     }
     
+    //Requests stats updates for survey
     public func updateResultStats(_ instance: Survey) async throws {
       guard let url = API_URLS.Surveys.updateResults,
             let headers = headers
@@ -1308,6 +1309,28 @@ class API {
         throw error
       }
     }
+    
+    //Requests stats updates for comments
+    public func updateCommentsStats(_ comments: [Comment]) async throws {
+      guard let url = API_URLS.Surveys.updateCommentsStats,
+            let headers = headers
+      else { throw APIError.invalidURL }
+      
+      let parameters: Parameters = ["ids": comments.map { $0.id } ]
+
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: headers)
+        
+        Comments.shared.updateStats(try JSON(data: data, options: .mutableContainers))
+      } catch let error {
+        throw error
+      }
+    }
+    
     
     func markFavorite(mark: Bool, surveyReference: SurveyReference) async {
       guard let url = mark ? API_URLS.Surveys.addFavorite : API_URLS.Surveys.removeFavorite,
@@ -1399,6 +1422,7 @@ class API {
             //                        await MainActor.run {
             rootNode.replies += 1
             //                            survey.commentsTotal += 1
+            
             NotificationCenter.default.post(name: Notifications.Comments.ChildrenCountChange, object: rootNode)
             //                        }
           }
@@ -1454,6 +1478,7 @@ class API {
         await MainActor.run {
           Comments.shared.all.remove(object: comment)
           //                    NotificationCenter.default.post(name: Notifications.Comments.Delete, object: comment)
+          
           comment.isDeleted = true
         }
         

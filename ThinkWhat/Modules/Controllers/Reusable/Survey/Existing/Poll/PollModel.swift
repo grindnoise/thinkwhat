@@ -209,4 +209,16 @@ extension PollModel: PollControllerInput {
       }
     }
   }
+  
+  func updateCommentsStats(_ comments: [Comment]) {
+    Task {
+      do {
+        try await API.shared.surveys.updateCommentsStats(comments)
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
 }

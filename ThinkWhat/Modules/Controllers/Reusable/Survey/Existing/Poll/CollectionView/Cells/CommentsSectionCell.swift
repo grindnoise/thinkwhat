@@ -53,14 +53,15 @@ class CommentsSectionCell: UICollectionViewCell {
     }
   }
   //Publishers
-  public var commentPublisher = PassthroughSubject<String, Never>()
-  public var anonCommentPublisher = PassthroughSubject<[String: String], Never>()
-  public var replyPublisher = PassthroughSubject<[Comment: String], Never>()
-  public var anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
-  public var claimPublisher = PassthroughSubject<Comment, Never>()
-  public var deletePublisher = PassthroughSubject<Comment, Never>()
-  public var threadPublisher = PassthroughSubject<Comment, Never>()
-  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
+  public let updateStatsPublisher = PassthroughSubject<[Comment], Never>()
+  public let commentPublisher = PassthroughSubject<String, Never>()
+  public let anonCommentPublisher = PassthroughSubject<[String: String], Never>()
+  public let replyPublisher = PassthroughSubject<[Comment: String], Never>()
+  public let anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
+  public let claimPublisher = PassthroughSubject<Comment, Never>()
+  public let deletePublisher = PassthroughSubject<Comment, Never>()
+  public let threadPublisher = PassthroughSubject<Comment, Never>()
+  public let paginationPublisher = PassthroughSubject<[Comment], Never>()
   public let boundsPublisher = PassthroughSubject<Bool, Never>()
   //Publishers
 //  public let commentSubject = CurrentValueSubject<String?, Never>(nil)
@@ -235,6 +236,14 @@ class CommentsSectionCell: UICollectionViewCell {
         guard let self = self else { return }
         
         self.threadPublisher.send($0)
+      }
+      .store(in: &subscriptions)
+    
+    instance.updateStatsPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.updateStatsPublisher.send($0)
       }
       .store(in: &subscriptions)
     

@@ -324,8 +324,7 @@ class Survey: Decodable {
       
       
       
-      //Import comments
-      let _ = try container.decode([Comment].self, forKey: .comments)
+      
       //            comments = try container.decode([Comment].self, forKey: .comments)
       
       if let dict = try container.decodeIfPresent([String: Date].self, forKey: .result), !dict.isEmpty {
@@ -336,6 +335,10 @@ class Survey: Decodable {
         Surveys.shared.all.append(self)
       }
       //            getReference()
+      
+      //Import comments
+      let _ = try container.decode([Comment].self, forKey: .comments)
+      
       //Media
       if let first = reference.media {
         //Prevent duplicates

@@ -27,9 +27,10 @@ protocol PollViewInput: AnyObject {
   func onExitWithSkip()
   func showVoters(for: Answer)
   func postComment(body: String, replyTo: Comment?, username: String?)
-  func requestComments(_:[Comment])
+  func requestComments(_: [Comment])
+  func updateCommentsStats(_: [Comment])
   func openCommentThread(_: Comment)
-  func deleteComment(_:Comment)
+  func deleteComment(_: Comment)
 }
 
 protocol PollControllerInput: AnyObject {
@@ -44,6 +45,7 @@ protocol PollControllerInput: AnyObject {
   func addView()
   func updateResultsStats(_: Survey)
   func postComment(body: String, replyTo: Comment?, username: String?)
+  func updateCommentsStats(_: [Comment])
   func commentClaim(comment: Comment, reason: Claim)
   func requestComments(_:[Comment])
   func deleteComment(_:Comment)
