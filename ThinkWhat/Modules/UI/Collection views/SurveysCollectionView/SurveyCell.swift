@@ -276,7 +276,7 @@ class SurveyCell: UICollectionViewCell {
       imageContainer
     ])
     instance.axis = .vertical
-    instance.spacing = 8
+    instance.spacing = padding*2
     
     return instance
   }()
@@ -453,8 +453,11 @@ class SurveyCell: UICollectionViewCell {
                                                                              scale: .large)),
                       for: .normal)
     instance.tintColor = .systemGray4
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-    instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor,
+                                    multiplier: 1/1).isActive = true
+    instance.addTarget(self,
+                       action: #selector(self.handleTap(sender:)),
+                       for: .touchUpInside)
     
     return instance
   }()
@@ -465,8 +468,11 @@ class SurveyCell: UICollectionViewCell {
                                                                              scale: .large)),
                       for: .normal)
     instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-    instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor,
+                                    multiplier: 1/1).isActive = true
+    instance.addTarget(self,
+                       action: #selector(self.handleTap(sender:)),
+                       for: .touchUpInside)
     
     return instance
   }()

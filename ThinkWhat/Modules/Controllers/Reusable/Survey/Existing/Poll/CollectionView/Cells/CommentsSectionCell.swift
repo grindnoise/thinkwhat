@@ -72,11 +72,7 @@ class CommentsSectionCell: UICollectionViewCell {
 //  public let deleteSubject = CurrentValueSubject<Comment?, Never>(nil)
 //  public let commentThreadSubject = CurrentValueSubject<Comment?, Never>(nil)
 //  public let commentsRequestSubject = CurrentValueSubject<[Comment], Never>([])
-  public var lastPostedComment: Comment? {
-    didSet {
-      collectionView.lastPostedComment = lastPostedComment
-    }
-  }
+  
   
   
   
@@ -152,26 +148,23 @@ class CommentsSectionCell: UICollectionViewCell {
   }()
   private lazy var collectionView: CommentsCollectionView = {
     let instance = CommentsCollectionView(rootComment: nil)
+    instance.isScrollEnabled = true
     
     let constraint = instance.heightAnchor.constraint(equalToConstant: 1)
-//    constraint.priority = .required
     constraint.identifier = "height"
     constraint.isActive = true
     
-    observers.append(instance.observe(\.contentSize,
-                                       options: .new) { [weak self] view, change in
+    observers.append(instance.observe(\.contentSize, options: .new) { [weak self] view, change in
       guard let self = self,
-//            let constraint = self.collectionView.getAllConstraints().filter({ $0.identifier == "height" }).first,
             let value = change.newValue,
             value != .zero,
             value.height != constraint.constant
       else { return }
       
       self.setNeedsLayout()
-      constraint.constant = value.height
+      constraint.constant = value.height//min(value.height, UIScreen.main.bounds.height*0.75)
       self.layoutIfNeeded()
       self.boundsPublisher.send(true)
-      //            self.boundsListener?.onBoundsChanged(view.frame)
     })
     
     instance.claimPublisher
@@ -275,6 +268,8 @@ class CommentsSectionCell: UICollectionViewCell {
 #endif
   }
   
+  
+  
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -286,6 +281,8 @@ class CommentsSectionCell: UICollectionViewCell {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+  
+  
   
   // MARK: - Private methods
   private func setupUI() {
@@ -351,6 +348,8 @@ class CommentsSectionCell: UICollectionViewCell {
 //      }
 //    })
   }
+  
+  
   
   // MARK: - Overriden methods
   //  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

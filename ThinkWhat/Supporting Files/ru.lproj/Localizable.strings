@@ -22,8 +22,12 @@
 "minimum_limits" = "Минимальное количество участников - 10";
 "insufficient_balance" = "У Вас недостаточно баллов для публикации";
 "replies" = "Ответы";
+"replies_total" = "ответов";
 "reply" = "Ответить";
 "add_comment" = "Напишите комментарий";
+"add_reply" = "Напишите ответ";
+"comment_is_deleted" = "[Комментарий удален]";
+"comment_is_banned" = "[Комментарий заблокирован из-за жалоб]";
 "pseudonym" = "Аноним#";
 "pseudonym_placeholder" = "Ваш псевдоним";
 "add_pseudonym" = "Ввeдите псевдоним";

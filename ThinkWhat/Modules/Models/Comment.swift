@@ -71,6 +71,10 @@ class Comments {
       comment.replies = replies
     }
   }
+  
+  func commentsCount(for survey: Survey) -> Int {
+    return all.filter({ $0.surveyId == survey.id && !$0.isDeleted && !$0.isBanned && !$0.isClaimed }).count
+  }
 }
 
 class Comment: Decodable {
@@ -81,6 +85,8 @@ class Comment: Decodable {
     case createdAt          = "created_on"
     case childrenCount      = "children_count"
     case replyTo            = "reply_to"
+    case isBanned           = "is_banned"
+    case isDeleted          = "is_deleted"
   }
   
   let id: Int
@@ -137,6 +143,10 @@ class Comment: Decodable {
       isBannedPublisher.send(completion: .finished)
       
       NotificationCenter.default.post(name: Notifications.Comments.Ban, object: self)
+      
+      guard let survey = survey else { return }
+      
+      survey.commentBannedPublisher.send(self)
     }
   }
   var isDeleted: Bool = false {
@@ -161,6 +171,10 @@ class Comment: Decodable {
       isClaimedPublisher.send(completion: .finished)
       
       NotificationCenter.default.post(name: Notifications.Comments.Claim, object: self)
+      
+      guard let survey = survey else { return }
+      
+      survey.commentClaimedPublisher.send(self)
     }
   }
   var answer: Answer? {
@@ -193,6 +207,8 @@ class Comment: Decodable {
       replies         = try container.decode(Int.self, forKey: .replies)
       replyToId       = try container.decodeIfPresent(Int.self, forKey: .replyTo)
       parentId        = try container.decodeIfPresent(Int.self, forKey: .parent)
+      isBanned        = try container.decode(Bool.self, forKey: .isBanned)
+      isDeleted       = try container.decode(Bool.self, forKey: .isDeleted)
       
       if let choice = try container.decodeIfPresent(Int.self, forKey: .choice),
          let survey = self.survey,

@@ -35,6 +35,7 @@ class CommentsController: UIViewController {
     // MARK: - Initialization
     init(_ comment: Comment) {
         self.item = comment
+      
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -58,24 +59,32 @@ class CommentsController: UIViewController {
         self.view = view as UIView
         
         navigationController?.navigationBar.prefersLargeTitles = false
-        title = "replies".localized + " (\(item.replies))"
+        title = "replies".localized + ": \(item.replies)"
         setTasks()
     }
     
     // MARK: - Private methods
     private func setTasks() {
-        tasks.append(Task { [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {
-                guard let self = self,
-                      let instance = notification.object as? Comment,
-                      instance == self.item
-                else { return }
-                
-                await MainActor.run {
-                    self.title = "replies".localized + " (\(instance.replies))"
-                }
-            }
-        })
+      item.repliesPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.title = "replies".localized + ": \($0)"
+        }
+        .store(in: &subscriptions)
+//        tasks.append(Task { [weak self] in
+//            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {
+//                guard let self = self,
+//                      let instance = notification.object as? Comment,
+//                      instance == self.item
+//                else { return }
+//
+//                await MainActor.run {
+//                    self.title = "replies".localized + " (\(instance.replies))"
+//                }
+//            }
+//        })
     }
 }
 

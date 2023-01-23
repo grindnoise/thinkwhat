@@ -48,10 +48,12 @@ class PollController: UIViewController {
   
   
   // MARK: - Private properties
-  private var userHasVoted = false
   private var observers: [NSKeyValueObservation] = []
   private var tasks: [Task<Void, Never>?] = []
   private var subscriptions = Set<AnyCancellable>()
+  //Logic
+  private var userHasVoted = false
+  private var isOnScreen = false
   //UI
   private lazy var avatar: Avatar = { Avatar() }()
   private lazy var topicIcon: Icon = {
@@ -151,10 +153,22 @@ class PollController: UIViewController {
     //        navigationController?.delegate = appDelegate.transitionCoordinator
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    
+    isOnScreen = true
+  }
+  
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
     setupUI()
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    
+    isOnScreen = false
   }
   
   override func willMove(toParent parent: UIViewController?) {
@@ -224,6 +238,8 @@ private extension PollController {
           guard let self = self,
                 let survey = self.item.survey
           else { return }
+          
+          guard self.isOnScreen else { return }
           
           self.controllerInput?.updateResultsStats(survey)
         }
@@ -425,6 +441,8 @@ private extension PollController {
         guard let self = self,
               let survey = self.item.survey
         else { return }
+        
+        guard self.isOnScreen else { return }
         
         self.controllerInput?.updateResultsStats(survey)
       }
@@ -632,6 +650,8 @@ private extension PollController {
 // MARK: - Input
 extension PollController: PollViewInput {
   func updateCommentsStats(_ comments: [Comment]) {
+    guard isOnScreen else { return }
+    
     controllerInput?.updateCommentsStats(comments)
   }
   
@@ -689,8 +709,13 @@ extension PollController: PollViewInput {
     
   }
   
-  func openCommentThread(_: Comment) {
+  func openCommentThread(_ comment: Comment) {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
     
+    navigationController?.pushViewController(CommentsController(comment), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
   
   func deleteComment(_ comment: Comment) {

@@ -23,6 +23,9 @@ extension UserDefaults {
         
 //        @UserDefault(key: "username", defaultValue: nil)
 //        static var username: String?
+      
+      @UserDefault(key: "pseudonym", defaultValue: nil)
+      static var pseudonym: String?
         
         @UserDefault(key: "email", defaultValue: nil)
         static var email: String?
@@ -105,6 +108,7 @@ extension UserDefaults {
             UserDefaults.Profile.tiktokURL      = nil
             UserDefaults.Profile.vkURL          = nil
             UserDefaults.Profile.facebookURL    = nil
+          UserDefaults.Profile.pseudonym = nil
             if imagePath != nil {
                 try? FileIOController.delete(dataPath: imagePath!)
                 imagePath = nil
@@ -153,6 +157,7 @@ extension UserDefaults {
             UserDefaults.Profile.tiktokURL      = profile.tiktokURL
             UserDefaults.Profile.vkURL          = profile.vkURL
             UserDefaults.Profile.facebookURL    = profile.facebookURL
+//          UserDefaults.Profile.pseudonym    = profile.facebookURL
         }
 
     }

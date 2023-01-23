@@ -22,8 +22,12 @@
 "minimum_limits" = "At least 10 participants required";
 "insufficient_balance" = "You don't have enough points for this publication";
 "replies" = "Replies";
+"replies_total" = "replies";
 "reply" = "Reply";
 "add_comment" = "Add comment";
+"add_reply" = "Add reply";
+"comment_is_deleted" = "[Comment has been deleted]";
+"comment_is_banned" = "[Comment has been banned]";
 "pseudonym" = "Anonymous#";
 "pseudonym_placeholder" = "Your pseudonym";
 "add_pseudonym" = "Enter pseudonym";

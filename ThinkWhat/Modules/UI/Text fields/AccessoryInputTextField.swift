@@ -122,15 +122,17 @@ final class AccessoryInputTextField: UITextField {
     let instance = FlexibleTextView(minLength: 3, maxLength: 20)
     instance.placeholder = "pseudonym_placeholder".localized
     instance.accessibilityIdentifier = "usernameTextView"
-    instance.text = "pseudonym".localized
+    instance.text = !UserDefaults.Profile.pseudonym.isNil ? UserDefaults.Profile.pseudonym! : "pseudonym".localized + String(describing: Int.random(in: 1..<1000))
     instance.font = textViewFont
     instance.maxHeight = 80
     instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: 8, bottom: instance.contentInset.bottom, right: 8)
-    
-    observers.append(instance.observe(\FlexibleTextView.bounds, options: .new) { view, change in
-      guard let value = change.newValue else { return }
-      view.cornerRadius = value.height/2
-    })
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
+    instance.text.publisher
+      .filter { !$0.isEmpty }
+      .sink { UserDefaults.Profile.pseudonym = $0 }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -156,7 +158,9 @@ final class AccessoryInputTextField: UITextField {
     self.placeholderText = placeholder
     self.textViewFont = font
     self.isAnon = isAnon
+    
     super.init(frame: .zero)
+    
     setupUI()
   }
   
@@ -185,7 +189,7 @@ final class AccessoryInputTextField: UITextField {
   private func handleSend() {
     switch isAnon {
     case true:
-      guard usernameTextView.text.count > ModelProperties.shared.anonMinLength else {
+      guard usernameTextView.text.count >= ModelProperties.shared.anonMinLength else {
         let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
                                                               text: "add_pseudonym",
                                                               tintColor: .systemOrange),

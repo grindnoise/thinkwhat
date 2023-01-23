@@ -211,7 +211,13 @@ class Avatar: UIView {
     didSet {
       guard let userprofile = userprofile else { return }
       
+      guard userprofile != Userprofile.anonymous else {
+        imageView.image = UIImage(named: "anon")
+        
+        return
+      }
       
+      setImage(for: userprofile)
       //            userprofile.image.publisher
       //                .receive(on: DispatchQueue.main)
       //                .map { $0 }
@@ -226,6 +232,8 @@ class Avatar: UIView {
       //                }
       //                .store(in: &subscriptions)
       
+      
+      
       userprofile.imagePublisher
         .receive(on: DispatchQueue.main)
         .sink(receiveCompletion: { error in
@@ -239,7 +247,7 @@ class Avatar: UIView {
         })
         .store(in: &subscriptions)
       
-      setImage(for: userprofile)
+      
     }
   }
   public var isSelected: Bool = false {

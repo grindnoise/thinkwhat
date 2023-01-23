@@ -54,14 +54,6 @@ class CommentsView: UIView {
             
         }.store(in: &subscriptions)
         
-//        instance.commentSubject.sink { [weak self] in
-//            guard let self = self,
-//                  let string = $0
-//            else { return }
-//
-//
-//        }.store(in: &subscriptions)
-        
         instance.replyPublisher.sink { [weak self] in
             guard let self = self,
                   let replyObject = $0.keys.first,

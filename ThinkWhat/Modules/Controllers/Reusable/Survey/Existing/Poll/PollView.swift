@@ -175,7 +175,17 @@ class PollView: UIView {
         self.viewInput?.postComment(body: $0, replyTo: nil, username: nil)
       }
       .store(in: &subscriptions)
-    
+    //New anon comment
+    instance.anonCommentPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let text = $0.values.first,
+              let username = $0.keys.first
+        else { return }
+        
+        self.viewInput?.postComment(body: text, replyTo: nil, username: username)
+      }
+      .store(in: &subscriptions)
     //Reply
     instance.replyPublisher
       .sink { [weak self] in
@@ -187,7 +197,20 @@ class PollView: UIView {
         self.viewInput?.postComment(body: text, replyTo: replyTo, username: nil)
       }
       .store(in: &subscriptions)
-    //Reply
+    //Anon reply
+    instance.anonReplyPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let dict = $0.values.first,
+              let replyTo = $0.keys.first,
+              let username = dict.keys.first,
+              let text = dict.values.first
+        else { return }
+        
+        self.viewInput?.postComment(body: text, replyTo: replyTo, username: username)
+      }
+      .store(in: &subscriptions)
+    //Delete
     instance.deletePublisher
       .sink { [weak self] in
         guard let self = self else { return }
@@ -196,7 +219,14 @@ class PollView: UIView {
       }
       .store(in: &subscriptions)
     
-    
+    //Thread
+    instance.threadPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.openCommentThread($0)
+      }
+      .store(in: &subscriptions)
     
     //Update comments stats (replies)
     instance.commentsUpdateStatsPublisher

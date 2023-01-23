@@ -1412,6 +1412,7 @@ class API {
         survey.commentsTotal += 1
         
         NotificationCenter.default.post(name: Notifications.Comments.Post, object: nil)
+        survey.survey?.commentPostedPublisher.send(instance)
         
         //Root comment children count increase notification
         if let replyTo = replyTo {
@@ -1419,12 +1420,7 @@ class API {
           let rootNode: Comment? = replyTo.isParentNode ? replyTo : replyTo.parent
           
           if let rootNode = rootNode {
-            //                        await MainActor.run {
             rootNode.replies += 1
-            //                            survey.commentsTotal += 1
-            
-            NotificationCenter.default.post(name: Notifications.Comments.ChildrenCountChange, object: rootNode)
-            //                        }
           }
         }
         
@@ -1478,8 +1474,9 @@ class API {
         await MainActor.run {
           Comments.shared.all.remove(object: comment)
           //                    NotificationCenter.default.post(name: Notifications.Comments.Delete, object: comment)
-          
           comment.isDeleted = true
+          
+          if let survey = comment.survey { survey.commentsTotal -= 1 }
         }
         
       } catch let error {

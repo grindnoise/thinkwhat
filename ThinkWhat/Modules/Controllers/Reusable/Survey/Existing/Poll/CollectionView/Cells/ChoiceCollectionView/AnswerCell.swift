@@ -405,7 +405,12 @@ private extension AnswerCell {
             self.percentageLabel.textColor = color
             self.checkmark.alpha = (self.isAnswerSelected || self.isChosen) ? 1 : 0
             self.percentageLabel.alpha = 1
-            self.disclosureIndicator.alpha = self.item.totalVotes == 0 ? 0 : 1
+            if survey.isAnonymous {
+              self.votersView.alpha = 0
+              self.disclosureIndicator.alpha = 0
+            } else {
+              self.disclosureIndicator.alpha = self.item.totalVotes == 0 ? 0 : 1
+            }
             self.votersLabel.alpha = 1
           } else {
             self.imageView.tintColor = self.isAnswerSelected ? survey.topic.tagColor : .systemGray
@@ -446,6 +451,10 @@ private extension AnswerCell {
         percentageView.setPercent(value: item.percent, animated: false)
         stackView.backgroundColor = !isChosen ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.1)
 //        setVoters()
+        if survey.isAnonymous {
+          votersView.alpha = 0
+          disclosureIndicator.alpha = 0
+        }
       } else {
 //        setNeedsLayout()
         openConstraint.isActive = false
@@ -461,11 +470,13 @@ private extension AnswerCell {
   
   @MainActor
   func setVoters() {
-    guard votersView.alpha == 0 else { return }
+    guard votersView.alpha == 0,
+          let survey = item.survey
+    else { return }
     
     let color = Colors.getColor(forId: item.order)
     
-    votersView.alpha = 1
+    votersView.alpha = survey.isAnonymous ? 0 : 1
     votersLabel.text = item.totalVotes == 0 ? "no_votes".localized.uppercased() : item.totalVotes.roundedWithAbbreviations
     votersLabel.textColor = item.totalVotes == 0 ? .secondaryLabel : color
     

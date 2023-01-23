@@ -245,8 +245,11 @@ class Survey: Decodable {
   }
   
   //Publishers
+  public let commentPostedPublisher = PassthroughSubject<Comment, Never>()
   public let commentAppendPublisher = PassthroughSubject<Comment, Never>()
   public let commentRemovePublisher = PassthroughSubject<Comment, Never>()
+  public let commentBannedPublisher = PassthroughSubject<Comment, Never>()
+  public let commentClaimedPublisher = PassthroughSubject<Comment, Never>()
   ///Convert to dict to create new survey
   //    var dict: [String: Any] {
   //        var _dict: [String: Any] = [:]
@@ -576,7 +579,7 @@ class Surveys {
     guard let id = json["id"].int,
           let survey = Surveys.shared.all.filter({ $0.id == id }).first,
           let progress = json["progress"].int,
-          //              let votesTotal = json["votes_total"].int,
+          let votesTotal = json["votes_total"].int,
           let rating = json["rating"].double,
           let answers = json["answers"].array,
           let commentsTotal = json["comments_total"].int,
@@ -586,6 +589,7 @@ class Surveys {
     survey.rating = rating
     survey.progress = progress
     survey.commentsTotal = commentsTotal
+    survey.votesTotal = votesTotal
     
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategyFormatters = [
