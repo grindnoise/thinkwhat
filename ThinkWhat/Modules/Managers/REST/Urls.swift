@@ -47,6 +47,7 @@ struct API_URLS {
         static let removeFavorite:      URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/remove_favorite/")}()
         static let updateStats:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_survey_stats/")}()
         static let updateResults:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_result_stats/")}()
+        static let getSurveyState:      URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_publication_state/")}()
         static let updateCommentsStats: URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_comments_stats/")}()
         static let postComment:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/post_comment/")}()
         static let claimComment:        URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/claim_comment/")}()

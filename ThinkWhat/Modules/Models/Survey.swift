@@ -11,6 +11,7 @@ import SwiftyJSON
 import Combine
 
 class Survey: Decodable {
+  // MARK: - Enums
   enum SurveyCategory: String, CaseIterable {
     case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic, Search, ByOwner
     
@@ -86,6 +87,7 @@ class Survey: Decodable {
     case Poll = "Poll"
     case Ranking = "Ranking"
   }
+  
   private enum CodingKeys: String, CodingKey {
     case active,
          id,
@@ -116,10 +118,16 @@ class Survey: Decodable {
          isHot = "is_hot",
          isOwn = "is_own",
          isComplete = "is_complete",
+         isBanned = "is_banned",
          shareLink = "share_link"
   }
   
-  var active:                 Bool
+  // MARK: - Properties
+  var isActive:               Bool {
+    didSet {
+      reference.isActive = isActive
+    }
+  }
   var id:                     Int
   var title:                  String
   var startDate:              Date
@@ -194,9 +202,10 @@ class Survey: Decodable {
       reference.isHot = isHot
     }
   }
-  var isBanned: Bool = false {
+  var isBanned: Bool {
     didSet {
-      guard isBanned else { return }
+      guard oldValue != isBanned else { return }
+      
       reference.isBanned = isBanned
     }
   }
@@ -298,7 +307,7 @@ class Survey: Decodable {
         owner = Userprofiles.shared.all.filter({ $0.id == _owner!.id }).first ?? _owner!
       }
       topic                   = _topic
-      active                  = try container.decode(Bool.self, forKey: .active)
+      isActive                = try container.decode(Bool.self, forKey: .active)
       id                      = try container.decode(Int.self, forKey: .id)
       progress                = try container.decode(Int.self, forKey: .progress)
       title                   = try container.decode(String.self, forKey: .title)
@@ -321,6 +330,7 @@ class Survey: Decodable {
       isHot                   = try container.decode(Bool.self, forKey: .isHot)
       isOwn                   = try container.decode(Bool.self, forKey: .isOwn)
       isComplete              = try container.decode(Bool.self, forKey: .isComplete)
+      isBanned                = try container.decode(Bool.self, forKey: .isBanned)
       let shareData           = try container.decode([String].self, forKey: .shareLink)
       shareHash               = shareData.first ?? ""
       shareEncryptedString    = shareData.last ?? ""
@@ -411,7 +421,25 @@ class Survey: Decodable {
     //        guard let existing = SurveyReferences.shared.all.filter({ $0.id == self.id && $0.topic == $0.topic && $0.title == self.title }).first
     guard let existing = SurveyReferences.shared.all.filter({ $0.id == self.id }).first
     else {
-      let instance = SurveyReference(id: id, title: title, description: description, startDate: startDate, topic: topic, type: type, likes: likes, views: views, isOwn: isOwn, isComplete: isComplete, isFavorite: isFavorite, isHot: isHot, survey: self, owner: owner, isAnonymous: isAnonymous, progress: progress, rating: rating)
+      let instance = SurveyReference(id: id,
+                                     title: title,
+                                     description: description,
+                                     startDate: startDate,
+                                     topic: topic,
+                                     type: type,
+                                     likes: likes,
+                                     views: views,
+                                     isOwn: isOwn,
+                                     isBanned: isBanned,
+                                     isActive: isActive,
+                                     isComplete: isComplete,
+                                     isFavorite: isFavorite,
+                                     isHot: isHot,
+                                     survey: self,
+                                     owner: owner,
+                                     isAnonymous: isAnonymous,
+                                     progress: progress,
+                                     rating: rating)
       //            SurveyReferences.shared.all.append(instance)
       return instance
     }
@@ -567,11 +595,15 @@ class Surveys {
             let progress = i.1["progress"].int,
             let comments = i.1["comments"].int,
             let rating = i.1["rating"].double,
+            let active = i.1["active"].bool,
+            let isBanned = i.1["is_banned"].bool,
             let views = i.1["views"].int else { return }
       instance.progress = progress
       instance.rating = rating
       instance.commentsTotal = comments
       instance.views = views
+      instance.isActive = active
+      instance.isBanned = isBanned
     }
   }
   
@@ -582,6 +614,8 @@ class Surveys {
           let votesTotal = json["votes_total"].int,
           let rating = json["rating"].double,
           let answers = json["answers"].array,
+          let isActive = json["active"].bool,
+          let isBanned = json["is_banned"].bool,
           let commentsTotal = json["comments_total"].int,
           let comments = try? json["comments"].rawData()
     else { return }
@@ -590,6 +624,8 @@ class Surveys {
     survey.progress = progress
     survey.commentsTotal = commentsTotal
     survey.votesTotal = votesTotal
+    survey.isActive = isActive
+    survey.isBanned = isBanned
     
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategyFormatters = [

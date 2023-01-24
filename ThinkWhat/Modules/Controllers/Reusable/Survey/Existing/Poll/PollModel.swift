@@ -19,6 +19,21 @@ class PollModel {
 
 // MARK: - Controller Input
 extension PollModel: PollControllerInput {
+  func updateSurveyState(_ instance: SurveyReference) {
+    Task {
+      do {
+        try await API.shared.surveys.getSurveyState(instance)
+      } catch {
+        await MainActor.run {
+          modelOutput?.commentDeleteError()
+        }
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
+  
   func deleteComment(_ comment: Comment) {
     Task {
       do {
@@ -156,6 +171,10 @@ extension PollModel: PollControllerInput {
         }
         answer.survey?.resultDetails = resultDetails
         answer.survey?.isComplete = true
+        if let current = Userprofiles.shared.current, !answer.voters.contains(current) {
+          answer.voters.append(current)
+        }
+          
         await MainActor.run {
           modelOutput?.onVoteCallback(.success(true))
         }

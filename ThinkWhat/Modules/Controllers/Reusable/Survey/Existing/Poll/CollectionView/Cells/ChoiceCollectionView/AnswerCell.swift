@@ -35,6 +35,11 @@ class AnswerCell: UICollectionViewCell {
           self.updatePublisher.send(true)
           
           self.updateUI()
+          DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            guard let self = self else { return }
+            
+            self.observeVoters()
+          }
         }
         .store(in: &subscriptions)
       //Update stats
@@ -55,15 +60,9 @@ class AnswerCell: UICollectionViewCell {
         }
         .store(in: &subscriptions)
       
+      guard survey.reference.isComplete else { return }
       //Voters append
-      item.votersPublisher
-        .receive(on: DispatchQueue.main)
-        .sink { [weak self] in
-          guard let self = self else { return }
-          
-          self.appendVoter(userprofile: $0)
-        }
-        .store(in: &subscriptions)
+      observeVoters()
     }
   }
   //Publishers
@@ -582,16 +581,29 @@ private extension AnswerCell {
     }
   }
   
+  func observeVoters() {
+    guard let item = item else { return }
+    
+    item.votersPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.appendVoter(userprofile: $0)
+      }
+      .store(in: &subscriptions)
+  }
+  
   //Live voters update
   func appendVoter(userprofile: Userprofile) {
-    setVoters()
-
+//    setVoters()
+    votersView.alpha = 1
     let color = Colors.getColor(forId: item.order)
-    
+
     guard avatars.map({ $0.userprofile }).filter({ $0 == userprofile }).isEmpty else { return }
-    
+
     self.votersLabel.text = self.item.totalVotes == 0 ? "no_votes".localized.uppercased() : self.item.totalVotes.roundedWithAbbreviations
-    
+
     let avatar = Avatar(isBordered: true,
                         borderColor: (isChosen || isAnswerSelected) ? (traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.1)) : .clear)
     avatar.layer.zPosition = 10
@@ -604,13 +616,13 @@ private extension AnswerCell {
 //      .filter { $0 }
       .sink { [weak self] _ in
         guard let self = self else { return }
-        
+
         self.votersPublisher.send(self.item)
       }
       .store(in: &subscriptions)
     avatar.heightAnchor.constraint(equalTo: votersView.heightAnchor).isActive = true
     avatar.widthAnchor.constraint(equalTo: avatar.heightAnchor, multiplier: 1/1).isActive = true
-    
+
     //Check if it's a first voter
     if avatars.isEmpty, let widthConstraint = votersView.getConstraint(identifier: "width") {
       let constraint = avatar.centerXAnchor.constraint(equalTo: votersView.centerXAnchor)
@@ -626,10 +638,10 @@ private extension AnswerCell {
         widthConstraint.constant = self.votersView.bounds.height
         self.layoutIfNeeded()
       } completion: { _ in }
-      
+
       return
     }
-    
+
     switch avatars.count {
     case 1:
       let constraint = avatar.centerXAnchor.constraint(equalTo: votersView.centerXAnchor,
@@ -637,17 +649,17 @@ private extension AnswerCell {
 //                                                       constant: (isChosen || isAnswerSelected) ? votersView.bounds.height/4 : -votersView.bounds.height/4)
       constraint.identifier = "centerXAnchor"
       constraint.isActive = true
-      
+
       guard let last = avatars.last,
             let lastConstraint = last.getConstraint(identifier: "centerXAnchor"),
             let widthConstraint = votersView.getConstraint(identifier: "width")
       else { return }
-      
+
       avatar.layer.zPosition = 10
       last.layer.zPosition = last.layer.zPosition - 1
 //      avatar.layer.zPosition = (isChosen || isAnswerSelected) ? last.layer.zPosition - 1 : 10
 //      last.layer.zPosition = (isChosen || isAnswerSelected) ? last.layer.zPosition : last.layer.zPosition - 1
-      
+
       avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
       UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.35, delay: 0, animations: {
         avatar.alpha = 1
@@ -676,21 +688,21 @@ private extension AnswerCell {
         constraint.identifier = "centerXAnchor"
         constraint.isActive = true
 //      }
-      
+
       guard let leading = avatars.first,
             let trailing = avatars.last,
             let leadingConstraint = leading.getConstraint(identifier: "centerXAnchor"),
             let trailingConstraint = trailing.getConstraint(identifier: "centerXAnchor"),
             let widthConstraint = votersView.getConstraint(identifier: "width")
       else { return }
-      
+
 //      if isChosen {
 //        avatar.layer.zPosition = leading.layer.zPosition - 1
 //        trailing.layer.zPosition -= 1
 //      } else {
         avatars.forEach { $0.layer.zPosition -= 1}
 //      }
-      
+
       avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
       UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.35, delay: 0, animations: {
         avatar.alpha = 1
@@ -724,7 +736,7 @@ private extension AnswerCell {
         constraint.identifier = "centerXAnchor"
         constraint.isActive = true
 //      }
-      
+
       guard let leading = avatars.first,
             let middle = avatars[1] as? Avatar,
             let trailing = avatars.last,
@@ -732,7 +744,7 @@ private extension AnswerCell {
             let middleConstraint = middle.getConstraint(identifier: "centerXAnchor"),
             let trailingConstraint = trailing.getConstraint(identifier: "centerXAnchor")
       else { return }
-      
+
 //      if isChosen || isAnswerSelected {
 //        avatar.layer.zPosition = leading.layer.zPosition - 1
 //        middle.layer.zPosition -= 1
@@ -740,7 +752,7 @@ private extension AnswerCell {
 //      } else {
         avatars.forEach { $0.layer.zPosition -= 1}
 //      }
-      
+
       avatar.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
       UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.35, delay: 0, animations: {
         avatar.alpha = 1

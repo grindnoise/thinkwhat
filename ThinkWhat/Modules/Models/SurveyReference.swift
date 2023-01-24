@@ -15,7 +15,7 @@ class SurveyReference: Decodable {// NSObject,
 //    static let null: SurveyReference = SurveyReference(id: 0)
     
     private enum CodingKeys: String, CodingKey {
-        case id, type, title, category, likes, views, progress, rating, description, share_link,
+        case id, type, title, category, likes, views, progress, rating, description, share_link, active,
              startDate = "start_date",
              isComplete = "is_complete",
              isOwn = "is_own",
@@ -26,6 +26,7 @@ class SurveyReference: Decodable {// NSObject,
              commentsTotal = "comments_total",
              isHot = "is_hot",
              isAnonymous = "is_anonymous",
+             isBanned = "is_banned",
              media = "media_preview"
     }
     
@@ -37,15 +38,22 @@ class SurveyReference: Decodable {// NSObject,
     //        hasher.combine(topic)
     //        return hasher.finalize()
     //    }
-    
-    var id: Int
-    var title: String
-    //    @objc dynamic var title: String
-    //    public let titleKeyPath = \SurveyReference.title
-    var startDate: Date
-    
-    var topic: Topic
-    var truncatedDescription: String
+  
+  var id: Int
+  var title: String
+  //    @objc dynamic var title: String
+  //    public let titleKeyPath = \SurveyReference.title
+  var startDate: Date
+  var isActive:               Bool {
+    didSet {
+      guard isActive != oldValue else { return }
+      
+      survey?.isActive = isActive
+      isActivePublisher.send(isActive)
+    }
+  }
+  var topic: Topic
+  var truncatedDescription: String
     //    var completionPercentage: Int
     var rating: Double {
         didSet {
@@ -123,11 +131,12 @@ class SurveyReference: Decodable {// NSObject,
             survey?.isFavorite = isFavorite
         }
     }
-    var isBanned: Bool = false {
+    var isBanned: Bool {
         didSet {
-            guard isBanned else { return }
+          guard oldValue != isBanned else { return }
             
-            isBannedPublisher.send(isBanned)
+          survey?.isBanned = isBanned
+          isBannedPublisher.send(isBanned)
 //            isBannedPublisher.send(completion: .finished)
             
             NotificationCenter.default.post(name: Notifications.Surveys.Ban, object: self)
@@ -192,6 +201,7 @@ class SurveyReference: Decodable {// NSObject,
     //Publishers
     var surveyPublisher         = PassthroughSubject<Survey, Never>()
     var ratingPublisher         = PassthroughSubject<Double, Never>()
+    var isActivePublisher       = PassthroughSubject<Bool, Never>()
     var isFavoritePublisher     = PassthroughSubject<Bool, Never>()
     var isCompletePublisher     = PassthroughSubject<Bool, Never>()
     var isClaimedPublisher      = PassthroughSubject<Bool, Never>()
@@ -216,6 +226,7 @@ class SurveyReference: Decodable {// NSObject,
                 throw "Type not defined"
             }
             isAnonymous             = try container.decode(Bool.self, forKey: .isAnonymous)
+            isActive             = try container.decode(Bool.self, forKey: .active)
             owner                   = Userprofile.anonymous
             let _owner              = try container.decodeIfPresent(Userprofile.self, forKey: .owner)
             if !_owner.isNil {
@@ -238,6 +249,7 @@ class SurveyReference: Decodable {// NSObject,
             isOwn       = try container.decode(Bool.self, forKey: .isOwn)
             isFavorite  = try container.decode(Bool.self, forKey: .isFavorite)
             isHot       = try container.decode(Bool.self, forKey: .isHot)
+          isBanned       = try container.decode(Bool.self, forKey: .isBanned)
             progress    = try container.decode(Int.self, forKey: .progress)
             let shareData           = try container.decode([String].self, forKey: .share_link)
             shareHash               = shareData.first ?? ""
@@ -274,10 +286,12 @@ class SurveyReference: Decodable {// NSObject,
         self.likes                   = 0
         self.views                   = 0
         self.type                    = .Poll
+        self.isActive                = true
         self.isOwn                   = true
         self.isHot                   = true
         self.isComplete              = true
         self.isFavorite              = true
+      self.isBanned = false
         self.votesTotal              = 0
         self.commentsTotal           = 0
         self.votesLimit              = 0
@@ -297,6 +311,8 @@ class SurveyReference: Decodable {// NSObject,
          likes: Int = 0,
          views: Int = 0,
          isOwn: Bool,
+         isBanned: Bool,
+         isActive: Bool,
          isComplete: Bool,
          isFavorite: Bool,
          isHot: Bool,
@@ -329,6 +345,8 @@ class SurveyReference: Decodable {// NSObject,
         self.truncatedDescription    = description
         self.progress                = progress
         self.rating                  = rating
+        self.isActive                = isActive
+      self.isBanned = isBanned
         
         //Swift
         if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {

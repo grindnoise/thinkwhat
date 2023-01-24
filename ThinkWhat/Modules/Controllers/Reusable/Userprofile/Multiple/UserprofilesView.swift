@@ -57,11 +57,19 @@ class UserprofilesView: UIView {
     paginationPublisher
       .sink { [unowned self] in
         guard !$0.isNil,
-              let viewInput = self.viewInput,
-              let userprofile = viewInput.userprofile
+              let viewInput = self.viewInput
         else { return }
 
-        self.viewInput?.loadUsers(for: userprofile, mode: viewInput.mode)
+        switch viewInput.mode {
+        case .Subscribers, .Subscriptions:
+          guard let userprofile = viewInput.userprofile else { return }
+          
+          self.viewInput?.loadUsers(for: userprofile, mode: viewInput.mode)
+        case .Voters:
+          guard let answer = viewInput.answer else { return }
+          
+          self.viewInput?.loadVoters(for: answer)
+        }
       }
       .store(in: &subscriptions)
 

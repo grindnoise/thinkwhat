@@ -121,6 +121,7 @@ class ListController: UIViewController, TintColorable {
 //        guard let main = tabBarController as? MainController else { return }
 //
 //        main.toggleLogo(on: true)
+      isOnScreen = true
     }
     
     override func viewDidAppear(_ animated: Bool) {

@@ -410,8 +410,9 @@ private extension UserprofilesCollectionView {
   
   @MainActor
   func reloadDataSource(items: [Userprofile], animated: Bool = true) {
-    guard !source.isNil else { return }
-    guard !dataItems.isEmpty else {
+    guard !source.isNil,
+          !dataItems.isEmpty
+    else {
       refreshPublisher.send(true)
       return
     }

@@ -46,6 +46,7 @@ protocol PollControllerInput: AnyObject {
   func updateResultsStats(_: Survey)
   func postComment(body: String, replyTo: Comment?, username: String?)
   func updateCommentsStats(_: [Comment])
+  func updateSurveyState(_: SurveyReference)
   func commentClaim(comment: Comment, reason: Claim)
   func requestComments(_:[Comment])
   func deleteComment(_:Comment)

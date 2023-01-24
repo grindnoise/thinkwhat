@@ -1541,19 +1541,75 @@ class API {
     }
     
     @discardableResult
-    public func getVoters(for answer: Answer) async throws -> Data {
+    public func getVoters(for answer: Answer) async throws -> [Userprofile] {
       guard let url = API_URLS.Surveys.voters,
             let headers = headers
       else { throw APIError.invalidURL }
       
       let parameters: Parameters = ["survey_id": answer.surveyID, "answer_id": answer.id, "exclude_ids": answer.voters.map({ return $0.id })]
-      
+#if DEBUG
+      print(parameters)
+#endif
       do {
-        return try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategyFormatters = [
+          DateFormatter.ddMMyyyy,
+          DateFormatter.dateTimeFormatter,
+          DateFormatter.dateFormatter
+        ]
+        var container: [Userprofile] = []
+        let instances = try decoder.decode([Userprofile].self, from: data)
+        instances.forEach { instance in
+          if let existing = Userprofiles.shared.all.filter({ $0 == instance }).first {
+            container.append(existing)
+          } else {
+            container.append(instance)
+          }
+        }
+        
+        return container.uniqued()
       } catch let error {
         throw error
       }
     }
+    
+    public func getSurveyState(_ instance: SurveyReference) async throws {
+      guard let url = API_URLS.Surveys.getSurveyState,
+            let headers = headers
+      else { throw APIError.invalidURL }
+        
+      let parameters: Parameters = ["id": instance.id]
+      
+      do {
+        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        
+        let json = try JSON(data: data, options:  .mutableContainers)
+        
+        guard let isActive = json["active"].bool,
+              let isBanned = json["is_banned"].bool
+        else { return }
+        
+        instance.isActive = isActive
+        instance.isBanned = isBanned
+      } catch let error {
+        throw error
+      }
+    }
+//    @discardableResult
+//    public func getVoters(for answer: Answer, exclude: [Userprofile]) async throws -> Data {
+//      guard let url = API_URLS.Surveys.voters,
+//            let headers = headers
+//      else { throw APIError.invalidURL }
+//
+//      let parameters: Parameters = ["survey_id": answer.surveyID, "answer_id": answer.id, "exclude_ids": answer.voters.map({ return $0.id })]
+//
+//      do {
+//        return try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+//      } catch let error {
+//        throw error
+//      }
+//    }
     
     func post(_ parameters: Parameters) async throws {
       guard let url = API_URLS.Surveys.root,

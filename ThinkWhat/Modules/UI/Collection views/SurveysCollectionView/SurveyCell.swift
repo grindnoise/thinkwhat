@@ -79,6 +79,7 @@ class SurveyCell: UICollectionViewCell {
         progressView
       ])
       nestedStack.axis = .horizontal
+      nestedStack.accessibilityIdentifier = "nestedStack"
       nestedStack.spacing = 4
       
       let stack = UIStackView(arrangedSubviews: [
@@ -788,6 +789,16 @@ private extension SurveyCell {
       }
       .store(in: &itemSubscriptions)
     
+    item.isActivePublisher
+      .receive(on: DispatchQueue.main)
+      .filter { !$0 }
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.setFinished()
+      }
+      .store(in: &itemSubscriptions)
+    
     item.commentsTotalPublisher
       .receive(on: DispatchQueue.main)
       .sink { [weak self] count in
@@ -1024,6 +1035,33 @@ private extension SurveyCell {
       color.cgColor,
       color.lighter(0.05).cgColor,
     ]
+  }
+  
+  func setFinished() {
+    guard !item.isActive,
+          let stack = headerView.getSubview(type: UIStackView.self, identifier: "nestedStack")
+    else { return }
+    
+    let imageView = UIImageView(image: UIImage(systemName: "flag.checkered.2.crossed"))
+    imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : .black
+    imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 1/1).isActive = true
+    imageView.contentMode = .center
+    imageView.alpha = 0
+    
+    UIView.animate(withDuration: 0.2) { [weak self] in
+      guard let self = self else { return }
+      
+      self.progressView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+      self.progressView.alpha = 0
+    } completion: { _ in
+      stack.removeArrangedSubview(self.progressView)
+      stack.spacing = self.padding
+      stack.addArrangedSubview(imageView)
+      self.progressView.removeFromSuperview()
+      UIView.animate(withDuration: 0.15) {
+        imageView.alpha = 1
+      }
+    }
   }
 }
 
