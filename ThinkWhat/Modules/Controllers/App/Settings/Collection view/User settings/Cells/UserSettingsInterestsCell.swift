@@ -51,27 +51,11 @@ class UserSettingsInterestsCell: UICollectionViewListCell {
 
         instance.interestPublisher
             .sink { [weak self] in
-                guard let self = self,
-                      let topic = $0
-                else { return }
+                guard let self = self else { return }
                 
-                self.interestPublisher.send(topic)
+                self.interestPublisher.send($0)
             }
             .store(in: &subscriptions)
-        
-//        let stack = UIStackView(arrangedSubviews: [tiktokIcon, tiktokTextField, tiktokButton])
-//        stack.axis = .horizontal
-//        stack.spacing = 8
-//
-//        instance.addSubview(stack)
-//        stack.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            stack.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 0),
-//            stack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -0),
-//            stack.topAnchor.constraint(equalTo: instance.topAnchor),
-//            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-//        ])
         
         return instance
     }()

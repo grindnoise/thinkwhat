@@ -127,6 +127,10 @@ extension Date {
         if seconds(from: date) > 0 { return "\(seconds(from: date))s" }
         return ""
     }
+  
+  static func dateComponents(from: Date, to: Date) -> DateComponents {
+    return Calendar.current.dateComponents([.day, .month, .year], from: from, to: to)
+  }
 }
 
 extension DateFormatter {

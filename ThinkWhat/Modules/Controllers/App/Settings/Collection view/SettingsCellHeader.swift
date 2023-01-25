@@ -264,13 +264,27 @@ class SettingsCellHeader: UICollectionReusableView {
             print("")
         }
         
-        let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
-        banner.present(content: PopupContent(parent: banner,
-                                             systemImage: "lightbulb.circle.fill",
-                                             text: text.localized,
-                                             buttonTitle: "ok",
-                                             fixedSize: false,
-                                             spacing: 24))
+      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "lightbulb.fill")!,
+                                                            text: text,
+                                                            tintColor: .systemYellow,
+                                                            fontName: Fonts.Semibold,
+                                                            textStyle: .headline,
+                                                            textAlignment: .natural),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 2)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
+      
+//        let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
+//        banner.present(content: PopupContent(parent: banner,
+//                                             systemImage: "lightbulb.circle.fill",
+//                                             text: text.localized,
+//                                             buttonTitle: "ok",
+//                                             fixedSize: false,
+//                                             spacing: 24))
     }
     
     
@@ -285,18 +299,3 @@ class SettingsCellHeader: UICollectionReusableView {
     }
 }
 
-extension SettingsCellHeader: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let banner = sender as? Popup {
-            banner.removeFromSuperview()
-        }
-    }
-}

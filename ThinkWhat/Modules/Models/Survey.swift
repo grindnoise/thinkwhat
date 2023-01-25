@@ -775,7 +775,12 @@ class Surveys {
   
   private func startTimer() {
     guard timer == nil else { return }
-    timer = Timer.scheduledTimer(timeInterval: TimeIntervals.ClearRejectedSurveys, target: self, selector: #selector(Surveys.clearRejectedSurveys), userInfo: nil, repeats: true)
+    
+    timer = Timer.scheduledTimer(timeInterval: TimeIntervals.ClearRejectedSurveys,
+                                 target: self,
+                                 selector: #selector(Surveys.clearRejectedSurveys),
+                                 userInfo: nil,
+                                 repeats: true)
     timer?.fire()
   }
 }

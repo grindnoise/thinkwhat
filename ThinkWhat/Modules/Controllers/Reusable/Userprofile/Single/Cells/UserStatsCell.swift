@@ -1,15 +1,15 @@
 //
-//  UserInterestsCell.swift
+//  UserStatsCell.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 03.11.2022.
-//  Copyright © 2022 Pavel Bukharov. All rights reserved.
+//  Created by Pavel Bukharov on 25.01.2023.
+//  Copyright © 2023 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 import Combine
 
-class UserInterestsCell: UICollectionViewListCell {
+class UserStatsCell: UICollectionViewListCell {
     
     // MARK: - Public properties
     public weak var userprofile: Userprofile! {
@@ -20,7 +20,7 @@ class UserInterestsCell: UICollectionViewListCell {
         }
     }
     //Publishers
-    public let topicPublisher = PassthroughSubject<Topic, Never>()
+//    public let topicPublisher = PassthroughSubject<Topic, Never>()
     
     
     
@@ -57,7 +57,7 @@ class UserInterestsCell: UICollectionViewListCell {
     private lazy var label: UILabel = {
         let instance = UILabel()
         instance.textColor = .secondaryLabel
-        instance.text = "interests".localized.uppercased()
+        instance.text = "stats".localized.uppercased()
         instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
         
         let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
@@ -79,8 +79,8 @@ class UserInterestsCell: UICollectionViewListCell {
 
         return instance
     }()
-    private lazy var collectionView: InterestsCollectionView = {
-        let instance = InterestsCollectionView()
+    private lazy var collectionView: UserStatsCollectionView = {
+        let instance = UserStatsCollectionView()
         instance.backgroundColor = .clear
         
         let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
@@ -100,13 +100,13 @@ class UserInterestsCell: UICollectionViewListCell {
             }
             .store(in: &subscriptions)
 
-        instance.interestPublisher
-            .sink { [weak self] in
-                guard let self = self else { return }
-                
-                self.topicPublisher.send($0)
-            }
-            .store(in: &subscriptions)
+//        instance.interestPublisher
+//            .sink { [weak self] in
+//                guard let self = self else { return }
+//
+//                self.topicPublisher.send($0)
+//            }
+//            .store(in: &subscriptions)
         
         return instance
     }()
@@ -154,7 +154,7 @@ class UserInterestsCell: UICollectionViewListCell {
 //    }
 }
 
-private extension UserInterestsCell {
+private extension UserStatsCell {
     @MainActor
     func setupUI() {
         backgroundColor = .clear
@@ -164,4 +164,5 @@ private extension UserInterestsCell {
                          insets: UIEdgeInsets(top: padding, left: padding, bottom: 0, right: padding))
     }
 }
+
 

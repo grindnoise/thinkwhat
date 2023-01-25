@@ -115,3 +115,16 @@ extension Publishers {
                                                                               times: times))
   }
 }
+
+//Exmaple
+//var logger = TimeLogger(sinceOrigin: true)
+//
+//let publisher = Publishers.timer(interval: .seconds(1), times: .max(6))
+//
+//let subscription = publisher.sink {
+//  print("rawValue: \($0)", to: &logger)
+//}
+//
+//DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+//  subscription.cancel()
+//}

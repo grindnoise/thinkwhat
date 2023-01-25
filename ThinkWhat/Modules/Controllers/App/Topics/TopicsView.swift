@@ -145,7 +145,8 @@ class TopicsView: UIView {
         let instance = SurveysCollectionView(category: .Search)
         instance.backgroundColor = .clear
         instance.alpha = 0
-        
+      instance.isOnScreen = false
+      
         //Pagination #2
         let paginationByTopicPublisher = instance.paginationByTopicPublisher
             .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
@@ -309,6 +310,7 @@ class TopicsView: UIView {
             self.viewInput?.setNavigationBarTintColor(topic.tagColor)
             self.touchLocation = point
             self.surveysCollectionView.topic = topic
+          self.surveysCollectionView.isOnScreen = true
             self.toggleDateFilter(on: true)
             self.setBackgroundColor()//.secondarySystemBackground)
             self.surveysCollectionView.alpha = 1
@@ -688,6 +690,7 @@ extension TopicsView: TopicsControllerOutput {
 //    }
     
     func onDefaultMode(color: UIColor? = nil) {
+      surveysCollectionView.isOnScreen = false
         surveysCollectionView.alpha = 1
 //        collectionView.backgroundColor = background.backgroundColor
         reveal(present: false, location: CGPoint(x: bounds.maxX, y: bounds.minY)/*touchLocation*/, view: surveysCollectionView, color: color ?? surveysCollectionView.topic!.tagColor, fadeView: collectionView, duration: 0.3)
@@ -696,6 +699,7 @@ extension TopicsView: TopicsControllerOutput {
     }
     
     func onSearchMode() {
+      surveysCollectionView.isOnScreen = false
         surveysCollectionView.category = .Search
         surveysCollectionView.alpha = 1
         surveysCollectionView.backgroundColor = background.backgroundColor

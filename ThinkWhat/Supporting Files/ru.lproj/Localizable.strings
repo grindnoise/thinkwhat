@@ -375,3 +375,6 @@
 "open_url_embedded" = "Открыть в приложении";
 "open_url_in_app" = "Открыть в ";
 "save_setting" = "Сохранить";
+
+//Userprofile
+"userprofile_is_in_community" = "В сообществе";

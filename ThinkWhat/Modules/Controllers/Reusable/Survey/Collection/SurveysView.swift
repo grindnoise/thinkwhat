@@ -96,21 +96,21 @@ class SurveysView: UIView {
             else { return }
 
             self.viewInput?.onSurveyTapped(instance)
-        }
+            }
             .store(in: &subscriptions)
-
-        //Update stats (exclude refs)
-        instance.updateStatsPublisher
-            .sink { [weak self] in
-            guard let self = self,
-                  let instances = $0
-            else { return }
-
-            self.viewInput?.updateSurveyStats(instances)
+      
+      //Update stats (exclude refs)
+      instance.updateStatsPublisher
+        .sink { [weak self] in
+          guard let self = self,
+                let instances = $0
+          else { return }
+          
+          self.viewInput?.updateSurveyStats(instances)
         }
-            .store(in: &subscriptions)
-
-        //Add to watch list
+        .store(in: &subscriptions)
+      
+      //Add to watch list
         instance.watchSubject.sink {
             print($0)
         } receiveValue: { [weak self] in
@@ -226,6 +226,10 @@ class SurveysView: UIView {
 
 // MARK: - Controller Output
 extension SurveysView: SurveysControllerOutput {
+  func viewDidDisappear() {
+    collectionView.deinitPublisher.send(true)
+  }
+  
     
     func onRequestCompleted(_: Result<Bool, Error>) {
         collectionView.endRefreshing()

@@ -128,6 +128,7 @@ class Userprofile: Decodable {
     instance!.vkURL = nil
     instance!.instagramURL = nil
     instance!.facebookURL = nil
+    instance!.dateJoined = Date()
     return instance!
   }()
   
@@ -136,6 +137,7 @@ class Userprofile: Decodable {
          isBanned = "is_banned",
          birthDate = "birth_date",
          firstName = "first_name",
+         dateJoined = "date_joined",
          lastName = "last_name",
          imageURL = "image",
          instagramURL = "instagram_url",
@@ -176,6 +178,7 @@ class Userprofile: Decodable {
     return "\(firstName) \(lastName)"
   }
   var email: String
+  var dateJoined: Date
   var birthDate: Date? {
     didSet {
       guard let birthDate = birthDate,
@@ -484,6 +487,7 @@ class Userprofile: Decodable {
     email       = _email
     gender      = _gender
     isBanned    = _isBanned
+    dateJoined  = UserDefaults.Profile.dateJoined ?? Date()
     subscribedAt = false
     imageURL    = UserDefaults.Profile.imageURL
     if let path = UserDefaults.Profile.imagePath, let _image = UIImage(contentsOfFile: path) {
@@ -502,6 +506,7 @@ class Userprofile: Decodable {
     tiktokURL       = UserDefaults.Profile.tiktokURL
     vkURL           = UserDefaults.Profile.vkURL
     facebookURL     = UserDefaults.Profile.facebookURL
+//    dateJoined      = UserDefaults.Profile.dateJoined ?? Date()
   }
   
   required init(from decoder: Decoder) throws {
@@ -516,6 +521,7 @@ class Userprofile: Decodable {
       if let _birthDate   = try container.decodeIfPresent(String.self, forKey: .birthDate) {
         birthDate = _birthDate.toDate()
       }
+      dateJoined          = try container.decode(Date.self, forKey: .dateJoined)
       imageURL            = URL(string: try container.decodeIfPresent(String.self, forKey: .imageURL) ?? "")
       favoritesTotal      = try container.decode(Int.self, forKey: .favoritesTotal)
       completeTotal       = try container.decode(Int.self, forKey: .completeTotal)

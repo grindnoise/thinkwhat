@@ -101,6 +101,8 @@ class AnswerCell: UICollectionViewCell {
     return true
   }
   //UI
+  private let padding: CGFloat = 8
+  private let lineSpacing: CGFloat = 4
   private var avatars: [Avatar] = []
   private lazy var horizontalStack: UIStackView = {
     let spacer = UIView.opaque()
@@ -214,8 +216,6 @@ class AnswerCell: UICollectionViewCell {
     
     return instance
   }()
-  private let padding: CGFloat = 8
-  private let lineSpacing: CGFloat = 4
   private lazy var stackView: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
       textView,

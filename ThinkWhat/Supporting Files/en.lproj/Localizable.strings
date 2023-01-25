@@ -375,3 +375,6 @@
 "open_url_embedded" = "Open in app";
 "open_url_in_app" = "Open in ";
 "save_setting" = "Save";
+
+//Userprofile
+"userprofile_is_in_community" = "Is in community";

@@ -27,7 +27,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
     public var googlePublisher = CurrentValueSubject<String?, Never>(nil)
     public var twitterPublisher = CurrentValueSubject<String?, Never>(nil)
     public var openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
-    public var keyboardWillAppear = PassthroughSubject<Bool, Never>()
+    public let keyboardWillAppear = PassthroughSubject<Bool, Never>()
     //UI
     public var color: UIColor = Colors.System.Red.rawValue {
         didSet {
@@ -492,18 +492,3 @@ extension UserSettingsSocialMediaCell: UITextFieldDelegate {
     }
 }
 
-extension UserSettingsSocialMediaCell: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let popup = sender as? Popup {
-            popup.removeFromSuperview()
-        }
-    }
-}

@@ -541,7 +541,21 @@ private extension UserSettingsCredentialsCell {
                 await MainActor.run {
                     self.avatar.imageUploadFinished(image)
                     
-                    showBanner(bannerDelegate: self, text: "image_uploaded".localized, content: UIImageView(image: UIImage(systemName: "photo", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemGreen, shadowed: true)
+                  let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "photo")!,
+                                                                        text: "image_uploaded",
+                                                                        tintColor: .systemOrange,
+                                                                        fontName: Fonts.Semibold,
+                                                                        textStyle: .headline,
+                                                                        textAlignment: .natural),
+                                         contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                         isModal: false,
+                                         useContentViewHeight: true,
+                                         shouldDismissAfter: 2)
+                  banner.didDisappearPublisher
+                    .sink { _ in banner.removeFromSuperview() }
+                    .store(in: &self.subscriptions)
+                  
+//                    showBanner(bannerDelegate: self, text: "".localized, content: UIImageView(image: UIImage(systemName: "photo", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemGreen, shadowed: true)
                 }
             }
         })
@@ -554,7 +568,21 @@ private extension UserSettingsCredentialsCell {
                       instance.isCurrent
                 else { return }
                     
-                showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemRed, shadowed: true)
+              let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                                    text: AppError.server.localizedDescription.localized,
+                                                                    tintColor: .systemOrange,
+                                                                    fontName: Fonts.Semibold,
+                                                                    textStyle: .headline,
+                                                                    textAlignment: .natural),
+                                     contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                     isModal: false,
+                                     useContentViewHeight: true,
+                                     shouldDismissAfter: 2)
+              banner.didDisappearPublisher
+                .sink { _ in banner.removeFromSuperview() }
+                .store(in: &self.subscriptions)
+              
+//                showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemRed, shadowed: true)
             }
         })
     }
@@ -573,7 +601,9 @@ private extension UserSettingsCredentialsCell {
     func editAge() {
         Fade.shared.present()
         let _ = ageTextField.becomeFirstResponder()
+      
         guard let date = Userprofiles.shared.current?.birthDate else { return }
+      
         datePicker.date = date
     }
     
@@ -763,18 +793,18 @@ extension UserSettingsCredentialsCell: UsernameInputTextFieldDelegate {
     }
 }
 
-extension UserSettingsCredentialsCell: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let popup = sender as? Popup {
-            popup.removeFromSuperview()
-        }
-    }
-}
+//extension UserSettingsCredentialsCell: BannerObservable {
+//    func onBannerWillAppear(_ sender: Any) {}
+//
+//    func onBannerWillDisappear(_ sender: Any) {}
+//
+//    func onBannerDidAppear(_ sender: Any) {}
+//
+//    func onBannerDidDisappear(_ sender: Any) {
+//        if let banner = sender as? Banner {
+//            banner.removeFromSuperview()
+//        } else if let popup = sender as? Popup {
+//            popup.removeFromSuperview()
+//        }
+//    }
+//}

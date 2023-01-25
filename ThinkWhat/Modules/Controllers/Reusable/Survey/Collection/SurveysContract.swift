@@ -49,4 +49,5 @@ protocol SurveysControllerOutput: AnyObject {
     var viewInput: SurveysViewInput? { get set }
     
     func onRequestCompleted(_: Result<Bool, Error>)
+  func viewDidDisappear()
 }

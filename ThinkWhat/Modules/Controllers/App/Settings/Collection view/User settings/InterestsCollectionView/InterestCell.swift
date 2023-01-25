@@ -10,106 +10,102 @@ import UIKit
 import Combine
 
 class InterestCell: UICollectionViewCell {
-    
-    // MARK: - Public properties
-    public weak var item: Topic! {
-        didSet {
-            guard let item = item else { return }
-            
-            label.text = item.title.uppercased()
-            label.backgroundColor = item.tagColor
-        }
+  
+  // MARK: - Public properties
+  public weak var item: Topic! {
+    didSet {
+      guard !item.isNil else { return }
+      
+      setupUI()
     }
-    //Publishers
-    public var interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
+  }
+  //Publishers
+  public let interestPublisher = PassthroughSubject<Topic, Never>()
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  //UI
+  private lazy var topicIcon: Icon = {
+    let instance = Icon(category: item.iconCategory)
+    instance.iconColor = .white
+    instance.isRounded = false
+    instance.clipsToBounds = false
+    instance.scaleMultiplicator = 1.85
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     
-    // MARK: - Private properties
-    private var observers: [NSKeyValueObservation] = []
-    private var subscriptions = Set<AnyCancellable>()
-    private var tasks: [Task<Void, Never>?] = []
-    //UI
-    private lazy var label: UILabel = {
-        let instance = UILabel()
-        instance.isUserInteractionEnabled = true
-        instance.text = "test"
-        instance.backgroundColor = .systemRed
-        instance.textAlignment = .center
-        instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
-        instance.textColor = .white
-        let recognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleTap))
-        recognizer.numberOfTapsRequired = 1
-        instance.addGestureRecognizer(recognizer)
-        instance.clipsToBounds = true
-        instance.publisher(for: \.bounds, options: .new)
-            .sink { rect in
-                instance.cornerRadius = rect.height/2.25
-            }
-            .store(in: &subscriptions)
-       
-        return instance
-    }()
+    return instance
+  }()
+  private lazy var topicTitle: InsetLabel = {
+    let instance = InsetLabel()
+    instance.font = UIFont(name: Fonts.Bold, size: 14)
+    instance.text = item.title.uppercased()
+    instance.textColor = .white
+    instance.isUserInteractionEnabled = true
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
     
-    // MARK: - Deinitialization
-    deinit {
-        observers.forEach { $0.invalidate() }
-        tasks.forEach { $0?.cancel() }
-        subscriptions.forEach { $0.cancel() }
-        NotificationCenter.default.removeObserver(self)
+    return instance
+  }()
+  private lazy var topicView: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [
+      topicIcon,
+      topicTitle
+    ])
+    instance.backgroundColor = item.tagColor
+    instance.axis = .horizontal
+    instance.spacing = 2
+    instance.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero}
+      .sink { instance.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  
+  
+  
+  // MARK: - Deinitialization
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
 #if DEBUG
-        print("\(String(describing: type(of: self))).\(#function)")
+    print("\(String(describing: type(of: self))).\(#function)")
 #endif
-    }
+  }
+  
+  // MARK: - Initialization
+  override init(frame: CGRect) {
+    super.init(frame: .zero)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  
+  
+  // MARK: - Private methods
+  private func setupUI() {
+    topicView.place(inside: contentView,
+                    insets: UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 4))
+  }
+  
+  @objc
+  private func handleTap() {
     
-    // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: .zero)
-        setupUI()
-    }
+    guard let item = item else { return }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: - Public methods
-    
-    // MARK: - Private methods
-    private func setupUI() {
-        contentView.backgroundColor = .clear
-        clipsToBounds = true
-        
-        contentView.addSubview(label)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
-            label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
-            label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
-        ])
-    }
-    
-    @objc
-    private func handleTap() {
-        
-        guard let item = item else { return }
-        
-        interestPublisher.send(item)
-    }
-    
-    // MARK: - Overridden methods
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        
-        interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
-    }
+    interestPublisher.send(item)
+  }
+  
+//  override func prepareForReuse() {
+//    super.prepareForReuse()
+//
+//    interestPublisher = CurrentValueSubject<Topic?, Never>(nil)
+//  }
 }

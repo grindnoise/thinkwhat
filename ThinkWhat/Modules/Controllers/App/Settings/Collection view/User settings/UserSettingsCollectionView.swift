@@ -227,7 +227,7 @@ class UserSettingsCollectionView: UICollectionView {
         let socialCellRegistration = UICollectionView.CellRegistration<UserSettingsSocialMediaCell, AnyHashable> { [unowned self] cell, indexPath, item in
             cell.keyboardWillAppear
                 .sink { [unowned self] _ in
-                    self.scrollToItem(at: indexPath, at: .top, animated: true)
+//                    self.scrollToItem(at: indexPath, at: .top, animated: true)
                 }
                 .store(in: &self.subscriptions)
             
@@ -417,11 +417,11 @@ class UserSettingsCollectionView: UICollectionView {
             switch section {
             case .City:
                 supplementaryView.mode = .City
-                supplementaryView.isBadgeEnabled = userprofile.cityTitle.isEmpty ? true : false
+                supplementaryView.isBadgeEnabled = false//userprofile.cityTitle.isEmpty ? true : false
             case .SocialMedia:
                 supplementaryView.mode = .SocialMedia
                 supplementaryView.isHelpEnabled = true
-                supplementaryView.isBadgeEnabled = userprofile.hasSocialMedia ? false : true
+                supplementaryView.isBadgeEnabled = false//userprofile.hasSocialMedia ? false : true
             case .Interests:
                 supplementaryView.mode = .Interests
                 supplementaryView.isHelpEnabled = true

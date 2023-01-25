@@ -324,10 +324,12 @@ private extension MainController {
               let notify = userprofile.notifyOnPublication
         else { return }
         
-        let banner = Banner(fadeBackground: false)
-        banner.present(content: UserNotificationContent(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication,
-                                                        userprofile: userprofile),
-                       dismissAfter: 0.75)
+        let banner = NewBanner(contentView: UserNotificationContent(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication,
+                                                                    userprofile: userprofile),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 1)
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
@@ -340,14 +342,15 @@ private extension MainController {
               let userprofile = dict.values.first
         else { return }
         
-        let banner = Banner(fadeBackground: false)
-        banner.present(content: UserNotificationContent(mode: .Subscribe,
-                                                        userprofile: userprofile),
-                       dismissAfter: 0.75)
+        let banner = NewBanner(contentView: UserNotificationContent(mode: .Subscribe,
+                                                                    userprofile: userprofile),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 1)
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
-        
       }
     })
     tasks.append(Task {@MainActor [weak self] in
@@ -357,10 +360,12 @@ private extension MainController {
               let userprofile = dict.values.first
         else { return }
         
-        let banner = Banner(fadeBackground: false)
-        banner.present(content: UserNotificationContent(mode: .Unsubscribe,
-                                                        userprofile: userprofile),
-                       dismissAfter: 0.75)
+        let banner = NewBanner(contentView: UserNotificationContent(mode: .Unsubscribe,
+                                                                    userprofile: userprofile),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 1)
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
