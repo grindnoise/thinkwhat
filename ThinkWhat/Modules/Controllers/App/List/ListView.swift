@@ -32,6 +32,13 @@ class ListView: UIView {
             }
         }
     }
+  public var isOnScreen: Bool = true {
+    didSet {
+      guard oldValue != isOnScreen else { return }
+              
+      collectionView.isOnScreen = isOnScreen
+    }
+  }
     
     
     

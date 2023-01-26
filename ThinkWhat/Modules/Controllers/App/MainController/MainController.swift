@@ -324,7 +324,7 @@ private extension MainController {
               let notify = userprofile.notifyOnPublication
         else { return }
         
-        let banner = NewBanner(contentView: UserNotificationContent(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication,
+        let banner = NewBanner(contentView: UserBannerContentView(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication,
                                                                     userprofile: userprofile),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
@@ -342,7 +342,7 @@ private extension MainController {
               let userprofile = dict.values.first
         else { return }
         
-        let banner = NewBanner(contentView: UserNotificationContent(mode: .Subscribe,
+        let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
                                                                     userprofile: userprofile),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
@@ -360,7 +360,7 @@ private extension MainController {
               let userprofile = dict.values.first
         else { return }
         
-        let banner = NewBanner(contentView: UserNotificationContent(mode: .Unsubscribe,
+        let banner = NewBanner(contentView: UserBannerContentView(mode: .Unsubscribe,
                                                                     userprofile: userprofile),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,

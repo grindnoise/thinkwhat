@@ -23,4 +23,7 @@ extension Int {
             return "\(self)"
         }
     }
+  var isZero: Bool {
+    return self == 0
+  }
 }

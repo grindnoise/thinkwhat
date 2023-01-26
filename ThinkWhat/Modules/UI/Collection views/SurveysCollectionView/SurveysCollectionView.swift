@@ -195,18 +195,23 @@ class SurveysCollectionView: UICollectionView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  init(category: Survey.SurveyCategory, color: UIColor? = nil) {
+  init(category: Survey.SurveyCategory,
+       color: UIColor? = nil) {
     self.category = category
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
     setupUI()
     setTasks()
+    
     guard let color = color else { return }
+    
     self.color = color
+    setColors()
   }
   
-  init(topic: Topic?, color: UIColor? = nil) {
+  init(topic: Topic,
+       color: UIColor? = nil) {
     self.topic = topic
     self.category = .Topic
     
@@ -215,11 +220,17 @@ class SurveysCollectionView: UICollectionView {
     setupUI()
     setTasks()
     
-    guard let color = color else { return }
+    guard let color = color else {
+      self.color = topic.tagColor
+      
+      return
+    }
     self.color = color
+    setColors()
   }
   
-  init(items: [SurveyReference], color: UIColor? = nil) {
+  init(items: [SurveyReference],
+       color: UIColor? = nil) {
     self.fetchResult = items
     self.category = .Search
     
@@ -231,9 +242,25 @@ class SurveysCollectionView: UICollectionView {
     guard let color = color else { return }
     
     self.color = color
+    setColors()
   }
   
-  
+  init(userprofile: Userprofile,
+       category: Survey.SurveyCategory,
+       color: UIColor? = nil) {
+    self.userprofile = userprofile
+    self.category = category
+    
+    super.init(frame: .zero, collectionViewLayout: .init())
+    
+    setupUI()
+    setTasks()
+    
+    guard let color = color else { return }
+    
+    self.color = color
+    setColors()
+  }
   
   // MARK: - Public methods
   @MainActor @objc
@@ -344,7 +371,7 @@ private extension SurveysCollectionView {
       return sectionLayout
     }
     
-    contentInset.bottom = category == .Topic ? 80 : 0
+    contentInset.bottom = (category == .ByOwner || category == .Topic) ? 80 : 0
     
     let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { [unowned self] cell, indexPath, item in
       cell.item = item
@@ -474,6 +501,7 @@ private extension SurveysCollectionView {
       .autoconnect()
       .sink { [weak self] _ in
         guard let self = self,
+              self.isOnScreen,
               self.category != .ByOwner,
               self.source.snapshot().itemIdentifiers.count != self.filterByPeriod(self.dataItems).count
         else { return }
@@ -489,9 +517,9 @@ private extension SurveysCollectionView {
       .autoconnect()
       .sink { [weak self] _ in
         guard let self = self,
+              self.isOnScreen,
               self.visibleCells.count < 4,
-              self.dataItems.count < 4,
-              self.isOnScreen
+              self.dataItems.count < 4
         else { return }
 
         self.requestData()

@@ -378,3 +378,9 @@
 
 //Userprofile
 "userprofile_is_in_community" = "В сообществе";
+"userprofile_subscribers" = "Подписчиков";
+"userprofile_publications_created" = "Публикаций создано";
+"userprofile_community_contribution" = "Вклад в сообщество";
+"userprofile_votes_received" = "Голосов получено";
+"userprofile_comments_received" = "Комментариев получено";
+"userprofile_comments_posted" = "Комментариев оставлено";

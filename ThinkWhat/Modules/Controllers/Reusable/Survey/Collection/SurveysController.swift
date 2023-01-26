@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class SurveysController: UIViewController {
+class SurveysController: UIViewController, TintColorable {
   
   // MARK: - Overridden properties
   override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -22,7 +22,10 @@ class SurveysController: UIViewController {
   var controllerOutput: SurveysControllerOutput?
   var controllerInput: SurveysControllerInput?
   public private(set) var topic: Topic?
+  public private(set) var userprofile: Userprofile?
   public private(set) var mode: Survey.SurveyCategory
+  //UI
+  public var tintColor: UIColor = .clear
   
   
   
@@ -82,14 +85,26 @@ class SurveysController: UIViewController {
   }
   
   // MARK: - Initialization
-  init(_ topic: Topic) {
+  init(_ topic: Topic, color: UIColor = .clear) {
     self.mode = .Topic
     self.topic = topic
+    self.tintColor = color
+    
     super.init(nibName: nil, bundle: nil)
   }
   
-  init(_ mode: Survey.SurveyCategory) {
+  init(_ mode: Survey.SurveyCategory, color: UIColor = .clear) {
     self.mode = mode
+    self.tintColor = color
+    
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  init(_ userprofile: Userprofile, color: UIColor = .clear) {
+    self.userprofile = userprofile
+    self.mode = .ByOwner
+    self.tintColor = color
+    
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -150,6 +165,8 @@ class SurveysController: UIViewController {
 
 extension SurveysController: SurveysViewInput {
   func openUserprofile(_ userprofile: Userprofile) {
+    guard mode != .ByOwner else { return }
+    
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
@@ -249,10 +266,29 @@ private extension SurveysController {
     
     switch mode {
     case .Topic:
-      guard let topic = topic else { return }
+      navigationItem.titleView = topicView
+    case .ByOwner:
+      guard let userprofile = userprofile else { return }
       
-      print(topic)
-      title = ""
+      let avatar = Avatar(userprofile: userprofile)
+      avatar.heightAnchor.constraint(equalToConstant: 40).isActive = true
+      avatar.tapPublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          let banner = NewBanner(contentView: UserBannerContentView(mode: .Username,
+                                                                      userprofile: userprofile),
+                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                 isModal: false,
+                                 useContentViewHeight: true,
+                                 shouldDismissAfter: 1)
+          banner.didDisappearPublisher
+            .sink { _ in banner.removeFromSuperview() }
+            .store(in: &self.subscriptions)
+        }
+        .store(in: &subscriptions)
+      
+      navigationItem.titleView = avatar
     case .Own:
       title = "my_publications".localized
     case .Favorite:
@@ -265,9 +301,7 @@ private extension SurveysController {
     
     navigationController?.setNavigationBarHidden(false, animated: false)
     navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
-    
-    //Setup nav bar
-    navigationItem.titleView = topicView
+    setBarItems()
     
     guard let navigationBar = self.navigationController?.navigationBar else { return }
     
@@ -281,7 +315,18 @@ private extension SurveysController {
     if #available(iOS 15.0, *) {
       navigationBar.compactScrollEdgeAppearance = appearance
     }
-    setNavigationBarTintColor(topic.isNil ? .secondaryLabel : topic!.tagColor)
+    
+    var color: UIColor = .secondaryLabel
+    
+    switch mode {
+    case .Topic:
+      guard let topic = topic else { return }
+      
+      color = topic.tagColor
+    default:
+      color = tintColor
+    }
+    setNavigationBarTintColor(color)
   }
   
   @objc
@@ -329,7 +374,7 @@ private extension SurveysController {
     }
   }
   
-  private func setRightBarButton() {
+  private func setBarItems() {
     let button = UIBarButtonItem(image: UIImage(systemName: "slider.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(self.handleTap))
     
     navigationItem.setRightBarButton(button, animated: true)

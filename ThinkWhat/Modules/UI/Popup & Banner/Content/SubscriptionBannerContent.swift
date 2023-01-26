@@ -9,9 +9,10 @@
 import UIKit
 import Combine
 
-class UserNotificationContent: UIView {
+class UserBannerContentView: UIView {
   
   enum Mode: String {
+    case Username = ""
     case Subscribe = "subscribe_to_user_notification"
     case Unsubscribe = "unsubscribe_from_user_notification"
     case NotifyOnPublication = "user_publication_notification_on"
@@ -19,6 +20,8 @@ class UserNotificationContent: UIView {
     
     func localizedDescription(userprofile: Userprofile) -> String {
       switch self {
+      case .Username:
+        return userprofile.name
       case .Subscribe:
         return self.rawValue.localized + " " + userprofile.name + " ✅"
       case .Unsubscribe:
@@ -96,8 +99,8 @@ class UserNotificationContent: UIView {
   init(mode: Mode,
        userprofile: Userprofile,
        textColor: UIColor = .label) {
-    self.mode = mode
     self.userprofile = userprofile
+    self.mode = mode
     self.textColor = textColor
     
     super.init(frame: .zero)
@@ -118,7 +121,7 @@ class UserNotificationContent: UIView {
   }
 }
 
-private extension UserNotificationContent {
+private extension UserBannerContentView {
   func setupUI() {
     backgroundColor = .clear
     stack.place(inside: self)

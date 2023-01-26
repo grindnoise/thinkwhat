@@ -43,6 +43,9 @@ class Userprofiles {
           let publicationsTotal = json["own_surveys_count"].int,
           let favoritesTotal = json["favorite_surveys_count"].int,
           let completeTotal = json["completed_surveys_count"].int,
+//          let votesReceivedTotal = json["votes_received_count"].int,
+//          let commentsTotal = json["comments_count"].int,
+//            let commentsReceivedTotal = json["comments_received_count"].int,
           let balance = json["balance"].int,
           let top_preferences = json["top_preferences"] as? JSON,
           let isBanned = json["is_banned"].bool,
@@ -145,6 +148,9 @@ class Userprofile: Decodable {
          vkURL = "vk_url",
          facebookURL = "facebook_url",
          completeTotal = "completed_surveys_count",
+         votesReceivedTotal = "votes_received_count",
+         commentsTotal = "comments_count",
+         commentsReceivedTotal = "comments_received_count",
          favoritesTotal = "favorite_surveys_count",
          publicationsTotal = "own_surveys_count",
          subscribersTotal = "subscribers_count",
@@ -294,6 +300,27 @@ class Userprofile: Decodable {
       NotificationCenter.default.post(name: Notifications.Userprofiles.CompleteTotal, object: self)
     }
   }
+  var votesReceivedTotal: Int = 0 {
+    didSet {
+      guard oldValue != votesReceivedTotal else { return }
+      
+      votesReceivedTotalPublisher.send(votesReceivedTotal)
+    }
+  }
+  var commentsTotal: Int = 0 {
+    didSet {
+      guard oldValue != commentsTotal else { return }
+      
+      commentsTotalPublisher.send(commentsTotal)
+    }
+  }
+  var commentsReceivedTotal: Int = 0 {
+    didSet {
+      guard oldValue != commentsReceivedTotal else { return }
+      
+      commentsReceivedTotalPublisher.send(commentsReceivedTotal)
+    }
+  }
   var favoritesTotal: Int = 0 {
     didSet {
       guard oldValue != favoritesTotal else { return }
@@ -433,13 +460,6 @@ class Userprofile: Decodable {
   
   //Store user choice
   var choices: [Survey: Answer] = [:]
-  //    var isCurrent: Bool {
-  //        guard let current = Userprofiles.shared.current,
-  //              current.id == id
-  //        else { return false }
-  //
-  //        return true
-  //    }
   var hasSocialMedia: Bool {
     guard !facebookURL.isNil || !instagramURL.isNil || !tiktokURL.isNil else {
       return false
@@ -465,6 +485,12 @@ class Userprofile: Decodable {
   var isCurrent: Bool { Userprofiles.shared.current == self }
   var isAnonymous: Bool { Userprofile.anonymous == self }
   //    var contentLocales: [String] = []
+  
+  //Publishers
+  public let votesReceivedTotalPublisher = PassthroughSubject<Int, Never>()
+  public let commentsTotalPublisher = PassthroughSubject<Int, Never>()
+  public let commentsReceivedTotalPublisher = PassthroughSubject<Int, Never>()
+  
   
   // MARK: - Private properties
   private var isDownloading = false
@@ -523,8 +549,11 @@ class Userprofile: Decodable {
       }
       dateJoined          = try container.decode(Date.self, forKey: .dateJoined)
       imageURL            = URL(string: try container.decodeIfPresent(String.self, forKey: .imageURL) ?? "")
+      votesReceivedTotal  = try container.decode(Int.self, forKey: .votesReceivedTotal)
       favoritesTotal      = try container.decode(Int.self, forKey: .favoritesTotal)
       completeTotal       = try container.decode(Int.self, forKey: .completeTotal)
+      commentsTotal       = try container.decode(Int.self, forKey: .commentsTotal)
+      commentsReceivedTotal = try container.decode(Int.self, forKey: .commentsReceivedTotal)
       publicationsTotal   = try container.decode(Int.self, forKey: .publicationsTotal)
       subscribersTotal    = try container.decode(Int.self, forKey: .subscribersTotal)
       subscriptionsTotal  = try container.decode(Int.self, forKey: .subscriptionsTotal)
@@ -585,10 +614,16 @@ class Userprofile: Decodable {
           let _publicationsTotal = json["own_surveys_count"].int,
           let _favoritesTotal = json["favorite_surveys_count"].int,
           let _completeTotal = json["completed_surveys_count"].int,
+//          let _votesReceivedTotal = json["votes_received_count"].int,
+//          let _commentsTotal = json["comments_count"].int,
+            //            let _commentsReceivedTotal = json["comments_received_count"].int,
           let _balance = json["balance"].int,
           let _top_preferences = json["top_preferences"] as? JSON,
           let _isBanned = json["is_banned"].bool else { return }
     subscribersTotal = _subscribersTotal
+//    votesReceivedTotal = _votesReceivedTotal
+//    commentsCount = _commentsCount
+//    commentsReceivedTotal = _commentsReceivedTotal
     subscriptionsTotal = _subscriptionsTotal
     publicationsTotal = _publicationsTotal
     favoritesTotal = _favoritesTotal

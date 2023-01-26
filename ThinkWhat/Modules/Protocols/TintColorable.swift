@@ -9,5 +9,5 @@
 import UIKit
 
 protocol TintColorable: UIViewController {
-    var tintColor: UIColor { get set }
+    dynamic var tintColor: UIColor { get set }
 }

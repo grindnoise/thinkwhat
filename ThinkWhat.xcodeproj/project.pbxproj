@@ -243,6 +243,7 @@
 		AB66B4DD282D06AC00244A38 /* ListSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66B4DC282D06AC00244A38 /* ListSwitch.swift */; };
 		AB66B4DF282D06B600244A38 /* ListSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB66B4DE282D06B600244A38 /* ListSwitch.xib */; };
 		AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */; };
+		AB68111E29828CA900C14C32 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB68111D29828CA900C14C32 /* CGSize.swift */; };
 		AB6AFFCF289D514B00D260F4 /* Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6AFFCE289D514B00D260F4 /* Combine.swift */; };
 		AB6B071F247688600095721B /* delUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6B071E247688600095721B /* delUserViewController.swift */; };
 		AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */; };
@@ -794,6 +795,7 @@
 		AB66B4DC282D06AC00244A38 /* ListSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListSwitch.swift; sourceTree = "<group>"; };
 		AB66B4DE282D06B600244A38 /* ListSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListSwitch.xib; sourceTree = "<group>"; };
 		AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconsStyleKit.swift; sourceTree = "<group>"; };
+		AB68111D29828CA900C14C32 /* CGSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSize.swift; sourceTree = "<group>"; };
 		AB6AFFCE289D514B00D260F4 /* Combine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Combine.swift; sourceTree = "<group>"; };
 		AB6B071E247688600095721B /* delUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delUserViewController.swift; sourceTree = "<group>"; };
 		AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyIcons.swift; sourceTree = "<group>"; };
@@ -1246,6 +1248,7 @@
 				AB913F782806FADF00609D51 /* UIViewController.swift */,
 				AB5787F829267EEF009C1DBF /* UIBarButtonItem.swift */,
 				ABB7D048295A02CE00DF00B4 /* Publisher.swift */,
+				AB68111D29828CA900C14C32 /* CGSize.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3551,6 +3554,7 @@
 				ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */,
 				AB592E212906C3140082EE13 /* UserprofileCollectionView.swift in Sources */,
 				ABF01A6C25418E2C009E2BC4 /* BackRoundedButton.swift in Sources */,
+				AB68111E29828CA900C14C32 /* CGSize.swift in Sources */,
 				AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */,
 				AB6B071F247688600095721B /* delUserViewController.swift in Sources */,
 				ABCE775928488C8E001E3413 /* ImageSelectionPopup.swift in Sources */,

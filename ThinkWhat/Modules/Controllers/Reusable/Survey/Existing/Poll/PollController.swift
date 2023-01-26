@@ -219,13 +219,13 @@ class PollController: UIViewController {
     isOnScreen = false
   }
   
-  override func willMove(toParent parent: UIViewController?) {
-    super.willMove(toParent: parent)
-    
-    guard parent.isNil else { return }
-    
-    clearNavigationBar(clear: true)
-  }
+//  override func willMove(toParent parent: UIViewController?) {
+//    super.willMove(toParent: parent)
+//
+//    guard parent.isNil else { return }
+//
+//    clearNavigationBar(clear: true)
+//  }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)

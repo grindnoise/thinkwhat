@@ -30,7 +30,11 @@ class ListController: UIViewController, TintColorable {
         }
     }
     //UI
-    public private(set) var isOnScreen = false
+  public private(set) var isOnScreen = false {
+    didSet {
+      controllerOutput?.isOnScreen = isOnScreen
+    }
+  }
     
     
     
@@ -128,6 +132,7 @@ class ListController: UIViewController, TintColorable {
         super.viewDidAppear(animated)
         
         isOnScreen = true
+      
         setSwitchHidden(false)
         
         guard let main = tabBarController as? MainController else { return }
@@ -203,7 +208,7 @@ extension ListController: ListViewInput {
         backItem.title = ""
         navigationItem.backBarButtonItem = backItem
         
-        navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
+      navigationController?.pushViewController(UserprofileController(userprofile: userprofile, color: tintColor), animated: true)
         tabBarController?.setTabBarVisible(visible: false, animated: true)
         
         guard let controller = tabBarController as? MainController else { return }

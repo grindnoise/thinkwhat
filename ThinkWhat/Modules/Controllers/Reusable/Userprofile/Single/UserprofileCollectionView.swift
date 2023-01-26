@@ -32,8 +32,18 @@ class UserprofileCollectionView: UICollectionView {
   public var subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
   public let topicPublisher = PassthroughSubject<Topic, Never>()
+  public let publicationsPublisher = PassthroughSubject<Userprofile, Never>()
+  public let commentsPublisher = PassthroughSubject<Userprofile, Never>()
+  public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
+  public let colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
+  //UI
+  public var color: UIColor = .label {
+    didSet {
+      colorPublisher.send(color)
+    }
+  }
   
-  
+
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -58,6 +68,14 @@ class UserprofileCollectionView: UICollectionView {
   
   
   // MARK: - Initialization
+//  init(color: UIColor) {
+//    self.color = color
+//    
+//    super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
+//
+//    setTasks()
+//  }
+  
   override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
     super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
     
@@ -122,6 +140,13 @@ private extension UserprofileCollectionView {
           self.urlPublisher.send(image)
         }
         .store(in: &self.subscriptions)
+      
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink {
+          cell.color = $0!
+        }
+        .store(in: &self.subscriptions)
     }
     
     let interestsCellRegistration = UICollectionView.CellRegistration<UserInterestsCell, AnyHashable> { [unowned self] cell, indexPath, item in
@@ -145,13 +170,37 @@ private extension UserprofileCollectionView {
     let statsCellRegistration = UICollectionView.CellRegistration<UserStatsCell, AnyHashable> { [unowned self] cell, _, _ in
       guard let userprofile = self.userprofile else { return }
       
-      //          cell.topicPublisher
-      //              .sink { [weak self] in
-      //                  guard let self = self else { return }
-      //
-      //                  self.topicPublisher.send($0)
-      //              }
-      //              .store(in: &subscriptions)
+      cell.color = self.color
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink {
+          cell.color = $0!
+        }
+        .store(in: &self.subscriptions)
+      
+      cell.publicationsPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.publicationsPublisher.send($0)
+        }
+        .store(in: &subscriptions)
+      
+      cell.commentsPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.commentsPublisher.send($0)
+        }
+        .store(in: &subscriptions)
+      
+      cell.subscribersPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.subscribersPublisher.send($0)
+        }
+        .store(in: &subscriptions)
       
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear

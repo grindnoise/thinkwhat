@@ -465,6 +465,7 @@ class Avatar: UIView {
   
   // MARK: - Initialization
   init(userprofile: Userprofile? = nil,
+       size: CGSize = .zero,
        isShadowed: Bool = false,
        isBordered: Bool = false,
        borderColor: UIColor = .clear,
@@ -474,11 +475,12 @@ class Avatar: UIView {
     self.isBordered = isBordered
     self.borderColor = borderColor
     self.userprofile = userprofile
+    let frame = CGRect(origin: .zero, size: size)
     
-    super.init(frame: .zero)
+    super.init(frame: frame)
     
+    self.frame = frame
     setTasks()
-    setSubscriptions()
     setupUI()
   }
   
@@ -599,15 +601,6 @@ class Avatar: UIView {
 
 // MARK: - Private
 private extension Avatar {
-  func setSubscriptions() {
-    //        image.publisher
-    //            .sink {
-    //                print("image received", $0)
-    //                self.imageView.image = $0
-    //            }
-    //            .store(in: &subscriptions)
-  }
-  
   @MainActor
   func setupUI() {
     backgroundColor = .clear
@@ -643,18 +636,22 @@ private extension Avatar {
   }
   
   func setTasks() {
-    //        tasks.append(Task { [weak self] in
-    //            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.ImageDownloaded) {
-    //                guard let self = self,
-    //                      let object = notification.object as? Userprofile,
-    //                      object === self.userprofile,
-    //                      let image = self.userprofile.image
-    //                else { return }
-    //
-    //                self.coloredBackground.stopShimmering()
-    //                self.imageView.image = image
-    //            }
-    //        })
+    guard let userprofile = userprofile else { return }
+    
+    setImage(for: userprofile)
+    
+    userprofile.imagePublisher
+      .receive(on: DispatchQueue.main)
+      .sink(receiveCompletion: { error in
+#if DEBUG
+        print(error)
+#endif
+      }, receiveValue: { [weak self] in
+        guard let self = self else { return }
+        
+        self.imageView.image = $0
+      })
+      .store(in: &subscriptions)
   }
   
   func setImage(for userprofile: Userprofile) {
