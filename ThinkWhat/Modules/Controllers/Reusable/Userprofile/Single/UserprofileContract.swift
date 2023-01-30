@@ -22,6 +22,7 @@ protocol UserprofileViewInput: AnyObject {
   func publications()
   func subscribers()
   func comments()
+  func compatibility(with: Userprofile)
 }
 
 protocol UserprofileControllerInput: AnyObject {
@@ -31,6 +32,7 @@ protocol UserprofileControllerInput: AnyObject {
   func switchNotifications(userprofile: Userprofile, notify: Bool)
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
+  func compatibility(with: Userprofile)
 }
 
 protocol UserprofileModelOutput: AnyObject {

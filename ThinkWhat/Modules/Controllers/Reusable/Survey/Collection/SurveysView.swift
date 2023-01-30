@@ -73,7 +73,7 @@ class SurveysView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil)
+        self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil, userprofile: nil)
       }
       .store(in: &subscriptions)
     
@@ -82,34 +82,64 @@ class SurveysView: UIView {
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
     
     paginationByTopicPublisher
-      .sink { [unowned self] in
-        guard let topic = $0.keys.first,
+      .sink { [weak self] in
+        guard let self = self,
+              let topic = $0.keys.first,
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
+        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic, userprofile: nil)
+      }
+      .store(in: &subscriptions)
+    
+    //Pagination #3
+    let paginationByOwnerPublisher = instance.paginationByOwnerPublisher
+      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+    
+    paginationByOwnerPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let userprofile = $0.keys.first,
+              let period = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .ByOwner, dateFilter: period, topic: nil, userprofile: userprofile)
       }
       .store(in: &subscriptions)
     
     //Refresh #1
     instance.refreshPublisher
-      .sink { [unowned self] in
-        guard let category = $0.keys.first,
+      .sink { [weak self] in
+        guard let self = self,
+              let category = $0.keys.first,
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil)
+        self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil, userprofile: nil)
       }
       .store(in: &subscriptions)
     
     //Refresh #2
     instance.refreshByTopicPublisher
-      .sink { [unowned self] in
-        guard let topic = $0.keys.first,
+      .sink { [weak self] in
+        guard let self = self,
+              let topic = $0.keys.first,
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
+        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic, userprofile: nil)
+      }
+      .store(in: &subscriptions)
+    
+    //Refresh #3
+    instance.refreshByOwnerPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let userprofile = $0.keys.first,
+              let period = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .ByOwner, dateFilter: period, topic: nil, userprofile: userprofile)
       }
       .store(in: &subscriptions)
     

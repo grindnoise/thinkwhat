@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class LoaderHeader: UICollectionReusableView {
+class LoaderCell: UICollectionReusableView {
   
   // MARK: - Public properties
   public var color: UIColor = Colors.Logo.Flame.rawValue {
@@ -23,14 +23,22 @@ class LoaderHeader: UICollectionReusableView {
     didSet {
       guard oldValue != isLoading else { return }
       
-      if isLoading {
-        animateLoaderColor()
-      }
-      
-      UIView.animate(withDuration: 0.2) { [weak self] in
+      loadingIndicator.transform = isLoading ? CGAffineTransform(scaleX: 0.5, y: 0.5) : .identity
+      loadingIndicator.alpha = isLoading ? 0 : 1
+      UIView.animate(withDuration: 0.2, animations: { [weak self] in
         guard let self = self else { return }
-        
+
         self.loadingIndicator.alpha = self.isLoading ? 1 : 0
+        self.loadingIndicator.transform = self.isLoading ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
+      }) { [weak self] _ in
+        guard let self = self else { return }
+       
+        if self.isLoading {
+          self.animateLoaderColor()
+        } else {
+          self.loadingIndicator.layer.removeAllAnimations()
+          self.animation = nil
+        }
       }
     }
   }
@@ -85,7 +93,7 @@ class LoaderHeader: UICollectionReusableView {
   }
 }
 
-private extension LoaderHeader {
+private extension LoaderCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
@@ -98,7 +106,7 @@ private extension LoaderHeader {
     NSLayoutConstraint.activate([
       loadingIndicator.topAnchor.constraint(equalTo: topAnchor),
       loadingIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
-      loadingIndicator.heightAnchor.constraint(equalToConstant: 40)
+      loadingIndicator.heightAnchor.constraint(equalToConstant: 50)
     ])
     let constraint = loadingIndicator.bottomAnchor.constraint(equalTo: bottomAnchor)
     constraint.priority = .defaultLow
@@ -116,7 +124,7 @@ private extension LoaderHeader {
                                toValue: color.lighter(0.25).cgColor as Any,
                                duration: 1,
                                delay: 0,
-                               repeatCount: 0,
+                               repeatCount: .infinity,
                                autoreverses: true,
                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                delegate: self,
@@ -135,7 +143,7 @@ private extension LoaderHeader {
   }
 }
 
-extension LoaderHeader: CAAnimationDelegate {
+extension LoaderCell: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
     if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
       completionBlocks.forEach{ $0() }

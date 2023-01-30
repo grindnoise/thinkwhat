@@ -20,7 +20,7 @@ protocol SurveysViewInput: AnyObject {
   var userprofile: Userprofile? { get }
   
   func onSurveyTapped(_: SurveyReference)
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?)
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -34,7 +34,7 @@ protocol SurveysControllerInput: AnyObject {
   
   var modelOutput: SurveysModelOutput? { get set }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?)
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(surveyReference: SurveyReference, claim: Claim)

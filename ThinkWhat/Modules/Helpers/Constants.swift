@@ -26,7 +26,7 @@ var localhost: Bool {
     return false
 #endif
 }
-
+var logger = TimeLogger(sinceOrigin: true)
 let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateFormat = "dd.MM.yyyy"

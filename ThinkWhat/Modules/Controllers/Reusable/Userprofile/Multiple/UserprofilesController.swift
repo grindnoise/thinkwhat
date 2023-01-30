@@ -501,7 +501,7 @@ extension UserprofilesController: UserprofilesViewInput {
     backItem.title = ""
     
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
+    navigationController?.pushViewController(UserprofileController(userprofile: userprofile, color: tintColor), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
 }

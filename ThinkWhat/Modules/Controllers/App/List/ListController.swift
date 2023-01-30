@@ -10,403 +10,402 @@ import UIKit
 import Combine
 
 class ListController: UIViewController, TintColorable {
-    
-    // MARK: - Public properties
-    var controllerOutput: ListControllerOutput?
-    var controllerInput: ListControllerInput?
-//    var surveyCategory: Survey.SurveyCategory {
-//        return category
-//    }
-    public private(set) var category: Survey.SurveyCategory = .New {
-        didSet {
-            controllerOutput?.onDataSourceChanged()
-//            setTitle()
-        }
+  
+  // MARK: - Public properties
+  var controllerOutput: ListControllerOutput?
+  var controllerInput: ListControllerInput?
+  //    var surveyCategory: Survey.SurveyCategory {
+  //        return category
+  //    }
+  public private(set) var category: Survey.SurveyCategory = .New {
+    didSet {
+      controllerOutput?.onDataSourceChanged()
+      //            setTitle()
     }
-    public var tintColor: UIColor = .clear {
-        didSet {
-//            setNavigationBarTintColor(tintColor)
-            listSwitch.color = tintColor
-        }
+  }
+  public var tintColor: UIColor = .clear {
+    didSet {
+      listSwitch.color = tintColor
     }
-    //UI
+  }
+  //UI
   public private(set) var isOnScreen = false {
     didSet {
       controllerOutput?.isOnScreen = isOnScreen
     }
   }
+  
+  
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  //UI
+  private lazy var titleStack: UIStackView = {
+    let opaque = UIView()
+    opaque.backgroundColor = .clear
     
+    let instance = UIStackView(arrangedSubviews: [
+      opaque,
+      listSwitch
+    ])
+    instance.axis = .horizontal
+    instance.spacing = 0
     
-    
-    // MARK: - Private properties
-    private var observers: [NSKeyValueObservation] = []
-    private var subscriptions = Set<AnyCancellable>()
-    private var tasks: [Task<Void, Never>?] = []
-    //UI
-    private lazy var titleStack: UIStackView = {
-        let opaque = UIView()
-        opaque.backgroundColor = .clear
-        
-        let instance = UIStackView(arrangedSubviews: [
-            opaque,
-            listSwitch
-        ])
-        instance.axis = .horizontal
-        instance.spacing = 0
-
-        return instance
-    }()
-    private lazy var listSwitch: ListSwitch = {
-        let instance = ListSwitch()
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4).isActive = true
-        instance.statePublisher
-            .sink { [weak self] in
-                guard let self = self,
-                      let state = $0
-                else { return }
-                
-                switch state {
-                case .New:
-                    self.category = .New
-                case .Top:
-                    self.category = .Top
-                case .Watching:
-                    self.category = .Favorite
-                case .Own:
-                    self.category = .Own
-                }
-            }
-            .store(in: &subscriptions)
-        
-        return instance
-    }()
-//    private lazy var titleLabel: UILabel = {
-//       let instance = UILabel()
-//        instance.font = UIFont(name: Fonts.Bold,
-//                               size: 32)
-//        instance.textAlignment = .left
-//        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-//
-//        return instance
-//    }()
-    
-
-    
-    // MARK: - Overridden methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        let model = ListModel()
-//        let view = ListView()
-               
-        self.controllerOutput = view as? ListView
-        self.controllerOutput?
-            .viewInput = self
-        self.controllerInput = model
-        self.controllerInput?
-            .modelOutput = self
-//        self.view = view as UIView
-        
-        ProtocolSubscriptions.subscribe(self)
-        setupUI()
-        setTasks()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        navigationController?.navigationBar.prefersLargeTitles = false//true
-        navigationItem.largeTitleDisplayMode = .never//.always
-        
-        setNavigationBarTintColor(tintColor)
-        titleStack.alpha = 1
-        tabBarController?.setTabBarVisible(visible: true, animated: true)
-        
-//        guard let main = tabBarController as? MainController else { return }
-//
-//        main.toggleLogo(on: true)
-      isOnScreen = true
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        isOnScreen = true
-      
-        setSwitchHidden(false)
-        
-        guard let main = tabBarController as? MainController else { return }
-        
-        main.toggleLogo(on: true)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        setSwitchHidden(true)
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        isOnScreen = false
-    }
-//
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        super.traitCollectionDidChange(previousTraitCollection)
-//
-//        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-//    }
-    
-    // MARK: - Public methods
-    public func setSwitchHidden(_ hidden: Bool, animated: Bool = true) {
-        guard let navigationBar = navigationController?.navigationBar,
-              let constraint = titleStack.getConstraint(identifier: "centerY")
+    return instance
+  }()
+  private lazy var listSwitch: ListSwitch = {
+    let instance = ListSwitch()
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4).isActive = true
+    instance.statePublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let state = $0
         else { return }
         
-        navigationBar.setNeedsLayout()
-        
-        titleStack.alpha = hidden ? 1 : 0
-        
-        guard animated else {
-            titleStack.alpha = !hidden ? 1 : 0
-            constraint.constant = hidden ? -100 : 0
-            navigationBar.layoutIfNeeded()
-            return
+        switch state {
+        case .New:
+          self.category = .New
+        case .Top:
+          self.category = .Top
+        case .Watching:
+          self.category = .Favorite
+        case .Own:
+          self.category = .Own
         }
-        UIView.animate(
-            withDuration: 0.5,
-            delay: 0,
-            usingSpringWithDamping: 0.8,
-            initialSpringVelocity: 0.3,
-            options: [.curveEaseInOut]) { [unowned self] in
-            self.titleStack.alpha = !hidden ? 1 : 0
-            constraint.constant = hidden ? -100 : 0
-            navigationBar.layoutIfNeeded()
-        }
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  //    private lazy var titleLabel: UILabel = {
+  //       let instance = UILabel()
+  //        instance.font = UIFont(name: Fonts.Bold,
+  //                               size: 32)
+  //        instance.textAlignment = .left
+  //        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+  //
+  //        return instance
+  //    }()
+  
+  
+  
+  // MARK: - Overridden methods
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    let model = ListModel()
+    //        let view = ListView()
+    
+    self.controllerOutput = view as? ListView
+    self.controllerOutput?
+      .viewInput = self
+    self.controllerInput = model
+    self.controllerInput?
+      .modelOutput = self
+    //        self.view = view as UIView
+    
+    ProtocolSubscriptions.subscribe(self)
+    setupUI()
+    setTasks()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    navigationController?.navigationBar.prefersLargeTitles = false//true
+    navigationItem.largeTitleDisplayMode = .never//.always
+    
+    setNavigationBarTintColor(tintColor)
+    titleStack.alpha = 1
+    tabBarController?.setTabBarVisible(visible: true, animated: true)
+    
+    //        guard let main = tabBarController as? MainController else { return }
+    //
+    //        main.toggleLogo(on: true)
+    isOnScreen = true
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    
+    isOnScreen = true
+    
+    setSwitchHidden(false)
+    
+    guard let main = tabBarController as? MainController else { return }
+    
+    main.toggleLogo(on: true)
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    setSwitchHidden(true)
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    
+    isOnScreen = false
+  }
+  //
+  //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+  //        super.traitCollectionDidChange(previousTraitCollection)
+  //
+  //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+  //    }
+  
+  // MARK: - Public methods
+  public func setSwitchHidden(_ hidden: Bool, animated: Bool = true) {
+    guard let navigationBar = navigationController?.navigationBar,
+          let constraint = titleStack.getConstraint(identifier: "centerY")
+    else { return }
+    
+    navigationBar.setNeedsLayout()
+    
+    titleStack.alpha = hidden ? 1 : 0
+    
+    guard animated else {
+      titleStack.alpha = !hidden ? 1 : 0
+      constraint.constant = hidden ? -100 : 0
+      navigationBar.layoutIfNeeded()
+      return
     }
+    UIView.animate(
+      withDuration: 0.5,
+      delay: 0,
+      usingSpringWithDamping: 0.8,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut]) { [unowned self] in
+        self.titleStack.alpha = !hidden ? 1 : 0
+        constraint.constant = hidden ? -100 : 0
+        navigationBar.layoutIfNeeded()
+      }
+  }
 }
 
 
 
 // MARK: - View Input
 extension ListController: ListViewInput {
-    func openSettings() {
-        tabBarController?.selectedIndex = 4
-    }
+  func openSettings() {
+    tabBarController?.selectedIndex = 4
+  }
+  
+  func unsubscribe(from userprofile: Userprofile) {
+    controllerInput?.unsubscribe(from: userprofile)
+  }
+  
+  func subscribe(to userprofile: Userprofile) {
+    controllerInput?.subscribe(to: userprofile)
+  }
+  
+  func openUserprofile(_ userprofile: Userprofile) {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
     
-    func unsubscribe(from userprofile: Userprofile) {
-        controllerInput?.unsubscribe(from: userprofile)
-    }
+    navigationController?.pushViewController(UserprofileController(userprofile: userprofile, color: tintColor), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
     
-    func subscribe(to userprofile: Userprofile) {
-        controllerInput?.subscribe(to: userprofile)
-    }
+    guard let controller = tabBarController as? MainController else { return }
     
-    func openUserprofile(_ userprofile: Userprofile) {
-        let backItem = UIBarButtonItem()
-        backItem.title = ""
-        navigationItem.backBarButtonItem = backItem
-        
-      navigationController?.pushViewController(UserprofileController(userprofile: userprofile, color: tintColor), animated: true)
-        tabBarController?.setTabBarVisible(visible: false, animated: true)
-        
-        guard let controller = tabBarController as? MainController else { return }
-        
-        controller.toggleLogo(on: false)
-    }
+    controller.toggleLogo(on: false)
+  }
+  
+  func share(_ surveyReference: SurveyReference) {
+    // Setting description
+    let firstActivityItem = surveyReference.title
     
-    func share(_ surveyReference: SurveyReference) {
-        // Setting description
-        let firstActivityItem = surveyReference.title
-        
-        // Setting url
-        let queryItems = [URLQueryItem(name: "hash", value: surveyReference.shareHash), URLQueryItem(name: "enc", value: surveyReference.shareEncryptedString)]
-        var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
-        urlComps.queryItems = queryItems
-        
-        let secondActivityItem: URL = urlComps.url!
-        
-        // If you want to use an image
-        let image : UIImage = UIImage(named: "anon")!
-        let activityViewController : UIActivityViewController = UIActivityViewController(
-            activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
-        
-        // This lines is for the popover you need to show in iPad
-        activityViewController.popoverPresentationController?.sourceView = self.view
-        
-        // This line remove the arrow of the popover to show in iPad
-        activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
-        activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
-        
-        // Pre-configuring activity items
-        activityViewController.activityItemsConfiguration = [
-            UIActivity.ActivityType.message
-        ] as? UIActivityItemsConfigurationReading
-        
-        // Anything you want to exclude
-        activityViewController.excludedActivityTypes = [
-            UIActivity.ActivityType.postToWeibo,
-            UIActivity.ActivityType.print,
-            UIActivity.ActivityType.assignToContact,
-            UIActivity.ActivityType.saveToCameraRoll,
-            UIActivity.ActivityType.addToReadingList,
-            UIActivity.ActivityType.postToFlickr,
-            UIActivity.ActivityType.postToVimeo,
-            UIActivity.ActivityType.postToTencentWeibo,
-            UIActivity.ActivityType.postToFacebook
-        ]
-        
-        activityViewController.isModalInPresentation = false
-        self.present(activityViewController,
-                     animated: true,
-                     completion: nil)
-    }
+    // Setting url
+    let queryItems = [URLQueryItem(name: "hash", value: surveyReference.shareHash), URLQueryItem(name: "enc", value: surveyReference.shareEncryptedString)]
+    var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
+    urlComps.queryItems = queryItems
     
-    func claim(surveyReference: SurveyReference, claim: Claim) {
-        controllerInput?.claim(surveyReference: surveyReference, claim: claim)
-    }
+    let secondActivityItem: URL = urlComps.url!
     
-    func addFavorite(_ surveyReference: SurveyReference) {
-        controllerInput?.addFavorite(surveyReference: surveyReference)
-    }
+    // If you want to use an image
+    let image : UIImage = UIImage(named: "anon")!
+    let activityViewController : UIActivityViewController = UIActivityViewController(
+      activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
     
-    func updateSurveyStats(_ instances: [SurveyReference]) {
-        guard isOnScreen else { return }
-        
-        controllerInput?.updateSurveyStats(instances)
-    }
+    // This lines is for the popover you need to show in iPad
+    activityViewController.popoverPresentationController?.sourceView = self.view
     
-    func onSurveyTapped(_ instance: SurveyReference) {
-        let backItem = UIBarButtonItem()
-            backItem.title = ""
-            navigationItem.backBarButtonItem = backItem
-//        navigationController?.pushViewController(TestViewController(), animated: true)
-        navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
-        tabBarController?.setTabBarVisible(visible: false, animated: true)
-        
-        guard let controller = tabBarController as? MainController else { return }
-        
-        controller.toggleLogo(on: false)
-    }
+    // This line remove the arrow of the popover to show in iPad
+    activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
+    activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
-        guard isOnScreen else { return }
-        
-        controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic)
-    }
+    // Pre-configuring activity items
+    activityViewController.activityItemsConfiguration = [
+      UIActivity.ActivityType.message
+    ] as? UIActivityItemsConfigurationReading
+    
+    // Anything you want to exclude
+    activityViewController.excludedActivityTypes = [
+      UIActivity.ActivityType.postToWeibo,
+      UIActivity.ActivityType.print,
+      UIActivity.ActivityType.assignToContact,
+      UIActivity.ActivityType.saveToCameraRoll,
+      UIActivity.ActivityType.addToReadingList,
+      UIActivity.ActivityType.postToFlickr,
+      UIActivity.ActivityType.postToVimeo,
+      UIActivity.ActivityType.postToTencentWeibo,
+      UIActivity.ActivityType.postToFacebook
+    ]
+    
+    activityViewController.isModalInPresentation = false
+    self.present(activityViewController,
+                 animated: true,
+                 completion: nil)
+  }
+  
+  func claim(surveyReference: SurveyReference, claim: Claim) {
+    controllerInput?.claim(surveyReference: surveyReference, claim: claim)
+  }
+  
+  func addFavorite(_ surveyReference: SurveyReference) {
+    controllerInput?.addFavorite(surveyReference: surveyReference)
+  }
+  
+  func updateSurveyStats(_ instances: [SurveyReference]) {
+    guard isOnScreen else { return }
+    
+    controllerInput?.updateSurveyStats(instances)
+  }
+  
+  func onSurveyTapped(_ instance: SurveyReference) {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    //        navigationController?.pushViewController(TestViewController(), animated: true)
+    navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard let controller = tabBarController as? MainController else { return }
+    
+    controller.toggleLogo(on: false)
+  }
+  
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
+    guard isOnScreen else { return }
+    
+    controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic)
+  }
 }
 
 private extension ListController {
-    func setTasks() {
-        tasks.append(Task { @MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
-                guard let self = self,
-                      let tab = notification.object as? Tab
-                else { return }
-                
-                self.isOnScreen = tab == .Feed
-            }
-        })
-        tasks.append(Task { @MainActor [weak self] in
-            for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
-                guard let self = self,
-                      self.isOnScreen
-                else { return }
-                
-                self.isOnScreen = false
-            }
-        })
-        tasks.append(Task { @MainActor [weak self] in
-            for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-                guard let self = self,
-                      let main = self.tabBarController as? MainController,
-                      main.selectedIndex == 2
-                else { return }
-                
-                self.isOnScreen = true
-            }
-        })
-    }
-    
-    
-    @MainActor
-    func setupUI() {
-        navigationItem.title = ""
-        navigationController?.navigationBar.prefersLargeTitles = false//deviceType == .iPhoneSE ? false : true
+  func setTasks() {
+    tasks.append(Task { @MainActor [weak self] in
+      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
+        guard let self = self,
+              let tab = notification.object as? Tab
+        else { return }
         
-        guard let navigationBar = self.navigationController?.navigationBar else { return }
-
-        navigationBar.addSubview(titleStack)
-        titleStack.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            titleStack.heightAnchor.constraint(equalToConstant: 40),
-            titleStack.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
-            titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
-        ])
+        self.isOnScreen = tab == .Feed
+      }
+    })
+    tasks.append(Task { @MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
+        guard let self = self,
+              self.isOnScreen
+        else { return }
         
-        let constraint = titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor, constant: -100)
-        constraint.identifier = "centerY"
-        constraint.isActive = true
-    }
+        self.isOnScreen = false
+      }
+    })
+    tasks.append(Task { @MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+        guard let self = self,
+              let main = self.tabBarController as? MainController,
+              main.selectedIndex == 2
+        else { return }
+        
+        self.isOnScreen = true
+      }
+    })
+  }
+  
+  
+  @MainActor
+  func setupUI() {
+    navigationItem.title = ""
+    navigationController?.navigationBar.prefersLargeTitles = false//deviceType == .iPhoneSE ? false : true
     
-//    @MainActor
-//    func setTitle(animated: Bool = true) {
-//        var text = ""
-//
-//        switch category {
-//        case .New:
-//            text =  "new".localized
-//        case .Top:
-//            text = "top".localized
-//        case .Favorite:
-//            text = "watching".localized
-//        case .Own:
-//            text = "own".localized
-//        default:
-//#if DEBUG
-//            print("")
-//#endif
-//        }
-//
-//        guard animated else {
-//            titleLabel.text = text
-//            return
-//        }
-//
-//
-//        UIView.transition(with: titleLabel,
-//                          duration: 0.15,
-//                          options: .transitionCrossDissolve) { [weak self] in
-//            guard let self = self else { return }
-//
-//            self.titleLabel.text = text
-//        }
-//
-//    }
+    guard let navigationBar = self.navigationController?.navigationBar else { return }
+    
+    navigationBar.addSubview(titleStack)
+    titleStack.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      titleStack.heightAnchor.constraint(equalToConstant: 40),
+      titleStack.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
+      titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
+    ])
+    
+    let constraint = titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor, constant: -100)
+    constraint.identifier = "centerY"
+    constraint.isActive = true
+  }
+  
+  //    @MainActor
+  //    func setTitle(animated: Bool = true) {
+  //        var text = ""
+  //
+  //        switch category {
+  //        case .New:
+  //            text =  "new".localized
+  //        case .Top:
+  //            text = "top".localized
+  //        case .Favorite:
+  //            text = "watching".localized
+  //        case .Own:
+  //            text = "own".localized
+  //        default:
+  //#if DEBUG
+  //            print("")
+  //#endif
+  //        }
+  //
+  //        guard animated else {
+  //            titleLabel.text = text
+  //            return
+  //        }
+  //
+  //
+  //        UIView.transition(with: titleLabel,
+  //                          duration: 0.15,
+  //                          options: .transitionCrossDissolve) { [weak self] in
+  //            guard let self = self else { return }
+  //
+  //            self.titleLabel.text = text
+  //        }
+  //
+  //    }
 }
 
 extension ListController: ListModelOutput {
-//    func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
-//        controllerOutput?.onAddFavoriteCallback(result)
-//    }
-    
-    func onRequestCompleted(_ result: Result<Bool, Error>) {
-        controllerOutput?.onRequestCompleted(result)
-//        switch result {
-//
-//        case .success:
-//            controllerOutput?.onRequestCompleted(result)
-//        case .failure(let error):
-//#if DEBUG
-//            error.printLocalized(class: type(of: self), functionName: #function)
-//#endif
-//        }
-    }
+  //    func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
+  //        controllerOutput?.onAddFavoriteCallback(result)
+  //    }
+  
+  func onRequestCompleted(_ result: Result<Bool, Error>) {
+    controllerOutput?.onRequestCompleted(result)
+    //        switch result {
+    //
+    //        case .success:
+    //            controllerOutput?.onRequestCompleted(result)
+    //        case .failure(let error):
+    //#if DEBUG
+    //            error.printLocalized(class: type(of: self), functionName: #function)
+    //#endif
+    //        }
+  }
 }
 
 extension ListController: DataObservable {
-    func onDataLoaded() {
-        navigationController?.setNavigationBarHidden(false, animated: true)
-    }
+  func onDataLoaded() {
+    navigationController?.setNavigationBarHidden(false, animated: true)
+  }
 }

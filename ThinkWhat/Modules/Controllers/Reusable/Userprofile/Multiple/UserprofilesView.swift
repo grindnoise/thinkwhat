@@ -21,6 +21,7 @@ class UserprofilesView: UIView {
       guard !viewInput.isNil else { return }
       
       collectionView.addEquallyTo(to: self)
+
     }
   }
   var gridItemSizePublisher = CurrentValueSubject<UserprofilesController.GridItemSize?, Never>(nil)
@@ -51,14 +52,12 @@ class UserprofilesView: UIView {
     }
 
     //Pagination #1
-    let paginationPublisher = instance.paginationPublisher
+    let paginationPublisher = instance.requestPublisher
       .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
 
     paginationPublisher
-      .sink { [unowned self] in
-        guard !$0.isNil,
-              let viewInput = self.viewInput
-        else { return }
+      .sink { [unowned self] _ in
+        guard let viewInput = self.viewInput else { return }
 
         switch viewInput.mode {
         case .Subscribers, .Subscriptions:
@@ -76,26 +75,17 @@ class UserprofilesView: UIView {
     gridItemSizePublisher.subscribe(instance.gridItemSizePublisher).store(in: &subscriptions)
 
     instance.userPublisher
-      .sink { [unowned self] in
-        guard let instance = $0 else { return }
-
-        self.viewInput?.onUserprofileTap(instance)
-      }
+      .sink { [unowned self] in self.viewInput?.onUserprofileTap($0) }
       .store(in: &subscriptions)
 
     instance.selectionPublisher
-      .sink { [unowned self] in
-        guard let instances = $0 else { return }
-
-        self.viewInput?.onSelection(instances)
-      }
+      .sink { [unowned self] in self.viewInput?.onSelection($0) }
       .store(in: &subscriptions)
 
 
     instance.refreshPublisher
-      .sink { [unowned self] in
-        guard !$0.isNil,
-              let viewInput = self.viewInput,
+      .sink { [unowned self] _ in
+        guard let viewInput = self.viewInput,
               let userprofile = viewInput.userprofile
         else { return }
 
@@ -104,23 +94,18 @@ class UserprofilesView: UIView {
       .store(in: &subscriptions)
     //Subscribe
     instance.subscribePublisher
-      .sink { [unowned self] in
-        guard let userprofiles = $0 else { return }
-
-        self.viewInput?.subscribe(at: userprofiles)
-      }
+      .sink { [unowned self] in self.viewInput?.subscribe(at: $0) }
       .store(in: &subscriptions)
 
     //Unsubscribe
     instance.unsubscribePublisher
       .sink { [unowned self] in
-        guard let userprofiles = $0 else { return }
 
         switch self.viewInput?.mode {
         case .Subscriptions:
-          self.viewInput?.unsubscribe(from: userprofiles)
+          self.viewInput?.unsubscribe(from: $0)
         case .Subscribers:
-          self.viewInput?.removeSubscribers(userprofiles)
+          self.viewInput?.removeSubscribers($0)
         default:
           print("")
         }

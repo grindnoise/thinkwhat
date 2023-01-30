@@ -37,13 +37,13 @@ class UserprofilesCollectionView: UICollectionView {
   public weak var answer: Answer?
   
   //Publishers
-  public var paginationPublisher = CurrentValueSubject<Bool?, Never>(nil)
-  public let userPublisher = CurrentValueSubject<Userprofile?, Never>(nil)
-  public let selectionPublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
-  public let refreshPublisher = CurrentValueSubject<Bool?, Never>(nil)
+  public let requestPublisher = PassthroughSubject<Bool, Never>()
+  public let userPublisher = PassthroughSubject<Userprofile, Never>()
+  public let selectionPublisher = PassthroughSubject<[Userprofile], Never>()
+  public let refreshPublisher = PassthroughSubject<Bool, Never>()
   public let gridItemSizePublisher = PassthroughSubject<UserprofilesController.GridItemSize?, Never>()
-  public let subscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
-  public let unsubscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
+  public let subscribePublisher = PassthroughSubject<[Userprofile], Never>()
+  public let unsubscribePublisher = PassthroughSubject<[Userprofile], Never>()
   
   
   
@@ -125,8 +125,8 @@ class UserprofilesCollectionView: UICollectionView {
   }
   
   init(userprofile: Userprofile, mode: UserprofilesViewMode, color: UIColor) {
-    
     self.color = color
+    
     super.init(frame: .zero, collectionViewLayout: .init())
     
     self.userprofile = userprofile
@@ -134,6 +134,8 @@ class UserprofilesCollectionView: UICollectionView {
     
     setupUI()
     setTasks()
+    
+    reloadDataSource(items: dataItems)
   }
   
   init(answer: Answer, mode: UserprofilesViewMode, color: UIColor) {
@@ -450,13 +452,13 @@ private extension UserprofilesCollectionView {
 extension UserprofilesCollectionView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
     if dataItems.count < 10 {
-      paginationPublisher.send(true)
+      requestPublisher.send(true)
       
       guard !loadingIndicator.isAnimating else { return }
       
       loadingIndicator.startAnimating()
     } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
-      paginationPublisher.send(true)
+      requestPublisher.send(true)
       
       guard !loadingIndicator.isAnimating else { return }
       

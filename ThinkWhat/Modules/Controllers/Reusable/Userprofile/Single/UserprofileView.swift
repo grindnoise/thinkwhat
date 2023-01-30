@@ -22,6 +22,7 @@ class UserprofileView: UIView {
       
       collectionView.colorPublisher.send(viewInput.tintColor)
       collectionView.userprofile = viewInput.userprofile
+//      viewInput.compatibility(with: viewInput.userprofile)
     }
   }
   

@@ -15,6 +15,18 @@ class UserprofileModel {
 
 // MARK: - Controller Input
 extension UserprofileModel: UserprofileControllerInput {
+  func compatibility(with userprofile: Userprofile) {
+    Task {
+      do {
+        try await API.shared.profiles.compatibility(with: userprofile)
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
+  
     func unsubscribe(from userprofile: Userprofile) {
         Task {
             try await API.shared.profiles.unsubscribe(from: [userprofile])

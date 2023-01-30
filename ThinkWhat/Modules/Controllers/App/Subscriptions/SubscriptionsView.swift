@@ -213,7 +213,7 @@ class SubscriptionsView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil)
+        self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil, userprofile: nil)
       }
       .store(in: &subscriptions)
     
@@ -227,23 +227,23 @@ class SubscriptionsView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
+        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic, userprofile: nil)
       }
       .store(in: &subscriptions)
     
-    //Pagination #3
-    let paginationByUserprofilePublisher = instance.paginationByUserprofilePublisher
-      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-    
-    paginationByUserprofilePublisher
-      .sink { [unowned self] in
-        guard let topic = $0.keys.first,
-              let period = $0.values.first
-        else { return }
-        
-        self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
-      }
-      .store(in: &subscriptions)
+    //    //Pagination #3
+    //    let paginationByOwnerPublisher = instance.paginationByOwnerPublisher
+    //      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+    //
+    //    paginationByOwnerPublisher
+    //      .sink { [unowned self] in
+    //        guard let topic = $0.keys.first,
+    //              let period = $0.values.first
+    //        else { return }
+    //
+    //        self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
+    //      }
+    //      .store(in: &subscriptions)
     
     //Refresh #1
     instance.refreshPublisher
@@ -252,7 +252,7 @@ class SubscriptionsView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil)
+        self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil, userprofile: nil)
       }
       .store(in: &subscriptions)
     
@@ -263,18 +263,18 @@ class SubscriptionsView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic)
+        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic, userprofile: nil)
       }
       .store(in: &subscriptions)
     
     //Refresh #3
-    instance.refreshByUserprofilePublisher
+    instance.refreshByOwnerPublisher
       .sink { [unowned self] in
         guard let userprofile = $0.keys.first,
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
+        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: nil, userprofile: userprofile)
       }
       .store(in: &subscriptions)
     

@@ -1077,6 +1077,25 @@ class API {
         throw error
       }
     }
+    
+    public func compatibility(with userprofile: Userprofile) async throws {
+      guard let url = API_URLS.Profiles.compatibility else { throw APIError.invalidURL }
+      
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .get,
+                                                 parameters: ["id": userprofile.id],
+                                                 encoding: URLEncoding.default,
+                                                 headers: parent.headers())
+        let json = try JSON(data: data, options: .mutableContainers)
+        
+        guard let compatibility = UserCompatibility(json) else { throw APIError.badData }
+        
+        userprofile.compatibilityPublisher.send(compatibility)
+      } catch {
+        userprofile.compatibilityPublisher.send(completion: .failure(error))
+      }
+    }
   }
   
   final class Polls {

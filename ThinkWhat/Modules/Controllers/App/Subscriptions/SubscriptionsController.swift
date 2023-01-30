@@ -10,694 +10,694 @@ import UIKit
 import Combine
 
 class SubscriptionsController: UIViewController, TintColorable {
-    
-    
-    private enum Mode {
-        case Default, Userprofile
+  
+  
+  private enum Mode {
+    case Default, Userprofile
+  }
+  
+  // MARK: - Public properties
+  public var controllerOutput: SubsciptionsControllerOutput?
+  public var controllerInput: SubsciptionsControllerInput?
+  public private(set) var isOnScreen = false
+  public var tintColor: UIColor = .clear
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  //Logic
+  private var userprofile: Userprofile? {
+    didSet {
+      guard !userprofile.isNil else { return }
+      
+      mode = .Userprofile
+      //            navigationItem.title = ""//userprofile.name
     }
-    
-    // MARK: - Public properties
-    public var controllerOutput: SubsciptionsControllerOutput?
-    public var controllerInput: SubsciptionsControllerInput?
-    public private(set) var isOnScreen = false
-    public var tintColor: UIColor = .clear
-    
-    // MARK: - Private properties
-    private var observers: [NSKeyValueObservation] = []
-    private var subscriptions = Set<AnyCancellable>()
-    private var tasks: [Task<Void, Never>?] = []
-    //Logic
-    private var userprofile: Userprofile? {
-        didSet {
-            guard !userprofile.isNil else { return }
-            
-            mode = .Userprofile
-            //            navigationItem.title = ""//userprofile.name
-        }
+  }
+  private var mode: Mode = .Default {
+    didSet {
+      guard oldValue != mode else { return }
+      
+      onModeChanged()
     }
-    private var mode: Mode = .Default {
-        didSet {
-            guard oldValue != mode else { return }
-            
-            onModeChanged()
-        }
+  }
+  //    private var period: Period = .AllTime {
+  //        didSet {
+  //            guard oldValue != period else { return }
+  //
+  //            controllerOutput?.setPeriod(period)
+  ////            setTitle()
+  ////            navigationItem.title = "subscriptions".localized + (period == .AllTime ? "" : " " + "per".localized.lowercased() + " \(period.rawValue.localized.lowercased())")
+  //
+  //            guard let button = navigationItem.rightBarButtonItem else { return }
+  //
+  //            button.menu = prepareMenu()
+  //        }
+  //    }
+  //UI
+  private var isRightButtonSpinning = false {
+    didSet {
+      let spinner = UIActivityIndicatorView()
+      spinner.color = .label
+      spinner.style = .medium
+      spinner.startAnimating()
+      navigationItem.setRightBarButton(isRightButtonSpinning ? UIBarButtonItem(customView: spinner) : nil,
+                                       animated: true)
     }
-//    private var period: Period = .AllTime {
-//        didSet {
-//            guard oldValue != period else { return }
-//
-//            controllerOutput?.setPeriod(period)
-////            setTitle()
-////            navigationItem.title = "subscriptions".localized + (period == .AllTime ? "" : " " + "per".localized.lowercased() + " \(period.rawValue.localized.lowercased())")
-//
-//            guard let button = navigationItem.rightBarButtonItem else { return }
-//
-//            button.menu = prepareMenu()
-//        }
-//    }
-    //UI
-    private var isRightButtonSpinning = false {
-        didSet {
-            let spinner = UIActivityIndicatorView()
-            spinner.color = .label
-            spinner.style = .medium
-            spinner.startAnimating()
-            navigationItem.setRightBarButton(isRightButtonSpinning ? UIBarButtonItem(customView: spinner) : nil,
-                                             animated: true)
-        }
-    }
-//    private lazy var titleLabel: UILabel = {
-//        let instance = UILabel()
-//        instance.font = UIFont(name: Fonts.Bold,
-//                               size: 32)
-//        instance.textAlignment = .left
-//        instance.adjustsFontSizeToFitWidth = true
-//        instance.minimumScaleFactor = 0.4
-//        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-//
-//        return instance
-//    }()
-//    private lazy var logo: AppLogoWithText = {
-//        let instance = AppLogoWithText(color: Colors.Logo.LightSteelBlue.main,
-//                                       minusToneColor: Colors.Logo.LightSteelBlue.minusTone)
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 6/1).isActive = true
-//        instance.isOpaque = false
-//
-//        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
-//        constraint.isActive = true
-//
-//        navigationController?.navigationBar.publisher(for: \.bounds)
-//            .sink { rect in
-//                constraint.constant = rect.height * 0.75
-//            }
-//            .store(in: &subscriptions)
-//
-//        return instance
-//    }()
+  }
+  //    private lazy var titleLabel: UILabel = {
+  //        let instance = UILabel()
+  //        instance.font = UIFont(name: Fonts.Bold,
+  //                               size: 32)
+  //        instance.textAlignment = .left
+  //        instance.adjustsFontSizeToFitWidth = true
+  //        instance.minimumScaleFactor = 0.4
+  //        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+  //
+  //        return instance
+  //    }()
+  //    private lazy var logo: AppLogoWithText = {
+  //        let instance = AppLogoWithText(color: Colors.Logo.LightSteelBlue.main,
+  //                                       minusToneColor: Colors.Logo.LightSteelBlue.minusTone)
+  //        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 6/1).isActive = true
+  //        instance.isOpaque = false
+  //
+  //        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
+  //        constraint.isActive = true
+  //
+  //        navigationController?.navigationBar.publisher(for: \.bounds)
+  //            .sink { rect in
+  //                constraint.constant = rect.height * 0.75
+  //            }
+  //            .store(in: &subscriptions)
+  //
+  //        return instance
+  //    }()
+  
+  
+  // MARK: - Overridden properties
+  override func viewDidLoad() {
+    super.viewDidLoad()
     
+    let model = SubscriptionsModel()
     
-    // MARK: - Overridden properties
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        let model = SubscriptionsModel()
-               
-        self.controllerOutput = view as? SubscriptionsView
-        self.controllerOutput?
-            .viewInput = self
-        self.controllerInput = model
-        self.controllerInput?
-            .modelOutput = self
-        ProtocolSubscriptions.subscribe(self)
-        
-        setupUI()
-        setTasks()
-    }
+    self.controllerOutput = view as? SubscriptionsView
+    self.controllerOutput?
+      .viewInput = self
+    self.controllerInput = model
+    self.controllerInput?
+      .modelOutput = self
+    ProtocolSubscriptions.subscribe(self)
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        setNavigationBarTintColor(tintColor)
-        navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.largeTitleDisplayMode = .never
-        controllerOutput?.onWillAppear()
-        tabBarController?.setTabBarVisible(visible: true, animated: true)
-//        titleLabel.alpha = 1
-        guard let main = tabBarController as? MainController else { return }
-        
-        main.toggleLogo(on: true)
-    }
+    setupUI()
+    setTasks()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        isOnScreen = true
-    }
+    setNavigationBarTintColor(tintColor)
+    navigationController?.navigationBar.prefersLargeTitles = false
+    navigationItem.largeTitleDisplayMode = .never
+    controllerOutput?.onWillAppear()
+    tabBarController?.setTabBarVisible(visible: true, animated: true)
+    //        titleLabel.alpha = 1
+    guard let main = tabBarController as? MainController else { return }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-//        titleLabel.alpha = 0
-//        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-//            guard let self = self else { return }
-//
-//            self.navigationController?.navigationBar.alpha = 0
-//        }
-    }
+    main.toggleLogo(on: true)
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        isOnScreen = false
-    }
+    isOnScreen = true
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
     
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        super.traitCollectionDidChange(previousTraitCollection)
-//
-//        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray)
-////        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-//    }
+    //        titleLabel.alpha = 0
+    //        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+    //            guard let self = self else { return }
+    //
+    //            self.navigationController?.navigationBar.alpha = 0
+    //        }
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    
+    isOnScreen = false
+  }
+  
+  //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+  //        super.traitCollectionDidChange(previousTraitCollection)
+  //
+  //        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray)
+  ////        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+  //    }
 }
 
 private extension SubscriptionsController {
-    func setTasks() {
-        tasks.append(Task { @MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
-                guard let self = self,
-                      let tab = notification.object as? Tab
-                else { return }
-                
-                self.isOnScreen = tab == .Subscriptions
-            }
-        })
+  func setTasks() {
+    tasks.append(Task { @MainActor [weak self] in
+      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
+        guard let self = self,
+              let tab = notification.object as? Tab
+        else { return }
         
-        //On notifications switch server callback
-        tasks.append(Task { @MainActor [weak self] in
-            for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
-                guard let self = self,
-                      self.mode == .Userprofile
-                else { return }
-                
-                self.isRightButtonSpinning = false
-                self.setBarItems()
-            }
-        })
-        
-        //On notifications switch server failure callback
-        tasks.append(Task { @MainActor [weak self] in
-            for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublicationsFailure) {
-                guard let self = self else { return }
-                
-                showBanner(bannerDelegate: self,
-                           text: AppError.server.localizedDescription,
-                           content: UIImageView(
-                            image: UIImage(systemName: "exclamationmark.triangle.fill",
-                                           withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
-                           color: UIColor.white,
-                           textColor: .white,
-                           dismissAfter: 0.75,
-                           backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
-                self.isRightButtonSpinning = false
-                self.setBarItems()
-            }
-        })
-        tasks.append(Task { @MainActor [weak self] in
-            for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
-                guard let self = self,
-                      self.isOnScreen
-                else { return }
-                
-                self.isOnScreen = false
-            }
-        })
-        tasks.append(Task { @MainActor [weak self] in
-            for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-                guard let self = self,
-                      let main = self.tabBarController as? MainController,
-                      main.selectedIndex == 1
-                else { return }
-                
-                self.isOnScreen = true
-            }
-        })
-    }
-
-    @MainActor
-    func setupUI() {
-        navigationItem.title = ""
-//        navigationItem.titleView = logo
-//        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray)
-        
-        guard let navigationBar = self.navigationController?.navigationBar else { return }
-        
-//        navigationBar.addSubview(titleLabel)
-//        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            titleLabel.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -2),
-//            titleLabel.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 2),
-//            titleLabel.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -(44+10)),
-//        ])
-//
-//        let constraint = titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10)
-//        constraint.identifier = "leading"
-//        constraint.isActive = true
-        
-        setBarItems()
-//        setTitle(animated: false)
-    }
+        self.isOnScreen = tab == .Subscriptions
+      }
+    })
     
-    @MainActor
-    func setBarItems(zeroSubscriptions: Bool = false) {
-        guard !isRightButtonSpinning else { return }
+    //On notifications switch server callback
+    tasks.append(Task { @MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
+        guard let self = self,
+              self.mode == .Userprofile
+        else { return }
         
-//        switch mode {
-//        case .Userprofile:
-//            guard let height = leftButton.getConstraint(identifier: "height"),
-//                  let leading = titleLabel.getConstraint(identifier: "leading")
-//            else { return }
-//
-//            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
-//                                                           delay: 0) { [weak self] in
-//                guard let self = self,
-//                      let navigationBar = self.navigationController?.navigationBar
-//                else { return }
-//
-//                navigationBar.setNeedsLayout()
-//                height.constant = 40
-//                leading.constant = 8
-//                navigationBar.layoutIfNeeded()
-//            }
-//        case .Default:
-//            print("")
-//        }
+        self.isRightButtonSpinning = false
+        self.setBarItems()
+      }
+    })
+    
+    //On notifications switch server failure callback
+    tasks.append(Task { @MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublicationsFailure) {
+        guard let self = self else { return }
         
+        showBanner(bannerDelegate: self,
+                   text: AppError.server.localizedDescription,
+                   content: UIImageView(
+                    image: UIImage(systemName: "exclamationmark.triangle.fill",
+                                   withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
+                   color: UIColor.white,
+                   textColor: .white,
+                   dismissAfter: 0.75,
+                   backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
+        self.isRightButtonSpinning = false
+        self.setBarItems()
+      }
+    })
+    tasks.append(Task { @MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
+        guard let self = self,
+              self.isOnScreen
+        else { return }
         
-        var rightButton: UIBarButtonItem!
+        self.isOnScreen = false
+      }
+    })
+    tasks.append(Task { @MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+        guard let self = self,
+              let main = self.tabBarController as? MainController,
+              main.selectedIndex == 1
+        else { return }
         
-        switch mode {
-        case .Default:
-            rightButton = UIBarButtonItem(title: "subscribers".localized.capitalized,
-                                          image: UIImage(systemName: "person.3.sequence.fill",
-                                                         withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                          primaryAction: {
-                let action = UIAction { [weak self] _ in
-                    guard let self = self else { return }
-                    
-                    self.onSubscribersTapped()
-                }
-                
-                return action
-            }(),
-                                          menu: nil)
-            navigationItem.setRightBarButton(rightButton, animated: true)
-            navigationItem.setLeftBarButton(nil, animated: true)
-            
-            //            guard let leading = titleLabel.getConstraint(identifier: "leading") else { return }
-            //
-//            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
-//                                                                   delay: 0) { [weak self] in
-//                guard let self = self,
-//                      let navigationBar = self.navigationController?.navigationBar
-//                else { return }
-//
-//                navigationBar.setNeedsLayout()
-//                leading.constant = 10
-//                navigationBar.layoutIfNeeded()
-//            }
-        case .Userprofile:
-            guard let userprofile = userprofile//,
-//                  let leading = titleLabel.getConstraint(identifier: "leading")
-            else { return }
-                  
-//            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
-//                                                                   delay: 0) { [weak self] in
-//                guard let self = self,
-//                      let navigationBar = self.navigationController?.navigationBar
-//                else { return }
-//
-//                navigationBar.setNeedsLayout()
-//                leading.constant = 44+10
-//                navigationBar.layoutIfNeeded()
-//            }
-
-            let notify = userprofile.notifyOnPublication ?? false
-            let notifyAction = UIAction { [weak self] _ in
-                guard let self = self else { return }
-                
-                self.isRightButtonSpinning = true
-                self.controllerInput?.switchNotifications(userprofile: userprofile,
-                                                          notify: !notify)
-            }
-            
-            
-            rightButton = UIBarButtonItem(title: nil,
-                                          image: UIImage(systemName: notify ? "bell.fill" : "bell.slash.fill",
-                                                         withConfiguration: UIImage.SymbolConfiguration(weight: .regular)),
-                                          primaryAction: notifyAction,
-                                          menu: nil)
-            rightButton.tintColor = notify ? tintColor : .secondaryLabel
-
-            let action = UIAction { [weak self] _ in
-                guard let self = self else { return }
-
-                self.mode = .Default
-            }
-
-            let leftButton = UIBarButtonItem(title: "actions".localized.capitalized,
-                                     image: UIImage(systemName: "arrow.left", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                     primaryAction: action,
-                                     menu: nil)
-
-            delayAsync(delay: 0.1) { [weak self] in
-                guard let self = self else { return }
-
-                self.navigationItem.setLeftBarButton(leftButton, animated: true)
-                self.navigationItem.setRightBarButton(rightButton, animated: true)
-            }
-        }
-    }
+        self.isOnScreen = true
+      }
+    })
+  }
+  
+  @MainActor
+  func setupUI() {
+    navigationItem.title = ""
+    //        navigationItem.titleView = logo
+    //        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray)
     
-    @MainActor
-    func setTitle(animated: Bool = true) {
-//        var text = ""
-//
-//        switch mode {
-//        case .Userprofile:
-//            guard let userprofile = userprofile else { return }
-//
-//            text = userprofile.name
-//        case .Default:
-//            text = "subscriptions".localized + (period == .AllTime ? "" : " (\(period.rawValue.localized.lowercased()))")
-//        }
-//
-//        guard animated else {
-//            titleLabel.text = text
-//            return
-//        }
-//
-//        UIView.transition(with: titleLabel,
-//                          duration: 0.15,
-//                          options: .transitionCrossDissolve) { [weak self] in
-//            guard let self = self else { return }
-//
-//            self.titleLabel.text = text
-//            self.titleLabel.textAlignment = self.mode == .Userprofile ? .center : .left
-//        }
-    }
+//    guard let navigationBar = self.navigationController?.navigationBar else { return }
     
-//    @MainActor
-//    func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
-//        let perDay: UIAction = .init(title: Period.PerDay.rawValue.localized,
-//                                     image: nil,
-//                                     identifier: nil,
-//                                     discoverabilityTitle: nil,
-//                                     attributes: .init(),
-//                                     state: period == .PerDay ? .on : .off,
-//                                     handler: { [weak self] _ in
-//            guard let self = self else { return }
-//
-//            self.period = .PerDay
-//        })
-//
-//        let perWeek: UIAction = .init(title: Period.PerWeek.rawValue.localized,
-//                                      image: nil,
-//                                      identifier: nil,
-//                                      discoverabilityTitle: nil,
-//                                      attributes: .init(),
-//                                      state: period == .PerWeek ? .on : .off,
-//                                      handler: { [weak self] _ in
-//            guard let self = self else { return }
-//
-//            self.period = .PerWeek
-//        })
-//
-//        let perMonth: UIAction = .init(title: Period.PerMonth.rawValue.localized,
-//                                       image: nil,
-//                                       identifier: nil,
-//                                       discoverabilityTitle: nil,
-//                                       attributes: .init(),
-//                                       state: period == .PerMonth ? .on : .off,
-//                                       handler: { [weak self] _ in
-//            guard let self = self else { return }
-//
-//            self.period = .PerMonth
-//        })
-//
-//        let allTime: UIAction = .init(title: Period.AllTime.rawValue.localized,
-//                                      image: nil,
-//                                      identifier: nil,
-//                                      discoverabilityTitle: nil,
-//                                      attributes: .init(),
-//                                      state: period == .AllTime ? .on : .off,
-//                                      handler: { [weak self] _ in
-//            guard let self = self else { return }
-//
-//            self.period = .AllTime
-//        })
-//
-//        let inlineMenu = UIMenu(title: "publications_per".localized,
-//                                image: nil,
-//                                identifier: nil,
-//                                options: .displayInline,
-//                                children: [
-//                                    perDay,
-//                                    perWeek,
-//                                    perMonth,
-//                                    allTime
-//                                ])
-//
-//        var subscribersCount = ""
-//        if let userprofile = Userprofiles.shared.current {
-//            subscribersCount  = " (\(userprofile.subscribers.count))"
-//        }
-//
-//        let filter: UIAction = .init(title: "my_subscribers".localized + subscribersCount,
-//                                     image: UIImage(systemName: "person.crop.circle.fill.badge.checkmark", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-//                                     identifier: nil,
-//                                     discoverabilityTitle: nil,
-//                                     attributes: .init(),
-//                                     state: .off,
-//                                     handler: { [weak self] _ in
-//            guard let self = self,
-//                  let userprofile = Userprofiles.shared.current
-//            else { return }
-//
-//            let backItem = UIBarButtonItem()
-//                backItem.title = ""
-//            self.navigationItem.backBarButtonItem = backItem
-//            self.navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile), animated: true)
-//            self.tabBarController?.setTabBarVisible(visible: false, animated: true)
-//
-//            guard let main = self.tabBarController as? MainController else { return }
-//
-//            main.toggleLogo(on: false)
-//        })
-//
-//        var children: [UIMenuElement] = []
-//
-//        if !zeroSubscriptions {
-//            children.append(inlineMenu)
-//        }
-//        children.append(filter)
-//
-//        return UIMenu(title: "", children: children)
-//    }
+    //        navigationBar.addSubview(titleLabel)
+    //        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    //
+    //        NSLayoutConstraint.activate([
+    //            titleLabel.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: -2),
+    //            titleLabel.topAnchor.constraint(equalTo: navigationBar.topAnchor, constant: 2),
+    //            titleLabel.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -(44+10)),
+    //        ])
+    //
+    //        let constraint = titleLabel.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10)
+    //        constraint.identifier = "leading"
+    //        constraint.isActive = true
     
-    @objc
-    func onBarButtonTap() {
-        if mode == .Userprofile {
-            mode = .Default
-        }
-    }
+    setBarItems()
+    //        setTitle(animated: false)
+  }
+  
+  @MainActor
+  func setBarItems(zeroSubscriptions: Bool = false) {
+    guard !isRightButtonSpinning else { return }
     
-    @MainActor
-    func onModeChanged() {
-        if mode == .Default {//, isOnScreen {
-            controllerOutput?.hideUserCard(nil)
+    //        switch mode {
+    //        case .Userprofile:
+    //            guard let height = leftButton.getConstraint(identifier: "height"),
+    //                  let leading = titleLabel.getConstraint(identifier: "leading")
+    //            else { return }
+    //
+    //            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
+    //                                                           delay: 0) { [weak self] in
+    //                guard let self = self,
+    //                      let navigationBar = self.navigationController?.navigationBar
+    //                else { return }
+    //
+    //                navigationBar.setNeedsLayout()
+    //                height.constant = 40
+    //                leading.constant = 8
+    //                navigationBar.layoutIfNeeded()
+    //            }
+    //        case .Default:
+    //            print("")
+    //        }
+    
+    
+    var rightButton: UIBarButtonItem!
+    
+    switch mode {
+    case .Default:
+      rightButton = UIBarButtonItem(title: "subscribers".localized.capitalized,
+                                    image: UIImage(systemName: "person.3.sequence.fill",
+                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                    primaryAction: {
+        let action = UIAction { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.onSubscribersTapped()
         }
         
-        setBarItems()
-//        setTitle()
+        return action
+      }(),
+                                    menu: nil)
+      navigationItem.setRightBarButton(rightButton, animated: true)
+      navigationItem.setLeftBarButton(nil, animated: true)
+      
+      //            guard let leading = titleLabel.getConstraint(identifier: "leading") else { return }
+      //
+      //            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
+      //                                                                   delay: 0) { [weak self] in
+      //                guard let self = self,
+      //                      let navigationBar = self.navigationController?.navigationBar
+      //                else { return }
+      //
+      //                navigationBar.setNeedsLayout()
+      //                leading.constant = 10
+      //                navigationBar.layoutIfNeeded()
+      //            }
+    case .Userprofile:
+      guard let userprofile = userprofile//,
+              //                  let leading = titleLabel.getConstraint(identifier: "leading")
+      else { return }
+      
+      //            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
+      //                                                                   delay: 0) { [weak self] in
+      //                guard let self = self,
+      //                      let navigationBar = self.navigationController?.navigationBar
+      //                else { return }
+      //
+      //                navigationBar.setNeedsLayout()
+      //                leading.constant = 44+10
+      //                navigationBar.layoutIfNeeded()
+      //            }
+      
+      let notify = userprofile.notifyOnPublication ?? false
+      let notifyAction = UIAction { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.isRightButtonSpinning = true
+        self.controllerInput?.switchNotifications(userprofile: userprofile,
+                                                  notify: !notify)
+      }
+      
+      
+      rightButton = UIBarButtonItem(title: nil,
+                                    image: UIImage(systemName: notify ? "bell.fill" : "bell.slash.fill",
+                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .regular)),
+                                    primaryAction: notifyAction,
+                                    menu: nil)
+      rightButton.tintColor = notify ? tintColor : .secondaryLabel
+      
+      let action = UIAction { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.mode = .Default
+      }
+      
+      let leftButton = UIBarButtonItem(title: "actions".localized.capitalized,
+                                       image: UIImage(systemName: "arrow.left", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                       primaryAction: action,
+                                       menu: nil)
+      
+      delayAsync(delay: 0.1) { [weak self] in
+        guard let self = self else { return }
+        
+        self.navigationItem.setLeftBarButton(leftButton, animated: true)
+        self.navigationItem.setRightBarButton(rightButton, animated: true)
+      }
+    }
+  }
+  
+  @MainActor
+  func setTitle(animated: Bool = true) {
+    //        var text = ""
+    //
+    //        switch mode {
+    //        case .Userprofile:
+    //            guard let userprofile = userprofile else { return }
+    //
+    //            text = userprofile.name
+    //        case .Default:
+    //            text = "subscriptions".localized + (period == .AllTime ? "" : " (\(period.rawValue.localized.lowercased()))")
+    //        }
+    //
+    //        guard animated else {
+    //            titleLabel.text = text
+    //            return
+    //        }
+    //
+    //        UIView.transition(with: titleLabel,
+    //                          duration: 0.15,
+    //                          options: .transitionCrossDissolve) { [weak self] in
+    //            guard let self = self else { return }
+    //
+    //            self.titleLabel.text = text
+    //            self.titleLabel.textAlignment = self.mode == .Userprofile ? .center : .left
+    //        }
+  }
+  
+  //    @MainActor
+  //    func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
+  //        let perDay: UIAction = .init(title: Period.PerDay.rawValue.localized,
+  //                                     image: nil,
+  //                                     identifier: nil,
+  //                                     discoverabilityTitle: nil,
+  //                                     attributes: .init(),
+  //                                     state: period == .PerDay ? .on : .off,
+  //                                     handler: { [weak self] _ in
+  //            guard let self = self else { return }
+  //
+  //            self.period = .PerDay
+  //        })
+  //
+  //        let perWeek: UIAction = .init(title: Period.PerWeek.rawValue.localized,
+  //                                      image: nil,
+  //                                      identifier: nil,
+  //                                      discoverabilityTitle: nil,
+  //                                      attributes: .init(),
+  //                                      state: period == .PerWeek ? .on : .off,
+  //                                      handler: { [weak self] _ in
+  //            guard let self = self else { return }
+  //
+  //            self.period = .PerWeek
+  //        })
+  //
+  //        let perMonth: UIAction = .init(title: Period.PerMonth.rawValue.localized,
+  //                                       image: nil,
+  //                                       identifier: nil,
+  //                                       discoverabilityTitle: nil,
+  //                                       attributes: .init(),
+  //                                       state: period == .PerMonth ? .on : .off,
+  //                                       handler: { [weak self] _ in
+  //            guard let self = self else { return }
+  //
+  //            self.period = .PerMonth
+  //        })
+  //
+  //        let allTime: UIAction = .init(title: Period.AllTime.rawValue.localized,
+  //                                      image: nil,
+  //                                      identifier: nil,
+  //                                      discoverabilityTitle: nil,
+  //                                      attributes: .init(),
+  //                                      state: period == .AllTime ? .on : .off,
+  //                                      handler: { [weak self] _ in
+  //            guard let self = self else { return }
+  //
+  //            self.period = .AllTime
+  //        })
+  //
+  //        let inlineMenu = UIMenu(title: "publications_per".localized,
+  //                                image: nil,
+  //                                identifier: nil,
+  //                                options: .displayInline,
+  //                                children: [
+  //                                    perDay,
+  //                                    perWeek,
+  //                                    perMonth,
+  //                                    allTime
+  //                                ])
+  //
+  //        var subscribersCount = ""
+  //        if let userprofile = Userprofiles.shared.current {
+  //            subscribersCount  = " (\(userprofile.subscribers.count))"
+  //        }
+  //
+  //        let filter: UIAction = .init(title: "my_subscribers".localized + subscribersCount,
+  //                                     image: UIImage(systemName: "person.crop.circle.fill.badge.checkmark", withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+  //                                     identifier: nil,
+  //                                     discoverabilityTitle: nil,
+  //                                     attributes: .init(),
+  //                                     state: .off,
+  //                                     handler: { [weak self] _ in
+  //            guard let self = self,
+  //                  let userprofile = Userprofiles.shared.current
+  //            else { return }
+  //
+  //            let backItem = UIBarButtonItem()
+  //                backItem.title = ""
+  //            self.navigationItem.backBarButtonItem = backItem
+  //            self.navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile), animated: true)
+  //            self.tabBarController?.setTabBarVisible(visible: false, animated: true)
+  //
+  //            guard let main = self.tabBarController as? MainController else { return }
+  //
+  //            main.toggleLogo(on: false)
+  //        })
+  //
+  //        var children: [UIMenuElement] = []
+  //
+  //        if !zeroSubscriptions {
+  //            children.append(inlineMenu)
+  //        }
+  //        children.append(filter)
+  //
+  //        return UIMenu(title: "", children: children)
+  //    }
+  
+  @objc
+  func onBarButtonTap() {
+    if mode == .Userprofile {
+      mode = .Default
+    }
+  }
+  
+  @MainActor
+  func onModeChanged() {
+    if mode == .Default {//, isOnScreen {
+      controllerOutput?.hideUserCard(nil)
     }
     
-    func getGradientColors() -> [CGColor] {
-        return [
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-            traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
-        ]
-    }
+    setBarItems()
+    //        setTitle()
+  }
+  
+  func getGradientColors() -> [CGColor] {
+    return [
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+    ]
+  }
 }
 
 extension SubscriptionsController: SubscriptionsViewInput {
-    func setDefaultMode() {
-        mode = .Default
+  func setDefaultMode() {
+    mode = .Default
+  }
+  
+  func onSubcriptionsCountEvent(zeroSubscriptions: Bool) {
+    if mode == .Userprofile {
+      mode = .Default
     }
+    setBarItems(zeroSubscriptions: zeroSubscriptions)
+  }
+  
+  func unsubscribe(from userprofile: Userprofile) {
+    controllerInput?.unsubscribe(from: userprofile)
+    //        mode = .Default
+  }
+  
+  func openUserprofile(_ userprofile: Userprofile) {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
     
-    func onSubcriptionsCountEvent(zeroSubscriptions: Bool) {
-        if mode == .Userprofile {
-            mode = .Default
-        }
-        setBarItems(zeroSubscriptions: zeroSubscriptions)
-    }
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.pushViewController(UserprofileController(userprofile: userprofile, color: tintColor), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
+  }
+  
+  func onDataSourceRequest(userprofile: Userprofile, dateFilter: Period?) {
+    controllerInput?.onDataSourceRequest(source: .ByOwner, dateFilter: dateFilter, topic: nil, userprofile: userprofile)
+  }
+  
+  func setUserprofileFilter(_ userprofile: Userprofile) {
+    self.userprofile = userprofile
+  }
+  
+  func share(_ surveyReference: SurveyReference) {
+    // Setting description
+    let firstActivityItem = surveyReference.title
     
-    func unsubscribe(from userprofile: Userprofile) {
-        controllerInput?.unsubscribe(from: userprofile)
-//        mode = .Default
-    }
+    // Setting url
+    let queryItems = [URLQueryItem(name: "hash", value: surveyReference.shareHash), URLQueryItem(name: "enc", value: surveyReference.shareEncryptedString)]
+    var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
+    urlComps.queryItems = queryItems
     
-    func openUserprofile(_ userprofile: Userprofile) {
-        let backItem = UIBarButtonItem()
-        backItem.title = ""
-        
-        navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
-        tabBarController?.setTabBarVisible(visible: false, animated: true)
-    }
+    let secondActivityItem: URL = urlComps.url!
     
-    func onDataSourceRequest(userprofile: Userprofile, dateFilter: Period?) {
-        controllerInput?.onDataSourceRequest(source: .ByOwner, dateFilter: dateFilter, topic: nil, userprofile: userprofile)
-    }
+    // If you want to use an image
+    let image : UIImage = UIImage(named: "anon")!
+    let activityViewController : UIActivityViewController = UIActivityViewController(
+      activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
     
-    func setUserprofileFilter(_ userprofile: Userprofile) {
-        self.userprofile = userprofile
-    }
+    // This lines is for the popover you need to show in iPad
+    activityViewController.popoverPresentationController?.sourceView = self.view
     
-    func share(_ surveyReference: SurveyReference) {
-        // Setting description
-        let firstActivityItem = surveyReference.title
-        
-        // Setting url
-        let queryItems = [URLQueryItem(name: "hash", value: surveyReference.shareHash), URLQueryItem(name: "enc", value: surveyReference.shareEncryptedString)]
-        var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
-        urlComps.queryItems = queryItems
-        
-        let secondActivityItem: URL = urlComps.url!
-        
-        // If you want to use an image
-        let image : UIImage = UIImage(named: "anon")!
-        let activityViewController : UIActivityViewController = UIActivityViewController(
-            activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
-        
-        // This lines is for the popover you need to show in iPad
-        activityViewController.popoverPresentationController?.sourceView = self.view
-        
-        // This line remove the arrow of the popover to show in iPad
-        activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
-        activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
-        
-        // Pre-configuring activity items
-        activityViewController.activityItemsConfiguration = [
-            UIActivity.ActivityType.message
-        ] as? UIActivityItemsConfigurationReading
-        
-        // Anything you want to exclude
-        activityViewController.excludedActivityTypes = [
-            UIActivity.ActivityType.postToWeibo,
-            UIActivity.ActivityType.print,
-            UIActivity.ActivityType.assignToContact,
-            UIActivity.ActivityType.saveToCameraRoll,
-            UIActivity.ActivityType.addToReadingList,
-            UIActivity.ActivityType.postToFlickr,
-            UIActivity.ActivityType.postToVimeo,
-            UIActivity.ActivityType.postToTencentWeibo,
-            UIActivity.ActivityType.postToFacebook
-        ]
-        
-        activityViewController.isModalInPresentation = false
-        self.present(activityViewController,
-                     animated: true,
-                     completion: nil)
-    }
+    // This line remove the arrow of the popover to show in iPad
+    activityViewController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.down
+    activityViewController.popoverPresentationController?.sourceRect = CGRect(x: 150, y: 150, width: 0, height: 0)
     
-    func claim(surveyReference: SurveyReference, claim: Claim) {
-        controllerInput?.claim(surveyReference: surveyReference, claim: claim)
-    }
+    // Pre-configuring activity items
+    activityViewController.activityItemsConfiguration = [
+      UIActivity.ActivityType.message
+    ] as? UIActivityItemsConfigurationReading
     
-    func addFavorite(_ surveyReference: SurveyReference) {
-        controllerInput?.addFavorite(surveyReference: surveyReference)
-    }
+    // Anything you want to exclude
+    activityViewController.excludedActivityTypes = [
+      UIActivity.ActivityType.postToWeibo,
+      UIActivity.ActivityType.print,
+      UIActivity.ActivityType.assignToContact,
+      UIActivity.ActivityType.saveToCameraRoll,
+      UIActivity.ActivityType.addToReadingList,
+      UIActivity.ActivityType.postToFlickr,
+      UIActivity.ActivityType.postToVimeo,
+      UIActivity.ActivityType.postToTencentWeibo,
+      UIActivity.ActivityType.postToFacebook
+    ]
     
-    func updateSurveyStats(_ instances: [SurveyReference]) {
-        guard isOnScreen else { return }
-        
-        controllerInput?.updateSurveyStats(instances)
-    }
+    activityViewController.isModalInPresentation = false
+    self.present(activityViewController,
+                 animated: true,
+                 completion: nil)
+  }
+  
+  func claim(surveyReference: SurveyReference, claim: Claim) {
+    controllerInput?.claim(surveyReference: surveyReference, claim: claim)
+  }
+  
+  func addFavorite(_ surveyReference: SurveyReference) {
+    controllerInput?.addFavorite(surveyReference: surveyReference)
+  }
+  
+  func updateSurveyStats(_ instances: [SurveyReference]) {
+    guard isOnScreen else { return }
     
-    func onSurveyTapped(_ instance: SurveyReference) {
-        let backItem = UIBarButtonItem()
-            backItem.title = ""
-            navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
-        tabBarController?.setTabBarVisible(visible: false, animated: true)
-        
-        guard let controller = tabBarController as? MainController else { return }
-        
-        controller.toggleLogo(on: false)
-    }
+    controllerInput?.updateSurveyStats(instances)
+  }
+  
+  func onSurveyTapped(_ instance: SurveyReference) {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
     
-    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
-        guard isOnScreen else { return }
-        
-        controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic, userprofile: nil)
-    }
+    guard let controller = tabBarController as? MainController else { return }
     
-    func onSubscribersTapped() {
-        
-        guard let userprofile = Userprofiles.shared.current,
-            userprofile.subscribersTotal != 0
-        else { return }
-        
-        let backItem = UIBarButtonItem()
-            backItem.title = ""
-            navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile, color: tintColor), animated: true)
-        tabBarController?.setTabBarVisible(visible: false, animated: true)
-        
-        guard let main = tabBarController as? MainController else { return }
-        
-        main.toggleLogo(on: false)
-    }
+    controller.toggleLogo(on: false)
+  }
+  
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?) {
+    guard isOnScreen else { return }
     
-    func onSubscpitionsTapped() {
-//        let backItem = UIBarButtonItem()
-//            backItem.title = ""
-//            navigationItem.backBarButtonItem = backItem
-//        navigationController?.pushViewController(SubscribersController(mode: .Subscriptions), animated: true)
-    }
+    controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic, userprofile: userprofile)
+  }
+  
+  func onSubscribersTapped() {
     
-//    @objc
-//    func toggleBarButton() {
-//        controllerOutput?.onUpperContainerShown(isBarButtonOn)
-//        UIView.animate(withDuration: 0.3,
-//                       delay: 0,
-//                       options: .curveEaseOut) {
-//            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
-//            self.barButton.transform = self.isBarButtonOn ? upsideDown :.identity
-//        } completion: { _ in
-//            self.isBarButtonOn = !self.isBarButtonOn
-//        }
-//    }
-    func onAllUsersTapped(mode: UserprofilesViewMode) {
-        guard let userprofile = Userprofiles.shared.current else { return }
-        
-        let backItem = UIBarButtonItem()
-            backItem.title = ""
-            navigationItem.backBarButtonItem = backItem
-        navigationController?.pushViewController(UserprofilesController(mode:  mode, userprofile: userprofile, color: tintColor), animated: true)
-        tabBarController?.setTabBarVisible(visible: false, animated: true)
-        
-        guard let main = tabBarController as? MainController else { return }
-        
-        main.toggleLogo(on: false)
-    }
+    guard let userprofile = Userprofiles.shared.current,
+          userprofile.subscribersTotal != 0
+    else { return }
+    
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile, color: tintColor), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard let main = tabBarController as? MainController else { return }
+    
+    main.toggleLogo(on: false)
+  }
+  
+  func onSubscpitionsTapped() {
+    //        let backItem = UIBarButtonItem()
+    //            backItem.title = ""
+    //            navigationItem.backBarButtonItem = backItem
+    //        navigationController?.pushViewController(SubscribersController(mode: .Subscriptions), animated: true)
+  }
+  
+  //    @objc
+  //    func toggleBarButton() {
+  //        controllerOutput?.onUpperContainerShown(isBarButtonOn)
+  //        UIView.animate(withDuration: 0.3,
+  //                       delay: 0,
+  //                       options: .curveEaseOut) {
+  //            let upsideDown = CGAffineTransform(rotationAngle: .pi * 0.999 )
+  //            self.barButton.transform = self.isBarButtonOn ? upsideDown :.identity
+  //        } completion: { _ in
+  //            self.isBarButtonOn = !self.isBarButtonOn
+  //        }
+  //    }
+  func onAllUsersTapped(mode: UserprofilesViewMode) {
+    guard let userprofile = Userprofiles.shared.current else { return }
+    
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.pushViewController(UserprofilesController(mode:  mode, userprofile: userprofile, color: tintColor), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard let main = tabBarController as? MainController else { return }
+    
+    main.toggleLogo(on: false)
+  }
 }
 
 extension SubscriptionsController: SubsciptionsModelOutput {
-    func onRequestCompleted(_ result: Result<Bool, Error>) {
-        controllerOutput?.onRequestCompleted(result)
-    }
+  func onRequestCompleted(_ result: Result<Bool, Error>) {
+    controllerOutput?.onRequestCompleted(result)
+  }
 }
 
 extension SubscriptionsController: DataObservable {
-    func onDataLoaded() {
-        navigationController?.setNavigationBarHidden(false, animated: true)
-    }
+  func onDataLoaded() {
+    navigationController?.setNavigationBarHidden(false, animated: true)
+  }
 }
 
 extension SubscriptionsController: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let popup = sender as? Popup {
-            popup.removeFromSuperview()
-        }
+  func onBannerWillAppear(_ sender: Any) {}
+  
+  func onBannerWillDisappear(_ sender: Any) {}
+  
+  func onBannerDidAppear(_ sender: Any) {}
+  
+  func onBannerDidDisappear(_ sender: Any) {
+    if let banner = sender as? Banner {
+      banner.removeFromSuperview()
+    } else if let popup = sender as? Popup {
+      popup.removeFromSuperview()
     }
+  }
 }

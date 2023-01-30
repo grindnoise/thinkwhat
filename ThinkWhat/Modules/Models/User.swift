@@ -264,7 +264,8 @@ class Userprofile: Decodable {
   }
   
   //Publishers
-  public var imagePublisher = PassthroughSubject<UIImage, Error>()
+  public let imagePublisher = PassthroughSubject<UIImage, Error>()
+  public let compatibilityPublisher = PassthroughSubject<UserCompatibility, Error>()
   
   var image: UIImage? {
     didSet {

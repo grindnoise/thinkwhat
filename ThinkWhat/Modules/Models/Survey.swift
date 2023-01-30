@@ -586,6 +586,8 @@ class Surveys {
       //            Notification.send(names: [Notifications.Surveys.Rejected])
     }
   }
+  //Publishers
+  public let instancesPublisher = PassthroughSubject<[Survey], Never>()
   
   //Updates rating, progress and views count
   func updateSurveyStats(_ json: JSON) {
@@ -678,7 +680,9 @@ class Surveys {
         if key == Category.Hot.rawValue {
           let instances = try decoder.decode([Survey].self, from: value.rawData())
           if instances.isEmpty {
-            notifications.append(Notifications.Surveys.EmptyReceived)
+//            fatalError()
+            Surveys.shared.instancesPublisher.send([])
+//            notifications.append(Notifications.Surveys.EmptyReceived)
             Notification.send(names: notifications.uniqued())
             //                        return
           }
@@ -692,7 +696,8 @@ class Surveys {
           let instances = try decoder.decode([SurveyReference].self, from: value.rawData())
           
           if instances.isEmpty {
-            NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
+            SurveyReferences.shared.instancesPublisher.send([])
+//            NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
           }
           
           for instance in instances {

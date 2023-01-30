@@ -171,7 +171,7 @@ extension SurveysController: SurveysViewInput {
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
     
-    navigationController?.pushViewController(UserprofileController(userprofile: userprofile), animated: true)
+    navigationController?.pushViewController(UserprofileController(userprofile: userprofile, color: tintColor), animated: true)
   }
   
   func unsubscribe(from userprofile: Userprofile) {
@@ -249,8 +249,8 @@ extension SurveysController: SurveysViewInput {
     //        tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
-    controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic)
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?) {
+    controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic, userprofile: userprofile)
   }
 }
 
@@ -261,9 +261,8 @@ extension SurveysController: SurveysModelOutput {
 }
 
 private extension SurveysController {
-  
+  @MainActor
   func setupUI() {
-    
     switch mode {
     case .Topic:
       navigationItem.titleView = topicView
@@ -330,9 +329,7 @@ private extension SurveysController {
   }
   
   @objc
-  private func handleTap() {
-    fatalError()
-  }
+  func handleTap() {}
   
   func setNavigationBarAppearance(largeTitleColor: UIColor, smallTitleColor: UIColor) {
     guard let navigationBar = navigationController?.navigationBar else { return }
@@ -374,9 +371,52 @@ private extension SurveysController {
     }
   }
   
-  private func setBarItems() {
-    let button = UIBarButtonItem(image: UIImage(systemName: "slider.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(self.handleTap))
+  func setBarItems() {
+    
+    let button = UIBarButtonItem(title: "",
+                    image: UIImage(systemName: "slider.horizontal.3",
+                                              withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                    primaryAction: nil,
+                    menu: prepareMenu())
     
     navigationItem.setRightBarButton(button, animated: true)
+  }
+  
+  func prepareMenu() -> UIMenu {
+      let shareAction: UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+          guard let self = self//,
+//                let instance = self.item
+          else { return }
+
+//          self.shareSubject.send(instance)
+      })
+      
+      let watchAction : UIAction = .init(title: "watch".localized, image: UIImage(systemName: "binoculars.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+          guard let self = self//,
+//                let instance = self.item
+          else { return }
+          
+//          self.watchSubject.send(instance)
+      })
+      watchAction.accessibilityIdentifier = "watch"
+
+      
+      let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
+          guard let self = self//,
+//                let instance = self.item
+          else { return }
+          
+//          self.claimSubject.send(instance)
+      })
+      
+      var actions: [UIAction] = []//[claimAction, watchAction, shareAction]
+      
+//      if !item.isOwn {
+          actions.append(claimAction)
+          actions.append(watchAction)
+//      }
+      actions.append(shareAction)
+      
+      return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
   }
 }

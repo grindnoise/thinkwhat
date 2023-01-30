@@ -218,11 +218,11 @@ private extension UserStatsPlainCell {
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.commentsTotal.roundedWithAbbreviations),
                                                attributes: [
                                                 .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                .foregroundColor: userprofile.commentsTotal.isZero ? UIColor.label : color
+//                                                .foregroundColor: userprofile.commentsTotal.isZero ? UIColor.label : color
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = userprofile.commentsTotal.isZero ? false : true
-      disclosureIndicator.alpha = userprofile.commentsTotal.isZero ? 0 : 1
+//      disclosureIndicator.alpha = userprofile.commentsTotal.isZero ? 0 : 1
     case .Subscribers:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.subscribersTotal.roundedWithAbbreviations),
                                                attributes: [

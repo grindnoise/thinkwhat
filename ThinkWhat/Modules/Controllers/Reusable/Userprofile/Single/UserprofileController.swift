@@ -117,6 +117,7 @@ private extension UserprofileController {
   }
   
   func setTasks() {
+    controllerInput?.compatibility(with: userprofile)
     //On notifications switch server callback
     tasks.append(Task { @MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
@@ -196,6 +197,10 @@ private extension UserprofileController {
 }
 
 extension UserprofileController: UserprofileViewInput {
+  func compatibility(with userprofile: Userprofile) {
+    controllerInput?.compatibility(with: userprofile)
+  }
+  
   func publications() {
     let backItem = UIBarButtonItem()
     backItem.title = ""

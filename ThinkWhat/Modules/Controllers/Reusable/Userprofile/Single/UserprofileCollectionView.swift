@@ -12,7 +12,7 @@ import Combine
 class UserprofileCollectionView: UICollectionView {
   
   enum Section: Int, CaseIterable {
-    case Credentials, Interests, Stats
+    case Credentials, Compatibility, Interests, Stats
   }
   
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
@@ -99,8 +99,34 @@ private extension UserprofileCollectionView {
       configuration.showsSeparators = false
       
       let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: environment)
-      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? 30 : 0, trailing: 0)
+      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? 30 : 8, trailing: 0)
       return sectionLayout
+    }
+    
+    let compatibilityCellRegistration = UICollectionView.CellRegistration<UserCompatibilityCell, AnyHashable> { [unowned self] cell, indexPath, item in
+      guard let userprofile = self.userprofile else { return }
+      
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink {
+          cell.color = $0!
+        }
+        .store(in: &self.subscriptions)
+      
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      cell.userprofile = userprofile
+//      cell.imagePublisher
+//        .sink { [weak self] in
+//          guard let self = self,
+//                let image = $0
+//          else { return }
+//
+//          self.imagePublisher.send(image)
+//        }
+//        .store(in: &self.subscriptions)
     }
     
     let credentialsCellRegistration = UICollectionView.CellRegistration<UserCredentialsCell, AnyHashable> { [unowned self] cell, indexPath, item in
@@ -237,8 +263,7 @@ private extension UserprofileCollectionView {
     ////            }
     //        }
     
-    source = Source(collectionView: self) { [unowned self]
-      (collectionView: UICollectionView, indexPath: IndexPath, identifier: Int) -> UICollectionViewCell? in
+    source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
       guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
       
       if section == .Credentials {
@@ -251,6 +276,10 @@ private extension UserprofileCollectionView {
                                                             item: identifier)
       } else if section == .Stats {
         return collectionView.dequeueConfiguredReusableCell(using: statsCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .Compatibility {
+        return collectionView.dequeueConfiguredReusableCell(using: compatibilityCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
       }
@@ -267,12 +296,14 @@ private extension UserprofileCollectionView {
     var snapshot = Snapshot()
     snapshot.appendSections([
       .Credentials,
+      .Compatibility,
       .Interests,
       .Stats,
     ])
     snapshot.appendItems([0], toSection: .Credentials)
-    snapshot.appendItems([1], toSection: .Interests)
-    snapshot.appendItems([2], toSection: .Stats)
+    snapshot.appendItems([1], toSection: .Compatibility)
+    snapshot.appendItems([2], toSection: .Interests)
+    snapshot.appendItems([3], toSection: .Stats)
     source.apply(snapshot, animatingDifferences: false)
   }
   

@@ -751,7 +751,7 @@ extension PollController: PollViewInput {
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
     
-    navigationController?.pushViewController(UserprofileController(userprofile: item.owner), animated: true)
+    navigationController?.pushViewController(UserprofileController(userprofile: item.owner, color: item.topic.tagColor), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
   
