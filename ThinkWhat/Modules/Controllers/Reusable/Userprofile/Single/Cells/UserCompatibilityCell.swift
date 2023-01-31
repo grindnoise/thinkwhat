@@ -17,6 +17,7 @@ class UserCompatibilityCell: UICollectionViewListCell {
       guard let userprofile = userprofile else { return }
       
       setupUI()
+      compatibilityView.username = userprofile.firstNameSingleWord
       
       userprofile.compatibilityPublisher
         .receive(on: DispatchQueue.main)
@@ -26,7 +27,7 @@ class UserCompatibilityCell: UICollectionViewListCell {
           guard let self = self else { return }
           
           self.compatibilityView.percent = Double($0.percent)
-          self.compatibilityView.animate(duration: 1, delay: 0.5)
+//          self.compatibilityView.animate(duration: 1, delay: 0.5)
         }
         .store(in: &subscriptions)
     }

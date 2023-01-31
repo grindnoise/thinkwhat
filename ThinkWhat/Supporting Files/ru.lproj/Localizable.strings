@@ -101,6 +101,7 @@
 "third" = "Треть";
 "back" = "Назад";
 "per" = "За";
+"more_info" = "Подробнее";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";
@@ -385,3 +386,8 @@
 "userprofile_comments_received" = "Комментариев получено";
 "userprofile_comments_posted" = "Комментариев оставлено";
 "userprofile_compatibility" = "Совместимость";
+"userprofile_compatibility_level_with_user" = "Ваш уровень совместимости с ";
+"userprofile_compatibility_level_with_user_is" = " ";
+"userprofile_compatibility_level_low" = "низкий";
+"userprofile_compatibility_level_middle" = "средний";
+"userprofile_compatibility_level_high" = "высокий";

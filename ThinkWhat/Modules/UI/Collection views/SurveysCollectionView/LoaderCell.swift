@@ -1,5 +1,5 @@
 //
-//  SurveyLoadingCell.swift
+//  LoaderCell.swift
 //  ThinkWhat
 //
 //  Created by Pavel Bukharov on 16.12.2022.
@@ -37,7 +37,8 @@ class LoaderCell: UICollectionReusableView {
           self.animateLoaderColor()
         } else {
           self.loadingIndicator.layer.removeAllAnimations()
-          self.animation = nil
+          self.colorAnimation = nil
+          self.scaleAnimation = nil
         }
       }
     }
@@ -48,7 +49,8 @@ class LoaderCell: UICollectionReusableView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  private var animation: CAAnimation?
+  private var colorAnimation: CAAnimation?
+  private var scaleAnimation: CAAnimation?
   private lazy var loadingIndicator: Icon = {
     let instance = Icon(category: Icon.Category.Logo)
     instance.iconColor = color
@@ -89,7 +91,8 @@ class LoaderCell: UICollectionReusableView {
   
   public func cancelAllAnimations() {
     loadingIndicator.layer.removeAllAnimations()
-    animation = nil
+    colorAnimation = nil
+    scaleAnimation = nil
   }
 }
 
@@ -119,7 +122,7 @@ private extension LoaderCell {
   
   @MainActor
   func animateLoaderColor() {//from: UIColor, to: UIColor) {
-    animation = Animations.get(property: .FillColor,
+    colorAnimation = Animations.get(property: .FillColor,
                                fromValue: color.cgColor as Any,
                                toValue: color.lighter(0.25).cgColor as Any,
                                duration: 1,
@@ -137,8 +140,27 @@ private extension LoaderCell {
                                     self.animateLoaderColor()//from: to, to: from)
                                   }
                                 }])
+    scaleAnimation = Animations.get(property: .Scale,
+                               fromValue: 1 as Any,
+                               toValue: 0.97 as Any,
+                               duration: 1,
+                               delay: 0,
+                               repeatCount: .infinity,
+                               autoreverses: true,
+                               timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                               delegate: self,
+                               isRemovedOnCompletion: true,
+                               completionBlocks: [
+                                {[weak self] in
+                                  guard let self = self else { return }
+                                  
+                                  if !self.isLoading {
+                                    self.animateLoaderColor()//from: to, to: from)
+                                  }
+                                }])
     
-    loadingIndicator.icon.add(animation!, forKey: nil)
+    loadingIndicator.icon.add(scaleAnimation!, forKey: nil)
+    loadingIndicator.icon.add(colorAnimation!, forKey: nil)
     //      loadingIndicator.iconColor = to
   }
 }

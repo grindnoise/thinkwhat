@@ -247,7 +247,7 @@
 		AB6AFFCF289D514B00D260F4 /* Combine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6AFFCE289D514B00D260F4 /* Combine.swift */; };
 		AB6B071F247688600095721B /* delUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6B071E247688600095721B /* delUserViewController.swift */; };
 		AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */; };
-		AB6F4C03294CC362001BB40B /* SurveyLoadingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6F4C02294CC362001BB40B /* SurveyLoadingCell.swift */; };
+		AB6F4C03294CC362001BB40B /* LoaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6F4C02294CC362001BB40B /* LoaderCell.swift */; };
 		AB7085E726CB9A1F006F020F /* SelectSideApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7085E626CB9A1F006F020F /* SelectSideApp.swift */; };
 		AB70BFDE28631F41001F0B2B /* DisabledPasteTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB70BFDD28631F41001F0B2B /* DisabledPasteTextField.swift */; };
 		AB72960127DA096200D45B54 /* MainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB72960027DA096200D45B54 /* MainController.swift */; };
@@ -802,7 +802,7 @@
 		AB6AFFCE289D514B00D260F4 /* Combine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Combine.swift; sourceTree = "<group>"; };
 		AB6B071E247688600095721B /* delUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delUserViewController.swift; sourceTree = "<group>"; };
 		AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyIcons.swift; sourceTree = "<group>"; };
-		AB6F4C02294CC362001BB40B /* SurveyLoadingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyLoadingCell.swift; sourceTree = "<group>"; };
+		AB6F4C02294CC362001BB40B /* LoaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoaderCell.swift; sourceTree = "<group>"; };
 		AB7085E626CB9A1F006F020F /* SelectSideApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectSideApp.swift; sourceTree = "<group>"; };
 		AB70BFDD28631F41001F0B2B /* DisabledPasteTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisabledPasteTextField.swift; sourceTree = "<group>"; };
 		AB72960027DA096200D45B54 /* MainController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainController.swift; sourceTree = "<group>"; };
@@ -2772,7 +2772,7 @@
 				ABD2A2B22883DE1E00591568 /* SurveysCollectionView.swift */,
 				ABD2A2B528841B1100591568 /* SurveyCell.swift */,
 				AB93AF71293E407900B20097 /* SurveyCellBackup.swift */,
-				AB6F4C02294CC362001BB40B /* SurveyLoadingCell.swift */,
+				AB6F4C02294CC362001BB40B /* LoaderCell.swift */,
 			);
 			path = SurveysCollectionView;
 			sourceTree = "<group>";
@@ -3495,7 +3495,7 @@
 				ABADF5A627F73CC300A26474 /* PlainBannerContent.swift in Sources */,
 				ABBA73F12382896900540ECF /* UserSurveysViewController.swift in Sources */,
 				AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */,
-				AB6F4C03294CC362001BB40B /* SurveyLoadingCell.swift in Sources */,
+				AB6F4C03294CC362001BB40B /* LoaderCell.swift in Sources */,
 				AB72963427DB5EFB00D45B54 /* TopicsController.swift in Sources */,
 				ABAEEE5A27A5D4A100E4EF29 /* VKDelegate.swift in Sources */,
 				ABF3DF17283BA4A200309AA9 /* Int.swift in Sources */,

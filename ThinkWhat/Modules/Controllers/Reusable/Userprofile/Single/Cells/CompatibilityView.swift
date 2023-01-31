@@ -16,11 +16,13 @@ class CompatibilityView: UIView {
   
   
   // MARK: - Public properties
+  public var username = ""
   public var percent: Double = 0 {
     didSet {
       guard percent != oldValue else { return }
       
       setProgress(value: percent)
+      animate(duration: 1, delay: 0)
     }
   }
   
@@ -29,6 +31,34 @@ class CompatibilityView: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
+  private let lineWidthMultiplier: CGFloat = 0.115
+  private lazy var descriptionLabel: UILabel = {
+    let instance = UILabel()
+    instance.textAlignment = .center
+    instance.numberOfLines = 0
+    instance.text = "100%"
+    
+    return instance
+  }()
+  private lazy var percentageLabel: UILabel = {
+    let instance = UILabel()
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+    instance.publisher(for: \.bounds)
+      .filter { $0 != .zero }
+      .sink { instance.font = UIFont(name: Fonts.Semibold, size: $0.height * 0.3) }
+      .store(in: &subscriptions)
+    instance.textAlignment = .center
+    instance.numberOfLines = 1
+    instance.text = "100%"
+    
+    return instance
+  }()
+  private lazy var disclosureButton: UIButton = {
+    let instance = UIButton()
+    instance.tintColor = color
+    
+    return instance
+  }()
   private lazy var percentageView: UIView = {
     let instance = UIView()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
@@ -39,24 +69,31 @@ class CompatibilityView: UIView {
       .sink { [weak self] rect in
         guard let self = self else { return }
         
-        let lineWidth = rect.width * 0.1
+        let lineWidth = rect.width * self.lineWidthMultiplier
         self.backgroundCircle.lineWidth = lineWidth
         self.backgroundCircle.path = UIBezierPath(ovalIn: rect.insetBy(dx: lineWidth/2, dy: lineWidth/2)).cgPath
-//        self.setProgress(value: self.percent)
       }
       .store(in: &subscriptions)
+    percentageLabel.placeInCenter(of: instance, heightMultiplier: 0.75)
     
     return instance
   }()
-  private lazy var descriptionView: UIView = {
-    let instance = UIView()
+  private lazy var descriptionStack: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [
+      descriptionLabel,
+      disclosureButton,
+    ])
+    instance.spacing = padding
+    instance.axis = .vertical
+//    descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+//    descriptionLabel.heightAnchor.constraint(equalTo: instance.heightAnchor, multiplier: <#T##CGFloat#>)
     
     return instance
   }()
   private lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
       percentageView,
-      descriptionView
+      descriptionStack
     ])
     instance.spacing = padding
     instance.axis = .horizontal
@@ -119,6 +156,67 @@ class CompatibilityView: UIView {
   
   // MARK: - Public methods
   public func animate(duration: TimeInterval, delay: TimeInterval) {
+    func setDescriptionLabel() {
+      descriptionStack.alpha = 0
+      descriptionStack.transform = .init(scaleX: 0.75, y: 0.75)
+      
+      var level = "userprofile_compatibility_level_low".localized
+      if  33..<66 ~= Int(percent) {
+        level = "userprofile_compatibility_level_middle".localized
+      } else {
+        level = "userprofile_compatibility_level_high".localized
+      }
+      
+      let attributedString = NSMutableAttributedString(string: "userprofile_compatibility_level_with_user".localized,
+                                                       attributes: [
+                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any
+                                                       ])
+      attributedString.append(NSAttributedString(string: username, attributes: [
+        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any
+      ]))
+      attributedString.append(NSAttributedString(string: "userprofile_compatibility_level_with_user_is".localized, attributes: [
+        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any
+      ]))
+      attributedString.append(NSAttributedString(string: level, attributes: [
+        .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .headline) as Any,
+        .foregroundColor: color as Any
+      ]))
+      descriptionLabel.attributedText = attributedString
+      
+      disclosureButton.setAttributedTitle(NSMutableAttributedString(string: "more_info".localized.uppercased(),
+                                                       attributes: [
+                                                        .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote) as Any,
+                                                        .foregroundColor: color as Any
+                                                       ]),
+                                          for: .normal)
+      
+      UIView.animate(withDuration: 0.35, delay: 0.1) { [weak self] in
+        guard let self = self else { return }
+        
+        self.descriptionStack.alpha = 1
+        self.descriptionStack.transform = .identity
+      }
+    }
+    
+    setDescriptionLabel()
+    
+    guard percent != .zero else {
+      foregroundCircle.opacity = 0
+      percentageLabel.text = "0%"
+      return
+    }
+    
+    let timer = Publishers.countdown(queue: .main,
+                                     interval: .milliseconds(Int((1.0/percent)*1000)),
+                                     times: .max(Int(percent)))
+    timer.sink { [weak self] element in
+      guard let self = self else { return }
+      
+      self.percentageLabel.text = "\(Int(self.percent) - element)%"
+    }.store(in: &subscriptions)
+      
+    //    timer.sink(receiveCompletion: { _ in print("completed", to: &logger)} , receiveValue: { _ in print("started", to: &logger)} )//
+    
     isAnimating = true
     let anim = Animations.get(property: .StrokeEnd,
                               fromValue: 0,
@@ -168,7 +266,7 @@ private extension CompatibilityView {
   }
   
   func setProgress(value: Double) {
-    let lineWidth = percentageView.bounds.width * 0.1
+    let lineWidth = percentageView.bounds.width * lineWidthMultiplier
     let startAngle = -CGFloat.pi / 2
     let path = UIBezierPath(arcCenter: CGPoint(x: percentageView.bounds.midX, y: percentageView.bounds.midY),
                             radius: percentageView.bounds.width/2 - lineWidth/2,

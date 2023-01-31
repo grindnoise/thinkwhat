@@ -322,3 +322,92 @@ extension Publisher {
 }
 
 
+
+
+
+extension Publishers {
+  struct Countdown: Publisher {
+    typealias Output = Int
+    typealias Failure = Never
+    
+    let configuration: DispatchTimerConfiguration
+    
+    init(configuration: DispatchTimerConfiguration) {
+      self.configuration = configuration
+    }
+    
+    func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
+      let subscription = CountdownSubscription(subscriber: subscriber,
+                                               configuration: configuration)
+      subscriber.receive(subscription: subscription)
+    }
+  }
+}
+
+private final class CountdownSubscription<S: Subscriber>: Subscription where S.Input == Int {
+  //comes from subscriber
+  let configuration: DispatchTimerConfiguration
+  //The maximum number of times the timer will fire, which you copied from the configuration. You’ll use it as a counter that you decrement every time you send a value
+  var times: Subscribers.Demand
+  //The current demand; e.g., the number of values the subscriber requested — you decrement it every time you send a value
+  var requested: Subscribers.Demand = .none
+  //Internal Source timer that will generate events
+  var source: DispatchSourceTimer? = nil
+  //The subscriber. This makes it clear that the subscription is responsible for retaining the subscriber for as long as it doesn’t complete, fail or cancel
+  var subscriber: S?
+  
+  init(subscriber: S, configuration: DispatchTimerConfiguration) {
+    self.configuration = configuration
+    self.subscriber = subscriber
+    self.times = configuration.times
+  }
+  
+  func cancel() {
+    self.subscriber = nil
+    self.source = nil
+  }
+  
+  func request(_ demand: Subscribers.Demand) {
+    guard times > .none else {
+      subscriber?.receive(completion: .finished)
+      return
+    }
+    
+    requested += demand
+    
+    if source == nil, requested > .none {
+      source = DispatchSource.makeTimerSource(queue: configuration.queue)
+      source?.schedule(deadline: .now() + configuration.interval,
+                       repeating: configuration.interval,
+                       leeway: configuration.leeway)
+      
+      source?.setEventHandler { [weak self] in
+        guard let self = self,
+        self.requested > .none
+        else { return }
+        
+        self.requested -= .max(1)
+        self.times -= .max(1)
+        self.subscriber?.receive(self.times.max ?? 0)
+        
+        guard self.times == .none else { return }
+        
+        self.subscriber?.receive(completion: .finished)
+      }
+      source?.activate()
+    }
+  }
+}
+
+extension Publishers {
+  static func countdown(queue: DispatchQueue? = nil,
+                    interval: DispatchTimeInterval,
+                    leeway: DispatchTimeInterval = .nanoseconds(0),
+                    times: Subscribers.Demand = .unlimited) -> Publishers.Countdown {
+    
+    return Publishers.Countdown(configuration: DispatchTimerConfiguration(queue: queue,
+                                                                              interval: interval,
+                                                                              leeway: leeway,
+                                                                              times: times))
+  }
+}

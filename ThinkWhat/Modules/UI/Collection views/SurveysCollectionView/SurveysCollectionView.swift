@@ -60,7 +60,7 @@ class SurveysCollectionView: UICollectionView {
     }
   }
   public var isOnScreen = true
-//  public var colorTheme: UIColor = Colors.System.Red.rawValue
+  //  public var colorTheme: UIColor = Colors.System.Red.rawValue
   
   //Publishers
   public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
@@ -91,45 +91,38 @@ class SurveysCollectionView: UICollectionView {
   //Logic
   private let lock = NSRecursiveLock()
   private var loaderStartedAt = Date()
+  private var isApplyingSnapshot = false
   private var isLoading = false {
     didSet {
       guard oldValue != isLoading,
             category != .Search
       else { return }
       
-//      defer { lock.unlock() }
       lock.lock()
       
       var snap = source.snapshot()
       if isLoading, snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
         snap.appendSections([.loader])
-        print("isLoading", isLoading, to: &logger)
-//        delayAsync(delay: 0.31) { [weak self] in
+//        self.isLoadingPublisher.send(self.isLoading)
+        
+        setLoading(source: self.source, snapshot: snap)
+//        self.isApplyingSnapshot = true
+//#if DEBUG
+//        print("isLoading", isLoading, to: &logger)
+//#endif
+//        self.source.apply(snap, animatingDifferences: true) { [weak self] in
 //          guard let self = self else { return }
-          self.source.apply(snap, animatingDifferences: true) { [weak self] in
-            guard let self = self else { return }
-            
-            self.isLoadingPublisher.send(self.isLoading)
-            self.loaderStartedAt = Date()
-            self.lock.unlock()
-          }
+//
+//          self.isApplyingSnapshot = false
+//          self.isLoadingPublisher.send(self.isLoading)
+//          self.loaderStartedAt = Date()
+//          self.lock.unlock()
 //        }
       } else if !isLoading, !snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
         snap.deleteSections([.loader])
-        self.isLoadingPublisher.send(self.isLoading)
-//        delayAsync(delay: 0.31) { [weak self] in
-//          guard let self = self else { return }
-          print("isLoading", self.isLoading, to: &logger)
-//        DispatchQueue.main.async {[weak self] in
-//          guard let self = self else { return }
-          
-          self.source.apply(snap, animatingDifferences: true) { [weak self] in
-            guard let self = self else { return }
-            
-            self.lock.unlock()
-          }
-//        }
-//        }
+//        self.isLoadingPublisher.send(self.isLoading)
+                
+        setLoading(source: self.source, snapshot: snap)
       }
     }
   }
@@ -173,11 +166,11 @@ class SurveysCollectionView: UICollectionView {
       else { return }
       
       scrollPublisher.send(isScrollingDown)
-//      isScrollingDown = lastContentOffsetY > oldValue
+      //      isScrollingDown = lastContentOffsetY > oldValue
       
-//      guard isScrollingDown, lastContentOffsetY + bounds.height > contentSize.height else { return }
-//
-//      requestData()
+      //      guard isScrollingDown, lastContentOffsetY + bounds.height > contentSize.height else { return }
+      //
+      //      requestData()
       //            guard oldValue > 0,
       //                  contentSize.height > lastContentOffsetY + bounds.height
       //            else { return }
@@ -187,18 +180,18 @@ class SurveysCollectionView: UICollectionView {
     didSet {
       guard oldValue != isScrollingDown else { return }
       
-//      scrollPublisher.send(isScrollingDown)
+      //      scrollPublisher.send(isScrollingDown)
     }
   }
   private var loadingInProgress = false
-//  private lazy var loadingIndicator: UIActivityIndicatorView = {
-//    let indicator = UIActivityIndicatorView(style: .medium)
-//    indicator.translatesAutoresizingMaskIntoConstraints = false
-//    indicator.hidesWhenStopped = true
-//    indicator.color = .secondaryLabel
-//
-//    return indicator
-//  }()
+  //  private lazy var loadingIndicator: UIActivityIndicatorView = {
+  //    let indicator = UIActivityIndicatorView(style: .medium)
+  //    indicator.translatesAutoresizingMaskIntoConstraints = false
+  //    indicator.hidesWhenStopped = true
+  //    indicator.color = .secondaryLabel
+  //
+  //    return indicator
+  //  }()
   //    private var hMaskLayer: CAGradientLayer!
   private lazy var searchSpinner: UIActivityIndicatorView = {
     let instance = UIActivityIndicatorView(style: .large)
@@ -330,7 +323,7 @@ class SurveysCollectionView: UICollectionView {
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-
+    
     searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
   }
 }
@@ -470,7 +463,7 @@ private extension SurveysCollectionView {
             banner.didDisappearPublisher
               .sink { _ in banner.removeFromSuperview() }
               .store(in: &self.subscriptions)
-
+            
             return
           }
           
@@ -506,7 +499,7 @@ private extension SurveysCollectionView {
     }
     
     let loaderRegistration = UICollectionView.SupplementaryRegistration<LoaderCell>(elementKind: UICollectionView.elementKindSectionFooter) { [unowned self] supplementaryView,_,_ in
-
+      
       supplementaryView.color = self.color
       self.isLoadingPublisher
         .sink { supplementaryView.isLoading = $0 }
@@ -542,27 +535,27 @@ private extension SurveysCollectionView {
               self.category != .ByOwner,
               self.source.snapshot().itemIdentifiers.count != self.filterByPeriod(self.dataItems).count
         else { return }
-
+        
         var snap = Snapshot()
         snap.appendSections([.main])
         snap.appendItems(self.filterByPeriod(self.dataItems))//self.dataItems)
         self.source.apply(snap, animatingDifferences: true)
       }
       .store(in: &subscriptions)
-
-//    Timer.publish(every: 8, on: .main, in: .common)
-//      .autoconnect()
-//      .sink { [weak self] _ in
-//        guard let self = self,
-//              !self.isLoading,
-//              self.isOnScreen,
-//              self.visibleCells.count < 4,
-//              self.dataItems.count < 4
-//        else { return }
-//
-//        self.requestData()
-//      }
-//      .store(in: &subscriptions)
+    
+    //    Timer.publish(every: 8, on: .main, in: .common)
+    //      .autoconnect()
+    //      .sink { [weak self] _ in
+    //        guard let self = self,
+    //              !self.isLoading,
+    //              self.isOnScreen,
+    //              self.visibleCells.count < 4,
+    //              self.dataItems.count < 4
+    //        else { return }
+    //
+    //        self.requestData()
+    //      }
+    //      .store(in: &subscriptions)
     
     Timer.publish(every: 8, on: .main, in: .common)
       .autoconnect()
@@ -573,7 +566,7 @@ private extension SurveysCollectionView {
         else { return }
         
         let diff = self.loaderStartedAt.distance(to: Date())
-
+        
         guard diff > 10 else { return }
 #if DEBUG
         print("diff", diff)
@@ -581,7 +574,7 @@ private extension SurveysCollectionView {
         self.isLoading = false
       }
       .store(in: &subscriptions)
-
+    
     //Empty received
     SurveyReferences.shared.instancesPublisher
       .sink { [weak self] instances in
@@ -596,27 +589,27 @@ private extension SurveysCollectionView {
         }
       }
       .store(in: &subscriptions)
-//    tasks.append(Task {@MainActor [weak self] in
-//      for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.EmptyReceived) {
-//        guard let self = self,
-//              self.isLoading
-//        else { return }
-//
-////        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-////          guard let self = self else { return }
-////
-//        delayAsync(delay: 0.5) { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.isLoading = false
-//        }
-////        }
-//
-////        guard self.indexPathsForVisibleItems.map({ $0.row }).contains(self.dataItems.count-1) else { return }
-////
-////        self.scrollToItem(at: IndexPath(row: self.numberOfItems(inSection: 0)-1, section: 0), at: .bottom, animated: true)
-//      }
-//    })
+    //    tasks.append(Task {@MainActor [weak self] in
+    //      for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.EmptyReceived) {
+    //        guard let self = self,
+    //              self.isLoading
+    //        else { return }
+    //
+    ////        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+    ////          guard let self = self else { return }
+    ////
+    //        delayAsync(delay: 0.5) { [weak self] in
+    //          guard let self = self else { return }
+    //
+    //          self.isLoading = false
+    //        }
+    ////        }
+    //
+    ////        guard self.indexPathsForVisibleItems.map({ $0.row }).contains(self.dataItems.count-1) else { return }
+    ////
+    ////        self.scrollToItem(at: IndexPath(row: self.numberOfItems(inSection: 0)-1, section: 0), at: .bottom, animated: true)
+    //      }
+    //    })
     
     //Survey claimed by user
     tasks.append(Task {@MainActor [weak self] in
@@ -625,14 +618,14 @@ private extension SurveysCollectionView {
               let instance = notification.object as? SurveyReference,
               self.source.snapshot().itemIdentifiers.contains(instance)
         else { return }
-
+        
         var snap = self.source.snapshot()
         snap.deleteItems([instance])
         self.source.apply(snap, animatingDifferences: true)
         //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
       }
     })
-
+    
     //Survey banned on server
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Ban) {
@@ -640,15 +633,15 @@ private extension SurveysCollectionView {
               let instance = notification.object as? SurveyReference,
               self.source.snapshot().itemIdentifiers.contains(instance)
         else { return }
-
+        
         var snap = self.source.snapshot()
         snap.deleteItems([instance])
         self.source.apply(snap, animatingDifferences: true)
         //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
       }
     })
-
-
+    
+    
     //Subscriptions added
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SubscriptionAppend) {
@@ -657,12 +650,12 @@ private extension SurveysCollectionView {
               let instance = notification.object as? SurveyReference,
               !self.source.snapshot().itemIdentifiers.contains(instance)
         else { return }
-
+        
         //Check by date filter
         guard instance.isValid(byBeriod: self.period) else {
           return
         }
-
+        
         var snap = self.source.snapshot()
         snap.appendItems([instance], toSection: .main)
         self.source.apply(snap, animatingDifferences: true) { [weak self] in
@@ -672,7 +665,7 @@ private extension SurveysCollectionView {
         }
       }
     })
-
+    
     //By userprofile added
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.AppendReference) {
@@ -683,12 +676,12 @@ private extension SurveysCollectionView {
               instance.owner == userprofile,
               !self.source.snapshot().itemIdentifiers.contains(instance)
         else { return }
-
+        
         //Check by date filter
         guard instance.isValid(byBeriod: self.period) else {
           return
         }
-
+        
         var snap = self.source.snapshot()
         snap.appendItems([instance], toSection: .main)
         self.source.apply(snap, animatingDifferences: true) { [weak self] in
@@ -698,7 +691,7 @@ private extension SurveysCollectionView {
         }
       }
     })
-
+    
     //By userprofile removed
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.RemoveReference) {
@@ -709,13 +702,13 @@ private extension SurveysCollectionView {
               instance.owner == userprofile,
               self.source.snapshot().itemIdentifiers.contains(instance)
         else { return }
-
+        
         var snap = self.source.snapshot()
         snap.deleteItems([instance])
         self.source.apply(snap, animatingDifferences: true)
       }
     })
-
+    
     //New added
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.NewAppend) {
@@ -724,37 +717,37 @@ private extension SurveysCollectionView {
               let instance = notification.object as? SurveyReference,
               !self.source.snapshot().itemIdentifiers.contains(instance)
         else { return }
-
-//        delayAsync(delay: 1) {[weak self] in
-//          guard let self = self else { return }
-         
-//          self.isLoading = false
-//        }
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.isLoading = false
-//        }
-
+        
+        //        delayAsync(delay: 1) {[weak self] in
+        //          guard let self = self else { return }
+        
+        //          self.isLoading = false
+        //        }
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+        //          guard let self = self else { return }
+        //
+        //          self.isLoading = false
+        //        }
+        
         //Check by date filter
         guard instance.isValid(byBeriod: self.period) else {
           return
         }
-
+        
         var snap = self.source.snapshot()
         snap.appendItems([instance], toSection: .main)
         self.source.apply(snap, animatingDifferences: true) { [weak self] in
           guard let self = self else { return }
           
-//          delayAsync(delay: 0.3) { [weak self] in
-//            guard let self = self else { return }
-           
-            self.isLoading = false
-//          }
+          //          delayAsync(delay: 0.3) { [weak self] in
+          //            guard let self = self else { return }
+          
+          self.isLoading = false
+          //          }
         }
       }
     })
-
+    
     //Top added
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopAppend) {
@@ -763,12 +756,12 @@ private extension SurveysCollectionView {
               let instance = notification.object as? SurveyReference,
               !self.source.snapshot().itemIdentifiers.contains(instance)
         else { return }
-
+        
         //Check by date filter
         guard instance.isValid(byBeriod: self.period) else {
           return
         }
-
+        
         var snap = self.source.snapshot()
         snap.appendItems([instance], toSection: .main)
         self.source.apply(snap, animatingDifferences: true) { [weak self] in
@@ -778,7 +771,7 @@ private extension SurveysCollectionView {
         }
       }
     })
-
+    
     //Own added
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.OwnAppend) {
@@ -787,12 +780,12 @@ private extension SurveysCollectionView {
               let instance = notification.object as? SurveyReference,
               !self.source.snapshot().itemIdentifiers.contains(instance)
         else { return }
-
+        
         //Check by date filter
         guard instance.isValid(byBeriod: self.period) else {
           return
         }
-
+        
         var snap = self.source.snapshot()
         snap.appendItems([instance], toSection: .main)
         self.source.apply(snap, animatingDifferences: true) { [weak self] in
@@ -802,7 +795,7 @@ private extension SurveysCollectionView {
         }
       }
     })
-
+    
     //Favorite added
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
@@ -810,12 +803,12 @@ private extension SurveysCollectionView {
               self.category == .Favorite,
               let instance = notification.object as? SurveyReference
         else { return }
-
+        
         //Check by date filter
         guard instance.isValid(byBeriod: self.period) else {
           return
         }
-
+        
         var snap = self.source.snapshot()
         snap.appendItems([instance], toSection: .main)
         self.source.apply(snap, animatingDifferences: true) { [weak self] in
@@ -825,7 +818,7 @@ private extension SurveysCollectionView {
         }
       }
     })
-
+    
     //Favorite toggle
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteRemove) {
@@ -833,28 +826,28 @@ private extension SurveysCollectionView {
               self.category == .Favorite,
               let instance = notification.object as? SurveyReference
         else { return }
-
+        
         var snap = self.source.snapshot()
         snap.deleteItems([instance])
         self.source.apply(snap, animatingDifferences: true)
       }
     })
-
+    
     //Topic added
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
         guard let self = self else { return }
-
+        
         guard self.category == .Topic,
               let instance = notification.object as? SurveyReference,
               !self.source.snapshot().itemIdentifiers.contains(instance)
         else { return }
-
+        
         //Check by date filter
         guard instance.isValid(byBeriod: self.period) else {
           return
         }
-
+        
         var snap = self.source.snapshot()
         snap.appendItems([instance], toSection: .main)
         self.source.apply(snap, animatingDifferences: true) { [weak self] in
@@ -864,7 +857,7 @@ private extension SurveysCollectionView {
         }
       }
     })
-
+    
     //Subscribed at added
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
@@ -874,7 +867,7 @@ private extension SurveysCollectionView {
               self.userprofile.isNil,//Current user
               let userprofile = dict.values.first
         else { return }
-
+        
         //Append, sort
         let snap = self.source.snapshot()
         var items = snap.itemIdentifiers
@@ -882,7 +875,7 @@ private extension SurveysCollectionView {
           .filter({ $0.owner == userprofile })
           .filter({ !items.contains($0) })
         items += difference
-
+        
         var newSnap = Snapshot()
         newSnap.appendSections([.main])//, .loader])
         newSnap.appendItems(self.filterByPeriod(items.uniqued().sorted { $0.startDate > $1.startDate }))
@@ -893,7 +886,7 @@ private extension SurveysCollectionView {
         }
       }
     })
-
+    
     //Subscribed at removed
     tasks.append(Task {@MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
@@ -901,7 +894,7 @@ private extension SurveysCollectionView {
               self.category == .Subscriptions,
               self.userprofile.isNil//Current user
         else { return }
-
+        
         var snap = Snapshot()
         snap.appendSections([.main])//, .loader])
         snap.appendItems(self.dataItems)
@@ -919,7 +912,7 @@ private extension SurveysCollectionView {
   func setRefreshControl() {
     if category == .Search {
       refreshControl = nil
-//      loadingIndicator.stopAnimating()
+      //      loadingIndicator.stopAnimating()
     } else {
       refreshControl = UIRefreshControl()
       refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
@@ -950,12 +943,12 @@ private extension SurveysCollectionView {
     } else if category == .ByOwner, let userprofile = userprofile {
       paginationByOwnerPublisher.send([userprofile: period])
     } else {
-//      isLoading = true
+      //      isLoading = true
       paginationPublisher.send([category: period])
     }
     isLoading = true
   }
- 
+  
   func appendToDataSource() {
     var snapshot = source.snapshot()
     guard let newInstance = dataItems.last, !snapshot.itemIdentifiers.contains(newInstance) else { return }
@@ -972,10 +965,62 @@ private extension SurveysCollectionView {
   func setDataSource(animatingDifferences: Bool = true) {
     var snapshot = Snapshot()
     snapshot.appendSections([.main])
-//    if category != .Search {
-//      snapshot.appendSections([.loader])
-//    }
+    //    if category != .Search {
+    //      snapshot.appendSections([.loader])
+    //    }
     snapshot.appendItems(filterByPeriod(dataItems), toSection: .main)
-    source.apply(snapshot, animatingDifferences: animatingDifferences)
+//    fatalError()
+//    source.apply(snapshot, animatingDifferences: animatingDifferences)
+    setLoading(source: source, snapshot: snapshot)
+  }
+  
+  @MainActor
+  func setLoading(source: Source, snapshot: Snapshot) {
+    
+    guard isApplyingSnapshot else {
+      self.isApplyingSnapshot = true
+#if DEBUG
+      print("isLoading", self.isLoading, to: &logger)
+#endif
+
+      if !isLoading {
+        self.isLoadingPublisher.send(self.isLoading)
+      }
+      
+      source.apply(snapshot, animatingDifferences: true) { [weak self] in
+        guard let self = self else { return }
+
+        self.isApplyingSnapshot = false
+        self.lock.unlock()
+        if self.isLoading {
+          self.isLoadingPublisher.send(self.isLoading)
+        }
+      }
+
+      return
+    }
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+      guard let self = self else { return }
+      
+      self.isApplyingSnapshot = true
+#if DEBUG
+      print("isLoading", self.isLoading, to: &logger)
+#endif
+
+      if !self.isLoading {
+        self.isLoadingPublisher.send(self.isLoading)
+      }
+      
+      source.apply(snapshot, animatingDifferences: true) { [weak self] in
+        guard let self = self else { return }
+        
+        self.isApplyingSnapshot = false
+        self.lock.unlock()
+        if self.isLoading {
+          self.isLoadingPublisher.send(self.isLoading)
+        }
+      }
+    }
   }
 }
