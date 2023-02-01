@@ -262,6 +262,13 @@ class Userprofile: Decodable {
       }
     }
   }
+  var compatibility: UserCompatibility? {
+    didSet {
+      guard let compatibility = compatibility else { return }
+      
+      compatibilityPublisher.send(compatibility)
+    }
+  }
   
   //Publishers
   public let imagePublisher = PassthroughSubject<UIImage, Error>()

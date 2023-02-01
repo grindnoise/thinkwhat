@@ -391,3 +391,5 @@
 "userprofile_compatibility_level_low" = "low";
 "userprofile_compatibility_level_middle" = "middle";
 "userprofile_compatibility_level_high" = "high";
+"userprofile_contrib_hint" = "Topics which user is interested in to discuss within community";
+"userprofile_сompatibility_hint" = "How united you are in the vector of thinking";

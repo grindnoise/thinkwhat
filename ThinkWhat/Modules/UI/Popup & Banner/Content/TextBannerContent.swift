@@ -24,6 +24,12 @@ class TextBannerContent: UIView {
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     instance.tintColor = imageTintColor
     
+    if let icon = icon {
+      instance.image = nil
+      icon.place(inside: instance)
+      icon.setIconColor(imageTintColor)
+    }
+    
     return instance
   }()
   private lazy var label: UILabel = {
@@ -57,6 +63,7 @@ class TextBannerContent: UIView {
   private let textStyle: UIFont.TextStyle
   private let fontName: String
   private let textAlignment: NSTextAlignment
+  private var icon: Icon?
   
   
   
@@ -75,6 +82,7 @@ class TextBannerContent: UIView {
   
   // MARK: - Initialization
   init(image: UIImage,
+       icon: Icon? = nil,
        text: String,
        textColor: UIColor = .label,
        tintColor: UIColor,
@@ -83,6 +91,7 @@ class TextBannerContent: UIView {
        textAlignment: NSTextAlignment = .center) {
     self.fontName = fontName
     self.image = image
+    self.icon = icon
     self.text = text
     self.textColor = textColor
     self.textStyle = textStyle

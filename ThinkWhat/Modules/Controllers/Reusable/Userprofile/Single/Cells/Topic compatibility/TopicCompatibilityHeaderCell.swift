@@ -1,5 +1,5 @@
 //
-//  UserCompatibilityCell.swift
+//  DetailsCompatibilityHeaderCell.swift
 //  ThinkWhat
 //
 //  Created by Pavel Bukharov on 01.02.2023.
@@ -9,19 +9,35 @@
 import UIKit
 import Combine
 
-class UserCompatibilityCell: UICollectionViewListCell {
+import UIKit
+import Combine
+
+class TopicCompatibilityHeaderCell: UICollectionViewListCell {
   
   // MARK: - Public properties
-  public weak var userprofile: Userprofile! {
+  public var compatibility: UserCompatibility! {
     didSet {
-      guard let userprofile = userprofile else { return }
+      guard let compatibility = compatibility else { return }
       
-      collectionView.userprofile = userprofile
+      collectionView.compatibility = compatibility
 //      setupUI()
     }
   }
   //Publishers
-  public let refreshPublisher = PassthroughSubject<Bool, Never>()
+  @Published public var fold = false {
+    didSet {
+//      guard let constraint = collectionView.getConstraint(identifier: "height") else { return }
+      
+//      isFolding = true
+//      setNeedsLayout()
+//      UIView.animate(withDuration: 0.2, animations:  { [weak self] in
+//        guard let self = self else { return }
+//
+//        constraint.constant = 0
+//        self.layoutIfNeeded()
+//      })
+    }
+  }
   //UI
   public var color: UIColor = .clear {
     didSet {
@@ -35,13 +51,10 @@ class UserCompatibilityCell: UICollectionViewListCell {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  private var wasUnfolded = false
-  private var minHeight: CGFloat = .zero
-  private var maxHeight: CGFloat = .zero
+  private var isFolding = false
   private let padding: CGFloat = 16
-  private lazy var collectionView: UserCompatibilityCollectionView = {
-    let instance = UserCompatibilityCollectionView()
-    instance.clipsToBounds = true
+  private lazy var collectionView: TopicCompatibilityCollectionView = {
+    let instance = TopicCompatibilityCollectionView()
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemFill : .secondarySystemBackground
     instance.publisher(for: \.bounds)
       .sink { instance.cornerRadius = $0.width * 0.05 }
@@ -50,44 +63,17 @@ class UserCompatibilityCell: UICollectionViewListCell {
     let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
     constraint.identifier = "height"
     constraint.isActive = true
-    
+  
     instance.publisher(for: \.contentSize)
-      .filter { $0 != .zero && abs(constraint.constant) != abs($0.height) && $0.height != 44 }
+      .filter { $0 != .zero && abs(constraint.constant) != abs($0.height) }
       .sink { [weak self] in
         guard let self = self,
-              !self.wasUnfolded
+              !self.isFolding
         else { return }
         
         self.setNeedsLayout()
         constraint.constant = $0.height
         self.layoutIfNeeded()
-        
-        guard instance.numberOfItems(inSection: 1) == 0 else {
-          self.maxHeight = max(self.maxHeight, $0.height)
-          return
-        }
-        self.minHeight = $0.height
-      }
-      .store(in: &subscriptions)
-    
-    instance.refreshPublisher
-      .sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.refreshPublisher.send($0)
-      }
-      .store(in: &subscriptions)
-    
-    instance.foldPublisher
-      .sink { [weak self] shouldFold in
-        guard let self = self else { return }
-        
-          self.wasUnfolded = true
-          self.setNeedsLayout()
-          UIView.animate(withDuration: 0.3) {
-            constraint.constant = shouldFold ? self.minHeight : self.maxHeight
-            self.layoutIfNeeded()
-          }
       }
       .store(in: &subscriptions)
 
@@ -119,7 +105,7 @@ class UserCompatibilityCell: UICollectionViewListCell {
   }
 }
 
-private extension UserCompatibilityCell {
+private extension TopicCompatibilityHeaderCell {
   @MainActor
   func setupUI() {
     collectionView.place(inside: self,

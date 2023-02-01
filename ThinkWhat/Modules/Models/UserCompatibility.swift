@@ -17,17 +17,21 @@ struct TopicCompatibility {
 }
 
 struct UserCompatibility {
+  var userId: String
   var percent: Int
   var value: Double { Double(percent)/100 }
   var details: [TopicCompatibility]
   
   init?(_ json: JSON) {
     guard let compatibility = json["compatibility"].dictionary,
+          let id = compatibility["id"]?.string,
           let total = compatibility["total"]?.int,
           let matches = compatibility["matches"]?.int,
           let topics = json["topics"].array
     else { return nil }
+    
     details = []
+    userId = id
     percent = 100 * matches / total
     topics.forEach { dict in
       guard let topicId = dict["topic"].int,
@@ -45,5 +49,17 @@ struct UserCompatibility {
                                              percent: 100 * matchesIds.count / total)
       details.append(compatibility)
     }
+  }
+}
+
+extension UserCompatibility: Hashable {
+  static func == (lhs: UserCompatibility, rhs: UserCompatibility) -> Bool {
+    return lhs.userId == rhs.userId
+  }
+}
+
+extension TopicCompatibility: Hashable {
+  static func == (lhs: TopicCompatibility, rhs: TopicCompatibility) -> Bool {
+    return lhs.topic.hashValue == rhs.topic.hashValue
   }
 }

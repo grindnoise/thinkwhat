@@ -1089,9 +1089,10 @@ class API {
                                                  headers: parent.headers())
         let json = try JSON(data: data, options: .mutableContainers)
         
-        guard let compatibility = UserCompatibility(json) else { throw APIError.badData }
+        userprofile.compatibility = UserCompatibility(json)
         
-        userprofile.compatibilityPublisher.send(compatibility)
+//        userprofile.compatibility = compatibility
+//        userprofile.compatibilityPublisher.send(compatibility)
       } catch {
         userprofile.compatibilityPublisher.send(completion: .failure(error))
       }

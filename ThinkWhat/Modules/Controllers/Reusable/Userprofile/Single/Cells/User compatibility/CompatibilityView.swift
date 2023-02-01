@@ -17,14 +17,26 @@ class CompatibilityView: UIView {
   
   // MARK: - Public properties
   public var username = ""
-  public var percent: Double = 0 {
+  public var percent: Double = .zero {
     didSet {
       guard percent != oldValue else { return }
       
-      setProgress(value: percent)
-      animate(duration: 1, delay: 0)
+      foregroundCircle.path = getProgressPath(in: percentageView.bounds,
+                                              progress: percent,
+                                              lineWidth: percentageView.bounds.width * lineWidthMultiplier)
+      animate(duration: 1, delay: 0.15)
     }
   }
+  //Publishers
+  @Published var showDetails = false 
+  //UI
+  public var color: UIColor = .clear {
+    didSet {
+      updateUI()
+    }
+  }
+  
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -56,7 +68,10 @@ class CompatibilityView: UIView {
   private lazy var disclosureButton: UIButton = {
     let instance = UIButton()
     instance.tintColor = color
-    
+    instance.contentVerticalAlignment = .bottom
+    instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
+//    instance.heightAnchor.constraint(equalToConstant: "more_info".localized.uppercased().height(withConstrainedWidth: 1000,
+//                                                                                                font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)!)).isActive = true
     return instance
   }()
   private lazy var percentageView: UIView = {
@@ -72,28 +87,40 @@ class CompatibilityView: UIView {
         let lineWidth = rect.width * self.lineWidthMultiplier
         self.backgroundCircle.lineWidth = lineWidth
         self.backgroundCircle.path = UIBezierPath(ovalIn: rect.insetBy(dx: lineWidth/2, dy: lineWidth/2)).cgPath
+        
+        guard self.percent != .zero else { return }
+
+        self.foregroundCircle.path = self.getProgressPath(in: rect, progress: self.percent, lineWidth: lineWidth)
       }
       .store(in: &subscriptions)
+        
     percentageLabel.placeInCenter(of: instance, heightMultiplier: 0.75)
     
     return instance
   }()
-  private lazy var descriptionStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      descriptionLabel,
-      disclosureButton,
-    ])
-    instance.spacing = padding
-    instance.axis = .vertical
-//    descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-//    descriptionLabel.heightAnchor.constraint(equalTo: instance.heightAnchor, multiplier: <#T##CGFloat#>)
+  private lazy var descriptionView: UIView = {
+    let instance = UIView()
+    instance.alpha = 0
+    
+    descriptionLabel.place(inside: instance)
+    instance.addSubview(disclosureButton)
+    disclosureButton.translatesAutoresizingMaskIntoConstraints = false
+    disclosureButton.bottomAnchor.constraint(equalTo: instance.bottomAnchor).isActive = true
+    disclosureButton.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
+    
+//    UIStackView(arrangedSubviews: [
+//      descriptionLabel,
+//      disclosureButton,
+//    ])
+//    instance.spacing = padding
+//    instance.axis = .vertical
     
     return instance
   }()
   private lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
       percentageView,
-      descriptionStack
+      descriptionView
     ])
     instance.spacing = padding
     instance.axis = .horizontal
@@ -105,7 +132,7 @@ class CompatibilityView: UIView {
     instance.path = UIBezierPath(ovalIn: .zero).cgPath
     instance.fillColor = UIColor.clear.cgColor
     instance.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.systemGray.withAlphaComponent(0.1).cgColor
-    instance.lineWidth = 10
+//    instance.lineWidth = 10
     instance.lineCap = .round
     
     return instance
@@ -115,14 +142,28 @@ class CompatibilityView: UIView {
     instance.path = UIBezierPath(ovalIn: .zero).cgPath
     instance.fillColor = UIColor.clear.cgColor
     instance.strokeColor = color.cgColor
-    instance.lineWidth = 10
+//    instance.lineWidth = 10
     instance.lineCap = .round
+//    instance.publisher(for: \.bounds)
+//      .sink { [weak self] in
+//        guard let self = self else { return }
+//
+//        let lineWidth = percentageView.bounds.width * lineWidthMultiplier
+//        let startAngle = -CGFloat.pi / 2
+//        let path = UIBezierPath(arcCenter: CGPoint(x: percentageView.bounds.midX, y: percentageView.bounds.midY),
+//                                radius: percentageView.bounds.width/2 - lineWidth/2,
+//                                startAngle: startAngle,
+//                                endAngle: CGFloat.pi * 2 * value / 100 + startAngle,
+//                                clockwise: true)
+//        foregroundCircle.path = path.cgPath
+//      }
+//      .store(in: &subscriptions)
     
     return instance
   }()
   private let padding: CGFloat = 8
   private var isAnimating = false
-  private var color: UIColor
+  
   
   
   // MARK: - Deinitialization
@@ -139,14 +180,20 @@ class CompatibilityView: UIView {
   
   
   // MARK: - Initialization
-  init(color: UIColor) {
-    self.color = color
-    
+  override init(frame: CGRect) {
     super.init(frame: .zero)
     
     accessibilityIdentifier = "CompatibilityView"
     setupUI()
   }
+//  init(color: UIColor) {
+//    self.color = color
+//
+//    super.init(frame: .zero)
+//
+//    accessibilityIdentifier = "CompatibilityView"
+//    setupUI()
+//  }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
@@ -157,8 +204,8 @@ class CompatibilityView: UIView {
   // MARK: - Public methods
   public func animate(duration: TimeInterval, delay: TimeInterval) {
     func setDescriptionLabel() {
-      descriptionStack.alpha = 0
-      descriptionStack.transform = .init(scaleX: 0.75, y: 0.75)
+      descriptionView.alpha = 0
+      descriptionView.transform = .init(scaleX: 0.75, y: 0.75)
       
       var level = "userprofile_compatibility_level_low".localized
       if  33..<66 ~= Int(percent) {
@@ -193,8 +240,8 @@ class CompatibilityView: UIView {
       UIView.animate(withDuration: 0.35, delay: 0.1) { [weak self] in
         guard let self = self else { return }
         
-        self.descriptionStack.alpha = 1
-        self.descriptionStack.transform = .identity
+        self.descriptionView.alpha = 1
+        self.descriptionView.transform = .identity
       }
     }
     
@@ -262,18 +309,22 @@ private extension CompatibilityView {
   
   @MainActor
   func updateUI() {
-
+    foregroundCircle.strokeColor = color.cgColor
   }
   
-  func setProgress(value: Double) {
-    let lineWidth = percentageView.bounds.width * lineWidthMultiplier
+  func getProgressPath(in rect: CGRect, progress: Double, lineWidth: CGFloat) -> CGPath {
     let startAngle = -CGFloat.pi / 2
-    let path = UIBezierPath(arcCenter: CGPoint(x: percentageView.bounds.midX, y: percentageView.bounds.midY),
-                            radius: percentageView.bounds.width/2 - lineWidth/2,
-                            startAngle: startAngle,
-                            endAngle: CGFloat.pi * 2 * value / 100 + startAngle,
-                            clockwise: true)
-    foregroundCircle.path = path.cgPath
+    foregroundCircle.lineWidth = lineWidth
+    return UIBezierPath(arcCenter: CGPoint(x: rect.midX, y: rect.midY),
+                        radius: rect.width/2 - lineWidth/2,
+                        startAngle: startAngle,
+                        endAngle: CGFloat.pi * 2 * progress / 100 + startAngle,
+                        clockwise: true).cgPath
+  }
+  
+  @objc
+  func handleTap() {
+    showDetails = !showDetails
   }
 }
 

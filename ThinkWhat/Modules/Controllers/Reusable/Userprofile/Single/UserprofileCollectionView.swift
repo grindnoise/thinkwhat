@@ -99,7 +99,7 @@ private extension UserprofileCollectionView {
       configuration.showsSeparators = false
       
       let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: environment)
-      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? 30 : 8, trailing: 0)
+      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? 80 : 8, trailing: 0)
       return sectionLayout
     }
     
@@ -110,6 +110,15 @@ private extension UserprofileCollectionView {
         .filter { !$0.isNil }
         .sink {
           cell.color = $0!
+        }
+        .store(in: &self.subscriptions)
+      
+      cell.refreshPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.source.refresh()
         }
         .store(in: &self.subscriptions)
       
@@ -178,6 +187,13 @@ private extension UserprofileCollectionView {
     let interestsCellRegistration = UICollectionView.CellRegistration<UserInterestsCell, AnyHashable> { [unowned self] cell, indexPath, item in
       guard let userprofile = self.userprofile else { return }
       
+      cell.color = self.color
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink {
+          cell.color = $0!
+        }
+        .store(in: &self.subscriptions)
       cell.topicPublisher
         .sink { [weak self] in
           guard let self = self else { return }

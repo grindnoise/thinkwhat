@@ -1,28 +1,46 @@
 //
-//  UserInterestsCell.swift
+//  UserCompatibilityHeaderCell.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 03.11.2022.
-//  Copyright © 2022 Pavel Bukharov. All rights reserved.
+//  Created by Pavel Bukharov on 30.01.2023.
+//  Copyright © 2023 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 import Combine
 
-class UserInterestsCell: UICollectionViewListCell {
+class UserCompatibilityHeaderCell: UICollectionViewListCell {
   
   // MARK: - Public properties
   public weak var userprofile: Userprofile! {
     didSet {
       guard let userprofile = userprofile else { return }
       
-      collectionView.userprofile = userprofile
+      setupUI()
+      compatibilityView.username = userprofile.firstNameSingleWord
+      
+      userprofile.compatibilityPublisher//.shareReplay()
+        .receive(on: DispatchQueue.main)
+        .sink { error in
+          print(error)
+        } receiveValue: { [weak self] in
+          guard let self = self else { return }
+          
+          self.compatibilityView.percent = Double($0.percent)
+//          self.compatibilityView.animate(duration: 1, delay: 0.5)
+        }
+        .store(in: &subscriptions)
     }
   }
   //Publishers
-  public let topicPublisher = PassthroughSubject<Topic, Never>()
+  @Published public var showDetails = false
   //UI
-  public var color: UIColor = .clear
+  public var color: UIColor = .clear {
+    didSet {
+      compatibilityView.color = color
+    }
+  }
+  
   
   
   // MARK: - Private properties
@@ -38,21 +56,25 @@ class UserInterestsCell: UICollectionViewListCell {
                       for: .normal)
     instance.tintColor = .secondaryLabel
     instance.addTarget(self, action: #selector(self.hintTapped), for: .touchUpInside)
-//    instance.heightAnchor.constraint(equalTo: instance., multiplier: <#T##CGFloat#>)
     
     return instance
   }()
-  private lazy var background: UIView = {
-    let instance = UIView()
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    instance.publisher(for: \.bounds, options: .new)
-      .sink { rect in
-        instance.cornerRadius = rect.width*0.05
-      }
+  private lazy var compatibilityView: CompatibilityView = {
+    let instance = CompatibilityView()
+    instance.heightAnchor.constraint(equalToConstant: 120).isActive = true
+    instance.$showDetails
+      .sink { [unowned self] in self.showDetails = $0 }
       .store(in: &subscriptions)
-    stack.place(inside: instance,
-                insets: .uniform(size: padding),
-                bottomPriority: .defaultLow)
+    
+    return instance
+  }()
+  private lazy var verticalStack: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [
+      stack,
+      compatibilityView
+    ])
+    instance.axis = .vertical
+    instance.spacing = padding
     
     return instance
   }()
@@ -66,17 +88,17 @@ class UserInterestsCell: UICollectionViewListCell {
     
     let instance = UIStackView(arrangedSubviews: [
       stack,
-      collectionView
+      compatibilityView
     ])
     instance.axis = .vertical
-    instance.spacing = 16
+    instance.spacing = padding
     
     return instance
   }()
   private lazy var label: UILabel = {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
-    instance.text = "userprofile_community_contribution".localized.uppercased()
+    instance.text = "userprofile_compatibility".localized.uppercased()
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
     
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
@@ -98,37 +120,7 @@ class UserInterestsCell: UICollectionViewListCell {
     
     return instance
   }()
-  private lazy var collectionView: InterestsCollectionView = {
-    let instance = InterestsCollectionView()
-    instance.backgroundColor = .clear
-    
-    let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
-    constraint.priority = .defaultHigh
-    constraint.identifier = "height"
-    constraint.isActive = true
-    
-    instance.publisher(for: \.contentSize, options: .new)
-      .sink { [weak self] rect in
-        guard let self = self,
-              let constraint = instance.getConstraint(identifier: "height")
-        else { return }
-        
-        self.setNeedsLayout()
-        constraint.constant = rect.height
-        self.layoutIfNeeded()
-      }
-      .store(in: &subscriptions)
-    
-    instance.interestPublisher
-      .sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.topicPublisher.send($0)
-      }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
+  
   
   
   // MARK: - Destructor
@@ -146,8 +138,6 @@ class UserInterestsCell: UICollectionViewListCell {
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
-    
-    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -173,21 +163,22 @@ class UserInterestsCell: UICollectionViewListCell {
   //    }
 }
 
-private extension UserInterestsCell {
+private extension UserCompatibilityHeaderCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
     clipsToBounds = true
     
-    background.place(inside: self,
-                     insets: UIEdgeInsets(top: padding, left: padding, bottom: 0, right: padding))
+    stack.place(inside: self,
+                insets: UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding),
+                bottomPriority: .defaultLow)
   }
   
   @objc
   func hintTapped() {
     let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
                                                           icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: color),
-                                                          text: "userprofile_contrib_hint",
+                                                          text: "userprofile_сompatibility_hint",
                                                           tintColor: .clear,
                                                           fontName: Fonts.Regular,
                                                           textStyle: .headline,
@@ -201,4 +192,5 @@ private extension UserInterestsCell {
       .store(in: &self.subscriptions)
   }
 }
+
 

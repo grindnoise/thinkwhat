@@ -391,3 +391,5 @@
 "userprofile_compatibility_level_low" = "низкий";
 "userprofile_compatibility_level_middle" = "средний";
 "userprofile_compatibility_level_high" = "высокий";
+"userprofile_contrib_hint" = "Интересующие пользователя темы, которые он обсудил с сообществом";
+"userprofile_сompatibility_hint" = "То, насколько вы едины в векторе мышления";

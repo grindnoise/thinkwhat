@@ -492,8 +492,13 @@
 		ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE43694251C7FD300C1428D /* CustomSwitch.swift */; };
 		ABE4927F28AD2B7400637A8B /* ClaimPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4927E28AD2B7400637A8B /* ClaimPopupContent.swift */; };
 		ABE4928228AD2DBF00637A8B /* ClaimCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4928128AD2DBF00637A8B /* ClaimCollectionView.swift */; };
+		ABE56C15298AA264004C761D /* UserCompatibilityCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE56C14298AA264004C761D /* UserCompatibilityCollectionView.swift */; };
+		ABE56C17298AA681004C761D /* UserCompatibilityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE56C16298AA681004C761D /* UserCompatibilityCell.swift */; };
+		ABE56C1B298AC4C8004C761D /* TopicCompatibilityCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE56C1A298AC4C8004C761D /* TopicCompatibilityCollectionView.swift */; };
+		ABE56C1D298AC4FB004C761D /* TopicCompatibilityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE56C1C298AC4FB004C761D /* TopicCompatibilityCell.swift */; };
+		ABE56C1F298AC623004C761D /* TopicCompatibilityHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE56C1E298AC623004C761D /* TopicCompatibilityHeaderCell.swift */; };
 		ABE884A42987B46800ACEFC7 /* UserCompatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE884A32987B46800ACEFC7 /* UserCompatibility.swift */; };
-		ABE884A62987CCA200ACEFC7 /* UserCompatibilityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE884A52987CCA200ACEFC7 /* UserCompatibilityCell.swift */; };
+		ABE884A62987CCA200ACEFC7 /* UserCompatibilityHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE884A52987CCA200ACEFC7 /* UserCompatibilityHeaderCell.swift */; };
 		ABE884A82987D61400ACEFC7 /* CompatibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE884A72987D61400ACEFC7 /* CompatibilityView.swift */; };
 		ABEAEBF4266F4FFA00641C7E /* ArcLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */; };
 		ABEB5F7F285E1E0600C75C31 /* LimitsSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABEB5F7E285E1E0600C75C31 /* LimitsSelectionView.swift */; };
@@ -1050,8 +1055,13 @@
 		ABE43694251C7FD300C1428D /* CustomSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSwitch.swift; sourceTree = "<group>"; };
 		ABE4927E28AD2B7400637A8B /* ClaimPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimPopupContent.swift; sourceTree = "<group>"; };
 		ABE4928128AD2DBF00637A8B /* ClaimCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimCollectionView.swift; sourceTree = "<group>"; };
+		ABE56C14298AA264004C761D /* UserCompatibilityCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompatibilityCollectionView.swift; sourceTree = "<group>"; };
+		ABE56C16298AA681004C761D /* UserCompatibilityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompatibilityCell.swift; sourceTree = "<group>"; };
+		ABE56C1A298AC4C8004C761D /* TopicCompatibilityCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCompatibilityCollectionView.swift; sourceTree = "<group>"; };
+		ABE56C1C298AC4FB004C761D /* TopicCompatibilityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCompatibilityCell.swift; sourceTree = "<group>"; };
+		ABE56C1E298AC623004C761D /* TopicCompatibilityHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCompatibilityHeaderCell.swift; sourceTree = "<group>"; };
 		ABE884A32987B46800ACEFC7 /* UserCompatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompatibility.swift; sourceTree = "<group>"; };
-		ABE884A52987CCA200ACEFC7 /* UserCompatibilityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompatibilityCell.swift; sourceTree = "<group>"; };
+		ABE884A52987CCA200ACEFC7 /* UserCompatibilityHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompatibilityHeaderCell.swift; sourceTree = "<group>"; };
 		ABE884A72987D61400ACEFC7 /* CompatibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibilityView.swift; sourceTree = "<group>"; };
 		ABEAEBF3266F4FF900641C7E /* ArcLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcLabel.swift; sourceTree = "<group>"; };
 		ABEB5F7E285E1E0600C75C31 /* LimitsSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitsSelectionView.swift; sourceTree = "<group>"; };
@@ -1887,12 +1897,13 @@
 		AB592E222906C7A20082EE13 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				ABE56C19298AC481004C761D /* Topic compatibility */,
+				ABE56C18298AC448004C761D /* User compatibility */,
 				AB776A0D298172C000176349 /* Stats */,
 				AB592E232906C8180082EE13 /* UserCredentialsCell.swift */,
 				AB5B624C2914300A007F413E /* UserInterestsCell.swift */,
 				AB776A0B2981709A00176349 /* UserStatsCell.swift */,
-				ABE884A52987CCA200ACEFC7 /* UserCompatibilityCell.swift */,
-				ABE884A72987D61400ACEFC7 /* CompatibilityView.swift */,
+				ABE56C16298AA681004C761D /* UserCompatibilityCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -2850,6 +2861,26 @@
 			path = "Options selection";
 			sourceTree = "<group>";
 		};
+		ABE56C18298AC448004C761D /* User compatibility */ = {
+			isa = PBXGroup;
+			children = (
+				ABE884A72987D61400ACEFC7 /* CompatibilityView.swift */,
+				ABE884A52987CCA200ACEFC7 /* UserCompatibilityHeaderCell.swift */,
+				ABE56C14298AA264004C761D /* UserCompatibilityCollectionView.swift */,
+			);
+			path = "User compatibility";
+			sourceTree = "<group>";
+		};
+		ABE56C19298AC481004C761D /* Topic compatibility */ = {
+			isa = PBXGroup;
+			children = (
+				ABE56C1E298AC623004C761D /* TopicCompatibilityHeaderCell.swift */,
+				ABE56C1A298AC4C8004C761D /* TopicCompatibilityCollectionView.swift */,
+				ABE56C1C298AC4FB004C761D /* TopicCompatibilityCell.swift */,
+			);
+			path = "Topic compatibility";
+			sourceTree = "<group>";
+		};
 		ABEB5F7D285E1DE600C75C31 /* Limits */ = {
 			isa = PBXGroup;
 			children = (
@@ -3295,6 +3326,7 @@
 				AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */,
 				AB0AB63D27B5001F006FD33F /* AgreementView.swift in Sources */,
 				AB90FAFF28D4C6EF0096B147 /* InterestCell.swift in Sources */,
+				ABE56C15298AA264004C761D /* UserCompatibilityCollectionView.swift in Sources */,
 				ABBA73FA2386EC7B00540ECF /* NewIcon.swift in Sources */,
 				AB92112428E993C000BA12CA /* UserSettingsAccountCell.swift in Sources */,
 				AB7599ED245B29FE008B0569 /* SurveyPreview.swift in Sources */,
@@ -3317,6 +3349,7 @@
 				AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */,
 				AB72961627DA3F2300D45B54 /* SubscriptionsController.swift in Sources */,
 				ABA448EA27EE030B00F8E00D /* PollController.swift in Sources */,
+				ABE56C1B298AC4C8004C761D /* TopicCompatibilityCollectionView.swift in Sources */,
 				ABA7829928589D3600964FDE /* AddChoiceContentView.swift in Sources */,
 				AB8DA34227A182D300F92C18 /* SignupModel.swift in Sources */,
 				AB60B5BD285CD6150023C99B /* CommentsSelection.swift in Sources */,
@@ -3408,7 +3441,7 @@
 				AB1F34CE286B1D080086969E /* URLPasteView.swift in Sources */,
 				AB72964B27DB612000D45B54 /* SettingsView.swift in Sources */,
 				AB0980DC24CF04A100A02405 /* UserActivityCell.swift in Sources */,
-				ABE884A62987CCA200ACEFC7 /* UserCompatibilityCell.swift in Sources */,
+				ABE884A62987CCA200ACEFC7 /* UserCompatibilityHeaderCell.swift in Sources */,
 				AB04144F244EF3A600336857 /* SurveyStackViewController.swift in Sources */,
 				ABB80C8928B8ED76003D6C20 /* CommentHeaderCell.swift in Sources */,
 				AB5CA11824F5418500F55DEC /* TransitionCoordinator.swift in Sources */,
@@ -3478,6 +3511,7 @@
 				ABB6397628816B9000E4B4EF /* LinkPreviewCell.swift in Sources */,
 				ABDAE152258211D5007DD188 /* 3_VotesCountViewController.swift in Sources */,
 				AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */,
+				ABE56C1F298AC623004C761D /* TopicCompatibilityHeaderCell.swift in Sources */,
 				ABBA73FE2387C5A200540ECF /* FlameIcon.swift in Sources */,
 				AB8C99522485322000BC517B /* ClaimBarButton.swift in Sources */,
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
@@ -3512,6 +3546,7 @@
 				ABB0F6C528F5A4550068FDDF /* LanguageListContract.swift in Sources */,
 				AB913F8B28097D9C00609D51 /* ProgressCircle.swift in Sources */,
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
+				ABE56C17298AA681004C761D /* UserCompatibilityCell.swift in Sources */,
 				AB72964327DB60C800D45B54 /* SettingsController.swift in Sources */,
 				ABB0F6C828F5A4550068FDDF /* LanguageListModel.swift in Sources */,
 				AB52719E28EC1B1D0000F095 /* UserprofilesController.swift in Sources */,
@@ -3590,6 +3625,7 @@
 				AB63D7D6283FC03A00173116 /* TopicSelection.swift in Sources */,
 				AB39F40F2847457200DEE0ED /* InsetTextField.swift in Sources */,
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
+				ABE56C1D298AC4FB004C761D /* TopicCompatibilityCell.swift in Sources */,
 				AB4727A9268C6444002A9563 /* UI.swift in Sources */,
 				AB3A47D1283F59D200106407 /* PollCreationContract.swift in Sources */,
 				AB090D85287727FA00FAFAB0 /* AnswerCell.swift in Sources */,
