@@ -39,7 +39,7 @@ class UserprofilesController: UIViewController, TintColorable {
   //Logic
   private var selectedItems: [Userprofile] = []
   //UI
-  private var color: UIColor = .clear
+  private let padding: CGFloat = 8
   private var gridItemSize: UserprofilesController.GridItemSize = .third {
     didSet {
       guard oldValue != gridItemSize else { return }
@@ -51,6 +51,27 @@ class UserprofilesController: UIViewController, TintColorable {
       button.menu = prepareMenu()
     }
   }
+  private lazy var titleView: UILabel = {
+    let instance = UILabel()
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    instance.font = UIFont(name: Fonts.Bold, size: 20)
+    instance.textAlignment = .center
+    switch mode {
+    case .Subscribers:
+      instance.text = "subscribers".localized.uppercased()
+    case .Subscriptions:
+      instance.text = "subscribed_at".localized.uppercased()
+    case .Voters:
+      instance.text = "subscribers".localized.uppercased()
+    }
+    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font) + padding*2).isActive = true
+    instance.textColor = .white
+    instance.backgroundColor = tintColor
+    
+    return instance
+  }()
   
   // MARK: - Deinitialization
   deinit {
@@ -115,9 +136,6 @@ class UserprofilesController: UIViewController, TintColorable {
     self.view = view as UIView
     
     setupUI()
-    //        setToolBar()
-    //        setNavigationBarAppearance(largeTitleColor: mode == .Voters ? .white : .label, smallTitleColor: mode == .Voters ? .white : .label)
-    //        setNavigationBarAppearance(largeTitleColor: <#UIColor#>, smallTitleColor: <#UIColor#>)
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -229,6 +247,10 @@ private extension UserprofilesController {
     }
     
     switch mode {
+    case .Subscribers, .Subscriptions:
+      if let userprofile = userprofile, !userprofile.isCurrent {
+        navigationItem.titleView = titleView
+      }
     case .Voters:
       guard let answer = answer else { return }
       
@@ -240,10 +262,6 @@ private extension UserprofilesController {
       imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(recognizer:))))
       navigationItem.titleView = imageView
       navigationBar.tintColor = tintColor
-    default:
-#if DEBUG
-      print("test")
-#endif
     }
     
     setBarButtons()
@@ -390,15 +408,36 @@ private extension UserprofilesController {
   }
   
   func setBarButtons() {
-    
-    //        let button = UIBarButtonItem(image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)), style: .plain, target: self, action: #selector(self.handleTap), m)
-    
-    let button = UIBarButtonItem(title: "actions".localized.capitalized,
-                                 image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                 primaryAction: nil,
-                                 menu: prepareMenu())
-    
-    navigationItem.setRightBarButton(button, animated: true)
+    switch mode {
+    case .Subscribers, .Subscriptions:
+      guard let userprofile = userprofile else { return }
+      
+      let avatar = Avatar(userprofile: userprofile)
+      avatar.heightAnchor.constraint(equalToConstant: 40).isActive = true
+      avatar.tapPublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          let banner = NewBanner(contentView: UserBannerContentView(mode: .Username,
+                                                                      userprofile: userprofile),
+                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                 isModal: false,
+                                 useContentViewHeight: true,
+                                 shouldDismissAfter: 1)
+          banner.didDisappearPublisher
+            .sink { _ in banner.removeFromSuperview() }
+            .store(in: &self.subscriptions)
+        }
+        .store(in: &subscriptions)
+      navigationItem.setRightBarButton(UIBarButtonItem(customView: avatar), animated: false)
+    case .Voters:
+      let button = UIBarButtonItem(title: "actions".localized.capitalized,
+                                   image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                   primaryAction: nil,
+                                   menu: prepareMenu())
+      
+      navigationItem.setRightBarButton(button, animated: true)
+    }
   }
   
   func setTasks() {

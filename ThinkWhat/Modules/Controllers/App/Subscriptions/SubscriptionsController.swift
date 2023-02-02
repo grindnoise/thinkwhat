@@ -534,6 +534,10 @@ extension SubscriptionsController: SubscriptionsViewInput {
     navigationItem.backBarButtonItem = backItem
     navigationController?.pushViewController(UserprofileController(userprofile: userprofile, color: tintColor), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard let controller = tabBarController as? MainController else { return }
+    
+    controller.toggleLogo(on: false)
   }
   
   func onDataSourceRequest(userprofile: Userprofile, dateFilter: Period?) {

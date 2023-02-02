@@ -32,6 +32,9 @@ final class UserCompatibilityCollectionView: UICollectionView {
   public let foldPublisher = PassthroughSubject<Bool, Never>()
   public let refreshPublisher = PassthroughSubject<Bool, Never>()
   public let foldDetailsPublisher = PassthroughSubject<Bool, Never>()
+  public let disclosurePublisher = PassthroughSubject<TopicCompatibility, Never>()
+  
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -118,13 +121,9 @@ private extension UserCompatibilityCollectionView {
       cell.compatibility = self.userprofile.compatibility
 
       
-//      self.foldDetailsPublisher
-//        .sink { [weak self] _ in
-//          guard let self = self else { return }
-//
-//          self.foldDetailsPublisher.send(true)
-//        }
-//        .store(in: &self.subscriptions)
+      cell.disclosurePublisher
+        .sink { [unowned self] in  self.disclosurePublisher.send($0) }
+        .store(in: &self.subscriptions)
       
       self.$color
         .filter { $0 != .clear }

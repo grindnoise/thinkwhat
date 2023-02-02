@@ -12,9 +12,9 @@ import Combine
 class SurveysController: UIViewController, TintColorable {
   
   // MARK: - Overridden properties
-  override var preferredStatusBarStyle: UIStatusBarStyle {
-    return mode == .Topic ? .lightContent : .default
-  }
+//  override var preferredStatusBarStyle: UIStatusBarStyle {
+//    return mode == .Topic ? .lightContent : .default
+//  }
   
   
   

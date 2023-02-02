@@ -13,9 +13,11 @@ import Combine
 class Survey: Decodable {
   // MARK: - Enums
   enum SurveyCategory: String, CaseIterable {
-    case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic, Search, ByOwner
+    case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic, Search, ByOwner, Compatibility
     
-    func dataItems(_ topic: Topic? = nil, _ userprofile: Userprofile? = nil) -> [SurveyReference] {
+    func dataItems(topic: Topic? = nil,
+                   userprofile: Userprofile? = nil,
+                   compatibility: TopicCompatibility? = nil) -> [SurveyReference] {
       switch self {
       case .Hot:
         return Surveys.shared.hot.map { return $0.reference }.filter { !$0.isClaimed && !$0.isBanned }
@@ -53,6 +55,10 @@ class Survey: Decodable {
         return SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned }
       case .Search:
         fatalError()
+      case .Compatibility:
+        guard let compatibility = compatibility else { return [] }
+        
+        return SurveyReferences.shared[compatibility.surveys]
       }
     }
     
@@ -79,6 +85,8 @@ class Survey: Decodable {
         return API_URLS.Surveys.searchBySubstring
       case .ByOwner:
         return API_URLS.Surveys.byUserprofile
+      case .Compatibility:
+        return API_URLS.Surveys.ids
       }
     }
   }

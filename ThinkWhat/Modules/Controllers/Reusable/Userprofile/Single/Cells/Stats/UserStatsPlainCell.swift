@@ -57,14 +57,16 @@ class UserStatsPlainCell: UICollectionViewListCell {
     ])
     instance.axis = .horizontal
     instance.spacing = padding/2
-    instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: leftLabel.font)).isActive  = true
+    instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100,
+                                                                    font: leftLabel.font)).isActive  = true
     
     return instance
   }()
   private lazy var leftLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+                                      forTextStyle: .body)
     
     return instance
   }()

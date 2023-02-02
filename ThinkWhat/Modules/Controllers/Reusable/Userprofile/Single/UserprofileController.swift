@@ -41,6 +41,21 @@ class UserprofileController: UIViewController, TintColorable {
                                        animated: true)
     }
   }
+  private let padding: CGFloat = 8
+  private lazy var titleView: UILabel = {
+    let instance = UILabel()
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    instance.font = UIFont(name: Fonts.Bold, size: 20)
+    instance.textAlignment = .center
+    instance.text = "profile".localized.uppercased()
+    instance.widthAnchor.constraint(equalToConstant: "profile".localized.uppercased().width(withConstrainedHeight: 100, font: instance.font) + padding*2).isActive = true
+    instance.textColor = .white
+    instance.backgroundColor = tintColor
+    
+    return instance
+  }()
   
   
   
@@ -112,6 +127,7 @@ private extension UserprofileController {
   
   @MainActor
   func setupUI() {
+    navigationItem.titleView = titleView
     setBarItems()
     //        navigationController?.navigationBar.alpha = 1
   }
@@ -197,6 +213,18 @@ private extension UserprofileController {
 }
 
 extension UserprofileController: UserprofileViewInput {
+  func crossingSurveys(_: TopicCompatibility) {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.pushViewController(SurveysController(userprofile, color: tintColor), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard let controller = tabBarController as? MainController else { return }
+    
+    controller.toggleLogo(on: false)
+  }
+  
   func compatibility(with userprofile: Userprofile) {
     controllerInput?.compatibility(with: userprofile)
   }

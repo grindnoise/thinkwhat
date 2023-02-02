@@ -136,9 +136,9 @@ class SurveysCollectionView: UICollectionView {
   private var dataItems: [SurveyReference] {
     var items: [SurveyReference] = []
     if category == .ByOwner, let userprofile = userprofile {
-      items = category.dataItems(nil, userprofile)
+      items = category.dataItems(userprofile: userprofile)
     } else if category == .Topic, !topic.isNil {
-      items = category.dataItems(topic)
+      items = category.dataItems(topic: topic)
     } else if category == .Search {
       items = fetchResult
     } else {

@@ -1224,7 +1224,11 @@ class API {
       }
     }
     
-    public func surveyReferences(category: Survey.SurveyCategory, dateFilter: Period? = nil, topic: Topic? = nil, userprofile: Userprofile? = nil) async throws {
+    public func surveyReferences(category: Survey.SurveyCategory,
+                                 dateFilter: Period? = nil,
+                                 topic: Topic? = nil,
+                                 userprofile: Userprofile? = nil,
+                                 compatibility: TopicCompatibility? = nil) async throws {
       guard let url = category.url,
             let headers = headers
       else { throw APIError.invalidURL }
@@ -1236,6 +1240,12 @@ class API {
       } else if category == .ByOwner, let userprofile = userprofile {
         parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
         parameters["userprofile_id"] = userprofile.id
+      } else if category == .Compatibility, let compatibility = compatibility {
+        let fullSet = Set(compatibility.surveys)
+        let existingSet = Set(Set(category.dataItems(compatibility: compatibility).map { $0.id }))
+        let difference = fullSet.symmetricDifference(existingSet)
+        
+        parameters = ["exclude_ids": difference]
       } else {
         parameters = ["exclude_ids": category.dataItems().map { $0.id }]
       }

@@ -28,7 +28,13 @@ class CompatibilityView: UIView {
     }
   }
   //Publishers
-  @Published var showDetails = false 
+  @Published var showDetails = false {
+    didSet {
+      guard oldValue != showDetails else { return }
+      
+      setButtonTitle()
+    }
+  }
   //UI
   public var color: UIColor = .clear {
     didSet {
@@ -43,7 +49,7 @@ class CompatibilityView: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  private let lineWidthMultiplier: CGFloat = 0.115
+  private let lineWidthMultiplier: CGFloat = 0.1
   private lazy var descriptionLabel: UILabel = {
     let instance = UILabel()
     instance.textAlignment = .center
@@ -65,15 +71,44 @@ class CompatibilityView: UIView {
     
     return instance
   }()
-  private lazy var disclosureButton: UIButton = {
-    let instance = UIButton()
-    instance.tintColor = color
-    instance.contentVerticalAlignment = .bottom
-    instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
-//    instance.heightAnchor.constraint(equalToConstant: "more_info".localized.uppercased().height(withConstrainedWidth: 1000,
-//                                                                                                font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)!)).isActive = true
+  private lazy var disclosureView: UIStackView = {
+    let label = UILabel()
+    label.isUserInteractionEnabled = true
+    label.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)
+    label.textColor = color
+    label.textAlignment = .center
+    label.text = "more_info".localized.uppercased()
+    label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+    
+    
+    let disclosureIndicator = UIImageView(image: UIImage(systemName: "chevron.right"))
+    disclosureIndicator.accessibilityIdentifier = "chevron"
+    disclosureIndicator.clipsToBounds = true
+    disclosureIndicator.tintColor = .label
+    disclosureIndicator.contentMode = .center
+    disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
+    disclosureIndicator.isUserInteractionEnabled = true
+    disclosureIndicator.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+    disclosureIndicator.heightAnchor.constraint(equalTo: disclosureIndicator.widthAnchor, multiplier: 1/1).isActive = true
+    disclosureIndicator.widthAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 1000, font: label.font!)).isActive = true///3)
+    
+    let instance = UIStackView(arrangedSubviews: [
+      label,
+      disclosureIndicator
+    ])
+    instance.axis = .horizontal
+    
     return instance
   }()
+//  private lazy var disclosureButton: UIButton = {
+//    let instance = UIButton()
+//    instance.tintColor = color
+//    instance.contentVerticalAlignment = .bottom
+//    instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
+////    instance.heightAnchor.constraint(equalToConstant: "more_info".localized.uppercased().height(withConstrainedWidth: 1000,
+////                                                                                                font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)!)).isActive = true
+//    return instance
+//  }()
   private lazy var percentageView: UIView = {
     let instance = UIView()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
@@ -103,17 +138,10 @@ class CompatibilityView: UIView {
     instance.alpha = 0
     
     descriptionLabel.place(inside: instance)
-    instance.addSubview(disclosureButton)
-    disclosureButton.translatesAutoresizingMaskIntoConstraints = false
-    disclosureButton.bottomAnchor.constraint(equalTo: instance.bottomAnchor).isActive = true
-    disclosureButton.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
-    
-//    UIStackView(arrangedSubviews: [
-//      descriptionLabel,
-//      disclosureButton,
-//    ])
-//    instance.spacing = padding
-//    instance.axis = .vertical
+    instance.addSubview(disclosureView)
+    disclosureView.translatesAutoresizingMaskIntoConstraints = false
+    disclosureView.bottomAnchor.constraint(equalTo: instance.bottomAnchor).isActive = true
+    disclosureView.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
     
     return instance
   }()
@@ -216,7 +244,7 @@ class CompatibilityView: UIView {
       
       let attributedString = NSMutableAttributedString(string: "userprofile_compatibility_level_with_user".localized,
                                                        attributes: [
-                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any
+                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
                                                        ])
       attributedString.append(NSAttributedString(string: username, attributes: [
         .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any
@@ -230,12 +258,7 @@ class CompatibilityView: UIView {
       ]))
       descriptionLabel.attributedText = attributedString
       
-      disclosureButton.setAttributedTitle(NSMutableAttributedString(string: "more_info".localized.uppercased(),
-                                                       attributes: [
-                                                        .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote) as Any,
-                                                        .foregroundColor: color as Any
-                                                       ]),
-                                          for: .normal)
+//      setButtonTitle()
       
       UIView.animate(withDuration: 0.35, delay: 0.1) { [weak self] in
         guard let self = self else { return }
@@ -310,6 +333,13 @@ private extension CompatibilityView {
   @MainActor
   func updateUI() {
     foregroundCircle.strokeColor = color.cgColor
+    
+    guard let label = disclosureView.arrangedSubviews.filter({ $0 is UILabel }).first as? UILabel,
+          let imageView = disclosureView.arrangedSubviews.filter({ $0 is UIImageView }).first as? UIImageView
+    else { return }
+    
+    label.textColor = color
+    imageView.tintColor = color
   }
   
   func getProgressPath(in rect: CGRect, progress: Double, lineWidth: CGFloat) -> CGPath {
@@ -325,6 +355,28 @@ private extension CompatibilityView {
   @objc
   func handleTap() {
     showDetails = !showDetails
+  }
+  
+  func setButtonTitle() {
+    guard let imageView = disclosureView.arrangedSubviews.filter({ $0 is UIImageView }).first as? UIImageView else { return }
+    
+//    label.text = showDetails ? "hide_details".localized.uppercased() : "show_details".localized.uppercased()
+    UIView.animate(withDuration: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      imageView.transform = self.showDetails ? CGAffineTransform(rotationAngle: .pi/2) : .identity
+    }
+    
+//    UIView.setAnimationsEnabled(false)
+//    disclosureButton.setAttributedTitle(NSMutableAttributedString(string: showDetails ? "hide_details".localized.uppercased() : "show_details".localized.uppercased(),
+//                                                     attributes: [
+//                                                      .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote) as Any,
+//                                                      .foregroundColor: color as Any,
+//                                                     ]),
+//                                        for: .normal)
+////    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//      UIView.setAnimationsEnabled(true)
+////    }
   }
 }
 

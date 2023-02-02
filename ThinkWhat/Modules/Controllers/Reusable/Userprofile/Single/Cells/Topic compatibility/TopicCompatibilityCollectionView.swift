@@ -25,16 +25,11 @@ final class TopicCompatibilityCollectionView: UICollectionView {
       setupUI()
     }
   }
-//  public var userprofile: Userprofile! {
-//    didSet {
-//      guard !userprofile.isNil else { return }
-//
-//      setupUI()
-//    }
-//  }
   //Publishers
   @Published public var color: UIColor = .clear
-//  public let refreshPublisher = PassthroughSubject<Bool, Never>()
+  public let disclosurePublisher = PassthroughSubject<TopicCompatibility, Never>()
+  
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -82,6 +77,10 @@ private extension TopicCompatibilityCollectionView {
     
     let cellRegistration = UICollectionView.CellRegistration<TopicCompatibilityCell, AnyHashable> { [unowned self] cell, indexPath, item in
       cell.compatibility = self.compatibility.details[indexPath.row]
+      
+      cell.disclosurePublisher
+        .sink { [unowned self] in self.disclosurePublisher.send($0) }
+        .store(in: &self.subscriptions)
       
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear

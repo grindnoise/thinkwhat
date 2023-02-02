@@ -22,6 +22,7 @@ protocol UserprofileViewInput: AnyObject {
   func publications()
   func subscribers()
   func comments()
+  func crossingSurveys(_: TopicCompatibility)
   func compatibility(with: Userprofile)
 }
 

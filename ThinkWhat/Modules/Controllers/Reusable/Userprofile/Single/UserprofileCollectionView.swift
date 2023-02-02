@@ -36,6 +36,7 @@ class UserprofileCollectionView: UICollectionView {
   public let commentsPublisher = PassthroughSubject<Userprofile, Never>()
   public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
   public let colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
+  public let disclosurePublisher = PassthroughSubject<TopicCompatibility, Never>()
   //UI
   public var color: UIColor = .label {
     didSet {
@@ -120,6 +121,10 @@ private extension UserprofileCollectionView {
           
           self.source.refresh()
         }
+        .store(in: &self.subscriptions)
+      
+      cell.disclosurePublisher
+        .sink { [unowned self] in self.disclosurePublisher.send($0) }
         .store(in: &self.subscriptions)
       
       var config = UIBackgroundConfiguration.listPlainCell()

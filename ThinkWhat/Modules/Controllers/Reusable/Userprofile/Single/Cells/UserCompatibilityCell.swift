@@ -22,6 +22,7 @@ class UserCompatibilityCell: UICollectionViewListCell {
   }
   //Publishers
   public let refreshPublisher = PassthroughSubject<Bool, Never>()
+  public let disclosurePublisher = PassthroughSubject<TopicCompatibility, Never>()
   //UI
   public var color: UIColor = .clear {
     didSet {
@@ -42,7 +43,7 @@ class UserCompatibilityCell: UICollectionViewListCell {
   private lazy var collectionView: UserCompatibilityCollectionView = {
     let instance = UserCompatibilityCollectionView()
     instance.clipsToBounds = true
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemFill : .secondarySystemBackground
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.publisher(for: \.bounds)
       .sink { instance.cornerRadius = $0.width * 0.05 }
       .store(in: &subscriptions)
@@ -90,6 +91,10 @@ class UserCompatibilityCell: UICollectionViewListCell {
           }
       }
       .store(in: &subscriptions)
+    
+    instance.disclosurePublisher
+      .sink { [unowned self] in  self.disclosurePublisher.send($0) }
+      .store(in: &self.subscriptions)
 
     return instance
   }()

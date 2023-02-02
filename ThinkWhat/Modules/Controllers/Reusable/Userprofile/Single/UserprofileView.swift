@@ -101,6 +101,14 @@ class UserprofileView: UIView {
       }
       .store(in: &subscriptions)
     
+    instance.disclosurePublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.crossingSurveys($0)
+      }
+      .store(in: &self.subscriptions)
+    
     return instance
   }()
   

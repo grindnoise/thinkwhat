@@ -38,6 +38,7 @@ class TopicCompatibilityHeaderCell: UICollectionViewListCell {
 //      })
     }
   }
+  public let disclosurePublisher = PassthroughSubject<TopicCompatibility, Never>()
   //UI
   public var color: UIColor = .clear {
     didSet {
@@ -55,11 +56,6 @@ class TopicCompatibilityHeaderCell: UICollectionViewListCell {
   private let padding: CGFloat = 16
   private lazy var collectionView: TopicCompatibilityCollectionView = {
     let instance = TopicCompatibilityCollectionView()
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemFill : .secondarySystemBackground
-    instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.width * 0.05 }
-      .store(in: &subscriptions)
-
     let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
     constraint.identifier = "height"
     constraint.isActive = true
@@ -75,6 +71,10 @@ class TopicCompatibilityHeaderCell: UICollectionViewListCell {
         constraint.constant = $0.height
         self.layoutIfNeeded()
       }
+      .store(in: &subscriptions)
+    
+    instance.disclosurePublisher
+      .sink { [unowned self] in self.disclosurePublisher.send($0)}
       .store(in: &subscriptions)
 
     return instance
@@ -109,7 +109,7 @@ private extension TopicCompatibilityHeaderCell {
   @MainActor
   func setupUI() {
     collectionView.place(inside: self,
-                         insets: UIEdgeInsets(top: padding, left: padding, bottom: 0, right: padding),
+                         insets: UIEdgeInsets(top: 0, left: padding, bottom: padding, right: padding),
                          bottomPriority: .defaultLow)
   }
   

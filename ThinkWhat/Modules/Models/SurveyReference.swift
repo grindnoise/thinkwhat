@@ -382,6 +382,7 @@ extension SurveyReference: Hashable {
 
 class SurveyReferences {
   static let shared = SurveyReferences()
+  
   private init() {}
   var all: [SurveyReference] = [] {
     didSet {
@@ -428,6 +429,17 @@ class SurveyReferences {
   
   public func eraseData() {
     all.removeAll()
+  }
+  
+  subscript(ids: [Int]) -> [SurveyReference] {
+    var array: [SurveyReference] = []
+    
+    ids.forEach { id in
+      if let instance = all.filter({ $0.id == id }).first {
+        array.append(instance)
+      }
+    }
+    return array
   }
 }
 
