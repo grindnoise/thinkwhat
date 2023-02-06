@@ -14,17 +14,19 @@ struct TopicCompatibility {
   var surveys: [Int]
   var matches: [Int]
   var percent: Int
+  var userId: Int
+  var userprofile: Userprofile? { Userprofiles.shared.all.filter { $0.id == userId }.first }
 }
 
 struct UserCompatibility {
-  var userId: String
+  var userId: Int
   var percent: Int
   var value: Double { Double(percent)/100 }
   var details: [TopicCompatibility]
   
   init?(_ json: JSON) {
     guard let compatibility = json["compatibility"].dictionary,
-          let id = compatibility["id"]?.string,
+          let id = compatibility["id"]?.int,
           let total = compatibility["total"]?.int,
           let matches = compatibility["matches"]?.int,
           let topics = json["topics"].array
@@ -46,7 +48,8 @@ struct UserCompatibility {
       let compatibility = TopicCompatibility(topic: topic,
                                              surveys: surveysIds,
                                              matches: matchesIds,
-                                             percent: 100 * matchesIds.count / total)
+                                             percent: 100 * matchesIds.count / total,
+                                             userId: userId)
       details.append(compatibility)
     }
   }

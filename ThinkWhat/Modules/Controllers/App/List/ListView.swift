@@ -19,6 +19,8 @@ class ListView: UIView {
     didSet {
       guard let viewInput = viewInput else { return }
       
+      setupUI()
+      updatePeriodButton()
       setTitle(category: viewInput.category, animated: false)
       collectionView.color = viewInput.tintColor
       
@@ -57,10 +59,29 @@ class ListView: UIView {
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleLabel.font)).isActive = true
+    
+    let opaque = UIView.opaque()
+    opaque.backgroundColor = viewInput!.tintColor
+    opaque.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero && opaque.cornerRadius == .zero }
+      .sink { opaque.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    titleLabel.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
+    
+    let opaque_2 = UIView.opaque()
+    opaque_2.backgroundColor = viewInput!.tintColor
+    opaque_2.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero && opaque.cornerRadius == .zero }
+      .sink { opaque_2.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    periodButton.place(inside: opaque_2, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
     
     let stack = UIStackView(arrangedSubviews: [
-      titleLabel,
-      periodButton
+      opaque,
+      opaque_2
     ])
     stack.axis = .horizontal
     stack.spacing = 4
@@ -69,22 +90,21 @@ class ListView: UIView {
     stack.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      //            stack.topAnchor.constraint(equalTo: instance.topAnchor),
       stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
       stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-      //            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
+      stack.heightAnchor.constraint(equalTo: instance.heightAnchor),
     ])
     
     return instance
   }()
   private lazy var titleLabel: UILabel = {
     let instance = UILabel()
-    instance.numberOfLines = 1
     instance.textAlignment = .center
     instance.numberOfLines = 1
-    instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
-    instance.adjustsFontSizeToFitWidth = true
+    instance.textColor = .white//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
+    instance.font = UIFont(name: Fonts.Bold, size: 20)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
+//    instance.adjustsFontSizeToFitWidth = true
+    
     
     //        if let viewInput = viewInput {
     //            setTitle(category: viewInput.category, animated: false)
@@ -101,65 +121,12 @@ class ListView: UIView {
     instance.titleLabel?.numberOfLines = 1
     instance.showsMenuAsPrimaryAction = true
     instance.menu = prepareMenu()
-    
-    if #available(iOS 15, *) {
-      var config = UIButton.Configuration.filled()
-      config.cornerStyle = .medium
-      config.image = UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
-      config.imagePlacement = .trailing
-      config.imagePadding = 4
-      config.contentInsets.leading = 4
-      config.contentInsets.trailing = 4
-      config.contentInsets.top = 0
-      config.contentInsets.bottom = 0
-      config.title = "per_\(period.rawValue.lowercased())".localized.lowercased()
-      config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [weak self] incoming in
-        guard let self = self,
-              let viewInput = self.viewInput
-        else { return incoming }
-        
-        var outcoming = incoming
-        outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
-        outcoming.foregroundColor = viewInput.tintColor//UIColor.secondaryLabel
-        return outcoming
-      }
-      //            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
-      //                guard let self = self,
-      //                      let viewIput = self.viewInput
-      //                else { return .systemGray }
-      //
-      //                return viewIput.tintColor
-      //            }
-      config.buttonSize = .large
-      config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      config.baseForegroundColor = .label
-      
-      instance.configuration = config
-    } else {
-      let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
-      ])
-      instance.setAttributedTitle(attrString, for: .normal)
-      instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-      instance.imageView?.contentMode = .scaleAspectFit
-      instance.imageEdgeInsets.left = 10
-      instance.imageEdgeInsets.top = 2
-      instance.imageEdgeInsets.bottom = 2
-      instance.imageEdgeInsets.right = 2
-      instance.semanticContentAttribute = .forceRightToLeft
-      instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      
-      let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
-      constraint.identifier = "width"
-      constraint.isActive = true
-    }
-    
-    instance.publisher(for: \.bounds, options: .new).sink { rect in
-      instance.cornerRadius = rect.height * 0.15
-    }.store(in: &subscriptions)
-    
+    instance.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero}
+      .sink { instance.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+
     return instance
   }()
   private lazy var collectionView: SurveysCollectionView = {
@@ -326,41 +293,23 @@ class ListView: UIView {
       }
       .store(in: &self.subscriptions)
     
+//    let scrollPublisher = instance.scrollPublisher
+//      .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
+//
+//    scrollPublisher
+//      .sink { [unowned self] in self.isDateFilterHidden = $0 }
+//      .store(in: &subscriptions)
+    
     instance.scrollPublisher
       .sink { [weak self] in
         guard let self = self else { return }
-        
+
         self.isDateFilterHidden = $0
-        //                self.toggleDateFilter(on: !$0)
       }
       .store(in: &subscriptions)
     
     return instance
   }()
-  //    private lazy var featheredView: UIView = {
-  //        let instance = UIView()
-  //        instance.accessibilityIdentifier = "feathered"
-  //        instance.layer.masksToBounds = true
-  //        instance.backgroundColor = .clear
-  //        instance.addEquallyTo(to: background)
-  //        observers.append(instance.observe(\UIView.bounds, options: .new) { [weak self] view, change in
-  //            guard let self = self, let newValue = change.newValue, newValue.size != self.featheredLayer.bounds.size else { return }
-  //            self.featheredLayer.frame = newValue
-  //        })
-  //        collectionView.addEquallyTo(to: instance)
-  //        return instance
-  //    }()
-  //    private lazy var featheredLayer: CAGradientLayer = {
-  //        let instance = CAGradientLayer()
-  //        let outerColor = UIColor.clear.cgColor
-  ////        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.bl.cgColor : UIColor.secondarySystemBackground.cgColor
-  //        let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.white.cgColor
-  //        instance.colors = [outerColor, innerColor, innerColor, outerColor]
-  //        instance.locations = [0.0, 0.0075, 0.985, 1.0]
-  //        instance.frame = frame
-  //        return instance
-  //    }()
-  //    private var hMaskLayer: CAGradientLayer!
   private lazy var shadowView: UIView = {
     let instance = UIView()
     instance.layer.masksToBounds = false
@@ -385,10 +334,9 @@ class ListView: UIView {
     instance.accessibilityIdentifier = "bg"
     instance.layer.masksToBounds = false
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
-    observers.append(instance.observe(\UIView.bounds, options: .new) { view, change in
-      guard let value = change.newValue else { return }
-      view.cornerRadius = value.width * 0.05
-    })
+    instance.publisher(for: \.bounds)
+      .sink { [unowned self] in instance.cornerRadius = $0.width * 0.05 }
+      .store(in: &subscriptions)
     
     collectionView.addEquallyTo(to: instance)
     
@@ -401,7 +349,7 @@ class ListView: UIView {
       guard oldValue != period,
             let category = viewInput?.category
       else { return }
-      
+      updatePeriodButton()
       collectionView.period = period
       
       periodButton.menu = prepareMenu()
@@ -431,17 +379,13 @@ class ListView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setupUI()
+//    setupUI()
   }
-  
-  //    required init?(coder: NSCoder) {
-  //        fatalError("init(coder:) has not been implemented")
-  //    }
   
   required init?(coder: NSCoder) {
     super.init(coder: coder)
     
-    setupUI()
+//    setupUI()
   }
   
   
@@ -521,10 +465,10 @@ private extension ListView {
     var text = ""
     
     switch category {
-    case .New: text =  "new".localized
-    case .Top: text = "top".localized
-    case .Favorite: text = "watching".localized
-    case .Own: text = "own".localized
+    case .New: text =  "new".localized.uppercased()
+    case .Top: text = "top".localized.uppercased()
+    case .Favorite: text = "watching".localized.uppercased()
+    case .Own: text = "own".localized.uppercased()
     default: print("")
     }
     
@@ -658,7 +602,7 @@ private extension ListView {
     else { return }
     
     setNeedsLayout()
-    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
+    UIView.animate(withDuration: 0.15, delay: 0, options: .curveLinear) { [weak self] in
       guard let self = self else { return }
       
       self.filterView.alpha = on ? 1 : 0
@@ -668,6 +612,38 @@ private extension ListView {
       heightConstraint.constant = on ? self.filterViewHeight : 0
       self.layoutIfNeeded()
     }
+  }
+  
+  @MainActor
+  func updatePeriodButton() {
+    
+    periodButton.menu = prepareMenu()
+    
+    let buttonText = "per_\(period.rawValue.lowercased())".localized.uppercased()
+    
+//    if #available(iOS 15, *) {
+//      if !periodButton.configuration.isNil {
+//        periodButton.configuration?.title = buttonText
+//      }
+//    } else {
+      let attrString = NSMutableAttributedString(string: buttonText,
+                                                 attributes: [
+                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                  .foregroundColor: UIColor.white,
+                                                 ])
+      periodButton.setAttributedTitle(attrString, for: .normal)
+      
+//      guard let constraint = periodButton.getConstraint(identifier: "width") else { return }
+//
+//      setNeedsLayout()
+//      UIView.animate(withDuration: 0.15, delay: 0) { [weak self] in
+//        guard let self = self else { return }
+//
+//        constraint.constant = buttonText.width(withConstrainedHeight: 100,
+//                                               font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
+//        self.layoutIfNeeded()
+//      }
+//    }
   }
 }
 

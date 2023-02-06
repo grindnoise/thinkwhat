@@ -114,7 +114,16 @@ class UserprofileController: UIViewController, TintColorable {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
+    setNavigationBarTintColor(tintColor)
     navigationController?.navigationBar.alpha = 1
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+  }
+  
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -213,11 +222,11 @@ private extension UserprofileController {
 }
 
 extension UserprofileController: UserprofileViewInput {
-  func crossingSurveys(_: TopicCompatibility) {
+  func crossingSurveys(_ compatibility: TopicCompatibility) {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(SurveysController(userprofile, color: tintColor), animated: true)
+    navigationController?.pushViewController(SurveysController(compatibility, color: tintColor), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let controller = tabBarController as? MainController else { return }

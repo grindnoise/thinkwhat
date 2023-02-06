@@ -54,6 +54,13 @@ class SurveysCollectionView: UICollectionView {
       category = .ByOwner
     }
   }
+  public var compatibility: TopicCompatibility? {
+    didSet {
+      guard !compatibility.isNil else { return }
+      
+      category = .Compatibility
+    }
+  }
   public var fetchResult: [SurveyReference] = [] {
     didSet {
       setDataSource()
@@ -103,25 +110,9 @@ class SurveysCollectionView: UICollectionView {
       var snap = source.snapshot()
       if isLoading, snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
         snap.appendSections([.loader])
-//        self.isLoadingPublisher.send(self.isLoading)
-        
         setLoading(source: self.source, snapshot: snap)
-//        self.isApplyingSnapshot = true
-//#if DEBUG
-//        print("isLoading", isLoading, to: &logger)
-//#endif
-//        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.isApplyingSnapshot = false
-//          self.isLoadingPublisher.send(self.isLoading)
-//          self.loaderStartedAt = Date()
-//          self.lock.unlock()
-//        }
       } else if !isLoading, !snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
         snap.deleteSections([.loader])
-//        self.isLoadingPublisher.send(self.isLoading)
-                
         setLoading(source: self.source, snapshot: snap)
       }
     }
@@ -139,6 +130,8 @@ class SurveysCollectionView: UICollectionView {
       items = category.dataItems(userprofile: userprofile)
     } else if category == .Topic, !topic.isNil {
       items = category.dataItems(topic: topic)
+    } else if category == .Compatibility, !compatibility.isNil {
+      items = category.dataItems(compatibility: compatibility)
     } else if category == .Search {
       items = fetchResult
     } else {
@@ -148,32 +141,22 @@ class SurveysCollectionView: UICollectionView {
   }
   private let isLoadingPublisher = PassthroughSubject<Bool, Never>()
   //Scroll direction
+  private var lastStopYPoint: CGFloat = .zero
   private var lastContentOffsetY: CGFloat = 0 {
     didSet {
       //Pagination
-      let _isScrollingDown = lastContentOffsetY > oldValue
+      let isScrollingDown = lastContentOffsetY > oldValue
       
-      if _isScrollingDown, lastContentOffsetY + bounds.height > contentSize.height, !isLoading {
+      if isScrollingDown, lastContentOffsetY + bounds.height > contentSize.height, !isLoading {
         requestData()
       }
       
-      isScrollingDown = lastContentOffsetY > oldValue
+      let distance = lastStopYPoint - lastContentOffsetY
+      let threshold: CGFloat = 30
       
-      guard abs(oldValue - lastContentOffsetY) > 30 else { return }
+      guard abs(distance) > threshold else { return }
       
-      guard oldValue > 0,
-            contentSize.height > lastContentOffsetY + bounds.height
-      else { return }
-      
-      scrollPublisher.send(isScrollingDown)
-      //      isScrollingDown = lastContentOffsetY > oldValue
-      
-      //      guard isScrollingDown, lastContentOffsetY + bounds.height > contentSize.height else { return }
-      //
-      //      requestData()
-      //            guard oldValue > 0,
-      //                  contentSize.height > lastContentOffsetY + bounds.height
-      //            else { return }
+      scrollPublisher.send(distance > 0 ? false : true)
     }
   }
   private var isScrollingDown = false {
@@ -275,6 +258,22 @@ class SurveysCollectionView: UICollectionView {
     setColors()
   }
   
+  init(compatibility: TopicCompatibility,
+       color: UIColor? = nil) {
+    self.compatibility = compatibility
+    self.category = .Compatibility
+    
+    super.init(frame: .zero, collectionViewLayout: .init())
+    
+    setupUI()
+    setTasks()
+    
+    guard let color = color else { return }
+    
+    self.color = color
+    setColors()
+  }
+  
   init(userprofile: Userprofile,
        category: Survey.SurveyCategory,
        color: UIColor? = nil) {
@@ -331,6 +330,10 @@ class SurveysCollectionView: UICollectionView {
 extension SurveysCollectionView: UIScrollViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     lastContentOffsetY = scrollView.contentOffset.y
+  }
+  
+  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    lastStopYPoint = scrollView.contentOffset.y
   }
 }
 

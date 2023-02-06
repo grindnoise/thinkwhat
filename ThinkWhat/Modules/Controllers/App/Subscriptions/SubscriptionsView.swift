@@ -20,6 +20,7 @@ class SubscriptionsView: UIView {
     didSet {
       guard let viewInput = viewInput else { return }
       
+      setupUI()
       updatePeriodButton()
       surveysCollectionView.color = viewInput.tintColor
       
@@ -54,19 +55,12 @@ class SubscriptionsView: UIView {
       //            }
     }
   }
-  //UI
-  private var isDateFilterHidden = false {
-    didSet {
-      guard oldValue != isDateFilterHidden else { return }
-      
-      toggleDateFilter(on: !isDateFilterHidden)
-    }
-  }
   private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
   private var userprofile: Userprofile! {
     didSet {
       guard let userprofile = userprofile else { return }
       
+      viewInput?.toggleUserSelected(true)
       viewInput?.setUserprofileFilter(userprofile)
       surveysCollectionView.userprofile = userprofile
       onUserSelected(userprofile: userprofile)
@@ -83,6 +77,13 @@ class SubscriptionsView: UIView {
       updatePeriodButton()
     }
   }
+  private var isDateFilterHidden = false {
+    didSet {
+      guard oldValue != isDateFilterHidden else { return }
+      
+      toggleDateFilter(on: !isDateFilterHidden)
+    }
+  }
   private var isCollectionViewSetupCompleted = false
   private var needsAnimation = true
   private var isRevealed = false
@@ -90,10 +91,29 @@ class SubscriptionsView: UIView {
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleLabel.font)).isActive = true
+    
+    let opaque = UIView.opaque()
+    opaque.backgroundColor = viewInput!.tintColor
+    opaque.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero && opaque.cornerRadius == .zero }
+      .sink { opaque.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    titleLabel.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
+    
+    let opaque_2 = UIView.opaque()
+    opaque_2.backgroundColor = viewInput!.tintColor
+    opaque_2.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero && opaque.cornerRadius == .zero }
+      .sink { opaque_2.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    periodButton.place(inside: opaque_2, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
     
     let stack = UIStackView(arrangedSubviews: [
-      titleLabel,
-      periodButton
+      opaque,
+      opaque_2
     ])
     stack.axis = .horizontal
     stack.spacing = 4
@@ -102,10 +122,9 @@ class SubscriptionsView: UIView {
     stack.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      //            stack.topAnchor.constraint(equalTo: instance.topAnchor),
       stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
       stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-      //            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
+      stack.heightAnchor.constraint(equalTo: instance.heightAnchor),
     ])
     
     return instance
@@ -115,8 +134,8 @@ class SubscriptionsView: UIView {
     instance.numberOfLines = 1
     instance.textAlignment = .center
     instance.numberOfLines = 1
-    instance.textColor = .label//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-    instance.text = "publications".localized.capitalized
+    instance.textColor = .white
+    instance.text = "publications".localized.uppercased()
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
     instance.adjustsFontSizeToFitWidth = true
     instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
@@ -128,65 +147,12 @@ class SubscriptionsView: UIView {
     instance.titleLabel?.numberOfLines = 1
     instance.showsMenuAsPrimaryAction = true
     instance.menu = prepareMenu()
-    
-    if #available(iOS 15, *) {
-      var config = UIButton.Configuration.filled()
-      config.cornerStyle = .medium
-      config.image = UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
-      config.imagePlacement = .trailing
-      config.imagePadding = 6
-      config.contentInsets.leading = 4
-      config.contentInsets.trailing = 4
-      config.contentInsets.top = 2
-      config.contentInsets.bottom = 2
-      config.title = "per_\(period.rawValue.lowercased())".localized.lowercased()
-      config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [weak self] incoming in
-        guard let self = self,
-              let viewInput = self.viewInput
-        else { return incoming }
-        
-        var outcoming = incoming
-        outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
-        outcoming.foregroundColor = viewInput.tintColor//UIColor.secondaryLabel
-        return outcoming
-      }
-      //            config.imageColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
-      //                guard let self = self,
-      //                      let viewIput = self.viewInput
-      //                else { return .systemGray }
-      //
-      //                return viewIput.tintColor
-      //            }
-      config.buttonSize = .large
-      config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      config.baseForegroundColor = .label
-      
-      instance.configuration = config
-    } else {
-      let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
-      ])
-      instance.setAttributedTitle(attrString, for: .normal)
-      instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-      instance.imageView?.contentMode = .scaleAspectFit
-      instance.imageEdgeInsets.left = 10
-      instance.imageEdgeInsets.top = 2
-      instance.imageEdgeInsets.bottom = 2
-      instance.imageEdgeInsets.right = 2
-      instance.semanticContentAttribute = .forceRightToLeft
-      instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      
-      let constraint = instance.widthAnchor.constraint(equalToConstant: "Мужчина".width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)!))
-      constraint.identifier = "width"
-      constraint.isActive = true
-    }
-    
-    instance.publisher(for: \.bounds, options: .new).sink { rect in
-      instance.cornerRadius = rect.height * 0.15
-    }.store(in: &subscriptions)
-    
+    instance.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero}
+      .sink { instance.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+
     return instance
   }()
   private lazy var subscriptionsLabel: UILabel = {
@@ -466,15 +432,11 @@ class SubscriptionsView: UIView {
   }()
   //User view on selection
   private lazy var avatar: Avatar = {
-    guard let userprofile = userprofile else { return Avatar() }
-    
-    let instance = Avatar(userprofile: userprofile, isShadowed: true)
+    let instance = Avatar()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     instance.alpha = 0
     instance.tapPublisher
-      .sink { [unowned self] in
-        self.viewInput?.openUserprofile($0)
-      }
+      .sink { [unowned self] in self.viewInput?.openUserprofile($0) }
       .store(in: &subscriptions)
     
     return instance
@@ -711,6 +673,7 @@ class SubscriptionsView: UIView {
     return instance
   }()
   private lazy var filterViewHeight: CGFloat = .zero
+  
   @IBOutlet var contentView: UIView!
   
   
@@ -720,14 +683,14 @@ class SubscriptionsView: UIView {
     super.init(frame: frame)
     
     setTasks()
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
     super.init(coder: coder)
     
     setTasks()
-    setupUI()
+//    setupUI()
   }
   
   
@@ -741,7 +704,7 @@ class SubscriptionsView: UIView {
     if #available(iOS 15, *) {
       periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     } else {
-      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
       let attrString_1 = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
         NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
         NSAttributedString.Key.foregroundColor: Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
@@ -865,6 +828,7 @@ private extension SubscriptionsView {
       //            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
     ])
     
+//    periodButton.backgroundColor = viewInput!.tintColor
     userView.alpha = 0
     
     let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8)
@@ -929,7 +893,10 @@ private extension SubscriptionsView {
     
     setNeedsLayout()
     avatar.userprofile = userprofile
-    avatar.alpha = 0
+//    avatar.alpha = 0
+//    avatar.tapPublisher
+//      .sink { [unowned self] in self.viewInput?.openUserprofile($0) }
+//      .store(in: &subscriptions)
     //        usernameLabel.text = userprofile.name
     //        usernameLabel.setConstraints()
     //        notifyButton.setImage(UIImage(systemName: "bell.and.waves.left.and.right.fill",
@@ -1079,31 +1046,31 @@ private extension SubscriptionsView {
     
     periodButton.menu = prepareMenu()
     
-    let buttonText = "per_\(period.rawValue.lowercased())".localized.lowercased()
+    let buttonText = "per_\(period.rawValue.lowercased())".localized.uppercased()
     
-    if #available(iOS 15, *) {
-      if !periodButton.configuration.isNil {
-        periodButton.configuration?.title = buttonText
-      }
-    } else {
+//    if #available(iOS 15, *) {
+//      if !periodButton.configuration.isNil {
+//        periodButton.configuration?.title = buttonText
+//      }
+//    } else {
       let attrString = NSMutableAttributedString(string: buttonText,
                                                  attributes: [
-                                                  NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
-                                                  NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
+                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                  .foregroundColor: UIColor.white,
                                                  ])
       periodButton.setAttributedTitle(attrString, for: .normal)
       
-      guard let constraint = periodButton.getConstraint(identifier: "width") else { return }
-      
-      setNeedsLayout()
-      UIView.animate(withDuration: 0.15, delay: 0) { [weak self] in
-        guard let self = self else { return }
-        
-        constraint.constant = buttonText.width(withConstrainedHeight: 100,
-                                               font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
-        self.layoutIfNeeded()
-      }
-    }
+//      guard let constraint = periodButton.getConstraint(identifier: "width") else { return }
+//
+//      setNeedsLayout()
+//      UIView.animate(withDuration: 0.15, delay: 0) { [weak self] in
+//        guard let self = self else { return }
+//
+//        constraint.constant = buttonText.width(withConstrainedHeight: 100,
+//                                               font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
+//        self.layoutIfNeeded()
+//      }
+//    }
   }
   
   @MainActor
@@ -1117,7 +1084,7 @@ private extension SubscriptionsView {
     else { return }
     
     setNeedsLayout()
-    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
+    UIView.animate(withDuration: 0.15, delay: 0, options: .curveLinear) { [weak self] in
       guard let self = self else { return }
       
       //            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5

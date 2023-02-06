@@ -11,6 +11,9 @@ import Combine
 
 class SurveysController: UIViewController, TintColorable {
   
+  enum BarMode {
+    case Search, Default
+  }
   // MARK: - Overridden properties
 //  override var preferredStatusBarStyle: UIStatusBarStyle {
 //    return mode == .Topic ? .lightContent : .default
@@ -23,6 +26,7 @@ class SurveysController: UIViewController, TintColorable {
   var controllerInput: SurveysControllerInput?
   public private(set) var topic: Topic?
   public private(set) var userprofile: Userprofile?
+  public private(set) var compatibility: TopicCompatibility?
   public private(set) var mode: Survey.SurveyCategory
   //UI
   public var tintColor: UIColor = .clear
@@ -33,39 +37,112 @@ class SurveysController: UIViewController, TintColorable {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
+  //Logic
+  private var isSearching = false
+  private var barMode = BarMode.Default {
+    didSet {
+      guard oldValue != barMode else { return }
+      
+      onBarModeChanged()
+    }
+  }
   //UI
-  private lazy var topicIcon: Icon = {
-    let instance = Icon(category: topic.isNil ? .Null : topic!.iconCategory)
-    instance.iconColor = .white
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.65
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    
-    return instance
-  }()
-  private lazy var topicTitle: InsetLabel = {
-    let instance = InsetLabel()
-    instance.font = UIFont(name: Fonts.Bold, size: 20)
-    instance.text = topic.isNil ? "" : topic!.title.uppercased()
-    instance.textColor = .white
-    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
-    
-    return instance
-  }()
   private lazy var topicView: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      topicIcon,
-      topicTitle
-    ])
-    instance.backgroundColor = topic.isNil ? .secondaryLabel : topic!.tagColor
+    let topicTitle = InsetLabel()
+    topicTitle.font = UIFont(name: Fonts.Bold, size: 20)
+    topicTitle.textColor = .white
+    topicTitle.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+    topicTitle.insets.right = 8
+    
+    var instance: UIStackView!
+    
+    switch mode {
+    case .Compatibility:
+      guard let compatibility = compatibility,
+            let userprofile = compatibility.userprofile
+      else { return UIStackView() }
+      
+      let opaque = UIView.opaque()
+      opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 1/1).isActive = true
+      let avatar = Avatar(userprofile: userprofile,
+                          isBordered: true,
+                          borderColor: .white)
+      avatar.placeInCenter(of: opaque, heightMultiplier: 0.75)
+      
+      topicTitle.text = compatibility.topic.title.uppercased()
+      instance = UIStackView(arrangedSubviews: [
+        opaque,
+        topicTitle
+      ])
+      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
+      instance.backgroundColor = compatibility.topic.tagColor
+    case .ByOwner:
+      guard let userprofile = userprofile else { return UIStackView() }
+      
+      let opaque = UIView.opaque()
+      opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 1/1).isActive = true
+      let avatar = Avatar(userprofile: userprofile,
+                          isBordered: true,
+                          borderColor: .white)
+      avatar.placeInCenter(of: opaque, heightMultiplier: 0.75)
+      
+      topicTitle.text = "publications".localized.uppercased()
+      instance = UIStackView(arrangedSubviews: [
+        opaque,
+        topicTitle
+      ])
+      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
+      instance.backgroundColor = tintColor
+    default:
+      guard let topic = topic else { return UIStackView() }
+      
+      topicTitle.text = topic.title.uppercased()
+//      topicTitle.insets.right = 8
+      
+      let topicIcon = Icon(category: topic.iconCategory)
+      topicIcon.iconColor = .white
+      topicIcon.isRounded = false
+      topicIcon.clipsToBounds = false
+      topicIcon.scaleMultiplicator = 1.65
+      topicIcon.heightAnchor.constraint(equalTo: topicIcon.widthAnchor, multiplier: 1/1).isActive = true
+      instance = UIStackView(arrangedSubviews: [
+        topicIcon,
+        topicTitle
+      ])
+      instance.backgroundColor = topic.tagColor
+    }
+    
     instance.axis = .horizontal
     instance.spacing = 2
-    instance.alpha = 0
+//      instance.alpha = 0
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
       .filter { $0 != .zero}
       .sink { instance.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var searchField: InsetTextField = {
+    let instance = InsetTextField()
+    instance.placeholder = "search".localized
+    instance.alpha = 0
+    instance.delegate = self
+    instance.backgroundColor = .secondarySystemBackground//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    instance.tintColor = tintColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
+    instance.addTarget(self, action: #selector(TopicsController.textFieldDidChange(_:)), for: .editingChanged)
+    instance.returnKeyType = .done
+    instance.publisher(for: \.bounds, options: .new)
+      .sink { rect in
+        instance.cornerRadius = rect.height/2.25
+        
+        guard instance.insets == .zero else { return }
+        
+        instance.insets = UIEdgeInsets(top: instance.insets.top,
+                                       left: rect.height/2.25,
+                                       bottom: instance.insets.top,
+                                       right: rect.height/2.25)
+      }
       .store(in: &subscriptions)
     
     return instance
@@ -75,6 +152,8 @@ class SurveysController: UIViewController, TintColorable {
   
   // MARK: - Deinitialization
   deinit {
+    topicView.removeFromSuperview()
+    searchField.removeFromSuperview()
     observers.forEach { $0.invalidate() }
     tasks.forEach { $0?.cancel() }
     subscriptions.forEach { $0.cancel() }
@@ -103,6 +182,14 @@ class SurveysController: UIViewController, TintColorable {
   init(_ userprofile: Userprofile, color: UIColor = .clear) {
     self.userprofile = userprofile
     self.mode = .ByOwner
+    self.tintColor = color
+    
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  init(_ compatibility: TopicCompatibility, color: UIColor = .clear) {
+    self.compatibility = compatibility
+    self.mode = .Compatibility
     self.tintColor = color
     
     super.init(nibName: nil, bundle: nil)
@@ -154,12 +241,41 @@ class SurveysController: UIViewController, TintColorable {
     navigationItem.largeTitleDisplayMode = .never
     //Set bar visible
     navigationController?.navigationBar.alpha = 1
+    
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+   
+    guard let constraint = self.topicView.getConstraint(identifier: "centerY") else { return }
+    
+    UIView.animate(withDuration: 0.2) {[weak self] in
+      guard let self = self else { return }
+      
+      self.navigationController?.navigationBar.setNeedsLayout()
+      constraint.constant = 0
+      self.navigationController?.navigationBar.layoutIfNeeded()
+    }
   }
   
   override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     
     controllerOutput?.viewDidDisappear()
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    guard let constraint = self.topicView.getConstraint(identifier: "centerY") else { return }
+    
+    UIView.animate(withDuration: 0.1) { [weak self] in
+      guard let self = self else { return }
+      
+      self.navigationController?.navigationBar.setNeedsLayout()
+      constraint.constant = -100
+      self.navigationController?.navigationBar.layoutIfNeeded()
+    }
   }
 }
 
@@ -255,6 +371,11 @@ extension SurveysController: SurveysViewInput {
 }
 
 extension SurveysController: SurveysModelOutput {
+  func onSearchCompleted(_ instances: [SurveyReference]) {
+    controllerOutput?.onSearchCompleted(instances)
+    isSearching = false
+  }
+  
   func onRequestCompleted(_ result: Result<Bool, Error>) {
     controllerOutput?.onRequestCompleted(result)
   }
@@ -264,30 +385,32 @@ private extension SurveysController {
   @MainActor
   func setupUI() {
     switch mode {
-    case .Topic:
-      navigationItem.titleView = topicView
-    case .ByOwner:
-      guard let userprofile = userprofile else { return }
-      
-      let avatar = Avatar(userprofile: userprofile)
-      avatar.heightAnchor.constraint(equalToConstant: 40).isActive = true
-      avatar.tapPublisher
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          
-          let banner = NewBanner(contentView: UserBannerContentView(mode: .Username,
-                                                                      userprofile: userprofile),
-                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                 isModal: false,
-                                 useContentViewHeight: true,
-                                 shouldDismissAfter: 1)
-          banner.didDisappearPublisher
-            .sink { _ in banner.removeFromSuperview() }
-            .store(in: &self.subscriptions)
-        }
-        .store(in: &subscriptions)
-      
-      navigationItem.titleView = avatar
+//    case .Topic, .Compatibility, .ByOwner:
+//      navigationItem.titleView = topicView
+////    case .Compatibility:
+////      navigationItem.titleView = topicView
+////    case .ByOwner:
+////      guard let userprofile = userprofile else { return }
+////
+////      let avatar = Avatar(userprofile: userprofile)
+////      avatar.heightAnchor.constraint(equalToConstant: 40).isActive = true
+////      avatar.tapPublisher
+////        .sink { [weak self] _ in
+////          guard let self = self else { return }
+////
+////          let banner = NewBanner(contentView: UserBannerContentView(mode: .Username,
+////                                                                      userprofile: userprofile),
+////                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+////                                 isModal: false,
+////                                 useContentViewHeight: true,
+////                                 shouldDismissAfter: 1)
+////          banner.didDisappearPublisher
+////            .sink { _ in banner.removeFromSuperview() }
+////            .store(in: &self.subscriptions)
+////        }
+////        .store(in: &subscriptions)
+////
+////      navigationItem.titleView = avatar
     case .Own:
       title = "my_publications".localized
     case .Favorite:
@@ -301,31 +424,134 @@ private extension SurveysController {
     navigationController?.setNavigationBarHidden(false, animated: false)
     navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
     setBarItems()
-    
+
     guard let navigationBar = self.navigationController?.navigationBar else { return }
-    
+
     let appearance = UINavigationBarAppearance()
     appearance.configureWithOpaqueBackground()
     appearance.shadowColor = nil
     navigationBar.standardAppearance = appearance
     navigationBar.scrollEdgeAppearance = appearance
     navigationBar.prefersLargeTitles = false
-    
+
     if #available(iOS 15.0, *) {
       navigationBar.compactScrollEdgeAppearance = appearance
     }
-    
+
     var color: UIColor = .secondaryLabel
-    
+
     switch mode {
     case .Topic:
       guard let topic = topic else { return }
-      
+
       color = topic.tagColor
+    case .Compatibility:
+      guard let compatibility = compatibility else { return }
+
+      color = compatibility.topic.tagColor
     default:
       color = tintColor
     }
     setNavigationBarTintColor(color)
+    
+    navigationBar.addSubview(searchField)
+    navigationBar.addSubview(topicView)
+    searchField.translatesAutoresizingMaskIntoConstraints = false
+    topicView.translatesAutoresizingMaskIntoConstraints = false
+    
+    NSLayoutConstraint.activate([
+      searchField.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
+      searchField.heightAnchor.constraint(equalToConstant: 40),
+      searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
+//      topicView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
+      topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor)
+    ])
+    let constraint = searchField.widthAnchor.constraint(equalToConstant: 20)
+    constraint.identifier = "width"
+    constraint.isActive = true
+    
+    let centerY = topicView.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor,
+                                                     constant: -100)
+    centerY.identifier = "centerY"
+    centerY.isActive = true
+    
+    navigationBar.setNeedsLayout()
+    navigationBar.layoutIfNeeded()
+  }
+  
+  @MainActor
+  func onBarModeChanged() {
+    func toggleSearchField(on: Bool) {
+      guard let navigationBar = navigationController?.navigationBar,
+            let constraint = searchField.getConstraint(identifier: "width")
+      else { return }
+      
+      navigationBar.setNeedsLayout()
+      searchField.text = ""
+      
+      if on {
+        let touch = UITapGestureRecognizer(target:self, action:#selector(SurveysController.hideKeyboard))
+        view.addGestureRecognizer(touch)
+        
+        let _ = searchField.becomeFirstResponder()
+        controllerOutput?.toggleSearchMode(true)
+        
+        //Clear previous fetch request
+        controllerOutput?.onSearchCompleted([])
+        
+      } else {
+        if let recognizer = view.gestureRecognizers?.first {
+          view.removeGestureRecognizer(recognizer)
+        }
+        
+        let _ = searchField.resignFirstResponder()
+      }
+      navigationItem.title = ""
+      
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.9,
+        initialSpringVelocity: 0.2,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          self.searchField.alpha = on ? 1 : 0
+          constraint.constant = on ? navigationBar.frame.width - (10*2 + 44 + 4) : 20
+          navigationBar.layoutIfNeeded()
+        }) { _ in }
+    }
+    
+    func toggleTopicView(on: Bool) {
+      guard let navigationBar = navigationController?.navigationBar,
+            let constraint = topicView.getConstraint(identifier: "centerY")
+      else { return }
+      
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          self.topicView.alpha = on ? 1 : 0
+          constraint.constant = on ? 0 : -100
+          navigationBar.layoutIfNeeded()
+        }) { _ in }
+      
+      UIView.animate(withDuration: on ? 0.1 : 0.3,
+                     delay: 0.1) { [unowned self] in
+        self.topicView.alpha = on ? 1 : 0
+      }
+    }
+    
+    setBarItems()
+    
+    toggleSearchField(on: barMode == .Search ? true : false)
+    toggleTopicView(on: barMode != .Search ? true : false)
   }
   
   @objc
@@ -372,51 +598,57 @@ private extension SurveysController {
   }
   
   func setBarItems() {
+    let searchAction = UIAction { [unowned self] _ in
+      self.controllerOutput?.toggleSearchMode(true)
+      self.barMode = .Search
+    }
     
     let button = UIBarButtonItem(title: "",
-                    image: UIImage(systemName: "slider.horizontal.3",
-                                              withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                    primaryAction: nil,
-                    menu: prepareMenu())
+                                 image: UIImage(systemName: "magnifyingglass",
+                                                withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                 primaryAction: searchAction,
+                                 menu: nil)
     
     navigationItem.setRightBarButton(button, animated: true)
   }
   
-  func prepareMenu() -> UIMenu {
-      let shareAction: UIAction = .init(title: "share".localized, image: UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
-          guard let self = self//,
-//                let instance = self.item
-          else { return }
+  @objc
+  func hideKeyboard() {
+    if let recognizer = view.gestureRecognizers?.first {
+      view.removeGestureRecognizer(recognizer)
+    }
+    if mode == .Search {
+      searchField.resignFirstResponder()
+    }
+  }
+}
 
-//          self.shareSubject.send(instance)
-      })
+extension SurveysController: UITextFieldDelegate {
+  func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+    if let recognizers = view.gestureRecognizers, recognizers.isEmpty {
+      let touch = UITapGestureRecognizer(target:self, action:#selector(SurveysController.hideKeyboard))
+      view.addGestureRecognizer(touch)
+    }
+    return !isSearching
+  }
+  
+  @objc
+  func textFieldDidChange(_ textField: UITextField) {
+    guard !isSearching, let text = textField.text, text.count > 3 else {
+      onSearchCompleted([])
       
-      let watchAction : UIAction = .init(title: "watch".localized, image: UIImage(systemName: "binoculars.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
-          guard let self = self//,
-//                let instance = self.item
-          else { return }
-          
-//          self.watchSubject.send(instance)
-      })
-      watchAction.accessibilityIdentifier = "watch"
-
-      
-      let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
-          guard let self = self//,
-//                let instance = self.item
-          else { return }
-          
-//          self.claimSubject.send(instance)
-      })
-      
-      var actions: [UIAction] = []//[claimAction, watchAction, shareAction]
-      
-//      if !item.isOwn {
-          actions.append(claimAction)
-          actions.append(watchAction)
-//      }
-      actions.append(shareAction)
-      
-      return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+      return
+    }
+    controllerOutput?.beginSearchRefreshing()
+    isSearching = true
+    controllerInput?.search(substring: text, excludedIds: [])
+  }
+  
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    if let recognizer = view.gestureRecognizers?.first {
+      view.removeGestureRecognizer(recognizer)
+    }
+    textField.resignFirstResponder()
+    return true
   }
 }

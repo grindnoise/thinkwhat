@@ -91,60 +91,18 @@ class SurveyCell: UICollectionViewCell {
       
       return stack
     }
-    
-    let spacer = UIView()
-    spacer.backgroundColor = .clear
-    
+        
     let instance = UIStackView(arrangedSubviews: [
       createStack(),
-      spacer,
+      UIView.opaque(),
+      usernameLabel,
       avatar
     ])
     instance.axis = .horizontal
+    instance.spacing = padding/2
     
     return instance
   }()
-  //    private lazy var headerView: UIView = {
-  //        func createStack() -> UIStackView {
-  //            //Topic & progress
-  //            let nestedStack = UIStackView(arrangedSubviews: [
-  //                topicView,
-  //                progressView
-  //            ])
-  //            //            nestedStack.alignment = .leading
-  //            nestedStack.axis = .horizontal
-  //            nestedStack.spacing = 4
-  //
-  //            let stack = UIStackView(arrangedSubviews: [
-  //                nestedStack,
-  //                dateLabel
-  //            ])
-  //            stack.axis = .vertical
-  ////            stack.distribution = .fillEqually
-  //            stack.spacing = 4
-  //
-  //            return stack
-  //        }
-  //
-  //        let instance = UIView()
-  //        instance.backgroundColor = .clear
-  //
-  //        let stack = createStack()
-  //        instance.addSubview(stack)
-  //        instance.addSubview(avatar)
-  //        stack.translatesAutoresizingMaskIntoConstraints = false
-  //        avatar.translatesAutoresizingMaskIntoConstraints = false
-  //        NSLayoutConstraint.activate([
-  //            avatar.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
-  //            avatar.topAnchor.constraint(equalTo: instance.topAnchor),
-  //            avatar.bottomAnchor.constraint(equalTo: stack.bottomAnchor),
-  //            stack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-  //            stack.topAnchor.constraint(equalTo: instance.topAnchor),
-  //            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
-  //        ])
-  //
-  //        return instance
-  //    }()
   private lazy var topicGradient: CAGradientLayer = {
     let instance = CAGradientLayer()
     instance.type = .radial
@@ -157,6 +115,15 @@ class SurveyCell: UICollectionViewCell {
       .filter { $0 != .zero }
       .sink { instance.cornerRadius = $0.height/2.25}
       .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var usernameLabel: UILabel = {
+    let instance = UILabel()
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.textAlignment = .right
+    instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+    instance.numberOfLines = 2
     
     return instance
   }()
@@ -269,12 +236,13 @@ class SurveyCell: UICollectionViewCell {
     
     return instance
   }()
+  private lazy var contextInteraction: UIContextMenuInteraction = { .init(delegate: self) }()
   //Content
   private lazy var middleView: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
       titleLabel,
       descriptionLabel,
-      imageContainer
+//      imageContainer
     ])
     instance.axis = .vertical
     instance.spacing = padding*2
@@ -493,7 +461,7 @@ class SurveyCell: UICollectionViewCell {
   }
   
   
-  
+
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -511,6 +479,8 @@ class SurveyCell: UICollectionViewCell {
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
+    
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .white
     
     ratingLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     viewsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
@@ -543,36 +513,12 @@ class SurveyCell: UICollectionViewCell {
     titleLabel.text = ""
     imageView.image = nil
     progressView.alpha = 0
+    avatar.removeInteraction(contextInteraction)
     
     guard let constraint = imageContainer.getConstraint(identifier: "imageContainer") else { return }
     
     imageContainer.removeConstraint(constraint)
   }
-  
-  //    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
-  //        //Exhibit A - We need to cache our calculation to prevent a crash.
-  //            if !isHeightCalculated {
-  //                setNeedsLayout()
-  //                layoutIfNeeded()
-  //                let size = contentView.systemLayoutSizeFitting(layoutAttributes.size)
-  //                var newFrame = layoutAttributes.frame
-  //                newFrame.size.width = CGFloat(ceilf(Float(size.width)))
-  //                newFrame.size.height = CGFloat(ceilf(Float(size.height)))
-  //                layoutAttributes.frame = newFrame
-  //                isHeightCalculated = true
-  //            }
-  //            return layoutAttributes
-  //    }
-  //    override func updateConfiguration(using state: UICellConfigurationState) {
-  //        super.updateConfiguration(using: state)
-  //
-  //        var config = UIBackgroundConfiguration.listPlainCell()
-  //        config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-  //        backgroundConfiguration = config
-  //    }
-  //    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
-  //        print(layoutAttributes)
-  //    }
 }
 
 
@@ -581,41 +527,8 @@ class SurveyCell: UICollectionViewCell {
 private extension SurveyCell {
   @MainActor
   func setupUI() {
-    backgroundColor = .clear
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .white
     clipsToBounds = true
-    
-    //        testView.place(inside: contentView)
-    
-    //        let items = [
-    //            headerView,
-    //            middleView,
-    //            bottomView
-    //        ]
-    //        items.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-    //        contentView.addSubviews(items)
-    //        contentView.translatesAutoresizingMaskIntoConstraints = false
-    ////        contentView.autoresizingMask = .flexibleHeight
-    //
-    //        NSLayoutConstraint.activate([
-    //            contentView.topAnchor.constraint(equalTo: topAnchor),
-    //            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-    //            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-    //            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-    //            headerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-    //            headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-    //            headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-    ////            middleView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: padding*2),
-    ////            middleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-    ////            middleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-    //            bottomView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: padding*2),
-    //            bottomView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-    //            bottomView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-    ////            bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-    //        ])
-    //
-    //        let constraint = bottomView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-    //        constraint.priority = .defaultLow
-    //        constraint.isActive = true
     
     let stackView = UIStackView(arrangedSubviews: [
       headerView,
@@ -623,138 +536,29 @@ private extension SurveyCell {
       bottomView
     ])
     stackView.axis = .vertical
-    stackView.spacing = padding
+    stackView.spacing = padding*2
     
     stackView.place(inside: contentView, insets: .uniform(size: 8), bottomPriority: .defaultLow)
   }
   
-  func setTasks() {
-    tasks.append(Task { [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Rating) {
-        await MainActor.run {
-          guard let self = self,
-                let item = self.item,
-                let object = notification.object as? SurveyReference,
-                item === object
-          else { return }
-          
-          //                        self.ratingLabel.text = String(describing: String(describing: item.rating))
-        }
-      }
-    })
-    
-    tasks.append(Task { [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
-        await MainActor.run {
-          
-          guard let self = self,
-                let item = self.item,
-                let object = notification.object as? SurveyReference,
-                item === object
-          else { return }
-          
-          //                        self.menuButton.menu = self.prepareMenu()
-          //                        switch item.isComplete {
-          //                        case true:
-          //                            self.titleLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
-          //                            self.descriptionLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
-          //                            self.topicHorizontalStackView.insertArrangedSubview(self.progressView, at: 1)
-          //
-          //                            var stackView: UIStackView!
-          //                            if let _stackView = self.topicHorizontalStackView.getSubview(type: UIStackView.self, identifier: "marksStackView") {
-          //                                stackView = _stackView
-          //                            } else {
-          //                                stackView = UIStackView()
-          //                                stackView.spacing = 2
-          //                                stackView.backgroundColor = .clear
-          //                                stackView.accessibilityIdentifier = "marksStackView"
-          //                                stackView.publisher(for: \.bounds, options: .new)
-          //                                    .sink { rect in
-          //
-          //                                        stackView.cornerRadius = rect.height/2.25
-          //                                }
-          //                                    .store(in: &self.subscriptions)
-          //
-          //                                self.topicHorizontalStackView.addArrangedSubview(stackView)
-          //                            }
-          //                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty else { return }
-          //                            let container = UIView()
-          //                            container.backgroundColor = .clear
-          //                            container.accessibilityIdentifier = "isComplete"
-          //                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-          //
-          //
-          //
-          //                            let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
-          //                            instance.contentMode = .center
-          //                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .white : self.item.topic.tagColor
-          //                            instance.contentMode = .scaleAspectFit
-          //                            instance.addEquallyTo(to: container)
-          //                            stackView.insertArrangedSubview(container, at: 0)
-          //
-          //                            instance.publisher(for: \.bounds, options: .new)
-          //                                .sink { rect in
-          //
-          //                                    instance.cornerRadius = rect.height/2
-          //                                    let largeConfig = UIImage.SymbolConfiguration(pointSize: rect.height * 1.9, weight: .semibold, scale: .medium)
-          //                                    let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
-          //                                    instance.image = image
-          //                                }
-          //                                .store(in: &self.subscriptions)
-          //
-          //                        case false:
-          //                            guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
-          //                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isComplete" }).first else { return }
-          //                            stackView.removeArrangedSubview(mark)
-          //                            mark.removeFromSuperview()
-          //                        }
-        }
-      }
-    })
-    
-    tasks.append(Task { [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
-        await MainActor.run {
-          guard let self = self,
-                let item = self.item,
-                let object = notification.object as? SurveyReference,
-                item === object//,
-                  //                              let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
-                  //                              let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
-                  //                              let constraint = progressIndicator.getConstraint(identifier: "width")
-          else { return }
-          
-          //                        progressLabel.text = String(describing: item.progress) + "%"
-          //                        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
-          //                            self.progressView.setNeedsLayout()
-          //                            constraint.constant = constraint.constant * CGFloat(item.progress)/100
-          //                            self.progressView.layoutIfNeeded()
-          //                        }
-        }
-      }
-    })
-    
-    tasks.append(Task { [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {
-        await MainActor.run {
-          guard let self = self,
-                let item = self.item,
-                let object = notification.object as? SurveyReference,
-                item === object
-          else { return }
-          
-          //                    self.commentsView.alpha = 1
-          //                    self.commentsLabel.alpha = 1
-          //                    self.commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
-        }
-      }
-    })
-  }
+  func setTasks() { }
   
   func setSubscriptions() {
     guard let item = item else { return }
     
     let duration = 0.15
+    
+    item.ratingPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] rating in
+        guard let self = self else { return }
+        
+        UIView.transition(with: self.ratingLabel, duration: duration, options: .transitionCrossDissolve) { [weak self] in
+          guard let self = self else { return }
+          self.ratingLabel.text = String(describing: rating)
+        } completion: { _ in }
+      }
+      .store(in: &itemSubscriptions)
     
     item.isFavoritePublisher
       .receive(on: DispatchQueue.main)
@@ -855,15 +659,19 @@ private extension SurveyCell {
       topicTitle.text = item.topic.title.uppercased()
       //            updateProgress(animated: false)
       dateLabel.text = item.startDate.timeAgoDisplay()
+      let array = [item.owner.firstName, item.owner.lastName]
+      var username = ""
+      array.forEach { username += $0 + "\n" }
+      usernameLabel.text = String(username.prefix(username.count - 1))
       
       if item.isAnonymous {
         avatar.userprofile = Userprofile.anonymous
-      } else if item.owner.isCurrent {
-        avatar.addInteraction(UIContextMenuInteraction(delegate: self))
-        avatar.userprofile = Userprofiles.shared.current
+        usernameLabel.text = ""
       } else {
+        avatar.userprofile = item.owner.isCurrent ? Userprofiles.shared.current : item.owner
+        guard !item.owner.isCurrent else { return }
+        
         avatar.addInteraction(UIContextMenuInteraction(delegate: self))
-        avatar.userprofile = item.owner
       }
     }
     
@@ -880,12 +688,16 @@ private extension SurveyCell {
       
       //Media
       guard let media = item.media else {
-        let zeroHeight = imageContainer.heightAnchor.constraint(equalToConstant: 0)
-        zeroHeight.identifier = "imageContainer"
-        zeroHeight.isActive = true
+        middleView.removeArrangedSubview(imageContainer)
+        imageContainer.removeFromSuperview()
+//        let zeroHeight = imageContainer.heightAnchor.constraint(equalToConstant: 0)
+//        zeroHeight.identifier = "imageContainer"
+//        zeroHeight.isActive = true
         
         return
       }
+      
+      middleView.addArrangedSubview(imageContainer)
       
       let aspectRatio = imageContainer.heightAnchor.constraint(equalTo: imageContainer.widthAnchor, multiplier: 9/16)
       aspectRatio.identifier = "imageContainer"

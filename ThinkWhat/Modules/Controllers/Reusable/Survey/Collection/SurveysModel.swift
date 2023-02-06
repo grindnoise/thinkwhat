@@ -73,4 +73,19 @@ extension SurveysModel: SurveysControllerInput {
       }
     }
   }
+  
+  func search(substring: String, excludedIds: [Int] = []) {
+      Task {
+          do {
+              let instances = try await API.shared.surveys.search(substring: substring, excludedIds: excludedIds)
+              await MainActor.run {
+                  modelOutput?.onSearchCompleted(instances)
+              }
+          } catch {
+#if DEBUG
+              error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+          }
+      }
+  }
 }

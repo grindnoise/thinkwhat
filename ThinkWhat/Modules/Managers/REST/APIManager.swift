@@ -1245,7 +1245,7 @@ class API {
         let existingSet = Set(Set(category.dataItems(compatibility: compatibility).map { $0.id }))
         let difference = fullSet.symmetricDifference(existingSet)
         
-        parameters = ["exclude_ids": difference]
+        parameters = ["ids": difference]
       } else {
         parameters = ["exclude_ids": category.dataItems().map { $0.id }]
       }

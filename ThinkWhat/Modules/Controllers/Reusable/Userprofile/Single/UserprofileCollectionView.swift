@@ -12,7 +12,7 @@ import Combine
 class UserprofileCollectionView: UICollectionView {
   
   enum Section: Int, CaseIterable {
-    case Credentials, Compatibility, Interests, Stats
+    case Credentials, About, Compatibility, Interests, Stats
   }
   
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
@@ -104,7 +104,13 @@ private extension UserprofileCollectionView {
       return sectionLayout
     }
     
-    let compatibilityCellRegistration = UICollectionView.CellRegistration<UserCompatibilityCell, AnyHashable> { [unowned self] cell, indexPath, item in
+    let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, _, _ in
+      guard let userprofile = self.userprofile else { return }
+      
+      cell.userprofile = userprofile
+    }
+    
+    let compatibilityCellRegistration = UICollectionView.CellRegistration<UserCompatibilityCell, AnyHashable> { [unowned self] cell, _, _ in
       guard let userprofile = self.userprofile else { return }
       
       self.colorPublisher
@@ -256,34 +262,6 @@ private extension UserprofileCollectionView {
       cell.userprofile = userprofile
     }
     
-    //        let headerRegistraition = UICollectionView.SupplementaryRegistration<SettingsCellHeader>(elementKind: UICollectionView.elementKindSectionHeader) { [unowned self] supplementaryView, elementKind, indexPath in
-    //
-    //            guard let section = Section(rawValue: indexPath.section),
-    //                  let userprofile = self.userprofile
-    //            else { return }
-    //
-    ////            switch section {
-    ////            case .City:
-    ////                supplementaryView.mode = .City
-    ////                supplementaryView.isBadgeEnabled = userprofile.cityTitle.isEmpty ? true : false
-    ////            case .SocialMedia:
-    ////                supplementaryView.mode = .SocialMedia
-    ////                supplementaryView.isHelpEnabled = true
-    ////                supplementaryView.isBadgeEnabled = userprofile.hasSocialMedia ? false : true
-    ////            case .Interests:
-    ////                supplementaryView.mode = .Interests
-    ////                supplementaryView.isHelpEnabled = true
-    ////            case .Stats:
-    ////                supplementaryView.mode = .Stats
-    ////                supplementaryView.isHelpEnabled = false
-    ////            case .Management:
-    ////                supplementaryView.mode = .Management
-    ////                supplementaryView.isHelpEnabled = false
-    ////            default:
-    ////                print("")
-    ////            }
-    //        }
-    
     source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
       guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
       
@@ -303,6 +281,10 @@ private extension UserprofileCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: compatibilityCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
+      } else if section == .About {
+        return collectionView.dequeueConfiguredReusableCell(using: aboutCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
       }
       
       return UICollectionViewCell()
@@ -317,14 +299,23 @@ private extension UserprofileCollectionView {
     var snapshot = Snapshot()
     snapshot.appendSections([
       .Credentials,
+    ])
+    snapshot.appendItems([0], toSection: .Credentials)
+    if !userprofile.description.isEmpty {
+      snapshot.appendSections([
+        .About,
+      ])
+      snapshot.appendItems([1], toSection: .About)
+    }
+    snapshot.appendSections([
       .Compatibility,
       .Interests,
       .Stats,
     ])
-    snapshot.appendItems([0], toSection: .Credentials)
-    snapshot.appendItems([1], toSection: .Compatibility)
-    snapshot.appendItems([2], toSection: .Interests)
-    snapshot.appendItems([3], toSection: .Stats)
+    //    snapshot.appendItems([1], toSection: .Credentials)
+    snapshot.appendItems([2], toSection: .Compatibility)
+    snapshot.appendItems([3], toSection: .Interests)
+    snapshot.appendItems([4], toSection: .Stats)
     source.apply(snapshot, animatingDifferences: false)
   }
   

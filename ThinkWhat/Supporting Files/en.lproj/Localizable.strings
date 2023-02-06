@@ -380,6 +380,7 @@
 //Userprofile
 "userprofile_is_in_community" = "Is in community";
 "userprofile_subscribers" = "Subscribers";
+"userprofile_about" = "About me";
 "userprofile_publications_created" = "Publications posted";
 "userprofile_community_contribution" = "Сontribution to the community";
 "userprofile_votes_received" = "Votes received";

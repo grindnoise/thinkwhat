@@ -363,6 +363,44 @@ class MainController: UITabBarController {//}, StorageProtocol {
       //          .store(in: &self.subscriptions)
     }
   }
+  
+  
+  // MARK: - Public methods
+  public func setLogoLeading(constant: CGFloat, animated: Bool = false) {
+    guard let leading = logoStack.getConstraint(identifier: "leading") else { return }
+    
+    passthroughView.setNeedsLayout()
+    if animated {
+      UIView.animate(withDuration: 0.25,
+                     delay: 0,
+                     options: .curveEaseInOut)  { [unowned self] in
+        leading.constant = constant
+        self.passthroughView.layoutIfNeeded()
+      }
+    } else {
+      leading.constant = constant
+      passthroughView.layoutIfNeeded()
+    }
+  }
+  
+  public func setLogoCentered(animated: Bool = false) {
+    guard let leading = logoStack.getConstraint(identifier: "leading") else { return }
+    
+    let constant = (passthroughView.bounds.width - logoStack.bounds.width)/2
+    
+    view.setNeedsLayout()
+    if animated {
+      UIView.animate(withDuration: 0.25,
+                     delay: 0,
+                     options: .curveEaseInOut)  { [unowned self] in
+        leading.constant = constant
+        self.passthroughView.layoutIfNeeded()
+      }
+    } else {
+      leading.constant = constant
+      passthroughView.layoutIfNeeded()
+    }
+  }
 }
 
 private extension MainController {
@@ -735,42 +773,6 @@ private extension MainController {
     loadingIcon.iconColor = to.rawValue
     loadingText.iconColor = to.rawValue
   }
-  
-  func setLogoLeading(constant: CGFloat, animated: Bool = false) {
-    guard let leading = logoStack.getConstraint(identifier: "leading") else { return }
-    
-    passthroughView.setNeedsLayout()
-    if animated {
-      UIView.animate(withDuration: 0.25,
-                     delay: 0,
-                     options: .curveEaseInOut)  { [unowned self] in
-        leading.constant = constant
-        self.passthroughView.layoutIfNeeded()
-      }
-    } else {
-      leading.constant = constant
-      passthroughView.layoutIfNeeded()
-    }
-  }
-  
-  func setLogoCentered(animated: Bool = false) {
-    guard let leading = logoStack.getConstraint(identifier: "leading") else { return }
-    
-    let constant = (passthroughView.bounds.width - logoStack.bounds.width)/2
-    
-    view.setNeedsLayout()
-    if animated {
-      UIView.animate(withDuration: 0.25,
-                     delay: 0,
-                     options: .curveEaseInOut)  { [unowned self] in
-        leading.constant = constant
-        self.passthroughView.layoutIfNeeded()
-      }
-    } else {
-      leading.constant = constant
-      passthroughView.layoutIfNeeded()
-    }
-  }
 }
 
 extension MainController: UITabBarControllerDelegate {
@@ -818,7 +820,8 @@ extension MainController: UITabBarControllerDelegate {
         toggleLogo(on: true)
       case is SubscriptionsController:
         setColors(Colors.Logo.CoolGray.rawValue)
-        setLogoCentered(animated: true)
+//        setLogoCentered(animated: true)
+        setLogoLeading(constant: 10, animated: true)
         toggleLogo(on: true)
       case is ListController:
         currentTab = .Feed

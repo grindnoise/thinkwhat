@@ -250,48 +250,37 @@ private extension SubscriptionsController {
   @MainActor
   func setBarItems(zeroSubscriptions: Bool = false) {
     guard !isRightButtonSpinning else { return }
-    
-    //        switch mode {
-    //        case .Userprofile:
-    //            guard let height = leftButton.getConstraint(identifier: "height"),
-    //                  let leading = titleLabel.getConstraint(identifier: "leading")
-    //            else { return }
-    //
-    //            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
-    //                                                           delay: 0) { [weak self] in
-    //                guard let self = self,
-    //                      let navigationBar = self.navigationController?.navigationBar
-    //                else { return }
-    //
-    //                navigationBar.setNeedsLayout()
-    //                height.constant = 40
-    //                leading.constant = 8
-    //                navigationBar.layoutIfNeeded()
-    //            }
-    //        case .Default:
-    //            print("")
-    //        }
-    
-    
     var rightButton: UIBarButtonItem!
-    
     switch mode {
     case .Default:
-      rightButton = UIBarButtonItem(title: "subscribers".localized.capitalized,
-                                    image: UIImage(systemName: "person.3.sequence.fill",
-                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                    primaryAction: {
-        let action = UIAction { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.onSubscribersTapped()
-        }
-        
-        return action
-      }(),
-                                    menu: nil)
-      navigationItem.setRightBarButton(rightButton, animated: true)
-      navigationItem.setLeftBarButton(nil, animated: true)
+      let button = UIButton()
+      button.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
+                                                   attributes: [
+                                                    .font: UIFont(name: Fonts.Semibold, size: 16) as Any,
+                                                    .foregroundColor: tintColor as Any
+                                                   ]),
+                                for: .normal)
+      button.addTarget(self,
+                       action: #selector(self.onSubscribersTapped),
+                       for: .touchUpInside)
+      
+      //      rightButton = UIBarButtonItem(title: "subscribers".localized.capitalized,
+//                                    image: UIImage(systemName: "person.3.sequence.fill",
+//                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+//                                    primaryAction: {
+//        let action = UIAction { [weak self] _ in
+//          guard let self = self else { return }
+//
+//          self.onSubscribersTapped()
+//        }
+//
+//        return action
+//      }(),
+//                                    menu: nil)
+      navigationItem.setRightBarButton(UIBarButtonItem(customView: button),
+                                       animated: true)
+      navigationItem.setLeftBarButton(nil,
+                                      animated: true)
       
       //            guard let leading = titleLabel.getConstraint(identifier: "leading") else { return }
       //
@@ -494,6 +483,7 @@ private extension SubscriptionsController {
   @MainActor
   func onModeChanged() {
     if mode == .Default {//, isOnScreen {
+      toggleUserSelected(false)
       controllerOutput?.hideUserCard(nil)
     }
     
@@ -511,6 +501,18 @@ private extension SubscriptionsController {
 }
 
 extension SubscriptionsController: SubscriptionsViewInput {
+  func toggleUserSelected(_ selected: Bool) {
+    guard let controller = tabBarController as? MainController else { return }
+    
+    guard selected else {
+      controller.setLogoLeading(constant: 10,
+                                animated: true)
+      
+      return
+    }
+    controller.setLogoCentered(animated: true)
+  }
+  
   func setDefaultMode() {
     mode = .Default
   }
@@ -627,6 +629,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
     controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic, userprofile: userprofile)
   }
   
+  @objc
   func onSubscribersTapped() {
     
     guard let userprofile = Userprofiles.shared.current,

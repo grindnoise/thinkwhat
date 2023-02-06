@@ -473,6 +473,7 @@
 		ABCE775928488C8E001E3413 /* ImageSelectionPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCE775828488C8E001E3413 /* ImageSelectionPopup.swift */; };
 		ABCE775B28489342001E3413 /* ImageSelectionPopup.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */; };
 		ABCE775D2848D378001E3413 /* InsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCE775C2848D378001E3413 /* InsetLabel.swift */; };
+		ABCF3D012990F4FE001622AD /* UserInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCF3D002990F4FE001622AD /* UserInfoCell.swift */; };
 		ABD2A2B32883DE1E00591568 /* SurveysCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2A2B22883DE1E00591568 /* SurveysCollectionView.swift */; };
 		ABD2A2B628841B1100591568 /* SurveyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2A2B528841B1100591568 /* SurveyCell.swift */; };
 		ABD639A427A5B0C50020958F /* ReCAPTCHAViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD639A127A5B0C40020958F /* ReCAPTCHAViewModel.swift */; };
@@ -1036,6 +1037,7 @@
 		ABCE775828488C8E001E3413 /* ImageSelectionPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionPopup.swift; sourceTree = "<group>"; };
 		ABCE775A28489342001E3413 /* ImageSelectionPopup.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageSelectionPopup.xib; sourceTree = "<group>"; };
 		ABCE775C2848D378001E3413 /* InsetLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetLabel.swift; sourceTree = "<group>"; };
+		ABCF3D002990F4FE001622AD /* UserInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoCell.swift; sourceTree = "<group>"; };
 		ABD2A2B22883DE1E00591568 /* SurveysCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveysCollectionView.swift; sourceTree = "<group>"; };
 		ABD2A2B528841B1100591568 /* SurveyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCell.swift; sourceTree = "<group>"; };
 		ABD639A127A5B0C40020958F /* ReCAPTCHAViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReCAPTCHAViewModel.swift; sourceTree = "<group>"; };
@@ -1903,6 +1905,7 @@
 				AB592E232906C8180082EE13 /* UserCredentialsCell.swift */,
 				AB5B624C2914300A007F413E /* UserInterestsCell.swift */,
 				AB776A0B2981709A00176349 /* UserStatsCell.swift */,
+				ABCF3D002990F4FE001622AD /* UserInfoCell.swift */,
 				ABE56C16298AA681004C761D /* UserCompatibilityCell.swift */,
 			);
 			path = Cells;
@@ -3307,6 +3310,7 @@
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
 				AB868A6A23EB04A3008DEB84 /* 1_CategorySelectionViewController.swift in Sources */,
 				AB10031C27BFBBDE00338EE4 /* FillUserModel.swift in Sources */,
+				ABCF3D012990F4FE001622AD /* UserInfoCell.swift in Sources */,
 				ABEB5F84285E4F4100C75C31 /* HotSelectionView.swift in Sources */,
 				AB75838024E5661D004367DF /* ScrollArrow.swift in Sources */,
 				AB9DBF7B26A58C8C00EFA66D /* Django.swift in Sources */,

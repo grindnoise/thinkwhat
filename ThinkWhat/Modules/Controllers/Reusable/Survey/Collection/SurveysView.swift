@@ -50,11 +50,19 @@ class SurveysView: UIView {
       
       instance = SurveysCollectionView(topic: topic)
     case .Own, .Favorite:
-      instance = SurveysCollectionView(category: viewInput.mode, color: viewInput.tintColor)
+      instance = SurveysCollectionView(category: viewInput.mode,
+                                       color: viewInput.tintColor)
     case .ByOwner:
       guard let userprofile = viewInput.userprofile else { return SurveysCollectionView() }
 
-      instance = SurveysCollectionView(userprofile: userprofile, category: .ByOwner, color: viewInput.tintColor)
+      instance = SurveysCollectionView(userprofile: userprofile,
+                                       category: .ByOwner,
+                                       color: viewInput.tintColor)
+    case .Compatibility:
+      guard let compatibility = viewInput.compatibility else { return SurveysCollectionView() }
+      
+      instance = SurveysCollectionView(compatibility: compatibility,
+                                       color: viewInput.tintColor)
     default:
 #if DEBUG
       return SurveysCollectionView()
@@ -280,10 +288,22 @@ class SurveysView: UIView {
 
 // MARK: - Controller Output
 extension SurveysView: SurveysControllerOutput {
+  func onSearchCompleted(_ instances: [SurveyReference]) {
+      collectionView.endSearchRefreshing()
+      collectionView.fetchResult = instances
+  }
+  
+  func toggleSearchMode(_ on: Bool) {
+    print("toggleSearchMode", on)
+  }
+  
+  func beginSearchRefreshing() {
+    collectionView.beginSearchRefreshing()
+  }
+  
   func viewDidDisappear() {
     collectionView.deinitPublisher.send(true)
   }
-  
   
   func onRequestCompleted(_: Result<Bool, Error>) {
     collectionView.endRefreshing()

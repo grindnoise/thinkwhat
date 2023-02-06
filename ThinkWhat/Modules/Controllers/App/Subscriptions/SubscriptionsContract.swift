@@ -27,6 +27,7 @@ protocol SubscriptionsViewInput: AnyObject {
   func claim(surveyReference: SurveyReference, claim: Claim)
   func setUserprofileFilter(_: Userprofile)
   func openUserprofile(_: Userprofile)
+  func toggleUserSelected(_: Bool)
   func unsubscribe(from: Userprofile)
   func onAllUsersTapped(mode: UserprofilesViewMode)
   func onSubcriptionsCountEvent(zeroSubscriptions: Bool)

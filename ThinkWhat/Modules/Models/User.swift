@@ -136,7 +136,7 @@ class Userprofile: Decodable {
   }()
   
   private enum CodingKeys: String, CodingKey {
-    case id, age, gender, email, username, city,
+    case id, age, gender, email, username, city, description,
          isBanned = "is_banned",
          birthDate = "birth_date",
          firstName = "first_name",
@@ -184,6 +184,7 @@ class Userprofile: Decodable {
     return "\(firstName) \(lastName)"
   }
   var email: String
+  var description: String = ""
   var dateJoined: Date
   var birthDate: Date? {
     didSet {
@@ -548,6 +549,7 @@ class Userprofile: Decodable {
       let container       = try decoder.container(keyedBy: CodingKeys.self)
       id                  = try container.decode(Int.self, forKey: .id)
       balance             = try container.decodeIfPresent(Int.self, forKey: .balance) ?? 0
+      description         = try container.decode(String.self, forKey: .description)
       firstName           = try container.decode(String.self, forKey: .firstName)
       lastName            = try container.decode(String.self, forKey: .lastName)
       email               = try container.decode(String.self, forKey: .email)
