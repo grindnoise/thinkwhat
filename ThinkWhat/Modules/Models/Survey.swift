@@ -82,7 +82,7 @@ class Survey: Decodable {
       case .Topic:
         return API_URLS.Surveys.byTopic
       case .Search:
-        return API_URLS.Surveys.searchBySubstring
+        return API_URLS.Surveys.search
       case .ByOwner:
         return API_URLS.Surveys.byUserprofile
       case .Compatibility:

@@ -27,7 +27,13 @@ class SurveysController: UIViewController, TintColorable {
   public private(set) var topic: Topic?
   public private(set) var userprofile: Userprofile?
   public private(set) var compatibility: TopicCompatibility?
-  public private(set) var mode: Survey.SurveyCategory
+  public private(set) var mode: Survey.SurveyCategory {
+    didSet {
+      print("mode", mode)
+      controllerOutput?.setMode(mode)
+//      controllerOutput?.toggleSearchMode(mode == .Search ? true : false)
+    }
+  }
   //UI
   public var tintColor: UIColor = .clear
   
@@ -38,7 +44,9 @@ class SurveysController: UIViewController, TintColorable {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //Logic
+  private let initialMode: Survey.SurveyCategory
   private var isSearching = false
+  private var searchString = ""
   private var barMode = BarMode.Default {
     didSet {
       guard oldValue != barMode else { return }
@@ -46,8 +54,9 @@ class SurveysController: UIViewController, TintColorable {
       onBarModeChanged()
     }
   }
+  private var willMoveToParent = false
   //UI
-  private lazy var topicView: UIStackView = {
+  private lazy var titleView: UIStackView = {
     let topicTitle = InsetLabel()
     topicTitle.font = UIFont(name: Fonts.Bold, size: 20)
     topicTitle.textColor = .white
@@ -91,6 +100,16 @@ class SurveysController: UIViewController, TintColorable {
         opaque,
         topicTitle
       ])
+      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
+      instance.backgroundColor = tintColor
+    case .Own:
+      topicTitle.text = "my_publications".localized.uppercased()
+      instance = UIStackView(arrangedSubviews: [ topicTitle ])
+      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
+      instance.backgroundColor = tintColor
+    case .Favorite:
+      topicTitle.text = "watching".localized.uppercased()
+      instance = UIStackView(arrangedSubviews: [topicTitle])
       instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
       instance.backgroundColor = tintColor
     default:
@@ -152,7 +171,7 @@ class SurveysController: UIViewController, TintColorable {
   
   // MARK: - Deinitialization
   deinit {
-    topicView.removeFromSuperview()
+    titleView.removeFromSuperview()
     searchField.removeFromSuperview()
     observers.forEach { $0.invalidate() }
     tasks.forEach { $0?.cancel() }
@@ -166,6 +185,7 @@ class SurveysController: UIViewController, TintColorable {
   // MARK: - Initialization
   init(_ topic: Topic, color: UIColor = .clear) {
     self.mode = .Topic
+    self.initialMode = self.mode
     self.topic = topic
     self.tintColor = color
     
@@ -174,6 +194,7 @@ class SurveysController: UIViewController, TintColorable {
   
   init(_ mode: Survey.SurveyCategory, color: UIColor = .clear) {
     self.mode = mode
+    self.initialMode = self.mode
     self.tintColor = color
     
     super.init(nibName: nil, bundle: nil)
@@ -182,6 +203,7 @@ class SurveysController: UIViewController, TintColorable {
   init(_ userprofile: Userprofile, color: UIColor = .clear) {
     self.userprofile = userprofile
     self.mode = .ByOwner
+    self.initialMode = self.mode
     self.tintColor = color
     
     super.init(nibName: nil, bundle: nil)
@@ -190,6 +212,7 @@ class SurveysController: UIViewController, TintColorable {
   init(_ compatibility: TopicCompatibility, color: UIColor = .clear) {
     self.compatibility = compatibility
     self.mode = .Compatibility
+    self.initialMode = self.mode
     self.tintColor = color
     
     super.init(nibName: nil, bundle: nil)
@@ -222,17 +245,6 @@ class SurveysController: UIViewController, TintColorable {
     setupUI()
   }
   
-//  override func viewWillDisappear(_ animated: Bool) {
-//    super.viewWillDisappear(animated)
-//
-//    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-//      guard let self = self else { return }
-//
-//      self.titleLabel.alpha = 0
-//      self.titleLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-//    }
-//  }
-  
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
@@ -246,15 +258,37 @@ class SurveysController: UIViewController, TintColorable {
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-   
-    guard let constraint = self.topicView.getConstraint(identifier: "centerY") else { return }
-    
-    UIView.animate(withDuration: 0.2) {[weak self] in
-      guard let self = self else { return }
+    switch barMode {
+    case .Search:
+      guard let constraint = searchField.getConstraint(identifier: "centerY") else { return }
       
-      self.navigationController?.navigationBar.setNeedsLayout()
-      constraint.constant = 0
-      self.navigationController?.navigationBar.layoutIfNeeded()
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut]) { [weak self] in
+          guard let self = self else { return }
+        
+        self.navigationController?.navigationBar.setNeedsLayout()
+        constraint.constant = 0
+        self.navigationController?.navigationBar.layoutIfNeeded()
+      }
+    case .Default:
+      guard let constraint = titleView.getConstraint(identifier: "centerY") else { return }
+      
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut]) { [weak self] in
+          guard let self = self else { return }
+        
+        self.navigationController?.navigationBar.setNeedsLayout()
+        constraint.constant = 0
+        self.navigationController?.navigationBar.layoutIfNeeded()
+      }
     }
   }
   
@@ -267,15 +301,33 @@ class SurveysController: UIViewController, TintColorable {
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     
-    guard let constraint = self.topicView.getConstraint(identifier: "centerY") else { return }
-    
-    UIView.animate(withDuration: 0.1) { [weak self] in
-      guard let self = self else { return }
+    switch barMode {
+    case .Search:
+      guard let constraint = searchField.getConstraint(identifier: "centerY") else { return }
       
-      self.navigationController?.navigationBar.setNeedsLayout()
-      constraint.constant = -100
-      self.navigationController?.navigationBar.layoutIfNeeded()
+      UIView.animate(withDuration: 0.1) { [weak self] in
+        guard let self = self else { return }
+        
+        self.navigationController?.navigationBar.setNeedsLayout()
+        constraint.constant = -100
+        self.navigationController?.navigationBar.layoutIfNeeded()
+      }
+    case .Default:
+      guard let constraint = titleView.getConstraint(identifier: "centerY") else { return }
+      
+      UIView.animate(withDuration: 0.1) { [weak self] in
+        guard let self = self else { return }
+        
+        self.navigationController?.navigationBar.setNeedsLayout()
+        constraint.constant = -100
+        self.navigationController?.navigationBar.layoutIfNeeded()
+      }
     }
+  }
+  
+  override func willMove(toParent parent: UIViewController?) {
+      willMoveToParent = parent.isNil ? true : false
+      super.willMove(toParent: parent)
   }
 }
 
@@ -365,8 +417,26 @@ extension SurveysController: SurveysViewInput {
     //        tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?) {
-    controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic, userprofile: userprofile)
+  func onDataSourceRequest(source: Survey.SurveyCategory,
+                           dateFilter: Period?,
+                           topic: Topic?,
+                           userprofile: Userprofile?,
+                           substring: String,
+                           except: [SurveyReference],
+                           ownersIds: [Int],
+                           topicsIds: [Int]) {
+    if source == .Search {
+      controllerInput?.search(substring: searchString,
+                              localized: false,
+                              except: except,
+                              ownersIds: ownersIds,
+                              topicsIds: topicsIds)
+    } else {
+      controllerInput?.onDataSourceRequest(source: source,
+                                           dateFilter: dateFilter,
+                                           topic: topic,
+                                           userprofile: userprofile)
+    }
   }
 }
 
@@ -384,43 +454,6 @@ extension SurveysController: SurveysModelOutput {
 private extension SurveysController {
   @MainActor
   func setupUI() {
-    switch mode {
-//    case .Topic, .Compatibility, .ByOwner:
-//      navigationItem.titleView = topicView
-////    case .Compatibility:
-////      navigationItem.titleView = topicView
-////    case .ByOwner:
-////      guard let userprofile = userprofile else { return }
-////
-////      let avatar = Avatar(userprofile: userprofile)
-////      avatar.heightAnchor.constraint(equalToConstant: 40).isActive = true
-////      avatar.tapPublisher
-////        .sink { [weak self] _ in
-////          guard let self = self else { return }
-////
-////          let banner = NewBanner(contentView: UserBannerContentView(mode: .Username,
-////                                                                      userprofile: userprofile),
-////                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-////                                 isModal: false,
-////                                 useContentViewHeight: true,
-////                                 shouldDismissAfter: 1)
-////          banner.didDisappearPublisher
-////            .sink { _ in banner.removeFromSuperview() }
-////            .store(in: &self.subscriptions)
-////        }
-////        .store(in: &subscriptions)
-////
-////      navigationItem.titleView = avatar
-    case .Own:
-      title = "my_publications".localized
-    case .Favorite:
-      title = "watching".localized
-    default:
-#if DEBUG
-      print("")
-#endif
-    }
-    
     navigationController?.setNavigationBarHidden(false, animated: false)
     navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.plain, target:nil, action:nil)
     setBarItems()
@@ -455,22 +488,26 @@ private extension SurveysController {
     setNavigationBarTintColor(color)
     
     navigationBar.addSubview(searchField)
-    navigationBar.addSubview(topicView)
+    navigationBar.addSubview(titleView)
     searchField.translatesAutoresizingMaskIntoConstraints = false
-    topicView.translatesAutoresizingMaskIntoConstraints = false
+    titleView.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      searchField.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
       searchField.heightAnchor.constraint(equalToConstant: 40),
-      searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
-//      topicView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
-      topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor)
+      searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 44 + 4),
+//      titleView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
+      titleView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor)
     ])
-    let constraint = searchField.widthAnchor.constraint(equalToConstant: 20)
-    constraint.identifier = "width"
+    
+    let constraint = searchField.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor)
+    constraint.identifier = "centerY"
     constraint.isActive = true
     
-    let centerY = topicView.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor,
+    let widthConstraint = searchField.widthAnchor.constraint(equalToConstant: 20)
+    widthConstraint.identifier = "width"
+    widthConstraint.isActive = true
+    
+    let centerY = titleView.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor,
                                                      constant: -100)
     centerY.identifier = "centerY"
     centerY.isActive = true
@@ -494,7 +531,7 @@ private extension SurveysController {
         view.addGestureRecognizer(touch)
         
         let _ = searchField.becomeFirstResponder()
-        controllerOutput?.toggleSearchMode(true)
+//        controllerOutput?.toggleSearchMode(true)
         
         //Clear previous fetch request
         controllerOutput?.onSearchCompleted([])
@@ -518,14 +555,14 @@ private extension SurveysController {
           guard let self = self else { return }
           
           self.searchField.alpha = on ? 1 : 0
-          constraint.constant = on ? navigationBar.frame.width - (10*2 + 44 + 4) : 20
+          constraint.constant = on ? navigationBar.frame.width - (10*2 + (44 + 4)*2) : 20
           navigationBar.layoutIfNeeded()
         }) { _ in }
     }
     
     func toggleTopicView(on: Bool) {
       guard let navigationBar = navigationController?.navigationBar,
-            let constraint = topicView.getConstraint(identifier: "centerY")
+            let constraint = titleView.getConstraint(identifier: "centerY")
       else { return }
       
       UIView.animate(
@@ -537,19 +574,18 @@ private extension SurveysController {
         animations: { [weak self] in
           guard let self = self else { return }
           
-          self.topicView.alpha = on ? 1 : 0
+          self.titleView.alpha = on ? 1 : 0
           constraint.constant = on ? 0 : -100
           navigationBar.layoutIfNeeded()
         }) { _ in }
       
       UIView.animate(withDuration: on ? 0.1 : 0.3,
-                     delay: 0.1) { [unowned self] in
-        self.topicView.alpha = on ? 1 : 0
-      }
+                     delay: 0.1) { [unowned self] in self.titleView.alpha = on ? 1 : 0 }
     }
     
     setBarItems()
     
+    searchString = barMode == .Search ? searchString: "" 
     toggleSearchField(on: barMode == .Search ? true : false)
     toggleTopicView(on: barMode != .Search ? true : false)
   }
@@ -598,16 +634,35 @@ private extension SurveysController {
   }
   
   func setBarItems() {
-    let searchAction = UIAction { [unowned self] _ in
-      self.controllerOutput?.toggleSearchMode(true)
-      self.barMode = .Search
-    }
+    var button: UIBarButtonItem!
     
-    let button = UIBarButtonItem(title: "",
-                                 image: UIImage(systemName: "magnifyingglass",
-                                                withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                 primaryAction: searchAction,
-                                 menu: nil)
+    switch barMode {
+    case .Search:
+      let action = UIAction { [unowned self] _ in
+//        self.controllerOutput?.toggleSearchMode(false)
+        self.mode = initialMode
+        self.barMode = .Default
+      }
+      
+      button = UIBarButtonItem(title: "",
+                               image: UIImage(systemName: "arrow.left",
+                                              withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                               primaryAction: action,
+                               menu: nil)
+      
+    case .Default:
+      let action = UIAction { [unowned self] _ in
+//        self.controllerOutput?.toggleSearchMode(true)
+        self.mode = .Search
+        self.barMode = .Search
+      }
+      
+      button = UIBarButtonItem(title: "",
+                               image: UIImage(systemName: "magnifyingglass",
+                                              withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                               primaryAction: action,
+                               menu: nil)
+    }
     
     navigationItem.setRightBarButton(button, animated: true)
   }
@@ -641,7 +696,29 @@ extension SurveysController: UITextFieldDelegate {
     }
     controllerOutput?.beginSearchRefreshing()
     isSearching = true
-    controllerInput?.search(substring: text, excludedIds: [])
+    searchString = text
+    
+    let ownerPredicate: [Int] = {
+      guard initialMode == .ByOwner,
+            let userprofile = userprofile
+      else { return [] }
+      
+      return [userprofile.id]
+    }()
+    
+    let topicPredicate: [Int] = {
+      guard initialMode == .Topic,
+            let topic = topic
+      else { return [] }
+      
+      return [topic.id]
+    }()
+    
+    controllerInput?.search(substring: text,
+                            localized: false,
+                            except: [],
+                            ownersIds: ownerPredicate,
+                            topicsIds: topicPredicate)
   }
   
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {

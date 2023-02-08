@@ -19,8 +19,24 @@ class SubscriptionsController: UIViewController, TintColorable {
   // MARK: - Public properties
   public var controllerOutput: SubsciptionsControllerOutput?
   public var controllerInput: SubsciptionsControllerInput?
+  //UI
   public private(set) var isOnScreen = false
   public var tintColor: UIColor = .clear
+  public private(set) var isUserSelected = false {
+    didSet {
+      guard oldValue != isUserSelected,
+            let controller = tabBarController as? MainController
+      else { return }
+      
+      guard isUserSelected else {
+        controller.setLogoLeading(constant: 10,
+                                  animated: true)
+        
+        return
+      }
+      controller.setLogoCentered(animated: true)
+    }
+  }
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -501,17 +517,7 @@ private extension SubscriptionsController {
 }
 
 extension SubscriptionsController: SubscriptionsViewInput {
-  func toggleUserSelected(_ selected: Bool) {
-    guard let controller = tabBarController as? MainController else { return }
-    
-    guard selected else {
-      controller.setLogoLeading(constant: 10,
-                                animated: true)
-      
-      return
-    }
-    controller.setLogoCentered(animated: true)
-  }
+  func toggleUserSelected(_ selected: Bool) { isUserSelected = selected }
   
   func setDefaultMode() {
     mode = .Default

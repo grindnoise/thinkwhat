@@ -74,6 +74,7 @@ class SurveysView: UIView {
     //Pagination #1
     let paginationPublisher = instance.paginationPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+      .eraseToAnyPublisher()
     
     paginationPublisher
       .sink { [unowned self] in
@@ -81,13 +82,21 @@ class SurveysView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil, userprofile: nil)
+        self.viewInput?.onDataSourceRequest(source: source,
+                                            dateFilter: period,
+                                            topic: nil,
+                                            userprofile: nil,
+                                            substring: "",
+                                            except: [],
+                                            ownersIds: [],
+                                            topicsIds: [])
       }
       .store(in: &subscriptions)
     
     //Pagination #2
     let paginationByTopicPublisher = instance.paginationByTopicPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+      .eraseToAnyPublisher()
     
     paginationByTopicPublisher
       .sink { [weak self] in
@@ -96,13 +105,21 @@ class SurveysView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic, userprofile: nil)
+        self.viewInput?.onDataSourceRequest(source: .Topic,
+                                            dateFilter: period,
+                                            topic: topic,
+                                            userprofile: nil,
+                                            substring: "",
+                                            except: [],
+                                            ownersIds: [],
+                                            topicsIds: [])
       }
       .store(in: &subscriptions)
     
     //Pagination #3
     let paginationByOwnerPublisher = instance.paginationByOwnerPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+      .eraseToAnyPublisher()
     
     paginationByOwnerPublisher
       .sink { [weak self] in
@@ -111,9 +128,68 @@ class SurveysView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .ByOwner, dateFilter: period, topic: nil, userprofile: userprofile)
+        self.viewInput?.onDataSourceRequest(source: .ByOwner,
+                                            dateFilter: period,
+                                            topic: nil,
+                                            userprofile: userprofile,
+                                            substring: "",
+                                            except: [],
+                                            ownersIds: [],
+                                            topicsIds: [])
       }
       .store(in: &subscriptions)
+    
+    ///Pagination #4
+    /// Request data when searching in user's surveys
+    /// - Parameters:
+    ///   - completion: A closure to be called on completion of reapplying the snapshot.
+    let paginationByOwnerSearchPublisher = instance.paginationByOwnerSearchPublisher
+      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+      .eraseToAnyPublisher()
+    
+    paginationByOwnerSearchPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let userprofile = $0.keys.first,
+              let excluded = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .Search,
+                                            dateFilter: .AllTime,
+                                            topic: nil,
+                                            userprofile: nil,
+                                            substring: "",
+                                            except: excluded,
+                                            ownersIds: [userprofile.id],
+                                            topicsIds: [])
+      }
+      .store(in: &subscriptions)
+    
+    ///Pagination #5
+    /// Request data when searching in topic
+    let paginationByTopicSearchPublisher = instance.paginationByTopicSearchPublisher
+      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+      .eraseToAnyPublisher()
+    
+    paginationByTopicSearchPublisher
+      .sink { [weak self] in
+        guard let self = self,
+              let topic = $0.keys.first,
+              let excluded = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .Search,
+                                            dateFilter: .AllTime,
+                                            topic: nil,
+                                            userprofile: nil,
+                                            substring: "",
+                                            except: excluded,
+                                            ownersIds: [],
+                                            topicsIds: [topic.id])
+      }
+      .store(in: &subscriptions)
+    
+    
     
     //Refresh #1
     instance.refreshPublisher
@@ -123,7 +199,14 @@ class SurveysView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil, userprofile: nil)
+        self.viewInput?.onDataSourceRequest(source: category,
+                                            dateFilter: period,
+                                            topic: nil,
+                                            userprofile: nil,
+                                            substring: "",
+                                            except: [],
+                                            ownersIds: [],
+                                            topicsIds: [])
       }
       .store(in: &subscriptions)
     
@@ -135,7 +218,14 @@ class SurveysView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic, userprofile: nil)
+        self.viewInput?.onDataSourceRequest(source: .Topic,
+                                            dateFilter: period,
+                                            topic: topic,
+                                            userprofile: nil,
+                                            substring: "",
+                                            except: [],
+                                            ownersIds: [],
+                                            topicsIds: [])
       }
       .store(in: &subscriptions)
     
@@ -147,7 +237,14 @@ class SurveysView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .ByOwner, dateFilter: period, topic: nil, userprofile: userprofile)
+        self.viewInput?.onDataSourceRequest(source: .ByOwner,
+                                            dateFilter: period,
+                                            topic: nil,
+                                            userprofile: userprofile,
+                                            substring: "",
+                                            except: [],
+                                            ownersIds: [],
+                                            topicsIds: [])
       }
       .store(in: &subscriptions)
     
@@ -280,10 +377,6 @@ class SurveysView: UIView {
     super.traitCollectionDidChange(previousTraitCollection)
     
   }
-  
-  override func layoutSubviews() {
-    
-  }
 }
 
 // MARK: - Controller Output
@@ -293,9 +386,14 @@ extension SurveysView: SurveysControllerOutput {
       collectionView.fetchResult = instances
   }
   
-  func toggleSearchMode(_ on: Bool) {
-    print("toggleSearchMode", on)
+  func setMode(_ mode: Survey.SurveyCategory) {
+    collectionView.category = mode
   }
+//  func toggleSearchMode(_ on: Bool) {
+//    guard let mode = viewInput?.mode else { return }
+//
+//
+//  }
   
   func beginSearchRefreshing() {
     collectionView.beginSearchRefreshing()

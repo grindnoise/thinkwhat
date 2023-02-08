@@ -84,6 +84,7 @@ class UserprofilesView: UIView {
 
 
     instance.refreshPublisher
+      .filter { !$0.isNil }
       .sink { [unowned self] _ in
         guard let viewInput = self.viewInput,
               let userprofile = viewInput.userprofile

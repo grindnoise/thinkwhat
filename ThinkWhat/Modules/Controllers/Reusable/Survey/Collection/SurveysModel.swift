@@ -59,10 +59,16 @@ extension SurveysModel: SurveysControllerInput {
     }
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?) {
+  func onDataSourceRequest(source: Survey.SurveyCategory,
+                           dateFilter: Period?,
+                           topic: Topic?,
+                           userprofile: Userprofile?) {
     Task {
       do {
-        try await API.shared.surveys.surveyReferences(category: source, dateFilter: dateFilter, topic: topic, userprofile: userprofile)
+        try await API.shared.surveys.surveyReferences(category: source,
+                                                      dateFilter: dateFilter,
+                                                      topic: topic,
+                                                      userprofile: userprofile)
         await MainActor.run {
           modelOutput?.onRequestCompleted(.success(true))
         }
@@ -74,18 +80,38 @@ extension SurveysModel: SurveysControllerInput {
     }
   }
   
-  func search(substring: String, excludedIds: [Int] = []) {
-      Task {
-          do {
-              let instances = try await API.shared.surveys.search(substring: substring, excludedIds: excludedIds)
-              await MainActor.run {
-                  modelOutput?.onSearchCompleted(instances)
-              }
-          } catch {
+  func search(substring: String,
+              localized: Bool = false,
+              except surveys: [SurveyReference] = [],
+              ownersIds: [Int] = [],
+              topicsIds: [Int] = []) {
+    
+    var existing: [SurveyReference] {
+      var instances =  SurveyReferences.shared.all
+        .filter({ $0.title.contains(substring) })
+        .filter({ !surveys.map({ $0.id }).contains($0.id) })
+      
+      if !ownersIds.isEmpty { instances = instances.filter({ ownersIds.contains($0.owner.id) }) }
+      if !topicsIds.isEmpty { instances = instances.filter({ topicsIds.contains($0.topic.id) }) }
+      
+      return instances
+    }
+    
+    Task {
+      do {
+        let received = try await API.shared.surveys.search(substring: substring,
+                                                            localized: localized,
+                                                            excludedIds: surveys.map { $0.id } + existing.map { $0.id },
+                                                            ownersIds: ownersIds,
+                                                            topicsIds: topicsIds)
+        await MainActor.run {
+          modelOutput?.onSearchCompleted(surveys + existing + received)
+        }
+      } catch {
 #if DEBUG
-              error.printLocalized(class: type(of: self), functionName: #function)
+        error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-          }
       }
+    }
   }
 }

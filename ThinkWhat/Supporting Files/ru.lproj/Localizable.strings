@@ -330,6 +330,7 @@
 "stats" = "Статистика";
 "my_publications" = "Мои публикации";
 "my_subscribers" = "Мои подписчики";
+"my_subscriptions" = "Мои подписки";
 "balance" = "Баланс";
 "account_management" = "Управление аккаунтом";
 "logout" = "Выйти";

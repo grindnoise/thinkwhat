@@ -24,7 +24,7 @@ class CompatibilityView: UIView {
       foregroundCircle.path = getProgressPath(in: percentageView.bounds,
                                               progress: percent,
                                               lineWidth: percentageView.bounds.width * lineWidthMultiplier)
-      animate(duration: 1, delay: 0.15)
+      animate(duration: 1, delay: 0)
     }
   }
   //Publishers

@@ -21,7 +21,14 @@ protocol SurveysViewInput: AnyObject {
   var compatibility: TopicCompatibility? { get }
   
   func onSurveyTapped(_: SurveyReference)
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?)
+  func onDataSourceRequest(source: Survey.SurveyCategory,
+                           dateFilter: Period?,
+                           topic: Topic?,
+                           userprofile: Userprofile?,
+                           substring: String,
+                           except: [SurveyReference],
+                           ownersIds: [Int],
+                           topicsIds: [Int])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -41,7 +48,11 @@ protocol SurveysControllerInput: AnyObject {
   func claim(surveyReference: SurveyReference, claim: Claim)
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
-  func search(substring: String, excludedIds: [Int])
+  func search(substring: String,
+              localized: Bool,
+              except: [SurveyReference],
+              ownersIds: [Int],
+              topicsIds: [Int])
 }
 
 protocol SurveysModelOutput: AnyObject {
@@ -55,6 +66,7 @@ protocol SurveysControllerOutput: AnyObject {
   func onRequestCompleted(_: Result<Bool, Error>)
   func viewDidDisappear()
   func beginSearchRefreshing()
-  func toggleSearchMode(_: Bool)
+//  func toggleSearchMode(_: Bool)
+  func setMode(_: Survey.SurveyCategory)
   func onSearchCompleted(_: [SurveyReference])
 }

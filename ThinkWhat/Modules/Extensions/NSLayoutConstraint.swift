@@ -58,5 +58,15 @@ extension NSLayoutConstraint {
         
         return newConstraint
     }
-    
+  
+//  static func constraint(equalTo : NSLayoutYAxisAnchor, constant: CGFloat = 0, identifier: String) -> NSLayoutConstraint {
+//    let constraint = NSLayoutConstraint(
+//  }
 }
+
+//extension NSLayoutYAxisAnchor {
+//  convenience init(equalTo : NSLayoutYAxisAnchor, constant: CGFloat = 0, identifier: String) {
+//    self.init()
+//    centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
+//  }
+//}

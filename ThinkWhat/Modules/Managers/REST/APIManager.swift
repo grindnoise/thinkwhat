@@ -917,10 +917,21 @@ class API {
     public func getSubscribers(for userprofile: Userprofile) async throws {
       guard let url = API_URLS.Profiles.subscribers else { throw APIError.invalidURL }
       //Exclude
-      let parameters: Parameters = ["exclude_ids": userprofile.subscribers.map{ return $0.id}]
+      var subscribers = userprofile.subscribers.map({ return $0.id })
+      var parameters: Parameters = [:]
+      if !subscribers.isEmpty {
+        parameters["exclude_ids"] = subscribers
+      }
+      if !userprofile.isCurrent {
+        parameters["userprofile_id"] = userprofile.id
+      }
       
       do {
-        let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: parent.headers())
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
                                                    DateFormatter.dateTimeFormatter,
@@ -930,7 +941,8 @@ class API {
         
         await MainActor.run {
           guard !instances.isEmpty else {
-            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersEmpty, object: userprofile)
+            userprofile.subscribersRemovePublisher.send([])
+//            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersEmpty, object: userprofile)
             return
           }
           
@@ -1228,7 +1240,8 @@ class API {
                                  dateFilter: Period? = nil,
                                  topic: Topic? = nil,
                                  userprofile: Userprofile? = nil,
-                                 compatibility: TopicCompatibility? = nil) async throws {
+                                 compatibility: TopicCompatibility? = nil,
+                                 fetchResult: [SurveyReference] = []) async throws {
       guard let url = category.url,
             let headers = headers
       else { throw APIError.invalidURL }
@@ -1246,6 +1259,8 @@ class API {
         let difference = fullSet.symmetricDifference(existingSet)
         
         parameters = ["ids": difference]
+      } else if category == .Search {
+        parameters = ["exclude_ids": fetchResult.map { $0.id }]
       } else {
         parameters = ["exclude_ids": category.dataItems().map { $0.id }]
       }
@@ -1255,7 +1270,11 @@ class API {
       }
       
       do {
-        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: headers)
         try await MainActor.run {
           Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
         }
@@ -1384,13 +1403,58 @@ class API {
       }
     }
     
-    func search(substring: String, excludedIds: [Int]) async throws -> [SurveyReference] {
-      guard let url = API_URLS.Surveys.searchBySubstring,
+//    func search(substring: String, excludedIds: [Int]) async throws -> [SurveyReference] {
+//      guard let url = API_URLS.Surveys.searchBySubstring,
+//            let headers = headers
+//      else { throw APIError.invalidURL }
+//
+//      var parameters: Parameters = ["substring": substring]
+//      if !excludedIds.isEmpty { parameters["exclude_ids"] = excludedIds }
+//      do {
+//        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+//        let decoder = JSONDecoder()
+//        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+//                                                   DateFormatter.dateTimeFormatter,
+//                                                   DateFormatter.dateFormatter ]
+//
+//        let instances = try decoder.decode([SurveyReference].self, from: data)
+//        guard !instances.isEmpty else {
+//          return []
+//        }
+//        return {
+//          var array: [SurveyReference] = []
+//          instances.forEach { instance in array.append(SurveyReferences.shared.all.filter({ $0 == instance }).first ?? instance) }
+//          return array
+//        }()
+//      } catch let error {
+//#if DEBUG
+//        print(error)
+//#endif
+//        throw error
+//      }
+//    }
+    
+    func search(substring: String,
+                localized: Bool = false,
+                excludedIds: [Int] = [],
+                ownersIds: [Int] = [],
+                topicsIds: [Int] = []) async throws -> [SurveyReference] {
+      guard let url = API_URLS.Surveys.search,
             let headers = headers
       else { throw APIError.invalidURL }
       
-      var parameters: Parameters = ["substring": substring]
-      if !excludedIds.isEmpty { parameters["exclude_ids"] = excludedIds }
+      let parameters: Parameters = [
+        "localized": localized,
+        "substring": substring,
+        "owner_ids": ownersIds,
+        "category_ids": topicsIds,
+        "exclude_ids": excludedIds,
+      ]
+    
+#if DEBUG
+      print(parameters)
+#endif
+
       do {
         let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
         let decoder = JSONDecoder()

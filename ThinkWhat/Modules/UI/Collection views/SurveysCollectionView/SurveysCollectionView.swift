@@ -35,7 +35,7 @@ class SurveysCollectionView: UICollectionView {
       }
       
       setRefreshControl()
-      setDataSource(animatingDifferences: (category == .Topic || category == .Search) ? false : true)
+      setDataSource(animatingDifferences: (category == .Topic/* || category == .Search*/) ? false : true)
       
       guard !dataItems.isEmpty, !visibleCells.isEmpty else { return }
       
@@ -73,20 +73,22 @@ class SurveysCollectionView: UICollectionView {
   public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
   public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
   public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-  public var paginationPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
-  public var paginationByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
-  public var paginationByOwnerPublisher = PassthroughSubject<[Userprofile: Period], Never>()
-  public var refreshPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
-  public var refreshByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
-  public var refreshByOwnerPublisher = PassthroughSubject<[Userprofile: Period], Never>()
+  public let paginationPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
+  public let paginationByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
+  public let paginationByOwnerPublisher = PassthroughSubject<[Userprofile: Period], Never>()
+  public let paginationByOwnerSearchPublisher = PassthroughSubject<[Userprofile: [SurveyReference]], Never>()
+  public let paginationByTopicSearchPublisher = PassthroughSubject<[Topic: [SurveyReference]], Never>()
+  public let refreshPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
+  public let refreshByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
+  public let refreshByOwnerPublisher = PassthroughSubject<[Userprofile: Period], Never>()
   public var rowPublisher = CurrentValueSubject<SurveyReference?, Never>(nil)
   public var updateStatsPublisher = CurrentValueSubject<[SurveyReference]?, Never>(nil)
-  public let subscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
-  public let unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
-  public let userprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
-  public let settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
-  public var scrollPublisher = PassthroughSubject<Bool, Never>()
-  public var deinitPublisher = PassthroughSubject<Bool, Never>()
+  public var subscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+  public var unsubscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+  public var userprofilePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
+  public var settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
+  public let scrollPublisher = PassthroughSubject<Bool, Never>()
+  public let deinitPublisher = PassthroughSubject<Bool, Never>()
   //UI
   public var color: UIColor = .secondaryLabel {
     didSet {
@@ -945,6 +947,10 @@ private extension SurveysCollectionView {
       paginationByTopicPublisher.send([topic: period])
     } else if category == .ByOwner, let userprofile = userprofile {
       paginationByOwnerPublisher.send([userprofile: period])
+    } else if category == .Search, let userprofile = userprofile {
+      paginationByOwnerSearchPublisher.send([userprofile: source.snapshot().itemIdentifiers])
+    } else if category == .Search, let topic = topic {
+      paginationByTopicSearchPublisher.send([topic: source.snapshot().itemIdentifiers])
     } else {
       //      isLoading = true
       paginationPublisher.send([category: period])

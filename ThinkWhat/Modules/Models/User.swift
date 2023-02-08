@@ -274,6 +274,9 @@ class Userprofile: Decodable {
   //Publishers
   public let imagePublisher = PassthroughSubject<UIImage, Error>()
   public let compatibilityPublisher = PassthroughSubject<UserCompatibility, Error>()
+  public let subscribersAppendPublisher = PassthroughSubject<[Userprofile], Never>()
+  public let subscribersRemovePublisher = PassthroughSubject<[Userprofile], Never>()
+  public let subscriptionsPublisher = PassthroughSubject<[Userprofile], Error>()
   
   var image: UIImage? {
     didSet {
@@ -418,7 +421,8 @@ class Userprofile: Decodable {
         
         let difference = oldSet.symmetricDifference(newSet)
         difference.forEach {
-          NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersRemove, object: [self: $0])
+          subscribersRemovePublisher.send([$0])
+//          NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersRemove, object: [self: $0])
           //                    subscribersTotal -= 1
         }
       } else {
@@ -427,17 +431,20 @@ class Userprofile: Decodable {
         let newSet = Set(subscribers)
         
         let difference = newSet.symmetricDifference(oldSet)
-        difference.forEach {
-          guard oldValue.contains($0), let index = subscribers.lastIndex(of: $0) else {
-            //Notify
-            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersAppend, object: [self: $0])
-            //                        subscribersTotal += 1
-            return
-          }
-          //Duplicate removal
-          subscribers.remove(at: index)
-          NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersEmpty, object: self)
-        }
+        subscribersAppendPublisher.send(Array(difference))
+//        difference.forEach {
+//          guard oldValue.contains($0), let index = subscribers.lastIndex(of: $0) else {
+//            //Notify
+//            subscribersAppendPublisher.send([$0])
+////            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersAppend, object: [self: $0])
+//            //                        subscribersTotal += 1
+//            return
+//          }
+//          //Duplicate removal
+//          subscribers.remove(at: index)
+//          subscribersRemovePublisher.send([])
+////          NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersEmpty, object: self)
+//        }
       }
     }
   }

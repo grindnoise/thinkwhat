@@ -94,13 +94,17 @@ private extension UserprofileCollectionView {
     
     //        delegate = self
     
-    collectionViewLayout = UICollectionViewCompositionalLayout{ section, environment -> NSCollectionLayoutSection in
+    collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, environment -> NSCollectionLayoutSection in
+      
       var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
       configuration.backgroundColor = .clear
       configuration.showsSeparators = false
       
       let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: environment)
-      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? 80 : 8, trailing: 0)
+      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0,
+                                                            leading: 0,
+                                                            bottom: section == Section.allCases.count-(!self.userprofile.description.isEmpty ? 1 : 2) ? 80 : 8,
+                                                            trailing: 0)
       return sectionLayout
     }
     

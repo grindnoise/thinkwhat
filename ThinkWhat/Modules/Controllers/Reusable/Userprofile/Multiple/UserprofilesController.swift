@@ -51,24 +51,68 @@ class UserprofilesController: UIViewController, TintColorable {
       button.menu = prepareMenu()
     }
   }
-  private lazy var titleView: UILabel = {
-    let instance = UILabel()
+  private lazy var titleView: UIStackView = {
+    let topicTitle = InsetLabel()
+    topicTitle.font = UIFont(name: Fonts.Bold, size: 20)
+    topicTitle.textColor = .white
+    topicTitle.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+    topicTitle.insets.right = 8
+    
+    var instance: UIStackView!
+    let opaque = UIView.opaque()
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 1/1).isActive = true
+    
+    switch mode {
+    case .Subscribers, .Subscriptions:
+      guard let userprofile = userprofile else { return UIStackView() }
+      
+      if userprofile.isCurrent {
+        instance = UIStackView(arrangedSubviews: [
+          topicTitle
+        ])
+        topicTitle.text = (mode == .Subscribers ? "my_subscribers" : "my_subscriptions").localized.uppercased()
+        topicTitle.insets.left = 8
+      } else {
+        let avatar = Avatar(userprofile: userprofile.isCurrent ? Userprofiles.shared.current! : userprofile,
+                            isBordered: true,
+                            borderColor: .white)
+        avatar.placeInCenter(of: opaque, heightMultiplier: 0.75)
+        instance = UIStackView(arrangedSubviews: [
+          opaque,
+          topicTitle
+        ])
+        topicTitle.text = (mode == .Subscribers ? "subscribers" : "subscribed_for").localized.uppercased()
+      }
+      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
+      instance.backgroundColor = tintColor
+    default:
+      guard let answer = answer,
+            let topic = answer.survey?.topic,
+            let navigationBar = navigationController?.navigationBar
+      else { return UIStackView() }
+      
+      topicTitle.text = topic.title.uppercased()
+      
+      let imageView = UIImageView(image: UIImage(systemName: "\(answer.order+1).circle.fill",
+                                                 withConfiguration: UIImage.SymbolConfiguration(pointSize: navigationBar.frame.height * 0.75)))
+      imageView.contentMode = .center
+      imageView.tintColor = .white
+      imageView.placeInCenter(of: opaque, heightMultiplier: 0.75)
+
+      instance = UIStackView(arrangedSubviews: [
+        opaque,
+        topicTitle
+      ])
+      instance.backgroundColor = topic.tagColor
+    }
+    
+    instance.axis = .horizontal
+    instance.spacing = 2
     instance.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero}
       .sink { instance.cornerRadius = $0.height/2.25 }
       .store(in: &subscriptions)
-    instance.font = UIFont(name: Fonts.Bold, size: 20)
-    instance.textAlignment = .center
-    switch mode {
-    case .Subscribers:
-      instance.text = "subscribers".localized.uppercased()
-    case .Subscriptions:
-      instance.text = "subscribed_at".localized.uppercased()
-    case .Voters:
-      instance.text = "subscribers".localized.uppercased()
-    }
-    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font) + padding*2).isActive = true
-    instance.textColor = .white
-    instance.backgroundColor = tintColor
     
     return instance
   }()
@@ -126,12 +170,12 @@ class UserprofilesController: UIViewController, TintColorable {
     let view = UserprofilesView()
     let model = UserprofilesModel()
     
-    self.controllerOutput = view
-    self.controllerOutput?
-      .viewInput = self
     self.controllerInput = model
     self.controllerInput?
       .modelOutput = self
+    self.controllerOutput = view
+    self.controllerOutput?
+      .viewInput = self
     
     self.view = view as UIView
     
@@ -246,23 +290,25 @@ private extension UserprofilesController {
       navigationBar.compactScrollEdgeAppearance = appearance
     }
     
-    switch mode {
-    case .Subscribers, .Subscriptions:
-      if let userprofile = userprofile, !userprofile.isCurrent {
-        navigationItem.titleView = titleView
-      }
-    case .Voters:
-      guard let answer = answer else { return }
-      
-      let imageView = UIImageView(image: UIImage(systemName: "\(answer.order+1).circle.fill",
-                                                 withConfiguration: UIImage.SymbolConfiguration(pointSize: navigationBar.frame.height * 0.75)))
-      imageView.contentMode = .center
-      imageView.tintColor = Colors.getColor(forId: answer.order)
-      imageView.isUserInteractionEnabled = true
-      imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(recognizer:))))
-      navigationItem.titleView = imageView
-      navigationBar.tintColor = tintColor
-    }
+    navigationItem.titleView = titleView
+    
+//    switch mode {
+//    case .Subscribers, .Subscriptions:
+//      if let userprofile = userprofile, !userprofile.isCurrent {
+//        navigationItem.titleView = topicView
+//      }
+//    case .Voters:
+//      guard let answer = answer else { return }
+//
+//      let imageView = UIImageView(image: UIImage(systemName: "\(answer.order+1).circle.fill",
+//                                                 withConfiguration: UIImage.SymbolConfiguration(pointSize: navigationBar.frame.height * 0.75)))
+//      imageView.contentMode = .center
+//      imageView.tintColor = Colors.getColor(forId: answer.order)
+//      imageView.isUserInteractionEnabled = true
+//      imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(recognizer:))))
+//      navigationItem.titleView = imageView
+//      navigationBar.tintColor = tintColor
+//    }
     
     setBarButtons()
   }
@@ -408,36 +454,36 @@ private extension UserprofilesController {
   }
   
   func setBarButtons() {
-    switch mode {
-    case .Subscribers, .Subscriptions:
-      guard let userprofile = userprofile else { return }
-      
-      let avatar = Avatar(userprofile: userprofile)
-      avatar.heightAnchor.constraint(equalToConstant: 40).isActive = true
-      avatar.tapPublisher
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          
-          let banner = NewBanner(contentView: UserBannerContentView(mode: .Username,
-                                                                      userprofile: userprofile),
-                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                 isModal: false,
-                                 useContentViewHeight: true,
-                                 shouldDismissAfter: 1)
-          banner.didDisappearPublisher
-            .sink { _ in banner.removeFromSuperview() }
-            .store(in: &self.subscriptions)
-        }
-        .store(in: &subscriptions)
-      navigationItem.setRightBarButton(UIBarButtonItem(customView: avatar), animated: false)
-    case .Voters:
-      let button = UIBarButtonItem(title: "actions".localized.capitalized,
-                                   image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                   primaryAction: nil,
-                                   menu: prepareMenu())
-      
-      navigationItem.setRightBarButton(button, animated: true)
-    }
+//    switch mode {
+//    case .Subscribers, .Subscriptions:
+//      guard let userprofile = userprofile else { return }
+//
+//      let avatar = Avatar(userprofile: userprofile)
+//      avatar.heightAnchor.constraint(equalToConstant: 40).isActive = true
+//      avatar.tapPublisher
+//        .sink { [weak self] _ in
+//          guard let self = self else { return }
+//
+//          let banner = NewBanner(contentView: UserBannerContentView(mode: .Username,
+//                                                                      userprofile: userprofile),
+//                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                                 isModal: false,
+//                                 useContentViewHeight: true,
+//                                 shouldDismissAfter: 1)
+//          banner.didDisappearPublisher
+//            .sink { _ in banner.removeFromSuperview() }
+//            .store(in: &self.subscriptions)
+//        }
+//        .store(in: &subscriptions)
+//      navigationItem.setRightBarButton(UIBarButtonItem(customView: avatar), animated: false)
+//    case .Voters:
+//      let button = UIBarButtonItem(title: "actions".localized.capitalized,
+//                                   image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+//                                   primaryAction: nil,
+//                                   menu: prepareMenu())
+//
+//      navigationItem.setRightBarButton(button, animated: true)
+//    }
   }
   
   func setTasks() {

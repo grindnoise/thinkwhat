@@ -820,8 +820,8 @@ extension MainController: UITabBarControllerDelegate {
         toggleLogo(on: true)
       case is SubscriptionsController:
         setColors(Colors.Logo.CoolGray.rawValue)
-//        setLogoCentered(animated: true)
-        setLogoLeading(constant: 10, animated: true)
+        let controller = controller as! SubscriptionsController
+        controller.isUserSelected ? { setLogoCentered(animated: true) }() : { setLogoLeading(constant: 10, animated: true) }() 
         toggleLogo(on: true)
       case is ListController:
         currentTab = .Feed

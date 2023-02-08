@@ -33,14 +33,20 @@ class UserprofilesCollectionView: UICollectionView {
       reloadDataSource(items: dataItems)
     }
   }
-  public weak var userprofile: Userprofile?
+  public weak var userprofile: Userprofile? {
+    didSet {
+      guard !userprofile.isNil else { return }
+      
+      setTasks()
+    }
+  }
   public weak var answer: Answer?
   
   //Publishers
   public let requestPublisher = PassthroughSubject<Bool, Never>()
   public let userPublisher = PassthroughSubject<Userprofile, Never>()
   public let selectionPublisher = PassthroughSubject<[Userprofile], Never>()
-  public let refreshPublisher = PassthroughSubject<Bool, Never>()
+  public let refreshPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public let gridItemSizePublisher = PassthroughSubject<UserprofilesController.GridItemSize?, Never>()
   public let subscribePublisher = PassthroughSubject<[Userprofile], Never>()
   public let unsubscribePublisher = PassthroughSubject<[Userprofile], Never>()
@@ -319,59 +325,85 @@ private extension UserprofilesCollectionView {
                                            item: userprofile)
     }
     
+    var snapshot = NSDiffableDataSourceSnapshot<Section, Userprofile>()
+    snapshot.appendSections([.Main])
+    source.apply(snapshot, animatingDifferences: false)
+    
     reloadDataSource(items: dataItems)
   }
   
   func setTasks() {
-    //Subscriber append
-    tasks.append( Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersAppend) {
+    guard let userprofile = userprofile else { return }
+    
+    userprofile.subscribersAppendPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] subscribers in
         guard let self = self,
-              self.mode == .Subscribers,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let owner = dict.keys.first,
-              owner == self.userprofile,
-              let subscriber = dict.values.first,
-              self.source.snapshot().itemIdentifiers.contains(subscriber)
+              self.mode == .Subscribers
         else { return }
         
-        self.appendToDataSource(item: subscriber)
-        self.loadingIndicator.stopAnimating()
-      }
-    })
-    //Subscriber remove
-    tasks.append( Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersRemove) {
-        guard let self = self,
-              self.mode == .Subscribers,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let owner = dict.keys.first,
-              owner == self.userprofile,
-              let subscriber = dict.values.first,
-              self.source.snapshot().itemIdentifiers.contains(subscriber)
-        else { return }
+        let snapshot = self.source.snapshot()
+        let currentSet = Set(snapshot.itemIdentifiers)
+        let appendingSet = Set(subscribers)
         
-        self.removeFromDataSource(item: subscriber)
-        self.loadingIndicator.stopAnimating()
-      }
-    })
-    //Subscription append
-    tasks.append( Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
-        guard let self = self,
-              self.mode == .Subscriptions,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let owner = dict
-          .keys.first,
-              owner == self.userprofile,
-              let userprofile = dict.values.first,
-              self.source.snapshot().itemIdentifiers.contains(userprofile)
-        else { return }
+        let difference = appendingSet.symmetricDifference(currentSet)
+#if DEBUG
+    print("symmetricDifference", difference)
+#endif
         
-        self.appendToDataSource(item: userprofile)
+        self.appendToDataSource(items: Array(difference))
         self.loadingIndicator.stopAnimating()
       }
-    })
+      .store(in: &subscriptions)
+//    //Subscriber append
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersAppend) {
+//        guard let self = self,
+//              self.mode == .Subscribers,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let owner = dict.keys.first,
+//              owner == self.userprofile,
+//              let subscriber = dict.values.first,
+//              self.source.snapshot().itemIdentifiers.contains(subscriber)
+//        else { return }
+//
+//        self.appendToDataSource(item: subscriber)
+//        self.loadingIndicator.stopAnimating()
+//      }
+//    })
+//    //Subscriber remove
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersRemove) {
+//        guard let self = self,
+//              self.mode == .Subscribers,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let owner = dict.keys.first,
+//              owner == self.userprofile,
+//              let subscriber = dict.values.first,
+//              self.source.snapshot().itemIdentifiers.contains(subscriber)
+//        else { return }
+//
+//        self.removeFromDataSource(item: subscriber)
+//        self.loadingIndicator.stopAnimating()
+//      }
+//    })
+//    //Subscription append
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
+//        guard let self = self,
+//              self.mode == .Subscriptions,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let owner = dict
+//          .keys.first,
+//              owner == self.userprofile,
+//              let userprofile = dict.values.first,
+//              self.source.snapshot().itemIdentifiers.contains(userprofile)
+//        else { return }
+//
+//        self.appendToDataSource(item: userprofile)
+//        self.loadingIndicator.stopAnimating()
+//      }
+//    })
     //Subscription remove
     tasks.append( Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
@@ -387,17 +419,17 @@ private extension UserprofilesCollectionView {
         self.removeFromDataSource(item: userprofile)
       }
     })
-    //End refreshing
-    tasks.append( Task {@MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersEmpty) {
-        guard let self = self,
-              self.mode == .Subscribers
-        else { return }
-        
-//        self.endRefreshing()
-        self.loadingIndicator.stopAnimating()
-      }
-    })
+//    //End refreshing
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersEmpty) {
+//        guard let self = self,
+//              self.mode == .Subscribers
+//        else { return }
+//
+////        self.endRefreshing()
+//        self.loadingIndicator.stopAnimating()
+//      }
+//    })
     tasks.append( Task {@MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsEmpty) {
         guard let self = self,
@@ -420,17 +452,16 @@ private extension UserprofilesCollectionView {
     }
     
     var snapshot = NSDiffableDataSourceSnapshot<Section, Userprofile>()
-    snapshot.appendSections([.Main])
     snapshot.appendItems(items)
     source.apply(snapshot, animatingDifferences: animated)
   }
   
   @MainActor
-  func appendToDataSource(item: Userprofile, animated: Bool = true) {
+  func appendToDataSource(items: [Userprofile], animated: Bool = true) {
     guard !source.isNil else { return }
     
     var snapshot = source.snapshot()
-    snapshot.appendItems([item])
+    snapshot.appendItems(items)
     source.apply(snapshot, animatingDifferences: animated)
   }
   
