@@ -1312,7 +1312,11 @@ class API {
     //            }
     //        }
     
-    
+    /**
+     Returns a new constraint designated by `multiplier`. Original constraint is deactivated
+     - parameter instances: surveys to update.
+     - parameter duration: time interval to animate.
+     */
     public func updateSurveyStats(_ instances: [SurveyReference]) async throws {
       guard let url = API_URLS.Surveys.updateStats,
             let headers = headers
@@ -1330,8 +1334,29 @@ class API {
                             options: .mutableContainers)
         
         await MainActor.run {
-          Surveys.shared.updateSurveyStats(json)
+          Surveys.shared.updateStats(json)
         }
+      } catch let error {
+        throw error
+      }
+    }
+    
+    /**
+     Request update topics stats. `Topic.active` & `Topic.total`
+     */
+    public func updateTopicsStats() async throws {
+      guard let url = API_URLS.Topics.updateStats,
+            let headers = headers
+      else { throw APIError.invalidURL }
+      
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .get,
+                                                 parameters: nil,
+                                                 encoding: URLEncoding.default,
+                                                 headers: headers)
+        let json = try JSON(data: data, options: .mutableContainers)
+        Topics.shared.updateStats(json)
       } catch let error {
         throw error
       }

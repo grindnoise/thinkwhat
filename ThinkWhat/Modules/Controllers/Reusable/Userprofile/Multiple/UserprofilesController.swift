@@ -75,7 +75,8 @@ class UserprofilesController: UIViewController, TintColorable {
       } else {
         let avatar = Avatar(userprofile: userprofile.isCurrent ? Userprofiles.shared.current! : userprofile,
                             isBordered: true,
-                            borderColor: .white)
+                            lightBorderColor: .white,
+                            darkBorderColor: .white)
         avatar.placeInCenter(of: opaque, heightMultiplier: 0.75)
         instance = UIStackView(arrangedSubviews: [
           opaque,
@@ -84,17 +85,15 @@ class UserprofilesController: UIViewController, TintColorable {
         topicTitle.text = (mode == .Subscribers ? "subscribers" : "subscribed_for").localized.uppercased()
       }
       instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
-      instance.backgroundColor = tintColor
     default:
       guard let answer = answer,
             let topic = answer.survey?.topic,
             let navigationBar = navigationController?.navigationBar
       else { return UIStackView() }
       
-      topicTitle.text = topic.title.uppercased()
+      topicTitle.text = answer.description.count > 15 ? answer.description.prefix(15).trimmingCharacters(in: .whitespacesAndNewlines).uppercased() + "..." : answer.description.uppercased()
       
-      let imageView = UIImageView(image: UIImage(systemName: "\(answer.order+1).circle.fill",
-                                                 withConfiguration: UIImage.SymbolConfiguration(pointSize: navigationBar.frame.height * 0.75)))
+      let imageView = UIImageView(image: UIImage(systemName: "\(answer.order+1).circle.fill"))
       imageView.contentMode = .center
       imageView.tintColor = .white
       imageView.placeInCenter(of: opaque, heightMultiplier: 0.75)
@@ -103,9 +102,10 @@ class UserprofilesController: UIViewController, TintColorable {
         opaque,
         topicTitle
       ])
-      instance.backgroundColor = topic.tagColor
     }
-    
+    instance.isUserInteractionEnabled = true
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer: ))))
+    instance.backgroundColor = tintColor
     instance.axis = .horizontal
     instance.spacing = 2
     instance.publisher(for: \.bounds)
@@ -292,6 +292,7 @@ private extension UserprofilesController {
     
     navigationItem.titleView = titleView
     
+    navigationBar.tintColor = tintColor
 //    switch mode {
 //    case .Subscribers, .Subscriptions:
 //      if let userprofile = userprofile, !userprofile.isCurrent {
@@ -454,8 +455,9 @@ private extension UserprofilesController {
   }
   
   func setBarButtons() {
-//    switch mode {
-//    case .Subscribers, .Subscriptions:
+    switch mode {
+    case .Subscribers, .Subscriptions:
+      print("")
 //      guard let userprofile = userprofile else { return }
 //
 //      let avatar = Avatar(userprofile: userprofile)
@@ -476,14 +478,20 @@ private extension UserprofilesController {
 //        }
 //        .store(in: &subscriptions)
 //      navigationItem.setRightBarButton(UIBarButtonItem(customView: avatar), animated: false)
-//    case .Voters:
-//      let button = UIBarButtonItem(title: "actions".localized.capitalized,
-//                                   image: UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-//                                   primaryAction: nil,
-//                                   menu: prepareMenu())
-//
-//      navigationItem.setRightBarButton(button, animated: true)
-//    }
+    case .Voters:
+      let action = UIAction() { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.controllerOutput?.filter()
+      }
+      
+      let button = UIBarButtonItem(title: nil,
+                                   image: UIImage(systemName: "slider.horizontal.3", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                   primaryAction: action,
+                                   menu: nil)
+
+      navigationItem.setRightBarButton(button, animated: true)
+    }
   }
   
   func setTasks() {
@@ -523,15 +531,23 @@ private extension UserprofilesController {
   }
   
   @objc
-  func handleGesture(recognizer: UITapGestureRecognizer) {
+  func handleTap(recognizer: UITapGestureRecognizer) {
     if let answer = answer {
+      let attributedText = NSMutableAttributedString(string: answer.description,
+                                                     attributes: [
+                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
+                                                     ])
+      attributedText.append(.init(string: "\n\n" + "votes".localized.uppercased() + ": \(answer.totalVotes)",
+                                  attributes: [
+                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any,
+                                    .foregroundColor: UIColor.secondaryLabel as Any
+                                  ]))
+      
       let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "\(answer.order+1).circle.fill")!,
-                                                            text: answer.description,
-                                                            textColor: tintColor,
-                                                            tintColor: tintColor,
-                                                            fontName: Fonts.Semibold,
-                                                            textStyle: .headline,
-                                                            textAlignment: .natural),
+                                                            text: "",
+                                                            attributedText: attributedText,
+                                                            textColor: .label,
+                                                            tintColor: tintColor),
                              contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                              isModal: false,
                              useContentViewHeight: true,

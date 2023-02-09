@@ -598,7 +598,7 @@ class Surveys {
   public let instancesPublisher = PassthroughSubject<[Survey], Never>()
   
   //Updates rating, progress and views count
-  func updateSurveyStats(_ json: JSON) {
+  func updateStats(_ json: JSON) {
     for i in json {
       let instance: SurveyReference? = SurveyReferences.shared.all.filter({ $0.id == Int(i.0) }).first ?? Surveys.shared.all.filter({ $0.reference.id == Int(i.0)}).first?.reference
       guard let instance = instance,

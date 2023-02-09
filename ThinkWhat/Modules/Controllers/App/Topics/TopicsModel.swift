@@ -9,66 +9,78 @@
 import Foundation
 
 class TopicsModel {
-    
-    weak var modelOutput: TopicsModelOutput?
+  
+  weak var modelOutput: TopicsModelOutput?
 }
 
 // MARK: - Controller Input
 extension TopicsModel: TopicsControllerInput {
-    func search(substring: String, excludedIds: [Int] = []) {
-        Task {
-            do {
-                let instances = try await API.shared.surveys.search(substring: substring, excludedIds: excludedIds)
-                await MainActor.run {
-                    modelOutput?.onSearchCompleted(instances)
-                }
-            } catch {
+  func search(substring: String, excludedIds: [Int] = []) {
+    Task {
+      do {
+        let instances = try await API.shared.surveys.search(substring: substring, excludedIds: excludedIds)
+        await MainActor.run {
+          modelOutput?.onSearchCompleted(instances)
+        }
+      } catch {
 #if DEBUG
-                error.printLocalized(class: type(of: self), functionName: #function)
+        error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-            }
-        }
+      }
     }
-    
-    func onDataSourceRequest(dateFilter: Period, topic: Topic) {
-        Task {
-            try await API.shared.surveys.surveyReferences(category: .Topic, dateFilter: dateFilter, topic: topic)
-        }
+  }
+  
+  func onDataSourceRequest(dateFilter: Period, topic: Topic) {
+    Task {
+      try await API.shared.surveys.surveyReferences(category: .Topic, dateFilter: dateFilter, topic: topic)
     }
-    
-    func unsubscribe(from userprofile: Userprofile) {
-        Task {
-            try await API.shared.profiles.unsubscribe(from: [userprofile])
-        }
+  }
+  
+  func unsubscribe(from userprofile: Userprofile) {
+    Task {
+      try await API.shared.profiles.unsubscribe(from: [userprofile])
     }
-    
-    func subscribe(to userprofile: Userprofile) {
-        Task {
-            try await API.shared.profiles.subscribe(at: [userprofile])
-        }
+  }
+  
+  func subscribe(to userprofile: Userprofile) {
+    Task {
+      try await API.shared.profiles.subscribe(at: [userprofile])
     }
-    
-    func claim(surveyReference: SurveyReference, claim: Claim) {
-        Task {
-            try await API.shared.surveys.claim(surveyReference: surveyReference, reason: claim)
-        }
+  }
+  
+  func claim(surveyReference: SurveyReference, claim: Claim) {
+    Task {
+      try await API.shared.surveys.claim(surveyReference: surveyReference, reason: claim)
     }
-    
-    func addFavorite(surveyReference: SurveyReference) {
-        Task {
-            await API.shared.surveys.markFavorite(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
-        }
+  }
+  
+  func addFavorite(surveyReference: SurveyReference) {
+    Task {
+      await API.shared.surveys.markFavorite(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
     }
-    
-    func updateSurveyStats(_ instances: [SurveyReference]) {
-        Task {
-            do {
-                try await API.shared.surveys.updateSurveyStats(instances)
-            } catch {
+  }
+  
+  func updateSurveyStats(_ instances: [SurveyReference]) {
+    Task {
+      do {
+        try await API.shared.surveys.updateSurveyStats(instances)
+      } catch {
 #if DEBUG
-                error.printLocalized(class: type(of: self), functionName: #function)
+        error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-            }
-        }
+      }
     }
+  }
+  
+  func updateTopicsStats() {
+    Task {
+      do {
+        try await API.shared.surveys.updateTopicsStats()
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
 }

@@ -27,6 +27,10 @@ struct API_URLS {
     static let switchNotifications: URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/switch_subscription_notifications/")}()
   }
   
+  struct Topics {
+    static let updateStats:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/total_count/")}()
+  }
+  
   struct Surveys {
     static let surveyById:          URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_id/")}()
     static let subscriptions:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/subscriptions/")}()

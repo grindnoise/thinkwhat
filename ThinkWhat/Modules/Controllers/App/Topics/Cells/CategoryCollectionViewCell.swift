@@ -102,9 +102,9 @@ class CategoryCollectionViewCell: UICollectionViewCell {
         titleString.append(NSAttributedString(string: category.title.uppercased(), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : category.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
         title.attributedText = titleString
         
-        let countString = NSMutableAttributedString()
-        countString.append(NSAttributedString(string: String(describing: category.visibleCount.roundedWithAbbreviations), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : category.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
-        count.attributedText = countString
+//        let countString = NSMutableAttributedString()
+//        countString.append(NSAttributedString(string: String(describing: category.visibleCount.roundedWithAbbreviations), attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : category.tagColor, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+//        count.attributedText = countString
     }
 }
 

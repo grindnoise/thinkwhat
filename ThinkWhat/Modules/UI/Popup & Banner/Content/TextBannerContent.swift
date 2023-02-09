@@ -34,11 +34,16 @@ class TextBannerContent: UIView {
   }()
   private lazy var label: UILabel = {
     let instance = UILabel()
-    instance.textColor = textColor
+    
     instance.numberOfLines = 0
-    instance.font = UIFont.scaledFont(fontName: fontName, forTextStyle: textStyle)
-    instance.text = text.localized
-    instance.textAlignment = textAlignment
+    if !attributedText.isNil {
+      instance.attributedText = attributedText
+    } else {
+      instance.text = text.localized
+      instance.textColor = textColor
+      instance.textAlignment = textAlignment
+      instance.font = UIFont.scaledFont(fontName: fontName, forTextStyle: textStyle)
+    }
     
     return instance
   }()
@@ -64,6 +69,7 @@ class TextBannerContent: UIView {
   private let fontName: String
   private let textAlignment: NSTextAlignment
   private var icon: Icon?
+  private var attributedText: NSAttributedString?
   
   
   
@@ -84,6 +90,7 @@ class TextBannerContent: UIView {
   init(image: UIImage,
        icon: Icon? = nil,
        text: String,
+       attributedText: NSAttributedString? = nil,
        textColor: UIColor = .label,
        tintColor: UIColor,
        fontName: String = Fonts.Regular,
@@ -93,6 +100,7 @@ class TextBannerContent: UIView {
     self.image = image
     self.icon = icon
     self.text = text
+    self.attributedText = attributedText
     self.textColor = textColor
     self.textStyle = textStyle
     self.imageTintColor = tintColor

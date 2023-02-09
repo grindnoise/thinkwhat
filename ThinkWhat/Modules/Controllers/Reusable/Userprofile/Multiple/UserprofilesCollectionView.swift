@@ -41,7 +41,6 @@ class UserprofilesCollectionView: UICollectionView {
     }
   }
   public weak var answer: Answer?
-  
   //Publishers
   public let requestPublisher = PassthroughSubject<Bool, Never>()
   public let userPublisher = PassthroughSubject<Userprofile, Never>()
@@ -50,6 +49,8 @@ class UserprofilesCollectionView: UICollectionView {
   public let gridItemSizePublisher = PassthroughSubject<UserprofilesController.GridItemSize?, Never>()
   public let subscribePublisher = PassthroughSubject<[Userprofile], Never>()
   public let unsubscribePublisher = PassthroughSubject<[Userprofile], Never>()
+  //UI
+  public var color: UIColor = .clear
   
   
   
@@ -59,7 +60,6 @@ class UserprofilesCollectionView: UICollectionView {
   private var tasks: [Task<Void, Never>?] = []
   
   //UI
-  private let color: UIColor
   //    private var isEditing = false
   private var selectedItems: [Userprofile] = []
   private var gridItemSize: UserprofilesController.GridItemSize = .third {
@@ -451,7 +451,7 @@ private extension UserprofilesCollectionView {
       return
     }
     
-    var snapshot = NSDiffableDataSourceSnapshot<Section, Userprofile>()
+    var snapshot = source.snapshot()
     snapshot.appendItems(items)
     source.apply(snapshot, animatingDifferences: animated)
   }

@@ -75,7 +75,8 @@ class SurveysController: UIViewController, TintColorable {
       opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 1/1).isActive = true
       let avatar = Avatar(userprofile: userprofile,
                           isBordered: true,
-                          borderColor: .white)
+                          lightBorderColor: .white,
+                          darkBorderColor: .white)
       avatar.placeInCenter(of: opaque, heightMultiplier: 0.75)
       
       topicTitle.text = compatibility.topic.title.uppercased()
@@ -92,7 +93,8 @@ class SurveysController: UIViewController, TintColorable {
       opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 1/1).isActive = true
       let avatar = Avatar(userprofile: userprofile,
                           isBordered: true,
-                          borderColor: .white)
+                          lightBorderColor: .white,
+                          darkBorderColor: .white)
       avatar.placeInCenter(of: opaque, heightMultiplier: 0.75)
       
       topicTitle.text = "publications".localized.uppercased()
@@ -144,6 +146,7 @@ class SurveysController: UIViewController, TintColorable {
   }()
   private lazy var searchField: InsetTextField = {
     let instance = InsetTextField()
+    instance.autocorrectionType = .no
     instance.placeholder = "search".localized
     instance.alpha = 0
     instance.delegate = self

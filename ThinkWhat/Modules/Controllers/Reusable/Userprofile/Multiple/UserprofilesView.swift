@@ -18,10 +18,10 @@ class UserprofilesView: UIView {
   // MARK: - Public properties
   public weak var viewInput: (UserprofilesViewInput & TintColorable)? {
     didSet {
-      guard !viewInput.isNil else { return }
+      guard let viewInput = viewInput else { return }
       
       collectionView.addEquallyTo(to: self)
-
+      collectionView.color = viewInput.tintColor
     }
   }
   var gridItemSizePublisher = CurrentValueSubject<UserprofilesController.GridItemSize?, Never>(nil)

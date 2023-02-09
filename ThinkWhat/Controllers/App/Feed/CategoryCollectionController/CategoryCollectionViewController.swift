@@ -31,7 +31,7 @@ class CategoryCollectionViewController: UICollectionViewController {
         self.collectionView?.register(UINib(nibName: "CategoryCollectionViewCell", bundle: Bundle.main), forCellWithReuseIdentifier: reuseIdentifier)
         if categories == nil {
             parentMode = true
-            categories = Topics.shared.all.filter { $0.parent == nil }.sorted { $0.total > $1.total }
+//            categories = Topics.shared.all.filter { $0.parent == nil }.sorted { $0.total > $1.total }
         }
         effectView.frame = collectionView.bounds
         effectView.addEquallyTo(to: collectionView)

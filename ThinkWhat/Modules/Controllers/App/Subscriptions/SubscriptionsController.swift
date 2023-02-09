@@ -133,6 +133,7 @@ class SubscriptionsController: UIViewController, TintColorable {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
+    clearNavigationBar(clear: true)
     setNavigationBarTintColor(tintColor)
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationItem.largeTitleDisplayMode = .never

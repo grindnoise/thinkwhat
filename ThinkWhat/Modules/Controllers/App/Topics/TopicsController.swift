@@ -262,6 +262,19 @@ private extension TopicsController {
   }
   
   func setTasks() {
+    //Filter bug fix
+    Timer.publish(every: 10, on: .main, in: .common)
+      .autoconnect()
+      .sink { [weak self] _ in
+        guard let self = self,
+              self.isOnScreen,
+              self.mode == .Default
+        else { return }
+        
+        self.controllerInput?.updateTopicsStats()
+      }
+      .store(in: &subscriptions)
+    
     tasks.append(Task { @MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
         guard let self = self,

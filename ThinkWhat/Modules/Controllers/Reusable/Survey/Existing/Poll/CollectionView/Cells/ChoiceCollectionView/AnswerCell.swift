@@ -396,7 +396,7 @@ private extension AnswerCell {
           else { return }
           
           if survey.isComplete {
-//            self.setVoters()
+            self.setVoters()
 //            self.percentageView.setPercent(value: self.item.percent, animated: true)
             self.imageView.tintColor = color
             self.imageView.transform = .identity
@@ -527,7 +527,8 @@ private extension AnswerCell {
     
     voters.enumerated().forEach { index, userprofile in
       let avatar = Avatar(isBordered: true,
-                          borderColor: (isChosen || isAnswerSelected) ? (traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.1)) : .clear)
+                          lightBorderColor: (isChosen || isAnswerSelected) ? (traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)) : .clear,
+                          darkBorderColor: (isChosen || isAnswerSelected) ? (traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.1)) : .clear)
       avatar.layer.zPosition = 10 - CGFloat(index)
       avatars.append(avatar)
       votersView.addSubview(avatar)
@@ -605,7 +606,8 @@ private extension AnswerCell {
     self.votersLabel.text = self.item.totalVotes == 0 ? "no_votes".localized.uppercased() : self.item.totalVotes.roundedWithAbbreviations
 
     let avatar = Avatar(isBordered: true,
-                        borderColor: (isChosen || isAnswerSelected) ? (traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.1)) : .clear)
+                        lightBorderColor: (isChosen || isAnswerSelected) ? (traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : color.withAlphaComponent(0.1)) : .clear,
+                        darkBorderColor: (isChosen || isAnswerSelected) ? (traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.1)) : .clear)
     avatar.layer.zPosition = 10
     avatar.alpha = 0
     avatar.userprofile = userprofile.isCurrent ? Userprofiles.shared.current! : userprofile

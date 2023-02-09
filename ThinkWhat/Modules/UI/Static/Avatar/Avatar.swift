@@ -264,9 +264,10 @@ class Avatar: UIView {
     }
   }
   public var isBordered: Bool
-  public var borderColor: UIColor {
+  public var darkBorderColor: UIColor = .clear
+  public var lightBorderColor: UIColor {
     didSet {
-      shimmer.backgroundColor = borderColor
+      shimmer.backgroundColor = lightBorderColor
     }
   }
   public var shadowColor: UIColor = .clear {
@@ -299,7 +300,8 @@ class Avatar: UIView {
     
     if isBordered {
       let coloredBg = UIView()
-      coloredBg.backgroundColor = borderColor
+      coloredBg.accessibilityIdentifier = "coloredBg"
+      coloredBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? darkBorderColor : lightBorderColor
       coloredBg.place(inside: instance)
       shimmer.place(inside: coloredBg)
       //        shimmer.placeInCenter(of: instance, heightMultiplier: 0.85)
@@ -468,12 +470,14 @@ class Avatar: UIView {
        size: CGSize = .zero,
        isShadowed: Bool = false,
        isBordered: Bool = false,
-       borderColor: UIColor = .clear,
+       lightBorderColor: UIColor = .clear,
+       darkBorderColor: UIColor = .clear,
        mode: Mode = .Default) {
     self.mode = mode
     self.isShadowed = isShadowed
     self.isBordered = isBordered
-    self.borderColor = borderColor
+    self.lightBorderColor = lightBorderColor
+    self.darkBorderColor = darkBorderColor
     self.userprofile = userprofile
     let frame = CGRect(origin: .zero, size: size)
     
@@ -584,6 +588,10 @@ class Avatar: UIView {
     shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
     //        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
+    
+    guard let coloredBg = background.getSubview(type: UIView.self, identifier: "coloredBg") else { return }
+    
+    coloredBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? darkBorderColor : lightBorderColor
   }
   
   override func layoutSubviews() {

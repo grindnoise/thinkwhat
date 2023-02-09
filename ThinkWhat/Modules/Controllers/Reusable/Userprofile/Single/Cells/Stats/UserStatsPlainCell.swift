@@ -46,7 +46,7 @@ class UserStatsPlainCell: UICollectionViewListCell {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  private let padding: CGFloat = 8
+  private let padding: CGFloat = 10
   private lazy var stack: UIStackView = {
     let opaque = UIView.opaque()
     let instance = UIStackView(arrangedSubviews: [

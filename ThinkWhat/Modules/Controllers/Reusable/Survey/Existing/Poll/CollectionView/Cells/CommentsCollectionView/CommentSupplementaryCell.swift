@@ -83,7 +83,7 @@ class CommentSupplementaryCell: UICollectionReusableView {
   // MARK: - Private methods
   private func setupUI() {
     label.place(inside: self,
-                insets: .uniform(size: padding),
+                insets: UIEdgeInsets(top: 0, left: padding, bottom: padding, right: padding),
                 bottomPriority: .defaultLow)
   }
   

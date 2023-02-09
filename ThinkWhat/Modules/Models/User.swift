@@ -529,7 +529,7 @@ class Userprofile: Decodable {
     email       = _email
     gender      = _gender
     isBanned    = _isBanned
-    dateJoined  = UserDefaults.Profile.dateJoined ?? Date()
+    dateJoined  = UserDefaults.Profile.dateJoined ?? Date(timeIntervalSinceReferenceDate: 1)
     subscribedAt = false
     imageURL    = UserDefaults.Profile.imageURL
     if let path = UserDefaults.Profile.imagePath, let _image = UIImage(contentsOfFile: path) {

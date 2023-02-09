@@ -19,7 +19,11 @@ class CompatibilityView: UIView {
   public var username = ""
   public var percent: Double = .zero {
     didSet {
-      guard percent != oldValue else { return }
+//      guard percent != oldValue else {
+//        setZeroCompatibility()
+//
+//        return
+//      }
       
       foregroundCircle.path = getProgressPath(in: percentageView.bounds,
                                               progress: percent,
@@ -111,6 +115,7 @@ class CompatibilityView: UIView {
 //  }()
   private lazy var percentageView: UIView = {
     let instance = UIView()
+    instance.alpha = 0
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     instance.layer.addSublayer(backgroundCircle)
     instance.layer.addSublayer(foregroundCircle)
@@ -133,11 +138,13 @@ class CompatibilityView: UIView {
     
     return instance
   }()
-  private lazy var descriptionView: UIView = {
-    let instance = UIView()
+  private lazy var descriptionView: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [
+      descriptionLabel,
+    ])
     instance.alpha = 0
-    
-    descriptionLabel.place(inside: instance)
+    instance.axis = .vertical
+//    descriptionLabel.place(inside: instance)
     instance.addSubview(disclosureView)
     disclosureView.translatesAutoresizingMaskIntoConstraints = false
     disclosureView.bottomAnchor.constraint(equalTo: instance.bottomAnchor).isActive = true
@@ -232,43 +239,91 @@ class CompatibilityView: UIView {
   // MARK: - Public methods
   public func animate(duration: TimeInterval, delay: TimeInterval) {
     func setDescriptionLabel() {
-      descriptionView.alpha = 0
-      descriptionView.transform = .init(scaleX: 0.75, y: 0.75)
+      var attributedString: NSMutableAttributedString!
+      let paragraph = NSMutableParagraphStyle()
+      paragraph.alignment = .center
+      var text = ""
       
-      var level = "userprofile_compatibility_level_low".localized
-      if  33..<66 ~= Int(percent) {
-        level = "userprofile_compatibility_level_middle".localized
+      if #available(iOS 15.0, *) {
+          paragraph.usesDefaultHyphenation = true
       } else {
-        level = "userprofile_compatibility_level_high".localized
+          paragraph.hyphenationFactor = 1
       }
       
-      let attributedString = NSMutableAttributedString(string: "userprofile_compatibility_level_with_user".localized,
-                                                       attributes: [
-                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
-                                                       ])
-      attributedString.append(NSAttributedString(string: username, attributes: [
-        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any
-      ]))
-      attributedString.append(NSAttributedString(string: "userprofile_compatibility_level_with_user_is".localized, attributes: [
-        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any
-      ]))
-      attributedString.append(NSAttributedString(string: level, attributes: [
-        .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .headline) as Any,
-        .foregroundColor: color as Any
-      ]))
-      descriptionLabel.attributedText = attributedString
+      if percent.isZero {
+        text = "userprofile_compatibility_level_zero".localized
+      } else if  1..<20 ~= Int(percent) {
+        text = "userprofile_compatibility_level_ultra_low".localized
+      } else if  20..<40 ~= Int(percent) {
+        text = "userprofile_compatibility_level_low".localized
+      } else if  40..<60 ~= Int(percent) {
+        text = "userprofile_compatibility_level_middle".localized
+      } else if  60..<80 ~= Int(percent) {
+        text = "userprofile_compatibility_level_high".localized
+      } else if  80..<100 ~= Int(percent) {
+        text = "userprofile_compatibility_level_ultra_high".localized
+      } else {
+        text = "userprofile_compatibility_level_max".localized
+      }
       
-//      setButtonTitle()
-      
-      UIView.animate(withDuration: 0.35, delay: 0.1) { [weak self] in
-        guard let self = self else { return }
+      if percent.isZero {
+        attributedString = NSMutableAttributedString(string: "userprofile_compatibility_level_zero".localized,
+                                                   attributes: [
+                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
+//                                                    .paragraphStyle: paragraph,
+                                                   ])
+        disclosureView.alpha = 0
+      } else {
+        attributedString = NSMutableAttributedString(string: text.uppercased() + "\n", attributes: [
+          .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
+          .foregroundColor: color as Any,
+          .paragraphStyle: paragraph,
+        ])
         
-        self.descriptionView.alpha = 1
-        self.descriptionView.transform = .identity
+        attributedString.append(NSAttributedString(string: "userprofile_compatibility_level".localized,
+                                                   attributes: [
+                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
+                                                    .paragraphStyle: paragraph,
+                                                   ]))
+        //      let attributedString = NSMutableAttributedString(string: "userprofile_compatibility_level_with_user".localized,
+        //                                                       attributes: [
+        //                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
+        //                                                        .paragraphStyle: paragraph,
+        //                                                       ])
+        //      attributedString.append(NSAttributedString(string: username, attributes: [
+        //        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
+        //        .paragraphStyle: paragraph,
+        //      ]))
+        //      attributedString.append(NSAttributedString(string: "userprofile_compatibility_level_with_user_is".localized, attributes: [
+        //        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
+        //        .paragraphStyle: paragraph,
+        //      ]))
+        //      attributedString.append(NSAttributedString(string: text, attributes: [
+        //        .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
+        //        .foregroundColor: color as Any,
+        //        .paragraphStyle: paragraph,
+        //      ]))
       }
+      descriptionLabel.attributedText = attributedString
     }
     
+    let maxDuration: Double = 2
+    let animDuration = maxDuration * Double(percent) / Double(100)
     setDescriptionLabel()
+    descriptionView.transform = .init(scaleX: 0.75, y: 0.75)
+    percentageView.transform = .init(scaleX: 0.75, y: 0.75)
+    UIView.animate(withDuration: 0.35, delay: 0.1) { [weak self] in
+      guard let self = self else { return }
+      
+      self.descriptionView.alpha = 1
+      self.descriptionView.transform = .identity
+    }
+    UIView.animate(withDuration: 0.35) { [weak self] in
+      guard let self = self else { return }
+      
+      self.percentageView.alpha = 1
+      self.percentageView.transform = .identity
+    }
     
     guard percent != .zero else {
       foregroundCircle.opacity = 0
@@ -277,7 +332,7 @@ class CompatibilityView: UIView {
     }
     
     let timer = Publishers.countdown(queue: .main,
-                                     interval: .milliseconds(Int((1.0/percent)*1000)),
+                                     interval: .milliseconds(Int((animDuration/percent)*1000)),
                                      times: .max(Int(percent)))
     timer.sink { [weak self] element in
       guard let self = self else { return }
@@ -291,7 +346,7 @@ class CompatibilityView: UIView {
     let anim = Animations.get(property: .StrokeEnd,
                               fromValue: 0,
                               toValue: 1,
-                              duration: duration,
+                              duration: animDuration,
                               delay: delay,
                               timingFunction: .easeInEaseOut,
                               delegate: self,
@@ -377,6 +432,10 @@ private extension CompatibilityView {
 ////    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
 //      UIView.setAnimationsEnabled(true)
 ////    }
+  }
+  
+  func setZeroCompatibility() {
+    
   }
 }
 

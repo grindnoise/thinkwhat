@@ -354,6 +354,21 @@ extension SurveysCollectionView: UICollectionViewDelegate {
   }
   
   func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    switch category {
+    case .Topic:
+      if dataItems.count < 10, let topic = topic, topic.activeCount > dataItems.count {
+        requestData()
+      }
+    case .ByOwner:
+      if dataItems.count < 10, let userprofile = userprofile, userprofile.publicationsTotal > dataItems.count {
+        requestData()
+      }
+    default:
+#if DEBUG
+      print("")
+#endif
+    }
+    
     guard category != .Search, isScrollingDown, !isLoading else { return }
     
     let max = source.snapshot().itemIdentifiers.count-1
@@ -380,6 +395,7 @@ private extension SurveysCollectionView {
       .autoconnect()
       .sink { [weak self] seconds in
         guard let self = self,
+              self.category != .Search,
               let cells = self.visibleCells as? [SurveyCell]
         else { return }
         

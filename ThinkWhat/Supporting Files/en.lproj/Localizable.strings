@@ -388,10 +388,15 @@
 "userprofile_comments_received" = "Comments received";
 "userprofile_comments_posted" = "Comments posted";
 "userprofile_compatibility" = "Compatibility";
+"userprofile_compatibility_level" = "compatibility level";
 "userprofile_compatibility_level_with_user" = "Your compatibility with ";
 "userprofile_compatibility_level_with_user_is" = " is ";
+"userprofile_compatibility_level_zero" = "Your interests do not overlap";
+"userprofile_compatibility_level_ultra_low" = "ultra low";
 "userprofile_compatibility_level_low" = "low";
 "userprofile_compatibility_level_middle" = "middle";
 "userprofile_compatibility_level_high" = "high";
+"userprofile_compatibility_level_ultra_high" = "ultra high";
+"userprofile_compatibility_level_max" = "maximum";
 "userprofile_contrib_hint" = "Topics which user is interested in to discuss within community";
-"userprofile_сompatibility_hint" = "The indicator is calculated on the results of surveys in which you participated";
+"userprofile_сompatibility_hint" = "The indicator is calculated on the results of surveys in which you both participated";

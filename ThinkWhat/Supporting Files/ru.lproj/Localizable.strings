@@ -388,10 +388,15 @@
 "userprofile_comments_received" = "Комментариев получено";
 "userprofile_comments_posted" = "Комментариев оставлено";
 "userprofile_compatibility" = "Совместимость";
+"userprofile_compatibility_level" = "уровень совместимости";
 "userprofile_compatibility_level_with_user" = "Ваш уровень совместимости с ";
 "userprofile_compatibility_level_with_user_is" = " ";
+"userprofile_compatibility_level_zero" = "Ваши интересы не пересекаются";
+"userprofile_compatibility_level_ultra_low" = "очень низкий";
 "userprofile_compatibility_level_low" = "низкий";
 "userprofile_compatibility_level_middle" = "средний";
 "userprofile_compatibility_level_high" = "высокий";
+"userprofile_compatibility_level_ultra_high" = "очень высокий";
+"userprofile_compatibility_level_max" = "максимальный";
 "userprofile_contrib_hint" = "Интересующие пользователя темы, которые он обсудил с сообществом";
-"userprofile_сompatibility_hint" = "Индикатор расчитывается на основании результатов опросов, в которых вы участвовали";
+"userprofile_сompatibility_hint" = "Индикатор расчитывается на основании результатов опросов, в которых вы оба участвовали";

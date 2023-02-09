@@ -803,13 +803,15 @@ private extension SubscriptionsView {
     guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
     
     addSubview(contentView)
-    contentView.addSubview(topView)
-    contentView.addSubview(filterView)
-    contentView.addSubview(shadowView)
-    contentView.translatesAutoresizingMaskIntoConstraints = false
-    topView.translatesAutoresizingMaskIntoConstraints = false
-    filterView.translatesAutoresizingMaskIntoConstraints = false
-    shadowView.translatesAutoresizingMaskIntoConstraints = false
+    
+    var views = [
+      topView,
+      filterView,
+      shadowView,
+    ]
+  
+    contentView.addSubviews(views)
+    views.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     
     NSLayoutConstraint.activate([
       contentView.topAnchor.constraint(equalTo: topAnchor),
