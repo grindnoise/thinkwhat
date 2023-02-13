@@ -18,7 +18,7 @@ class EmptyCard: UIView {
     var isEnabled = false
     weak fileprivate var delegate: CallbackObservable?
     @IBOutlet var contentView: UIView!
-    @IBOutlet weak var loadingIndicator: LoadingIndicator!
+//     var loadingIndicator: LoadingIndicator!
     @IBOutlet weak var createButton: UIButton! {
         didSet {
             createButton.backgroundColor = UIColor { traitCollection in
@@ -95,7 +95,7 @@ class EmptyCard: UIView {
         if newValue != isEnabled {
             isEnabled = newValue
             if isEnabled {
-                loadingIndicator.addEnableAnimation()
+//                loadingIndicator.start()
                 createButton.transform = createButton.transform.scaledBy(x: 0.75, y: 0.75)
                 createButton.alpha = 0
                 UIView.animate(withDuration: 0.5) {

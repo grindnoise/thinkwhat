@@ -44,11 +44,20 @@ class PercentageView: UIView {
   
   
   // MARK: - Initialization
-  init(lineWidth: CGFloat) {
+  init(lineWidth: CGFloat,
+       foregoundColor: UIColor? = nil,
+       backgroundColor: UIColor? = nil
+  ) {
     self.lineWidth = lineWidth
     
     super.init(frame: .zero)
     
+    if !foregoundColor.isNil {
+      foregroundLine.strokeColor = foregoundColor!.cgColor
+    }
+    if !backgroundColor.isNil {
+      backgroundLine.strokeColor = backgroundColor!.cgColor
+    }
     accessibilityIdentifier = "PercentageView"
     setupUI()
   }

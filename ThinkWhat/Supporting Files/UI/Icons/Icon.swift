@@ -205,7 +205,7 @@ class Icon: UIView {
             }
         }
     }
-    var isRounded = true {
+    var isRounded = false {
         didSet {
             cornerRadius = isRounded ? bounds.width / 2 : 0
             layer.masksToBounds = isRounded ? true : false

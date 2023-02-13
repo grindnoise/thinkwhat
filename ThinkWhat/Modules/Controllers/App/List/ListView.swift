@@ -102,7 +102,7 @@ class ListView: UIView {
     instance.textAlignment = .center
     instance.numberOfLines = 1
     instance.textColor = .white//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-    instance.font = UIFont(name: Fonts.Bold, size: 20)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
+    instance.font = UIFont(name: Fonts.Bold, size: 18)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
 //    instance.adjustsFontSizeToFitWidth = true
     
     
@@ -628,7 +628,7 @@ private extension ListView {
 //    } else {
       let attrString = NSMutableAttributedString(string: buttonText,
                                                  attributes: [
-                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Bold, size: 18) as Any,
                                                   .foregroundColor: UIColor.white,
                                                  ])
       periodButton.setAttributedTitle(attrString, for: .normal)

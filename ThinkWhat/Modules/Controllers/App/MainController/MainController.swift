@@ -341,27 +341,28 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     appDelegate.window?.addSubview(self.passthroughView)
     
-    delayAsync(delay: 2) {
-      //        let banner = Banner(fadeBackground: false)
-      //        banner.present(content: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
-      //                                                  text: "watch_survey_notification",
-      //                                                  tintColor: .label),
-      //                       dismissAfter: 10.75)
-      //        banner.didDisappearPublisher
-      //            .sink { _ in banner.removeFromSuperview() }
-      //            .store(in: &self.subscriptions)
-      
-      
-      //        let banner = NewBanner(contentView: SelectSideApp(app: .Youtube),
-      //                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-      //                               isModal: false,
-      ////                               useShadows: false,
-      //                               useContentViewHeight: true,
-      //                               shouldDismissAfter: 2)
-      //        banner.didDisappearPublisher
-      //          .sink { _ in banner.removeFromSuperview() }
-      //          .store(in: &self.subscriptions)
-    }
+//    var test = LoadingIndicator(color: Colors.System.Red.rawValue)
+//    test.didDisappearPublisher
+//      .sink { _ in
+//        test.removeFromSuperview()
+//      }
+//      .store(in: &subscriptions)
+//
+//    delayAsync(delay: 4) {[weak self] in
+//      guard let self = self else { return }
+//
+//      test.placeInCenter(of: self.view,
+//                         widthMultiplier: 0.33)
+//      test.start()
+//
+//
+//
+//    }
+//
+//    delayAsync(delay: 8) {[weak self] in
+//      guard let self = self else { return }
+//      test.stop()
+//    }
   }
   
   
@@ -596,8 +597,8 @@ private extension MainController {
                                  selectedImage: UIImage(systemName: "square.stack.3d.up.fill"),
                                  color: Colors.Logo.GreenMunshell.rawValue),
       createNavigationController(for: TopicsController(), title: "topics",
-                                 image: UIImage(systemName: "circle.grid.3x3"),
-                                 selectedImage: UIImage(systemName: "circle.grid.3x3.fill"),
+                                 image: UIImage(systemName: "chart.bar.doc.horizontal"),
+                                 selectedImage: UIImage(systemName: "chart.bar.doc.horizontal.fill"),
                                  color: Colors.Logo.Marigold.rawValue),
       createNavigationController(for: SettingsController(), title: "settings",
                                  image: UIImage(systemName: "gearshape"),

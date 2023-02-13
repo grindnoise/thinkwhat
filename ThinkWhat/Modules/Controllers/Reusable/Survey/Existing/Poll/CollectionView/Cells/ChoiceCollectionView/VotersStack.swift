@@ -1,0 +1,209 @@
+//
+//  VotersStack.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 10.02.2023.
+//  Copyright © 2023 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+import Combine
+
+class VotersStack: UIView {
+  
+  // MARK: - Overridden properties
+  
+  
+  
+  // MARK: - Public properties
+  
+  
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  ///`Logic`
+  ///For limiting avatars in stack
+  private let capacity: Int
+  private var stack: Stack<Avatar>
+  ///`UI`
+  private let lightBorderColor: UIColor
+  private let darkBorderColor: UIColor
+  private let height: CGFloat
+  private var intersection: CGFloat { height * 1/3 }
+  
+  
+  
+  // MARK: - Deinitialization
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
+#if DEBUG
+    print("\(String(describing: type(of: self))).\(#function)")
+#endif
+  }
+  
+  
+  
+  // MARK: - Initialization
+  init(userprofiles: [Userprofile],
+       capacity: Int,
+       lightBorderColor: UIColor,
+       darkBorderColor: UIColor,
+       height: CGFloat
+  ) {
+    self.height = height
+    self.lightBorderColor = lightBorderColor
+    self.darkBorderColor = darkBorderColor
+    self.capacity = capacity
+    stack = Stack(capacity: capacity)
+    
+    super.init(frame: .zero)
+    
+    userprofiles.forEach {
+      print($0.name)
+      stack.push(Avatar(userprofile: $0,
+                        isBordered: true,
+                        lightBorderColor: lightBorderColor,
+                        darkBorderColor: darkBorderColor)) }
+    setupUI()
+  }
+  
+  override init(frame: CGRect) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  
+  
+  // MARK: - Public methods
+  public func push(userprofile: Userprofile, animated: Bool = true) {
+    let pushed = Avatar(userprofile: userprofile,
+                        isBordered: true,
+                        lightBorderColor: lightBorderColor,
+                        darkBorderColor: darkBorderColor)
+    
+    
+    guard stack.storage.filter({ $0.userprofile == userprofile }).isEmpty else { return }
+    
+    pushed.transform = .init(scaleX: 0.5, y: 0.5)
+    pushed.alpha = 0
+    
+    if subviews.isEmpty {
+      addSubview(pushed)
+      pushed.translatesAutoresizingMaskIntoConstraints = false
+      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+      let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
+      constraint.identifier = "anchor"
+      constraint.isActive = true
+    } else if let last = subviews.last {
+      addSubview(pushed)
+      pushed.translatesAutoresizingMaskIntoConstraints = false
+      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+      let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
+      constraint.identifier = "anchor"
+      constraint.isActive = true
+    }
+    
+    UIView.animate(
+      withDuration: 0.3,
+      delay: 0,
+      usingSpringWithDamping: 0.9,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut]) {
+        pushed.alpha = 1
+        pushed.transform = .identity
+      }
+    
+    if let popped = stack.push(pushed),
+       let constraint = popped.getConstraint(identifier: "anchor") {
+      
+      var peak: UIView?
+      
+      if stack.storage.count > 1 {
+        peak = stack.peek()
+      }
+      setNeedsLayout()
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.9,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          constraint.constant = self.height - self.intersection
+          self.layoutIfNeeded()
+          popped.alpha = 0
+          popped.transform = .init(scaleX: 0.5, y: 0.5)
+        }) { [weak self] _ in
+          guard let self = self else { return }
+          
+          popped.removeFromSuperview()
+          
+          guard let peak = peak,
+                let peakConstraint = peak.getConstraint(identifier: "anchor")
+          else { return }
+
+
+          self.setNeedsLayout()
+          peak.removeConstraint(peakConstraint)
+          let new = peak.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+          new.identifier = "anchor"
+          new.isActive = true
+          self.layoutIfNeeded()
+        }
+    }
+//    print("pushed",pushed)
+//    print("popped",popped)
+  }
+  
+  
+  
+  // MARK: - Overridden methods
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+  }
+}
+
+private extension VotersStack {
+  func setupUI() {
+    backgroundColor = .clear
+    clipsToBounds = false
+    
+    ///Intersection by 1/3
+    let constraint = widthAnchor.constraint(equalTo: heightAnchor,
+                           multiplier: CGFloat(capacity - 1))
+    constraint.constant = -intersection//(36)*(1/3)
+    constraint.isActive = true
+    //*0.7).isActive = true
+    
+    stack.storage.reversed().forEach { avatar in
+      if subviews.isEmpty {
+        addSubview(avatar)
+        avatar.translatesAutoresizingMaskIntoConstraints = false
+        avatar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        let constraint = avatar.trailingAnchor.constraint(equalTo: trailingAnchor)
+        constraint.identifier = "anchor"
+        constraint.isActive = true
+        
+      } else if let last = subviews.last {
+        addSubview(avatar)
+        avatar.translatesAutoresizingMaskIntoConstraints = false
+        avatar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        let constraint = avatar.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
+        constraint.identifier = "anchor"
+        constraint.isActive = true
+      }
+    }
+  }
+}
+

@@ -573,17 +573,13 @@ private extension SurveysController {
         delay: 0,
         usingSpringWithDamping: 0.8,
         initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [weak self] in
+        options: [.curveEaseInOut]) { [weak self] in
           guard let self = self else { return }
           
           self.titleView.alpha = on ? 1 : 0
           constraint.constant = on ? 0 : -100
           navigationBar.layoutIfNeeded()
-        }) { _ in }
-      
-      UIView.animate(withDuration: on ? 0.1 : 0.3,
-                     delay: 0.1) { [unowned self] in self.titleView.alpha = on ? 1 : 0 }
+        }
     }
     
     setBarItems()

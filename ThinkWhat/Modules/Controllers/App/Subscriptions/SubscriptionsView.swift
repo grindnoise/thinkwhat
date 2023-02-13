@@ -136,7 +136,7 @@ class SubscriptionsView: UIView {
     instance.numberOfLines = 1
     instance.textColor = .white
     instance.text = "publications".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
+    instance.font = UIFont(name: Fonts.Bold, size: 18)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
     instance.adjustsFontSizeToFitWidth = true
     instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
     
@@ -1057,7 +1057,7 @@ private extension SubscriptionsView {
 //    } else {
       let attrString = NSMutableAttributedString(string: buttonText,
                                                  attributes: [
-                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Bold, size: 18) as Any,
                                                   .foregroundColor: UIColor.white,
                                                  ])
       periodButton.setAttributedTitle(attrString, for: .normal)

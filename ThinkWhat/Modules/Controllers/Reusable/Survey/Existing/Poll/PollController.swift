@@ -93,13 +93,17 @@ class PollController: UIViewController {
     
     return instance
   }()
-  private lazy var loadingIndicator: Icon = {
-    let instance = Icon(category: Icon.Category.Logo)
-    instance.iconColor = item.topic.tagColor
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.2
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+  private lazy var loadingIndicator: LoadingIndicator = {
+    let instance = LoadingIndicator(color: item.topic.tagColor)
+    instance.didDisappearPublisher
+      .sink { [weak self] _ in
+        guard let self = self,
+              let survey = self.item.survey
+        else { return }
+        
+        self.controllerOutput?.presentView(survey)
+      }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -267,7 +271,8 @@ private extension PollController {
     guard let navigationBar = self.navigationController?.navigationBar else { return }
 
     let appearance = UINavigationBarAppearance()
-    appearance.configureWithOpaqueBackground()
+    appearance.configureWithDefaultBackground()
+    appearance.backgroundColor = .systemBackground
     appearance.shadowColor = nil
     navigationBar.standardAppearance = appearance
     navigationBar.scrollEdgeAppearance = appearance
@@ -551,7 +556,7 @@ private extension PollController {
     navigationController?.setNavigationBarHidden(true, animated: false)
     loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
     controllerInput?.load(item, incrementViewCounter: true)
-    animateLoaderColor(from: item.topic.tagColor, to: item.topic.tagColor.lighter(0.35))
+    loadingIndicator.start()
   }
   
   func setBarButtonItems() {
@@ -706,35 +711,6 @@ private extension PollController {
                                    menu: nil)
     navigationItem.rightBarButtonItem = actionButton
   }
-  
-  @MainActor
-  func animateLoaderColor(from: UIColor, to: UIColor) {
-    let anim = Animations.get(property: .FillColor,
-                              fromValue: from.cgColor as Any,
-                              toValue: to.cgColor as Any,
-                              duration: 1.5,
-                              delay: 0,
-                              repeatCount: 0,
-                              autoreverses: false,
-                              timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                              delegate: self,
-                              isRemovedOnCompletion: true,
-                              completionBlocks: [
-                                {[weak self] in
-                                  guard let self = self else { return }
-                                  
-                                  guard !self.item.survey.isNil else {
-                                    //                                                delayAsync(delay: 0.75) {
-                                    self.animateLoaderColor(from: to, to: from)
-                                    //                                                }
-                                    return
-                                  }
-                                  //                                            self.launch()
-                                }])
-    
-    loadingIndicator.icon.add(anim, forKey: nil)
-    loadingIndicator.iconColor = to
-  }
 }
 
 
@@ -820,18 +796,7 @@ extension PollController: PollModelOutput {
     switch result {
     case .success:
       navigationController?.setNavigationBarHidden(false, animated: true)
-      UIView.animate(withDuration: 0.3, animations: { [weak self] in
-        guard let self = self else { return }
-        
-        self.loadingIndicator.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-        self.loadingIndicator.alpha = 0
-      }) { _ in
-        self.loadingIndicator.removeFromSuperview()
-        
-        guard let item = self.item.survey else { return }
-        
-        self.controllerOutput?.presentView(item)
-      }
+      loadingIndicator.stop()
     case .failure:
       let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
                                                             text: AppError.server.localizedDescription,

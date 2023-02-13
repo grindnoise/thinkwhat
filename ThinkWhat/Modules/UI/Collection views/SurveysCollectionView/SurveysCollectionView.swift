@@ -30,16 +30,16 @@ class SurveysCollectionView: UICollectionView {
   }
   public var category: Survey.SurveyCategory {
     didSet {
-      defer {
-        setColors()
-      }
+//      defer {
+//        setColors()
+//      }
       
       setRefreshControl()
       setDataSource(animatingDifferences: (category == .Topic/* || category == .Search*/) ? false : true)
       
       guard !dataItems.isEmpty, !visibleCells.isEmpty else { return }
       
-      scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+      scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: category == .Topic ? false : true)
     }
   }
   public var period: Period = .AllTime {
@@ -94,7 +94,8 @@ class SurveysCollectionView: UICollectionView {
     didSet {
       guard oldValue != color else { return }
       
-      setColors()
+      colorPublisher.send(color)
+//      setColors()
     }
   }
   //Logic
@@ -169,22 +170,25 @@ class SurveysCollectionView: UICollectionView {
     }
   }
   private var loadingInProgress = false
-  //  private lazy var loadingIndicator: UIActivityIndicatorView = {
-  //    let indicator = UIActivityIndicatorView(style: .medium)
-  //    indicator.translatesAutoresizingMaskIntoConstraints = false
-  //    indicator.hidesWhenStopped = true
-  //    indicator.color = .secondaryLabel
-  //
-  //    return indicator
-  //  }()
-  //    private var hMaskLayer: CAGradientLayer!
-  private lazy var searchSpinner: UIActivityIndicatorView = {
-    let instance = UIActivityIndicatorView(style: .large)
-    instance.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-    instance.alpha = 0
-    instance.layoutCentered(in: self)
+  private lazy var loadingIndicator: LoadingIndicator = {
+    let instance = LoadingIndicator(color: color, shouldSendCompletion: false)
+    instance.didDisappearPublisher
+      .sink { _ in
+        instance.reset()
+      }
+      .store(in: &subscriptions)
+    instance.placeInCenter(of: self, widthMultiplier: 0.25)
+    
     return instance
   }()
+  private let colorPublisher = PassthroughSubject<UIColor, Never>()
+//  private lazy var searchSpinner: UIActivityIndicatorView = {
+//    let instance = UIActivityIndicatorView(style: .large)
+//    instance.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//    instance.alpha = 0
+//    instance.layoutCentered(in: self)
+//    return instance
+//  }()
   
   
   
@@ -301,31 +305,24 @@ class SurveysCollectionView: UICollectionView {
   
   @MainActor @objc
   public func beginSearchRefreshing() {
-    searchSpinner.startAnimating()
-    
-    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0) {[weak self] in
-      guard let self = self else { return }
-      
-      self.searchSpinner.alpha = 1
-    }
+    loadingIndicator.start()
+//    searchSpinner.startAnimating()
+//
+//    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0) {[weak self] in
+//      guard let self = self else { return }
+//
+//      self.searchSpinner.alpha = 1
+//    }
   }
   
   @MainActor @objc
   public func endSearchRefreshing() {
-    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
-      guard let self = self else { return }
-      
-      self.searchSpinner.alpha = 1
-    } completion: { _ in self.searchSpinner.stopAnimating() }
-  }
-  
-  
-  
-  // MARK: - Overriden methods
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    
-    searchSpinner.color = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    loadingIndicator.stop()
+//    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
+//      guard let self = self else { return }
+//
+//      self.searchSpinner.alpha = 1
+//    } completion: { _ indff self.searchSpinner.stopAnimating() }
   }
 }
 
@@ -522,6 +519,11 @@ private extension SurveysCollectionView {
     let loaderRegistration = UICollectionView.SupplementaryRegistration<LoaderCell>(elementKind: UICollectionView.elementKindSectionFooter) { [unowned self] supplementaryView,_,_ in
       
       supplementaryView.color = self.color
+      
+      self.colorPublisher
+        .sink { supplementaryView.color = $0 }
+        .store(in: &self.subscriptions)
+      
       self.isLoadingPublisher
         .sink { supplementaryView.isLoading = $0 }
         .store(in: &self.subscriptions)
@@ -942,7 +944,7 @@ private extension SurveysCollectionView {
   
   @MainActor
   func setColors() {
-    refreshControl?.tintColor = color
+//    refreshControl?.tintColor = color
   }
   
   @objc

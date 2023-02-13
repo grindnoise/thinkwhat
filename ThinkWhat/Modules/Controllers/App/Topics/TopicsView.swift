@@ -87,7 +87,7 @@ class TopicsView: UIView {
     instance.numberOfLines = 1
     instance.textColor = .white
     instance.text = "publications".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
+    instance.font = UIFont(name: Fonts.Bold, size: 18)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
     instance.adjustsFontSizeToFitWidth = true
     instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
     
@@ -251,9 +251,12 @@ class TopicsView: UIView {
     
     instance.scrollPublisher
       .sink { [weak self] in
-        guard let self = self else { return }
+        guard let self = self,
+              self.viewInput?.mode == .Topic
+        else { return }
         
-        self.toggleDateFilter(on: !$0)
+//        self.toggleDateFilter(on: !$0)
+        self.isDateFilterOnScreen = !$0
       }
       .store(in: &subscriptions)
     
@@ -277,7 +280,8 @@ class TopicsView: UIView {
       self.touchLocation = point
       self.surveysCollectionView.topic = topic
       self.surveysCollectionView.isOnScreen = true
-      self.toggleDateFilter(on: true)
+      self.isDateFilterOnScreen = true
+//      self.toggleDateFilter(on: true)
       self.setBackgroundColor()//.secondarySystemBackground)
       self.surveysCollectionView.alpha = 1
       //            self.surveysCollectionView.backgroundColor = self.background.backgroundColor
@@ -341,6 +345,13 @@ class TopicsView: UIView {
       
       surveysCollectionView.period = period
       updatePeriodButton()
+    }
+  }
+  private var isDateFilterOnScreen = false {
+    didSet {
+      guard oldValue != isDateFilterOnScreen else { return }
+      
+      toggleDateFilter(on: isDateFilterOnScreen)
     }
   }
   
@@ -559,13 +570,13 @@ private extension TopicsView {
       guard let self = self else { return }
       
       guard let viewInput = self.viewInput, viewInput.mode == .Topic  else {
-        let color: UIColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+        let color: UIColor = .secondarySystemBackground//self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
         self.background.backgroundColor = color
         self.surveysCollectionView.backgroundColor = color
         return
       }
       
-      let color: UIColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+      let color: UIColor = .secondarySystemBackground//self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
       self.background.backgroundColor = color
       self.surveysCollectionView.backgroundColor = color
       //            self.background.backgroundColor = color
@@ -660,7 +671,7 @@ private extension TopicsView {
     let buttonText = "per_\(period.rawValue.lowercased())".localized.uppercased()
     let attrString = NSMutableAttributedString(string: buttonText,
                                                attributes: [
-                                                .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                .font: UIFont(name: Fonts.Bold, size: 18) as Any,
                                                 .foregroundColor: UIColor.white,
                                                ])
     periodButton.setAttributedTitle(attrString, for: .normal)
@@ -690,16 +701,26 @@ extension TopicsView: TopicsControllerOutput {
     //        collectionView.backgroundColor = background.backgroundColor
     reveal(present: false, location: CGPoint(x: bounds.maxX, y: bounds.minY)/*touchLocation*/, view: surveysCollectionView, color: color ?? surveysCollectionView.topic!.tagColor, fadeView: collectionView, duration: 0.3)
     setBackgroundColor()//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground)//)
-    toggleDateFilter(on: false)
+//    toggleDateFilter(on: false)
+    isDateFilterOnScreen = false
   }
   
   func onSearchMode() {
+    guard let viewInput = viewInput else { return }
+    
     surveysCollectionView.isOnScreen = false
     surveysCollectionView.category = .Search
+    surveysCollectionView.color = viewInput.tintColor
     surveysCollectionView.alpha = 1
     surveysCollectionView.backgroundColor = background.backgroundColor
-    touchLocation = CGPoint(x: bounds.maxX, y: bounds.minY)
-    reveal(present: true, location: touchLocation, view: surveysCollectionView, color: viewInput!.tintColor, fadeView: collectionView, duration: 0.35)
+    touchLocation = CGPoint(x: bounds.maxX,
+                            y: bounds.minY)
+    reveal(present: true,
+           location: touchLocation,
+           view: surveysCollectionView,
+           color: viewInput.tintColor,
+           fadeView: collectionView,
+           duration: 0.35)
   }
   
   func onSearchCompleted(_ instances: [SurveyReference]) {

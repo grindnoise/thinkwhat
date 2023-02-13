@@ -397,7 +397,7 @@ private extension TopicCellHeaderContent {
     titleGradient.colors = getGradientColors(color: color)
     iconGradient.colors = getGradientColors(color: color)
     viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.activeCount.roundedWithAbbreviations)
-    viewsLabel.textColor = configuration.topicItem.topic.activeCount > 0 ? color : .tertiaryLabel
+    viewsLabel.textColor = configuration.topicItem.topic.activeCount > 0 ? color : .secondaryLabel
     
     currentConfiguration.topicItem.topic.activeCountPublisher
       .receive(on: DispatchQueue.main)

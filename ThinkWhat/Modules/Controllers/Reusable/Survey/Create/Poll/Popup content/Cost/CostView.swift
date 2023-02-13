@@ -86,7 +86,8 @@ class CostView: UIView {
             UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 1, options: .curveEaseOut) {
                 indicator.alpha = 0
             } completion: { _ in
-                indicator.removeAllAnimations()
+              indicator.stop()
+//                indicator.removeAllAnimations()
                 indicator.removeFromSuperview()
                 
                 switch c.result {
@@ -136,9 +137,11 @@ class CostView: UIView {
             if v == confirm {
                 guard success else {
                     dataProvider?.post()
-                    let indicator = LoadingIndicator(frame: .zero)
-                    indicator.alpha = 0
-                    indicator.addEnableAnimation()
+//                    let indicator = LoadingIndicator(frame: .zero)
+                  let indicator = LoadingIndicator(color: Colors.System.Red.rawValue)
+                  indicator.start()
+//                    indicator.alpha = 0
+//                    indicator.addEnableAnimation()
                     contentView.addSubview(indicator)
                     indicator.translatesAutoresizingMaskIntoConstraints = false
                     NSLayoutConstraint.activate([
@@ -152,11 +155,7 @@ class CostView: UIView {
                         self.collectionView?.alpha = 0
                         self.title.alpha = 0
                         self.stackView.alpha = 0
-                    } completion: { _ in
-                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
-                            indicator.alpha = 1
-                        }
-                    }
+                    } completion: { _ in }
                     return
                 }
                 callbackDelegate?.callbackReceived("pop")

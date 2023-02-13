@@ -139,6 +139,17 @@ private extension UserprofileController {
     navigationItem.titleView = titleView
     setBarItems()
     //        navigationController?.navigationBar.alpha = 1
+    guard let navigationBar = self.navigationController?.navigationBar else { return }
+
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithDefaultBackground()
+    appearance.backgroundColor = .systemBackground
+    appearance.shadowColor = nil
+    navigationBar.standardAppearance = appearance
+    navigationBar.scrollEdgeAppearance = appearance
+    navigationBar.prefersLargeTitles = false
+
+    if #available(iOS 15.0, *) { navigationBar.compactScrollEdgeAppearance = appearance }
   }
   
   func setTasks() {

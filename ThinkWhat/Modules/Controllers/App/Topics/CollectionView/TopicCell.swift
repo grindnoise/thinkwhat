@@ -319,7 +319,7 @@ private extension TopicCellContent {
     topicDescription.text = currentConfiguration.topicItem.description
     //        topicDescription.textColor = traitCollection.userInterfaceStyle == .dark ? .darkGray : .label
     viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.activeCount.roundedWithAbbreviations)
-    viewsLabel.textColor = configuration.topicItem.topic.activeCount > 0 ? color : .tertiaryLabel
+    viewsLabel.textColor = configuration.topicItem.topic.activeCount > 0 ? color : .secondaryLabel
     currentConfiguration.topicItem.topic.activeCountPublisher
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] in self.viewsLabel.text = $0.roundedWithAbbreviations }

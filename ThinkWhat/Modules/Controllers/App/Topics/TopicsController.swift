@@ -45,7 +45,7 @@ class TopicsController: UIViewController, TintColorable {
       setNavigationBarTintColor(tintColor)
     }
   }
-  //UI
+  ///`UI`
   public private(set) var isOnScreen = false
   
   
@@ -54,7 +54,7 @@ class TopicsController: UIViewController, TintColorable {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //Logic
+  ///`Logic`
   private var topic: Topic? {
     didSet {
       guard !topic.isNil else { return }
@@ -62,6 +62,8 @@ class TopicsController: UIViewController, TintColorable {
       mode = .Topic
     }
   }
+  ///`Publishers`
+  private var searchPublisher = CurrentValueSubject<String?, Never>(nil)
   
   //    private lazy var gradient: CAGradientLayer = {
   //        let instance = CAGradientLayer()
@@ -190,21 +192,42 @@ class TopicsController: UIViewController, TintColorable {
     super.viewDidAppear(animated)
     
     isOnScreen = true
+    switch mode {
+    case .Topic:
+      toggleTopicView(on: true)
+    case .Search:
+      toggleSearchField(on: true)
+    default:
+#if DEBUG
+      print("")
+#endif
+    }
   }
   
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-    //        barButton.alpha = 0
     
-    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-      guard let self = self else { return }
-      
-      self.navigationController?.navigationBar.alpha = 0
+    switch mode {
+    case .Topic:
+      toggleTopicView(on: false)
+    case .Search:
+      toggleSearchField(on: false)
+    default:
+#if DEBUG
+      print("")
+#endif
     }
-    if mode == .Search {
-      searchField.alpha = 0
-      searchField.resignFirstResponder()
-    }
+//    //        barButton.alpha = 0
+//
+//    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
+//      guard let self = self else { return }
+//
+//      self.navigationController?.navigationBar.alpha = 0
+//    }
+//    if mode == .Search {
+//      searchField.alpha = 0
+//      searchField.resignFirstResponder()
+//    }
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -240,8 +263,9 @@ private extension TopicsController {
       searchField.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
       searchField.heightAnchor.constraint(equalToConstant: 40),
       searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
-      topicView.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)),//searchField.heightAnchor),
-      topicView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
+//      topicView.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)),//searchField.heightAnchor),
+//      topicView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
+      topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor)
     ])
     let constraint = searchField.widthAnchor.constraint(equalToConstant: 20)
     constraint.identifier = "width"
@@ -254,9 +278,14 @@ private extension TopicsController {
     //        leading.identifier = "leading"
     //        leading.isActive = true
     
-    let centerX = topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor, constant: -(navigationBar.bounds.width - topicView.bounds.width)/2)
-    centerX.identifier = "centerX"
-    centerX.isActive = true
+//    let centerX = topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor, constant: -(navigationBar.bounds.width - topicView.bounds.width)/2)
+//    centerX.identifier = "centerX"
+//    centerX.isActive = true
+    
+    let centerY = topicView.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor,
+                                                     constant: -50)
+    centerY.identifier = "centerY"
+    centerY.isActive = true
     
     setBarItems()
   }
@@ -303,6 +332,14 @@ private extension TopicsController {
         self.isOnScreen = true
       }
     })
+    
+    let debounced = searchPublisher
+      .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
+    
+    debounced
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.controllerInput?.search(substring: $0!, excludedIds: []) }
+      .store(in: &subscriptions)
   }
   
   @objc
@@ -384,84 +421,6 @@ private extension TopicsController {
   
   @MainActor
   func onModeChanged() {
-    func toggleSearchField(on: Bool) {
-      guard let navigationBar = navigationController?.navigationBar,
-            let constraint = searchField.getConstraint(identifier: "width")
-      else { return }
-      
-      navigationBar.setNeedsLayout()
-      searchField.text = ""
-      
-      if on {
-        let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
-        view.addGestureRecognizer(touch)
-        
-        let _ = searchField.becomeFirstResponder()
-        controllerOutput?.onSearchMode()
-        
-        //Clear previous fetch request
-        controllerOutput?.onSearchCompleted([])
-        
-      } else {
-        if let recognizer = view.gestureRecognizers?.first {
-          view.removeGestureRecognizer(recognizer)
-        }
-        
-        let _ = searchField.resignFirstResponder()
-      }
-      navigationItem.title = ""
-      
-      UIView.animate(
-        withDuration: 0.3,
-        delay: 0,
-        usingSpringWithDamping: 0.9,
-        initialSpringVelocity: 0.2,
-        options: [.curveEaseInOut],
-        animations: { [weak self] in
-          guard let self = self else { return }
-          
-          self.searchField.alpha = on ? 1 : 0
-          constraint.constant = on ? navigationBar.frame.width - (10*2 + 44 + 4) : 20
-          navigationBar.layoutIfNeeded()
-        }) { _ in }
-    }
-    
-    func toggleTopicView(on: Bool) {
-      guard let topic = topic,
-            let navigationBar = navigationController?.navigationBar,
-            let constraint = topicView.getConstraint(identifier: "centerX")
-              //                  let iconCategory = Icon.Category(rawValue: topic.id)
-      else { return }
-      
-      
-      topicView.backgroundColor = topic.tagColor
-      //            topicTitle.textColor = topic.tagColor
-      topicTitle.text = topic.title.uppercased()//localizedTitle
-      //            (topicIcon.icon as! CAShapeLayer).fillColor = topic.tagColor.cgColor
-      //            topicIcon.iconColor = topic.tagColor
-      topicIcon.category = topic.iconCategory//Icon.Category(rawValue: topic.id) ?? .Null
-      
-      
-      UIView.animate(
-        withDuration: 0.3,
-        delay: 0,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [weak self] in
-          guard let self = self else { return }
-          
-          self.topicView.alpha = on ? 1 : 0
-          constraint.constant = on ? 0 : -(navigationBar.bounds.width - self.topicView.bounds.width)/2//-(10 + self.topicView.bounds.width)
-          navigationBar.layoutIfNeeded()
-        }) { _ in }
-      
-      UIView.animate(withDuration: on ? 0.1 : 0.3,
-                     delay: 0.1) { [unowned self] in
-        self.topicView.alpha = on ? 1 : 0
-      }
-    }
-    
     setBarItems()
     
     guard let mainController = tabBarController as? MainController else { return }
@@ -481,6 +440,74 @@ private extension TopicsController {
       toggleSearchField(on: false)
       toggleTopicView(on: false)
     }
+  }
+  
+  func toggleSearchField(on: Bool) {
+    guard let navigationBar = navigationController?.navigationBar,
+          let constraint = searchField.getConstraint(identifier: "width")
+    else { return }
+    
+    navigationBar.setNeedsLayout()
+    searchField.text = ""
+    
+    if on {
+      let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
+      view.addGestureRecognizer(touch)
+      
+      let _ = searchField.becomeFirstResponder()
+      controllerOutput?.onSearchMode()
+      
+      //Clear previous fetch request
+      controllerOutput?.onSearchCompleted([])
+      
+    } else {
+      if let recognizer = view.gestureRecognizers?.first {
+        view.removeGestureRecognizer(recognizer)
+      }
+      
+      let _ = searchField.resignFirstResponder()
+    }
+    navigationItem.title = ""
+    
+    UIView.animate(
+      withDuration: 0.3,
+      delay: 0,
+      usingSpringWithDamping: 0.9,
+      initialSpringVelocity: 0.2,
+      options: [.curveEaseInOut],
+      animations: { [weak self] in
+        guard let self = self else { return }
+        
+        self.searchField.alpha = on ? 1 : 0
+        constraint.constant = on ? navigationBar.frame.width - (10*2 + 44 + 4) : 20
+        navigationBar.layoutIfNeeded()
+      }) { _ in }
+  }
+  
+  func toggleTopicView(on: Bool) {
+    guard let topic = topic,
+          let navigationBar = navigationController?.navigationBar,
+          let constraint = topicView.getConstraint(identifier: "centerY")
+    else { return }
+    
+    topicView.backgroundColor = topic.tagColor
+    topicTitle.text = topic.title.uppercased()
+    topicIcon.category = topic.iconCategory
+    navigationBar.setNeedsLayout()
+    navigationBar.layoutIfNeeded()
+    
+    UIView.animate(
+      withDuration: 0.3,
+      delay: on ? 0.2 : 0,
+      usingSpringWithDamping: 0.8,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut]) { [weak self] in
+        guard let self = self else { return }
+        
+        self.topicView.alpha = on ? 1 : 0
+        constraint.constant = on ? 0 : -50
+        navigationBar.layoutIfNeeded()
+      }
   }
 }
 
@@ -647,9 +674,11 @@ extension TopicsController: UITextFieldDelegate {
       
       return
     }
+    
+    searchPublisher.send(text)
     controllerOutput?.beginSearchRefreshing()
     isSearching = true
-    controllerInput?.search(substring: text, excludedIds: [])
+//    controllerInput?.search(substring: text, excludedIds: [])
   }
   
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {

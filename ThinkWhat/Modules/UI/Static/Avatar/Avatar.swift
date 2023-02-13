@@ -178,6 +178,8 @@ class Avatar: UIView {
   
   //    @Published private var image: UIImage?
   
+//  override var debugDescription: String { "Avatar for: \(userprofile!.name)" }
+  
   // MARK: - Public properties
   public var mode: Mode = .Default {
     didSet {
@@ -786,3 +788,4 @@ private extension Avatar {
 //      return viewController
 //    }
 //}
+

@@ -476,6 +476,8 @@
 		ABCF3D012990F4FE001622AD /* UserInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCF3D002990F4FE001622AD /* UserInfoCell.swift */; };
 		ABD2A2B32883DE1E00591568 /* SurveysCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2A2B22883DE1E00591568 /* SurveysCollectionView.swift */; };
 		ABD2A2B628841B1100591568 /* SurveyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD2A2B528841B1100591568 /* SurveyCell.swift */; };
+		ABD4FCAB29964B8100F7E8EB /* VotersStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD4FCAA29964B8100F7E8EB /* VotersStack.swift */; };
+		ABD4FCAD29965E8F00F7E8EB /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD4FCAC29965E8F00F7E8EB /* Stack.swift */; };
 		ABD639A427A5B0C50020958F /* ReCAPTCHAViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD639A127A5B0C40020958F /* ReCAPTCHAViewModel.swift */; };
 		ABD639A527A5B0C50020958F /* ReCAPTCHAViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD639A227A5B0C50020958F /* ReCAPTCHAViewController.swift */; };
 		ABD639A627A5B0C50020958F /* recaptcha.html in Resources */ = {isa = PBXBuildFile; fileRef = ABD639A327A5B0C50020958F /* recaptcha.html */; };
@@ -1040,6 +1042,8 @@
 		ABCF3D002990F4FE001622AD /* UserInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoCell.swift; sourceTree = "<group>"; };
 		ABD2A2B22883DE1E00591568 /* SurveysCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveysCollectionView.swift; sourceTree = "<group>"; };
 		ABD2A2B528841B1100591568 /* SurveyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyCell.swift; sourceTree = "<group>"; };
+		ABD4FCAA29964B8100F7E8EB /* VotersStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VotersStack.swift; sourceTree = "<group>"; };
+		ABD4FCAC29965E8F00F7E8EB /* Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stack.swift; sourceTree = "<group>"; };
 		ABD639A127A5B0C40020958F /* ReCAPTCHAViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReCAPTCHAViewModel.swift; sourceTree = "<group>"; };
 		ABD639A227A5B0C50020958F /* ReCAPTCHAViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReCAPTCHAViewController.swift; sourceTree = "<group>"; };
 		ABD639A327A5B0C50020958F /* recaptcha.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = recaptcha.html; sourceTree = "<group>"; };
@@ -1161,6 +1165,7 @@
 			children = (
 				AB090D822876F06D00FAFAB0 /* AnwersCollectionView.swift */,
 				AB090D84287727FA00FAFAB0 /* AnswerCell.swift */,
+				ABD4FCAA29964B8100F7E8EB /* VotersStack.swift */,
 			);
 			path = ChoiceCollectionView;
 			sourceTree = "<group>";
@@ -1206,6 +1211,7 @@
 				AB4054F42878283E000F7768 /* LLDB.md */,
 				AB5CCBD52888228C00B970A7 /* EventEmitter.swift */,
 				AB2E08B829802D41004F264A /* TimeLogger.swift */,
+				ABD4FCAC29965E8F00F7E8EB /* Stack.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -3464,8 +3470,10 @@
 				AB72962D27DB5A6D00D45B54 /* ListView.swift in Sources */,
 				AB2AA1B8235D94DF0086D16C /* SurveyTableViewCell.swift in Sources */,
 				AB1C4B9428ABED00003674E8 /* APIRequestInterceptor.swift in Sources */,
+				ABD4FCAB29964B8100F7E8EB /* VotersStack.swift in Sources */,
 				AB142A922874802400F9E13D /* QuestionCell.swift in Sources */,
 				AB2918C8238E5B4700EF488A /* CircularTransition.swift in Sources */,
+				ABD4FCAD29965E8F00F7E8EB /* Stack.swift in Sources */,
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
 				ABC18337284E502A005D1C31 /* ImageSelectionHeaderContent.swift in Sources */,
 				AB649E2828A15A9C00978520 /* Comment.swift in Sources */,
