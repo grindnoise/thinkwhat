@@ -12,7 +12,7 @@ import Combine
 class TopicsController: UIViewController, TintColorable {
   
   enum Mode {
-    case Search, Default, Topic//Parent, Child, List, Search
+    case GlobalSearch, TopicSearch, Default, Topic//Parent, Child, List, Search
   }
   
   // MARK: - Public properties
@@ -63,7 +63,8 @@ class TopicsController: UIViewController, TintColorable {
     }
   }
   ///`Publishers`
-  private var searchPublisher = CurrentValueSubject<String?, Never>(nil)
+  private var searchGlobalPublisher = CurrentValueSubject<String?, Never>(nil)
+  private var searchTopicPublisher = CurrentValueSubject<[String: Topic]?, Never>(nil)
   
   //    private lazy var gradient: CAGradientLayer = {
   //        let instance = CAGradientLayer()
@@ -151,10 +152,10 @@ class TopicsController: UIViewController, TintColorable {
   }()
   private var textFieldIsSetup = false
   private var isSearching = false //{
-  //        didSet {
-  //            searchField.isShowingSpinner = isSearching
-  //        }
-  //    }
+//    didSet {
+//      searchField.isShowingSpinner = isSearching
+//    }
+//  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -179,13 +180,13 @@ class TopicsController: UIViewController, TintColorable {
     
     //        barButton.alpha = 1
     tabBarController?.setTabBarVisible(visible: true, animated: true)
-    self.navigationController?.navigationBar.alpha = 1
+    navigationController?.navigationBar.alpha = 1
     navigationController?.navigationBar.prefersLargeTitles = false//true
     navigationItem.largeTitleDisplayMode = .never//.always
     
-    if mode == .Search {
-      searchField.alpha = 1
-    }
+//    if mode == .GlobalSearch || mode == .TopicSearch {
+//      searchField.alpha = 1
+//    }
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -195,7 +196,7 @@ class TopicsController: UIViewController, TintColorable {
     switch mode {
     case .Topic:
       toggleTopicView(on: true)
-    case .Search:
+    case .GlobalSearch, .TopicSearch:
       toggleSearchField(on: true)
     default:
 #if DEBUG
@@ -210,7 +211,7 @@ class TopicsController: UIViewController, TintColorable {
     switch mode {
     case .Topic:
       toggleTopicView(on: false)
-    case .Search:
+    case .GlobalSearch, .TopicSearch:
       toggleSearchField(on: false)
     default:
 #if DEBUG
@@ -262,11 +263,16 @@ private extension TopicsController {
     NSLayoutConstraint.activate([
       searchField.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
       searchField.heightAnchor.constraint(equalToConstant: 40),
-      searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
+//      searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
 //      topicView.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)),//searchField.heightAnchor),
 //      topicView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
       topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor)
     ])
+    
+    let leading = searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10)
+    leading.identifier = "leading"
+    leading.isActive = true
+    
     let constraint = searchField.widthAnchor.constraint(equalToConstant: 20)
     constraint.identifier = "width"
     constraint.isActive = true
@@ -333,12 +339,32 @@ private extension TopicsController {
       }
     })
     
-    let debounced = searchPublisher
-      .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
+    let debouncedGlobal = searchGlobalPublisher
+      .debounce(for: .milliseconds(700), scheduler: DispatchQueue.main)
     
-    debounced
+    debouncedGlobal
       .filter { !$0.isNil }
-      .sink { [unowned self] in self.controllerInput?.search(substring: $0!, excludedIds: []) }
+      .sink { [unowned self] in
+        self.controllerInput?.search(substring: $0!,
+                                     localized: false,
+                                     topic: nil)
+      }
+      .store(in: &subscriptions)
+    
+    let debouncedTopic = searchTopicPublisher
+      .debounce(for: .milliseconds(700), scheduler: DispatchQueue.main)
+    
+    debouncedTopic
+      .filter { !$0.isNil }
+      .sink { [unowned self] in
+        guard let substring = $0?.keys.first,
+              let topic = $0?.values.first
+        else { return }
+        
+        self.controllerInput?.search(substring: substring,
+                                     localized: false,
+                                     topic: topic)
+      }
       .store(in: &subscriptions)
   }
   
@@ -347,11 +373,11 @@ private extension TopicsController {
     switch mode {
     case .Topic:
       mode = .Default
-    case .Search:
+    case .GlobalSearch://, .TopicSearch:
       mode = .Default
     case .Default:
-      mode = .Search
-    }
+      mode = .GlobalSearch
+    default: print("") }
   }
   
   func getGradientColors() -> [CGColor] {
@@ -375,7 +401,7 @@ private extension TopicsController {
         let action = UIAction { [weak self] _ in
           guard let self = self else { return }
           
-          self.mode = .Search
+          self.mode = .GlobalSearch
         }
         
         return action
@@ -384,9 +410,9 @@ private extension TopicsController {
       navigationItem.setRightBarButton(rightButton, animated: true)
       navigationItem.setLeftBarButton(nil, animated: true)
       
-    case .Search:
+    case .GlobalSearch:
       rightButton = UIBarButtonItem(title: nil,
-                                    image: UIImage(systemName: "arrow.left",
+                                    image: UIImage(systemName: "xmark",
                                                    withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                     primaryAction: {
         let action = UIAction { [weak self] _ in
@@ -399,12 +425,39 @@ private extension TopicsController {
       }(),
                                     menu: nil)
       navigationItem.setRightBarButton(rightButton, animated: true)
-      navigationItem.setLeftBarButton(nil, animated: true)
+//      navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
+//                                                      image: UIImage(systemName: "chevron.left",
+//                                                                     withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+//                                                      primaryAction: {
+//        let action = UIAction { [weak self] _ in
+//          guard let self = self else { return }
+//
+//          self.mode = .Default
+//        }
+//
+//        return action
+//      }())
+//                                      , animated: true)
+      
       
     case .Topic:
       rightButton = UIBarButtonItem(title: nil,
-                                    image: UIImage(systemName: "arrow.left", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                    image: UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                     primaryAction: {
+        let action = UIAction { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.mode = .TopicSearch
+        }
+        
+        return action
+      }(),
+                                    menu: nil)
+      navigationItem.setRightBarButton(rightButton, animated: true)
+      navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
+                                                      image: UIImage(systemName: "chevron.left",
+                                                                     withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                                      primaryAction: {
         let action = UIAction { [weak self] _ in
           guard let self = self else { return }
           
@@ -412,10 +465,42 @@ private extension TopicsController {
         }
         
         return action
+      }())
+                                      , animated: true)
+//      navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
+//                                                      image: UIImage(systemName: "xmark",
+//                                                                     withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+//                                                      primaryAction: {
+//        let action = UIAction { [weak self] _ in
+//          guard let self = self else { return }
+//
+//          self.mode = .Topic
+//        }
+//        return action
+//      }(),
+//                                                      menu: nil)
+//                                      , animated: true)
+    case .TopicSearch:
+      rightButton = UIBarButtonItem(title: nil,
+                                    image: UIImage(systemName: "xmark",
+                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                    primaryAction: {
+        let action = UIAction { [weak self] _ in
+          guard let self = self,
+                let topic = self.topic
+          else { return }
+          
+          self.mode = .Topic
+          self.toggleTopicView(on: true)
+          self.toggleSearchField(on: false)
+          self.controllerOutput?.setTopicMode(topic)
+          self.isSearching = false
+        }
+        
+        return action
       }(),
                                     menu: nil)
       navigationItem.setRightBarButton(rightButton, animated: true)
-      navigationItem.setLeftBarButton(nil, animated: true)
     }
   }
   
@@ -426,10 +511,10 @@ private extension TopicsController {
     guard let mainController = tabBarController as? MainController else { return }
     
     switch mode {
-    case .Search:
+    case .GlobalSearch, .TopicSearch:
       mainController.toggleLogo(on: false)
       toggleSearchField(on: true)
-      
+      toggleTopicView(on: false)
     case .Topic:
       mainController.toggleLogo(on: false)
       toggleTopicView(on: true)
@@ -444,13 +529,28 @@ private extension TopicsController {
   
   func toggleSearchField(on: Bool) {
     guard let navigationBar = navigationController?.navigationBar,
-          let constraint = searchField.getConstraint(identifier: "width")
+          let widthConstraint = searchField.getConstraint(identifier: "width"),
+          let leadingConstraint = searchField.getConstraint(identifier: "leading")
     else { return }
     
     navigationBar.setNeedsLayout()
     searchField.text = ""
+    var widthConstant = CGFloat.zero
     
     if on {
+      leadingConstraint.constant = mode == .GlobalSearch ? 10 : 44 + 4
+      var inset = CGFloat.zero
+      switch mode {
+      case .GlobalSearch:
+        searchField.placeholder = "search".localized
+        inset = 10*2 + (44 + 4)
+      default:
+        inset = 10 + (44 + 4)*2
+        guard let topic = topic else { return }
+        
+        searchField.placeholder = "search_topic".localized + " \(topic.title.lowercased())"
+      }
+      widthConstant = navigationBar.frame.width - inset
       let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
       view.addGestureRecognizer(touch)
       
@@ -479,7 +579,7 @@ private extension TopicsController {
         guard let self = self else { return }
         
         self.searchField.alpha = on ? 1 : 0
-        constraint.constant = on ? navigationBar.frame.width - (10*2 + 44 + 4) : 20
+        widthConstraint.constant = widthConstant
         navigationBar.layoutIfNeeded()
       }) { _ in }
   }
@@ -627,7 +727,7 @@ extension TopicsController: TopicsViewInput {
     if let recognizer = view.gestureRecognizers?.first {
       view.removeGestureRecognizer(recognizer)
     }
-    if mode == .Search {
+    if mode == .GlobalSearch || mode == .TopicSearch {
       searchField.resignFirstResponder()
     }
   }
@@ -675,7 +775,14 @@ extension TopicsController: UITextFieldDelegate {
       return
     }
     
-    searchPublisher.send(text)
+    switch mode {
+    case .GlobalSearch:
+      searchGlobalPublisher.send(text)
+    default:
+      guard let topic = controllerOutput?.topic else { return }
+      searchTopicPublisher.send([text : topic])
+    }
+      
     controllerOutput?.beginSearchRefreshing()
     isSearching = true
 //    controllerInput?.search(substring: text, excludedIds: [])

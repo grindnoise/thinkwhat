@@ -114,7 +114,7 @@ extension PollModel: PollControllerInput {
     Task {
       guard let survey = answer.survey else { return }
       do {
-        let json = try await API.shared.vote(answer: answer)
+        let json = try await API.shared.surveys.vote(answer: answer)
         let resultDetails = SurveyResult(choice: answer)
         for i in json {
           if i.0 == "survey_result" {
@@ -152,10 +152,11 @@ extension PollModel: PollControllerInput {
                                                            DateFormatter.dateTimeFormatter,
                                                            DateFormatter.dateFormatter ]
                 let instances = try decoder.decode([Userprofile].self, from: data)
-                instances.forEach { instance in
-                  answer.voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
-                }
-                //                                print(answer.voters)
+                var voters: [Userprofile] = []
+                
+                instances.forEach { instance in voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance) }
+                
+                answer.appendVoters(voters)
               }
               survey.votesTotal = totalVotes
             } catch let error {
@@ -171,9 +172,9 @@ extension PollModel: PollControllerInput {
         }
         answer.survey?.resultDetails = resultDetails
         answer.survey?.isComplete = true
-        if let current = Userprofiles.shared.current, !answer.voters.contains(current) {
-          answer.voters.append(current)
-        }
+//        if let current = Userprofiles.shared.current, !answer.voters.contains(current) {
+//          answer.voters.append(current)
+//        }
           
         await MainActor.run {
           modelOutput?.onVoteCallback(.success(true))

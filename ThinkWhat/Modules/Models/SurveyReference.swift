@@ -426,6 +426,7 @@ class SurveyReferences {
   }
   //Publishers
   public let instancesPublisher = PassthroughSubject<[SurveyReference], Never>()
+  public let instancesByTopicPublisher = PassthroughSubject<[SurveyReference], Never>()
   
   public func eraseData() {
     all.removeAll()

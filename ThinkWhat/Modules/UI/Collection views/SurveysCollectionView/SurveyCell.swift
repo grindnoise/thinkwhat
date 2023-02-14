@@ -22,6 +22,7 @@ class SurveyCell: UICollectionViewCell {
       setSubscriptions()
       
       item.isCompletePublisher
+        .receive(on: DispatchQueue.main)
         .sink { [weak self] _ in
           guard let self = self else { return }
           

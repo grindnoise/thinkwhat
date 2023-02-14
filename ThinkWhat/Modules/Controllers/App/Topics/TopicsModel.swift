@@ -15,12 +15,25 @@ class TopicsModel {
 
 // MARK: - Controller Input
 extension TopicsModel: TopicsControllerInput {
-  func search(substring: String, excludedIds: [Int] = []) {
+  func search(substring: String,
+              localized: Bool,
+              topic: Topic?) {
+    
+    var existing: [SurveyReference] {
+      return SurveyReferences.shared.all
+        .filter({ $0.title.contains(substring) })
+        .filter({ $0.topic == topic })
+    }
+    
     Task {
       do {
-        let instances = try await API.shared.surveys.search(substring: substring, excludedIds: excludedIds)
+        let received = try await API.shared.surveys.search(substring: substring,
+                                                           localized: localized,
+                                                           excludedIds: existing.map { $0.id },
+                                                           ownersIds: [],
+                                                           topicsIds: topic.isNil ? [] : [topic!.id])
         await MainActor.run {
-          modelOutput?.onSearchCompleted(instances)
+          modelOutput?.onSearchCompleted(existing + received)
         }
       } catch {
 #if DEBUG
@@ -30,9 +43,26 @@ extension TopicsModel: TopicsControllerInput {
     }
   }
   
+//  func search(substring: String, excludedIds: [Int] = []) {
+//    Task {
+//      do {
+//        let instances = try await API.shared.surveys.search(substring: substring, excludedIds: excludedIds)
+//        await MainActor.run {
+//          modelOutput?.onSearchCompleted(instances)
+//        }
+//      } catch {
+//#if DEBUG
+//        error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//      }
+//    }
+//  }
+  
   func onDataSourceRequest(dateFilter: Period, topic: Topic) {
     Task {
-      try await API.shared.surveys.surveyReferences(category: .Topic, dateFilter: dateFilter, topic: topic)
+      try await API.shared.surveys.surveyReferences(category: .Topic,
+                                                    dateFilter: dateFilter,
+                                                    topic: topic)
     }
   }
   

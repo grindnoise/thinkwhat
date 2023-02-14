@@ -418,35 +418,6 @@ class API {
     self.request(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default) { completion($0) }
   }
   
-  public func vote(answer: Answer) async throws -> JSON {
-    guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.VOTE) else { throw APIError.notFound }
-    guard let surveyID = answer.survey?.id else { throw APIError.badData }
-    var parameters: [String: Any] = ["survey": surveyID, "answer": answer.id]
-#if DEBUG
-    print(parameters)
-#endif
-    if Surveys.shared.hot.count <= MIN_STACK_SIZE {
-      let stackList = Surveys.shared.hot.map { $0.id }
-      let rejectedList = Surveys.shared.rejected.map { $0.id }
-      let completedList = [answer.id]
-      let list = Array(Set(stackList + rejectedList + completedList))
-      if !list.isEmpty {
-        parameters["ids"] = list
-      }
-    }
-    
-    do {
-      let data = try await requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers())
-      let json = try JSON(data: data, options: .mutableContainers)
-      await MainActor.run {
-        Surveys.shared.completed.append(answer.survey!)
-      }
-      //            answer.survey?.reference.isComplete = true
-      return json
-    } catch let error {
-      throw error
-    }
-  }
   
   //    @propertyWrapper
   //    struct AccessControl {
@@ -1128,7 +1099,8 @@ class API {
     
     //Get fullbody by reference ID
     @discardableResult
-    func getSurvey(byReference surveyReference: SurveyReference, incrementCounter: Bool = false) async throws -> Survey {
+    func getSurvey(byReference surveyReference: SurveyReference,
+                   incrementCounter: Bool = false) async throws -> Survey {
       guard let url = API_URLS.Surveys.surveyById,
             !headers.isNil
       else { throw APIError.invalidURL }
@@ -1198,7 +1170,8 @@ class API {
       }
     }
     
-    public func claim(surveyReference: SurveyReference, reason: Claim) async throws  {
+    public func claim(surveyReference: SurveyReference,
+                      reason: Claim) async throws  {
       guard let url = API_URLS.Surveys.claim,
             !headers.isNil
       else { throw APIError.invalidURL }
@@ -1729,6 +1702,43 @@ class API {
 //        throw error
 //      }
 //    }
+    public func vote(answer: Answer) async throws -> JSON {
+      guard let url = API_URLS.Surveys.vote,
+            let headers = headers,
+            let id = answer.survey?.id
+      else { throw APIError.invalidURL }
+      
+      var parameters: [String: Any] = ["survey": id, "answer": answer.id]
+  #if DEBUG
+      print(parameters)
+  #endif
+      if Surveys.shared.hot.count <= MIN_STACK_SIZE {
+        let stackList = Surveys.shared.hot.map { $0.id }
+        let rejectedList = Surveys.shared.rejected.map { $0.id }
+        let completedList = [answer.id]
+        let list = Array(Set(stackList + rejectedList + completedList))
+        if !list.isEmpty {
+          parameters["ids"] = list
+        }
+      }
+      
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: headers)
+        let json = try JSON(data: data, options: .mutableContainers)
+        answer.survey?.isComplete = true
+//        await MainActor.run {
+//          Surveys.shared.completed.append(answer.survey!)
+//        }
+        //            answer.survey?.reference.isComplete = true
+        return json
+      } catch let error {
+        throw error
+      }
+    }
     
     func post(_ parameters: Parameters) async throws {
       guard let url = API_URLS.Surveys.root,

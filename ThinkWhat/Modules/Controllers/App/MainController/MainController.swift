@@ -834,7 +834,8 @@ extension MainController: UITabBarControllerDelegate {
         setColors(Colors.Logo.Marigold.rawValue)
         setLogoCentered(animated: true)
         guard let instance = controller as? TopicsController,
-              (instance.mode == .Search || instance.mode == .Topic)
+              instance.mode != .Default
+//              (instance.mode == .Search || instance.mode == .Topic)
         else { return }
         
         toggleLogo(on: false)

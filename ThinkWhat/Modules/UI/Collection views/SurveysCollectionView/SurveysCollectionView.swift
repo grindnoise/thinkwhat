@@ -104,6 +104,12 @@ class SurveysCollectionView: UICollectionView {
   private var isApplyingSnapshot = false
   private var isLoading = false {
     didSet {
+//      if !isLoading, let refreshControl = refreshControl, refreshControl.isRefreshing { refreshControl.endRefreshing() }
+//      if let refreshControl = refreshControl, refreshControl.isRefreshing {
+//        refreshControl.endRefreshing()
+////        return
+//      }
+      
       guard oldValue != isLoading,
             category != .Search
       else { return }
@@ -143,13 +149,13 @@ class SurveysCollectionView: UICollectionView {
     return items.uniqued().sorted { $0.startDate > $1.startDate }
   }
   private let isLoadingPublisher = PassthroughSubject<Bool, Never>()
-  //Scroll direction
+  ///Scroll direction
   private var lastStopYPoint: CGFloat = .zero
   private var lastContentOffsetY: CGFloat = 0 {
     didSet {
-      //Pagination
       let isScrollingDown = lastContentOffsetY > oldValue
       
+      ///Pagination
       if isScrollingDown, lastContentOffsetY + bounds.height > contentSize.height, !isLoading {
         requestData()
       }
@@ -598,7 +604,7 @@ private extension SurveysCollectionView {
       }
       .store(in: &subscriptions)
     
-    //Empty received
+    ///Empty received
     SurveyReferences.shared.instancesPublisher
       .sink { [weak self] instances in
         guard let self = self else { return }
@@ -607,11 +613,41 @@ private extension SurveysCollectionView {
           delayAsync(delay: 0.5) { [weak self] in
             guard let self = self else { return }
             
+            self.refreshControl?.endRefreshing()
             self.isLoading = false
           }
         }
       }
       .store(in: &subscriptions)
+    
+    ///Surveys by topic received
+    SurveyReferences.shared.instancesByTopicPublisher
+      .sink { [weak self] instances in
+        guard let self = self,
+              self.category == .Topic
+        else { return }
+        
+        let snapshot = self.source.snapshot()
+        let currentSet = Set(snapshot.itemIdentifiers)
+        let appendingSet = Set(instances)
+        
+        let difference = Array(appendingSet.symmetricDifference(currentSet))
+        
+        guard difference.isEmpty else { return }
+        
+        ///Check by `period` filter
+        let appendingArray: [SurveyReference] = difference.filter({ $0.isValid(byBeriod: self.period) })
+        
+        var snap = self.source.snapshot()
+        snap.appendItems(appendingArray, toSection: .main)
+        self.source.apply(snap, animatingDifferences: true) { [weak self] in
+          guard let self = self else { return }
+          
+          self.isLoading = false
+        }
+      }
+      .store(in: &subscriptions)
+    
     //    tasks.append(Task {@MainActor [weak self] in
     //      for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.EmptyReceived) {
     //        guard let self = self,
@@ -856,30 +892,30 @@ private extension SurveysCollectionView {
       }
     })
     
-    //Topic added
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
-        guard let self = self else { return }
-        
-        guard self.category == .Topic,
-              let instance = notification.object as? SurveyReference,
-              !self.source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-        
-        //Check by date filter
-        guard instance.isValid(byBeriod: self.period) else {
-          return
-        }
-        
-        var snap = self.source.snapshot()
-        snap.appendItems([instance], toSection: .main)
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.isLoading = false
-        }
-      }
-    })
+//    //Topic added
+//    tasks.append(Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
+//        guard let self = self else { return }
+//
+//        guard self.category == .Topic,
+//              let instance = notification.object as? SurveyReference,
+//              !self.source.snapshot().itemIdentifiers.contains(instance)
+//        else { return }
+//
+//        //Check by date filter
+//        guard instance.isValid(byBeriod: self.period) else {
+//          return
+//        }
+//
+//        var snap = self.source.snapshot()
+//        snap.appendItems([instance], toSection: .main)
+//        self.source.apply(snap, animatingDifferences: true) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.isLoading = false
+//        }
+//      }
+//    })
     
     //Subscribed at added
     tasks.append(Task {@MainActor [weak self] in
@@ -990,6 +1026,8 @@ private extension SurveysCollectionView {
   }
   
   func setDataSource(animatingDifferences: Bool = true) {
+    ///Reset loading state
+    self.isLoading = false
     var snapshot = Snapshot()
     snapshot.appendSections([.main])
     //    if category != .Search {

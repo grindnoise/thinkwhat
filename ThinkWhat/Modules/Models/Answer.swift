@@ -28,16 +28,16 @@ class Answer: Decodable {
   var order: Int
   var voters: [Userprofile] = [] {
     didSet {
-      //Check for duplicates
-      guard let lastInstance = voters.last else { return }
-      
-      guard oldValue.filter({ $0 == lastInstance }).isEmpty else {
-        voters.remove(object: lastInstance)
-        
-        return
-      }
-      votersPublisher.send(lastInstance)
-      NotificationCenter.default.post(name: Notifications.SurveyAnswers.VotersAppend, object: self)
+//      //Check for duplicates
+//      guard let lastInstance = voters.last else { return }
+//
+//      guard oldValue.filter({ $0 == lastInstance }).isEmpty else {
+//        voters.remove(object: lastInstance)
+//
+//        return
+//      }
+      votersPublisher.send(voters)
+//      NotificationCenter.default.post(name: Notifications.SurveyAnswers.VotersAppend, object: self)
     }
   }
   var surveyID : Int
@@ -64,7 +64,7 @@ class Answer: Decodable {
   private let tempId = 999999
   //Publishers
   public let votesPublisher = PassthroughSubject<Int, Never>()
-  public let votersPublisher = PassthroughSubject<Userprofile, Never>()
+  public let votersPublisher = PassthroughSubject<[Userprofile], Never>()
   
   
   
@@ -79,11 +79,13 @@ class Answer: Decodable {
       description = try container.decode(String.self, forKey: .description)
       order       = try container.decode(Int.self, forKey: .order)
       let instances = try container.decode([Userprofile].self, forKey: .voters)
-      instances.forEach { instance in
-        //                if voters.filter({ $0 == instance }).isEmpty {
-        voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
-        //                }
-      }
+      
+      appendVoters(instances)
+//      instances.forEach { instance in
+//        //                if voters.filter({ $0 == instance }).isEmpty {
+//        voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
+//        //                }
+//      }
       url         = URL(string:try container.decode(String.self, forKey: .title))
       imageURL    = URL(string: try container.decodeIfPresent(String.self, forKey: .image) ?? "")
       fileURL     = URL(string: try container.decodeIfPresent(String.self, forKey: .file) ?? "")
@@ -108,11 +110,12 @@ class Answer: Decodable {
       description = json[CodingKeys.title.rawValue].stringValue
       if json.first?.0 == CodingKeys.voters.rawValue, let data = try json.first?.1.rawData() {
         let instances = try JSONDecoder().decode([Userprofile].self, from: data)
-        instances.forEach { instance in
-          if voters.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-            voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
-          }
-        }
+        appendVoters(instances)
+//        instances.forEach { instance in
+//          if voters.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+//            voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
+//          }
+//        }
       }
       url         = URL(string: json[CodingKeys.url.rawValue].stringValue) ?? url
       imageURL    = URL(string: json[CodingKeys.image.rawValue].stringValue) ?? imageURL
@@ -120,6 +123,34 @@ class Answer: Decodable {
     } catch {
       fatalError(error.localizedDescription)
     }
+  }
+  
+  func appendVoters(_ instances: [Userprofile]) {
+    let currentSet = Set(voters)
+    
+    var new: [Userprofile] = []
+    instances.forEach { instance in
+      if instance.isCurrent {
+        new.append(Userprofiles.shared.current!)
+      } else {
+        new.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance)
+      }
+    }
+    
+    let newSet = Set(new)
+    
+    guard !currentSet.isEmpty else {
+      voters.append(contentsOf: newSet)
+      return
+    }
+    
+    let appendingSet = newSet.subtracting(currentSet)
+//    newSet.map { $0.id }
+//    currentSet.map { $0.id }
+//    appendingSet.map { $0.id }
+    guard !appendingSet.isEmpty else { return }
+    
+    voters.append(contentsOf: appendingSet)
   }
 }
 

@@ -740,7 +740,7 @@ class Userprofile: Decodable {
 
 extension Userprofile: Hashable {
   static func == (lhs: Userprofile, rhs: Userprofile) -> Bool {
-    return lhs.id == rhs.id && lhs.firstName == rhs.firstName && lhs.lastName == rhs.lastName && lhs.gender == rhs.gender && lhs.gender == rhs.gender// && lhs.age == rhs.age//lhs.hashValue == rhs.hashValue
+    return lhs.id == rhs.id && lhs.firstName == rhs.firstName && lhs.lastName == rhs.lastName// && lhs.gender == rhs.gender && lhs.gender == rhs.gender// && lhs.age == rhs.age//lhs.hashValue == rhs.hashValue
   }
   
   func hash(into hasher: inout Hasher) {

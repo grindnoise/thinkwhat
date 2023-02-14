@@ -39,16 +39,16 @@ class AnswerCell: UICollectionViewCell {
         .sink { [weak self] _ in
           guard let self = self else { return }
 
+          self.observeVoters()
           self.closedConstraint.isActive = false
           self.openConstraint.isActive = true
           self.updatePublisher.send(true)
-
-          self.updateUI()
-          DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            guard let self = self else { return }
-
-            self.observeVoters()
-          }
+          self.setChosen()
+//          DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.observeVoters()
+//          }
         }
         .store(in: &subscriptions)
       ///Update stats
@@ -81,6 +81,7 @@ class AnswerCell: UICollectionViewCell {
   //Publishers
   public let selectionPublisher = PassthroughSubject<Answer, Never>()
   public let deselectionPublisher = PassthroughSubject<Bool, Never>()
+  ///Used to refresh `collectionView`
   public let updatePublisher = PassthroughSubject<Bool, Never>()
   public let votersPublisher = PassthroughSubject<Answer, Never>()
   //Logic
@@ -88,7 +89,7 @@ class AnswerCell: UICollectionViewCell {
     didSet {
       guard oldValue != isAnswerSelected else { return }
       
-      updateUI(animated: true)
+      setSelected()
     }
   }
   //Flag for user interaction
@@ -379,13 +380,41 @@ private extension AnswerCell {
   }
   
   @MainActor
-  func updateUI(animated: Bool = true) {
-    guard let survey = item.survey,
-          let image = UIImage(systemName: "\(item.order+1).circle.fill")
-    else { return }
-    
-    let color = Colors.getColor(forId: item.order)
-    
+  func setSelected() {
+    UIView.animate(
+      withDuration: 0.3,
+      delay: 0,
+      usingSpringWithDamping: 0.8,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut]) { [weak self] in
+        guard let self = self,
+              let survey = self.item.survey
+        else { return }
+        
+        self.imageView.tintColor = self.isAnswerSelected ? survey.topic.tagColor : .systemGray
+        self.textView.backgroundColor = !self.isAnswerSelected ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : survey.topic.tagColor.withAlphaComponent(0.1)
+      }
+  }
+  
+  @MainActor
+  func setChosen() {
+    votersStack.setColors(lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.1) : .clear,
+                          darkBorderColor: (isChosen || isAnswerSelected) ? .tertiarySystemBackground : .clear)
+    UIView.animate(
+      withDuration: 0.3,
+      delay: 0,
+      usingSpringWithDamping: 0.8,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut]) { [weak self] in
+        guard let self = self else { return }
+        
+        self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.1) : .clear
+        self.imageView.tintColor = self.color
+        self.textView.backgroundColor = .clear
+        self.checkmark.alpha = 1
+//        print(self.item.voters.count)
+//        self.item.voters.prefix(5) { self.votersStack.push(userprofiles: $0)}
+      }
   }
   
   func observeVoters() {
@@ -396,7 +425,7 @@ private extension AnswerCell {
       .sink { [weak self] in
         guard let self = self else { return }
         
-        self.votersStack.push(userprofile: $0)
+        self.votersStack.push(userprofiles: $0.suffix(5))
       }
       .store(in: &subscriptions)
   }

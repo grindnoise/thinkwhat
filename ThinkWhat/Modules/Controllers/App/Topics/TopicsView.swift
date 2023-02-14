@@ -38,7 +38,7 @@ class TopicsView: UIView {
       }
     }
   }
-  //UI
+  ///`UI`
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
@@ -262,7 +262,6 @@ class TopicsView: UIView {
     
     return instance
   }()
-  private var touchLocation: CGPoint = .zero
   private lazy var collectionView: TopicsCollectionView = {
     let instance = TopicsCollectionView()
     instance.backgroundColor = .clear
@@ -338,7 +337,8 @@ class TopicsView: UIView {
       opaque_2.backgroundColor = color
     }
   }
-  //Logic
+  ///`Logic`
+  private var touchLocation: CGPoint = .zero
   private var period: Period = .AllTime {
     didSet {
       guard oldValue != period else { return }
@@ -680,6 +680,13 @@ private extension TopicsView {
 
 // MARK: - Controller Output
 extension TopicsView: TopicsControllerOutput {
+  var topic: Topic? { surveysCollectionView.topic }
+  
+  func setTopicMode(_ topic: Topic) {
+    surveysCollectionView.topic = topic
+  }
+  
+  
   func beginSearchRefreshing() {
     surveysCollectionView.beginSearchRefreshing()
   }
@@ -715,6 +722,9 @@ extension TopicsView: TopicsControllerOutput {
     surveysCollectionView.backgroundColor = background.backgroundColor
     touchLocation = CGPoint(x: bounds.maxX,
                             y: bounds.minY)
+    
+    guard viewInput.mode == .GlobalSearch else { return }
+    
     reveal(present: true,
            location: touchLocation,
            view: surveysCollectionView,

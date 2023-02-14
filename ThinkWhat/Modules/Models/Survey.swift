@@ -544,13 +544,9 @@ class Surveys {
   
   
   //    var categorizedLinks:   [Topic: [SurveyReference]] = [:]
-  var completed:               [Survey] = [] {
-    didSet {
-      completed.forEach { $0.reference.isComplete = true }
-    }
-  }
-  var all:                     [Survey] = []
-  var hot:                     [Survey] = []
+  var completed: [Survey] { all.filter { $0.isComplete } }
+  var all: [Survey] = []
+  var hot: [Survey] = []
   //    var banned:                  [Survey] = [] {///Banned by user
   //        didSet {
   //            guard let instance = banned.last else { return }
@@ -653,9 +649,10 @@ class Surveys {
       do {
         let data = try answer["last_voters"].rawData()
         let userprofiles = try decoder.decode([Userprofile].self, from: data)
-        userprofiles.forEach { userprofile in
-          instance.voters.append(Userprofiles.shared.all.filter({ $0 == userprofile }).first ?? userprofile)
-        }
+        instance.appendVoters(userprofiles)
+//        userprofiles.forEach { userprofile in
+//          instance.voters.append(Userprofiles.shared.all.filter({ $0 == userprofile }).first ?? userprofile)
+//        }
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
@@ -737,7 +734,8 @@ class Surveys {
                 favoriteReferences.append(instance)
               }
             } else if key == Category.Topic.rawValue {
-              NotificationCenter.default.post(name: Notifications.Surveys.TopicAppend, object: instance)
+              SurveyReferences.shared.instancesByTopicPublisher.send([instance])
+//              NotificationCenter.default.post(name: Notifications.Surveys.TopicAppend, object: instance)
               SurveyReferences.shared.all.append(instance)
             } else if key == Category.Userprofile.rawValue {
               SurveyReferences.shared.all.append(instance)

@@ -266,10 +266,20 @@ class Avatar: UIView {
     }
   }
   public var isBordered: Bool
-  public var darkBorderColor: UIColor = .clear
+  public var darkBorderColor: UIColor = .clear {
+    didSet {
+      guard let coloredBg = background.getSubview(type: UIView.self, identifier: "coloredBg") else { return }
+      
+      coloredBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? darkBorderColor : lightBorderColor
+    }
+  }
   public var lightBorderColor: UIColor {
     didSet {
       shimmer.backgroundColor = lightBorderColor
+      
+      guard let coloredBg = background.getSubview(type: UIView.self, identifier: "coloredBg") else { return }
+      
+      coloredBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? darkBorderColor : lightBorderColor
     }
   }
   public var shadowColor: UIColor = .clear {

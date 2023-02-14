@@ -282,22 +282,22 @@ private extension PollController {
   }
   
   func setTasks() {
-    func updateResultsStats() {
-      //Update survey stats every n seconds
-      Timer
-        .publish(every: 5, on: .current, in: .common)
-        .autoconnect()
-        .sink { [weak self] seconds in
-          guard let self = self,
-                let survey = self.item.survey
-          else { return }
-          
-          guard self.isOnScreen else { return }
-          
-          self.controllerInput?.updateResultsStats(survey)
-        }
-        .store(in: &subscriptions)
-    }
+//    func updateResultsStats() {
+//      //Update survey stats every n seconds
+//      Timer
+//        .publish(every: 5, on: .current, in: .common)
+//        .autoconnect()
+//        .sink { [weak self] seconds in
+//          guard let self = self,
+//                let survey = self.item.survey
+//          else { return }
+//
+//          guard self.isOnScreen else { return }
+//
+//          self.controllerInput?.updateResultsStats(survey)
+//        }
+//        .store(in: &subscriptions)
+//    }
     
     item.isFavoritePublisher
       .receive(on: DispatchQueue.main)
@@ -335,7 +335,9 @@ private extension PollController {
       updateSurveyState()
       
       item.isCompletePublisher
+        .receive(on: DispatchQueue.main)
         .filter { $0 }
+//        .delay(for: .seconds(1), scheduler: DispatchQueue.main)
         .sink { [weak self] _ in
           guard let self = self,
                 self.isOnScreen
@@ -521,7 +523,8 @@ private extension PollController {
       .autoconnect()
       .sink { [weak self] seconds in
         guard let self = self,
-              let survey = self.item.survey
+              let survey = self.item.survey,
+              survey.isComplete
         else { return }
         
         guard self.isOnScreen else { return }

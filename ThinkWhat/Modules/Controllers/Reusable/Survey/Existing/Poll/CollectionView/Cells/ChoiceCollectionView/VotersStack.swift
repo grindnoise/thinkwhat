@@ -28,8 +28,8 @@ class VotersStack: UIView {
   private let capacity: Int
   private var stack: Stack<Avatar>
   ///`UI`
-  private let lightBorderColor: UIColor
-  private let darkBorderColor: UIColor
+  private var lightBorderColor: UIColor
+  private var darkBorderColor: UIColor
   private let height: CGFloat
   private var intersection: CGFloat { height * 1/3 }
   
@@ -83,88 +83,323 @@ class VotersStack: UIView {
   
   
   // MARK: - Public methods
-  public func push(userprofile: Userprofile, animated: Bool = true) {
-    let pushed = Avatar(userprofile: userprofile,
-                        isBordered: true,
-                        lightBorderColor: lightBorderColor,
-                        darkBorderColor: darkBorderColor)
-    
-    
-    guard stack.storage.filter({ $0.userprofile == userprofile }).isEmpty else { return }
-    
-    pushed.transform = .init(scaleX: 0.5, y: 0.5)
-    pushed.alpha = 0
-    
-    if subviews.isEmpty {
-      addSubview(pushed)
-      pushed.translatesAutoresizingMaskIntoConstraints = false
-      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-      let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
-      constraint.identifier = "anchor"
-      constraint.isActive = true
-    } else if let last = subviews.last {
-      addSubview(pushed)
-      pushed.translatesAutoresizingMaskIntoConstraints = false
-      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-      let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
-      constraint.identifier = "anchor"
-      constraint.isActive = true
-    }
-    
-    UIView.animate(
-      withDuration: 0.3,
-      delay: 0,
-      usingSpringWithDamping: 0.9,
-      initialSpringVelocity: 0.3,
-      options: [.curveEaseInOut]) {
-        pushed.alpha = 1
-        pushed.transform = .identity
-      }
-    
-    if let popped = stack.push(pushed),
-       let constraint = popped.getConstraint(identifier: "anchor") {
-      
-      var peak: UIView?
-      
-      if stack.storage.count > 1 {
-        peak = stack.peek()
-      }
-      setNeedsLayout()
-      UIView.animate(
-        withDuration: 0.3,
-        delay: 0,
-        usingSpringWithDamping: 0.9,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [weak self] in
-          guard let self = self else { return }
+  public func push(userprofiles: [Userprofile]) {
+    func push(_ instances: [Userprofile]) {
+      instances.forEach { userprofile in
+        let pushed = Avatar(userprofile: userprofile,
+                            isBordered: true,
+                            lightBorderColor: lightBorderColor,
+                            darkBorderColor: darkBorderColor)
+        
+        guard stack.storage.filter({ $0.userprofile == userprofile }).isEmpty else { return }
+        
+        if subviews.isEmpty {
+          addSubview(pushed)
+          pushed.translatesAutoresizingMaskIntoConstraints = false
+          pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+          let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
+          constraint.identifier = "anchor"
+          constraint.isActive = true
+        } else if let last = subviews.last {
+          addSubview(pushed)
+          pushed.translatesAutoresizingMaskIntoConstraints = false
+          pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+          let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
+          constraint.identifier = "anchor"
+          constraint.isActive = true
+        }
+        
+        if let popped = stack.push(pushed) {
           
-          constraint.constant = self.height - self.intersection
-          self.layoutIfNeeded()
-          popped.alpha = 0
-          popped.transform = .init(scaleX: 0.5, y: 0.5)
-        }) { [weak self] _ in
-          guard let self = self else { return }
+          var peak: UIView?
           
+          if stack.storage.count > 1 {
+            peak = stack.peek()
+          }
           popped.removeFromSuperview()
           
           guard let peak = peak,
                 let peakConstraint = peak.getConstraint(identifier: "anchor")
           else { return }
-
-
-          self.setNeedsLayout()
+          
+          
+          setNeedsLayout()
           peak.removeConstraint(peakConstraint)
-          let new = peak.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+          let new = peak.trailingAnchor.constraint(equalTo: trailingAnchor)
           new.identifier = "anchor"
           new.isActive = true
-          self.layoutIfNeeded()
+          layoutIfNeeded()
         }
+      }
     }
-//    print("pushed",pushed)
-//    print("popped",popped)
+    
+    func push(_ instance: Userprofile) {
+      let pushed = Avatar(userprofile: instance,
+                          isBordered: true,
+                          lightBorderColor: lightBorderColor,
+                          darkBorderColor: darkBorderColor)
+      
+      if subviews.isEmpty {
+        addSubview(pushed)
+        pushed.translatesAutoresizingMaskIntoConstraints = false
+        pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
+        constraint.identifier = "anchor"
+        constraint.isActive = true
+      } else if let last = subviews.last {
+        addSubview(pushed)
+        pushed.translatesAutoresizingMaskIntoConstraints = false
+        pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
+        constraint.identifier = "anchor"
+        constraint.isActive = true
+      }
+      
+        pushed.transform = .init(scaleX: 0.5, y: 0.5)
+        pushed.alpha = 0
+        UIView.animate(
+          withDuration: 0.3,
+          delay: 0,
+          usingSpringWithDamping: 0.9,
+          initialSpringVelocity: 0.3,
+          options: [.curveEaseInOut]) {
+            pushed.alpha = 1
+            pushed.transform = .identity
+          }
+      
+      if let popped = stack.push(pushed),
+         let constraint = popped.getConstraint(identifier: "anchor") {
+        
+        var peak: UIView?
+        
+        if stack.storage.count > 1 {
+          peak = stack.peek()
+        }
+        
+        setNeedsLayout()
+        
+        UIView.animate(
+          withDuration: 0.3,
+          delay: 0,
+          usingSpringWithDamping: 0.9,
+          initialSpringVelocity: 0.3,
+          options: [.curveEaseInOut],
+          animations: { [weak self] in
+            guard let self = self else { return }
+            
+            constraint.constant = self.height - self.intersection
+            self.layoutIfNeeded()
+            popped.alpha = 0
+            popped.transform = .init(scaleX: 0.5, y: 0.5)
+          }) { [weak self] _ in
+            guard let self = self else { return }
+            
+            popped.removeFromSuperview()
+            
+            guard let peak = peak,
+                  let peakConstraint = peak.getConstraint(identifier: "anchor")
+            else { return }
+
+
+            self.setNeedsLayout()
+            peak.removeConstraint(peakConstraint)
+            let new = peak.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+            new.identifier = "anchor"
+            new.isActive = true
+            self.layoutIfNeeded()
+          }
+      }
+    }
+    
+    let currentSet = Set(stack.storage.compactMap { $0.userprofile })
+//    let appendingSet = Set(userprofiles)
+//    let appendingArray = Array(appendingSet.symmetricDifference(currentSet))
+    
+    let newSet = Set(userprofiles)
+    
+    guard !currentSet.isEmpty else {
+      push(Array(newSet))
+      return
+    }
+    
+    let appendingSet = newSet.subtracting(currentSet)
+//    newSet.map { $0.id }
+//    currentSet.map { $0.id }
+//    appendingSet.map { $0.id }
+    guard !appendingSet.isEmpty else { return }
+    
+    appendingSet.count > 1 ? push(Array(appendingSet)) : push(appendingSet.first!)
   }
   
+//  public func push(userprofile: Userprofile,
+//                   animated: Bool = true) {
+//
+//    let pushed = Avatar(userprofile: userprofile,
+//                        isBordered: true,
+//                        lightBorderColor: lightBorderColor,
+//                        darkBorderColor: darkBorderColor)
+//
+//
+//    guard stack.storage.filter({ $0.userprofile == userprofile }).isEmpty else { return }
+//
+//
+//
+//    if subviews.isEmpty {
+//      addSubview(pushed)
+//      pushed.translatesAutoresizingMaskIntoConstraints = false
+//      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+//      let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
+//      constraint.identifier = "anchor"
+//      constraint.isActive = true
+//    } else if let last = subviews.last {
+//      addSubview(pushed)
+//      pushed.translatesAutoresizingMaskIntoConstraints = false
+//      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+//      let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
+//      constraint.identifier = "anchor"
+//      constraint.isActive = true
+//    }
+//
+//    if animated {
+//      pushed.transform = .init(scaleX: 0.5, y: 0.5)
+//      pushed.alpha = 0
+//      UIView.animate(
+//        withDuration: 0.3,
+//        delay: 0,
+//        usingSpringWithDamping: 0.9,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut]) {
+//          pushed.alpha = 1
+//          pushed.transform = .identity
+//        }
+//    }
+//
+//    if let popped = stack.push(pushed),
+//       let constraint = popped.getConstraint(identifier: "anchor") {
+//
+//      var peak: UIView?
+//
+//      if stack.storage.count > 1 {
+//        peak = stack.peek()
+//      }
+//
+//      setNeedsLayout()
+//
+//      guard animated else {
+//        setNeedsLayout()
+//        popped.removeFromSuperview()
+//
+//        guard let peak = peak,
+//              let peakConstraint = peak.getConstraint(identifier: "anchor")
+//        else { return }
+//
+//
+//        setNeedsLayout()
+//        peak.removeConstraint(peakConstraint)
+//        let new = peak.trailingAnchor.constraint(equalTo: trailingAnchor)
+//        new.identifier = "anchor"
+//        new.isActive = true
+//        layoutIfNeeded()
+//
+//        return
+//      }
+//
+//      UIView.animate(
+//        withDuration: 0.3,
+//        delay: 0,
+//        usingSpringWithDamping: 0.9,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut],
+//        animations: { [weak self] in
+//          guard let self = self else { return }
+//
+//          constraint.constant = self.height - self.intersection
+//          self.layoutIfNeeded()
+//          popped.alpha = 0
+//          popped.transform = .init(scaleX: 0.5, y: 0.5)
+//        }) { [weak self] _ in
+//          guard let self = self else { return }
+//
+//          popped.removeFromSuperview()
+//
+//          guard let peak = peak,
+//                let peakConstraint = peak.getConstraint(identifier: "anchor")
+//          else { return }
+//
+//
+//          self.setNeedsLayout()
+//          peak.removeConstraint(peakConstraint)
+//          let new = peak.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+//          new.identifier = "anchor"
+//          new.isActive = true
+//          self.layoutIfNeeded()
+//        }
+//    }
+////    print("pushed",pushed)
+////    print("popped",popped)
+//  }
+  
+//  public func push(userprofiles: [Userprofile]) {
+//    userprofiles.forEach { userprofile in
+//      let pushed = Avatar(userprofile: userprofile,
+//                          isBordered: true,
+//                          lightBorderColor: lightBorderColor,
+//                          darkBorderColor: darkBorderColor)
+//
+//      guard stack.storage.filter({ $0.userprofile == userprofile }).isEmpty else { return }
+//
+//      pushed.alpha = 0
+//
+//      if subviews.isEmpty {
+//        addSubview(pushed)
+//        pushed.translatesAutoresizingMaskIntoConstraints = false
+//        pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+//        let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
+//        constraint.identifier = "anchor"
+//        constraint.isActive = true
+//      } else if let last = subviews.last {
+//        addSubview(pushed)
+//        pushed.translatesAutoresizingMaskIntoConstraints = false
+//        pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+//        let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
+//        constraint.identifier = "anchor"
+//        constraint.isActive = true
+//      }
+//
+//      if let popped = stack.push(pushed) {
+//
+//        var peak: UIView?
+//
+//        if stack.storage.count > 1 {
+//          peak = stack.peek()
+//        }
+//        popped.removeFromSuperview()
+//
+//        guard let peak = peak,
+//              let peakConstraint = peak.getConstraint(identifier: "anchor")
+//        else { return }
+//
+//
+//        setNeedsLayout()
+//        peak.removeConstraint(peakConstraint)
+//        let new = peak.trailingAnchor.constraint(equalTo: trailingAnchor)
+//        new.identifier = "anchor"
+//        new.isActive = true
+//        layoutIfNeeded()
+//      }
+//    }
+//  }
+      
+  public func setColors(lightBorderColor: UIColor,
+                        darkBorderColor: UIColor) {
+    self.lightBorderColor = lightBorderColor
+    self.darkBorderColor = darkBorderColor
+    
+    stack.storage.forEach {
+      $0.lightBorderColor = lightBorderColor
+      $0.darkBorderColor = darkBorderColor
+    }
+  }
   
   
   // MARK: - Overridden methods

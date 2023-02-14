@@ -24,6 +24,7 @@ class PollView: UIView {
       guard !item.isComplete else { return }
       
       item.reference.isCompletePublisher
+        .receive(on: DispatchQueue.main)
         .sink { [weak self] _ in
           guard let self = self else { return }
           

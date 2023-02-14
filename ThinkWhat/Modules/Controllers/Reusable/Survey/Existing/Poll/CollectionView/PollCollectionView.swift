@@ -88,6 +88,7 @@ class PollCollectionView: UICollectionView {
     
     self.item = item
     item.reference.isCompletePublisher
+      .receive(on: DispatchQueue.main)
       .filter { $0 }
       .sink { [weak self] _ in
         guard let self = self,
@@ -250,6 +251,7 @@ private extension PollCollectionView {
         }
         .store(in: &self.subscriptions)
       cell.updatePublisher
+        .receive(on: DispatchQueue.main)
         .sink { [weak self] _ in
           guard let self = self else { return }
           

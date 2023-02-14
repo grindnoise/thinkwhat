@@ -77,7 +77,8 @@
 "votes" = "votes";
 "publications" = "Publications";
 "publications_active_total" = "Active publications:";
-"search" = "Поиск";
+"search" = "Search";
+"search_topic" = "Search in";
 "profile" = "Profile";
 "edit" = "Edit";
 "progress" = "Progress";

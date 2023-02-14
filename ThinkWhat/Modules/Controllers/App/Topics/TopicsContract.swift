@@ -32,7 +32,9 @@ protocol TopicsControllerInput: AnyObject {
   var modelOutput: TopicsModelOutput? { get set }
   
   func onDataSourceRequest(dateFilter: Period, topic: Topic)
-  func search(substring: String, excludedIds: [Int])
+  func search(substring: String,
+              localized: Bool,
+              topic: Topic?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(surveyReference: SurveyReference, claim: Claim)
@@ -49,7 +51,9 @@ protocol TopicsModelOutput: AnyObject {
 
 protocol TopicsControllerOutput: AnyObject {
   var viewInput: (TopicsViewInput & TintColorable)? { get set }
+  var topic: Topic? { get }
   
+  func setTopicMode(_: Topic)
   func onDefaultMode(color: UIColor?)
   func onSearchMode()
   func onSearchCompleted(_: [SurveyReference])

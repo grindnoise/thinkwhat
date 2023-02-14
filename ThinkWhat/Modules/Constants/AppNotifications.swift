@@ -79,7 +79,7 @@ struct Notifications {
     
     struct SurveyAnswers {
         static let TotalVotes                       = Notification.Name("SurveyAnswerTotalVotes")
-        static let VotersAppend                     = Notification.Name("SurveyAnswerVotersAppend")
+//        static let VotersAppend                     = Notification.Name("SurveyAnswerVotersAppend")
     }
     
     struct Comments {
@@ -101,7 +101,7 @@ struct Notifications {
         static let FavoriteAppend                   = Notification.Name("SurveysFavoriteAppend")
         static let FavoriteRemove                   = Notification.Name("SurveysFavoriteRemove")
         static let FavoriteRequestFailure           = Notification.Name("Notifications.Surveys.FavoriteRequestFailure")
-        static let TopicAppend                      = Notification.Name("SurveysTopicAppend")
+//        static let TopicAppend                      = Notification.Name("SurveysTopicAppend")
         static let Append                           = Notification.Name("Notifications.Surveys.Append")
         static let AppendReference                  = Notification.Name("Notifications.Surveys.AppendReference")
         static let Remove                           = Notification.Name("Notifications.Surveys.Remove")
