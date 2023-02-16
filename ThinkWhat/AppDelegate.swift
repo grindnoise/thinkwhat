@@ -68,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         VK.handle(url: url, sourceApplication: app)
         ///Google
         return GIDSignIn.sharedInstance.handle(url)
-        return true
+//        return true
     }
     
     func applicationWillResignActive(_ application: UIApplication) {

@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol BannerObservable: class {
+protocol BannerObservable: AnyObject {
     func onBannerWillAppear(_ sender: Any)
     func onBannerWillDisappear(_ sender: Any)
     func onBannerDidAppear(_ sender: Any)

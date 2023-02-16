@@ -268,6 +268,21 @@ class AnswerCell: UICollectionViewCell {
                                lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.1) : .clear,
                                darkBorderColor: (isChosen || isAnswerSelected) ? .tertiarySystemBackground : .clear,
                                height: statsHeight-padding)
+    instance.tapPublisher
+      .sink { [weak self] _ in
+        guard let self = self,
+              let survey = self.item.survey,
+              survey.isComplete,
+              !survey.isAnonymous,
+              self.item.totalVotes > 0
+        else { return }
+        
+        self.votersPublisher.send(self.item)
+      }
+      .store(in: &subscriptions)
+    //    let opaque = UIView.opaque()
+//    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(sender: ))))
+//    opaque.addEquallyTo(to: instance)
     
     return instance
   }()
@@ -411,9 +426,9 @@ private extension AnswerCell {
         self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.1) : .clear
         self.imageView.tintColor = self.color
         self.textView.backgroundColor = .clear
-        self.checkmark.alpha = 1
-//        print(self.item.voters.count)
-//        self.item.voters.prefix(5) { self.votersStack.push(userprofiles: $0)}
+        self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
+        //        print(self.item.voters.count)
+        //        self.item.voters.prefix(5) { self.votersStack.push(userprofiles: $0)}
       }
   }
   
@@ -432,7 +447,9 @@ private extension AnswerCell {
   
   @objc
   func handleGesture(sender: UITapGestureRecognizer) {
-    if sender.view == textView {
+    guard let view = sender.view else { return }
+    
+    if view == textView {
       guard !item.survey!.isComplete else { return }
       
       isAnswerSelected = !isAnswerSelected
@@ -442,8 +459,12 @@ private extension AnswerCell {
       case false:
         deselectionPublisher.send(true)
       }
-    } else if let survey = item.survey, survey.isComplete, (sender == disclosureIndicator || sender == votersCountLabel) {
-      votersPublisher.send(self.item)
+    } else if let survey = item.survey,
+              survey.isComplete,
+              !survey.isAnonymous,
+              item.totalVotes > 0,
+              (view == disclosureIndicator || view == votersCountLabel) {//} || view.accessibilityIdentifier == "opaque") {
+      votersPublisher.send(item)
     }
   }
 }

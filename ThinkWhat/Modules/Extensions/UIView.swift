@@ -30,6 +30,7 @@ extension UIView {
   
   class func opaque() -> UIView {
     let opaque = UIView()
+    opaque.accessibilityIdentifier = "opaque"
     opaque.backgroundColor = .clear
     
     return opaque

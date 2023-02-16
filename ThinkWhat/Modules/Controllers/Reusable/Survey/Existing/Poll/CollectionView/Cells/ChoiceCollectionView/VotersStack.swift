@@ -16,7 +16,8 @@ class VotersStack: UIView {
   
   
   // MARK: - Public properties
-  
+  ///`Publishers`
+  public let tapPublisher = PassthroughSubject<Bool, Never>()
   
   
   // MARK: - Private properties
@@ -32,6 +33,13 @@ class VotersStack: UIView {
   private var darkBorderColor: UIColor
   private let height: CGFloat
   private var intersection: CGFloat { height * 1/3 }
+  private lazy var listener: UIView = {
+    let opaque = UIView.opaque()
+    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+    opaque.layer.zPosition = 100
+    
+    return opaque
+  }()
   
   
   
@@ -63,13 +71,13 @@ class VotersStack: UIView {
     
     super.init(frame: .zero)
     
-    userprofiles.forEach {
-      print($0.name)
-      stack.push(Avatar(userprofile: $0,
-                        isBordered: true,
-                        lightBorderColor: lightBorderColor,
-                        darkBorderColor: darkBorderColor)) }
+//    userprofiles.forEach {
+//      stack.push(Avatar(userprofile: $0,
+//                        isBordered: true,
+//                        lightBorderColor: lightBorderColor,
+//                        darkBorderColor: darkBorderColor)) }
     setupUI()
+    push(userprofiles: userprofiles)
   }
   
   override init(frame: CGRect) {
@@ -93,15 +101,17 @@ class VotersStack: UIView {
         
         guard stack.storage.filter({ $0.userprofile == userprofile }).isEmpty else { return }
         
-        if subviews.isEmpty {
-          addSubview(pushed)
+        if subviews.filter({ $0 is Avatar }).isEmpty {
+//          addSubview(pushed)
+          insertSubview(pushed, belowSubview: listener)
           pushed.translatesAutoresizingMaskIntoConstraints = false
           pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
           let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
           constraint.identifier = "anchor"
           constraint.isActive = true
-        } else if let last = subviews.last {
-          addSubview(pushed)
+        } else if let last = subviews.filter({ $0 is Avatar }).last {
+//          addSubview(pushed)
+          insertSubview(pushed, belowSubview: listener)
           pushed.translatesAutoresizingMaskIntoConstraints = false
           pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
           let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
@@ -139,15 +149,17 @@ class VotersStack: UIView {
                           lightBorderColor: lightBorderColor,
                           darkBorderColor: darkBorderColor)
       
-      if subviews.isEmpty {
-        addSubview(pushed)
+      if subviews.filter({ $0 is Avatar }).isEmpty {
+//        addSubview(pushed)
+        insertSubview(pushed, belowSubview: listener)
         pushed.translatesAutoresizingMaskIntoConstraints = false
         pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
         let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
         constraint.identifier = "anchor"
         constraint.isActive = true
-      } else if let last = subviews.last {
-        addSubview(pushed)
+      } else if let last = subviews.filter({ $0 is Avatar }).last as? Avatar {
+//        addSubview(pushed)
+        insertSubview(pushed, belowSubview: listener)
         pushed.translatesAutoresizingMaskIntoConstraints = false
         pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
         let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
@@ -230,165 +242,6 @@ class VotersStack: UIView {
     
     appendingSet.count > 1 ? push(Array(appendingSet)) : push(appendingSet.first!)
   }
-  
-//  public func push(userprofile: Userprofile,
-//                   animated: Bool = true) {
-//
-//    let pushed = Avatar(userprofile: userprofile,
-//                        isBordered: true,
-//                        lightBorderColor: lightBorderColor,
-//                        darkBorderColor: darkBorderColor)
-//
-//
-//    guard stack.storage.filter({ $0.userprofile == userprofile }).isEmpty else { return }
-//
-//
-//
-//    if subviews.isEmpty {
-//      addSubview(pushed)
-//      pushed.translatesAutoresizingMaskIntoConstraints = false
-//      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-//      let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
-//      constraint.identifier = "anchor"
-//      constraint.isActive = true
-//    } else if let last = subviews.last {
-//      addSubview(pushed)
-//      pushed.translatesAutoresizingMaskIntoConstraints = false
-//      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-//      let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
-//      constraint.identifier = "anchor"
-//      constraint.isActive = true
-//    }
-//
-//    if animated {
-//      pushed.transform = .init(scaleX: 0.5, y: 0.5)
-//      pushed.alpha = 0
-//      UIView.animate(
-//        withDuration: 0.3,
-//        delay: 0,
-//        usingSpringWithDamping: 0.9,
-//        initialSpringVelocity: 0.3,
-//        options: [.curveEaseInOut]) {
-//          pushed.alpha = 1
-//          pushed.transform = .identity
-//        }
-//    }
-//
-//    if let popped = stack.push(pushed),
-//       let constraint = popped.getConstraint(identifier: "anchor") {
-//
-//      var peak: UIView?
-//
-//      if stack.storage.count > 1 {
-//        peak = stack.peek()
-//      }
-//
-//      setNeedsLayout()
-//
-//      guard animated else {
-//        setNeedsLayout()
-//        popped.removeFromSuperview()
-//
-//        guard let peak = peak,
-//              let peakConstraint = peak.getConstraint(identifier: "anchor")
-//        else { return }
-//
-//
-//        setNeedsLayout()
-//        peak.removeConstraint(peakConstraint)
-//        let new = peak.trailingAnchor.constraint(equalTo: trailingAnchor)
-//        new.identifier = "anchor"
-//        new.isActive = true
-//        layoutIfNeeded()
-//
-//        return
-//      }
-//
-//      UIView.animate(
-//        withDuration: 0.3,
-//        delay: 0,
-//        usingSpringWithDamping: 0.9,
-//        initialSpringVelocity: 0.3,
-//        options: [.curveEaseInOut],
-//        animations: { [weak self] in
-//          guard let self = self else { return }
-//
-//          constraint.constant = self.height - self.intersection
-//          self.layoutIfNeeded()
-//          popped.alpha = 0
-//          popped.transform = .init(scaleX: 0.5, y: 0.5)
-//        }) { [weak self] _ in
-//          guard let self = self else { return }
-//
-//          popped.removeFromSuperview()
-//
-//          guard let peak = peak,
-//                let peakConstraint = peak.getConstraint(identifier: "anchor")
-//          else { return }
-//
-//
-//          self.setNeedsLayout()
-//          peak.removeConstraint(peakConstraint)
-//          let new = peak.trailingAnchor.constraint(equalTo: self.trailingAnchor)
-//          new.identifier = "anchor"
-//          new.isActive = true
-//          self.layoutIfNeeded()
-//        }
-//    }
-////    print("pushed",pushed)
-////    print("popped",popped)
-//  }
-  
-//  public func push(userprofiles: [Userprofile]) {
-//    userprofiles.forEach { userprofile in
-//      let pushed = Avatar(userprofile: userprofile,
-//                          isBordered: true,
-//                          lightBorderColor: lightBorderColor,
-//                          darkBorderColor: darkBorderColor)
-//
-//      guard stack.storage.filter({ $0.userprofile == userprofile }).isEmpty else { return }
-//
-//      pushed.alpha = 0
-//
-//      if subviews.isEmpty {
-//        addSubview(pushed)
-//        pushed.translatesAutoresizingMaskIntoConstraints = false
-//        pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-//        let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
-//        constraint.identifier = "anchor"
-//        constraint.isActive = true
-//      } else if let last = subviews.last {
-//        addSubview(pushed)
-//        pushed.translatesAutoresizingMaskIntoConstraints = false
-//        pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-//        let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
-//        constraint.identifier = "anchor"
-//        constraint.isActive = true
-//      }
-//
-//      if let popped = stack.push(pushed) {
-//
-//        var peak: UIView?
-//
-//        if stack.storage.count > 1 {
-//          peak = stack.peek()
-//        }
-//        popped.removeFromSuperview()
-//
-//        guard let peak = peak,
-//              let peakConstraint = peak.getConstraint(identifier: "anchor")
-//        else { return }
-//
-//
-//        setNeedsLayout()
-//        peak.removeConstraint(peakConstraint)
-//        let new = peak.trailingAnchor.constraint(equalTo: trailingAnchor)
-//        new.identifier = "anchor"
-//        new.isActive = true
-//        layoutIfNeeded()
-//      }
-//    }
-//  }
       
   public func setColors(lightBorderColor: UIColor,
                         darkBorderColor: UIColor) {
@@ -413,6 +266,7 @@ private extension VotersStack {
   func setupUI() {
     backgroundColor = .clear
     clipsToBounds = false
+    listener.addEquallyTo(to: self)
     
     ///Intersection by 1/3
     let constraint = widthAnchor.constraint(equalTo: heightAnchor,
@@ -420,25 +274,32 @@ private extension VotersStack {
     constraint.constant = -intersection//(36)*(1/3)
     constraint.isActive = true
     //*0.7).isActive = true
-    
-    stack.storage.reversed().forEach { avatar in
-      if subviews.isEmpty {
-        addSubview(avatar)
-        avatar.translatesAutoresizingMaskIntoConstraints = false
-        avatar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-        let constraint = avatar.trailingAnchor.constraint(equalTo: trailingAnchor)
-        constraint.identifier = "anchor"
-        constraint.isActive = true
-        
-      } else if let last = subviews.last {
-        addSubview(avatar)
-        avatar.translatesAutoresizingMaskIntoConstraints = false
-        avatar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-        let constraint = avatar.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
-        constraint.identifier = "anchor"
-        constraint.isActive = true
-      }
-    }
+//
+//    stack.storage.reversed().forEach { avatar in
+//      if subviews.filter({ $0 is Avatar }).isEmpty {
+//        insertSubview(avatar, belowSubview: listener)
+////        addSubview(avatar)
+//        avatar.translatesAutoresizingMaskIntoConstraints = false
+//        avatar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+//        let constraint = avatar.trailingAnchor.constraint(equalTo: trailingAnchor)
+//        constraint.identifier = "anchor"
+//        constraint.isActive = true
+//
+//      } else if let last = subviews.last as? Avatar {
+////        addSubview(avatar)
+//        insertSubview(avatar, belowSubview: listener)
+//        avatar.translatesAutoresizingMaskIntoConstraints = false
+//        avatar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+//        let constraint = avatar.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
+//        constraint.identifier = "anchor"
+//        constraint.isActive = true
+//      }
+//    }
+  }
+  
+  @objc
+  func handleTap() {
+    tapPublisher.send(true)
   }
 }
 

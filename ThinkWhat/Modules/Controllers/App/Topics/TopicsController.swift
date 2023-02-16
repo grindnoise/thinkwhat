@@ -340,11 +340,15 @@ private extension TopicsController {
     })
     
     let debouncedGlobal = searchGlobalPublisher
-      .debounce(for: .milliseconds(700), scheduler: DispatchQueue.main)
+      .throttle(for: .seconds(1),
+                scheduler: DispatchQueue.main,
+                latest: true)
     
     debouncedGlobal
       .filter { !$0.isNil }
       .sink { [unowned self] in
+        
+        self.controllerOutput?.beginSearchRefreshing()
         self.controllerInput?.search(substring: $0!,
                                      localized: false,
                                      topic: nil)
@@ -352,7 +356,9 @@ private extension TopicsController {
       .store(in: &subscriptions)
     
     let debouncedTopic = searchTopicPublisher
-      .debounce(for: .milliseconds(700), scheduler: DispatchQueue.main)
+      .throttle(for: .seconds(1),
+                scheduler: DispatchQueue.main,
+                latest: true)
     
     debouncedTopic
       .filter { !$0.isNil }
@@ -361,6 +367,7 @@ private extension TopicsController {
               let topic = $0?.values.first
         else { return }
         
+        self.controllerOutput?.beginSearchRefreshing()
         self.controllerInput?.search(substring: substring,
                                      localized: false,
                                      topic: topic)
@@ -775,6 +782,9 @@ extension TopicsController: UITextFieldDelegate {
       return
     }
     
+//    controllerOutput?.beginSearchRefreshing()
+    isSearching = true
+    
     switch mode {
     case .GlobalSearch:
       searchGlobalPublisher.send(text)
@@ -783,8 +793,7 @@ extension TopicsController: UITextFieldDelegate {
       searchTopicPublisher.send([text : topic])
     }
       
-    controllerOutput?.beginSearchRefreshing()
-    isSearching = true
+    
 //    controllerInput?.search(substring: text, excludedIds: [])
   }
   

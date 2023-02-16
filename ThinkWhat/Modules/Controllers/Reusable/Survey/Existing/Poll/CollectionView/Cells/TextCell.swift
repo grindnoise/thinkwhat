@@ -17,16 +17,23 @@ class TextCell: UICollectionViewCell {
       guard let text = text else { return }
       
       textView.attributedText = NSAttributedString(string: text, attributes: attributes)
+      setupUI()
     }
   }
   public var attributes: [NSAttributedString.Key: Any] = [:]
+  public var insets: UIEdgeInsets = .uniform(size: 8)
+  ///`Publishers`
+  public let boundsPublisher = PassthroughSubject<Bool, Never>()
+  
+  
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
-  private let padding: CGFloat = 8
+  ///`UI`
+//  private let padding: CGFloat = 8
   private lazy var container: UIStackView = { UIStackView(arrangedSubviews: [textView]) }()
   private lazy var textView: UITextView = {
     let instance = UITextView()
@@ -66,6 +73,7 @@ class TextCell: UICollectionViewCell {
       self.setNeedsLayout()
       constraint.constant = value.height
       self.layoutIfNeeded()
+      self.boundsPublisher.send(true)
     })
     
     return instance
@@ -90,8 +98,7 @@ class TextCell: UICollectionViewCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setupUI()
-    setTasks()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -116,21 +123,8 @@ private extension TextCell {
   func setupUI() {
     backgroundColor = .systemBackground
     container.place(inside: contentView,
-                    insets: .uniform(size: 8),//UIEdgeInsets(top: 0, left: 8, bottom: 8, right: 8),
+                    insets: insets,
                     bottomPriority: .defaultLow)
-    
-    //        setNeedsLayout()
-    //        layoutIfNeeded()
-  }
-  
-  func setTasks() {
-    //        tasks.append( Task {@MainActor [weak self] in
-    //            for await notification in NotificationCenter.default.notifications(for: <# notification #>) {
-    //                guard let self = self else { return }
-    //
-    //
-    //            }
-    //        })
   }
 }
 

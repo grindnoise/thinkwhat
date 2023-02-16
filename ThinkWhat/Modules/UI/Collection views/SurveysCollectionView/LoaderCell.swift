@@ -29,6 +29,7 @@ class LoaderCell: UICollectionReusableView {
         loadingIndicator.start()
       } else {
         loadingIndicator.stop()
+//        loadingIndicator.reset()
       }
       
 //      loadingIndicator.transform = isLoading ? CGAffineTransform(scaleX: 0.5, y: 0.5) : .identity
@@ -60,18 +61,7 @@ class LoaderCell: UICollectionReusableView {
   private var colorAnimation: CAAnimation?
   private var scaleAnimation: CAAnimation?
   
-  private lazy var loadingIndicator: LoadingIndicator = {
-    let instance = LoadingIndicator(color: color)
-    instance.didDisappearPublisher
-      .sink { [weak self] _ in
-        guard let self = self else { return }
-        
-//        self.controllerOutput?.presentView(survey)
-      }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
+  private lazy var loadingIndicator: LoadingIndicator = { LoadingIndicator(color: color, shouldSendCompletion: false) }()
 //  private lazy var loadingIndicator: Icon = {
 //    let instance = Icon(category: Icon.Category.Logo)
 //    instance.iconColor = color

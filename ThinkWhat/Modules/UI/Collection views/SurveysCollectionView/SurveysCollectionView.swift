@@ -95,6 +95,7 @@ class SurveysCollectionView: UICollectionView {
       guard oldValue != color else { return }
       
       colorPublisher.send(color)
+      loadingIndicator.color = color
 //      setColors()
     }
   }
@@ -177,12 +178,14 @@ class SurveysCollectionView: UICollectionView {
   }
   private var loadingInProgress = false
   private lazy var loadingIndicator: LoadingIndicator = {
-    let instance = LoadingIndicator(color: color, shouldSendCompletion: false)
-    instance.didDisappearPublisher
-      .sink { _ in
-        instance.reset()
-      }
-      .store(in: &subscriptions)
+    let instance = LoadingIndicator(color: color,
+                                    duration: 0.5,
+                                    shouldSendCompletion: false)
+//    instance.didDisappearPublisher
+//      .sink { _ in
+//        instance.reset()
+//      }
+//      .store(in: &subscriptions)
     instance.placeInCenter(of: self, widthMultiplier: 0.25)
     
     return instance
@@ -311,6 +314,7 @@ class SurveysCollectionView: UICollectionView {
   
   @MainActor @objc
   public func beginSearchRefreshing() {
+    print("beginSearchRefreshing")
     loadingIndicator.start()
 //    searchSpinner.startAnimating()
 //
@@ -321,9 +325,10 @@ class SurveysCollectionView: UICollectionView {
 //    }
   }
   
-  @MainActor @objc
+  @MainActor
+  @objc
   public func endSearchRefreshing() {
-    loadingIndicator.stop()
+    loadingIndicator.stop(reset: true)
 //    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
 //      guard let self = self else { return }
 //

@@ -154,7 +154,8 @@ class CommentsSectionCell: UICollectionViewCell {
     constraint.identifier = "height"
     constraint.isActive = true
     
-    observers.append(instance.observe(\.contentSize, options: .new) { [weak self] view, change in
+    observers.append(instance.observe(\.contentSize,
+                                       options: .new) { [weak self] view, change in
       guard let self = self,
             let value = change.newValue,
             value != .zero,

@@ -29,6 +29,16 @@ class SurveyCell: UICollectionViewCell {
           self.comleteButton.tintColor = self.item.isComplete ? self.item.topic.tagColor : .systemGray4
         }
         .store(in: &subscriptions)
+      
+      item.isVisitedPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.titleLabel.textColor = self.item.isVisited ? .secondaryLabel : .label
+          self.descriptionLabel.textColor = self.item.isVisited ? .secondaryLabel : .label
+        }
+        .store(in: &subscriptions)
     }
   }
   //    public var updatePublisher = PassthroughSubject<SurveyReference, Never>()
@@ -253,7 +263,8 @@ class SurveyCell: UICollectionViewCell {
   private lazy var titleLabel: UILabel = {
     let instance = UILabel()
     instance.textAlignment = .left
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title1)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                      forTextStyle: .title1)
     instance.numberOfLines = 0
     instance.lineBreakMode = .byTruncatingTail
     instance.textColor = .label
@@ -682,7 +693,9 @@ private extension SurveyCell {
       else { return }
       
       titleLabel.text = item.title
+      titleLabel.textColor = item.isVisited ? .secondaryLabel : .label
       descriptionLabel.text = item.truncatedDescription
+      descriptionLabel.textColor = item.isVisited ? .secondaryLabel : .label
       
       constraint.constant = item.title.height(withConstrainedWidth: bounds.width, font: titleLabel.font)
       constraint2.constant = item.truncatedDescription.height(withConstrainedWidth: bounds.width, font: descriptionLabel.font)

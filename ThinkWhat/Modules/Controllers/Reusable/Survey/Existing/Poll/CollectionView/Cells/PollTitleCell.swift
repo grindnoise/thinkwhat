@@ -293,7 +293,7 @@ private extension PollTitleCell {
     stackView.axis = .vertical
     stackView.spacing = padding*3
     stackView.place(inside: contentView,
-                    insets: UIEdgeInsets(top: padding, left: 0, bottom: 16, right: 0),
+                    insets: UIEdgeInsets(top: padding*2, left: padding, bottom: padding*3, right: padding),
                     bottomPriority: .defaultLow)
   }
   

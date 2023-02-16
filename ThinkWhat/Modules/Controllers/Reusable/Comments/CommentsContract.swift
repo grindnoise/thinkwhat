@@ -11,7 +11,7 @@ import UIKit
 /// *View* sends user actions to the *Controller*.
 ///
 /// **Controller** conforms to this protocol
-protocol CommentsViewInput: class {
+protocol CommentsViewInput: AnyObject {
     
     var controllerOutput: CommentsControllerOutput? { get set }
     var controllerInput: CommentsControllerInput? { get set }
@@ -25,7 +25,7 @@ protocol CommentsViewInput: class {
 /// *Controller* tells the *Model* what to do based on the input
 ///
 /// **Model** conforms to this protocol
-protocol CommentsControllerInput: class {
+protocol CommentsControllerInput: AnyObject {
     
     var modelOutput: CommentsModelOutput? { get set }
     
@@ -38,7 +38,7 @@ protocol CommentsControllerInput: class {
 /// *Model* returns the result to the *Controller*
 ///
 /// **Controller** conforms to this protocol
-protocol CommentsModelOutput: class {
+protocol CommentsModelOutput: AnyObject {
     var survey: Survey? { get }
     
     func commentPostFailure()
@@ -48,7 +48,7 @@ protocol CommentsModelOutput: class {
 /// *Controller* returns a UI-representable result to the *View*
 ///
 /// **View** conforms to this protocol
-protocol CommentsControllerOutput: class {
+protocol CommentsControllerOutput: AnyObject {
     var viewInput: CommentsViewInput? { get set }
     
     func commentPostFailure()

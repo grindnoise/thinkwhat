@@ -94,7 +94,8 @@ class PollController: UIViewController {
     return instance
   }()
   private lazy var loadingIndicator: LoadingIndicator = {
-    let instance = LoadingIndicator(color: item.topic.tagColor)
+    let instance = LoadingIndicator(color: item.topic.tagColor,
+                                    duration: 0.5)
     instance.didDisappearPublisher
       .sink { [weak self] _ in
         guard let self = self,
@@ -102,6 +103,7 @@ class PollController: UIViewController {
         else { return }
         
         self.controllerOutput?.presentView(survey)
+        instance.removeFromSuperview()
       }
       .store(in: &subscriptions)
     
@@ -835,6 +837,7 @@ extension PollController: PollModelOutput {
         
         if details.isPopular {
           let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "dollarsign")!,
+                                                                icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemGreen),
                                                                 text: "most_popular_choice".localized + "🚀\n" + "got_points".localized + "\(String(describing: details.points)) " + "\("points".localized) 🥳",
                                                                 tintColor: .systemGreen,
                                                                 fontName: Fonts.Semibold,
@@ -849,6 +852,7 @@ extension PollController: PollModelOutput {
             .store(in: &self.subscriptions)
         } else {
           let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "dollarsign")!,
+                                                                icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemGreen),
                                                                 text: "got_points".localized + "\(String(describing: details.points)) " + "points".localized,
                                                                 tintColor: .systemGreen,
                                                                 fontName: Fonts.Semibold,

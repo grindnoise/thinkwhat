@@ -24,6 +24,9 @@ class LoadingIndicator: UIView {
   }
   ///`Publishers`
   public let didDisappearPublisher = PassthroughSubject<Bool, Never>()//: PassthroughSubject<Bool, Never>!
+  ///`UI`
+  public var duration: TimeInterval
+  
   
   
   // MARK: - Private properties
@@ -46,8 +49,9 @@ class LoadingIndicator: UIView {
   private let shouldSendCompletion: Bool
   private var colorAnimationStopped = false {
     didSet {
-      guard !oldValue && colorAnimationStopped && scaleAnimationStopped else { return }
-      
+      guard /*!oldValue && */colorAnimationStopped && scaleAnimationStopped else { return }
+      colorAnimation = nil
+      scaleAnimation = nil
       animationsStopped.send(true)
     }
   }
@@ -55,7 +59,6 @@ class LoadingIndicator: UIView {
   private let animationsStopped = PassthroughSubject<Bool, Never>()
   private var shouldStopAnimating = false
   private var isAnimating = false
-  
   
   
   // MARK: - Deinitialization
@@ -73,7 +76,9 @@ class LoadingIndicator: UIView {
   
   // MARK: - Initialization
   init(color: UIColor,
+       duration: TimeInterval = 1,
        shouldSendCompletion: Bool = true) {
+    self.duration = duration
     self.color = color
     self.shouldSendCompletion = shouldSendCompletion
     
@@ -91,9 +96,17 @@ class LoadingIndicator: UIView {
   // MARK: - Public methods
   @MainActor
   public func start(animated: Bool = true) {
-    guard !isAnimating else { return }
+    guard !isAnimating else {
+//      delayAsync(delay: 0.25) { [weak self] in
+//        guard let self = self else { return }
+//
+//        self.start(animated: animated)
+//      }
+      
+      return
+    }
     
-    isAnimating = true
+//    isAnimating = true
 //    didDisappearPublisher = PassthroughSubject<Bool, Never>()
     
     guard animated else {
@@ -122,16 +135,16 @@ class LoadingIndicator: UIView {
       }
   }
   
-  public func reset() {
-    colorAnimationStopped = false
-    scaleAnimationStopped = false
-//    private let animationsStopped = PassthroughSubject<Bool, Never>()
-    shouldStopAnimating = false
-//    didDisappearPublisher = PassthroughSubject<Bool, Never>()
-  }
+//  public func reset() {
+//    colorAnimationStopped = false
+//    scaleAnimationStopped = false
+////    private let animationsStopped = PassthroughSubject<Bool, Never>()
+//    shouldStopAnimating = false
+////    didDisappearPublisher = PassthroughSubject<Bool, Never>()
+//  }
   
   @MainActor
-  public func stop() {
+  public func stop(reset: Bool = false) {
     shouldStopAnimating = true
     
     animationsStopped
@@ -150,9 +163,14 @@ class LoadingIndicator: UIView {
           }) { [weak self] _ in
             guard let self = self else { return }
             
-//            self.isAnimating = false
             self.logo.icon.removeAllAnimations()
             self.didDisappearPublisher.send(true)
+            
+            guard reset else { return }
+            
+            self.colorAnimationStopped = false
+            self.scaleAnimationStopped = false
+            self.shouldStopAnimating = false
             
             guard self.shouldSendCompletion else { return }
             
@@ -182,10 +200,13 @@ private extension LoadingIndicator {
   
   @MainActor
   func animate() {//from: UIColor, to: UIColor) {
+//    guard !isAnimating else { return }
+    isAnimating = true
+    
     colorAnimation = Animations.get(property: .FillColor,
                                     fromValue: color.cgColor as Any,
-                                    toValue: color.darker(0.25).cgColor as Any,
-                                    duration: 1,
+                                    toValue: color.withAlphaComponent(0.75).cgColor as Any,
+                                    duration: duration,
                                     delay: 0,
                                     repeatCount: 1,
                                     autoreverses: true,
@@ -199,7 +220,7 @@ private extension LoadingIndicator {
                                         self.isAnimating = false
                                         
                                         if self.shouldStopAnimating {
-                                          self.colorAnimation = nil
+//                                          self.colorAnimation = nil
                                           self.colorAnimationStopped = true
 //                                          self.scaleAnimationStopped = true
                                         } else {
@@ -209,7 +230,7 @@ private extension LoadingIndicator {
     scaleAnimation = Animations.get(property: .Path,
                                     fromValue: (logo.icon as! CAShapeLayer).path as Any,
                                     toValue: (logo.icon as! CAShapeLayer).path?.getScaledPath(size: bounds.size, scaleMultiplicator: 1.15) as Any,
-                                    duration: 1,
+                                    duration: duration,
                                     delay: 0,
                                     repeatCount: 1,
                                     autoreverses: true,
@@ -223,7 +244,7 @@ private extension LoadingIndicator {
                                         self.isAnimating = false
                                         
                                         if self.shouldStopAnimating {
-                                          self.scaleAnimation = nil
+//                                          self.scaleAnimation = nil
                                           self.scaleAnimationStopped = true
                                         } else {
                                           self.animate()

@@ -8,10 +8,10 @@
 
 import UIKit
 
-protocol CallbackObservable: class {
+protocol CallbackObservable: AnyObject {
     func callbackReceived(_ sender: Any)
 }
 
-protocol CallbackCallable: class {
+protocol CallbackCallable: AnyObject {
     var callbackDelegate: CallbackObservable? { get set }
 }

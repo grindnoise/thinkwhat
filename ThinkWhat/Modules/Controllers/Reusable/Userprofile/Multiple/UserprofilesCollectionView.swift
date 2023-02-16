@@ -30,7 +30,7 @@ class UserprofilesCollectionView: UICollectionView {
     didSet {
       guard !userprofile.isNil else { return }
       
-      reloadDataSource(items: dataItems)
+      reloadDataSource()
     }
   }
   public weak var userprofile: Userprofile? {
@@ -101,7 +101,11 @@ class UserprofilesCollectionView: UICollectionView {
   private var selectedGender: Gender = .Unassigned
   private var filtered: [Userprofile] = [] {
     didSet {
-      reloadDataSource(items: filtered, animated: true)
+      guard selectedGender == .Unassigned, selectedMaxAge == 99, selectedMinAge == 18 else {
+        reloadDataSource(useFilterder: true)
+        return
+      }
+      reloadDataSource()
     }
   }
   
@@ -140,8 +144,6 @@ class UserprofilesCollectionView: UICollectionView {
     
     setupUI()
     setTasks()
-    
-    reloadDataSource(items: dataItems)
   }
   
   init(answer: Answer, mode: UserprofilesViewMode, color: UIColor) {
@@ -163,10 +165,10 @@ class UserprofilesCollectionView: UICollectionView {
   
   
   // MARK: - Public methods
-//  @MainActor @objc
-//  public func endRefreshing() {
-//    refreshControl?.endRefreshing()
-//  }
+  //  @MainActor @objc
+  //  public func endRefreshing() {
+  //    refreshControl?.endRefreshing()
+  //  }
   
   public func editingMode(_ on: Bool) {
     allowsMultipleSelection = on ? true : false
@@ -273,13 +275,13 @@ private extension UserprofilesCollectionView {
       }
       .store(in: &subscriptions)
     
-//    refreshControl = UIRefreshControl()
-//    refreshControl?.attributedTitle = NSAttributedString(string: "updating_data".localized, attributes: [
-//      .foregroundColor: UIColor.secondaryLabel,
-//      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
-//    ])
-//    refreshControl?.tintColor = .secondaryLabel
-//    refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
+    //    refreshControl = UIRefreshControl()
+    //    refreshControl?.attributedTitle = NSAttributedString(string: "updating_data".localized, attributes: [
+    //      .foregroundColor: UIColor.secondaryLabel,
+    //      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any
+    //    ])
+    //    refreshControl?.tintColor = .secondaryLabel
+    //    refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
     
     addSubview(loadingIndicator)
     
@@ -329,7 +331,7 @@ private extension UserprofilesCollectionView {
     snapshot.appendSections([.Main])
     source.apply(snapshot, animatingDifferences: false)
     
-    reloadDataSource(items: dataItems)
+    reloadDataSource()
   }
   
   func setTasks() {
@@ -348,62 +350,62 @@ private extension UserprofilesCollectionView {
         
         let difference = appendingSet.symmetricDifference(currentSet)
 #if DEBUG
-    print("symmetricDifference", difference)
+        print("symmetricDifference", difference)
 #endif
         
         self.appendToDataSource(items: Array(difference))
         self.loadingIndicator.stopAnimating()
       }
       .store(in: &subscriptions)
-//    //Subscriber append
-//    tasks.append( Task {@MainActor [weak self] in
-//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersAppend) {
-//        guard let self = self,
-//              self.mode == .Subscribers,
-//              let dict = notification.object as? [Userprofile: Userprofile],
-//              let owner = dict.keys.first,
-//              owner == self.userprofile,
-//              let subscriber = dict.values.first,
-//              self.source.snapshot().itemIdentifiers.contains(subscriber)
-//        else { return }
-//
-//        self.appendToDataSource(item: subscriber)
-//        self.loadingIndicator.stopAnimating()
-//      }
-//    })
-//    //Subscriber remove
-//    tasks.append( Task {@MainActor [weak self] in
-//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersRemove) {
-//        guard let self = self,
-//              self.mode == .Subscribers,
-//              let dict = notification.object as? [Userprofile: Userprofile],
-//              let owner = dict.keys.first,
-//              owner == self.userprofile,
-//              let subscriber = dict.values.first,
-//              self.source.snapshot().itemIdentifiers.contains(subscriber)
-//        else { return }
-//
-//        self.removeFromDataSource(item: subscriber)
-//        self.loadingIndicator.stopAnimating()
-//      }
-//    })
-//    //Subscription append
-//    tasks.append( Task {@MainActor [weak self] in
-//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
-//        guard let self = self,
-//              self.mode == .Subscriptions,
-//              let dict = notification.object as? [Userprofile: Userprofile],
-//              let owner = dict
-//          .keys.first,
-//              owner == self.userprofile,
-//              let userprofile = dict.values.first,
-//              self.source.snapshot().itemIdentifiers.contains(userprofile)
-//        else { return }
-//
-//        self.appendToDataSource(item: userprofile)
-//        self.loadingIndicator.stopAnimating()
-//      }
-//    })
+    //    //Subscriber append
+    //    tasks.append( Task {@MainActor [weak self] in
+    //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersAppend) {
+    //        guard let self = self,
+    //              self.mode == .Subscribers,
+    //              let dict = notification.object as? [Userprofile: Userprofile],
+    //              let owner = dict.keys.first,
+    //              owner == self.userprofile,
+    //              let subscriber = dict.values.first,
+    //              self.source.snapshot().itemIdentifiers.contains(subscriber)
+    //        else { return }
+    //
+    //        self.appendToDataSource(item: subscriber)
+    //        self.loadingIndicator.stopAnimating()
+    //      }
+    //    })
+    //    //Subscriber remove
+    //    tasks.append( Task {@MainActor [weak self] in
+    //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersRemove) {
+    //        guard let self = self,
+    //              self.mode == .Subscribers,
+    //              let dict = notification.object as? [Userprofile: Userprofile],
+    //              let owner = dict.keys.first,
+    //              owner == self.userprofile,
+    //              let subscriber = dict.values.first,
+    //              self.source.snapshot().itemIdentifiers.contains(subscriber)
+    //        else { return }
+    //
+    //        self.removeFromDataSource(item: subscriber)
+    //        self.loadingIndicator.stopAnimating()
+    //      }
+    //    })
+    //    //Subscription append
+    //    tasks.append( Task {@MainActor [weak self] in
+    //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
+    //        guard let self = self,
+    //              self.mode == .Subscriptions,
+    //              let dict = notification.object as? [Userprofile: Userprofile],
+    //              let owner = dict
+    //          .keys.first,
+    //              owner == self.userprofile,
+    //              let userprofile = dict.values.first,
+    //              self.source.snapshot().itemIdentifiers.contains(userprofile)
+    //        else { return }
+    //
+    //        self.appendToDataSource(item: userprofile)
+    //        self.loadingIndicator.stopAnimating()
+    //      }
+    //    })
     //Subscription remove
     tasks.append( Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
@@ -419,39 +421,45 @@ private extension UserprofilesCollectionView {
         self.removeFromDataSource(item: userprofile)
       }
     })
-//    //End refreshing
-//    tasks.append( Task {@MainActor [weak self] in
-//      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersEmpty) {
-//        guard let self = self,
-//              self.mode == .Subscribers
-//        else { return }
-//
-////        self.endRefreshing()
-//        self.loadingIndicator.stopAnimating()
-//      }
-//    })
+    //    //End refreshing
+    //    tasks.append( Task {@MainActor [weak self] in
+    //      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersEmpty) {
+    //        guard let self = self,
+    //              self.mode == .Subscribers
+    //        else { return }
+    //
+    ////        self.endRefreshing()
+    //        self.loadingIndicator.stopAnimating()
+    //      }
+    //    })
     tasks.append( Task {@MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsEmpty) {
         guard let self = self,
               self.mode == .Subscriptions
         else { return }
         
-//        self.endRefreshing()
+        //        self.endRefreshing()
         self.loadingIndicator.stopAnimating()
       }
     })
   }
   
   @MainActor
-  func reloadDataSource(items: [Userprofile], animated: Bool = true) {
-    guard !source.isNil,
-          !dataItems.isEmpty
-    else {
-      refreshPublisher.send(true)
-      return
-    }
+  func reloadDataSource(useFilterder: Bool = false,
+                        animated: Bool = true) {
     
-    var snapshot = source.snapshot()
+    var items = useFilterder ? filtered : dataItems
+    
+    
+//    guard !source.isNil,
+//          !dataItems.isEmpty
+//    else {
+//      refreshPublisher.send(true)
+//      return
+//    }
+    
+    var snapshot = Snapshot()
+    snapshot.appendSections([.Main])
     snapshot.appendItems(items)
     source.apply(snapshot, animatingDifferences: animated)
   }
@@ -546,20 +554,3 @@ extension UserprofilesCollectionView: UICollectionViewDelegate {
       }
   }
 }
-
-
-//extension UserprofilesCollectionView: BannerObservable {
-//  func onBannerWillAppear(_ sender: Any) {}
-//
-//  func onBannerWillDisappear(_ sender: Any) {}
-//
-//  func onBannerDidAppear(_ sender: Any) {}
-//
-//  func onBannerDidDisappear(_ sender: Any) {
-//    if let banner = sender as? Banner {
-//      banner.removeFromSuperview()
-//    } else if let banner = sender as? Popup {
-//      banner.removeFromSuperview()
-//    }
-//  }
-//}

@@ -42,7 +42,7 @@ class PollCollectionView: UICollectionView {
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
   
   // MARK: - Public properties
-  //Publishers
+  ///`Publishers`
   public let profileTapPublisher = PassthroughSubject<Bool, Never>()
   public var imagePublisher = PassthroughSubject<Mediafile, Never>()
   public var webPublisher = PassthroughSubject<URL, Never>()
@@ -50,7 +50,7 @@ class PollCollectionView: UICollectionView {
   public let answerDeselectionPublisher = PassthroughSubject<Bool, Never>()
   public let isVotingSubscriber = PassthroughSubject<Bool, Never>()
   public let votersPublisher = PassthroughSubject<Answer, Never>()
-  //Comments
+  ///`Comments`
   public var commentPublisher = PassthroughSubject<String, Never>()
   public var commentsUpdateStatsPublisher = PassthroughSubject<[Comment], Never>()
 //  public let commentsCellBoundsPublisher = PassthroughSubject<Bool, Never>()
@@ -68,17 +68,12 @@ class PollCollectionView: UICollectionView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //Logic
+  ///`Logic`
   private weak var item: Survey?
   private var source: Source!
   private var isFirstAnswerSelection = true
-  //    private var mode: PollController.Mode {
-  //        didSet {
-  //            guard oldValue != mode else { return }
-  //
-  //            print(mode)
-  //        }
-  //    }
+  ///`UI`
+  private let padding: CGFloat = 8
   
   
   
@@ -179,6 +174,14 @@ private extension PollCollectionView {
         .paragraphStyle: paragraphStyle
       ]
       cell.text = text
+      
+      cell.boundsPublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.source.refresh(animatingDifferences: false)//commentsCellBoundsPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
     }
     
     let imagesCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [unowned self] cell, _, _ in
@@ -219,6 +222,7 @@ private extension PollCollectionView {
       } else {
         paragraphStyle.hyphenationFactor = 1
       }
+      cell.insets = .init(top: padding*3, left: padding, bottom: padding, right: padding)
       cell.attributes = [
         .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body) as Any,
         .foregroundColor: UIColor.secondaryLabel,
@@ -290,7 +294,7 @@ private extension PollCollectionView {
         .sink { [weak self] _ in
           guard let self = self else { return }
           
-          self.source.refresh()//commentsCellBoundsPublisher.send($0)
+          self.source.refresh(animatingDifferences: false)//commentsCellBoundsPublisher.send($0)
         }
         .store(in: &self.subscriptions)
       

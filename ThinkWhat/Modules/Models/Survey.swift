@@ -119,6 +119,7 @@ class Survey: Decodable {
          isPrivate = "is_private",
          isAnonymous = "is_anonymous",
          isFavorite = "is_favorite",
+         isVisited = "is_visited",
          isCommentingAllowed = "is_commenting_allowed",
          totalVotes = "votes_total",
          commentsTotal = "comments_total",
@@ -162,6 +163,11 @@ class Survey: Decodable {
   var votesLimit:             Int {
     didSet {
       reference.votesLimit = votesLimit
+    }
+  }
+  var isVisited:              Bool {
+    didSet {
+      reference.isVisited = isVisited
     }
   }
   var isPrivate:              Bool
@@ -339,6 +345,7 @@ class Survey: Decodable {
       isOwn                   = try container.decode(Bool.self, forKey: .isOwn)
       isComplete              = try container.decode(Bool.self, forKey: .isComplete)
       isBanned                = try container.decode(Bool.self, forKey: .isBanned)
+      isVisited               = try container.decode(Bool.self, forKey: .isVisited)
       let shareData           = try container.decode([String].self, forKey: .shareLink)
       shareHash               = shareData.first ?? ""
       shareEncryptedString    = shareData.last ?? ""
@@ -442,6 +449,7 @@ class Survey: Decodable {
                                      isActive: isActive,
                                      isComplete: isComplete,
                                      isFavorite: isFavorite,
+                                     isVisited: isVisited,
                                      isHot: isHot,
                                      survey: self,
                                      owner: owner,
@@ -547,28 +555,6 @@ class Surveys {
   var completed: [Survey] { all.filter { $0.isComplete } }
   var all: [Survey] = []
   var hot: [Survey] = []
-  //    var banned:                  [Survey] = [] {///Banned by user
-  //        didSet {
-  //            guard let instance = banned.last else { return }
-  //            hot.remove(object: instance)
-  //            hot.remove(object: instance)
-  //            ///Remove from lists
-  //            ///Top
-  //            if topReferences.contains(instance.reference) {
-  //                topReferences.remove(object: instance.reference)
-  //            } else if let existing = topReferences.filter({ $0 == instance.reference }).first {
-  //                topReferences.remove(object: existing)
-  //            }
-  //            ///New
-  //            if newReferences.contains(instance.reference) {
-  //                newReferences.remove(object: instance.reference)
-  //            } else if let existing = newReferences.filter({ $0 == instance.reference }).first {
-  //                newReferences.remove(object: existing)
-  //            }
-  //            NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: instance.reference)
-  ////            Notification.send(names: [Notifications.Surveys.Claimed])
-  //        }
-  //    }
   var rejected: [Survey]  = [] {//Local list of rejected surveys, should be cleared periodically
     didSet {
       guard let instance = rejected.last else { return }
@@ -650,9 +636,9 @@ class Surveys {
         let data = try answer["last_voters"].rawData()
         let userprofiles = try decoder.decode([Userprofile].self, from: data)
         instance.appendVoters(userprofiles)
-//        userprofiles.forEach { userprofile in
-//          instance.voters.append(Userprofiles.shared.all.filter({ $0 == userprofile }).first ?? userprofile)
-//        }
+        //        userprofiles.forEach { userprofile in
+        //          instance.voters.append(Userprofiles.shared.all.filter({ $0 == userprofile }).first ?? userprofile)
+        //        }
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
@@ -685,9 +671,9 @@ class Surveys {
         if key == Category.Hot.rawValue {
           let instances = try decoder.decode([Survey].self, from: value.rawData())
           if instances.isEmpty {
-//            fatalError()
+            //            fatalError()
             Surveys.shared.instancesPublisher.send([])
-//            notifications.append(Notifications.Surveys.EmptyReceived)
+            //            notifications.append(Notifications.Surveys.EmptyReceived)
             Notification.send(names: notifications.uniqued())
             //                        return
           }
@@ -702,7 +688,7 @@ class Surveys {
           
           if instances.isEmpty {
             SurveyReferences.shared.instancesPublisher.send([])
-//            NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
+            //            NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
           }
           
           for instance in instances {
@@ -735,7 +721,7 @@ class Surveys {
               }
             } else if key == Category.Topic.rawValue {
               SurveyReferences.shared.instancesByTopicPublisher.send([instance])
-//              NotificationCenter.default.post(name: Notifications.Surveys.TopicAppend, object: instance)
+              //              NotificationCenter.default.post(name: Notifications.Surveys.TopicAppend, object: instance)
               SurveyReferences.shared.all.append(instance)
             } else if key == Category.Userprofile.rawValue {
               SurveyReferences.shared.all.append(instance)
@@ -779,12 +765,15 @@ class Surveys {
       return nil
     }
   }
+}
   
-  @objc fileprivate func clearRejectedSurveys() {
+private extension Surveys {
+  @objc
+  func clearRejectedSurveys() {
     rejected.removeAll()
   }
   
-  private func startTimer() {
+  func startTimer() {
     guard timer == nil else { return }
     
     timer = Timer.scheduledTimer(timeInterval: TimeIntervals.ClearRejectedSurveys,

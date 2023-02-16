@@ -717,7 +717,7 @@ extension TopicsView: TopicsControllerOutput {
     
     surveysCollectionView.isOnScreen = false
     surveysCollectionView.category = .Search
-    surveysCollectionView.color = viewInput.tintColor
+    surveysCollectionView.color = viewInput.mode == .TopicSearch ? (topic.isNil ? .systemGray4 : topic!.tagColor) : viewInput.tintColor
     surveysCollectionView.alpha = 1
     surveysCollectionView.backgroundColor = background.backgroundColor
     touchLocation = CGPoint(x: bounds.maxX,

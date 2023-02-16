@@ -1124,8 +1124,11 @@ class API {
                                                    DateFormatter.dateFormatter ]
         let instance = try decoder.decode(Survey.self, from: json.rawData())
         guard let existing = Surveys.shared.all.filter({ $0 == instance }).first else {
+          instance.isVisited = true
           return instance
         }
+        
+        existing.isVisited = true
         return existing
       } catch let error {
         throw error
@@ -1199,10 +1202,9 @@ class API {
       let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: ["survey_id": surveyReference.id], encoding: JSONEncoding.default, headers: parent.headers())
       let json = try JSON(data: data, options: .mutableContainers)
       if let value = json["views"].int {
-        await MainActor.run {
-          surveyReference.survey?.views = value
-        }
-      } else if let error = json["views"].string {
+        surveyReference.survey?.views = value
+        surveyReference.isVisited = true
+      } else if let error = json["error"].string {
         throw error
       } else {
         throw "Unknown error"

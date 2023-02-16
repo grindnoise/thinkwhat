@@ -27,7 +27,8 @@ class SurveyReference: Decodable {// NSObject,
          isHot = "is_hot",
          isAnonymous = "is_anonymous",
          isBanned = "is_banned",
-         media = "media_preview"
+         media = "media_preview",
+         isVisited = "is_visited"
   }
   
   //    //NS
@@ -142,6 +143,15 @@ class SurveyReference: Decodable {// NSObject,
       NotificationCenter.default.post(name: Notifications.Surveys.Ban, object: self)
     }
   }
+  var isVisited: Bool {
+    didSet {
+      guard oldValue != isVisited else { return }
+      
+      survey?.isVisited = isVisited
+      isVisitedPublisher.send(isVisited)
+
+    }
+  }
   var isClaimed: Bool = false {
     didSet {
       guard isClaimed, isClaimed != oldValue else { return }
@@ -198,7 +208,7 @@ class SurveyReference: Decodable {// NSObject,
   }
   var shareHash:              String = ""
   var shareEncryptedString:   String = ""
-  //Publishers
+  ///`Publishers`
   var surveyPublisher         = PassthroughSubject<Survey, Never>()
   var ratingPublisher         = PassthroughSubject<Double, Never>()
   var isActivePublisher       = PassthroughSubject<Bool, Never>()
@@ -206,6 +216,7 @@ class SurveyReference: Decodable {// NSObject,
   var isCompletePublisher     = PassthroughSubject<Bool, Never>()
   var isClaimedPublisher      = PassthroughSubject<Bool, Never>()
   var isBannedPublisher       = PassthroughSubject<Bool, Never>()
+  var isVisitedPublisher      = PassthroughSubject<Bool, Never>()
   var isHotPublisher          = PassthroughSubject<Bool, Never>()
   var viewsPublisher          = PassthroughSubject<Int, Never>()
   var likesPublisher          = PassthroughSubject<Int, Never>()
@@ -249,7 +260,8 @@ class SurveyReference: Decodable {// NSObject,
       isOwn       = try container.decode(Bool.self, forKey: .isOwn)
       isFavorite  = try container.decode(Bool.self, forKey: .isFavorite)
       isHot       = try container.decode(Bool.self, forKey: .isHot)
-      isBanned       = try container.decode(Bool.self, forKey: .isBanned)
+      isBanned    = try container.decode(Bool.self, forKey: .isBanned)
+      isVisited   = try container.decode(Bool.self, forKey: .isVisited)
       progress    = try container.decode(Int.self, forKey: .progress)
       let shareData           = try container.decode([String].self, forKey: .share_link)
       shareHash               = shareData.first ?? ""
@@ -291,6 +303,7 @@ class SurveyReference: Decodable {// NSObject,
     self.isHot                   = true
     self.isComplete              = true
     self.isFavorite              = true
+    self.isVisited               = true
     self.isBanned = false
     self.votesTotal              = 0
     self.commentsTotal           = 0
@@ -315,6 +328,7 @@ class SurveyReference: Decodable {// NSObject,
        isActive: Bool,
        isComplete: Bool,
        isFavorite: Bool,
+       isVisited: Bool,
        isHot: Bool,
        survey: Survey,
        owner: Userprofile,
@@ -336,6 +350,7 @@ class SurveyReference: Decodable {// NSObject,
     self.isHot                   = isHot
     self.isComplete              = isComplete
     self.isFavorite              = isFavorite
+    self.isVisited               = isVisited
     self.votesTotal              = votesTotal
     self.commentsTotal           = commentsTotal
     self.votesLimit              = votesLimit
