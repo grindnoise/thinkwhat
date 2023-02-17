@@ -201,8 +201,8 @@ class Avatar: UIView {
       } else if mode == .Editing {
         button.menu = prepareMenu()
         button.alpha = 1
-        button.setImage(UIImage(systemName: "pencil",
-                                withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
+        button.setImage(UIImage(systemName: "camera.fill",
+                                withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5,
                                                                                weight: .semibold)),
                         for: .normal)
         button.imageView?.contentMode = .center
@@ -254,8 +254,8 @@ class Avatar: UIView {
   }
   public var isSelected: Bool = false {
     didSet {
-      button.setImage(UIImage(systemName: isSelected ? "pencil" : "",
-                              withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
+      button.setImage(UIImage(systemName: isSelected ? "camera.fill" : "",
+                              withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5,
                                                                              weight: .semibold)),
                       for: .normal)
     }
@@ -439,14 +439,14 @@ class Avatar: UIView {
           case .Selection:
             systemImage = self.isSelected ? "checkmark" : ""
           case .Editing:
-            systemImage = "pencil"
+            systemImage = "camera.fill"
             //      case .Choice:
             //        systemImage = "circlebadge.fill"
           default:
             systemImage = ""
           }
           instance.setImage(UIImage(systemName: systemImage,
-                                    withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.6,
+                                    withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5,
                                                                                    weight: .semibold)),
                             for: .normal)
           
@@ -643,7 +643,7 @@ private extension Avatar {
     button.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      button.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.275),
+      button.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.35),
     ])
     
     let constraintX = button.centerXAnchor.constraint(equalTo: leadingAnchor)

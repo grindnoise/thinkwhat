@@ -96,7 +96,14 @@ class SurveysCollectionView: UICollectionView {
       
       colorPublisher.send(color)
       loadingIndicator.color = color
-//      setColors()
+//      guard let superIndicator = viewByClassName(className: "_UIScrollViewScrollIndicator"),
+//            let indicator = superIndicator.subviews.first
+//      else { return }
+//
+//      indicator.backgroundColor = color
+//      let colored = UIView()
+//      colored.backgroundColor = color
+//      colored.place(inside: indicator)
     }
   }
   //Logic
@@ -340,6 +347,9 @@ class SurveysCollectionView: UICollectionView {
 extension SurveysCollectionView: UIScrollViewDelegate {
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     lastContentOffsetY = scrollView.contentOffset.y
+    
+//    guard let verticalIndicator = scrollView.subviews[(scrollView.subviews.count - 1)] as? UIImageView else { return }
+//    verticalIndicator.backgroundColor = color
   }
   
   func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {

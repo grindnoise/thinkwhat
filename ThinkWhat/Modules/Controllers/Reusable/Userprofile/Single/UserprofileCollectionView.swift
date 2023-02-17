@@ -203,6 +203,7 @@ private extension UserprofileCollectionView {
       guard let userprofile = self.userprofile else { return }
       
       cell.color = self.color
+      cell.insets = UIEdgeInsets(top: 16, left: 16, bottom: 0, right: 16)
       self.colorPublisher
         .filter { !$0.isNil }
         .sink {

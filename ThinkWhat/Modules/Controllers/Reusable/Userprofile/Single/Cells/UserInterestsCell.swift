@@ -19,10 +19,21 @@ class UserInterestsCell: UICollectionViewListCell {
       collectionView.userprofile = userprofile
     }
   }
-  //Publishers
+  ///`Publishers`
   public let topicPublisher = PassthroughSubject<Topic, Never>()
-  //UI
+  ///`UI`
   public var color: UIColor = .clear
+  public var padding: CGFloat = 16 {
+    didSet {
+      updateUI()
+    }
+  }
+  public var insets: UIEdgeInsets? {
+    didSet {
+      updateUI()
+    }
+  }
+  
   
   
   // MARK: - Private properties
@@ -30,7 +41,6 @@ class UserInterestsCell: UICollectionViewListCell {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  private let padding: CGFloat = 16
   private lazy var hintButton: UIButton = {
     let instance = UIButton()
     instance.setImage(UIImage(systemName: "questionmark",
@@ -181,6 +191,19 @@ private extension UserInterestsCell {
     
     background.place(inside: self,
                      insets: UIEdgeInsets(top: padding, left: padding, bottom: 0, right: padding))
+  }
+  
+  @MainActor
+  func updateUI() {
+    background.removeFromSuperview()
+    
+    guard let insets = insets else {
+      background.place(inside: self,
+                       insets: .uniform(size: padding))
+      return
+    }
+    background.place(inside: self,
+                     insets: insets)
   }
   
   @objc

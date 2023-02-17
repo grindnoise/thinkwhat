@@ -308,6 +308,7 @@
 "voters" = "Voters";
 
 //Settings VC
+"location" = "Location";
 "social_media" = "Social media";
 "facebook" = "Facebook";
 "google" = "Google";

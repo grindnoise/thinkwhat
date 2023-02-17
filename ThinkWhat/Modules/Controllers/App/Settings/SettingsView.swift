@@ -175,12 +175,8 @@ class SettingsView: UIView {
             }
             .store(in: &self.subscriptions)
         
-        instance.interestPublisher
-            .sink { [unowned self] in
-                guard let topic = $0 else { return }
-                
-                self.viewInput?.onTopicSelected(topic)
-            }
+        instance.topicPublisher
+            .sink { [unowned self] in self.viewInput?.onTopicSelected($0) }
             .store(in: &subscriptions)
         
         instance.publicationsPublisher

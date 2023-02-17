@@ -19,11 +19,11 @@ class UserStatsCell: UICollectionViewListCell {
       collectionView.userprofile = userprofile
     }
   }
-  //Publishers
+  ///`Publishers`
   public let publicationsPublisher = PassthroughSubject<Userprofile, Never>()
   public let commentsPublisher = PassthroughSubject<Userprofile, Never>()
   public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
-  //UI
+  ///`UI`
   public var color: UIColor = .label {
     didSet {
       collectionView.color = color

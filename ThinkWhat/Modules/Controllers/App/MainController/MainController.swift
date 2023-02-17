@@ -247,10 +247,14 @@ class MainController: UITabBarController {//}, StorageProtocol {
     }
     
     UIView.animate(
-      withDuration: 0.5,
-      delay: 0,
-      usingSpringWithDamping: 0.7,
-      initialSpringVelocity: 0.4,
+      //      withDuration: 0.5,
+      //      delay: 0,
+      //      usingSpringWithDamping: 0.7,
+      //      initialSpringVelocity: 0.4,
+      withDuration: 0.3,
+      delay: 0.0,
+      usingSpringWithDamping: 2.0,
+      initialSpringVelocity: 0.5,
       options: [.curveEaseInOut]) { [weak self] in
         guard let self = self else { return }
         
@@ -372,8 +376,13 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     passthroughView.setNeedsLayout()
     if animated {
-      UIView.animate(withDuration: 0.25,
-                     delay: 0,
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0.0,
+        usingSpringWithDamping: 2.0,
+        initialSpringVelocity: 0.5,
+//        withDuration: 0.25,
+//                     delay: 0,
                      options: .curveEaseInOut)  { [unowned self] in
         leading.constant = constant
         self.passthroughView.layoutIfNeeded()
@@ -391,8 +400,12 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     view.setNeedsLayout()
     if animated {
-      UIView.animate(withDuration: 0.25,
-                     delay: 0,
+      UIView.animate(withDuration: 0.3,
+                     delay: 0.0,
+                     usingSpringWithDamping: 2.0,
+                     initialSpringVelocity: 0.5,
+//                     withDuration: 0.25,
+//                     delay: 0,
                      options: .curveEaseInOut)  { [unowned self] in
         leading.constant = constant
         self.passthroughView.layoutIfNeeded()

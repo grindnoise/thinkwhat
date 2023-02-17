@@ -34,7 +34,11 @@ struct UserCompatibility {
     
     details = []
     userId = id
-    percent = 100 * matches / total
+    if matches == .zero || total == .zero {
+      percent = 0
+    } else {
+      percent = 100 * matches / total
+    }
     topics.forEach { dict in
       guard let topicId = dict["topic"].int,
             let topic = Topics.shared.all.filter({ $0.id == topicId}).first,

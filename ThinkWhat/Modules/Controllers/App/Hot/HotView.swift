@@ -195,89 +195,89 @@ extension HotView: HotControllerOutput {
     }
     
     func onNext(_ card: (HotCard & UIView)?) {
-        func nextFrame() {
-            UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
-                card!.transform  = .identity
-                if let constraint = card?.getAllConstraints().filter({$0.identifier == "centerX"}).first {
-                    self.setNeedsLayout()
-                    constraint.constant = 0
-                    self.layoutIfNeeded()
-                }
-//                self.setNeedsLayout()
-//                card!.centerXAnchor.constraint(equalTo: self.destinationView.centerXAnchor).isActive = true
-//                self.layoutIfNeeded()
-//                card!.frame.origin = self.surveyPreviewCurrentOrigin
-                if !self.previousCard.isNil {
-                    if let constraint = self.previousCard!.getAllConstraints().filter({$0.identifier == "centerX"}).first {
-                        self.setNeedsLayout()
-                        constraint.constant -= self.destinationView.bounds.width + 10
-                        self.layoutIfNeeded()
-                    }
-                    self.previousCard!.alpha = 0
-//                    self.previousCard!.voteButton.backgroundColor = K_COLOR_GRAY
-//                    self.previousCard!.nextButton.tintColor = K_COLOR_GRAY
-                    self.previousCard!.transform = self.previousCard!.transform.scaledBy(x: 0.85, y: 0.85)
-                    self.surveyStack.remove(object: self.previousCard!.survey)
-                }
-            }) {
-                _ in
-                self.currentCard = card
-                if !self.previousCard.isNil {
-                    self.previousCard!.removeFromSuperview()
-                }
-                
-                if let _nextPreview = self.getCard() {
-                    self.nextCard = _nextPreview
-                } else {
-                    self.nextCard = nil
-                }
-            }
-        }
-        
-        if !card.isNil {
-            card!.transform = card!.transform.scaledBy(x: 0.85, y: 0.85)
-            emptyCard.setEnabled(false) { _ in
-                nextFrame()
-            }
-            return
-        } else if card.isNil, let card = getCard() {
-            if emptyCard.isEnabled {
-                self.emptyCard.setEnabled(false) { _ in
-                    self.onNext(card)
-                }
-            } else {
-                guard currentCard.isNil else { return }
-                onNext(card)
-            }
-        } else {
-        
-//        guard card.isNil else {
+//        func nextFrame() {
+//            UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
+//                card!.transform  = .identity
+//                if let constraint = card?.getAllConstraints().filter({$0.identifier == "centerX"}).first {
+//                    self.setNeedsLayout()
+//                    constraint.constant = 0
+//                    self.layoutIfNeeded()
+//                }
+////                self.setNeedsLayout()
+////                card!.centerXAnchor.constraint(equalTo: self.destinationView.centerXAnchor).isActive = true
+////                self.layoutIfNeeded()
+////                card!.frame.origin = self.surveyPreviewCurrentOrigin
+//                if !self.previousCard.isNil {
+//                    if let constraint = self.previousCard!.getAllConstraints().filter({$0.identifier == "centerX"}).first {
+//                        self.setNeedsLayout()
+//                        constraint.constant -= self.destinationView.bounds.width + 10
+//                        self.layoutIfNeeded()
+//                    }
+//                    self.previousCard!.alpha = 0
+////                    self.previousCard!.voteButton.backgroundColor = K_COLOR_GRAY
+////                    self.previousCard!.nextButton.tintColor = K_COLOR_GRAY
+//                    self.previousCard!.transform = self.previousCard!.transform.scaledBy(x: 0.85, y: 0.85)
+//                    self.surveyStack.remove(object: self.previousCard!.survey)
+//                }
+//            }) {
+//                _ in
+//                self.currentCard = card
+//                if !self.previousCard.isNil {
+//                    self.previousCard!.removeFromSuperview()
+//                }
+//
+//                if let _nextPreview = self.getCard() {
+//                    self.nextCard = _nextPreview
+//                } else {
+//                    self.nextCard = nil
+//                }
+//            }
+//        }
+//
+//        if !card.isNil {
 //            card!.transform = card!.transform.scaledBy(x: 0.85, y: 0.85)
-////            addSubview(card!)
 //            emptyCard.setEnabled(false) { _ in
 //                nextFrame()
 //            }
 //            return
+//        } else if card.isNil, let card = getCard() {
+//            if emptyCard.isEnabled {
+//                self.emptyCard.setEnabled(false) { _ in
+//                    self.onNext(card)
+//                }
+//            } else {
+//                guard currentCard.isNil else { return }
+//                onNext(card)
+//            }
+//        } else {
+//
+////        guard card.isNil else {
+////            card!.transform = card!.transform.scaledBy(x: 0.85, y: 0.85)
+//////            addSubview(card!)
+////            emptyCard.setEnabled(false) { _ in
+////                nextFrame()
+////            }
+////            return
+////        }
+//        UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
+//            if !self.previousCard.isNil {
+//                self.previousCard!.alpha = 0
+//                self.previousCard!.frame.origin.x -= self.frame.width
+//                self.previousCard!.transform = self.previousCard!.transform.scaledBy(x: 0.85, y: 0.85)
+//            }
+//        }) {
+//            _ in
+//            if !self.currentCard.isNil {
+//                self.currentCard.removeFromSuperview()
+//                self.surveyStack.remove(object: self.currentCard.survey)
+//                self.currentCard = nil
+//            }
+//            self.emptyCard.setEnabled(true) { _ in }
+//            guard !self.previousCard.isNil else { return }
+//            self.previousCard!.removeFromSuperview()
 //        }
-        UIView.animate(withDuration: 0.32, delay: 0, options: .curveEaseInOut, animations: {
-            if !self.previousCard.isNil {
-                self.previousCard!.alpha = 0
-                self.previousCard!.frame.origin.x -= self.frame.width
-                self.previousCard!.transform = self.previousCard!.transform.scaledBy(x: 0.85, y: 0.85)
-            }
-        }) {
-            _ in
-            if !self.currentCard.isNil {
-                self.currentCard.removeFromSuperview()
-                self.surveyStack.remove(object: self.currentCard.survey)
-                self.currentCard = nil
-            }
-            self.emptyCard.setEnabled(true) { _ in }
-            guard !self.previousCard.isNil else { return }
-            self.previousCard!.removeFromSuperview()
-        }
-        return
-        }
+//        return
+//        }
     }
     
     func onDidLayout() { }

@@ -561,6 +561,7 @@ private extension TopicsController {
       let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
       view.addGestureRecognizer(touch)
       
+      searchField.tintColor = (mode == .Topic || mode == .TopicSearch) ? topic.isNil ? tintColor : topic!.tagColor : tintColor
       let _ = searchField.becomeFirstResponder()
       controllerOutput?.onSearchMode()
       
@@ -631,8 +632,9 @@ extension TopicsController: TopicsViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    
-    navigationController?.pushViewController(UserprofileController(userprofile: userprofile, color: tintColor), animated: true)
+    navigationController?.pushViewController(UserprofileController(userprofile: userprofile,
+                                                                   color: (mode == .Topic || mode == .TopicSearch) ? topic.isNil ? tintColor : topic!.tagColor : tintColor),
+                                             animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
   

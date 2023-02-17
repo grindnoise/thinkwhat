@@ -308,6 +308,7 @@
 "voters" = "Проголосовашие";
 
 //Settings VC
+"location" = "Местонахождение";
 "social_media" = "Cоциальные сети";
 "facebook" = "Facebook";
 "google" = "Google";
