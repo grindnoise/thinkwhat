@@ -8,35 +8,79 @@
 
 import UIKit
 import Combine
+import FlagKit
+import L10n_swift
 
 class UserSettingsCityCell: UICollectionViewListCell {
-  
+
   // MARK: - Public properties
   public weak var userprofile: Userprofile! {
     didSet {
+      userprofile.cityFetchPublisher
+        .receive(on: DispatchQueue.main)
+        .mapError { error -> AppError in
+          switch error {
+          case is APIError:
+            return AppError.server
+          default:
+            return AppError.server
+          }
+        }
+        .sink { [weak self] completion in
+          guard let self = self else { return }
+          
+          switch completion {
+          case .failure(let error):
+            self.isSearching = false
+            let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                                  icon: Icon.init(category: .Logo,
+                                                                                  scaleMultiplicator: 1.5,
+                                                                                  iconColor: .systemRed),
+                                                                  text: error.localizedDescription,
+                                                                  tintColor: .clear,
+                                                                  fontName: Fonts.Regular,
+                                                                  textStyle: .headline,
+                                                                  textAlignment: .natural),
+                                   contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                   isModal: false,
+                                   useContentViewHeight: true,
+                                   shouldDismissAfter: 2)
+            banner.didDisappearPublisher
+              .sink { _ in banner.removeFromSuperview() }
+              .store(in: &self.subscriptions)
+          case .finished:
+#if DEBUG
+            print("finished")
+#endif
+          }
+        } receiveValue: { [weak self] result in
+          guard let self = self else { return }
+
+          self.processResults(result)
+        }
+        .store(in: &subscriptions)
+
       guard let city = userprofile.city else { return }
-      
+
       self.city = city
     }
   }
   public weak var city: City! {
     didSet {
-      guard let localized = city.localized,
-            !localized.isEmpty
-      else {
-        textField.text = city.name
-        return
-      }
+      guard oldValue != city else { return }
+
+      ///Set user's default
+      userprofile.cityId = city.geonameId
       
-      textField.text = localized
+      setText()
     }
   }
   ///`Publishers`
   public let publicationsPublisher = PassthroughSubject<Userprofile, Never>()
   public let commentsPublisher = PassthroughSubject<Userprofile, Never>()
   public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
-  public let citySelectionPublisher = PassthroughSubject<City?, Never>()
-  public let cityFetchPublisher = PassthroughSubject<String?, Never>()
+  public let citySelectionPublisher = PassthroughSubject<City, Never>()
+  public var cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
   ///`UI`
   public var color: UIColor = .gray
   public var padding: CGFloat = 8 {
@@ -49,22 +93,23 @@ class UserSettingsCityCell: UICollectionViewListCell {
       updateUI()
     }
   }
-  
-  
-  
+
+
+
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///`Logic`
-  private var selectedCity: City? = nil {
-    didSet {
-      guard let selectedCity = selectedCity else { return }
-      
-      citySelectionPublisher.send(selectedCity)
-      endEditing(true)
-    }
-  }
+//  private var selectedCity: City? = nil {
+//    didSet {
+//      guard let selectedCity = selectedCity else { return }
+//
+//      citySelectionPublisher.send(selectedCity)
+//      endEditing(true)
+//    }
+//  }
+  private var isSearching = false
   ///`UI`
   private lazy var hintButton: UIButton = {
     let instance = UIButton()
@@ -73,7 +118,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
                       for: .normal)
     instance.tintColor = .secondaryLabel
     instance.addTarget(self, action: #selector(self.hintTapped), for: .touchUpInside)
-    
+
     return instance
   }()
   private lazy var background: UIView = {
@@ -87,30 +132,31 @@ class UserSettingsCityCell: UICollectionViewListCell {
     stack.place(inside: instance,
                 insets: .uniform(size: padding*2),
                 bottomPriority: .defaultLow)
-    
+
     return instance
   }()
   private lazy var stack: UIStackView = {
     let headerStack = UIStackView(arrangedSubviews: [
       label,
       UIView.opaque(),
-      hintButton
+//      hintButton
     ])
     headerStack.axis = .horizontal
-    
+
     let contentStack = UIStackView(arrangedSubviews: [
       textField,
+      UIView.opaque(),
       countryFlag
     ])
     contentStack.axis = .horizontal
-    
+
     let instance = UIStackView(arrangedSubviews: [
       headerStack,
       contentStack
     ])
     instance.axis = .vertical
     instance.spacing = padding*2
-    
+
     return instance
   }()
   private lazy var label: UILabel = {
@@ -118,34 +164,35 @@ class UserSettingsCityCell: UICollectionViewListCell {
     instance.textColor = .secondaryLabel
     instance.text = "location".localized.uppercased()
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
-    
+
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"
     heightConstraint.priority = .defaultHigh
     heightConstraint.isActive = true
-    
+
     instance.publisher(for: \.bounds, options: .new)
       .sink { [weak self] rect in
         guard let self = self,
               let constraint = instance.getConstraint(identifier: "height")
         else { return }
-        
+
         self.setNeedsLayout()
         constraint.constant = instance.text!.height(withConstrainedWidth: 1000, font: instance.font)
         self.layoutIfNeeded()
       }
       .store(in: &subscriptions)
-    
+
     return instance
   }()
   private lazy var countryFlag: UIImageView = {
     let instance = UIImageView()
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    
+    instance.contentMode = .center
+//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+
     return instance
   }()
-  private lazy var textField: UnderlinedSearchTextField = {
-    let instance = UnderlinedSearchTextField()
+  private lazy var textField: SearchTextField = {
+    let instance = SearchTextField()
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
     instance.indicator.color = UIColor { traitCollection in
       switch traitCollection.userInterfaceStyle {
@@ -167,23 +214,26 @@ class UserSettingsCityCell: UICollectionViewListCell {
     instance.theme.fontColor = .label
     instance.theme.subtitleFontColor = .secondaryLabel
     instance.theme.cellHeight = "test".height(withConstrainedWidth: 100, font: instance.theme.font)*2
-    instance.itemSelectionHandler = { [weak self] item, itemPosition in
-      guard let self = self else { return }
-      
-      instance.text = item[itemPosition].title
-      
-      guard let selectedCity = item[itemPosition].attachment as? City else { return }
-      
-      self.selectedCity = selectedCity
-    }
-    instance.addTarget(self, action: #selector(self.handleIO(_:)), for: .editingChanged)
+    instance.selectionPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] in
+        guard let self = self,
+              let selected = $0.attachment as? City
+        else { return }
+        
+        self.citySelectionPublisher.send(selected)
+        self.city = selected
+        _ = instance.resignFirstResponder()
+      }
+      .store(in: &subscriptions)
+    instance.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: .editingChanged)
     instance.delegate = self
-    
+
     return instance
   }()
-  
-  
-  
+
+
+
   // MARK: - Destructor
   deinit {
     observers.forEach { $0.invalidate() }
@@ -193,36 +243,36 @@ class UserSettingsCityCell: UICollectionViewListCell {
     print("\(String(describing: type(of: self))).\(#function)")
 #endif
   }
-  
-  
-  
+
+
+
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
-    
+
     setupUI()
   }
-  
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
-  
+
+
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-    
+
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
   }
-  
-  //    override func prepareForReuse() {
-  //        super.prepareForReuse()
-  //
-  //        urlPublisher = CurrentValueSubject<URL?, Never>(nil)
-  //        subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
-  //        imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
-  //    }
+
+  override func prepareForReuse() {
+    super.prepareForReuse()
+
+    cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
+//    subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
+//    imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
+  }
 }
 
 private extension UserSettingsCityCell {
@@ -230,15 +280,15 @@ private extension UserSettingsCityCell {
   func setupUI() {
     backgroundColor = .clear
     clipsToBounds = true
-    
+
     background.place(inside: self,
                      insets: .init(top: padding*2, left: padding, bottom: padding*2, right: padding))
   }
-  
+
   @MainActor
   func updateUI() {
     background.removeFromSuperview()
-    
+
     guard let insets = insets else {
       background.place(inside: self,
                        insets: .uniform(size: padding))
@@ -247,7 +297,7 @@ private extension UserSettingsCityCell {
     background.place(inside: self,
                      insets: insets)
   }
-  
+
   @objc
   func hintTapped() {
     let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
@@ -265,49 +315,66 @@ private extension UserSettingsCityCell {
       .sink { _ in banner.removeFromSuperview() }
       .store(in: &self.subscriptions)
   }
-  
-  @objc
-  func handleIO(_ instance: UnderlinedSearchTextField) {
-    guard let text = instance.text, text.count >= 4 else { return }
-    
-    instance.showLoadingIndicator()
-    cityFetchPublisher.send(text)
-    //        instance.isUserInteractionEnabled = false
-  }
-  
+
   func processResults(_ cities: [City]) {
-    let items: [SearchTextFieldItem] = cities.map { return SearchTextFieldItem(title: $0.name,
-                                                                               subtitle: (!$0.regionName.isNil && !$0.countryName.isNil) ?  "\(String(describing: $0.regionName!)), \(String(describing: $0.countryName!))" : "",
-                                                                               image: nil,
-                                                                               attachment: $0)}
+    let items: [SearchTextFieldItem] = cities.map { city in
+      return SearchTextFieldItem(title: city.name,
+                                 subtitle: (!city.regionName.isEmpty && !city.countryName.isEmpty) ?  "\(String(describing: city.regionName)), \(String(describing: city.countryName))" : "",
+                                 image: nil,
+                                 attachment: city)}
     textField.filterItems(items)
     textField.stopLoadingIndicator()
-    textField.isUserInteractionEnabled = true
+    isSearching = false
+    //    textField.isUserInteractionEnabled = true
+  }
+  
+  func setText() {
+    func countryName(countryCode: String) -> String? {
+      let current = Locale(identifier: L10n.shared.language)
+        return current.localizedString(forRegionCode: countryCode)
+    }
+    
+    let countryName = countryName(countryCode: city.countryCode)
+    textField.text = (city.localizedName.isEmpty ? city.name : city.localizedName) + (countryName.isNil ? "" : ", \(String(describing: countryName!))")
+    countryFlag.image = Flag(countryCode: city.countryCode)?.image(style: .roundedRect)
   }
 }
 
 extension UserSettingsCityCell: UITextFieldDelegate {
-  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-    guard !self.textField.isSpinning else { return false }
-    return true
-  }
-  
   func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-    return true
-  }
-  
-  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    return true
-  }
-  
-  func textFieldDidEndEditing(_ textField: UITextField) {
-    guard let selectedCity = selectedCity else {
-      textField.text = city.localized ?? city.name
-      return
+    if let recognizers = gestureRecognizers, recognizers.isEmpty {
+      let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
+      addGestureRecognizer(touch)
     }
-    
-    textField.text = selectedCity.name
+    return !isSearching
   }
+
+  @objc
+  func textFieldDidChange(_ textField: UnderlinedSearchTextField) {
+    guard !isSearching, let text = textField.text, text.count > 3 else { return }
+
+    textField.showLoadingIndicator()
+    isSearching = true
+    cityFetchPublisher.send(text)
+  }
+
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    if let recognizer = gestureRecognizers?.first { removeGestureRecognizer(recognizer) }
+    textField.resignFirstResponder()
+
+    setText()
+    
+    return true
+  }
+
+//  func textFieldDidEndEditing(_ textField: UITextField) {
+//    guard let selectedCity = city else {
+//      textField.text = city.localizedName.isEmpty ? city.name : city.localizedName
+//      return
+//    }
+//
+//    textField.text = selectedCity.localizedName.isEmpty ? selectedCity.name : selectedCity.localizedName
+//  }
 }
 
 
@@ -330,14 +397,66 @@ extension UserSettingsCityCell: UITextFieldDelegate {
 //        didSet {
 //            guard let city = city else { return }
 //
-//            guard let localized = city.localized,
-//                  !localized.isEmpty
-//            else {
+////            guard let localized = city.localizedName,
+////                  !localized.isEmpty
+////            else {
 //                textField.text = city.name
-//                return
-//            }
-//            textField.text = localized
+////                return
+////            }
+////            textField.text = localized
 //        }
+//    }
+//    public weak var userprofile: Userprofile! {
+//      didSet {
+//        userprofile.cityFetchPublisher
+//          .receive(on: DispatchQueue.main)
+//          .mapError { error -> AppError in
+//            switch error {
+//            case is APIError:
+//              return AppError.server
+//            default:
+//              return AppError.server
+//            }
+//          }
+//          .sink { [weak self] completion in
+//            guard let self = self else { return }
+//
+//
+//            switch completion {
+//            case .failure(let error):
+//              self.isSearching = false
+//              let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+//                                                                    icon: Icon.init(category: .Logo,
+//                                                                                    scaleMultiplicator: 1.5,
+//                                                                                    iconColor: .systemRed),
+//                                                                    text: error.localizedDescription,
+//                                                                    tintColor: .clear,
+//                                                                    fontName: Fonts.Regular,
+//                                                                    textStyle: .headline,
+//                                                                    textAlignment: .natural),
+//                                     contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                                     isModal: false,
+//                                     useContentViewHeight: true,
+//                                     shouldDismissAfter: 2)
+//              banner.didDisappearPublisher
+//                .sink { _ in banner.removeFromSuperview() }
+//                .store(in: &self.subscriptions)
+//            case .finished:
+//  #if DEBUG
+//              print("finished")
+//  #endif
+//            }
+//          } receiveValue: { [weak self] result in
+//            guard let self = self else { return }
+//
+//            self.processResults(result)
+//          }
+//          .store(in: &subscriptions)
+//
+//        guard let city = userprofile.city else { return }
+//
+//        self.city = city
+//      }
 //    }
 //    //Publishers
 //    public var citySelectionPublisher = CurrentValueSubject<City?, Never>(nil)
@@ -355,6 +474,7 @@ extension UserSettingsCityCell: UITextFieldDelegate {
 //    private var observers: [NSKeyValueObservation] = []
 //    private var subscriptions = Set<AnyCancellable>()
 //    private var tasks: [Task<Void, Never>?] = []
+//  private var isSearching = false
 //    private var selectedCity: City? = nil {
 //        didSet {
 //            guard let selectedCity = selectedCity else { return }
@@ -470,30 +590,30 @@ extension UserSettingsCityCell: UITextFieldDelegate {
 //    }
 //
 //    func setTasks() {
-//        //Cities fetch result
-//        tasks.append( Task {@MainActor [weak self] in
-//            for await notification in NotificationCenter.default.notifications(for: Notifications.Cities.FetchResult) {
-//                guard let self = self,
-//                      let cities = notification.object as? [City]
-//                else { return }
-//
-//                //                await MainActor.run {
-//                self.processResults(cities)
-//                //                }
-//            }
-//        })
-//
-//        //Cities fetch error
-//        tasks.append( Task {@MainActor [weak self] in
-//            for await _ in NotificationCenter.default.notifications(for: Notifications.Cities.FetchError) {
-//                guard let self = self else { return }
-//
-//                //                await MainActor.run {
-//                self.textField.stopLoadingIndicator()
-//                showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemRed, shadowed: true)
-//                //                }
-//            }
-//        })
+////        //Cities fetch result
+////        tasks.append( Task {@MainActor [weak self] in
+////            for await notification in NotificationCenter.default.notifications(for: Notifications.Cities.FetchResult) {
+////                guard let self = self,
+////                      let cities = notification.object as? [City]
+////                else { return }
+////
+////                //                await MainActor.run {
+////                self.processResults(cities)
+////                //                }
+////            }
+////        })
+////
+////        //Cities fetch error
+////        tasks.append( Task {@MainActor [weak self] in
+////            for await _ in NotificationCenter.default.notifications(for: Notifications.Cities.FetchError) {
+////                guard let self = self else { return }
+////
+////                //                await MainActor.run {
+////                self.textField.stopLoadingIndicator()
+////                showBanner(bannerDelegate: self, text: AppError.server.localizedDescription.localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemRed, shadowed: true)
+////                //                }
+////            }
+////        })
 //    }
 //
 //    @objc
@@ -506,13 +626,15 @@ extension UserSettingsCityCell: UITextFieldDelegate {
 //    }
 //
 //    func processResults(_ cities: [City]) {
-//        let items: [SearchTextFieldItem] = cities.map { return SearchTextFieldItem(title: $0.name,
-//                                                                                   subtitle: (!$0.regionName.isNil && !$0.countryName.isNil) ?  "\(String(describing: $0.regionName!)), \(String(describing: $0.countryName!))" : "",
-//                                                                                   image: nil,
-//                                                                                   attachment: $0)}
-//        textField.filterItems(items)
-//        textField.stopLoadingIndicator()
-//        textField.isUserInteractionEnabled = true
+//      let items: [SearchTextFieldItem] = cities.map { city in
+//        return SearchTextFieldItem(title: city.name,
+//                                   subtitle: (!city.regionName.isEmpty && !city.countryName.isEmpty) ?  "\(String(describing: city.regionName)), \(String(describing: city.countryName))" : "",
+//                                   image: nil,
+//                                   attachment: city)}
+//      textField.filterItems(items)
+//      textField.stopLoadingIndicator()
+//      isSearching = false
+//  //    textField.isUserInteractionEnabled = true
 //    }
 //
 //    func setColors() {
@@ -545,26 +667,10 @@ extension UserSettingsCityCell: UITextFieldDelegate {
 //
 //    func textFieldDidEndEditing(_ textField: UITextField) {
 //        guard let selectedCity = selectedCity else {
-//            textField.text = city.localized ?? city.name
+//          textField.text = city.localizedName.isEmpty ? city.name : city.localizedName
 //            return
 //        }
 //
 //        textField.text = selectedCity.name
-//    }
-//}
-//
-//extension UserSettingsCityCell: BannerObservable {
-//    func onBannerWillAppear(_ sender: Any) {}
-//
-//    func onBannerWillDisappear(_ sender: Any) {}
-//
-//    func onBannerDidAppear(_ sender: Any) {}
-//
-//    func onBannerDidDisappear(_ sender: Any) {
-//        if let banner = sender as? Banner {
-//            banner.removeFromSuperview()
-//        } else if let popup = sender as? Popup {
-//            popup.removeFromSuperview()
-//        }
 //    }
 //}

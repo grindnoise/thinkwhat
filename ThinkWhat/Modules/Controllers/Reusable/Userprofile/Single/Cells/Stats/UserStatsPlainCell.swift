@@ -12,6 +12,7 @@ import Combine
 class UserStatsPlainCell: UICollectionViewListCell {
   
   enum Mode: String {
+    case Balance = "balance"
     case DateJoined = "userprofile_is_in_community"
     case Publications = "userprofile_publications_created"
     case Votes = "userprofile_votes_received"
@@ -158,6 +159,15 @@ private extension UserStatsPlainCell {
     else { return }
     
     switch mode {
+    case .Balance:
+      let attributedTitle = NSAttributedString(string: String(describing: userprofile.balance),
+                                               attributes: [
+                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .foregroundColor: userprofile.publicationsTotal.isZero ? UIColor.label : color
+                                               ])
+      rightButton.setAttributedTitle(attributedTitle, for: .normal)
+      rightButton.isUserInteractionEnabled = true
+      disclosureIndicator.alpha = 1
     case .DateJoined:
       let fullComponents = Date.dateComponents(from: userprofile.dateJoined, to: Date())
       //

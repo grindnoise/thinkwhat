@@ -555,7 +555,7 @@ private extension TopicsController {
         inset = 10 + (44 + 4)*2
         guard let topic = topic else { return }
         
-        searchField.placeholder = "search_topic".localized + " \(topic.title.lowercased())"
+        searchField.placeholder = "search_topic".localized + " \"\(topic.title)\""
       }
       widthConstant = navigationBar.frame.width - inset
       let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))

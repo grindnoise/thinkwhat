@@ -553,7 +553,7 @@ private extension MainController {
             
             guard !shouldTerminate else { return }
             
-            try Userprofiles.loadUserData(userData)
+            try Userprofiles.updateUserData(userData)
             Surveys.shared.load(surveys)
             
             

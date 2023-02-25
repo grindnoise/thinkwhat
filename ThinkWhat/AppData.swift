@@ -10,7 +10,7 @@ import Foundation
 import SwiftyJSON
 
 class AppData {
-    
+
     static let shared = AppData()
     
     private init() {}

@@ -60,10 +60,10 @@ struct Notifications {
         static let NotifyOnPublicationsFailure      = Notification.Name("Notifications.Userprofiles.NotifyOnPublicationsFailure")
     }
     
-    struct Cities {
-        static let FetchResult                      = Notification.Name("NotificationCitiesFetchResult")
-        static let FetchError                       = Notification.Name("NotificationCitiesFetchError")
-    }
+//    struct Cities {
+//        static let FetchResult                      = Notification.Name("NotificationCitiesFetchResult")
+//        static let FetchError                       = Notification.Name("NotificationCitiesFetchError")
+//    }
     
     struct System {
         static let UpdateStats                      = Notification.Name("NotificationUpdateStats")

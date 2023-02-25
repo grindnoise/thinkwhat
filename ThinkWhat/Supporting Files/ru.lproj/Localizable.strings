@@ -315,11 +315,11 @@
 "twitter" = "Twitter";
 "tiktok" = "TikTok";
 "instagram" = "Instagram";
-"facebook_link" = "Адрес на Facebook";
-"google_link" = "Адрес на Google";
-"twitter_link" = "Адрес на Twitter";
-"tiktok_link" = "Адрес на TikTok";
-"instagram_link" = "Адрес на Instagram";
+"facebook_link" = "профиль в Facebook";
+"google_link" = "профиль в Google";
+"twitter_link" = "профиль в Twitter";
+"tiktok_link" = "профиль в TikTok";
+"instagram_link" = "профиль в Instagram";
 "completed" = "Пройдено";
 "preferences" = "Мои предпочтения:";
 "my_balance" = "Мой баланс:";
@@ -334,7 +334,7 @@
 "my_subscribers" = "Мои подписчики";
 "my_subscriptions" = "Мои подписки";
 "balance" = "Баланс";
-"account_management" = "Управление аккаунтом";
+"account_management" = "Управление учетной записью";
 "logout" = "Выйти";
 "delete_account" = "Удалить аккаунт";
 "allow_push_notifications" = "Разрешить уведомления";

@@ -27,7 +27,7 @@ class UserprofileCollectionView: UICollectionView {
       setupUI()
     }
   }
-  //Publishers
+  ///`Publishers`
   public let urlPublisher = PassthroughSubject<URL, Never>()
   public var subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
@@ -37,7 +37,7 @@ class UserprofileCollectionView: UICollectionView {
   public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
   public let colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
   public let disclosurePublisher = PassthroughSubject<TopicCompatibility, Never>()
-  //UI
+  ///`UI`
   public var color: UIColor = .label {
     didSet {
       colorPublisher.send(color)
@@ -50,9 +50,10 @@ class UserprofileCollectionView: UICollectionView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //Collection
+  ///`Collection`
   private var source: Source!
-  
+  ///`UI`
+  private let padding: CGFloat = 8
   
   
   // MARK: - Destructor
@@ -228,6 +229,8 @@ private extension UserprofileCollectionView {
     let statsCellRegistration = UICollectionView.CellRegistration<UserStatsCell, AnyHashable> { [unowned self] cell, _, _ in
       guard let userprofile = self.userprofile else { return }
       
+      cell.userprofile = userprofile
+      cell.insets = UIEdgeInsets(top: padding*2, left: padding*2, bottom: padding*2, right: padding*2)
       cell.color = self.color
       self.colorPublisher
         .filter { !$0.isNil }
@@ -264,7 +267,6 @@ private extension UserprofileCollectionView {
       config.backgroundColor = .clear
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
-      cell.userprofile = userprofile
     }
     
     source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in

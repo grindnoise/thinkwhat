@@ -9,66 +9,87 @@
 import Foundation
 
 class Cities {
-    static let shared = Cities()
-    private init() {}
-    var all: [City] = []
-    
-    public func eraseData() {
-        all.removeAll()
-    }
+  static let shared = Cities()
+  private init() {}
+  var all: [City] = []
+  
+  public func eraseData() { all.removeAll() }
+  
+  subscript(id: Int) -> City? {
+    return all.filter({ $0.geonameId == id }).first
+  }
 }
 
 class City: Decodable {
-    private enum CodingKeys: String, CodingKey {
-        case id, name, countryName, geonames, geonameId, localized,
-             geoname_ID  = "geoname_id",
-             regionID   = "region_id",
-             countryID  = "country_id",
-             regionName  = "adminName1"
+  class func initFromGeonamesObject(_ object: GeonamesObject) -> City {
+    guard let existing = Cities.shared.all.filter({ $0.geonameId == object.geonameID }).first else {
+      return City(object)
     }
-    var id: Int?
-    var name: String
-    var localized: String?
-    var geonameID: Int
-    var countryID: Int?
-    var regionID: Int?
-    var countryName: String?
-    var regionName: String?
     
-    required init(from decoder: Decoder) throws {
-        do {
-            let container   = try decoder.container(keyedBy: CodingKeys.self)
-            id              = try container.decodeIfPresent(Int.self, forKey: .id)
-            name            = try container.decode(String.self, forKey: .name)
-            if let geonameId = try container.decodeIfPresent(Int.self, forKey: .geonameId) {
-                geonameID = geonameId
-            } else if let _geoname_ID = try container.decodeIfPresent(Int.self, forKey: .geoname_ID) {
-                geonameID = _geoname_ID
-            } else {
-                throw "geonameID not found"
-            }
-            localized       = try container.decodeIfPresent(String.self, forKey: .localized)
-            countryID       = try container.decodeIfPresent(Int.self, forKey: .countryID)
-            regionID        = try container.decodeIfPresent(Int.self, forKey: .regionID)
-            countryName     = try container.decodeIfPresent(String.self, forKey: .countryName)
-            regionName      = try container.decodeIfPresent(String.self, forKey: .regionName)
-            if Cities.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
-                Cities.shared.all.append(self)
-            }
-        } catch {
-//            print(error)
-            throw error
-        }
+//    existing.geonamesObject = object
+    return existing
+  }
+  
+  private enum CodingKeys: String, CodingKey {
+    case id, name, countryName = "country_name", geonames, regionName = "region_name", localizedName = "localized_name", geonameId = "geoname_id", countryCode = "country_code"
+  }
+  //    var id: Int?
+  var name: String
+  var localizedName: String
+  var geonameId: Int
+  //    var countryID: Int?
+  //    var regionID: Int?
+  var countryName: String
+  var countryCode: String
+  var regionName: String
+//  var geonamesObject: GeonamesObject?
+  
+  deinit {
+    print(self)
+  }
+  
+  required init(from decoder: Decoder) throws {
+    do {
+      let container   = try decoder.container(keyedBy: CodingKeys.self)
+      name            = try container.decode(String.self, forKey: .name)
+      geonameId       = try container.decode(Int.self, forKey: .geonameId)
+      localizedName   = try container.decode(String.self, forKey: .localizedName)
+      countryName     = try container.decode(String.self, forKey: .countryName)
+      countryCode     = try container.decode(String.self, forKey: .countryCode)
+      regionName      = try container.decode(String.self, forKey: .regionName)
+      if Cities.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
+        Cities.shared.all.append(self)
+      }
+    } catch {
+#if DEBUG
+      error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      throw error
     }
+  }
+  
+  
+  init(_ geonamesObject: GeonamesObject)  {
+    name            = geonamesObject.name
+    geonameId       = geonamesObject.geonameID
+    localizedName   = geonamesObject.name
+    countryName     = geonamesObject.countryName
+    countryCode     = geonamesObject.countryCode
+    regionName      = geonamesObject.regionName
+//    self.geonamesObject  = geonamesObject
+    if Cities.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
+      Cities.shared.all.append(self)
+    }
+  }
 }
 
 extension City: Hashable {
-    static func == (lhs: City, rhs: City) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(geonameID)
-        hasher.combine(name)
-    }
+  static func == (lhs: City, rhs: City) -> Bool {
+    return lhs.hashValue == rhs.hashValue
+  }
+  
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(geonameId)
+    hasher.combine(name)
+  }
 }

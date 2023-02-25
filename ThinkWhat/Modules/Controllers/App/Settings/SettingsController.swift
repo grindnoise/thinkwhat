@@ -429,8 +429,8 @@ extension SettingsController: SettingsViewInput {
     controllerInput?.updateUserprofile(parameters: parameters, image: nil)
   }
   
-  func onCitySearch(_ instance: String) {
-    controllerInput?.fetchCity(instance)
+  func fetchCity(userprofile: Userprofile, string: String) {
+    controllerInput?.fetchCity(userprofile: userprofile, string: string)
   }
   
   func openCamera() {
@@ -459,13 +459,13 @@ extension SettingsController: SettingsViewInput {
   }
   
   func updateCity(_ instance: City) {
-    controllerInput?.saveCity(instance) { [weak self] _ in
-      Userprofiles.shared.current?.city = instance
+    controllerInput?.saveCity(instance) { _ in  }//Userprofiles.shared.current?.city = instance }//[weak self] _ in
+//      Userprofiles.shared.current?.city = instance
       //            guard let self = self else { return }
       //
       //            let parameters = API.prepareUserData(city: instance)
       //            self.controllerInput?.updateUserprofile(parameters: parameters, image: nil)
-    }
+//    }
   }
   
   func onSocialTapped(_ url: URL) {
@@ -482,6 +482,10 @@ extension SettingsController: SettingsViewInput {
     config.entersReaderIfAvailable = true
     vc = SFSafariViewController(url: url, configuration: config)
     present(vc, animated: true)
+    
+    guard let main = tabBarController as? MainController else { return }
+    
+    main.toggleLogo(on: false)
   }
 }
 

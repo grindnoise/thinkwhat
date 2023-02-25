@@ -84,26 +84,14 @@ class UserSettingsInterestsCell: UICollectionViewListCell {
     
     // MARK: - Private methods
     private func setupUI() {
-        contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
-        clipsToBounds = false
-        
-        contentView.addSubview(collectionView)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: topAnchor),
-            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            collectionView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding*2),
-            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding*2),
-            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-        ])
+      contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
+      clipsToBounds = false
+      
+      collectionView.place(inside: self,
+                           insets: .init(top: padding*2, left: padding, bottom: padding*2, right: padding))
     }
-    
-    private func setTasks() {
+  
+  private func setTasks() {
 //        tasks.append( Task {@MainActor [weak self] in
 //            for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.FacebookURL) {
 //                guard let self = self,

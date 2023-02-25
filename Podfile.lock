@@ -17,6 +17,7 @@ PODS:
     - FBSDKCoreKit (= 12.3.1)
   - FBSDKShareKit (12.3.1):
     - FBSDKCoreKit (= 12.3.1)
+  - FlagKit (2.2)
   - GoogleSignIn (6.1.0):
     - AppAuth (~> 1.4)
     - GTMAppAuth (~> 1.0)
@@ -53,6 +54,7 @@ DEPENDENCIES:
   - FBSDKCoreKit
   - FBSDKLoginKit
   - FBSDKShareKit
+  - FlagKit
   - GoogleSignIn
   - L10n-swift (~> 5.10)
   - Nimble
@@ -75,6 +77,7 @@ SPEC REPOS:
     - FBSDKCoreKit_Basics
     - FBSDKLoginKit
     - FBSDKShareKit
+    - FlagKit
     - GoogleSignIn
     - GTMAppAuth
     - GTMSessionFetcher
@@ -99,6 +102,7 @@ SPEC CHECKSUMS:
   FBSDKCoreKit_Basics: b832439de7a8262ee17495889264e75785af54de
   FBSDKLoginKit: 4adb764028103621b48dfd601b08b03fe2114cdf
   FBSDKShareKit: c09900fc885130c009194ef35992cbdcad47fe27
+  FlagKit: eca7dc89064b0c986302ba9acefad1bf80a435b1
   GoogleSignIn: c90b5bec45e780f54c6a8e1e3c182a86e3dda69d
   GTMAppAuth: ad5c2b70b9a8689e1a04033c9369c4915bfcbe89
   GTMSessionFetcher: 43748f93435c2aa068b1cbe39655aaf600652e91
@@ -114,6 +118,6 @@ SPEC CHECKSUMS:
   UIView-Shimmer: ff0a32c73d67c7dbdea3d9e530538b10d18aea56
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: 7480b3e93c319df942021abc5ba81d7a2a3b94b9
+PODFILE CHECKSUM: 0789c1488386ca3d52b6b4a4fd64be8b0f7eaad5
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

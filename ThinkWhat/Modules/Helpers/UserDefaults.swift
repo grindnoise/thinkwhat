@@ -30,12 +30,15 @@ extension UserDefaults {
     @UserDefault(key: "email", defaultValue: nil)
     static var email: String?
     
-    @UserDefault(key: "city", defaultValue: "")
-    static var city: String {
-      didSet {
-        print(city)
-      }
-    }
+//    @UserDefault(key: "city", defaultValue: "")
+//    static var city: String {
+//      didSet {
+//        print(city)
+//      }
+//    }
+    
+    @UserDefault(key: "cityId", defaultValue: nil)
+    static var cityId: Int?
     
     @UserDefault(key: "image_path", defaultValue: nil)
     static var imagePath: String?
@@ -98,8 +101,8 @@ extension UserDefaults {
       UserDefaults.Profile.id             = nil
       UserDefaults.Profile.firstName      = nil
       UserDefaults.Profile.lastName       = nil
-      UserDefaults.Profile.city           = ""
-      
+//      UserDefaults.Profile.city           = ""
+      UserDefaults.Profile.cityId         = nil
       //            UserDefaults.Profile.username       = nil
       UserDefaults.Profile.email          = nil
       UserDefaults.Profile.birthDate      = nil
@@ -150,7 +153,8 @@ extension UserDefaults {
       UserDefaults.Profile.firstName      = profile.firstName
       UserDefaults.Profile.lastName       = profile.lastName
       UserDefaults.Profile.email          = profile.email
-      UserDefaults.Profile.city           = profile.cityTitle
+//      UserDefaults.Profile.city           = profile.cityTitle
+      UserDefaults.Profile.cityId         = profile.cityId
       UserDefaults.Profile.birthDate      = profile.birthDate
       //            UserDefaults.Profile.username       = profile.username
       UserDefaults.Profile.gender         = profile.gender

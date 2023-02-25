@@ -29,9 +29,7 @@ class SurveysController: UIViewController, TintColorable {
   public private(set) var compatibility: TopicCompatibility?
   public private(set) var mode: Survey.SurveyCategory {
     didSet {
-      print("mode", mode)
       controllerOutput?.setMode(mode)
-//      controllerOutput?.toggleSearchMode(mode == .Search ? true : false)
     }
   }
   //UI
@@ -52,6 +50,15 @@ class SurveysController: UIViewController, TintColorable {
       guard oldValue != barMode else { return }
       
       onBarModeChanged()
+      
+      guard barMode == .Search else { return }
+      
+      if initialMode == .Topic,
+         let topic = topic {
+        searchField.placeholder = "search_topic".localized + " \"\(topic.title)\""
+      } else {
+        searchField.placeholder = "search".localized
+      }
     }
   }
   private var willMoveToParent = false
@@ -644,7 +651,7 @@ private extension SurveysController {
       }
       
       button = UIBarButtonItem(title: "",
-                               image: UIImage(systemName: "arrow.left",
+                               image: UIImage(systemName: "xmark",
                                               withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                primaryAction: action,
                                menu: nil)

@@ -441,7 +441,7 @@ private extension UserSettingsCredentialsCell {
       verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
     ])
     
-    let constraint = verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
+    let constraint = verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding*2)
     constraint.priority = .defaultLow
     constraint.identifier = "bottomAnchor"
     constraint.isActive = true

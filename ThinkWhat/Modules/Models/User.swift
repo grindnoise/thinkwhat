@@ -36,8 +36,8 @@ class Userprofiles {
     }
   }
   
-  class func loadUserData(_ json: JSON) throws {
-    guard let userprofile = Userprofiles.shared.current,
+  class func updateUserData(_ json: JSON) throws {
+    guard !Userprofiles.shared.current.isNil,
           let subscribersTotal = json["subscribers_count"].int,
           let subscriptionsTotal = json["subscribed_at_count"].int,
           let publicationsTotal = json["own_surveys_count"].int,
@@ -48,39 +48,37 @@ class Userprofiles {
 //            let commentsReceivedTotal = json["comments_received_count"].int,
           let balance = json["balance"].int,
           let top_preferences = json["top_preferences"] as? JSON,
+//          let city = try json["city"].rawData() as? Data,
           let isBanned = json["is_banned"].bool,
           let locales = json["locales"].arrayObject as? [String]
     else { return }
     
-    
-    userprofile.subscribersTotal = subscribersTotal
-    userprofile.subscriptionsTotal = subscriptionsTotal
-    userprofile.publicationsTotal = publicationsTotal
-    userprofile.favoritesTotal = favoritesTotal
-    userprofile.completeTotal = completeTotal
-    userprofile.balance = balance
-    userprofile.isBanned = isBanned
-    userprofile.updatePreferences(top_preferences)
+    Userprofiles.shared.current!.subscribersTotal = subscribersTotal
+    Userprofiles.shared.current!.subscriptionsTotal = subscriptionsTotal
+    Userprofiles.shared.current!.publicationsTotal = publicationsTotal
+    Userprofiles.shared.current!.favoritesTotal = favoritesTotal
+    Userprofiles.shared.current!.completeTotal = completeTotal
+    Userprofiles.shared.current!.balance = balance
+    Userprofiles.shared.current!.isBanned = isBanned
+    Userprofiles.shared.current!.updatePreferences(top_preferences)
     UserDefaults.App.contentLanguages = locales
-    //        locales.forEach {
-    //            userprofile.contentLocales.append($0)
-    //        }
-    
+  
+    var decoder: JSONDecoder!
     guard let subscriptionsData = try? json["subscriptions"].rawData(),
           let subscribersData = try? json["subscribers"].rawData()
     else { return }
     
     do {
-      let decoder = JSONDecoder()
-      decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                 DateFormatter.dateTimeFormatter,
-                                                 DateFormatter.dateFormatter ]
-      
-      userprofile.subscriptions = try decoder.decode([Userprofile].self, from: subscriptionsData)
-      userprofile.subscribers = try decoder.decode([Userprofile].self, from: subscribersData)
+      decoder = JSONDecoder.withDateTimeDecodingStrategyFormatters()
+      Userprofiles.shared.current!.subscriptions = try decoder.decode([Userprofile].self, from: subscriptionsData)
+      Userprofiles.shared.current!.subscribers = try decoder.decode([Userprofile].self, from: subscribersData)
     } catch {
       throw AppError.server
     }
+    
+    guard let city = try json["city"].rawData() as? Data else { return }
+    
+    Userprofiles.shared.current!.city = try decoder.decode(City.self, from: city)
   }
   
   //    func loadSubscribedFor(_ data: Data) {
@@ -137,30 +135,30 @@ class Userprofile: Decodable {
   
   private enum CodingKeys: String, CodingKey {
     case id, age, gender, email, username, city, description,
-         isBanned = "is_banned",
-         birthDate = "birth_date",
-         firstName = "first_name",
-         dateJoined = "date_joined",
-         lastName = "last_name",
-         imageURL = "image",
-         instagramURL = "instagram_url",
-         tiktokURL = "tiktok_url",
-         vkURL = "vk_url",
-         facebookURL = "facebook_url",
-         completeTotal = "completed_surveys_count",
-         votesReceivedTotal = "votes_received_count",
-         commentsTotal = "comments_count",
-         commentsReceivedTotal = "comments_received_count",
-         favoritesTotal = "favorite_surveys_count",
-         publicationsTotal = "own_surveys_count",
-         subscribersTotal = "subscribers_count",
-         subscriptionsTotal = "subscribed_at_count",
-         lastVisit = "last_visit",
+         isBanned                 = "is_banned",
+         birthDate                = "birth_date",
+         firstName                = "first_name",
+         dateJoined               = "date_joined",
+         lastName                 = "last_name",
+         imageURL                 = "image",
+         instagramURL             = "instagram_url",
+         tiktokURL                = "tiktok_url",
+         vkURL                    = "vk_url",
+         facebookURL              = "facebook_url",
+         completeTotal            = "completed_surveys_count",
+         votesReceivedTotal       = "votes_received_count",
+         commentsTotal            = "comments_count",
+         commentsReceivedTotal    = "comments_received_count",
+         favoritesTotal           = "favorite_surveys_count",
+         publicationsTotal        = "own_surveys_count",
+         subscribersTotal         = "subscribers_count",
+         subscriptionsTotal       = "subscribed_at_count",
+         lastVisit                = "last_visit",
          topPublicationCategories = "top_pub_categories",
-         wasEdited = "is_edited",
-         balance = "credit",
-         subscribedAt = "subscribed_at",
-         notifyOnPublication = "notify_on_publication"
+         wasEdited                = "is_edited",
+         balance                  = "credit",
+         subscribedAt             = "subscribed_at",
+         notifyOnPublication      = "notify_on_publication"
   }
   enum UserSurveyType {
     case Own, Favorite
@@ -244,25 +242,32 @@ class Userprofile: Decodable {
   }
   var vkURL: URL?
   var city: City? {
+//    willSet {
+//      print(newValue)
+//    }
     didSet {
       guard let city = city else { return }
       
-      guard let localized = city.localized else { return }
-      
-      guard !(localized.isEmpty ? city.name : localized).isEmpty else { return }
-      cityTitle = localized.isEmpty ? city.name : localized
+      cityTitle = city.localizedName.isEmpty ? city.name : city.localizedName
     }
   }
-  var cityTitle: String = "" {
+  var cityId: Int = 0 {
     didSet {
-      guard oldValue != cityTitle else { return }
-      if self == Userprofiles.shared.current,
-         !cityTitle.isEmpty,
-         UserDefaults.Profile.city != cityTitle {
-        UserDefaults.Profile.city = cityTitle
-      }
+      guard isCurrent else { return }
+      
+      UserDefaults.Profile.cityId = cityId
     }
   }
+  var cityTitle: String = "" //{
+//    didSet {
+//      guard oldValue != cityTitle else { return }
+//      if self == Userprofiles.shared.current,
+//         !cityTitle.isEmpty,
+//         UserDefaults.Profile.city != cityTitle {
+//        UserDefaults.Profile.city = cityTitle
+//      }
+//    }
+//  }
   var compatibility: UserCompatibility? {
     didSet {
       guard let compatibility = compatibility else { return }
@@ -273,6 +278,7 @@ class Userprofile: Decodable {
   
   //Publishers
   public let imagePublisher = PassthroughSubject<UIImage, Error>()
+  public let cityFetchPublisher = PassthroughSubject<[City], Error>()
   public let compatibilityPublisher = PassthroughSubject<UserCompatibility, Error>()
   public let subscribersAppendPublisher = PassthroughSubject<[Userprofile], Never>()
   public let subscribersRemovePublisher = PassthroughSubject<[Userprofile], Never>()
@@ -534,15 +540,8 @@ class Userprofile: Decodable {
     imageURL    = UserDefaults.Profile.imageURL
     if let path = UserDefaults.Profile.imagePath, let _image = UIImage(contentsOfFile: path) {
       image = _image
-    } else {
-      if let url = imageURL {
-        Task {
-          image = try await API.shared.system.downloadImageAsync(from: url)
-          //                    await MainActor.run { image = data }
-        }
-      }
-    }
-    cityTitle       = UserDefaults.Profile.city
+    } else if let url = imageURL {  Task { image = try await API.shared.system.downloadImageAsync(from: url) } }
+//    cityTitle       = UserDefaults.Profile.city
     birthDate       = UserDefaults.Profile.birthDate
     instagramURL    = UserDefaults.Profile.instagramURL
     tiktokURL       = UserDefaults.Profile.tiktokURL
@@ -584,18 +583,33 @@ class Userprofile: Decodable {
       notifyOnPublication = try container.decodeIfPresent(Bool.self, forKey: .notifyOnPublication)
       gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
       ///City decoding
-      if let cityInstance = try? container.decodeIfPresent(City.self, forKey: .city) {
-        city = Cities.shared.all.filter({ $0 == cityInstance }).first ?? cityInstance
-        cityTitle = city!.localized ?? city!.name
+      if !isCurrent, let decodedCity = try? container.decodeIfPresent(City.self, forKey: .city) {
+        let cityInstance = Cities.shared.all.filter({ $0 == decodedCity }).first ?? decodedCity
+        city = cityInstance
+        cityTitle = cityInstance.localizedName.isEmpty ? cityInstance.name : cityInstance.localizedName
       }
       //            topPublicationCategories.removeAll()
-      if let topics = try container.decodeIfPresent([String: Int].self, forKey: .topPublicationCategories), topics != nil, !topics.isEmpty {
-        preferences = []
-        topics.forEach { dict in
-          if let topic = Topics.shared.all.filter({ $0.id == Int(dict.key) }).first {
-            preferences.append([topic: dict.value])
+      if let topics = try container.decodeIfPresent([String: Int].self, forKey: .topPublicationCategories) {
+        preferences = topics.map { (key, value) -> [Topic: Int] in
+          if let id = Int(key), let topic = Topics.shared[id] {
+            return [topic: value]
           }
+          return [:]
         }
+//      }
+//        preferences = topics.reduce(into: [Topic: Int]) { result, dict  in
+//          guard let topic = Topics.shared.all.filter({ $0.id == Int(dict.key) }).first else { return }
+//
+//
+//            preferences.append([topic: dict.value])
+//          }
+//        }
+//        preferences = []
+//        topics.forEach { dict in
+//          if let topic = Topics.shared.all.filter({ $0.id == Int(dict.key) }).first {
+//            preferences.append([topic: dict.value])
+//          }
+//        }
       }
       
       //Update current
@@ -610,8 +624,8 @@ class Userprofile: Decodable {
       Userprofiles.shared.current?.lastName = lastName
       Userprofiles.shared.current?.birthDate = birthDate
       Userprofiles.shared.current?.gender = gender
-      Userprofiles.shared.current?.city = city
-      Userprofiles.shared.current?.cityTitle = cityTitle
+//      Userprofiles.shared.current?.city = city
+//      Userprofiles.shared.current?.cityTitle = cityTitle
       Userprofiles.shared.current?.facebookURL = facebookURL
       Userprofiles.shared.current?.instagramURL = instagramURL
       Userprofiles.shared.current?.tiktokURL = tiktokURL

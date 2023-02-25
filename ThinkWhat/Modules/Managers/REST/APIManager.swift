@@ -684,6 +684,7 @@ class API {
     }
     
     ///Return city `id`
+    @discardableResult
     public func saveCity(_ parameters: Parameters) async throws -> City {
       guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CREATE_CITY) else {
         throw APIError.notFound
@@ -700,7 +701,6 @@ class API {
                                                    DateFormatter.dateTimeFormatter,
                                                    DateFormatter.dateFormatter ]
         return try decoder.decode(City.self, from: data)
-        //            guard let id = try JSON(data: data, options: .mutableContainers)["id"].int else { throw "City id error" }
       } catch let error {
         throw error
       }
@@ -1013,11 +1013,15 @@ class API {
       guard let url = API_URLS.Profiles.updateCurrentStats else { throw APIError.invalidURL }
       
       do {
-        let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: parent.headers())
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .get,
+                                                 parameters: nil,
+                                                 encoding: URLEncoding.default,
+                                                 headers: parent.headers())
         
         let json = try JSON(data: data, options: .mutableContainers)
         
-        try Userprofiles.loadUserData(json)
+        try Userprofiles.updateUserData(json)
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)

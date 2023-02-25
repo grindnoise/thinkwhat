@@ -127,7 +127,7 @@ enum AuthProvider: String {
 }
 
 enum SocialMedia: String {
-    case VK, Facebook, TikTok, Instagram
+    case VK, Facebook, TikTok, Instagram, Twitter
 }
 
 enum ThirdPartyApp: String {

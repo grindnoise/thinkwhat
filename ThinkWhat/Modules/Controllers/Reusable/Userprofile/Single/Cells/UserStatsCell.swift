@@ -11,6 +11,10 @@ import Combine
 
 class UserStatsCell: UICollectionViewListCell {
   
+  enum Mode {
+    case Userprofile, Settings
+  }
+  
   // MARK: - Public properties
   public weak var userprofile: Userprofile! {
     didSet {
@@ -23,10 +27,26 @@ class UserStatsCell: UICollectionViewListCell {
   public let publicationsPublisher = PassthroughSubject<Userprofile, Never>()
   public let commentsPublisher = PassthroughSubject<Userprofile, Never>()
   public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
+  ///`Logic`
+  public var mode: Mode = .Userprofile {
+    didSet {
+      collectionView.mode = mode
+    }
+  }
   ///`UI`
   public var color: UIColor = .label {
     didSet {
       collectionView.color = color
+    }
+  }
+  public var padding: CGFloat = 8 {
+    didSet {
+      updateUI()
+    }
+  }
+  public var insets: UIEdgeInsets? {
+    didSet {
+      updateUI()
     }
   }
   
@@ -36,8 +56,7 @@ class UserStatsCell: UICollectionViewListCell {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
-  private let padding: CGFloat = 16
+  ///`UI`
   private lazy var background: UIView = {
     let instance = UIView()
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
@@ -47,7 +66,7 @@ class UserStatsCell: UICollectionViewListCell {
       }
       .store(in: &subscriptions)
     stack.place(inside: instance,
-                insets: .uniform(size: padding),
+                insets: .uniform(size: padding*2),
                 bottomPriority: .defaultLow)
     
     return instance
@@ -185,7 +204,20 @@ private extension UserStatsCell {
     clipsToBounds = true
     
     background.place(inside: self,
-                     insets: UIEdgeInsets(top: padding, left: padding, bottom: 0, right: padding))
+                     insets: UIEdgeInsets(top: padding*2, left: padding, bottom: padding*2, right: padding))
+  }
+  
+  @MainActor
+  func updateUI() {
+    background.removeFromSuperview()
+
+    guard let insets = insets else {
+      background.place(inside: self,
+                       insets: .uniform(size: padding))
+      return
+    }
+    background.place(inside: self,
+                     insets: insets)
   }
 }
 

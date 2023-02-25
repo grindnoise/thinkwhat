@@ -12,6 +12,7 @@ target 'ThinkWhat' do
     pod 'FBSDKLoginKit'
     pod 'L10n-swift', '~> 5.10'
     pod "Agrume"
+    pod "FlagKit"
     pod 'FBSDKShareKit'
     pod 'Swinject', '2.7.1'
     pod 'Alamofire', '~> 5.5'
