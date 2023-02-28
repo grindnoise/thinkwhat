@@ -62,13 +62,15 @@ extension SurveysModel: SurveysControllerInput {
   func onDataSourceRequest(source: Survey.SurveyCategory,
                            dateFilter: Period?,
                            topic: Topic?,
-                           userprofile: Userprofile?) {
+                           userprofile: Userprofile?,
+                           compatibility: TopicCompatibility?) {
     Task {
       do {
         try await API.shared.surveys.surveyReferences(category: source,
                                                       dateFilter: dateFilter,
                                                       topic: topic,
-                                                      userprofile: userprofile)
+                                                      userprofile: userprofile,
+                                                      compatibility: compatibility)
         await MainActor.run {
           modelOutput?.onRequestCompleted(.success(true))
         }

@@ -569,7 +569,7 @@ private extension UserSettingsStatsCell {
         } else if sender === subscriptionsView {
             subscriptionsPublisher.send(true)
         } else if sender === balanceView {
-            let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
+            let banner = Popup(heightScaleFactor: 0.5)
             banner.present(content: PopupContent(parent: banner,
                                                  systemImage: "lightbulb.circle.fill",
                                                  text: "balance_help".localized,

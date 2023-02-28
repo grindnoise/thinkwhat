@@ -17,8 +17,6 @@ class AccountManagementCell: UICollectionViewListCell {
   }
   
   // MARK: - Public properties
-  ///`Publishers`
-  public let tapPublisher = PassthroughSubject<Mode, Never>()
   ///`Logic`
   public var mode: Mode = .Logout {
     didSet {
@@ -47,6 +45,7 @@ class AccountManagementCell: UICollectionViewListCell {
       var config = UIButton.Configuration.plain()
       config.contentInsets.top = 0
       config.contentInsets.bottom = 0
+      config.contentInsets.leading = 0
       config.imagePlacement = .trailing
       config.imagePadding = 8.0
       config.buttonSize = .large
@@ -55,13 +54,36 @@ class AccountManagementCell: UICollectionViewListCell {
     } else {
       instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : .label
       instance.imageEdgeInsets.left = 8
-      instance.contentEdgeInsets.top = 8
-      instance.contentEdgeInsets.bottom = 8
+      instance.contentEdgeInsets.top = 0
+      instance.contentEdgeInsets.bottom = 0
+      instance.contentEdgeInsets.left = 0
       instance.semanticContentAttribute = .forceRightToLeft
     }
     
     return instance
   }()
+  private lazy var imageView: UIImageView = {
+    let instance = UIImageView()
+    instance.contentMode = .left
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+    
+    return instance
+  }()
+  private lazy var stack: UIStackView = {
+    let opaque = UIView.opaque()
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 1/1).isActive = true
+    imageView.placeInCenter(of: opaque)
+    
+    let instance = UIStackView(arrangedSubviews: [
+      button,
+      UIView.opaque(),
+      opaque
+    ])
+    instance.axis = .horizontal
+    
+    return instance
+  }()
+  
   
   
   // MARK: - Destructor
@@ -112,20 +134,22 @@ private extension AccountManagementCell {
     backgroundColor = .clear
     clipsToBounds = true
     
-    button.placeInCenter(of: self)
+    stack.place(inside: self)
   }
   
   @MainActor
   func updateUI() {
-    guard let image = UIImage(systemName: (mode == .Logout ? "rectangle.portrait.and.arrow.forward" : "trash"), withConfiguration: UIImage.SymbolConfiguration(scale: .medium)) else { return }
+    guard let image = UIImage(systemName: (mode == .Logout ? "rectangle.portrait.and.arrow.forward" : "trash")) else { return }
     
-    let string = (mode == .Logout ? "logout" : "delete_account").localized.uppercased()
+    let string = (mode == .Logout ? "logout" : "delete_account").localized
     let color: UIColor = mode == .Logout ? .label : .systemRed
+    imageView.tintColor = color
+    imageView.image = image
     
     if #available(iOS 15, *) {
       let attrString = AttributedString(string,
                                         attributes: AttributeContainer([
-                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline) as Any,
+                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
                                           .foregroundColor: color
                                         ]))
       button.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
@@ -134,22 +158,36 @@ private extension AccountManagementCell {
         return outgoing
       }
       button.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in color }
-      button.configuration?.image = image
+//      button.configuration?.image = image
       button.configuration?.attributedTitle = attrString
     } else {
       let attrString = NSMutableAttributedString(string: string,
                                                  attributes: [
-                                                  .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline) as Any,
+                                                  .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
                                                   .foregroundColor: color
                                                  ])
-      button.setImage(image, for: .normal)
+//      button.setImage(image, for: .normal)
       button.setAttributedTitle(attrString, for: .normal)
-      button.imageView?.tintColor = color
+//      button.imageView?.tintColor = color
     }
   }
   
   @objc
   func handleTap() {
-    tapPublisher.send(mode)
+    let banner = NewPopup(padding: padding*2,
+                          contentPadding: .uniform(size: padding*2))
+    let content = AccountManagementPopupContent(mode: mode,
+                                               color: mode == .Logout ? .systemBlue : .systemRed)
+    content.actionPublisher
+      .sink {
+        print($0)
+        banner.dismiss()
+      }
+      .store(in: &banner.subscriptions)
+    
+    banner.setContent(content)
+    banner.didDisappearPublisher
+      .sink { _ in banner.removeFromSuperview() }
+      .store(in: &self.subscriptions)
   }
 }

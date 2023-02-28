@@ -78,8 +78,10 @@ class SurveysCollectionView: UICollectionView {
   public let paginationByOwnerPublisher = PassthroughSubject<[Userprofile: Period], Never>()
   public let paginationByOwnerSearchPublisher = PassthroughSubject<[Userprofile: [SurveyReference]], Never>()
   public let paginationByTopicSearchPublisher = PassthroughSubject<[Topic: [SurveyReference]], Never>()
+  public let paginationByCompatibilityPublisher = PassthroughSubject<TopicCompatibility, Never>()
   public let refreshPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
   public let refreshByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
+  public let refreshByCompatibilityPublisher = PassthroughSubject<TopicCompatibility, Never>()
   public let refreshByOwnerPublisher = PassthroughSubject<[Userprofile: Period], Never>()
   public var rowPublisher = CurrentValueSubject<SurveyReference?, Never>(nil)
   public var updateStatsPublisher = CurrentValueSubject<[SurveyReference]?, Never>(nil)
@@ -233,67 +235,52 @@ class SurveysCollectionView: UICollectionView {
   init(category: Survey.SurveyCategory,
        color: UIColor? = nil) {
     self.category = category
+    self.color = color ?? .secondaryLabel
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
     setupUI()
     setTasks()
-    
-    guard let color = color else { return }
-    
-    self.color = color
-    setColors()
   }
   
   init(topic: Topic,
        color: UIColor? = nil) {
     self.topic = topic
     self.category = .Topic
+    if let color = color {
+      self.color = color
+    } else {
+      self.color = topic.tagColor
+    }
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
     setupUI()
     setTasks()
-    
-    guard let color = color else {
-      self.color = topic.tagColor
-      
-      return
-    }
-    self.color = color
-    setColors()
   }
   
   init(items: [SurveyReference],
        color: UIColor? = nil) {
     self.fetchResult = items
     self.category = .Search
+    self.color = color ?? .secondaryLabel
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
     setupUI()
     setTasks()
-    
-    guard let color = color else { return }
-    
-    self.color = color
-    setColors()
   }
   
   init(compatibility: TopicCompatibility,
        color: UIColor? = nil) {
     self.compatibility = compatibility
     self.category = .Compatibility
+    self.color = color ?? .secondaryLabel
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
     setupUI()
     setTasks()
-    
-    guard let color = color else { return }
-    
-    self.color = color
-    setColors()
   }
   
   init(userprofile: Userprofile,
@@ -301,16 +288,12 @@ class SurveysCollectionView: UICollectionView {
        color: UIColor? = nil) {
     self.userprofile = userprofile
     self.category = category
+    self.color = color ?? .secondaryLabel
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
     setupUI()
     setTasks()
-    
-    guard let color = color else { return }
-    
-    self.color = color
-    setColors()
   }
   
   // MARK: - Public methods
@@ -425,7 +408,7 @@ private extension SurveysCollectionView {
     delegate = self
     
     setRefreshControl()
-    setColors()
+//    setColors()
     
     collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
       var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
@@ -989,19 +972,22 @@ private extension SurveysCollectionView {
       //      loadingIndicator.stopAnimating()
     } else {
       refreshControl = UIRefreshControl()
+      refreshControl?.tintColor = color
       refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
     }
   }
   
-  @MainActor
-  func setColors() {
-//    refreshControl?.tintColor = color
-  }
+//  @MainActor
+//  func setColors() {
+////    refreshControl?.tintColor = color
+//  }
   
   @objc
   func refresh() {
     if category == .Topic, let topic = topic {
       refreshByTopicPublisher.send([topic: period])
+    } else if category == .Compatibility, let compatibility = compatibility {
+      refreshByCompatibilityPublisher.send(compatibility)
     } else if category == .ByOwner, let userprofile = userprofile {
       refreshByOwnerPublisher.send([userprofile: period])
     } else {
@@ -1020,6 +1006,8 @@ private extension SurveysCollectionView {
       paginationByOwnerSearchPublisher.send([userprofile: source.snapshot().itemIdentifiers])
     } else if category == .Search, let topic = topic {
       paginationByTopicSearchPublisher.send([topic: source.snapshot().itemIdentifiers])
+    } else if category == .Compatibility, let compatibility = compatibility {
+      paginationByCompatibilityPublisher.send(compatibility)
     } else {
       //      isLoading = true
       paginationPublisher.send([category: period])

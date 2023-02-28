@@ -50,9 +50,11 @@ class Userprofiles {
           let top_preferences = json["top_preferences"] as? JSON,
 //          let city = try json["city"].rawData() as? Data,
           let isBanned = json["is_banned"].bool,
-          let locales = json["locales"].arrayObject as? [String]
+          let locales = json["locales"].arrayObject as? [String],
+          let description = json["description"].string
     else { return }
     
+    Userprofiles.shared.current!.description = description
     Userprofiles.shared.current!.subscribersTotal = subscribersTotal
     Userprofiles.shared.current!.subscriptionsTotal = subscriptionsTotal
     Userprofiles.shared.current!.publicationsTotal = publicationsTotal

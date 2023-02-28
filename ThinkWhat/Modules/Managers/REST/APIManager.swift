@@ -70,6 +70,7 @@ class API {
   class func prepareUserData(firstName: String? = nil,
                              lastName: String? = nil,
                              email: String? = nil,
+                             description: String? = nil,
                              gender: Gender? = nil,
                              birthDate: String? = nil,
                              city: City? = nil,
@@ -104,6 +105,9 @@ class API {
       //            parameters["owner.\(DjangoVariables.User.email)"] = email!
     }
     
+    if !description.isNil {
+      parameters[DjangoVariables.UserProfile.description] = description!
+    }
     if !gender.isNil {
       parameters[DjangoVariables.UserProfile.gender] = gender!.rawValue
     }
@@ -1237,7 +1241,7 @@ class API {
         let existingSet = Set(Set(category.dataItems(compatibility: compatibility).map { $0.id }))
         let difference = fullSet.symmetricDifference(existingSet)
         
-        parameters = ["ids": difference]
+        parameters = ["ids": Array(difference)]
       } else if category == .Search {
         parameters = ["exclude_ids": fetchResult.map { $0.id }]
       } else {

@@ -351,7 +351,7 @@ private extension SubscriptionsController {
       }
       
       let leftButton = UIBarButtonItem(title: "actions".localized.capitalized,
-                                       image: UIImage(systemName: "arrow.left", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                       image: UIImage(systemName: "chevron.left", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                        primaryAction: action,
                                        menu: nil)
       

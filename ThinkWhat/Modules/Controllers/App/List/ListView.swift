@@ -121,12 +121,11 @@ class ListView: UIView {
     instance.titleLabel?.numberOfLines = 1
     instance.showsMenuAsPrimaryAction = true
     instance.menu = prepareMenu()
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-
+    instance.imageView?.tintColor = .white
+    instance.imageEdgeInsets.left = 4
+    instance.semanticContentAttribute = .forceRightToLeft
+    instance.setImage(UIImage(systemName: ("calendar")), for: .normal)
+    
     return instance
   }()
   private lazy var collectionView: SurveysCollectionView = {

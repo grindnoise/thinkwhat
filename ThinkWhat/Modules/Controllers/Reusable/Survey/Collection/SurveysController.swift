@@ -53,9 +53,8 @@ class SurveysController: UIViewController, TintColorable {
       
       guard barMode == .Search else { return }
       
-      if initialMode == .Topic,
-         let topic = topic {
-        searchField.placeholder = "search_topic".localized + " \"\(topic.title)\""
+      if initialMode == .Topic, let topic = topic {
+        searchField.placeholder = "search_topic".localized + " \"\(topic.title)" + "\(topic.isOther ? "/" + topic.parent!.title : "")\""
       } else {
         searchField.placeholder = "search".localized
       }
@@ -431,6 +430,7 @@ extension SurveysController: SurveysViewInput {
                            dateFilter: Period?,
                            topic: Topic?,
                            userprofile: Userprofile?,
+                           compatibility: TopicCompatibility?,
                            substring: String,
                            except: [SurveyReference],
                            ownersIds: [Int],
@@ -445,7 +445,8 @@ extension SurveysController: SurveysViewInput {
       controllerInput?.onDataSourceRequest(source: source,
                                            dateFilter: dateFilter,
                                            topic: topic,
-                                           userprofile: userprofile)
+                                           userprofile: userprofile,
+                                           compatibility: compatibility)
     }
   }
 }

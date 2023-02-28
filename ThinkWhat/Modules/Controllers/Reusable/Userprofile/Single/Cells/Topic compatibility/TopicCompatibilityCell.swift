@@ -17,8 +17,6 @@ class TopicCompatibilityCell: UICollectionViewListCell {
       guard !compatibility.isNil else { return }
       
       setupUI()
-      let instances = SurveyReferences.shared[compatibility.surveys]
-      print(instances)
     }
   }
   //Publishers
@@ -36,19 +34,22 @@ class TopicCompatibilityCell: UICollectionViewListCell {
   private lazy var stack: UIStackView = {
     let opaque = UIView.opaque()
     let instance = UIStackView(arrangedSubviews: [
-      percentageView,
-      opaque,
+//      percentageView,
+      //      opaque,
+      topicView,
+      UIView.opaque(),
       rightButton,
       disclosureIndicator
     ])
     instance.axis = .horizontal
     instance.spacing = padding/2
-    instance.heightAnchor.constraint(equalToConstant: compatibility.topic.title.uppercased().height(withConstrainedWidth: 1000,
-                                                                                                    font: UIFont(name: Fonts.Bold, size: 14)!) * 2.25).isActive = true
-    opaque.addSubview(topicView)
-    topicView.translatesAutoresizingMaskIntoConstraints = false
-    topicView.leadingAnchor.constraint(equalTo: opaque.leadingAnchor, constant: padding/2).isActive = true
-    topicView.centerYAnchor.constraint(equalTo: opaque.centerYAnchor).isActive = true
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Bold, size: 14)!)).isActive = true
+//    instance.heightAnchor.constraint(equalToConstant: compatibility.topic.title.uppercased().height(withConstrainedWidth: 1000,
+//                                                                                                    font: UIFont(name: Fonts.Bold, size: 14)!) * 2.25).isActive = true
+//    opaque.addSubview(topicView)
+//    topicView.translatesAutoresizingMaskIntoConstraints = false
+//    topicView.leadingAnchor.constraint(equalTo: opaque.leadingAnchor, constant: padding/2).isActive = true
+//    topicView.centerYAnchor.constraint(equalTo: opaque.centerYAnchor).isActive = true
     
     return instance
   }()
@@ -83,44 +84,44 @@ class TopicCompatibilityCell: UICollectionViewListCell {
     
     return instance
   }()
-  private lazy var percentageLabel: UILabel = {
-    let instance = UILabel()
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    instance.publisher(for: \.bounds)
-      .filter { $0 != .zero }
-      .sink { instance.font = UIFont(name: Fonts.Semibold, size: $0.height * 0.35) }
-      .store(in: &subscriptions)
-    instance.textAlignment = .center
-    instance.numberOfLines = 1
-    
-    return instance
-  }()
-  private lazy var percentageView: UIView = {
-    let instance = UIView()
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    instance.layer.addSublayer(backgroundCircle)
-    instance.layer.addSublayer(foregroundCircle)
-    instance.publisher(for: \.bounds)
-      .filter { $0 != .zero }
-      .sink { [weak self] rect in
-        guard let self = self else { return }
-        
-        let lineWidth = rect.width * self.lineWidthMultiplier
-        self.backgroundCircle.lineWidth = lineWidth
-        self.backgroundCircle.path = UIBezierPath(ovalIn: rect.insetBy(dx: lineWidth/2, dy: lineWidth/2)).cgPath
-        
-        guard !self.compatibility.isNil,
-              self.compatibility.percent != 0
-        else { return }
-
-        self.foregroundCircle.path = self.getProgressPath(in: rect, progress: Double(self.compatibility.percent), lineWidth: lineWidth)
-      }
-      .store(in: &subscriptions)
-        
-    percentageLabel.placeInCenter(of: instance, heightMultiplier: 0.75)
-    
-    return instance
-  }()
+//  private lazy var percentageLabel: UILabel = {
+//    let instance = UILabel()
+//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+//    instance.publisher(for: \.bounds)
+//      .filter { $0 != .zero }
+//      .sink { instance.font = UIFont(name: Fonts.Semibold, size: $0.height * 0.35) }
+//      .store(in: &subscriptions)
+//    instance.textAlignment = .center
+//    instance.numberOfLines = 1
+//
+//    return instance
+//  }()
+//  private lazy var percentageView: UIView = {
+//    let instance = UIView()
+//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+//    instance.layer.addSublayer(backgroundCircle)
+//    instance.layer.addSublayer(foregroundCircle)
+//    instance.publisher(for: \.bounds)
+//      .filter { $0 != .zero }
+//      .sink { [weak self] rect in
+//        guard let self = self else { return }
+//
+//        let lineWidth = rect.width * self.lineWidthMultiplier
+//        self.backgroundCircle.lineWidth = lineWidth
+//        self.backgroundCircle.path = UIBezierPath(ovalIn: rect.insetBy(dx: lineWidth/2, dy: lineWidth/2)).cgPath
+//
+//        guard !self.compatibility.isNil,
+//              self.compatibility.percent != 0
+//        else { return }
+//
+//        self.foregroundCircle.path = self.getProgressPath(in: rect, progress: Double(self.compatibility.percent), lineWidth: lineWidth)
+//      }
+//      .store(in: &subscriptions)
+//
+//    percentageLabel.placeInCenter(of: instance, heightMultiplier: 0.75)
+//
+//    return instance
+//  }()
   private lazy var backgroundCircle: CAShapeLayer = {
     let instance = CAShapeLayer()
     instance.path = UIBezierPath(ovalIn: .zero).cgPath
@@ -149,7 +150,7 @@ class TopicCompatibilityCell: UICollectionViewListCell {
     
     let topicTitle = InsetLabel()
     topicTitle.font = UIFont(name: Fonts.Bold, size: 14)
-    topicTitle.text = compatibility.topic.title.uppercased()
+    topicTitle.text = compatibility.topic.title.uppercased() + ": \(compatibility.percent)%"
     topicTitle.textColor = .white
 //    topicTitle.isUserInteractionEnabled = true
 //    topicTitle.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
@@ -243,7 +244,8 @@ private extension TopicCompatibilityCell {
   func setupUI() {
     backgroundColor = .clear
     clipsToBounds = true
-    percentageLabel.text = "\(compatibility.percent)%"
+
+//    percentageLabel.text = "\(compatibility.percent)%"
     let attributedTitle = NSAttributedString(string: String(describing: compatibility.surveys.count.roundedWithAbbreviations),
                                              attributes: [
                                               .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
@@ -253,7 +255,7 @@ private extension TopicCompatibilityCell {
     disclosureIndicator.tintColor = compatibility.topic.tagColor
     
     stack.place(inside: self,
-                insets: UIEdgeInsets(top: padding, left: 0, bottom: padding, right: 0),
+                insets: .init(top: padding, left: 0, bottom: padding, right: 0),
                 bottomPriority: .defaultLow)
   }
   

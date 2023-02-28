@@ -147,12 +147,11 @@ class SubscriptionsView: UIView {
     instance.titleLabel?.numberOfLines = 1
     instance.showsMenuAsPrimaryAction = true
     instance.menu = prepareMenu()
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-
+    instance.imageView?.tintColor = .white
+    instance.imageEdgeInsets.left = 4
+    instance.semanticContentAttribute = .forceRightToLeft
+    instance.setImage(UIImage(systemName: ("calendar")), for: .normal)
+    
     return instance
   }()
   private lazy var subscriptionsLabel: UILabel = {
@@ -293,7 +292,7 @@ class SubscriptionsView: UIView {
             let surveyReference = $0
       else { return }
       
-      let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.7)
+      let banner = Popup(heightScaleFactor: 0.7)
       banner.accessibilityIdentifier = "claim"
       let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
       

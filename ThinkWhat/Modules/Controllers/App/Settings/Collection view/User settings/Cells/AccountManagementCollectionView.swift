@@ -16,13 +16,7 @@ class AccountManagementCollectionView: UICollectionView {
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
   
-  
-  // MARK: - Public properties
-  ///`Publishers`
-  public let logoutPublisher = PassthroughSubject<Bool, Never>()
-  public let deletePublisher = PassthroughSubject<Bool, Never>()
-  
-  
+
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -71,9 +65,8 @@ private extension AccountManagementCollectionView {
       return sectionLayout
     }
 
-    let cellRegistration = UICollectionView.CellRegistration<AccountManagementCell, AnyHashable> { [weak self] cell, indexPath, _ in
-      guard let self = self,
-            let section = Section(rawValue: indexPath.section)
+    let cellRegistration = UICollectionView.CellRegistration<AccountManagementCell, AnyHashable> { cell, indexPath, _ in
+      guard let section = Section(rawValue: indexPath.section)
       else { return }
       
       var config = UIBackgroundConfiguration.listPlainCell()
@@ -81,18 +74,6 @@ private extension AccountManagementCollectionView {
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
       cell.mode = section == .Logout ? .Logout : .Delete
-      cell.tapPublisher
-        .sink { [weak self] in
-          guard let self = self else { return }
-          
-          switch $0 {
-          case .Logout:
-            self.logoutPublisher.send(true)
-          case .Delete:
-            self.deletePublisher.send(true)
-          }
-        }
-        .store(in: &self.subscriptions)
     }
     
     source = Source(collectionView: self) {

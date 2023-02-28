@@ -56,7 +56,7 @@ private extension LanguageListViewController {
     
     @objc
     func handleTap() {
-        let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
+        let banner = Popup()
         banner.present(content: PopupContent(parent: banner,
                                              systemImage: "globe",
                                              text: "content_language_hint".localized,

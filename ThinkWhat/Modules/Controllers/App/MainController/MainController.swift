@@ -251,7 +251,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
       //      delay: 0,
       //      usingSpringWithDamping: 0.7,
       //      initialSpringVelocity: 0.4,
-      withDuration: 0.3,
+      withDuration: tabAnimationDuration,
       delay: 0.0,
       usingSpringWithDamping: 2.0,
       initialSpringVelocity: 0.5,
@@ -377,7 +377,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
     passthroughView.setNeedsLayout()
     if animated {
       UIView.animate(
-        withDuration: 0.3,
+        withDuration: tabAnimationDuration,
         delay: 0.0,
         usingSpringWithDamping: 2.0,
         initialSpringVelocity: 0.5,
@@ -400,7 +400,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     view.setNeedsLayout()
     if animated {
-      UIView.animate(withDuration: 0.3,
+      UIView.animate(withDuration: tabAnimationDuration,
                      delay: 0.0,
                      usingSpringWithDamping: 2.0,
                      initialSpringVelocity: 0.5,
@@ -779,7 +779,7 @@ private extension MainController {
                                 delay: 0,
                                 repeatCount: 0,
                                 autoreverses: false,
-                                timingFunction: CAMediaTimingFunctionName.linear,
+                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                 delegate: self,
                                 isRemovedOnCompletion: false)
     loadingIcon.icon.add(anim_1, forKey: nil)
@@ -800,7 +800,7 @@ extension MainController: UITabBarControllerDelegate {
       let logoColorAnim = Animations.get(property: .FillColor,
                                          fromValue: logoIcon.iconColor.cgColor as Any,
                                          toValue: color.cgColor as Any,
-                                         duration: 0.35,
+                                         duration: tabAnimationDuration,
                                          delay: 0,
                                          repeatCount: 0,
                                          autoreverses: false,
@@ -813,7 +813,7 @@ extension MainController: UITabBarControllerDelegate {
       let textColorAnim = Animations.get(property: .FillColor,
                                          fromValue: logoText.iconColor.cgColor as Any,
                                          toValue: color.cgColor as Any,
-                                         duration: 0.25,
+                                         duration: tabAnimationDuration,
                                          delay: 0,
                                          repeatCount: 0,
                                          autoreverses: false,

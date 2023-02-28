@@ -237,7 +237,9 @@ extension UserprofileController: UserprofileViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(SurveysController(compatibility, color: tintColor), animated: true)
+    navigationController?.pushViewController(SurveysController(compatibility,
+                                                               color: compatibility.topic.tagColor),
+                                             animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let controller = tabBarController as? MainController else { return }

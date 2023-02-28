@@ -26,6 +26,7 @@ var localhost: Bool {
     return false
 #endif
 }
+let tabAnimationDuration: TimeInterval = 0.35
 var logger = TimeLogger(sinceOrigin: true)
 let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
@@ -49,6 +50,8 @@ func delayAsync(delay: Double, completion:@escaping ()->()) {
         }
     }
 }
+
+enum EditingMode { case ReadOnly, Write }
 
 //Open side app or embedded html
 enum SideAppPreference: String {

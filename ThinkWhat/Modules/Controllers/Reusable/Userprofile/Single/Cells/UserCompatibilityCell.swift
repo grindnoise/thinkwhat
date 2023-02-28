@@ -122,6 +122,15 @@ class UserCompatibilityCell: UICollectionViewListCell {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+  
+  
+  
+  // MARK: - Overridden methods
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+  }
 }
 
 private extension UserCompatibilityCell {

@@ -1,0 +1,276 @@
+//
+//  UserSettingsInfoCollectionView.swift
+//  ThinkWhat
+//
+//  Created by Pavel Bukharov on 28.02.2023.
+//  Copyright © 2023 Pavel Bukharov. All rights reserved.
+//
+
+import UIKit
+import Combine
+
+class UserSettingsInfoCollectionView: UICollectionView {
+  
+  enum Section: Int, CaseIterable {
+    case About, City, SocialMedia, Interests
+  }
+  
+  
+  
+  // MARK: - Public properties
+  ///`Publishers`
+  public let topicPublisher = PassthroughSubject<Topic, Never>()
+  public let citySelectionPublisher = PassthroughSubject<City, Never>()
+  public let cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
+  public let openURLPublisher = PassthroughSubject<URL, Never>()
+  public let facebookPublisher = PassthroughSubject<String, Never>()
+  public let instagramPublisher = PassthroughSubject<String, Never>()
+  public let tiktokPublisher = PassthroughSubject<String, Never>()
+  public let googlePublisher = PassthroughSubject<String, Never>()
+  public let twitterPublisher = PassthroughSubject<String, Never>()
+  ///`UI`
+  public var color: UIColor = Colors.System.Red.rawValue {
+    didSet {
+      colorPublisher.send(color)
+    }
+  }
+
+  
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  private var source: UICollectionViewDiffableDataSource<Section, Int>!
+  ///`UI`
+  private let padding: CGFloat = 8
+  ///`Publishers`
+  private var colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
+  @Published public private(set) var userprofileDescription: String?
+  
+  // MARK: - Destructor
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
+#if DEBUG
+    print("\(String(describing: type(of: self))).\(#function)")
+#endif
+  }
+  
+  
+  
+  // MARK: - Initialization
+  init() {
+    super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
+    
+    setupUI()
+  }
+  
+  override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
+    super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
+    
+    setupUI()
+  }
+  
+  required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+  
+  
+  
+  // MARK: - Private methods
+  private func setupUI() {
+    //        delegate = sel
+    collectionViewLayout = UICollectionViewCompositionalLayout{ [unowned self] section, environment -> NSCollectionLayoutSection in
+      var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
+      configuration.backgroundColor = .clear
+      configuration.showsSeparators = false
+      
+      let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: environment)
+      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? self.padding : 0, trailing: 0)
+      return sectionLayout
+    }
+    
+    let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, _, item in
+      guard let userprofile = Userprofiles.shared.current else { return }
+      
+      cell.padding = self.padding
+      cell.userprofile = userprofile
+//      cell.publisher(for: \.bounds)
+//        .receive(on: DispatchQueue.main)
+//        .sink { _ in
+//          self.source.refresh() }
+//        .store(in: &self.subscriptions)
+      cell.$boundsPublisher
+        .filter { !$0.isNil && $0 != 0 }
+        .sink { [unowned self] _ in
+          self.source.refresh(animatingDifferences: true)
+        }
+        .store(in: &subscriptions)
+      cell.descriptionPublisher
+        .sink { [unowned self] in self.userprofileDescription = $0 }
+        .store(in: &self.subscriptions)
+      
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink { cell.color = $0! }
+        .store(in: &self.subscriptions)
+    }
+    
+    let cityCellRegistration = UICollectionView.CellRegistration<UserSettingsCityCell, AnyHashable> { [unowned self] cell, _, item in
+      
+      cell.color = self.color
+      cell.padding = .zero
+      
+      ///Fetch
+      cell.cityFetchPublisher
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.cityFetchPublisher.send($0!) }
+        .store(in: &self.subscriptions)
+      
+      ///Selection
+      cell.citySelectionPublisher
+        .sink { [unowned self] in self.citySelectionPublisher.send($0) }
+        .store(in: &self.subscriptions)
+      
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink { cell.color = $0! }
+        .store(in: &self.subscriptions)
+      
+      guard let userprofile = Userprofiles.shared.current else { return }
+      
+      cell.userprofile = userprofile
+    }
+    
+    let interestsCellRegistration = UICollectionView.CellRegistration<UserInterestsCell, AnyHashable> { [unowned self] cell, _, _ in
+      guard let userprofile = Userprofiles.shared.current else { return }
+      
+      cell.userprofile = userprofile
+      cell.color = self.color
+      cell.padding = .zero
+      cell.topicPublisher
+        .sink { [unowned self] in self.topicPublisher.send($0) }
+        .store(in: &self.subscriptions)
+      
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+    }
+    
+    let socialCellRegistration = UICollectionView.CellRegistration<UserSettingsSocialHeaderCell, AnyHashable> { [unowned self] cell, indexPath, item in
+//      cell.keyboardWillAppear
+//        .sink { [unowned self] _ in
+//          //                    self.scrollToItem(at: indexPath, at: .top, animated: true)
+//        }
+//        .store(in: &self.subscriptions)
+      cell.padding = .zero
+      //Facebook
+      cell.facebookPublisher.sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.facebookPublisher.send($0)
+      }.store(in: &self.subscriptions)
+      
+      //Instagram
+      cell.instagramPublisher.sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.instagramPublisher.send($0)
+      }.store(in: &self.subscriptions)
+      
+      //Instagram
+      cell.tiktokPublisher.sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.tiktokPublisher.send($0)
+      }.store(in: &self.subscriptions)
+      
+      //URL
+      cell.openURLPublisher.sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.openURLPublisher.send($0)
+      }.store(in: &self.subscriptions)
+      //            //Google
+      //            cell.googlePublisher.sink { [weak self] in
+      //                guard let self = self,
+      //                      let string = $0
+      //                else { return }
+      //
+      //            }.store(in: &self.subscriptions)
+      //
+      //            //Twitter
+      //            cell.twitterPublisher.sink { [weak self] in
+      //                guard let self = self,
+      //                      let string = $0
+      //                else { return }
+      //
+      //            }.store(in: &self.subscriptions)
+      
+      var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+      backgroundConfig.backgroundColor = .clear
+      cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+      cell.backgroundConfiguration = backgroundConfig
+      
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink { cell.color = $0! }
+        .store(in: &self.subscriptions)
+      
+      guard let userprofile = Userprofiles.shared.current else { return }
+      
+      cell.userprofile = userprofile
+      cell.color = self.color
+    }
+    
+    source = UICollectionViewDiffableDataSource<Section, Int>(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
+      guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
+      if section == .City {
+        return collectionView.dequeueConfiguredReusableCell(using: cityCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .SocialMedia {
+        return collectionView.dequeueConfiguredReusableCell(using: socialCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .Interests {
+        return collectionView.dequeueConfiguredReusableCell(using: interestsCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .About {
+        return collectionView.dequeueConfiguredReusableCell(using: aboutCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      }
+      
+      return UICollectionViewCell()
+    }
+    
+    var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
+    snapshot.appendSections([.About, .City, .SocialMedia, .Interests])
+    snapshot.appendItems([0], toSection: .About)
+    snapshot.appendItems([1], toSection: .City)
+    snapshot.appendItems([2], toSection: .SocialMedia)
+    snapshot.appendItems([3], toSection: .Interests)
+    source.apply(snapshot, animatingDifferences: false)
+  }
+}
+
+//extension CurrentUserProfileCollectionView: UICollectionViewDelegate {
+//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+//        print(indexPath)
+//    }
+//}
+

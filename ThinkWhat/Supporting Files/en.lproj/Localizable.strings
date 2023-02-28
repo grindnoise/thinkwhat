@@ -103,6 +103,7 @@
 "back" = "Back";
 "per" = "Per";
 "more_info" = "More info";
+"confirm" = "Confirm";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";
@@ -379,6 +380,10 @@
 "open_url_embedded" = "Open in app";
 "open_url_in_app" = "Open in ";
 "save_setting" = "Save";
+"account_logout" = "Logout";
+"account_delete" = "Account deleting";
+"account_logout_description" = "You are about to sign out of your account. Continue?";
+"account_delete_description" = "Deleting an account is an irreversible action. Continue?";
 
 //Userprofile
 "userprofile_is_in_community" = "Is in community";

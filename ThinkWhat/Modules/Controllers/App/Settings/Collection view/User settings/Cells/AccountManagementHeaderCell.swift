@@ -20,9 +20,6 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
       //            setColors()
     }
   }
-  //Publishers
-  public var logoutPublisher = CurrentValueSubject<Bool?, Never>(nil)
-  public var deletePublisher = CurrentValueSubject<Bool?, Never>(nil)
   ///`UI`
   public var padding: CGFloat = 8 {
     didSet {
@@ -93,37 +90,32 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
     let instance = AccountManagementCollectionView()
     instance.backgroundColor = .clear
     
-    let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 50)
     constraint.priority = .defaultHigh
     constraint.identifier = "height"
     constraint.isActive = true
     
-    instance.publisher(for: \.contentSize, options: .new)
-      .sink { [weak self] rect in
-        guard let self = self,
-              let constraint = instance.getConstraint(identifier: "height")
-        else { return }
-        
-        self.setNeedsLayout()
-        constraint.constant = rect.height
-        self.layoutIfNeeded()
-      }
-      .store(in: &subscriptions)
-    
-    instance.logoutPublisher
-      .sink { [weak self] _ in
-        guard let self = self else { return }
-        
-        fatalError()
-      }
-      .store(in: &subscriptions)
-    instance.deletePublisher
-      .sink { [weak self] _ in
-        guard let self = self else { return }
-        
-        fatalError()
-      }
-      .store(in: &subscriptions)
+    observers.append(instance.observe(\.contentSize, options: .new) {[weak self] view, change in
+      guard let self = self,
+            let height = change.newValue?.height,
+            let constraint = instance.getConstraint(identifier: "height")
+      else { return }
+      
+      self.setNeedsLayout()
+      constraint.constant = height
+      self.layoutIfNeeded()
+    })
+//    instance.publisher(for: \.contentSize, options: .new)
+//      .sink { [weak self] rect in
+//        guard let self = self,
+//              let constraint = instance.getConstraint(identifier: "height")
+//        else { return }
+//
+//        self.setNeedsLayout()
+//        constraint.constant = rect.height
+//        self.layoutIfNeeded()
+//      }
+//      .store(in: &subscriptions)
     
     return instance
   }()
@@ -159,16 +151,7 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
-    
-  }
-  
-  override func prepareForReuse() {
-    super.prepareForReuse()
-    
-    //Reset publishers
-    logoutPublisher = CurrentValueSubject<Bool?, Never>(nil)
-    deletePublisher = CurrentValueSubject<Bool?, Never>(nil)
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
   }
 }
 

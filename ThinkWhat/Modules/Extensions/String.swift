@@ -124,23 +124,25 @@ extension String {
     var isFacebookLink: Bool {
         let regex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?facebook.com\\/.*"
         let result = NSPredicate(format: "SELF MATCHES %@", regex)
-        return result.evaluate(with: self)
+      return result.evaluate(with: self)
     }
-    var isTikTokLink: Bool {
-        let regex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?tiktok.com\\/.*"
-        let result = NSPredicate(format: "SELF MATCHES %@", regex)
-        return result.evaluate(with: self)
-    }
-    var isVKLink: Bool {
+  var isTikTokLink: Bool {
+    let regex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?tiktok.com\\/.*"
+    let result = NSPredicate(format: "SELF MATCHES %@", regex)
+    return result.evaluate(with: self)
+  }
+  var isInstagramLink: Bool {
+    let regex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?(instagram.com|instagr.am)\\/([A-Za-z0-9-_.]+)"
+//    let regex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?(instagram.com|instagr.am)\\/([A-Za-z0-9-_.]+)/im"//.*"
+    let result = NSPredicate(format: "SELF MATCHES %@", regex)
+    return result.evaluate(with: self)
+  }
+  var isVKLink: Bool {
         let regex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?vk.com\\/.*"
         let result = NSPredicate(format: "SELF MATCHES %@", regex)
         return result.evaluate(with: self)
     }
-    var isInstagramLink: Bool {
-        let regex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?(instagram.com|instagr.am)\\/([A-Za-z0-9-_.]+)/im"//.*"
-        let result = NSPredicate(format: "SELF MATCHES %@", regex)
-        return result.evaluate(with: self)
-    }
+    
 //
 //        return self.contains("https://www.tiktok.com/")
 ////        let youtubeRegex = "(http(s)?:\\/\\/)?(www\\.|m\\.)?youtu(be\\.com|\\.be)(\\/watch\\?([&=a-z]{0,})(v=[\\d\\w]{1,}).+|\\/[\\d\\w]{1,})"

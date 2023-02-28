@@ -24,7 +24,7 @@ class ScrollingTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioni
   var lastIndex = 0
   
   func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-    return 0.3
+    return tabAnimationDuration
   }
   
   init(tabBarController: UITabBarController, lastIndex: Int) {

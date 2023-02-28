@@ -82,7 +82,13 @@ class UserSettingsCityCell: UICollectionViewListCell {
   public let citySelectionPublisher = PassthroughSubject<City, Never>()
   public var cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
   ///`UI`
-  public var color: UIColor = .gray
+  public var color: UIColor = .gray {
+    didSet {
+      guard oldValue != color else { return }
+      
+      textField.indicator.color = color
+    }
+  }
   public var padding: CGFloat = 8 {
     didSet {
       updateUI()
@@ -125,9 +131,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
     let instance = UIView()
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.publisher(for: \.bounds, options: .new)
-      .sink { rect in
-        instance.cornerRadius = rect.width*0.05
-      }
+      .sink { instance.cornerRadius = $0.width*0.05 }
       .store(in: &subscriptions)
     stack.place(inside: instance,
                 insets: .uniform(size: padding*2),
@@ -143,19 +147,30 @@ class UserSettingsCityCell: UICollectionViewListCell {
     ])
     headerStack.axis = .horizontal
 
+    let leftSpacer = UIView.opaque()
+    leftSpacer.widthAnchor.constraint(equalToConstant: 8).isActive = true
+//    let rightSpacer = UIView.opaque()
+//    rightSpacer.widthAnchor.constraint(equalToConstant: 8).isActive = true
     let contentStack = UIStackView(arrangedSubviews: [
+      leftSpacer,
       textField,
-      UIView.opaque(),
-      countryFlag
+//      UIView.opaque(),
+      countryFlag,
+//      rightSpacer
     ])
     contentStack.axis = .horizontal
+    contentStack.accessibilityIdentifier = "contentStack"
 
     let instance = UIStackView(arrangedSubviews: [
       headerStack,
       contentStack
     ])
     instance.axis = .vertical
-    instance.spacing = padding*2
+    instance.spacing = 4
+    contentStack.backgroundColor = .secondarySystemFill
+    contentStack.publisher(for: \.bounds, options: .new)
+      .sink { contentStack.cornerRadius = $0.width*0.05 }
+      .store(in: &subscriptions)
 
     return instance
   }()
@@ -191,17 +206,14 @@ class UserSettingsCityCell: UICollectionViewListCell {
 
     return instance
   }()
-  private lazy var textField: SearchTextField = {
-    let instance = SearchTextField()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
-    instance.indicator.color = UIColor { traitCollection in
-      switch traitCollection.userInterfaceStyle {
-      case .dark:
-        return .label
-      default:
-        return K_COLOR_RED
-      }
-    }
+  private lazy var textField: SearchInsetTextField = {
+    let instance = SearchInsetTextField()
+    instance.insets = UIEdgeInsets(top: 8,
+                                   left: 0,
+                                   bottom: 8,
+                                   right: 0)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.indicator.color = color
     instance.spellCheckingType = .no
     instance.autocorrectionType = .no
     instance.attributedPlaceholder = NSAttributedString(string: "city_placeholder".localized, attributes: [
@@ -262,6 +274,8 @@ class UserSettingsCityCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
 
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
   }
@@ -283,6 +297,17 @@ private extension UserSettingsCityCell {
 
     background.place(inside: self,
                      insets: .init(top: padding*2, left: padding, bottom: padding*2, right: padding))
+    
+    setNeedsLayout()
+    layoutIfNeeded()
+    
+    guard let contentStack = stack.arrangedSubviews.filter({ $0.accessibilityIdentifier == "contentStack"}).first else { return }
+    
+    countryFlag.translatesAutoresizingMaskIntoConstraints = false
+    let constraint = countryFlag.widthAnchor.constraint(equalToConstant: contentStack.bounds.height)
+    countryFlag.heightAnchor.constraint(equalToConstant: contentStack.bounds.height).isActive = true
+    constraint.identifier = "width"
+    constraint.isActive = true
   }
 
   @MainActor
@@ -337,6 +362,24 @@ private extension UserSettingsCityCell {
     let countryName = countryName(countryCode: city.countryCode)
     textField.text = (city.localizedName.isEmpty ? city.name : city.localizedName) + (countryName.isNil ? "" : ", \(String(describing: countryName!))")
     countryFlag.image = Flag(countryCode: city.countryCode)?.image(style: .roundedRect)
+    guard countryFlag.alpha.isZero,
+          let constraint = countryFlag.getConstraint(identifier: "width"),
+          let contentStack = stack.arrangedSubviews.filter({ $0.accessibilityIdentifier == "contentStack"}).first
+    else { return }
+    
+    self.stack.setNeedsLayout()
+    constraint.constant = contentStack.bounds.height
+    self.stack.layoutIfNeeded()
+    
+    UIView.animate(withDuration: 0.2,
+                   delay: 0,
+                   options: .curveEaseInOut,
+                   animations: { [weak self] in
+      guard let self = self else { return }
+      
+      self.countryFlag.transform = .identity
+      self.countryFlag.alpha = 1
+    })
   }
 }
 
@@ -367,6 +410,25 @@ extension UserSettingsCityCell: UITextFieldDelegate {
     return true
   }
 
+  func textFieldDidBeginEditing(_ textField: UITextField) {
+    UIView.animate(withDuration: 0.2,
+                   delay: 0,
+                   options: .curveEaseInOut,
+                   animations: { [weak self] in
+      guard let self = self else { return }
+      
+      self.countryFlag.transform = .init(scaleX: 0.7, y: 0.7)
+      self.countryFlag.alpha = 0
+    }) { [weak self] _ in
+      guard let self = self,
+            let constraint = self.countryFlag.getConstraint(identifier: "width")
+      else { return }
+      
+      self.stack.setNeedsLayout()
+      constraint.constant = 8
+      self.stack.layoutIfNeeded()
+    }
+  }
 //  func textFieldDidEndEditing(_ textField: UITextField) {
 //    guard let selectedCity = city else {
 //      textField.text = city.localizedName.isEmpty ? city.name : city.localizedName

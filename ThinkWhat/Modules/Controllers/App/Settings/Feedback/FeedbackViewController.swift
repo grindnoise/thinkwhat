@@ -59,7 +59,7 @@ private extension FeedbackViewController {
     @objc
     func handleTap() {
         view.endEditing(true)
-        let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
+        let banner = Popup(heightScaleFactor: 0.5)
         banner.present(content: PopupContent(parent: banner,
                                              systemImage: "envelope.fill",
                                              text: "feedback_hint".localized,

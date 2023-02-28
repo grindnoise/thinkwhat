@@ -20,7 +20,7 @@ class UserInterestsCell: UICollectionViewListCell {
     }
   }
   ///`Publishers`
-  public let topicPublisher = PassthroughSubject<Topic, Never>()
+  public var topicPublisher = PassthroughSubject<Topic, Never>()
   ///`UI`
   public var color: UIColor = .clear
   public var padding: CGFloat = 16 {
@@ -169,18 +169,21 @@ class UserInterestsCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
     
   }
   
-  //    override func prepareForReuse() {
-  //        super.prepareForReuse()
-  //
-  //        urlPublisher = CurrentValueSubject<URL?, Never>(nil)
-  //        subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
-  //        imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
-  //    }
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    
+    topicPublisher = PassthroughSubject<Topic, Never>()
+    //        urlPublisher = CurrentValueSubject<URL?, Never>(nil)
+    //        subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
+    //        imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
+  }
 }
 
 private extension UserInterestsCell {

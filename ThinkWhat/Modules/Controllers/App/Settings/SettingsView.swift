@@ -64,6 +64,10 @@ class SettingsView: UIView {
       }
       .store(in: &subscriptions)
     
+    instance.$userprofileDescription
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.viewInput?.updateDescription($0!) }
+      .store(in: &self.subscriptions)
     
     //            .sink { style in
     //                instance.backgroundColor = style == .dark ? .secondarySystemBackground : .systemBackground
@@ -138,8 +142,7 @@ class SettingsView: UIView {
       .store(in: &self.subscriptions)
     
     instance.citySelectionPublisher
-    .filter { !$0.isNil } // && !$0!.geonamesObject.isNil }
-      .sink { [unowned self] in self.viewInput?.updateCity($0!) }
+      .sink { [unowned self] in self.viewInput?.updateCity($0) }
       .store(in: &self.subscriptions)
     
     instance.facebookPublisher
@@ -175,7 +178,9 @@ class SettingsView: UIView {
       .store(in: &self.subscriptions)
     
     instance.topicPublisher
-      .sink { [unowned self] in self.viewInput?.onTopicSelected($0) }
+      .sink { [unowned self] in
+        self.viewInput?.onTopicSelected($0)
+      }
       .store(in: &subscriptions)
     
     instance.publicationsPublisher
@@ -240,7 +245,7 @@ class SettingsView: UIView {
         
         self.viewInput?.updateAppSettings(settings)
         
-        let banner = Popup(callbackDelegate: nil, bannerDelegate: self, heightScaleFactor: 0.5)
+        let banner = Popup(heightScaleFactor: 0.5)
         banner.present(content: PopupContent(parent: banner,
                                              systemImage: "lightbulb.circle.fill",
                                              text: "restart",

@@ -103,6 +103,7 @@
 "back" = "Назад";
 "per" = "За";
 "more_info" = "Подробнее";
+"confirm" = "Подтвердить";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";
@@ -320,7 +321,7 @@
 "twitter_link" = "профиль в Twitter";
 "tiktok_link" = "профиль в TikTok";
 "instagram_link" = "профиль в Instagram";
-"completed" = "Пройдено";
+"completed" = "Публикаций пройдено";
 "preferences" = "Мои предпочтения:";
 "my_balance" = "Мой баланс:";
 //"points" = "Баллов";
@@ -335,7 +336,7 @@
 "my_subscriptions" = "Мои подписки";
 "balance" = "Баланс";
 "account_management" = "Управление учетной записью";
-"logout" = "Выйти";
+"logout" = "Выйти из аккаунта";
 "delete_account" = "Удалить аккаунт";
 "allow_push_notifications" = "Разрешить уведомления";
 "NOTIFICATIONS_OWN_COMPLETED" = "Мои завершенные публикации";
@@ -379,6 +380,10 @@
 "open_url_embedded" = "Открыть в приложении";
 "open_url_in_app" = "Открыть в ";
 "save_setting" = "Сохранить";
+"account_logout" = "Выход из аккаунта";
+"account_delete" = "Удаление аккаунта";
+"account_logout_description" = "Вы собираетесь выйти из учетной записи. Продолжить?";
+"account_delete_description" = "Удаление аккаунта - необратимое действие. Продолжить?";
 
 //Userprofile
 "userprofile_is_in_community" = "В сообществе";

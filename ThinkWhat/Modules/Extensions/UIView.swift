@@ -252,6 +252,7 @@ extension UIView {
     leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: insets.left).isActive = true
     topAnchor.constraint(equalTo: parent.topAnchor, constant: insets.top).isActive = true
     trailingAnchor.constraint(equalTo: parent.trailingAnchor, constant: -insets.right).isActive = true
+    
     let constraint = bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -insets.bottom)
     constraint.priority = bottomPriority
     constraint.isActive = true
@@ -269,12 +270,15 @@ extension UIView {
   }
   
   func placeInCenter(of parent: UIView,
-                     heightMultiplier: CGFloat = 1) {
+                     heightMultiplier: CGFloat = .zero) {
     parent.addSubview(self)
     translatesAutoresizingMaskIntoConstraints = false
     
     centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
     centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
+
+    guard heightMultiplier != .zero else { return }
+    
     heightAnchor.constraint(equalTo: parent.heightAnchor, multiplier: heightMultiplier).isActive = true
   }
   
@@ -288,6 +292,24 @@ extension UIView {
     centerYAnchor.constraint(equalTo: parent.centerYAnchor, constant: yOffset).isActive = true
     centerXAnchor.constraint(equalTo: parent.centerXAnchor, constant: xOffset).isActive = true
     widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: widthMultiplier).isActive = true
+  }
+  
+  func placeLeading(inside parent: UIView,
+                    leadingInset: CGFloat = .zero,
+                    topInset: CGFloat = .zero,
+                    bottomInset: CGFloat = .zero) {
+    parent.addSubview(self)
+    translatesAutoresizingMaskIntoConstraints = false
+    
+    leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: leadingInset).isActive = true
+    
+    guard topInset != .zero, bottomInset != .zero else {
+      topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
+      bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: bottomInset).isActive = true
+      
+      return
+    }
+    centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
   }
   
   func addEquallyTo(to view: UIView, multiplier: CGFloat) {

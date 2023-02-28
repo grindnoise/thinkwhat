@@ -274,6 +274,11 @@ private extension SettingsController {
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+  func updateDescription(_ string: String) {
+    let parameters = API.prepareUserData(description: string)
+    controllerInput?.updateUserprofile(parameters: parameters, image: nil)
+  }
+  
   func showLicense() {
     var vc: SFSafariViewController!
     let config = SFSafariViewController.Configuration()

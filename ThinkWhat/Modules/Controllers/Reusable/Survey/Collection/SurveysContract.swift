@@ -25,6 +25,7 @@ protocol SurveysViewInput: AnyObject {
                            dateFilter: Period?,
                            topic: Topic?,
                            userprofile: Userprofile?,
+                           compatibility: TopicCompatibility?,
                            substring: String,
                            except: [SurveyReference],
                            ownersIds: [Int],
@@ -42,7 +43,11 @@ protocol SurveysControllerInput: AnyObject {
   
   var modelOutput: SurveysModelOutput? { get set }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?)
+  func onDataSourceRequest(source: Survey.SurveyCategory,
+                           dateFilter: Period?,
+                           topic: Topic?, 
+                           userprofile: Userprofile?,
+                           compatibility: TopicCompatibility?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(surveyReference: SurveyReference, claim: Claim)

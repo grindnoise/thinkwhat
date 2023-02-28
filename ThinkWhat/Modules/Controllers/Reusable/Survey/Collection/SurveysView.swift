@@ -86,6 +86,7 @@ class SurveysView: UIView {
                                             dateFilter: period,
                                             topic: nil,
                                             userprofile: nil,
+                                            compatibility: nil,
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
@@ -109,6 +110,7 @@ class SurveysView: UIView {
                                             dateFilter: period,
                                             topic: topic,
                                             userprofile: nil,
+                                            compatibility: nil,
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
@@ -132,6 +134,7 @@ class SurveysView: UIView {
                                             dateFilter: period,
                                             topic: nil,
                                             userprofile: userprofile,
+                                            compatibility: nil,
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
@@ -158,6 +161,7 @@ class SurveysView: UIView {
                                             dateFilter: .AllTime,
                                             topic: nil,
                                             userprofile: nil,
+                                            compatibility: nil,
                                             substring: "",
                                             except: excluded,
                                             ownersIds: [userprofile.id],
@@ -182,6 +186,7 @@ class SurveysView: UIView {
                                             dateFilter: .AllTime,
                                             topic: nil,
                                             userprofile: nil,
+                                            compatibility: nil,
                                             substring: "",
                                             except: excluded,
                                             ownersIds: [],
@@ -189,7 +194,27 @@ class SurveysView: UIView {
       }
       .store(in: &subscriptions)
     
+    ///Pagination #6
+    /// By topic compatibiity
+    let paginationByCompatibilityPublisher = instance.paginationByCompatibilityPublisher
+      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+      .eraseToAnyPublisher()
     
+    paginationByCompatibilityPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .Compatibility,
+                                            dateFilter: .AllTime,
+                                            topic: nil,
+                                            userprofile: nil,
+                                            compatibility: $0,
+                                            substring: "",
+                                            except: [],
+                                            ownersIds: [],
+                                            topicsIds: [])
+      }
+      .store(in: &subscriptions)
     
     //Refresh #1
     instance.refreshPublisher
@@ -203,6 +228,7 @@ class SurveysView: UIView {
                                             dateFilter: period,
                                             topic: nil,
                                             userprofile: nil,
+                                            compatibility: nil,
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
@@ -222,6 +248,25 @@ class SurveysView: UIView {
                                             dateFilter: period,
                                             topic: topic,
                                             userprofile: nil,
+                                            compatibility: nil,
+                                            substring: "",
+                                            except: [],
+                                            ownersIds: [],
+                                            topicsIds: [])
+      }
+      .store(in: &subscriptions)
+    
+    ///Refresh #4
+    /// By topic compatibiity
+    instance.refreshByCompatibilityPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .Compatibility,
+                                            dateFilter: .AllTime,
+                                            topic: nil,
+                                            userprofile: nil,
+                                            compatibility: $0,
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
@@ -241,6 +286,7 @@ class SurveysView: UIView {
                                             dateFilter: period,
                                             topic: nil,
                                             userprofile: userprofile,
+                                            compatibility: nil,
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
@@ -297,7 +343,7 @@ class SurveysView: UIView {
             let surveyReference = $0
       else { return }
       
-      let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: 0.7)
+      let banner = Popup(heightScaleFactor: 0.7)
       banner.accessibilityIdentifier = "claim"
       let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
       

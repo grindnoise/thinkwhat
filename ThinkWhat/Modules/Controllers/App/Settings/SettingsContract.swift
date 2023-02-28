@@ -18,6 +18,7 @@ protocol SettingsViewInput: AnyObject {
   
   func updateUsername(_: [String: String])
   func updateBirthDate(_: Date)
+  func updateDescription(_: String)
   func updateGender(_: Gender)
   func updateCity(_ : City)
   func updateFacebook(_ : String)

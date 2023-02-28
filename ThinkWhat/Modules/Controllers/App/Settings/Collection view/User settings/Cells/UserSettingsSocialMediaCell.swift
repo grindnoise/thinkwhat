@@ -43,20 +43,65 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
   private var tasks: [Task<Void, Never>?] = []
   ///`UI`
   private let padding: CGFloat = 8
-  private lazy var stack: UIStackView = {
-    let opaque = UIView.opaque()
-    let instance = UIStackView(arrangedSubviews: [
-      icon,
-      textField,
-      disclosureIndicator
-    ])
-    instance.axis = .horizontal
-    instance.spacing = padding/2
-    instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100,
-                                                                    font: leftLabel.font)).isActive  = true
+  private lazy var backgroundLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.path = UIBezierPath(roundedRect: .zero, cornerRadius: 0).cgPath
+    instance.fillColor = UIColor.secondarySystemFill.cgColor
     
     return instance
   }()
+  private lazy var stack: UIStackView = {
+    let opaque = UIView.opaque()
+    let leftSpacer = UIView.opaque()
+    leftSpacer.widthAnchor.constraint(equalToConstant: 4).isActive = true
+    let rightSpacer = UIView.opaque()
+    rightSpacer.widthAnchor.constraint(equalToConstant: 8).isActive = true
+    let instance = UIStackView(arrangedSubviews: [
+      leftSpacer,
+      icon,
+      textField,
+      disclosureIndicator,
+      rightSpacer
+    ])
+    instance.axis = .horizontal
+    instance.spacing = padding/2
+    instance.clipsToBounds = false
+//    instance.backgroundColor = .secondarySystemFill
+    instance.layer.addSublayer(backgroundLayer)
+    instance.publisher(for: \.bounds, options: .new)
+      .sink { [unowned self] in self.backgroundLayer.path = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath }
+      .store(in: &subscriptions)
+    
+    icon.translatesAutoresizingMaskIntoConstraints = false
+    icon.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+//    instance.publisher(for: \.bounds, options: .new)
+//      .sink { [weak self] in
+//        guard let self = self else {
+//
+//        instance.cornerRadius = $0.width*0.05
+//      }
+//      .store(in: &subscriptions)
+
+    return instance
+  }()
+//  private lazy var stack: UIStackView = {
+//      let opaque = UIView.opaque()
+//      let instance = UIStackView(arrangedSubviews: [
+//        icon,
+//        textField,
+//        disclosureIndicator
+//      ])
+//      instance.axis = .horizontal
+//      instance.spacing = padding/2
+//        instance.backgroundColor = .secondarySystemFill
+//        instance.publisher(for: \.bounds, options: .new)
+//          .sink { instance.cornerRadius = $0.width*0.05 }
+//          .store(in: &subscriptions)
+//      instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100,
+//                                                                      font: leftLabel.font)).isActive  = true
+//
+//      return instance
+//    }()
   private lazy var leftLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .label
@@ -79,28 +124,44 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
     return instance
   }()
   private lazy var textField: UnderlinedSignTextField = {
-    let instance = UnderlinedSignTextField()//lowerTextFieldTopConstant: -4)
-    instance.customRightView = nil
-    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-    instance.clearButtonMode = .always
-    instance.text = ""
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+    let instance = UnderlinedSignTextField()
+//    instance.insets = UIEdgeInsets(top: 8,
+//                                   left: 0,
+//                                   bottom: 8,
+//                                   right: 0)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.translatesAutoresizingMaskIntoConstraints = false
+    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font!) + 16)
+    constraint.identifier = "height"
+    constraint.isActive  = true
     instance.spellCheckingType = .no
     instance.autocorrectionType = .no
-    instance.attributedPlaceholder = NSAttributedString(string: "facebook_link".localized, attributes: [
-      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline) as Any,
-      NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
-    ])
+//  private lazy var textField: UnderlinedSignTextField = {
+//      let instance = UnderlinedSignTextField()//lowerTextFieldTopConstant: -4)
+      instance.customRightView = nil
+//      instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//      instance.clearButtonMode = .always
+//      instance.text = ""
+//      instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+//      instance.spellCheckingType = .no
+//      instance.autocorrectionType = .no
     instance.addTarget(self, action: #selector(self.handleIO(_:)), for: .editingChanged)
     instance.delegate = self
+    instance.clipsToBounds = false
+    instance.layer.masksToBounds = false
     
     instance.publisher(for: \.bounds, options: .new)
       .sink { [weak self] rect in
-        guard instance.getConstraint(identifier: "height").isNil else { return }
-        
-        let constraint = instance.heightAnchor.constraint(equalToConstant: rect.height)
-        constraint.identifier = "height"
-        constraint.isActive = true
+        guard let self = self,
+              let constraint = instance.getConstraint(identifier: "height")
+        else { return }
+
+        self.setNeedsLayout()
+        constraint.constant = max(rect.height, 40)
+        self.layoutIfNeeded()
+//        let constraint = instance.heightAnchor.constraint(equalToConstant: max(rect.height, 40))
+//        constraint.identifier = "height"
+//        constraint.isActive = true
       }
       .store(in: &subscriptions)
     
@@ -123,160 +184,6 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
     
     return instance
   }()
-  
-  
-  
-  
-  //  private lazy var facebookIcon: FacebookLogo = {
-  //    let instance = FacebookLogo()
-  //    instance.isOpaque = false
-  //    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-  //
-  //    return instance
-  //  }()
-  //  private lazy var facebookTextField: UnderlinedSignTextField = {
-  //    let instance = UnderlinedSignTextField()//lowerTextFieldTopConstant: -4)
-  //    instance.customRightView = nil
-  //    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-  //    instance.clearButtonMode = .always
-  //    instance.text = ""
-  //    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
-  //    instance.spellCheckingType = .no
-  //    instance.autocorrectionType = .no
-  //    instance.attributedPlaceholder = NSAttributedString(string: "facebook_link".localized, attributes: [
-  //      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline) as Any,
-  //      NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
-  //    ])
-  //    instance.addTarget(self, action: #selector(self.handleIO(_:)), for: .editingChanged)
-  //    instance.delegate = self
-  //
-  //    instance.publisher(for: \.bounds, options: .new)
-  //      .sink { [weak self] rect in
-  //        guard instance.getConstraint(identifier: "height").isNil else { return }
-  //
-  //        let constraint = instance.heightAnchor.constraint(equalToConstant: rect.height)
-  //        constraint.identifier = "height"
-  //        constraint.isActive = true
-  //      }
-  //      .store(in: &subscriptions)
-  //
-  //    return instance
-  //  }()
-  //  private lazy var facebookButton: UIButton = {
-  //    let instance = UIButton()
-  //    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-  //    instance.imageView?.contentMode = .center
-  //    instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
-  //    instance.publisher(for: \.bounds, options: .new)
-  //      .sink { rect in
-  //        instance.setImage(UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5)), for: .normal)
-  //      }
-  //      .store(in: &subscriptions)
-  //
-  //    return instance
-  //  }()
-  //  private lazy var facebookView: UIStackView = {
-  //    let instance = UIStackView(arrangedSubviews: [facebookIcon, facebookTextField, facebookButton])
-  //    instance.axis = .horizontal
-  //    instance.spacing = 8
-  //
-  //    return instance
-  //  }()
-  //  private lazy var instagramIcon: InstagramLogo = {
-  //    let instance = InstagramLogo()
-  //    instance.isOpaque = false
-  //    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-  //
-  //    return instance
-  //  }()
-  //  private lazy var instagramTextField: UnderlinedSignTextField = {
-  //    let instance = UnderlinedSignTextField()//lowerTextFieldTopConstant: -4)
-  //    instance.text = ""
-  //    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-  //    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
-  //    instance.spellCheckingType = .no
-  //    instance.autocorrectionType = .no
-  //    instance.attributedPlaceholder = NSAttributedString(string: "instagram_link".localized, attributes: [
-  //      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline) as Any,
-  //      NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
-  //    ])
-  //    instance.addTarget(self, action: #selector(self.handleIO(_:)), for: .editingChanged)
-  //    instance.delegate = self
-  //
-  //    return instance
-  //  }()
-  //  private lazy var instagramButton: UIButton = {
-  //    let instance = UIButton()
-  //    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-  //    instance.imageView?.contentMode = .center
-  //    instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
-  //    instance.publisher(for: \.bounds, options: .new)
-  //      .sink { rect in
-  //        instance.setImage(UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5)), for: .normal)
-  //      }
-  //      .store(in: &subscriptions)
-  //
-  //    return instance
-  //  }()
-  //  private lazy var instagramView: UIStackView = {
-  //    let instance = UIStackView(arrangedSubviews: [instagramIcon, instagramTextField, instagramButton])
-  //    instance.axis = .horizontal
-  //    instance.spacing = 8
-  //
-  //    return instance
-  //  }()
-  //  private lazy var tiktokIcon: TikTokLogo = {
-  //    let instance = TikTokLogo()
-  //    instance.isOpaque = false
-  //    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-  //
-  //    return instance
-  //  }()
-  //  private lazy var tiktokTextField: UnderlinedSignTextField = {
-  //    let instance = UnderlinedSignTextField()//lowerTextFieldTopConstant: -8)
-  //    instance.text = ""
-  //    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-  //    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
-  //    instance.spellCheckingType = .no
-  //    instance.autocorrectionType = .no
-  //    instance.attributedPlaceholder = NSAttributedString(string: "tiktok_link".localized, attributes: [
-  //      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline) as Any,
-  //      NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
-  //    ])
-  //    instance.addTarget(self, action: #selector(self.handleIO(_:)), for: .editingChanged)
-  //    instance.delegate = self
-  //
-  //    return instance
-  //  }()
-  //  private lazy var tiktokButton: UIButton = {
-  //    let instance = UIButton()
-  //    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-  //    instance.imageView?.contentMode = .center
-  //    instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
-  //    instance.publisher(for: \.bounds, options: .new)
-  //      .sink { rect in
-  //        instance.setImage(UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5)), for: .normal)
-  //      }
-  //      .store(in: &subscriptions)
-  //
-  //    return instance
-  //  }()
-  //  private lazy var tiktokView: UIStackView = {
-  //    let instance =  UIStackView(arrangedSubviews: [tiktokIcon, tiktokTextField, tiktokButton])
-  //    instance.axis = .horizontal
-  //    instance.spacing = 8
-  //
-  //
-  //    return instance
-  //  }()
-  //  private lazy var verticalStack: UIStackView = {
-  //    let instance = UIStackView(arrangedSubviews: [facebookView, instagramView, tiktokView])
-  //    instance.axis = .vertical
-  //    instance.spacing = 8
-  //    instance.distribution = .fillEqually
-  //
-  //    return instance
-  //  }()
   
   
   
@@ -338,6 +245,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
 private extension UserSettingsSocialMediaCell {
   @MainActor
   func setupUI() {
+    clipsToBounds = false
     stack.place(inside: contentView,
                 bottomPriority: .defaultLow)
   }
@@ -411,11 +319,14 @@ private extension UserSettingsSocialMediaCell {
     }
     textField.text = url.isNil ? "" : url!.absoluteString
     textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [
-      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline) as Any,
+      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body) as Any,
       NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
     ])
     logo.isOpaque = false
     logo.place(inside: icon)
+//    setNeedsLayout()
+//    layoutIfNeeded()
+//    logo.placeInCenter(of: icon, heightMultiplier: 1)
     disclosureIndicator.alpha = url.isNil ? 0 : 1
   }
   
@@ -449,8 +360,7 @@ extension UserSettingsSocialMediaCell: UITextFieldDelegate {
   
   func textFieldDidEndEditing(_ textField: UITextField) {
     guard let tf = textField as? UnderlinedSignTextField,
-          let text = textField.text,
-          let userprofile = Userprofiles.shared.current
+          let text = textField.text
     else {  return }
     
     

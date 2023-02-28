@@ -21,7 +21,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
       setupButtons()
     }
   }
-  //Publishers
+  ///`Publishers`
   public var namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
   public var datePublisher = CurrentValueSubject<Date?, Never>(nil)
   public var genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
@@ -33,6 +33,17 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
       setColors()
     }
   }
+  ///`UI`
+  public var padding: CGFloat = 16 {
+    didSet {
+      updateUI()
+    }
+  }
+  public var insets: UIEdgeInsets? {
+    didSet {
+      updateUI()
+    }
+  }
   
   
   
@@ -41,7 +52,6 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  private let padding: CGFloat = 8
   private lazy var username: UILabel = {
     let instance = UILabel()
     instance.isUserInteractionEnabled = true
@@ -321,6 +331,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     instance.inputAccessoryView = toolBar
     let tenYearsAgo = Calendar.current.date(byAdding: DateComponents(year: -10), to: Date())
     datePicker.maximumDate = tenYearsAgo
+    datePicker.layer.zPosition = 10000
     
     addSubview(instance)
     
@@ -365,39 +376,38 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
   
   
   // MARK: - Overriden methods
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    
-    super.traitCollectionDidChange(previousTraitCollection)
-    
-    //        datePicker.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-    
-    if #available(iOS 15, *) {
-      if !genderButton.configuration.isNil, !ageButton.configuration.isNil {
-        genderButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        ageButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      }
-    } else {
-      genderButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      ageButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    }
-    
-    //Set dynamic font size
-    guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-    
-    guard let constraint_1 = username.getConstraint(identifier: "height"),
-          //              let constraint_2 = gender.getConstraint(identifier: "height"),
-          !username.text.isNil
-    else { return }
-    
-    username.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
-    //        gender.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
-    //        age.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
-    
-    setNeedsLayout()
-    constraint_1.constant = username.text!.height(withConstrainedWidth: username.bounds.width, font: username.font)
-    //        constraint_2.constant = "test".height(withConstrainedWidth: gender.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
-    layoutIfNeeded()
-  }
+//  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//    super.traitCollectionDidChange(previousTraitCollection)
+//
+//    //        datePicker.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//
+//    if #available(iOS 15, *) {
+//      if !genderButton.configuration.isNil, !ageButton.configuration.isNil {
+//        genderButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//        ageButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//      }
+//    } else {
+//      genderButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//      ageButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    }
+//
+//    //Set dynamic font size
+//    guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+//
+//    guard let constraint_1 = username.getConstraint(identifier: "height"),
+//          //              let constraint_2 = gender.getConstraint(identifier: "height"),
+//          !username.text.isNil
+//    else { return }
+//
+//    username.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
+//    //        gender.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
+//    //        age.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
+//
+//    setNeedsLayout()
+//    constraint_1.constant = username.text!.height(withConstrainedWidth: username.bounds.width, font: username.font)
+//    //        constraint_2.constant = "test".height(withConstrainedWidth: gender.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
+//    layoutIfNeeded()
+//  }
   
   override func updateConstraints() {
     super.updateConstraints()
@@ -445,6 +455,21 @@ private extension UserSettingsCredentialsCell {
     constraint.priority = .defaultLow
     constraint.identifier = "bottomAnchor"
     constraint.isActive = true
+  }
+  
+  @MainActor
+  func updateUI() {
+    verticalStack.removeFromSuperview()
+
+    guard let insets = insets else {
+      verticalStack.place(inside: self,
+                          insets: .uniform(size: padding),
+                          bottomPriority: .defaultLow)
+      return
+    }
+    verticalStack.place(inside: self,
+                        insets: insets,
+                        bottomPriority: .defaultLow)
   }
   
   func setTasks() {
