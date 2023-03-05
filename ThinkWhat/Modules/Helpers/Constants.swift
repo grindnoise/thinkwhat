@@ -26,7 +26,7 @@ var localhost: Bool {
     return false
 #endif
 }
-let tabAnimationDuration: TimeInterval = 0.35
+let tabAnimationDuration: TimeInterval = 0.3
 var logger = TimeLogger(sinceOrigin: true)
 let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()

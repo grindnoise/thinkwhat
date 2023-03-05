@@ -66,7 +66,7 @@ class SurveyPreview: UIView {
         //content.backgroundColor = UIColor.lightGray.withAlphaComponent(0.09)
         self.addSubview(content)
         titleLabel.text = survey.title
-        descriptionLabel.text = "   \(survey.description)"
+        descriptionLabel.text = "   \(survey.detailsDescription)"
 //        surveyDate.text = survey.startDate.toDateString()//.toDateTimeStringWithoutSeconds()
         
     }

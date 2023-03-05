@@ -242,20 +242,62 @@ extension UIView {
     NSLayoutConstraint.activate([horizontalConstraint, verticalConstraint, widthConstraint, heightConstraint])
   }
   
+  @discardableResult
   func place(inside parent: UIView,
              insets: UIEdgeInsets = .uniform(size: 0),
-             bottomPriority: UILayoutPriority = .required) {
+             bottomPriority: UILayoutPriority = .required) -> [NSLayoutConstraint] {
     
     parent.addSubview(self)
     translatesAutoresizingMaskIntoConstraints = false
     
-    leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: insets.left).isActive = true
-    topAnchor.constraint(equalTo: parent.topAnchor, constant: insets.top).isActive = true
-    trailingAnchor.constraint(equalTo: parent.trailingAnchor, constant: -insets.right).isActive = true
+    let leadingAnchorConstraint = leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: insets.left)
+    leadingAnchorConstraint.isActive = true
+    leadingAnchorConstraint.identifier = "leadingAnchor"
+    let topAnchorConstraint = topAnchor.constraint(equalTo: parent.topAnchor, constant: insets.top)
+    topAnchorConstraint.isActive = true
+    topAnchorConstraint.identifier = "topAnchor"
+    let trailingAnchorConstraint = trailingAnchor.constraint(equalTo: parent.trailingAnchor, constant: -insets.right)
+    trailingAnchorConstraint.isActive = true
+    trailingAnchorConstraint.identifier = "trailingAnchor"
+    let bottomAnchorConstraint = bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -insets.bottom)
+    bottomAnchorConstraint.isActive = true
+    bottomAnchorConstraint.priority = bottomPriority
+    bottomAnchorConstraint.identifier = "bottomAnchor"
     
-    let constraint = bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -insets.bottom)
-    constraint.priority = bottomPriority
-    constraint.isActive = true
+    return [
+      leadingAnchorConstraint,
+      trailingAnchorConstraint,
+      topAnchorConstraint,
+      bottomAnchorConstraint
+    ]
+  }
+  
+  @discardableResult
+  func placeXCentered(inside parent: UIView,
+                      insets: UIEdgeInsets = .uniform(size: 0)) -> [NSLayoutConstraint] {
+    
+    parent.addSubview(self)
+    translatesAutoresizingMaskIntoConstraints = false
+    
+    let centerXAnchorConstraint = centerXAnchor.constraint(equalTo: parent.centerXAnchor)
+    centerXAnchorConstraint.isActive = true
+    centerXAnchorConstraint.identifier = "centerXAnchor"
+    let widthAnchorConstraint = widthAnchor.constraint(equalTo: parent.widthAnchor, constant: -(insets.left + insets.right))
+    widthAnchorConstraint.isActive = true
+    widthAnchorConstraint.identifier = "widthAnchor"
+    let topAnchorConstraint = topAnchor.constraint(equalTo: parent.topAnchor, constant: insets.top)
+    topAnchorConstraint.isActive = true
+    topAnchorConstraint.identifier = "topAnchor"
+    let bottomAnchorConstraint = bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -insets.bottom)
+    bottomAnchorConstraint.isActive = true
+    bottomAnchorConstraint.identifier = "bottomAnchor"
+    
+    return [
+      centerXAnchorConstraint,
+      widthAnchorConstraint,
+      topAnchorConstraint,
+      bottomAnchorConstraint
+    ]
   }
   
   func placeInCenter(of parent: UIView,

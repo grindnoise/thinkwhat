@@ -254,9 +254,36 @@ class WebViewCell: UICollectionViewCell {
           }
         } else if sideAppPreference == nil, tempAppPreference == nil, isTiTokInstalled {
           
-          let banner = Banner(fadeBackground: false)
           let content = SelectSideApp(app: .TikTok)
-          banner.present(content: content, dismissAfter: 0.75)
+          let banner = NewBanner(contentView: content,
+                                 isModal: true)
+          content.inAppPublisher
+            .sink { [weak self] _ in
+              guard let self = self else { return }
+              
+              self.tempAppPreference = .Embedded
+              // TODO: - Add code
+//              delayAsync(delay: 0.5) {
+//                self.playerView.playVideo()
+//              }
+              banner.dismiss()
+            }
+            .store(in: &self.subscriptions)
+          
+          content.sideAppPublisher
+            .sink { [weak self] _ in
+              guard let self = self else { return }
+              
+              self.tempAppPreference = .App
+              // TODO: - Add code
+//              self.openYotubeApp()
+              banner.dismiss()
+            }
+            .store(in: &self.subscriptions)
+//          let content = SelectSideApp(app: .TikTok)
+//          let banner = Banner(fadeBackground: false)
+
+//          banner.present(content: content, dismissAfter: 0.75)
           banner.didDisappearPublisher
               .sink { _ in banner.removeFromSuperview() }
               .store(in: &self.subscriptions)

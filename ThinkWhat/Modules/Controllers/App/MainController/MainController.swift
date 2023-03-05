@@ -877,18 +877,6 @@ extension MainController: UITabBarControllerDelegate {
   }
 }
 
-//extension MainController: CallbackObservable {
-//    func callbackReceived(_ sender: Any) {
-//        if sender is APIUnavailableView {
-//            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
-//                self.apiUnavailableView?.alpha = 0
-//            } completion: { _ in
-//                self.loadData()
-//            }
-//        }
-//    }
-//}
-
 extension MainController: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
     if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
@@ -903,19 +891,3 @@ extension MainController: CAAnimationDelegate {
     }
   }
 }
-
-//extension MainController: BannerObservable {
-//    func onBannerWillAppear(_ sender: Any) {}
-//
-//    func onBannerWillDisappear(_ sender: Any) {}
-//
-//    func onBannerDidAppear(_ sender: Any) {}
-//
-//    func onBannerDidDisappear(_ sender: Any) {
-//        if let banner = sender as? TestBanner {
-//            banner.removeFromSuperview()
-//        } else if let popup = sender as? Popup {
-//            popup.removeFromSuperview()
-//        }
-//    }
-//}

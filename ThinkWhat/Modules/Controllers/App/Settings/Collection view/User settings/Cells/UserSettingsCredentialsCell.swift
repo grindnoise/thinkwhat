@@ -256,11 +256,21 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     return instance
   }()
   private lazy var verticalStack: UIStackView = {
+    let nested = UIStackView(arrangedSubviews: [
+      genderButton,
+      ageButton
+    ])
+    nested.axis = .horizontal
+    nested.clipsToBounds = false
+    nested.spacing = padding
+//    nested.distribution = .fillEqually
+    
+    
     let instance = UIStackView(arrangedSubviews: [
       userView,
       username,
-      nestedVerticalStack
-    ])// genderButton, ageButton])
+      nested
+    ])
     instance.axis = .vertical
     instance.alignment = .center
     instance.clipsToBounds = false
@@ -277,29 +287,6 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     
     return instance
   }()
-  private lazy var nestedVerticalStack: UIStackView = {
-    let opaque = UIView.opaque()
-    ageButton.placeInCenter(of: opaque)
-    let instance = UIStackView(arrangedSubviews: [
-      genderButton,
-      opaque
-    ])
-    instance.axis = .vertical
-    instance.clipsToBounds = false
-    instance.spacing = padding
-    instance.distribution = .fillEqually
-    
-    //        userView.translatesAutoresizingMaskIntoConstraints = false
-    //        username.translatesAutoresizingMaskIntoConstraints = false
-    //
-    //        NSLayoutConstraint.activate([
-    //            userView.widthAnchor.constraint(equalTo: instance.widthAnchor),
-    //            userView.heightAnchor.constraint(equalToConstant: 200),
-    //            username.widthAnchor.constraint(equalTo: instance.widthAnchor),
-    //        ])
-    
-    return instance
-  }()
   private lazy var credentialsTextField: UsernameInputTextField = {
     let instance = UsernameInputTextField(font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!, delegate: self)
     addSubview(instance)
@@ -313,21 +300,14 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 44))
     toolBar.isTranslucent = true
     toolBar.accessibilityIdentifier = "toolBar"
-    //        toolBar.tintColor = UIColor { traitCollection in
-    //            switch traitCollection.userInterfaceStyle {
-    //            case .dark:
-    //                return UIColor.systemBlue
-    //            default:
-    //                return K_COLOR_RED
-    //            }
-    //        }
     toolBar.backgroundColor = .tertiarySystemBackground
     toolBar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
     toolBar.superview?.backgroundColor = .tertiarySystemBackground
-    let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: nil, action: #selector(self.dateSelected))
+    let doneButton = UIBarButtonItem(title: "select".localized, style: .done, target: nil, action: #selector(self.dateSelected))
     let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
     toolBar.items = [space, doneButton]
     toolBar.barStyle = .default
+    toolBar.tintColor = color
     instance.inputAccessoryView = toolBar
     let tenYearsAgo = Calendar.current.date(byAdding: DateComponents(year: -10), to: Date())
     datePicker.maximumDate = tenYearsAgo

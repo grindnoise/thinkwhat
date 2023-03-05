@@ -18,7 +18,7 @@ class PollDescriptionCell: UICollectionViewCell {
             
 //            setNeedsLayout()
 //            layoutIfNeeded()
-            textView.text = item.description
+            textView.text = item.detailsDescription
 //            let constraint = textView.heightAnchor.constraint(equalToConstant: textView.contentSize.height)
 //            constraint.identifier = "height"
 //            constraint.isActive = true

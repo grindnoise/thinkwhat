@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CardView: UIView, HotCard {
+class CardView: UIView {//}, HotCard {
     func onVote() {
         
     }
@@ -55,8 +55,8 @@ class CardView: UIView, HotCard {
             paragraph.hyphenationFactor = 1
         }
         
-        let attributedText = NSMutableAttributedString(string: survey.description, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
-        attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: .label, backgroundColor: .clear), range: survey.description.fullRange())
+        let attributedText = NSMutableAttributedString(string: survey.detailsDescription, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
+        attributedText.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 17), foregroundColor: .label, backgroundColor: .clear), range: survey.detailsDescription.fullRange())
         self.descriptionTextView.attributedText = attributedText
         setupUI()
         setObservers()

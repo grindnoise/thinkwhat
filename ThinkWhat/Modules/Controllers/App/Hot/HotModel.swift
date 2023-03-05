@@ -11,11 +11,57 @@ import SwiftyJSON
 
 class HotModel {
     
-    weak var modelOutput: HotModelOutput?
+  weak var modelOutput: HotModelOutput?
 }
 
 // MARK: - Controller Input
 extension HotModel: HotControllerInput {
+  func getSurveys(_ excludeList: [Survey]) {
+    Task {
+      do {
+        var parameters: [String: Any] = [:]
+        let stackList = excludeList.map { $0.id }
+        let rejectedList = Surveys.shared.all
+          .filter { $0.isRejected}
+          .map { $0.id }
+        let claimedList = Surveys.shared.all
+          .filter { $0.isClaimed}
+          .map { $0.id }
+        let list = Array(Set(stackList + rejectedList + claimedList)).uniqued()
+        
+        if !list.isEmpty {
+          parameters["exclude_ids"] = list
+        }
+        
+        let data = try await API.shared.surveys.getSurveys(type: .Hot,
+                                                           parameters: parameters)
+        let json = try JSON(data: data,
+                            options: .mutableContainers)
+#if DEBUG
+        print(json)
+#endif
+        Surveys.shared.load(json)
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
+    
+    
+    
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
     func reject(_ survey: Survey) {
         Task {
             do {
@@ -34,7 +80,9 @@ extension HotModel: HotControllerInput {
             do {
                 var parameters: [String: Any] = [:]
                 let stackList = Surveys.shared.hot.map { $0.id }
-                let rejectedList = Surveys.shared.rejected.map { $0.id }
+              let rejectedList = Surveys.shared.all
+                .filter { $0.isRejected}
+                .map { $0.id }
                 let list = Array(Set(stackList + rejectedList))
                 if !list.isEmpty {
                     parameters["exclude_ids"] = list
@@ -47,11 +95,11 @@ extension HotModel: HotControllerInput {
 #endif
                 await MainActor.run {
                     Surveys.shared.load(json)
-                    modelOutput?.onRequestCompleted()
+//                    modelOutput?.onRequestCompleted()
                 }
             } catch {
                 await MainActor.run {
-                    modelOutput?.onRequestCompleted()
+//                    modelOutput?.onRequestCompleted()
                 }
 #if DEBUG
                 print(error.localizedDescription)

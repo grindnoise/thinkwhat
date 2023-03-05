@@ -8,48 +8,29 @@
 
 import UIKit
 
-/// *View* sends user actions to the *Controller*.
-///
-/// **Controller** conforms to this protocol
-protocol HotViewInput: class {
-    
-    var controllerOutput: HotControllerOutput? { get set }
-    var controllerInput: HotControllerInput? { get set }
-    // View input methods here
-//    var surveyStack: [Survey] { get set }
-    func onReject(_: Survey)
-    func onEmptyStack()
-    func onVote(survey: Survey)
-    func onClaim(survey: Survey, reason: Claim)
+protocol HotViewInput: AnyObject {
+  var controllerOutput: HotControllerOutput? { get set }
+  var controllerInput: HotControllerInput? { get set }
+  var queue: QueueArray<Survey> { get }
+  var tabBarHeight: CGFloat { get }
+  var navBarHeight: CGFloat { get }
+  
+  func deque() -> Survey?
+  
 }
 
-/// *Controller* tells the *Model* what to do based on the input
-///
-/// **Model** conforms to this protocol
-protocol HotControllerInput: class {
-    
-    var modelOutput: HotModelOutput? { get set }
-    func loadSurveys()
-    func claim(survey: Survey, reason: Claim)
-    func reject(_: Survey)
+protocol HotControllerInput: AnyObject {
+  var modelOutput: HotModelOutput? { get set }
+ 
+  func getSurveys(_:[Survey])
 }
 
-/// *Model* returns the result to the *Controller*
-///
-/// **Controller** conforms to this protocol
-protocol HotModelOutput: class {
-    func onRequestCompleted()
+protocol HotModelOutput: AnyObject {
+  
 }
 
-/// *Controller* returns a UI-representable result to the *View*
-///
-/// **View** conforms to this protocol
-protocol HotControllerOutput: class {
-    var viewInput: HotViewInput? { get set }
-    
-    func onLoad()
-    func skipCard()
-    func onDidAppear()
-    func onDidLayout()
-    func populateStack()
+protocol HotControllerOutput: AnyObject {
+  var viewInput: (UIViewController & HotViewInput)? { get set }
+  
+  func peek(_: Survey?)
 }

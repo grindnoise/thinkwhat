@@ -8,7 +8,7 @@
 
 import UIKit
 
-class LargeCard: UIView, HotCard {
+class LargeCard: UIView {//}, HotCard {
 
     deinit {
         print("LargeCard deinit")
@@ -142,7 +142,7 @@ class LargeCard: UIView, HotCard {
             paragraph.hyphenationFactor = 1
         }
         paragraph.alignment = .center
-        let string = survey.description
+        let string = survey.detailsDescription
         let descriptionString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle : paragraph])
         descriptionString.addAttributes(StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: titleLabel.bounds.width * 0.05), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any], range: string.fullRange())
         descriptionLabel.attributedText = descriptionString

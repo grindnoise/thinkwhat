@@ -175,196 +175,196 @@ struct ColorsStruct {
 }
 
 enum Colors {
-    case system(System)
-    case logo(Logo)
-    case tag(Tag)
+  case system(System)
+  case logo(Logo)
+  case tag(Tag)
+  
+  enum System: RawRepresentable, CaseIterable {
+    typealias RawValue = UIColor
     
-    enum System: RawRepresentable, CaseIterable {
-        typealias RawValue = UIColor
-        
-        case Red//Persian red
-        case Purple
-        
-        init?(rawValue: RawValue) {
-            switch rawValue.toHexString().lowercased() {
-            case "#cc3333".lowercased(): self = .Red
-            case "#666699".lowercased(): self = .Purple
-            default: return nil
-            }
-        }
-        
-        var rawValue: RawValue {
-            switch self {
-            case .Red:      return UIColor(hexString: "#cc3333")
-            case .Purple:   return UIColor(hexString: "#666699")
-            }
-        }
-        
-        public func next() -> System {
-            switch self {
-            case .Red: return .Purple
-            case .Purple: return .Red
-            }
-        }
+    case Red//Persian red
+    case Purple
+    
+    init?(rawValue: RawValue) {
+      switch rawValue.toHexString().lowercased() {
+      case "#cc3333".lowercased(): self = .Red
+      case "#666699".lowercased(): self = .Purple
+      default: return nil
+      }
     }
     
-    enum Logo: RawRepresentable, CaseIterable {
-        typealias RawValue = UIColor
-        
-        case Flame            //= UIColor(hexString: "#e4572e")
-        case CoolGray   //= UIColor(hexString: "#AFC2D5")
-        case Marigold         //= UIColor(hexString: "#F3A712")
-        case GreenMunshell          //= UIColor(hexString: "#A8C686")
-        case AirBlue          //= UIColor(hexString: "#669BBC")
-        
-        init?(rawValue: RawValue) {
-            switch rawValue.toHexString().lowercased() {
-            case "#e4572e".lowercased(): self = .Flame
-            case "#8B8BAE".lowercased(): self = .CoolGray
-            case "#F3A712".lowercased(): self = .Marigold
-            case "#00A878".lowercased(): self = .GreenMunshell
-            case "#669BBC".lowercased(): self = .AirBlue
-            default: return nil
-            }
-        }
-        
-        var rawValue: RawValue {
-            switch self {
-            case .Flame:                return UIColor(hexString: "#e4572e")
-            case .CoolGray:             return UIColor(hexString: "#8B8BAE")
-            case .Marigold:             return UIColor(hexString: "#F3A712")
-            case .GreenMunshell:        return UIColor(hexString: "#00A878")
-            case .AirBlue:              return UIColor(hexString: "#669BBC")
-            }
-        }
-        
-        public func next() -> Logo {
-            switch self {
-            case .Flame: return .CoolGray
-            case .CoolGray: return .Marigold
-            case .Marigold: return .GreenMunshell
-            case .GreenMunshell: return .AirBlue
-            case .AirBlue: return .Flame
-            }
-        }
+    var rawValue: RawValue {
+      switch self {
+      case .Red:      return UIColor(hexString: "#cc3333")
+      case .Purple:   return UIColor(hexString: "#666699")
+      }
     }
     
-    enum Tag: RawRepresentable, CaseIterable {
-        typealias RawValue = UIColor
-        
-        case RoyalPurple
-        case PacificBlue
-        case LaserLemon
-        case CoyoteBrown
-        case EnglishVermillion
-        case BudGreen
-        case Corn
-        case Saffron
-        case OrangeSoda
-        case DarkSlateBlue
-        case BleuDeFrance
-        case SandyBrown
-        case CafeNoir
-        case Cardinal
-        case GreenPantone
-        case HoneyYellow
-        case VioletBlueCrayola
-        case Avocado
-        
-        init?(rawValue: RawValue) {
-            switch rawValue.toHexString().lowercased() {
-            case "#6C4FB2".lowercased(): self = .RoyalPurple
-            case "#47A8BD".lowercased(): self = .PacificBlue
-            case "#F0F757".lowercased(): self = .LaserLemon
-            case "#8F5D35".lowercased(): self = .CoyoteBrown
-            case "#D14C57".lowercased(): self = .EnglishVermillion
-            case "#72BC71".lowercased(): self = .BudGreen
-            case "#F2E86D".lowercased(): self = .Corn
-            case "#F8C630".lowercased(): self = .Saffron
-            case "#F2542D".lowercased(): self = .OrangeSoda
-            case "#4E4187".lowercased(): self = .DarkSlateBlue
-            case "#3083DC".lowercased(): self = .BleuDeFrance
-            case "#FC9F5B".lowercased(): self = .SandyBrown
-            case "#4E3822".lowercased(): self = .CafeNoir
-            case "#AD343E".lowercased(): self = .Cardinal
-            case "#4DAA57".lowercased(): self = .GreenPantone
-            case "#FBB02D".lowercased(): self = .HoneyYellow
-            case "#7776BC".lowercased(): self = .VioletBlueCrayola
-            case "#5C8001".lowercased(): self = .Avocado
-            default: return nil
-            }
-        }
-        
-        var rawValue: RawValue {
-            switch self {
-            case .RoyalPurple:          return UIColor(hexString: "#6C4FB2")
-            case .PacificBlue:          return UIColor(hexString: "#47A8BD")
-            case .LaserLemon:           return UIColor(hexString: "#F0F757")
-            case .CoyoteBrown:          return UIColor(hexString: "#8F5D35")
-            case .EnglishVermillion:    return UIColor(hexString: "#D14C57")
-            case .BudGreen:             return UIColor(hexString: "#72BC71")
-            case .Corn:                 return UIColor(hexString: "#F2E86D")
-            case .Saffron:              return UIColor(hexString: "#F8C630")
-            case .OrangeSoda:           return UIColor(hexString: "#F2542D")
-            case .DarkSlateBlue:        return UIColor(hexString: "#4E4187")
-            case .BleuDeFrance:         return UIColor(hexString: "#3083DC")
-            case .SandyBrown:           return UIColor(hexString: "#FC9F5B")
-            case .CafeNoir:             return UIColor(hexString: "#4E3822")
-            case .Cardinal:             return UIColor(hexString: "#AD343E")
-            case .GreenPantone:         return UIColor(hexString: "#4DAA57")
-            case .HoneyYellow:          return UIColor(hexString: "#FBB02D")
-            case .VioletBlueCrayola:    return UIColor(hexString: "#7776BC")
-            case .Avocado:              return UIColor(hexString: "#5C8001")
-            }
-        }
-        
-        public func next() -> Tag {
-            switch self {
-            case .RoyalPurple: return .PacificBlue
-            case .PacificBlue: return .LaserLemon
-            case .LaserLemon: return .CoyoteBrown
-            case .CoyoteBrown: return .EnglishVermillion
-            case .EnglishVermillion: return .BudGreen
-            case .BudGreen: return .Corn
-            case .Corn: return .Saffron
-            case .Saffron: return .OrangeSoda
-            case .OrangeSoda: return .DarkSlateBlue
-            case .DarkSlateBlue: return .BleuDeFrance
-            case .BleuDeFrance: return .SandyBrown
-            case .SandyBrown: return .CafeNoir
-            case .CafeNoir: return .Cardinal
-            case .Cardinal: return .GreenPantone
-            case .GreenPantone: return .HoneyYellow
-            case .HoneyYellow: return .VioletBlueCrayola
-            case .VioletBlueCrayola: return .Avocado
-            case .Avocado: return .RoyalPurple
-            }
-        }
-        
-        static func all() -> [UIColor] {
-            return [
-                Tag.GreenPantone.rawValue,
-                Tag.EnglishVermillion.rawValue,
-                Tag.HoneyYellow.rawValue,
-                Tag.RoyalPurple.rawValue,
-                Tag.Saffron.rawValue,
-                Tag.CoyoteBrown.rawValue,
-                Tag.BudGreen.rawValue,
-                Tag.PacificBlue.rawValue,
-                Tag.LaserLemon.rawValue,
-                Tag.Corn.rawValue,
-                Tag.Saffron.rawValue,
-                Tag.OrangeSoda.rawValue,
-                Tag.DarkSlateBlue.rawValue,
-                Tag.BleuDeFrance.rawValue,
-                Tag.SandyBrown.rawValue,
-                Tag.CafeNoir.rawValue,
-                Tag.Cardinal.rawValue,
-                Tag.VioletBlueCrayola.rawValue,
-                Tag.Avocado.rawValue
-            ]
-        }
+    public func next() -> System {
+      switch self {
+      case .Red: return .Purple
+      case .Purple: return .Red
+      }
     }
+  }
+  
+  enum Logo: RawRepresentable, CaseIterable {
+    typealias RawValue = UIColor
+    
+    case Flame            //= UIColor(hexString: "#e4572e")
+    case CoolGray   //= UIColor(hexString: "#AFC2D5")
+    case Marigold         //= UIColor(hexString: "#F3A712")
+    case GreenMunshell          //= UIColor(hexString: "#A8C686")
+    case AirBlue          //= UIColor(hexString: "#669BBC")
+    
+    init?(rawValue: RawValue) {
+      switch rawValue.toHexString().lowercased() {
+      case "#e4572e".lowercased(): self = .Flame
+      case "#8B8BAE".lowercased(): self = .CoolGray
+      case "#F3A712".lowercased(): self = .Marigold
+      case "#00A878".lowercased(): self = .GreenMunshell
+      case "#669BBC".lowercased(): self = .AirBlue
+      default: return nil
+      }
+    }
+    
+    var rawValue: RawValue {
+      switch self {
+      case .Flame:                return UIColor(hexString: "#e4572e")
+      case .CoolGray:             return UIColor(hexString: "#8B8BAE")
+      case .Marigold:             return UIColor(hexString: "#F3A712")
+      case .GreenMunshell:        return UIColor(hexString: "#00A878")
+      case .AirBlue:              return UIColor(hexString: "#669BBC")
+      }
+    }
+    
+    public func next() -> Logo {
+      switch self {
+      case .Flame: return .CoolGray
+      case .CoolGray: return .Marigold
+      case .Marigold: return .GreenMunshell
+      case .GreenMunshell: return .AirBlue
+      case .AirBlue: return .Flame
+      }
+    }
+  }
+  
+  enum Tag: RawRepresentable, CaseIterable {
+    typealias RawValue = UIColor
+    
+    case RoyalPurple
+    case PacificBlue
+    case LaserLemon
+    case CoyoteBrown
+    case EnglishVermillion
+    case BudGreen
+    case Corn
+    case Saffron
+    case OrangeSoda
+    case DarkSlateBlue
+    case BleuDeFrance
+    case SandyBrown
+    case CafeNoir
+    case Cardinal
+    case GreenPantone
+    case HoneyYellow
+    case VioletBlueCrayola
+    case Avocado
+    
+    init?(rawValue: RawValue) {
+      switch rawValue.toHexString().lowercased() {
+      case "#6C4FB2".lowercased(): self = .RoyalPurple
+      case "#47A8BD".lowercased(): self = .PacificBlue
+      case "#F0F757".lowercased(): self = .LaserLemon
+      case "#8F5D35".lowercased(): self = .CoyoteBrown
+      case "#D14C57".lowercased(): self = .EnglishVermillion
+      case "#72BC71".lowercased(): self = .BudGreen
+      case "#F2E86D".lowercased(): self = .Corn
+      case "#F8C630".lowercased(): self = .Saffron
+      case "#F2542D".lowercased(): self = .OrangeSoda
+      case "#4E4187".lowercased(): self = .DarkSlateBlue
+      case "#3083DC".lowercased(): self = .BleuDeFrance
+      case "#FC9F5B".lowercased(): self = .SandyBrown
+      case "#4E3822".lowercased(): self = .CafeNoir
+      case "#AD343E".lowercased(): self = .Cardinal
+      case "#4DAA57".lowercased(): self = .GreenPantone
+      case "#FBB02D".lowercased(): self = .HoneyYellow
+      case "#7776BC".lowercased(): self = .VioletBlueCrayola
+      case "#5C8001".lowercased(): self = .Avocado
+      default: return nil
+      }
+    }
+    
+    var rawValue: RawValue {
+      switch self {
+      case .RoyalPurple:          return UIColor(hexString: "#6C4FB2")
+      case .PacificBlue:          return UIColor(hexString: "#47A8BD")
+      case .LaserLemon:           return UIColor(hexString: "#F0F757")
+      case .CoyoteBrown:          return UIColor(hexString: "#8F5D35")
+      case .EnglishVermillion:    return UIColor(hexString: "#D14C57")
+      case .BudGreen:             return UIColor(hexString: "#72BC71")
+      case .Corn:                 return UIColor(hexString: "#F2E86D")
+      case .Saffron:              return UIColor(hexString: "#F8C630")
+      case .OrangeSoda:           return UIColor(hexString: "#F2542D")
+      case .DarkSlateBlue:        return UIColor(hexString: "#4E4187")
+      case .BleuDeFrance:         return UIColor(hexString: "#3083DC")
+      case .SandyBrown:           return UIColor(hexString: "#FC9F5B")
+      case .CafeNoir:             return UIColor(hexString: "#4E3822")
+      case .Cardinal:             return UIColor(hexString: "#AD343E")
+      case .GreenPantone:         return UIColor(hexString: "#4DAA57")
+      case .HoneyYellow:          return UIColor(hexString: "#FBB02D")
+      case .VioletBlueCrayola:    return UIColor(hexString: "#7776BC")
+      case .Avocado:              return UIColor(hexString: "#5C8001")
+      }
+    }
+    
+    public func next() -> Tag {
+      switch self {
+      case .RoyalPurple: return .PacificBlue
+      case .PacificBlue: return .LaserLemon
+      case .LaserLemon: return .CoyoteBrown
+      case .CoyoteBrown: return .EnglishVermillion
+      case .EnglishVermillion: return .BudGreen
+      case .BudGreen: return .Corn
+      case .Corn: return .Saffron
+      case .Saffron: return .OrangeSoda
+      case .OrangeSoda: return .DarkSlateBlue
+      case .DarkSlateBlue: return .BleuDeFrance
+      case .BleuDeFrance: return .SandyBrown
+      case .SandyBrown: return .CafeNoir
+      case .CafeNoir: return .Cardinal
+      case .Cardinal: return .GreenPantone
+      case .GreenPantone: return .HoneyYellow
+      case .HoneyYellow: return .VioletBlueCrayola
+      case .VioletBlueCrayola: return .Avocado
+      case .Avocado: return .RoyalPurple
+      }
+    }
+    
+    static func all() -> [UIColor] {
+      return [
+        Tag.GreenPantone.rawValue,
+        Tag.EnglishVermillion.rawValue,
+        Tag.HoneyYellow.rawValue,
+        Tag.RoyalPurple.rawValue,
+        Tag.Saffron.rawValue,
+        Tag.CoyoteBrown.rawValue,
+        Tag.BudGreen.rawValue,
+        Tag.PacificBlue.rawValue,
+        Tag.LaserLemon.rawValue,
+        Tag.Corn.rawValue,
+        Tag.Saffron.rawValue,
+        Tag.OrangeSoda.rawValue,
+        Tag.DarkSlateBlue.rawValue,
+        Tag.BleuDeFrance.rawValue,
+        Tag.SandyBrown.rawValue,
+        Tag.CafeNoir.rawValue,
+        Tag.Cardinal.rawValue,
+        Tag.VioletBlueCrayola.rawValue,
+        Tag.Avocado.rawValue
+      ]
+    }
+  }
   
   static func getColor(forId id: Int) -> UIColor {
     let colors = [
@@ -391,6 +391,11 @@ enum Colors {
     guard (0...colors.count-1).contains(id) else { return .systemGray }
     
     return colors[id]
+  }
+  
+  static func textField(color: UIColor,
+                        traitCollection: UITraitCollection) -> UIColor {
+    return color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.05 : 0.6)
   }
 }
 

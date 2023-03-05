@@ -17,18 +17,20 @@ class SurveyReference: Decodable {// NSObject,
   private enum CodingKeys: String, CodingKey {
     case id, type, title, category, likes, views, progress, rating, description, share_link, active,
          startDate = "start_date",
-         isComplete = "is_complete",
-         isOwn = "is_own",
-         isFavorite = "is_favorite",
          owner = "userprofile",
          votesLimit = "vote_capacity",
          votesTotal = "votes_total",
          commentsTotal = "comments_total",
+         isComplete = "is_complete",
+         isOwn = "is_own",
+         isNew = "is_new",
+         isTop = "is_top",
          isHot = "is_hot",
+         isFavorite = "is_favorite",
+         isVisited = "is_visited",
          isAnonymous = "is_anonymous",
          isBanned = "is_banned",
-         media = "media_preview",
-         isVisited = "is_visited"
+         media = "media_preview"
   }
   
   //    //NS
@@ -90,6 +92,52 @@ class SurveyReference: Decodable {// NSObject,
     }
   }
   var type: Survey.SurveyType
+  var owner: Userprofile
+  var votesTotal: Int {
+    didSet {
+      guard oldValue != votesTotal else { return }
+      
+      survey?.votesTotal = votesTotal
+      votesPublisher.send(votesTotal)
+    }
+  }
+  var commentsTotal: Int {
+    didSet {
+      guard oldValue != commentsTotal else { return }
+      
+      commentsTotalPublisher.send(commentsTotal)
+      NotificationCenter.default.post(name: Notifications.Surveys.CommentsTotal, object: self)
+      survey?.commentsTotal = commentsTotal
+    }
+  }
+  var votesLimit: Int
+  var survey: Survey? {
+    return Surveys.shared.all.filter{ $0.reference == self }.first
+  }
+  var progress: Int {
+    didSet {
+      guard oldValue != progress else { return }
+      NotificationCenter.default.post(name: Notifications.Surveys.Progress, object: self)
+      survey?.progress = progress
+    }
+  }
+  var media: Mediafile? {
+    didSet {
+      guard let media = media,
+            let survey = survey
+      else { return }
+      
+      if survey.media.isEmpty {
+        survey.media.append(media)
+      } else if let firstMedia = survey.media.first, firstMedia.image.isNil {
+        //Set image to prevent download
+        firstMedia.image = media.image
+      }
+    }
+  }
+  var shareHash:              String = ""
+  var shareEncryptedString:   String = ""
+  ///**Filtering properties
   var isComplete: Bool {
     didSet {
       guard oldValue != isComplete else { return }
@@ -107,10 +155,10 @@ class SurveyReference: Decodable {// NSObject,
       guard oldValue != isHot else { return }
       
       isHotPublisher.send(isHot)
-      //            isHotPublisher.send(completion: .finished)
-      NotificationCenter.default.post(name: Notifications.Surveys.SwitchHot, object: self)
     }
   }
+  var isNew: Bool
+  var isTop: Bool
   var isFavorite: Bool {
     didSet {
       guard oldValue != isFavorite else { return }
@@ -163,65 +211,27 @@ class SurveyReference: Decodable {// NSObject,
       survey?.isClaimed = isClaimed
     }
   }
-  var owner: Userprofile
-  var votesTotal: Int {
+  var isRejected: Bool = false {
     didSet {
-      guard oldValue != votesTotal else { return }
+      guard isRejected != oldValue else { return }
       
-      survey?.votesTotal = votesTotal
-      votesPublisher.send(votesTotal)
+      isRejectedPublisher.send(isRejected)
     }
   }
-  var commentsTotal: Int {
-    didSet {
-      guard oldValue != commentsTotal else { return }
-      
-      commentsTotalPublisher.send(commentsTotal)
-      NotificationCenter.default.post(name: Notifications.Surveys.CommentsTotal, object: self)
-      survey?.commentsTotal = commentsTotal
-    }
-  }
-  var votesLimit: Int
-  var survey: Survey? {
-    return Surveys.shared.all.filter{ $0.reference == self }.first
-  }
-  var progress: Int {
-    didSet {
-      guard oldValue != progress else { return }
-      NotificationCenter.default.post(name: Notifications.Surveys.Progress, object: self)
-      survey?.progress = progress
-    }
-  }
-  var media: Mediafile? {
-    didSet {
-      guard let media = media,
-            let survey = survey
-      else { return }
-      
-      if survey.media.isEmpty {
-        survey.media.append(media)
-      } else if let firstMedia = survey.media.first, firstMedia.image.isNil {
-        //Set image to prevent download
-        firstMedia.image = media.image
-      }
-    }
-  }
-  var shareHash:              String = ""
-  var shareEncryptedString:   String = ""
-  ///`Publishers`
-  var surveyPublisher         = PassthroughSubject<Survey, Never>()
-  var ratingPublisher         = PassthroughSubject<Double, Never>()
-  var isActivePublisher       = PassthroughSubject<Bool, Never>()
-  var isFavoritePublisher     = PassthroughSubject<Bool, Never>()
-  var isCompletePublisher     = PassthroughSubject<Bool, Never>()
-  var isClaimedPublisher      = PassthroughSubject<Bool, Never>()
-  var isBannedPublisher       = PassthroughSubject<Bool, Never>()
-  var isVisitedPublisher      = PassthroughSubject<Bool, Never>()
-  var isHotPublisher          = PassthroughSubject<Bool, Never>()
-  var viewsPublisher          = PassthroughSubject<Int, Never>()
-  var likesPublisher          = PassthroughSubject<Int, Never>()
-  var votesPublisher          = PassthroughSubject<Int, Never>()
-  var commentsTotalPublisher  = PassthroughSubject<Int, Never>()
+  ///**Publishers
+  public let ratingPublisher         = PassthroughSubject<Double, Never>()
+  public let isActivePublisher       = PassthroughSubject<Bool, Never>()
+  public let isFavoritePublisher     = PassthroughSubject<Bool, Never>()
+  public let isCompletePublisher     = PassthroughSubject<Bool, Never>()
+  public let isClaimedPublisher      = PassthroughSubject<Bool, Never>()
+  public let isBannedPublisher       = PassthroughSubject<Bool, Never>()
+  public let isVisitedPublisher      = PassthroughSubject<Bool, Never>()
+  public let isHotPublisher          = PassthroughSubject<Bool, Never>()
+  public let isRejectedPublisher     = PassthroughSubject<Bool, Never>()
+  public let viewsPublisher          = PassthroughSubject<Int, Never>()
+  public let likesPublisher          = PassthroughSubject<Int, Never>()
+  public let votesPublisher          = PassthroughSubject<Int, Never>()
+  public let commentsTotalPublisher  = PassthroughSubject<Int, Never>()
   
   
   
@@ -256,13 +266,15 @@ class SurveyReference: Decodable {// NSObject,
       votesTotal  = try container.decode(Int.self, forKey: .votesTotal)
       commentsTotal = try container.decode(Int.self, forKey: .commentsTotal)
       startDate   = try container.decode(Date.self, forKey: .startDate)
+      progress    = try container.decode(Int.self, forKey: .progress)
       isComplete  = try container.decode(Bool.self, forKey: .isComplete)
       isOwn       = try container.decode(Bool.self, forKey: .isOwn)
       isFavorite  = try container.decode(Bool.self, forKey: .isFavorite)
       isHot       = try container.decode(Bool.self, forKey: .isHot)
       isBanned    = try container.decode(Bool.self, forKey: .isBanned)
       isVisited   = try container.decode(Bool.self, forKey: .isVisited)
-      progress    = try container.decode(Int.self, forKey: .progress)
+      isTop       = try container.decode(Bool.self, forKey: .isTop)
+      isNew       = try container.decode(Bool.self, forKey: .isNew)
       let shareData           = try container.decode([String].self, forKey: .share_link)
       shareHash               = shareData.first ?? ""
       shareEncryptedString    = shareData.last ?? ""
@@ -304,7 +316,7 @@ class SurveyReference: Decodable {// NSObject,
     self.isComplete              = true
     self.isFavorite              = true
     self.isVisited               = true
-    self.isBanned = false
+    self.isBanned                = false
     self.votesTotal              = 0
     self.commentsTotal           = 0
     self.votesLimit              = 0
@@ -313,6 +325,8 @@ class SurveyReference: Decodable {// NSObject,
     self.truncatedDescription    = ""
     self.progress                = 0
     self.rating                  = 0
+    self.isNew                   = true
+    self.isTop                   = false
   }
   
   init(id: Int,
@@ -330,6 +344,8 @@ class SurveyReference: Decodable {// NSObject,
        isFavorite: Bool,
        isVisited: Bool,
        isHot: Bool,
+       isNew: Bool,
+       isTop: Bool,
        survey: Survey,
        owner: Userprofile,
        votesTotal: Int = 0,
@@ -361,7 +377,9 @@ class SurveyReference: Decodable {// NSObject,
     self.progress                = progress
     self.rating                  = rating
     self.isActive                = isActive
-    self.isBanned = isBanned
+    self.isBanned                = isBanned
+    self.isNew                   = isNew
+    self.isTop                   = isTop
     
     //Swift
     if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {

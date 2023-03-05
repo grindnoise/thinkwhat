@@ -384,6 +384,7 @@
 "account_delete" = "Account deleting";
 "account_logout_description" = "You are about to sign out of your account. Continue?";
 "account_delete_description" = "Deleting an account is an irreversible action. Continue?";
+"account_location_empty" = "Please select your location";
 
 //Userprofile
 "userprofile_is_in_community" = "Is in community";

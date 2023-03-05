@@ -27,7 +27,7 @@ class UserprofileCollectionView: UICollectionView {
       setupUI()
     }
   }
-  ///`Publishers`
+  ///**Publishers**
   public let urlPublisher = PassthroughSubject<URL, Never>()
   public var subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
@@ -37,7 +37,7 @@ class UserprofileCollectionView: UICollectionView {
   public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
   public let colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
   public let disclosurePublisher = PassthroughSubject<TopicCompatibility, Never>()
-  ///`UI`
+  ///**UI**
   public var color: UIColor = .label {
     didSet {
       colorPublisher.send(color)
@@ -120,18 +120,12 @@ private extension UserprofileCollectionView {
       
       self.colorPublisher
         .filter { !$0.isNil }
-        .sink {
-          cell.color = $0!
-        }
+        .sink { cell.color = $0! }
         .store(in: &self.subscriptions)
-      
+
       cell.refreshPublisher
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.source.refresh()
-        }
+        .sink { [unowned self] _ in self.source.refresh() }
         .store(in: &self.subscriptions)
       
       cell.disclosurePublisher

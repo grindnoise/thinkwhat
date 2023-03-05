@@ -117,7 +117,7 @@ struct Notifications {
         static let UpdateFavorite                   = Notification.Name("NotificationFavoriteSurveysUpdated")
         static let UpdateTopSurveys                 = Notification.Name("NotificationTopSurveysUpdated")
         static let UpdateNewSurveys                 = Notification.Name("NotificationNewSurveysUpdated")
-        static let SwitchHot                        = Notification.Name("NotificationSwitchHot")
+//        static let SwitchHot                        = Notification.Name("NotificationSwitchHot")
         static let UpdateSubscriptions              = Notification.Name("NotificationSubscriptionsReceived")
         static let UpdateOwn                        = Notification.Name("NotificationOwnSurveysUpdated")
 //        static let UpdateAll                        = Notification.Name("NotificationAllSurveysUpdated")

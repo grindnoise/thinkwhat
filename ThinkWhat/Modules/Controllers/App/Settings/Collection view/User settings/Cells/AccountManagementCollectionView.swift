@@ -16,16 +16,22 @@ class AccountManagementCollectionView: UICollectionView {
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
   
-
+  
+  
+  // MARK: - Public properties
+  @Published public var color: UIColor?
+  
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //Collection
+  ///**Collection
   private var source: Source!
-  //UI
+  ///**UI
   private let padding: CGFloat = 8
+  
   
   
   
@@ -65,15 +71,19 @@ private extension AccountManagementCollectionView {
       return sectionLayout
     }
 
-    let cellRegistration = UICollectionView.CellRegistration<AccountManagementCell, AnyHashable> { cell, indexPath, _ in
-      guard let section = Section(rawValue: indexPath.section)
-      else { return }
+    let cellRegistration = UICollectionView.CellRegistration<AccountManagementCell, AnyHashable> {[unowned self] cell, indexPath, _ in
+      guard let section = Section(rawValue: indexPath.section) else { return }
       
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
       cell.mode = section == .Logout ? .Logout : .Delete
+      
+      self.$color
+        .filter { !$0.isNil }
+        .sink { cell.color = $0! }
+        .store(in: &self.subscriptions)
     }
     
     source = Source(collectionView: self) {

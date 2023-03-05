@@ -34,7 +34,7 @@ class UserSettingsSocialCollectionView: UICollectionView {
   public var tiktokPublisher = PassthroughSubject<String, Never>()
   public var googlePublisher = PassthroughSubject<String, Never>()
   public var twitterPublisher = PassthroughSubject<String, Never>()
-  
+  @Published public private(set) var scrollPublisher: CGPoint?
   public let colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
   //UI
   public var color: UIColor = .label {
@@ -118,6 +118,7 @@ private extension UserSettingsSocialCollectionView {
         cell.mode = .Twitter
       }
       cell.openURLPublisher
+        .eraseToAnyPublisher()
         .sink { [weak self] in
           guard let self = self else { return }
           
@@ -125,6 +126,7 @@ private extension UserSettingsSocialCollectionView {
         }
         .store(in: &self.subscriptions)
       cell.urlStringPublisher
+        .eraseToAnyPublisher()
         .sink { [weak self] in
           guard let self = self else { return }
           
@@ -143,8 +145,14 @@ private extension UserSettingsSocialCollectionView {
           }
         }
         .store(in: &self.subscriptions)
+      cell.$scrollPublisher
+        .eraseToAnyPublisher()
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.scrollPublisher = $0 }
+        .store(in: &self.subscriptions)
       
       self.colorPublisher
+        .eraseToAnyPublisher()
         .filter { !$0.isNil }
         .sink { cell.color = $0! }
         .store(in: &self.subscriptions)

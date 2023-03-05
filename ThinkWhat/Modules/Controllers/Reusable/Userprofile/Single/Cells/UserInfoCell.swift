@@ -36,6 +36,7 @@ class UserInfoCell: UICollectionViewListCell {
   ///`Publishers`
   public private(set) var descriptionPublisher = PassthroughSubject<String, Never>()
   @Published public private(set) var boundsPublisher: CGFloat?
+  @Published public private(set) var scrollPublisher: CGPoint?
   
   
   // MARK: - Private properties
@@ -98,7 +99,7 @@ class UserInfoCell: UICollectionViewListCell {
     let instance = UITextView()
 //    instance.backgroundColor = .quaternarySystemFill
     instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.width*0.05 }
+      .sink { instance.cornerRadius = $0.width*0.025 }
       .store(in: &subscriptions)
     instance.textContainerInset = UIEdgeInsets(top: 8,
                                                left: 0,
@@ -121,7 +122,7 @@ class UserInfoCell: UICollectionViewListCell {
                                                    attributes: attributes())
       instance.backgroundColor = .clear
     case .Write:
-      instance.backgroundColor = .secondarySystemFill//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+      instance.backgroundColor = Colors.textField(color: .white, traitCollection: traitCollection)
       instance.delegate = self
       instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
       instance.text = userprofile.description
@@ -176,6 +177,7 @@ class UserInfoCell: UICollectionViewListCell {
     super.traitCollectionDidChange(previousTraitCollection)
     
     background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    textView.backgroundColor = Colors.textField(color: .white, traitCollection: traitCollection)
     
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
@@ -208,7 +210,7 @@ private extension UserInfoCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
-//    background.removeFromSuperview()
+    background.removeFromSuperview()
     
     guard insets != .zero else {
       background.place(inside: self,
@@ -220,6 +222,7 @@ private extension UserInfoCell {
     background.place(inside: self,
                      insets: insets,
                      bottomPriority: .defaultLow)
+    
   }
   
   func attributes() -> [NSAttributedString.Key: Any] {
@@ -262,6 +265,12 @@ private extension UserInfoCell {
 }
 
 extension UserInfoCell: UITextViewDelegate {
+  func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+    scrollPublisher = disclosureLabel.convert(disclosureLabel.frame.origin, to: self)
+    
+    return true
+  }
+  
   func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
       let currentText = textView.text ?? ""
       guard let stringRange = Range(range, in: currentText) else { return false }

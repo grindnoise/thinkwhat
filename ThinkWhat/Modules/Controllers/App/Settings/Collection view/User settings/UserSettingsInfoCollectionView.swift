@@ -28,6 +28,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
   public let tiktokPublisher = PassthroughSubject<String, Never>()
   public let googlePublisher = PassthroughSubject<String, Never>()
   public let twitterPublisher = PassthroughSubject<String, Never>()
+  @Published public private(set) var scrollPublisher: CGPoint?
   ///`UI`
   public var color: UIColor = Colors.System.Red.rawValue {
     didSet {
@@ -91,7 +92,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
       return sectionLayout
     }
     
-    let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, _, item in
+    let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, indexPath, item in
       guard let userprofile = Userprofiles.shared.current else { return }
       
       cell.padding = self.padding
@@ -102,14 +103,19 @@ class UserSettingsInfoCollectionView: UICollectionView {
 //          self.source.refresh() }
 //        .store(in: &self.subscriptions)
       cell.$boundsPublisher
+        .eraseToAnyPublisher()
         .filter { !$0.isNil && $0 != 0 }
-        .sink { [unowned self] _ in
-          self.source.refresh(animatingDifferences: true)
-        }
-        .store(in: &subscriptions)
-      cell.descriptionPublisher
-        .sink { [unowned self] in self.userprofileDescription = $0 }
+        .sink { [unowned self] _ in self.source.refresh(animatingDifferences: true)}
         .store(in: &self.subscriptions)
+      cell.$scrollPublisher
+        .eraseToAnyPublisher()
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.scrollPublisher = cell.convert($0!, to: self) }
+        .store(in: &self.subscriptions)
+      cell.descriptionPublisher
+        .eraseToAnyPublisher()
+        .sink { [unowned self] in self.userprofileDescription = $0 }
+        .store(in: &self.self.subscriptions)
       
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
@@ -132,10 +138,14 @@ class UserSettingsInfoCollectionView: UICollectionView {
         .filter { !$0.isNil }
         .sink { [unowned self] in self.cityFetchPublisher.send($0!) }
         .store(in: &self.subscriptions)
-      
       ///Selection
       cell.citySelectionPublisher
         .sink { [unowned self] in self.citySelectionPublisher.send($0) }
+        .store(in: &self.subscriptions)
+      cell.$scrollPublisher
+        .eraseToAnyPublisher()
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.scrollPublisher = cell.convert($0!, to: self) }
         .store(in: &self.subscriptions)
       
       var config = UIBackgroundConfiguration.listPlainCell()
@@ -177,47 +187,28 @@ class UserSettingsInfoCollectionView: UICollectionView {
 //        .store(in: &self.subscriptions)
       cell.padding = .zero
       //Facebook
-      cell.facebookPublisher.sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.facebookPublisher.send($0)
-      }.store(in: &self.subscriptions)
+      cell.facebookPublisher
+        .eraseToAnyPublisher()
+        .sink { [unowned self] in self.facebookPublisher.send($0) }
+        .store(in: &self.subscriptions)
+      cell.instagramPublisher
+        .eraseToAnyPublisher()
+        .sink { [unowned self] in self.instagramPublisher.send($0) }
+        .store(in: &self.subscriptions)
+      cell.tiktokPublisher
+        .eraseToAnyPublisher()
+        .sink { [unowned self] in self.tiktokPublisher.send($0) }
+        .store(in: &self.subscriptions)
+      cell.openURLPublisher
+        .eraseToAnyPublisher()
+        .sink { [unowned self] in self.openURLPublisher.send($0) }
+        .store(in: &self.subscriptions)
+      cell.$scrollPublisher
+        .eraseToAnyPublisher()
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.scrollPublisher = cell.convert($0!, to: self) }
+        .store(in: &self.subscriptions)
       
-      //Instagram
-      cell.instagramPublisher.sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.instagramPublisher.send($0)
-      }.store(in: &self.subscriptions)
-      
-      //Instagram
-      cell.tiktokPublisher.sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.tiktokPublisher.send($0)
-      }.store(in: &self.subscriptions)
-      
-      //URL
-      cell.openURLPublisher.sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.openURLPublisher.send($0)
-      }.store(in: &self.subscriptions)
-      //            //Google
-      //            cell.googlePublisher.sink { [weak self] in
-      //                guard let self = self,
-      //                      let string = $0
-      //                else { return }
-      //
-      //            }.store(in: &self.subscriptions)
-      //
-      //            //Twitter
-      //            cell.twitterPublisher.sink { [weak self] in
-      //                guard let self = self,
-      //                      let string = $0
-      //                else { return }
-      //
-      //            }.store(in: &self.subscriptions)
       
       var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
       backgroundConfig.backgroundColor = .clear

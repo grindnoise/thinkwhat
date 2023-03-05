@@ -47,36 +47,51 @@ class ScrollingTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioni
       viewWidth = -viewWidth
     }
     
-    if #available(iOS 16.0, *) {
-      toViewController!.view.transform = CGAffineTransform(CGAffineTransformComponents(scale: CGSize(width: 0.85,
-                                                                                                     height: 0.85),
-                                                                                       translation: CGVector(dx: viewWidth,
-                                                                                                             dy: .zero)))
-    } else {
-      toViewController!.view.transform = CGAffineTransform(translationX: viewWidth, y: 0)
-    }
-    toViewController!.view.alpha = 1
-
-    UIView.animate(withDuration: self.transitionDuration(using: (self.transitionContext)),
-                   delay: 0.0,
-                   usingSpringWithDamping: 2.0,
-                   initialSpringVelocity: 0.5,
-                   options: .curveEaseInOut,
-                   animations: {
-      toViewController!.view.transform = CGAffineTransform.identity
-      toViewController!.view.alpha = 1
-      fromViewController!.view.alpha = 0
-      if #available(iOS 16.0, *) {
-        fromViewController!.view.transform = CGAffineTransform(CGAffineTransformComponents(scale: CGSize(width: 0.85,
-                                                                                                       height: 0.85),
-                                                                                           translation: CGVector(dx: -viewWidth,
-                                                                                                                 dy: .zero)))
-      } else {
-        fromViewController!.view.transform = CGAffineTransform(translationX: -viewWidth, y: 0)
-      }
-    }, completion: { _ in
-      self.transitionContext?.completeTransition(!self.transitionContext!.transitionWasCancelled)
-      fromViewController!.view.transform = CGAffineTransform.identity
-    })
+    toViewController!.view.transform = CGAffineTransform(translationX: viewWidth, y: 0)
+    
+        UIView.animate(withDuration: self.transitionDuration(using: (self.transitionContext)),
+                       delay: 0.0,
+                       usingSpringWithDamping: 2.0,
+                       initialSpringVelocity: 0.5,
+                       options: .curveEaseInOut,
+                       animations: {
+          toViewController!.view.transform = CGAffineTransform.identity
+                      fromViewController!.view.transform = CGAffineTransform(translationX: -viewWidth, y: 0)
+                  }, completion: { _ in
+                      self.transitionContext?.completeTransition(!self.transitionContext!.transitionWasCancelled)
+                      fromViewController!.view.transform = CGAffineTransform.identity
+        })
+    
+//    if #available(iOS 16.0, *) {
+//      toViewController!.view.transform = CGAffineTransform(CGAffineTransformComponents(scale: CGSize(width: 0.85,
+//                                                                                                     height: 0.85),
+//                                                                                       translation: CGVector(dx: viewWidth,
+//                                                                                                             dy: .zero)))
+//    } else {
+//      toViewController!.view.transform = CGAffineTransform(translationX: viewWidth, y: 0)
+//    }
+//    toViewController!.view.alpha = 1
+//
+//    UIView.animate(withDuration: self.transitionDuration(using: (self.transitionContext)),
+//                   delay: 0.0,
+//                   usingSpringWithDamping: 2.0,
+//                   initialSpringVelocity: 0.5,
+//                   options: .curveEaseInOut,
+//                   animations: {
+//      toViewController!.view.transform = CGAffineTransform.identity
+//      toViewController!.view.alpha = 1
+//      fromViewController!.view.alpha = 0
+//      if #available(iOS 16.0, *) {
+//        fromViewController!.view.transform = CGAffineTransform(CGAffineTransformComponents(scale: CGSize(width: 0.85,
+//                                                                                                       height: 0.85),
+//                                                                                           translation: CGVector(dx: -viewWidth,
+//                                                                                                                 dy: .zero)))
+//      } else {
+//        fromViewController!.view.transform = CGAffineTransform(translationX: -viewWidth, y: 0)
+//      }
+//    }, completion: { _ in
+//      self.transitionContext?.completeTransition(!self.transitionContext!.transitionWasCancelled)
+//      fromViewController!.view.transform = CGAffineTransform.identity
+//    })
   }
 }

@@ -22,6 +22,7 @@ class UserSettingsInfoCell: UICollectionViewListCell {
   }
   ///`Publishers`
   @Published public private(set) var userprofileDescription: String?
+  @Published public private(set) var scrollPublisher: CGPoint?
   public private(set) var cityFetchPublisher = PassthroughSubject<String, Never>()
   public private(set) var citySelectionPublisher = PassthroughSubject<City, Never>()
   public private(set) var topicPublisher = PassthroughSubject<Topic, Never>()
@@ -67,6 +68,14 @@ class UserSettingsInfoCell: UICollectionViewListCell {
       .store(in: &self.subscriptions)
     instance.openURLPublisher
       .sink { [unowned self] in self.openURLPublisher.send($0) }
+      .store(in: &self.subscriptions)
+    instance.$scrollPublisher
+      .eraseToAnyPublisher()
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.scrollPublisher = $0 }
+      .store(in: &self.subscriptions)
+    instance.topicPublisher
+      .sink { [unowned self] in self.topicPublisher.send($0) }
       .store(in: &self.subscriptions)
     
     let constraint = instance.heightAnchor.constraint(equalToConstant: 100)

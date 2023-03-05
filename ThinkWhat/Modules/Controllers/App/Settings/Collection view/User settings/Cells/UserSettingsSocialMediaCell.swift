@@ -34,6 +34,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
       textField.tintColor = color
     }
   }
+  @Published public private(set) var scrollPublisher: CGPoint?
   
   
   
@@ -46,41 +47,38 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
   private lazy var backgroundLayer: CAShapeLayer = {
     let instance = CAShapeLayer()
     instance.path = UIBezierPath(roundedRect: .zero, cornerRadius: 0).cgPath
-    instance.fillColor = UIColor.secondarySystemFill.cgColor
+    instance.fillColor = Colors.textField(color: .white, traitCollection: traitCollection).cgColor
     
     return instance
   }()
   private lazy var stack: UIStackView = {
     let opaque = UIView.opaque()
-    let leftSpacer = UIView.opaque()
-    leftSpacer.widthAnchor.constraint(equalToConstant: 4).isActive = true
+//    let leftSpacer = UIView.opaque()
+//    leftSpacer.widthAnchor.constraint(equalToConstant: 4).isActive = true
     let rightSpacer = UIView.opaque()
     rightSpacer.widthAnchor.constraint(equalToConstant: 8).isActive = true
-    let instance = UIStackView(arrangedSubviews: [
-      leftSpacer,
-      icon,
-      textField,
-      disclosureIndicator,
-      rightSpacer
-    ])
+    let instance = UIStackView()
+    instance.layer.addSublayer(backgroundLayer)
+    instance.publisher(for: \.bounds, options: .new)
+      .sink { [unowned self] in self.backgroundLayer.path = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.025).cgPath }
+      .store(in: &subscriptions)
+    instance.addArrangedSubview(opaque)
+    instance.addArrangedSubview(textField)
+    instance.addArrangedSubview(disclosureIndicator)
+    instance.addArrangedSubview(rightSpacer)
     instance.axis = .horizontal
     instance.spacing = padding/2
     instance.clipsToBounds = false
 //    instance.backgroundColor = .secondarySystemFill
-    instance.layer.addSublayer(backgroundLayer)
-    instance.publisher(for: \.bounds, options: .new)
-      .sink { [unowned self] in self.backgroundLayer.path = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath }
-      .store(in: &subscriptions)
     
-    icon.translatesAutoresizingMaskIntoConstraints = false
-    icon.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
-//    instance.publisher(for: \.bounds, options: .new)
-//      .sink { [weak self] in
-//        guard let self = self else {
-//
-//        instance.cornerRadius = $0.width*0.05
-//      }
-//      .store(in: &subscriptions)
+    
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    opaque.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor).isActive = true
+
+    icon.placeInCenter(of: opaque, heightMultiplier: 0.75)
+    //    icon.translatesAutoresizingMaskIntoConstraints = false
+//    icon.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
 
     return instance
   }()
@@ -131,7 +129,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
 //                                   right: 0)
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
     instance.translatesAutoresizingMaskIntoConstraints = false
-    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font!) + 16)
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 10)
     constraint.identifier = "height"
     constraint.isActive  = true
     instance.spellCheckingType = .no
@@ -214,20 +212,21 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
   
   
   // MARK: - Overriden methods
-  //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-  //        super.traitCollectionDidChange(previousTraitCollection)
-  //
-  //        facebookTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-  //        instagramTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-  //        tiktokTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-  //
-  //        tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-  //        contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
-  //
-  //        guard !userprofile.isNil else { return }
-  //
-  //        setupButtons()
-  //    }
+      override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+          super.traitCollectionDidChange(previousTraitCollection)
+  
+        backgroundLayer.fillColor = Colors.textField(color: .white, traitCollection: traitCollection).cgColor
+//          facebookTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//          instagramTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//          tiktokTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//
+//          tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+//          contentView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground.withAlphaComponent(0.35) : .secondarySystemBackground.withAlphaComponent(0.7)
+//
+//          guard !userprofile.isNil else { return }
+//
+//          setupButtons()
+      }
   
   //  override func prepareForReuse() {
   //    super.prepareForReuse()
@@ -344,6 +343,8 @@ extension UserSettingsSocialMediaCell: UITextFieldDelegate {
   }
   
   func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+    scrollPublisher = textField.convert(textField.frame.origin, to: self)
+    
     return true
   }
   

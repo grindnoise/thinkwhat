@@ -20,39 +20,35 @@ class Survey: Decodable {
                    compatibility: TopicCompatibility? = nil) -> [SurveyReference] {
       switch self {
       case .Hot:
-        return Surveys.shared.hot.map { return $0.reference }.filter { !$0.isClaimed && !$0.isBanned }
+        let referencesFromSurveys = Surveys.shared.hot.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { $0.isHot && !$0.isClaimed && !$0.isBanned && !$0.isRejected } + referencesFromSurveys).uniqued()
       case .New:
-        //                return Surveys.shared.newReferences
-        return Surveys.shared.newReferences.filter { !$0.isClaimed && !$0.isBanned }//.filter({ $0.isFavorite })// || !$0.isComplete })
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned && $0.isRejected }.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned && !$0.isRejected } + referencesFromSurveys).uniqued()
       case .Top:
-        //                return Surveys.shared.topReferences
-        return Surveys.shared.topReferences.filter { !$0.isClaimed && !$0.isBanned }//.filter({ $0.isFavorite })// || !$0.isComplete })
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.isTop && !$0.isClaimed && !$0.isBanned && !$0.isRejected }.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .Own:
-        return Surveys.shared.ownReferences.filter { !$0.isClaimed && !$0.isBanned }
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.isOwn && !$0.isBanned }.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { $0.isOwn && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .Favorite:
-        return SurveyReferences.shared.all.filter { $0.isFavorite && !$0.isClaimed && !$0.isBanned }
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.isFavorite && !$0.isBanned }.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { $0.isFavorite && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .Subscriptions:
-        return SurveyReferences.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned }
-        //                return Surveys.shared.subscriptions.filter { !$0.isClaimed && !$0.isBanned }
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned }.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .All:
-        return SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned }
+        let referencesFromSurveys = Surveys.shared.all.filter { !$0.isRejected && !$0.isClaimed && !$0.isBanned }.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { !$0.isRejected && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .Topic:
-        guard !topic.isNil else { return [] }
-        //                var all = SurveyReferences.shared.all.filter({ $0.topic == topic! })
-        //                var completed = all.filter({ $0.isComplete })
-        //                let favorite = all.filter({ $0.isFavorite })
-        //                favorite.forEach {
-        //                    completed.remove(object: $0)
-        //                }
-        //                completed.forEach {
-        //                    all.remove(object: $0)
-        //                }
-        //                return all
-        return SurveyReferences.shared.all.filter({ $0.topic == topic! }).uniqued().filter { !$0.isClaimed && !$0.isBanned }
+        guard let topic = topic else { return [] }
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.topic == topic && !$0.isRejected && !$0.isClaimed && !$0.isBanned }.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { $0.topic == topic && !$0.isRejected && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .ByOwner:
         guard let userprofile = userprofile else { return [] }
         
-        return SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned }
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner == userprofile && !$0.isRejected && !$0.isClaimed && !$0.isBanned }.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isRejected && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .Search:
         fatalError()
       case .Compatibility:
@@ -126,6 +122,8 @@ class Survey: Decodable {
          owner = "userprofile",
          isHot = "is_hot",
          isOwn = "is_own",
+         isNew = "is_new",
+         isTop = "is_top",
          isComplete = "is_complete",
          isBanned = "is_banned",
          shareLink = "share_link"
@@ -141,7 +139,7 @@ class Survey: Decodable {
   var title:                  String
   var startDate:              Date
   var topic:                  Topic
-  var description:            String
+  var detailsDescription:            String
   var question:               String
   var rating:                 Double
   //Media
@@ -165,14 +163,6 @@ class Survey: Decodable {
       reference.votesLimit = votesLimit
     }
   }
-  var isVisited:              Bool {
-    didSet {
-      reference.isVisited = isVisited
-    }
-  }
-  var isPrivate:              Bool
-  var isAnonymous:            Bool
-  var isCommentingAllowed:    Bool
   var votesTotal:             Int = 0 {
     didSet {
       reference.votesTotal = votesTotal
@@ -209,10 +199,22 @@ class Survey: Decodable {
       reference.views = views
     }
   }
+  var reference: SurveyReference {
+    return getReference()
+    //        return SurveyReferences.shared.all.filter({ $0.hashValue == hashValue}).first ?? createReference()
+  }
+  var progress: Int {
+    didSet {
+      guard oldValue != progress else { return }
+      reference.progress = progress
+    }
+  }
   var type: SurveyType
+  ///**Filtering properties**
   var isHot: Bool {
     didSet {
       guard oldValue != isHot else { return }
+      
       reference.isHot = isHot
     }
   }
@@ -221,12 +223,6 @@ class Survey: Decodable {
       guard oldValue != isBanned else { return }
       
       reference.isBanned = isBanned
-    }
-  }
-  var isClaimed: Bool = false {
-    didSet {
-      guard isClaimed else { return }
-      reference.isClaimed = isClaimed
     }
   }
   var isComplete: Bool {
@@ -256,16 +252,32 @@ class Survey: Decodable {
       reference.isFavorite = isFavorite
     }
   }
-  var reference: SurveyReference {
-    return getReference()
-    //        return SurveyReferences.shared.all.filter({ $0.hashValue == hashValue}).first ?? createReference()
-  }
-  var progress: Int {
+  var isNew: Bool
+  var isTop: Bool
+  var isClaimed: Bool = false {
     didSet {
-      guard oldValue != progress else { return }
-      reference.progress = progress
+      guard isClaimed else { return }
+      reference.isClaimed = isClaimed
     }
   }
+  var isRejected: Bool = false {
+    didSet {
+      guard isRejected != oldValue else { return }
+      
+      isRejectedPublisher.send(isRejected)
+      reference.isRejectedPublisher.send(isRejected)
+    }
+  }
+  var isVisited: Bool {
+    didSet {
+      reference.isVisited = isVisited
+    }
+  }
+  var isPrivate: Bool
+  var isAnonymous: Bool
+  var isCommentingAllowed: Bool
+
+  
   
   //Publishers
   public let commentPostedPublisher = PassthroughSubject<Comment, Never>()
@@ -273,6 +285,7 @@ class Survey: Decodable {
   public let commentRemovePublisher = PassthroughSubject<Comment, Never>()
   public let commentBannedPublisher = PassthroughSubject<Comment, Never>()
   public let commentClaimedPublisher = PassthroughSubject<Comment, Never>()
+  public let isRejectedPublisher     = PassthroughSubject<Bool, Never>()
   ///Convert to dict to create new survey
   //    var dict: [String: Any] {
   //        var _dict: [String: Any] = [:]
@@ -325,7 +338,7 @@ class Survey: Decodable {
       id                      = try container.decode(Int.self, forKey: .id)
       progress                = try container.decode(Int.self, forKey: .progress)
       title                   = try container.decode(String.self, forKey: .title)
-      description             = try container.decode(String.self, forKey: .description)
+      detailsDescription             = try container.decode(String.self, forKey: .description)
       startDate               = try container.decode(Date.self, forKey: .startDate)
       url                     = URL(string: try container.decode(String.self, forKey: .url))
       question                = try container.decode(String.self, forKey: .question)
@@ -346,28 +359,25 @@ class Survey: Decodable {
       isComplete              = try container.decode(Bool.self, forKey: .isComplete)
       isBanned                = try container.decode(Bool.self, forKey: .isBanned)
       isVisited               = try container.decode(Bool.self, forKey: .isVisited)
+      isTop       = try container.decode(Bool.self, forKey: .isTop)
+      isNew       = try container.decode(Bool.self, forKey: .isNew)
       let shareData           = try container.decode([String].self, forKey: .shareLink)
       shareHash               = shareData.first ?? ""
       shareEncryptedString    = shareData.last ?? ""
       
-      
-      
-      
-      //            comments = try container.decode([Comment].self, forKey: .comments)
-      
       if let dict = try container.decodeIfPresent([String: Date].self, forKey: .result), !dict.isEmpty {
         result = [Int(dict.keys.first!)!: dict.values.first!]
       }
-      ///Check for existing
-      if Surveys.shared.all.filter({ $0 == self }).isEmpty {
-        Surveys.shared.all.append(self)
-      }
-      //            getReference()
       
-      //Import comments
+//      ///Check for existing
+//      if Surveys.shared.all.filter({ $0 == self }).isEmpty {
+//        Surveys.shared.all.append(self)
+//      }
+      
+      ///**Import comments**
       let _ = try container.decode([Comment].self, forKey: .comments)
       
-      //Media
+      ///**Media**
       if let first = reference.media {
         //Prevent duplicates
         var imported = try container.decode([Mediafile].self, forKey: .media)
@@ -378,9 +388,6 @@ class Survey: Decodable {
       } else {
         media                   = try container.decode([Mediafile].self, forKey: .media)
       }
-      //            if SurveyReferences.shared.all.filter({$0 == self.reference}).isEmpty {
-      //                SurveyReferences.shared.all.append(self.reference)
-      //            }
     } catch {
 #if DEBUG
       print(error.localizedDescription)
@@ -438,7 +445,7 @@ class Survey: Decodable {
     else {
       let instance = SurveyReference(id: id,
                                      title: title,
-                                     description: description,
+                                     description: detailsDescription,
                                      startDate: startDate,
                                      topic: topic,
                                      type: type,
@@ -451,6 +458,8 @@ class Survey: Decodable {
                                      isFavorite: isFavorite,
                                      isVisited: isVisited,
                                      isHot: isHot,
+                                     isNew: isNew,
+                                     isTop: isTop,
                                      survey: self,
                                      owner: owner,
                                      isAnonymous: isAnonymous,
@@ -494,6 +503,10 @@ extension Survey: Hashable {
   }
 }
 
+extension Survey: CustomStringConvertible {
+  public var description: String { "ID: \(id) Title: \(title) Author: \(owner.name)" }
+}
+
 class Surveys {
   enum SurveyContainerType {
     case TopLinks, NewLinks, Categorized, OwnLinks, Favorite, Downloaded, Completed, Stack, Claim, AllLinks
@@ -511,72 +524,16 @@ class Surveys {
   static let shared = Surveys()
   private init() {}
   private var timer:  Timer?
-  
-  //    var allReferences:           [SurveyReference] = []
-  var topReferences:           [SurveyReference] = [] {
+  var all: [Survey] = [] {
     didSet {
-      guard oldValue.count != subscriptions.count else { return }
-      Notification.send(names: [Notifications.Surveys.UpdateTopSurveys])
+      let existingSet = Set(oldValue)
+      let appendingSet = Set(all)
+      
+      instancesPublisher.send(Array(existingSet.symmetricDifference(appendingSet)))
     }
   }
-  
-  var newReferences:           [SurveyReference] = [] {
-    didSet {
-      if oldValue.count != newReferences.count {
-        let sorted = newReferences.sorted { $0.startDate > $1.startDate }
-        newReferences = sorted
-        //                Notification.send(names: [Notifications.Surveys.UpdateNewSurveys])
-      }
-    }
-  }
-  var ownReferences:           [SurveyReference] = [] {
-    didSet {
-      guard oldValue.count != subscriptions.count else { return }
-      Notification.send(names: [Notifications.Surveys.UpdateOwn])
-    }
-  }
-  var subscriptions:           [SurveyReference] = [] {
-    didSet {
-      guard oldValue.count != subscriptions.count else { return }
-      Notification.send(names: [Notifications.Surveys.UpdateSubscriptions])
-    }
-  }
-  //    var favoriteReferences:      [SurveyReference: Date] = [:]
-  
-  var favoriteReferences:      [SurveyReference] = [] {
-    didSet {
-      guard oldValue.count != subscriptions.count else { return }
-      Notification.send(names: [Notifications.Surveys.UpdateFavorite])
-    }
-  }
-  
-  
-  //    var categorizedLinks:   [Topic: [SurveyReference]] = [:]
-  var completed: [Survey] { all.filter { $0.isComplete } }
-  var all: [Survey] = []
-  var hot: [Survey] = []
-  var rejected: [Survey]  = [] {//Local list of rejected surveys, should be cleared periodically
-    didSet {
-      guard let instance = rejected.last else { return }
-      hot.remove(object: instance)
-      ///Remove from lists
-      ///Top
-      if topReferences.contains(instance.reference) {
-        topReferences.remove(object: instance.reference)
-      } else if let existing = topReferences.filter({ $0 == instance.reference }).first {
-        topReferences.remove(object: existing)
-      }
-      ///New
-      if newReferences.contains(instance.reference) {
-        newReferences.remove(object: instance.reference)
-      } else if let existing = newReferences.filter({ $0 == instance.reference }).first {
-        newReferences.remove(object: existing)
-      }
-      NotificationCenter.default.post(name: Notifications.Surveys.Rejected, object: instance.reference)
-      //            Notification.send(names: [Notifications.Surveys.Rejected])
-    }
-  }
-  //Publishers
+  var hot: [Survey] { return all.filter { $0.isHot && !$0.isClaimed && !$0.isRejected && !$0.isBanned && !$0.isComplete }}
+  ///**Publishers**
   public let instancesPublisher = PassthroughSubject<[Survey], Never>()
   
   //Updates rating, progress and views count
@@ -669,63 +626,49 @@ class Surveys {
       
       for (key, value) in json {
         if key == Category.Hot.rawValue {
-          let instances = try decoder.decode([Survey].self, from: value.rawData())
-          if instances.isEmpty {
-            //            fatalError()
-            Surveys.shared.instancesPublisher.send([])
-            //            notifications.append(Notifications.Surveys.EmptyReceived)
-            Notification.send(names: notifications.uniqued())
-            //                        return
-          }
-          for instance in instances {
-            if hot.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-              hot.append(Surveys.shared.all.filter({ $0 == instance }).first ?? instance)
-              notifications.append(Notifications.Surveys.SwitchHot)
-            }
-          }
+          append(try decoder.decode([Survey].self, from: value.rawData()))
         } else {
           let instances = try decoder.decode([SurveyReference].self, from: value.rawData())
           
           if instances.isEmpty {
             SurveyReferences.shared.instancesPublisher.send([])
-            //            NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
           }
           
           for instance in instances {
-            let instance = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance
-            
-            if key == Category.Top.rawValue {
-              if topReferences.filter({ $0 == instance }).isEmpty {
-                NotificationCenter.default.post(name: Notifications.Surveys.TopAppend, object: instance)
-                topReferences.append(instance)
-              }
-            } else if key == Category.New.rawValue {
-              if newReferences.filter({ $0 == instance }).isEmpty {
-                NotificationCenter.default.post(name: Notifications.Surveys.NewAppend, object: instance)
-                newReferences.append(instance)
-              }
-            } else if key == Category.Own.rawValue {
-              if ownReferences.filter({ $0 == instance }).isEmpty {
-                NotificationCenter.default.post(name: Notifications.Surveys.OwnAppend, object: instance)
-                ownReferences.append(instance)
-              }
-            } else if key == Category.Subscriptions.rawValue {
-              if subscriptions.filter({ $0 == instance }).isEmpty {
-                NotificationCenter.default.post(name: Notifications.Surveys.SubscriptionAppend, object: instance)
-                subscriptions.append(instance)
-              }
-            } else if key == Category.Favorite.rawValue {
-              if favoriteReferences.filter({ $0 == instance }).isEmpty {
-                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteAppend, object: instance)
-                favoriteReferences.append(instance)
-              }
-            } else if key == Category.Topic.rawValue {
-              SurveyReferences.shared.instancesByTopicPublisher.send([instance])
-              //              NotificationCenter.default.post(name: Notifications.Surveys.TopicAppend, object: instance)
-              SurveyReferences.shared.all.append(instance)
-            } else if key == Category.Userprofile.rawValue {
-              SurveyReferences.shared.all.append(instance)
-            }
+//            let instance = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance
+//
+//            if key == Category.Top.rawValue {
+//              if topReferences.filter({ $0 == instance }).isEmpty {
+//                NotificationCenter.default.post(name: Notifications.Surveys.TopAppend, object: instance)
+//                topReferences.append(instance)
+//              }
+//            } else if key == Category.New.rawValue {
+//              if newReferences.filter({ $0 == instance }).isEmpty {
+//                NotificationCenter.default.post(name: Notifications.Surveys.NewAppend, object: instance)
+//                newReferences.append(instance)
+//              }
+//            } else if key == Category.Own.rawValue {
+//              if ownReferences.filter({ $0 == instance }).isEmpty {
+//                NotificationCenter.default.post(name: Notifications.Surveys.OwnAppend, object: instance)
+//                ownReferences.append(instance)
+//              }
+//            } else if key == Category.Subscriptions.rawValue {
+//              if subscriptions.filter({ $0 == instance }).isEmpty {
+//                NotificationCenter.default.post(name: Notifications.Surveys.SubscriptionAppend, object: instance)
+//                subscriptions.append(instance)
+//              }
+//            } else if key == Category.Favorite.rawValue {
+//              if favoriteReferences.filter({ $0 == instance }).isEmpty {
+//                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteAppend, object: instance)
+//                favoriteReferences.append(instance)
+//              }
+//            } else if key == Category.Topic.rawValue {
+//              SurveyReferences.shared.instancesByTopicPublisher.send([instance])
+//              //              NotificationCenter.default.post(name: Notifications.Surveys.TopicAppend, object: instance)
+//              SurveyReferences.shared.all.append(instance)
+//            } else if key == Category.Userprofile.rawValue {
+//              SurveyReferences.shared.all.append(instance)
+//            }
           }
         }
       }
@@ -737,25 +680,38 @@ class Surveys {
     }
   }
   
-  ///Remove from lists & notify
-  func banSurvey(object: Survey) {
-    guard let instance = hot.filter({$0.hashValue == object.hashValue}).first else { return }
-    ///Clear new/top/hot
-    newReferences.remove(object: instance.reference)
-    newReferences.remove(object: instance.reference)
-    hot.remove(object: instance)
-    Notification.send(names: [Notifications.Surveys.UpdateNewSurveys, Notifications.Surveys.UpdateTopSurveys])
+  func append(_ instances: [Survey]) {
+    guard !instances.isEmpty else { instancesPublisher.send([]); return }
+    
+    let existingSet = Set(all)
+    let appendingSet = Set(instances)
+    let difference = Array(existingSet.symmetricDifference(appendingSet))
+    
+    guard !difference.isEmpty else { return }
+    
+    all.append(contentsOf: difference)
   }
   
+//  ///Remove from lists & notify
+//  func banSurvey(object: Survey) {
+//    guard let instance = hot.filter({$0.hashValue == object.hashValue}).first else { return }
+//    ///Clear new/top/hot
+//    newReferences.remove(object: instance.reference)
+//    newReferences.remove(object: instance.reference)
+//    hot.remove(object: instance)
+//    Notification.send(names: [Notifications.Surveys.UpdateNewSurveys, Notifications.Surveys.UpdateTopSurveys])
+//  }
+  
   func eraseData() {
-    topReferences.removeAll()
-    newReferences.removeAll()
-    //        categorizedLinks.removeAll()
-    ownReferences.removeAll()
-    favoriteReferences.removeAll()
+//    topReferences.removeAll()
+//    newReferences.removeAll()
+//    //        categorizedLinks.removeAll()
+//    ownReferences.removeAll()
+//    favoriteReferences.removeAll()
     all.removeAll()
-    hot.removeAll()
-    rejected.removeAll()
+//    hot.removeAll()
+//    rejected.removeAll()
+    
   }
   
   subscript (ID: Int) -> Survey? {
@@ -770,7 +726,12 @@ class Surveys {
 private extension Surveys {
   @objc
   func clearRejectedSurveys() {
-    rejected.removeAll()
+    Surveys.shared.all
+      .filter { $0.isRejected }
+      .forEach { $0.isRejected = false }
+    SurveyReferences.shared.all
+      .filter { $0.isRejected }
+      .forEach { $0.isRejected = false }
   }
   
   func startTimer() {

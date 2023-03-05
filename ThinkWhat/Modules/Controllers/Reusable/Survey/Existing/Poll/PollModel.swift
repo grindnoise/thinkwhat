@@ -111,80 +111,80 @@ extension PollModel: PollControllerInput {
   }
   
   func vote(_ answer: Answer) {
-    Task {
-      guard let survey = answer.survey else { return }
-      do {
-        let json = try await API.shared.surveys.vote(answer: answer)
-        let resultDetails = SurveyResult(choice: answer)
-        for i in json {
-          if i.0 == "survey_result" {
-            for entity in i.1 {
-              guard let answerId = entity.1["answer"].int,
-                    let timeString = entity.1["timestamp"].string,
-                    let timestamp = Date(dateTimeString: timeString) else { break }
-              await MainActor.run {
-                answer.survey?.result = [answerId: timestamp]
-                Surveys.shared.hot.remove(object: survey)
-                Userprofiles.shared.current!.balance += 1
-              }
-            }
-          } else if i.0 == "popular_vote", let isPopular = i.1.rawValue as? Bool {
-            resultDetails.isPopular = isPopular
-          } else if i.0 == "points", let points = i.1.int {
-            resultDetails.points = points
-          } else if i.0 == "hot" && !i.1.isEmpty {
-            await MainActor.run {
-              Surveys.shared.load(i.1)
-            }
-          } else if i.0 == "result_total" {
-            do {
-              var totalVotes = 0
-              for entity in i.1 {
-                guard let dict = entity.1.dictionary,
-                      let data = try dict["voters"]?.rawData(),
-                      let _answerID = dict["answer"]?.int,
-                      let answer = survey.answers.filter({ $0.id == _answerID }).first,
-                      let _total = dict["total"]?.int else { break }
-                answer.totalVotes = _total
-                totalVotes += _total
-                let decoder = JSONDecoder()
-                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                           DateFormatter.dateTimeFormatter,
-                                                           DateFormatter.dateFormatter ]
-                let instances = try decoder.decode([Userprofile].self, from: data)
-                var voters: [Userprofile] = []
-                
-                instances.forEach { instance in voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance) }
-                
-                answer.appendVoters(voters)
-              }
-              survey.votesTotal = totalVotes
-            } catch let error {
-#if DEBUG
-              print(error.localizedDescription)
-#endif
-              await MainActor.run {
-                modelOutput?.onVoteCallback(.failure(error))
-              }
-              return
-            }
-          }
-        }
-        answer.survey?.resultDetails = resultDetails
-        answer.survey?.isComplete = true
-//        if let current = Userprofiles.shared.current, !answer.voters.contains(current) {
-//          answer.voters.append(current)
+//    Task {
+//      guard let survey = answer.survey else { return }
+//      do {
+//        let json = try await API.shared.surveys.vote(answer: answer)
+//        let resultDetails = SurveyResult(choice: answer)
+//        for i in json {
+//          if i.0 == "survey_result" {
+//            for entity in i.1 {
+//              guard let answerId = entity.1["answer"].int,
+//                    let timeString = entity.1["timestamp"].string,
+//                    let timestamp = Date(dateTimeString: timeString) else { break }
+//              await MainActor.run {
+//                answer.survey?.result = [answerId: timestamp]
+//                Surveys.shared.hot.remove(object: survey)
+//                Userprofiles.shared.current!.balance += 1
+//              }
+//            }
+//          } else if i.0 == "popular_vote", let isPopular = i.1.rawValue as? Bool {
+//            resultDetails.isPopular = isPopular
+//          } else if i.0 == "points", let points = i.1.int {
+//            resultDetails.points = points
+//          } else if i.0 == "hot" && !i.1.isEmpty {
+//            await MainActor.run {
+//              Surveys.shared.load(i.1)
+//            }
+//          } else if i.0 == "result_total" {
+//            do {
+//              var totalVotes = 0
+//              for entity in i.1 {
+//                guard let dict = entity.1.dictionary,
+//                      let data = try dict["voters"]?.rawData(),
+//                      let _answerID = dict["answer"]?.int,
+//                      let answer = survey.answers.filter({ $0.id == _answerID }).first,
+//                      let _total = dict["total"]?.int else { break }
+//                answer.totalVotes = _total
+//                totalVotes += _total
+//                let decoder = JSONDecoder()
+//                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+//                                                           DateFormatter.dateTimeFormatter,
+//                                                           DateFormatter.dateFormatter ]
+//                let instances = try decoder.decode([Userprofile].self, from: data)
+//                var voters: [Userprofile] = []
+//
+//                instances.forEach { instance in voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance) }
+//
+//                answer.appendVoters(voters)
+//              }
+//              survey.votesTotal = totalVotes
+//            } catch let error {
+//#if DEBUG
+//              print(error.localizedDescription)
+//#endif
+//              await MainActor.run {
+//                modelOutput?.onVoteCallback(.failure(error))
+//              }
+//              return
+//            }
+//          }
 //        }
-          
-        await MainActor.run {
-          modelOutput?.onVoteCallback(.success(true))
-        }
-      } catch {
-        await MainActor.run {
-          modelOutput?.onVoteCallback(.failure(error))
-        }
-      }
-    }
+//        answer.survey?.resultDetails = resultDetails
+//        answer.survey?.isComplete = true
+////        if let current = Userprofiles.shared.current, !answer.voters.contains(current) {
+////          answer.voters.append(current)
+////        }
+//
+//        await MainActor.run {
+//          modelOutput?.onVoteCallback(.success(true))
+//        }
+//      } catch {
+//        await MainActor.run {
+//          modelOutput?.onVoteCallback(.failure(error))
+//        }
+//      }
+//    }
   }
   
   func claim(_ reason: Claim) {

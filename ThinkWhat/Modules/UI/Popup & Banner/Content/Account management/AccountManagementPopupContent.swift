@@ -73,7 +73,7 @@ class AccountManagementPopupContent: UIView {
     icon.contentMode = .center
     
     let opaque = UIView.opaque()
-    opaque.widthAnchor.constraint(equalToConstant: 8).isActive = true
+    opaque.widthAnchor.constraint(equalToConstant: padding/2).isActive = true
     
     let instance = UIStackView(arrangedSubviews: [
       opaque,
@@ -83,7 +83,7 @@ class AccountManagementPopupContent: UIView {
     instance.translatesAutoresizingMaskIntoConstraints = false
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: label.font)).isActive = true
     instance.axis = .horizontal
-    instance.spacing = padding
+    instance.spacing = padding/2
     instance.backgroundColor = color
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
@@ -94,6 +94,7 @@ class AccountManagementPopupContent: UIView {
   }()
   private lazy var textView: UITextView = {
     let instance = UITextView()
+    instance.backgroundColor = .clear
 //    instance.textContainerInset = UIEdgeInsets(top: padding*2,
 //                                               left: 0,
 //                                               bottom: padding*2,
@@ -122,7 +123,8 @@ class AccountManagementPopupContent: UIView {
     instance.attributedText = NSAttributedString(string: mode == .Logout ? "account_logout_description".localized : "account_delete_description".localized,
                                                  attributes: [
                                                   .paragraphStyle: paragraph,
-                                                  .font: UIFont(name: Fonts.Regular, size: 20) as Any
+                                                  .font: UIFont(name: Fonts.Regular, size: 20) as Any,
+                                                  .foregroundColor: UIColor.label
                                                  ])
     
     
@@ -134,12 +136,14 @@ class AccountManagementPopupContent: UIView {
                        action: #selector(self.handleTap(sender:)),
                        for: .touchUpInside)
     if #available(iOS 15, *) {
-      var config = UIButton.Configuration.plain()
-      config.contentInsets = .uniform(size: 0)
+      var config = UIButton.Configuration.filled()
+      config.cornerStyle = .small
+      config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+      config.baseBackgroundColor = color
       config.attributedTitle = AttributedString("confirm".localized,
                                                 attributes: AttributeContainer([
                                                   .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
-                                                  .foregroundColor: color as Any
+                                                  .foregroundColor: UIColor.white as Any
                                                 ]))
       instance.configuration = config
     } else {
@@ -224,6 +228,21 @@ class AccountManagementPopupContent: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    let paragraph = NSMutableParagraphStyle()
+    if #available(iOS 15.0, *) {
+        paragraph.usesDefaultHyphenation = true
+    } else {
+      paragraph.hyphenationFactor = 1
+    }
+    paragraph.alignment = .natural
+    paragraph.firstLineHeadIndent = padding * 2
+    
+    textView.attributedText = NSAttributedString(string: mode == .Logout ? "account_logout_description".localized : "account_delete_description".localized,
+                                                 attributes: [
+                                                  .paragraphStyle: paragraph,
+                                                  .font: UIFont(name: Fonts.Regular, size: 20) as Any,
+                                                  .foregroundColor: UIColor.label
+                                                 ])
   }
 }
 

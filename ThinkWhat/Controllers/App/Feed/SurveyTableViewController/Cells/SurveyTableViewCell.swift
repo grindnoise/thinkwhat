@@ -41,7 +41,7 @@ class SurveyTableViewCell: UITableViewCell {
         didSet {
             icon.backgroundColor = survey.topic.tagColor
             icon.category = Icon.Category(rawValue: survey.topic.id) ?? .Null
-            hotBadge.alpha = Surveys.shared.hot.filter({ $0.id == survey.id }).isEmpty ? 0 : 1
+//            hotBadge.alpha = Surveys.shared.hot.filter({ $0.id == survey.id }).isEmpty ? 0 : 1
         }
     }// {
 //        didSet {

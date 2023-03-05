@@ -158,7 +158,7 @@ private extension PollCollectionView {
     //            cell.contentConfiguration = content
     //        }
     let descriptionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
-      guard let text = self.item?.description else { return }
+      guard let text = self.item?.detailsDescription else { return }
       
       let paragraphStyle = NSMutableParagraphStyle()
       paragraphStyle.firstLineHeadIndent = 20

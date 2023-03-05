@@ -412,7 +412,9 @@ class API {
     var parameters: [String: Any] = ["survey": answer.survey!.id, "answer": answer.id]
     if Surveys.shared.hot.count <= MIN_STACK_SIZE {
       let stackList = Surveys.shared.hot.map { $0.id }
-      let rejectedList = Surveys.shared.rejected.map { $0.id }
+      let rejectedList = Surveys.shared.all
+        .filter { $0.isRejected}
+        .map { $0.id }
       let completedList = [answer.id]
       let list = Array(Set(stackList + rejectedList + completedList))//Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
       if !list.isEmpty {
@@ -1151,7 +1153,9 @@ class API {
       var parameters: Parameters = ["survey": survey.id]
       if Surveys.shared.hot.count <= MIN_STACK_SIZE {
         let stackList = Surveys.shared.hot.map { $0.id }
-        let rejectedList = Surveys.shared.rejected.map { $0.id }
+        let rejectedList = Surveys.shared.all
+          .filter { $0.isRejected}
+          .map { $0.id }
         let list = Array(Set(stackList + rejectedList))//Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
         if !list.isEmpty {
           let dict = list.asParameters(arrayParametersKey: "exclude_ids")
@@ -1724,7 +1728,9 @@ class API {
   #endif
       if Surveys.shared.hot.count <= MIN_STACK_SIZE {
         let stackList = Surveys.shared.hot.map { $0.id }
-        let rejectedList = Surveys.shared.rejected.map { $0.id }
+        let rejectedList = Surveys.shared.all
+          .filter { $0.isRejected}
+          .map { $0.id }
         let completedList = [answer.id]
         let list = Array(Set(stackList + rejectedList + completedList))
         if !list.isEmpty {
@@ -1751,114 +1757,114 @@ class API {
     }
     
     func post(_ parameters: Parameters) async throws {
-      guard let url = API_URLS.Surveys.root,
-            let headers = headers
-      else { throw APIError.invalidURL }
-      
-      do {
-        if parameters.keys.contains("media") {
-          guard let url = API_URLS.Surveys.root else { throw APIError.invalidURL }
-          guard let category = parameters["category"] as? Int,
-                let type = parameters["type"] as? String,
-                let is_private = parameters["is_private"] as? Bool,
-                let is_anonymous = parameters["is_anonymous"] as? Bool,
-                let is_commenting_allowed = parameters["is_commenting_allowed"] as? Bool,
-                let post_hot = parameters["post_hot"] as? Bool,
-                let vote_capacity = parameters["vote_capacity"] as? Int,
-                let title = parameters["title"] as? String,
-                let question = parameters["question"] as? String,
-                let description = parameters["description"] as? String,
-                let answers = parameters["answers"] as? [[String: String]],
-                let media = parameters["media"] as? [Parameters] else {
-            throw APIError.badData
-          }
-          let multipartFormData = MultipartFormData()
-          multipartFormData.append("\(category)".data(using: .utf8)!, withName: "category")
-          multipartFormData.append("\(type)".data(using: .utf8)!, withName: "type")
-          multipartFormData.append("\(is_private)".data(using: .utf8)!, withName: "is_private")
-          multipartFormData.append("\(is_anonymous)".data(using: .utf8)!, withName: "is_anonymous")
-          multipartFormData.append("\(is_commenting_allowed)".data(using: .utf8)!, withName: "is_commenting_allowed")
-          multipartFormData.append("\(post_hot)".data(using: .utf8)!, withName: "post_hot")
-          multipartFormData.append("\(vote_capacity)".data(using: .utf8)!, withName: "vote_capacity")
-          multipartFormData.append("\(title)".data(using: .utf8)!, withName: "title")
-          multipartFormData.append("\(question)".data(using: .utf8)!, withName: "question")
-          multipartFormData.append("\(description)".data(using: .utf8)!, withName: "description")
-          
-          answers.enumerated().forEach { index, dict in
-            guard let description = dict["description"] else { return }
-            multipartFormData.append("\(index)".data(using: .utf8)!, withName: "answers[\(index)]order")
-            multipartFormData.append(description.data(using: .utf8)!, withName: "answers[\(index)]description")
-          }
-          
-          if let hlink = parameters["hlink"] as? [Parameters] {
-            multipartFormData.append("\(hlink)".data(using: .utf8)!, withName: "hlink")
-          }
-          
-          media.enumerated().forEach{ index, dict in
-            multipartFormData.append("\(index)".data(using: .utf8)!, withName: "media[\(index)]order")
-            if let title = dict["title"] as? String { multipartFormData.append(title.data(using: .utf8)!, withName: "media[\(index)]title") }
-            if let image = dict["image"] as? UIImage,
-               let jpegData = image.jpegData(compressionQuality: 1) {
-              multipartFormData.append(jpegData, withName: "media[\(index)]image", fileName: "\(UUID().uuidString).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
-            }
-          }
-          
-          let data = try await parent.uploadMultipartFormDataAsync(url: url, method: .post, multipartDataForm: multipartFormData, headers: headers, uploadProgress: {_ in})
-          let json = try JSON(data: data, options: .mutableContainers)
-          let decoder = JSONDecoder()
-          decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                     DateFormatter.dateTimeFormatter,
-                                                     DateFormatter.dateFormatter ]
-          
-          do {
-            try await MainActor.run {
-              let instance = try decoder.decode(Survey.self, from: json["survey"].rawData())
-              Surveys.shared.ownReferences.append(instance.reference)
-            }
-          } catch {
-            guard let errorText = json["error"].string else {
-              throw APIError.badData
-            }
-#if DEBUG
-            print(errorText)
-#endif
-            throw error
-          }
-        } else {
-          let data = try await parent.requestAsync(url: url,
-                                                   httpMethod: .post,
-                                                   parameters: parameters,
-                                                   encoding: JSONEncoding.default,
-                                                   headers: headers,
-                                                   accessControl: true)
-          let json = try JSON(data: data, options: .mutableContainers)
-          let decoder = JSONDecoder()
-          decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                     DateFormatter.dateTimeFormatter,
-                                                     DateFormatter.dateFormatter ]
-          
-          do {
-            try await MainActor.run {
-              let instance = try decoder.decode(Survey.self, from: json["survey"].rawData())
-              Surveys.shared.ownReferences.append(instance.reference)
-            }
-          } catch {
-            guard let errorText = json["error"].string else {
-              throw APIError.badData
-            }
-#if DEBUG
-            print(errorText)
-            errorText.printLocalized(class: type(of: self), functionName: #function)
-#endif
-            throw error
-          }
-        }
-      } catch {
-#if DEBUG
-        error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-        throw error
-      }
+//      guard let url = API_URLS.Surveys.root,
+//            let headers = headers
+//      else { throw APIError.invalidURL }
+//      
+//      do {
+//        if parameters.keys.contains("media") {
+//          guard let url = API_URLS.Surveys.root else { throw APIError.invalidURL }
+//          guard let category = parameters["category"] as? Int,
+//                let type = parameters["type"] as? String,
+//                let is_private = parameters["is_private"] as? Bool,
+//                let is_anonymous = parameters["is_anonymous"] as? Bool,
+//                let is_commenting_allowed = parameters["is_commenting_allowed"] as? Bool,
+//                let post_hot = parameters["post_hot"] as? Bool,
+//                let vote_capacity = parameters["vote_capacity"] as? Int,
+//                let title = parameters["title"] as? String,
+//                let question = parameters["question"] as? String,
+//                let description = parameters["description"] as? String,
+//                let answers = parameters["answers"] as? [[String: String]],
+//                let media = parameters["media"] as? [Parameters] else {
+//            throw APIError.badData
+//          }
+//          let multipartFormData = MultipartFormData()
+//          multipartFormData.append("\(category)".data(using: .utf8)!, withName: "category")
+//          multipartFormData.append("\(type)".data(using: .utf8)!, withName: "type")
+//          multipartFormData.append("\(is_private)".data(using: .utf8)!, withName: "is_private")
+//          multipartFormData.append("\(is_anonymous)".data(using: .utf8)!, withName: "is_anonymous")
+//          multipartFormData.append("\(is_commenting_allowed)".data(using: .utf8)!, withName: "is_commenting_allowed")
+//          multipartFormData.append("\(post_hot)".data(using: .utf8)!, withName: "post_hot")
+//          multipartFormData.append("\(vote_capacity)".data(using: .utf8)!, withName: "vote_capacity")
+//          multipartFormData.append("\(title)".data(using: .utf8)!, withName: "title")
+//          multipartFormData.append("\(question)".data(using: .utf8)!, withName: "question")
+//          multipartFormData.append("\(description)".data(using: .utf8)!, withName: "description")
+//          
+//          answers.enumerated().forEach { index, dict in
+//            guard let description = dict["description"] else { return }
+//            multipartFormData.append("\(index)".data(using: .utf8)!, withName: "answers[\(index)]order")
+//            multipartFormData.append(description.data(using: .utf8)!, withName: "answers[\(index)]description")
+//          }
+//          
+//          if let hlink = parameters["hlink"] as? [Parameters] {
+//            multipartFormData.append("\(hlink)".data(using: .utf8)!, withName: "hlink")
+//          }
+//          
+//          media.enumerated().forEach{ index, dict in
+//            multipartFormData.append("\(index)".data(using: .utf8)!, withName: "media[\(index)]order")
+//            if let title = dict["title"] as? String { multipartFormData.append(title.data(using: .utf8)!, withName: "media[\(index)]title") }
+//            if let image = dict["image"] as? UIImage,
+//               let jpegData = image.jpegData(compressionQuality: 1) {
+//              multipartFormData.append(jpegData, withName: "media[\(index)]image", fileName: "\(UUID().uuidString).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
+//            }
+//          }
+//          
+//          let data = try await parent.uploadMultipartFormDataAsync(url: url, method: .post, multipartDataForm: multipartFormData, headers: headers, uploadProgress: {_ in})
+//          let json = try JSON(data: data, options: .mutableContainers)
+//          let decoder = JSONDecoder()
+//          decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+//                                                     DateFormatter.dateTimeFormatter,
+//                                                     DateFormatter.dateFormatter ]
+//          
+//          do {
+//            try await MainActor.run {
+//              let instance = try decoder.decode(Survey.self, from: json["survey"].rawData())
+//              Surveys.shared.ownReferences.append(instance.reference)
+//            }
+//          } catch {
+//            guard let errorText = json["error"].string else {
+//              throw APIError.badData
+//            }
+//#if DEBUG
+//            print(errorText)
+//#endif
+//            throw error
+//          }
+//        } else {
+//          let data = try await parent.requestAsync(url: url,
+//                                                   httpMethod: .post,
+//                                                   parameters: parameters,
+//                                                   encoding: JSONEncoding.default,
+//                                                   headers: headers,
+//                                                   accessControl: true)
+//          let json = try JSON(data: data, options: .mutableContainers)
+//          let decoder = JSONDecoder()
+//          decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+//                                                     DateFormatter.dateTimeFormatter,
+//                                                     DateFormatter.dateFormatter ]
+//          
+//          do {
+//            try await MainActor.run {
+//              let instance = try decoder.decode(Survey.self, from: json["survey"].rawData())
+//              Surveys.shared.ownReferences.append(instance.reference)
+//            }
+//          } catch {
+//            guard let errorText = json["error"].string else {
+//              throw APIError.badData
+//            }
+//#if DEBUG
+//            print(errorText)
+//            errorText.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//            throw error
+//          }
+//        }
+//      } catch {
+//#if DEBUG
+//        error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//        throw error
+//      }
     }
   }
   

@@ -27,6 +27,7 @@ class UserSettingsSocialHeaderCell: UICollectionViewListCell {
   public var googlePublisher = PassthroughSubject<String, Never>()
   public var twitterPublisher = PassthroughSubject<String, Never>()
   public let keyboardWillAppear = PassthroughSubject<Bool, Never>()
+  @Published public private(set) var scrollPublisher: CGPoint?
   ///`UI`
   public var color: UIColor = .label {
     didSet {
@@ -121,33 +122,22 @@ class UserSettingsSocialHeaderCell: UICollectionViewListCell {
       }
       .store(in: &subscriptions)
     instance.openURLPublisher
-      .sink { [weak self] in
-        guard let self = self else { return }
-       
-        self.openURLPublisher.send($0)
-      }
+      .sink { [unowned self] in self.openURLPublisher.send($0) }
       .store(in: &subscriptions)
     instance.instagramPublisher
-      .sink { [weak self] in
-        guard let self = self else { return }
-       
-        self.instagramPublisher.send($0)
-      }
+      .sink { [unowned self] in self.instagramPublisher.send($0) }
       .store(in: &subscriptions)
     instance.facebookPublisher
-      .sink { [weak self] in
-        guard let self = self else { return }
-       
-        self.facebookPublisher.send($0)
-      }
+      .sink { [unowned self] in self.facebookPublisher.send($0) }
       .store(in: &subscriptions)
     instance.tiktokPublisher
-      .sink { [weak self] in
-        guard let self = self else { return }
-       
-        self.tiktokPublisher.send($0)
-      }
+      .sink { [unowned self] in self.tiktokPublisher.send($0) }
       .store(in: &subscriptions)
+    instance.$scrollPublisher
+      .eraseToAnyPublisher()
+      .filter { !$0.isNil }
+      .sink { [unowned self] _ in self.scrollPublisher = self.label.convert(self.label.frame.origin, to: self) }
+      .store(in: &self.subscriptions)
     
     return instance
   }()

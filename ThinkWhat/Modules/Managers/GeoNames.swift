@@ -13,7 +13,7 @@ import L10n_swift
 
 class GeoNamesWorker {
   class func search(userprofile: Userprofile, string: String) async {
-    guard let url = URL(string: "http://api.geonames.org/searchJSON?name_startsWith=\(string)&cities=cities1000&featureClass=P&maxRows=10&lang=\(L10n.shared.language)&username=grindnoise".encodedURL)
+    guard let url = URL(string: "http://api.geonames.org/searchJSON?name_startsWith=\(string)&cities=cities1000&featureClass=P&maxRows=15&lang=\(L10n.shared.language)&username=grindnoise".encodedURL)
     else {
       userprofile.cityFetchPublisher.send(completion: .failure(APIError.invalidURL))
       return

@@ -31,6 +31,7 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
       updateUI()
     }
   }
+  @Published public var color: UIColor?
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -105,6 +106,11 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
       constraint.constant = height
       self.layoutIfNeeded()
     })
+    
+    $color
+      .sink { instance.color = $0 }
+      .store(in: &self.subscriptions)
+    
 //    instance.publisher(for: \.contentSize, options: .new)
 //      .sink { [weak self] rect in
 //        guard let self = self,

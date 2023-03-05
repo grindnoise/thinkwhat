@@ -177,6 +177,20 @@ class Comment: Decodable {
       survey.commentClaimedPublisher.send(self)
     }
   }
+  var isRejected: Bool = false {
+    didSet {
+      guard isClaimed else { return }
+      
+      isClaimedPublisher.send(true)
+      isClaimedPublisher.send(completion: .finished)
+      
+      NotificationCenter.default.post(name: Notifications.Comments.Claim, object: self)
+      
+      guard let survey = survey else { return }
+      
+      survey.commentClaimedPublisher.send(self)
+    }
+  }
   var answer: Answer? {
     didSet {
       guard let answer = answer else { return }

@@ -29,6 +29,7 @@ class AccountManagementCell: UICollectionViewListCell {
       updateUI()
     }
   }
+  public var color: UIColor = .systemBlue
   
   
   
@@ -177,7 +178,7 @@ private extension AccountManagementCell {
     let banner = NewPopup(padding: padding*2,
                           contentPadding: .uniform(size: padding*2))
     let content = AccountManagementPopupContent(mode: mode,
-                                               color: mode == .Logout ? .systemBlue : .systemRed)
+                                               color: mode == .Logout ? color : .systemRed)
     content.actionPublisher
       .sink {
         print($0)

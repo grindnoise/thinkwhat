@@ -11,15 +11,12 @@ import Combine
 
 class UserSettingsCollectionView: UICollectionView {
   
-  enum Section: Int, CaseIterable {
-    case Credentials, Info, Stats, Management
-//    case Credentials, About, City, Interests, SocialMedia, Stats, Management
-  }
+  enum Section: Int, CaseIterable { case Credentials, Info, Stats, Management }
   
   
   
   // MARK: - Public properties
-  ///`Publishers`
+  ///**Publishers
   public let topicPublisher = PassthroughSubject<Topic, Never>()
   public let namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
   public let datePublisher = CurrentValueSubject<Date?, Never>(nil)
@@ -39,15 +36,13 @@ class UserSettingsCollectionView: UICollectionView {
   public var subscribersPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
-  ///`UI`
+  @Published public private(set) var userprofileDescription: String?
+  ///**UI
   public var color: UIColor = Colors.System.Red.rawValue {
     didSet {
       setupUI()
     }
   }
-  ///`Publishers`
-  @Published public private(set) var userprofileDescription: String?
-  
   
   
   
@@ -184,20 +179,15 @@ class UserSettingsCollectionView: UICollectionView {
         .sink { [unowned self] in self.userprofileDescription = $0! }
         .store(in: &self.subscriptions)
       
-      let debounced = cell.cityFetchPublisher
-//        .filter { !$0.isNil }
+      cell.cityFetchPublisher
         .throttle(for: .seconds(1),
                   scheduler: DispatchQueue.main,
                   latest: true)
-      
+        .sink { [unowned self] in self.cityFetchPublisher.send($0) }
+        .store(in: &self.subscriptions)
       cell.citySelectionPublisher
         .sink { [unowned self] in self.citySelectionPublisher.send($0) }
         .store(in: &self.subscriptions)
-
-      debounced
-        .sink { [unowned self] in self.cityFetchPublisher.send($0) }
-        .store(in: &self.subscriptions)
-      
       cell.facebookPublisher
         .sink { [unowned self] in self.facebookPublisher.send($0) }
         .store(in: &self.subscriptions)
@@ -210,6 +200,19 @@ class UserSettingsCollectionView: UICollectionView {
       cell.openURLPublisher
         .sink { [unowned self] in self.openURLPublisher.send($0) }
         .store(in: &self.subscriptions)
+      cell.topicPublisher
+        .sink { [unowned self] in self.topicPublisher.send($0) }
+        .store(in: &self.subscriptions)
+      cell.$scrollPublisher
+        .eraseToAnyPublisher()
+        .filter { !$0.isNil }
+        .sink { [unowned self] in
+          let point = cell.convert($0!, to: self)
+          UIView.animate(withDuration: 0.2) { [unowned self] in
+            self.contentOffset.y = point.y
+          }
+        }
+        .store(in: &self.subscriptions)
       
       guard cell.insets == .zero else { return }
       
@@ -219,134 +222,6 @@ class UserSettingsCollectionView: UICollectionView {
                                   right: self.padding))
     }
     
-//    let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, _, _ in
-//      guard let userprofile = Userprofiles.shared.current else { return }
-//
-//      cell.publisher(for: \.bounds)
-//        .receive(on: DispatchQueue.main)
-//        .sink { _ in self.source.refresh() }
-//        .store(in: &self.subscriptions)
-//      cell.userprofile = userprofile
-//
-//      guard cell.insets == .zero else { return }
-//
-//      cell.setInsets(UIEdgeInsets(top: self.padding*2,
-//                                  left: self.padding,
-//                                  bottom: self.padding,
-//                                  right: self.padding))
-//    }
-//
-//    let cityCellRegistration = UICollectionView.CellRegistration<UserSettingsCityCell, AnyHashable> { [unowned self] cell, _, item in
-//
-//      cell.color = self.color
-//      cell.insets = UIEdgeInsets(top: padding*2, left: padding, bottom: padding*1, right: padding)
-//      ///Fetch
-////      cell.cityFetchPublisher
-////        .filter { !$0.isNil }
-////        .sink { [unowned self] in self.cityFetchPublisher.send($0!) }
-////        .store(in: &self.subscriptions)
-//      let debounced = cell.cityFetchPublisher
-//        .filter { !$0.isNil }
-//        .throttle(for: .seconds(1),
-//                  scheduler: DispatchQueue.main,
-//                  latest: true)
-//
-//      debounced
-//        .sink { [unowned self] in self.cityFetchPublisher.send($0!) }
-//        .store(in: &self.subscriptions)
-//
-//      ///Selection
-//      cell.citySelectionPublisher
-//        .sink { [unowned self] in self.citySelectionPublisher.send($0) }
-//        .store(in: &self.subscriptions)
-//
-//      var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-//      backgroundConfig.backgroundColor = .clear
-//      cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//      cell.backgroundConfiguration = backgroundConfig
-//
-//      guard let userprofile = Userprofiles.shared.current else { return }
-//
-//      cell.userprofile = userprofile
-//    }
-//
-//    let interestsCellRegistration = UICollectionView.CellRegistration<UserInterestsCell, AnyHashable> { [unowned self] cell, _, _ in
-//      guard let userprofile = Userprofiles.shared.current else { return }
-//
-//      cell.userprofile = userprofile
-//      cell.color = self.color
-//      cell.insets = UIEdgeInsets(top: padding*2, left: padding, bottom: padding*1, right: padding)
-//      cell.topicPublisher
-//        .sink { [unowned self] in self.topicPublisher.send($0) }
-//        .store(in: &self.subscriptions)
-//
-//      var config = UIBackgroundConfiguration.listPlainCell()
-//      config.backgroundColor = .clear
-//      cell.backgroundConfiguration = config
-//      cell.automaticallyUpdatesBackgroundConfiguration = false
-//    }
-//
-//    let socialCellRegistration = UICollectionView.CellRegistration<UserSettingsSocialHeaderCell, AnyHashable> { [unowned self] cell, indexPath, item in
-////      cell.keyboardWillAppear
-////        .sink { [unowned self] _ in
-////          //                    self.scrollToItem(at: indexPath, at: .top, animated: true)
-////        }
-////        .store(in: &self.subscriptions)
-//      cell.insets = UIEdgeInsets(top: padding*2, left: padding, bottom: padding*1, right: padding)
-//      //Facebook
-//      cell.facebookPublisher.sink { [weak self] in
-//        guard let self = self else { return }
-//
-//        self.facebookPublisher.send($0)
-//      }.store(in: &self.subscriptions)
-//
-//      //Instagram
-//      cell.instagramPublisher.sink { [weak self] in
-//        guard let self = self else { return }
-//
-//        self.instagramPublisher.send($0)
-//      }.store(in: &self.subscriptions)
-//
-//      //Instagram
-//      cell.tiktokPublisher.sink { [weak self] in
-//        guard let self = self else { return }
-//
-//        self.tiktokPublisher.send($0)
-//      }.store(in: &self.subscriptions)
-//
-//      //URL
-//      cell.openURLPublisher.sink { [weak self] in
-//        guard let self = self else { return }
-//
-//        self.openURLPublisher.send($0)
-//      }.store(in: &self.subscriptions)
-//      //            //Google
-//      //            cell.googlePublisher.sink { [weak self] in
-//      //                guard let self = self,
-//      //                      let string = $0
-//      //                else { return }
-//      //
-//      //            }.store(in: &self.subscriptions)
-//      //
-//      //            //Twitter
-//      //            cell.twitterPublisher.sink { [weak self] in
-//      //                guard let self = self,
-//      //                      let string = $0
-//      //                else { return }
-//      //
-//      //            }.store(in: &self.subscriptions)
-//
-//      var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-//      backgroundConfig.backgroundColor = .clear
-//      cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//      cell.backgroundConfiguration = backgroundConfig
-//
-//      guard let userprofile = Userprofiles.shared.current else { return }
-//
-//      cell.userprofile = userprofile
-//      cell.color = self.color
-//    }
-//
     let statsCellRegistration = UICollectionView.CellRegistration<UserStatsCell, AnyHashable> { [unowned self] cell, _, _ in
       guard let userprofile = Userprofiles.shared.current else { return }
       
@@ -384,43 +259,16 @@ class UserSettingsCollectionView: UICollectionView {
       cell.automaticallyUpdatesBackgroundConfiguration = false
     }
     
-    let accountManagementCellRegistration = UICollectionView.CellRegistration<AccountManagementHeaderCell, AnyHashable> { cell, _, _ in
+    let accountManagementCellRegistration = UICollectionView.CellRegistration<AccountManagementHeaderCell, AnyHashable> { [unowned self] cell, _, _ in
       var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
       backgroundConfig.backgroundColor = .clear
       cell.backgroundConfiguration = backgroundConfig
+      cell.color = self.color
       
       guard let userprofile = Userprofiles.shared.current else { return }
       
       cell.userprofile = userprofile
     }
-    
-    //        let headerRegistraition = UICollectionView.SupplementaryRegistration<SettingsCellHeader>(elementKind: UICollectionView.elementKindSectionHeader) { [unowned self] supplementaryView, elementKind, indexPath in
-    //
-    //            guard let section = Section(rawValue: indexPath.section),
-    //                  let userprofile = Userprofiles.shared.current
-    //            else { return }
-    //
-    //            switch section {
-    //            case .City:
-    //                supplementaryView.mode = .City
-    //                supplementaryView.isBadgeEnabled = false//userprofile.cityTitle.isEmpty ? true : false
-    //            case .SocialMedia:
-    //                supplementaryView.mode = .SocialMedia
-    //                supplementaryView.isHelpEnabled = true
-    //                supplementaryView.isBadgeEnabled = false//userprofile.hasSocialMedia ? false : true
-    //            case .Interests:
-    //                supplementaryView.mode = .Interests
-    //                supplementaryView.isHelpEnabled = true
-    //            case .Stats:
-    //                supplementaryView.mode = .Stats
-    //                supplementaryView.isHelpEnabled = false
-    //            case .Management:
-    //                supplementaryView.mode = .Management
-    //                supplementaryView.isHelpEnabled = false
-    //            default:
-    //                print("")
-    //            }
-    //        }
     
     source = UICollectionViewDiffableDataSource<Section, Int>(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
       guard let section = Section(rawValue: identifier) else { return UICollectionViewCell() }
@@ -441,44 +289,16 @@ class UserSettingsCollectionView: UICollectionView {
                                                             for: indexPath,
                                                             item: identifier)
       }
-//      } else if section == .City {
-//        return collectionView.dequeueConfiguredReusableCell(using: cityCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
-//      } else if section == .SocialMedia {
-//        return collectionView.dequeueConfiguredReusableCell(using: socialCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
-//      } else if section == .Interests {
-//        return collectionView.dequeueConfiguredReusableCell(using: interestsCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
-//      } else if section == .About {
-//        return collectionView.dequeueConfiguredReusableCell(using: aboutCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
-//      }
       
       return UICollectionViewCell()
     }
     
     var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
     snapshot.appendSections([.Credentials, .Info, .Stats, .Management])
-//    snapshot.appendSections([.Credentials, .About, .City, .Interests, .SocialMedia, .Stats, .Management])
     snapshot.appendItems([0], toSection: .Credentials)
     snapshot.appendItems([1], toSection: .Info)
     snapshot.appendItems([2], toSection: .Stats)
     snapshot.appendItems([3], toSection: .Management)
-    
-//    var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-//    snapshot.appendSections([.Credentials, .About, .City, .Interests, .SocialMedia, .Stats, .Management])
-//    snapshot.appendItems([0], toSection: .Credentials)
-//    snapshot.appendItems([1], toSection: .About)
-//    snapshot.appendItems([2], toSection: .City)
-//    snapshot.appendItems([3], toSection: .Interests)
-//    snapshot.appendItems([4], toSection: .SocialMedia)
-//    snapshot.appendItems([5], toSection: .Stats)
-//    snapshot.appendItems([6], toSection: .Management)
     
     source.apply(snapshot, animatingDifferences: false)
   }
