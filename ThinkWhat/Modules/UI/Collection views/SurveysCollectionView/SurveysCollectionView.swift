@@ -515,7 +515,7 @@ private extension SurveysCollectionView {
         .store(in: &self.subscriptions)
       
       var config = UIBackgroundConfiguration.listPlainCell()
-      config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+      config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
     }

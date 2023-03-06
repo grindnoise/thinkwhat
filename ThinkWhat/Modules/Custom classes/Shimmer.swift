@@ -10,12 +10,18 @@ import UIKit
 import Combine
 
 class Shimmer: UIView {
+  
+  
+  
   // MARK: - Private methods
   private lazy var subscriptions = Set<AnyCancellable>()
+  ///**UI**
+  private let lightColor: UIColor
+  private let darkColor: UIColor
   private lazy var gradient: CAGradientLayer = {
     backgroundColor = .clear
-    let light = UIColor.tertiarySystemBackground.cgColor//UIColor(red: 0, green: 0, blue: 0, alpha: 0.1).cgColor
-    let dark = UIColor.secondarySystemBackground.cgColor//UIColor.black.cgColor
+    let light = lightColor.cgColor
+    let dark = darkColor.cgColor
     
     let instance = CAGradientLayer()
     instance.colors = [dark, light, dark]
@@ -55,6 +61,26 @@ class Shimmer: UIView {
       }
     }
   }
+  
+  
+  
+  // MARK: - Initialization
+  init(lightColor: UIColor = .tertiarySystemBackground,
+       darkColor: UIColor = .secondarySystemBackground) {
+    self.lightColor = lightColor
+    self.darkColor = darkColor
+    
+    super.init(frame: .zero)
+    
+    backgroundColor = .clear
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  
+  
   
   // MARK: - Destructor
   deinit {

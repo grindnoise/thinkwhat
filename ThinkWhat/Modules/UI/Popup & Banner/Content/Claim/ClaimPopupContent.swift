@@ -11,557 +11,678 @@ import Combine
 import CoreData
 
 class ClaimPopupContent: UIView {
+  
+  // MARK: - Public properties
+  public var claimPublisher = PassthroughSubject<Claim, Never>()
+  
+  // MARK: - Private properties
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  private weak var parent: Popup?
+  private weak var surveyReference: SurveyReference?
+  ///**UI**
+  private let padding: CGFloat
+  private lazy var collectionView: ClaimCollectionView = {
+    let instance = ClaimCollectionView()
     
-    // MARK: - Public properties
-    public var claimPublisher = PassthroughSubject<Claim, Never>()
+    instance.claimSubject
+      .filter { !$0.isNil }
+      .map {
+        return $0
+      }
+      .assign(to: &self.$item)
     
-    // MARK: - Private properties
-    private var subscriptions = Set<AnyCancellable>()
-    private var tasks: [Task<Void, Never>?] = []
-    private weak var parent: Popup?
-    private weak var surveyReference: SurveyReference?
-    private lazy var collectionView: ClaimCollectionView = {
-        let instance = ClaimCollectionView()
+    instance.publisher(for: \.contentSize)
+      .filter { $0 != .zero }
+      .sink { [weak self] size in
+        guard let self = self else { return }
         
-        instance.claimSubject
-            .filter { !$0.isNil }
-            .map {
-                return $0
-            }
-            .assign(to: &self.$item)
-        
-        instance.publisher(for: \.contentSize)
-            .filter { $0 != .zero }
-            .sink { [weak self] size in
-                guard let self = self else { return }
-                
-                self.parent?.onContainerHeightChange(size.height +
-                                                     self.topContainer.bounds.height +
-                                                     self.bottomContainer.bounds.height +
-                                                     self.verticalStackView.spacing * CGFloat(self.verticalStackView.arrangedSubviews.count - 1))
-            }
-            .store(in: &subscriptions)
-        
-        return instance
-    }()
-    private var state: ButtonState = .Send
-    private lazy var label: UILabel = {
-        let instance = UILabel()
-        instance.alpha = 0
-        instance.numberOfLines = 0
-        instance.textAlignment = .center
-        instance.addEquallyTo(to: middleContainer)
-        
-        let textContent_1 = "claim_sent".localized + "\n" + "\n"
-        let textContent_2 = "thanks_for_feedback".localized
-        let paragraph = NSMutableParagraphStyle()
-        
-        if #available(iOS 15.0, *) {
-            paragraph.usesDefaultHyphenation = true
-        } else {
-            paragraph.hyphenationFactor = 1
-        }
-        paragraph.alignment = .center
-        
-        let attributedString = NSMutableAttributedString()
-        attributedString.append(NSAttributedString(string: textContent_1,
-                                                   attributes: [
-                                                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title1) as Any,
-                                                    NSAttributedString.Key.foregroundColor: UIColor.label,
-                                                   ] as [NSAttributedString.Key : Any]))
-        
-        attributedString.append(NSAttributedString(string: textContent_2,
-                                                   attributes: [
-                                                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title2) as Any,
-                                                    NSAttributedString.Key.foregroundColor: UIColor.label,
-                                                   ] as [NSAttributedString.Key : Any]))
-        instance.attributedText = attributedString
-        
-        return instance
-    }()
-    @Published private var item: Claim?
+        self.parent?.onContainerHeightChange(size.height +
+//                                             self.topContainer.bounds.height +
+                                             self.label.bounds.height +
+                                             self.bottomContainer.bounds.height +
+                                             self.stack.spacing * CGFloat(self.stack.arrangedSubviews.count - 1))
+      }
+      .store(in: &subscriptions)
     
-    // MARK: - UI properties
-    private lazy var verticalStackView: UIStackView = {
-        let instance = UIStackView(arrangedSubviews: [topContainer, middleContainer, bottomContainer])
-        instance.axis = .vertical
-        instance.spacing = 16
-        
-        topContainer.translatesAutoresizingMaskIntoConstraints = false
-        bottomContainer.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            topContainer.heightAnchor.constraint(equalToConstant: 80),
-            bottomContainer.heightAnchor.constraint(equalToConstant: 50),
-        ])
-        
-        return instance
-    }()
-    private lazy var icon: Icon = {
-        let instance = Icon()
-        instance.backgroundColor = .clear
-        instance.isRounded = false
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.scaleMultiplicator = 0.8
-        instance.iconColor = .systemRed//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-        instance.category = .ExclamationMark
-        
-        return instance
-    }()
-    private lazy var closeButton: UIButton = {
-        let instance = UIButton()
-        instance.backgroundColor = .clear
-        instance.imageView?.tintColor = .secondaryLabel// traitCollection.userInterfaceStyle == .dark ? .systemBlue : .secondaryLabel
-//        instance.imageView?.contentMode = .scaleAspectFit
-        instance.addTarget(self, action: #selector(self.close), for: .touchUpInside)
-        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-        
-        instance.publisher(for: \.bounds)
-            .sink { rect in
-            
-                instance.setImage(UIImage(systemName: "xmark",
-                                          withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height,
-                                                                                         weight: .bold)),
+    return instance
+  }()
+  private var state: ButtonState = .Send
+  private lazy var _label: UILabel = {
+    let instance = UILabel()
+    instance.alpha = 0
+    instance.numberOfLines = 0
+    instance.textAlignment = .center
+    instance.addEquallyTo(to: middleContainer)
+    
+    let textContent_1 = "claim_sent".localized + "\n" + "\n"
+    let textContent_2 = "thanks_for_feedback".localized
+    let paragraph = NSMutableParagraphStyle()
+    
+    if #available(iOS 15.0, *) {
+      paragraph.usesDefaultHyphenation = true
+    } else {
+      paragraph.hyphenationFactor = 1
+    }
+    paragraph.alignment = .center
+    
+    let attributedString = NSMutableAttributedString()
+    attributedString.append(NSAttributedString(string: textContent_1,
+                                               attributes: [
+                                                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title1) as Any,
+                                                NSAttributedString.Key.foregroundColor: UIColor.label,
+                                               ] as [NSAttributedString.Key : Any]))
+    
+    attributedString.append(NSAttributedString(string: textContent_2,
+                                               attributes: [
+                                                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title2) as Any,
+                                                NSAttributedString.Key.foregroundColor: UIColor.label,
+                                               ] as [NSAttributedString.Key : Any]))
+    instance.attributedText = attributedString
+    
+    return instance
+  }()
+  private lazy var label: UIStackView = {
+    let label = InsetLabel()
+    label.font = UIFont(name: Fonts.Bold, size: 20)
+    label.text = "claim".localized.uppercased()
+    label.textColor = .white
+    label.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+    
+    let icon = UIImageView(image: UIImage(systemName: "exclamationmark.triangle.fill",
+                                          withConfiguration: UIImage.SymbolConfiguration(weight: .bold)))
+    icon.heightAnchor.constraint(equalTo: icon.widthAnchor, multiplier: 1/1).isActive = true
+    icon.tintColor = .white
+    icon.contentMode = .center
+    
+    let opaque = UIView.opaque()
+    opaque.widthAnchor.constraint(equalToConstant: padding/2).isActive = true
+    
+    let instance = UIStackView(arrangedSubviews: [
+      opaque,
+      icon,
+      label
+    ])
+    instance.translatesAutoresizingMaskIntoConstraints = false
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: label.font)).isActive = true
+    instance.axis = .horizontal
+    instance.spacing = padding/2
+    instance.backgroundColor = .systemRed
+    instance.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero}
+      .sink { instance.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    return instance
+  }()
+  @Published private var item: Claim?
+  
+  // MARK: - UI properties
+  private lazy var stack: UIStackView = {
+    let top = UIView.opaque()
+    label.placeInCenter(of: top,
+                        topInset: padding*2,
+                        bottomInset: padding)
+    
+    let bottom = UIView.opaque()
+    let buttonsStack = UIStackView(arrangedSubviews: [
+      confirmButton,
+      cancelButton
+    ])
+    buttonsStack.distribution = .fillEqually
+    buttonsStack.contentMode = .left
+    buttonsStack.axis = .horizontal
+    buttonsStack.spacing = 4
+    buttonsStack.placeInCenter(of: bottom,
+                        topInset: padding,
+                        bottomInset: padding)
+    
+    let instance = UIStackView(arrangedSubviews: [
+      top,
+      middleContainer,
+      bottom
+    ])
+    instance.axis = .vertical
+    instance.spacing = padding
+    bottom.translatesAutoresizingMaskIntoConstraints = false
+    bottom.heightAnchor.constraint(equalTo: top.heightAnchor).isActive = true
+    
+    return instance
+  }()
+  private lazy var icon: Icon = {
+    let instance = Icon()
+    instance.backgroundColor = .clear
+    instance.isRounded = false
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+    instance.scaleMultiplicator = 0.8
+    instance.iconColor = .systemRed//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+    instance.category = .ExclamationMark
+    
+    return instance
+  }()
+  private lazy var confirmButton: UIButton = {
+    let instance = UIButton()
+    instance.addTarget(self,
+                       action: #selector(self.handleTap(sender:)),
+                       for: .touchUpInside)
+    if #available(iOS 15, *) {
+      var config = UIButton.Configuration.filled()
+      config.cornerStyle = .small
+      config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+      config.baseBackgroundColor = .systemRed
+      config.attributedTitle = AttributedString("confirm".localized,
+                                                attributes: AttributeContainer([
+                                                  .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                  .foregroundColor: UIColor.white as Any
+                                                ]))
+      instance.configuration = config
+    } else {
+      instance.contentEdgeInsets = .uniform(size: 0)
+      instance.setAttributedTitle(NSAttributedString(string: "confirm".localized,
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                      .foregroundColor: UIColor.systemRed as Any
+                                                     ]),
                                   for: .normal)
-            }
-            .store(in: &subscriptions)
-        
-        return instance
-    }()
-    private lazy var topContainer: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.addSubview(closeButton)
-        instance.addSubview(icon)
-        icon.translatesAutoresizingMaskIntoConstraints = false
-        closeButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            closeButton.topAnchor.constraint(equalTo: instance.topAnchor),
-            closeButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
-            closeButton.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.25),
-            icon.topAnchor.constraint(equalTo: closeButton.bottomAnchor),
-            icon.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-            icon.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-        ])
-        
-        return instance
-    }()
-    private lazy var middleContainer: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        collectionView.addEquallyTo(to: instance)
-//        instance.addSubview(collectionView)
-//        collectionView.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            collectionView.topAnchor.constraint(equalTo: instance.topAnchor),
-//            collectionView.leadingAnchor.constraint(equalTo: instance.trailingAnchor),
-//            collectionView.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.25),
-//            icon.topAnchor.constraint(equalTo: closeButton.bottomAnchor),
-//            icon.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-//            icon.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-//        ])
-        
-        return instance
-    }()
-    private lazy var actionButton: UIButton = {
-        let instance = UIButton()
-        
-        instance.addTarget(self, action: #selector(self.send), for: .touchUpInside)
-        if #available(iOS 15, *) {
-            let attrString = AttributedString(self.state.rawValue.localized.uppercased(), attributes: AttributeContainer([
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.white
-            ]))
-            var config = UIButton.Configuration.filled()
-            config.attributedTitle = attrString
-            config.baseBackgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-            config.image = UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
-            config.imagePlacement = .trailing
-            config.imagePadding = 8.0
-            config.contentInsets.leading = 20
-            config.contentInsets.trailing = 20
-            config.buttonSize = .large
-
-            instance.configuration = config
-        } else {
-            let attrString = NSMutableAttributedString(string: self.state.rawValue.localized.uppercased(), attributes: [
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.white
-            ])
-            instance.titleEdgeInsets.left = 20
-            instance.titleEdgeInsets.right = 20
-            instance.setImage(UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
-            instance.imageView?.tintColor = .white
-            instance.imageEdgeInsets.left = 8
-//            instance.imageEdgeInsets.right = 8
-            instance.setAttributedTitle(attrString, for: .normal)
-            instance.semanticContentAttribute = .forceRightToLeft
-            instance.backgroundColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-
-            let constraint = instance.widthAnchor.constraint(equalToConstant: self.state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)!))
-            constraint.identifier = "width"
-            constraint.isActive = true
-        }
-        
-        instance.publisher(for: \.bounds)
-            .sink { [weak self] rect in
-            guard let self = self else { return }
-            
-                instance.cornerRadius = rect.height/2.25
-            
-            guard let constraint = instance.getConstraint(identifier: "width") else { return }
-            self.setNeedsLayout()
-            constraint.constant = self.state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (instance .imageView?.bounds.width ?? 0) + 60
-            self.layoutIfNeeded()
-        }
-            .store(in: &subscriptions)
-
-        return instance
-    }()
-    private lazy var bottomContainer: UIView = {
-        let instance = UIView()
-        instance.backgroundColor = .clear
-        instance.addSubview(actionButton)
-        actionButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            actionButton.topAnchor.constraint(equalTo: instance.topAnchor),
-            actionButton.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-            actionButton.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-        ])
-        
-        return instance
-    }()
+    }
     
-    // MARK: - Destructor
-    deinit {
-        tasks.forEach { $0?.cancel() }
-        subscriptions.forEach { $0.cancel() }
-        NotificationCenter.default.removeObserver(self)
+    return instance
+  }()
+  private lazy var cancelButton: UIButton = {
+    let instance = UIButton()
+    instance.addTarget(self,
+                       action: #selector(self.handleTap(sender:)),
+                       for: .touchUpInside)
+    if #available(iOS 15, *) {
+      var config = UIButton.Configuration.plain()
+      config.contentInsets = .uniform(size: 0)
+      config.attributedTitle = AttributedString("cancel".localized,
+                                                attributes: AttributeContainer([
+                                                  .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                  .foregroundColor: UIColor.secondaryLabel as Any
+                                                ]))
+      instance.configuration = config
+    } else {
+      instance.contentEdgeInsets = .uniform(size: 0)
+      instance.setAttributedTitle(NSAttributedString(string: "cancel".localized,
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                      .foregroundColor: UIColor.secondaryLabel as Any
+                                                     ]),
+                                  for: .normal)
+    }
+    
+    return instance
+  }()
+  private lazy var closeButton: UIButton = {
+    let instance = UIButton()
+    instance.backgroundColor = .clear
+    instance.imageView?.tintColor = .secondaryLabel// traitCollection.userInterfaceStyle == .dark ? .systemBlue : .secondaryLabel
+    //        instance.imageView?.contentMode = .scaleAspectFit
+    instance.addTarget(self, action: #selector(self.close), for: .touchUpInside)
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+    
+    instance.publisher(for: \.bounds)
+      .sink { rect in
+        
+        instance.setImage(UIImage(systemName: "xmark",
+                                  withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height,
+                                                                                 weight: .bold)),
+                          for: .normal)
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+//  private lazy var topContainer: UIView = {
+//    let instance = UIView()
+//    instance.backgroundColor = .clear
+//    instance.addSubview(closeButton)
+//    instance.addSubview(icon)
+//    icon.translatesAutoresizingMaskIntoConstraints = false
+//    closeButton.translatesAutoresizingMaskIntoConstraints = false
+//
+//    NSLayoutConstraint.activate([
+//      closeButton.topAnchor.constraint(equalTo: instance.topAnchor),
+//      closeButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+//      closeButton.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.25),
+//      icon.topAnchor.constraint(equalTo: closeButton.bottomAnchor),
+//      icon.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+//      icon.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+//    ])
+//
+//    return instance
+//  }()
+  private lazy var middleContainer: UIView = {
+    let instance = UIView()
+    instance.backgroundColor = .clear
+    collectionView.addEquallyTo(to: instance)
+    //        instance.addSubview(collectionView)
+    //        collectionView.translatesAutoresizingMaskIntoConstraints = false
+    //
+    //        NSLayoutConstraint.activate([
+    //            collectionView.topAnchor.constraint(equalTo: instance.topAnchor),
+    //            collectionView.leadingAnchor.constraint(equalTo: instance.trailingAnchor),
+    //            collectionView.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 0.25),
+    //            icon.topAnchor.constraint(equalTo: closeButton.bottomAnchor),
+    //            icon.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+    //            icon.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+    //        ])
+    
+    return instance
+  }()
+  private lazy var actionButton: UIButton = {
+    let instance = UIButton()
+    
+    instance.addTarget(self, action: #selector(self.send), for: .touchUpInside)
+    if #available(iOS 15, *) {
+      let attrString = AttributedString(self.state.rawValue.localized.uppercased(), attributes: AttributeContainer([
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.white
+      ]))
+      var config = UIButton.Configuration.filled()
+      config.attributedTitle = attrString
+      config.baseBackgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+      config.image = UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+      config.imagePlacement = .trailing
+      config.imagePadding = 8.0
+      config.contentInsets.leading = 20
+      config.contentInsets.trailing = 20
+      config.buttonSize = .large
+      
+      instance.configuration = config
+    } else {
+      let attrString = NSMutableAttributedString(string: self.state.rawValue.localized.uppercased(), attributes: [
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.white
+      ])
+      instance.titleEdgeInsets.left = 20
+      instance.titleEdgeInsets.right = 20
+      instance.setImage(UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+      instance.imageView?.tintColor = .white
+      instance.imageEdgeInsets.left = 8
+      //            instance.imageEdgeInsets.right = 8
+      instance.setAttributedTitle(attrString, for: .normal)
+      instance.semanticContentAttribute = .forceRightToLeft
+      instance.backgroundColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+      
+      let constraint = instance.widthAnchor.constraint(equalToConstant: self.state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)!))
+      constraint.identifier = "width"
+      constraint.isActive = true
+    }
+    
+    instance.publisher(for: \.bounds)
+      .sink { [weak self] rect in
+        guard let self = self else { return }
+        
+        instance.cornerRadius = rect.height/2.25
+        
+        guard let constraint = instance.getConstraint(identifier: "width") else { return }
+        self.setNeedsLayout()
+        constraint.constant = self.state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (instance .imageView?.bounds.width ?? 0) + 60
+        self.layoutIfNeeded()
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var bottomContainer: UIView = {
+    let instance = UIView()
+    instance.backgroundColor = .clear
+    instance.addSubview(actionButton)
+    actionButton.translatesAutoresizingMaskIntoConstraints = false
+    
+    NSLayoutConstraint.activate([
+      actionButton.topAnchor.constraint(equalTo: instance.topAnchor),
+      actionButton.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+      actionButton.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+    ])
+    
+    return instance
+  }()
+  
+  // MARK: - Destructor
+  deinit {
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
 #if DEBUG
-        print("\(String(describing: type(of: self))).\(#function)")
+    print("\(String(describing: type(of: self))).\(#function)")
 #endif
-    }
+  }
+  
+  // MARK: - Initialization
+  init(parent: Popup?,
+       surveyReference: SurveyReference?,
+       padding: CGFloat = 8) {
+    self.padding = padding
     
-    // MARK: - Initialization
-    init(parent: Popup?, surveyReference: SurveyReference?) {
-        super.init(frame: .zero)
-        
-        self.surveyReference = surveyReference
-        self.parent = parent
-        
-        setupUI()
-        setTasks()
-        setSubscriptions()
-    }
+    super.init(frame: .zero)
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    self.surveyReference = surveyReference
+    self.parent = parent
     
-    override init(frame: CGRect) {
-        fatalError("init(frame:) has not been implemented")
-    }
-    
-    // MARK: - Private methods
-    private func setupUI() {
-        verticalStackView.addEquallyTo(to: self)
-    }
-    
-    private func setSubscriptions() {
-        $item.sink { [weak self] in
-            guard let self = self,
-                  !$0.isNil
-            else { return }
-            
-            UIView.animate(withDuration: 0.2) { [weak self] in
-                guard let self = self else { return
-                    
-                }
-                if #available(iOS 15, *) {
-                    self.actionButton.configuration?.baseBackgroundColor = .systemRed
-                } else {
-                    self.actionButton.backgroundColor = .systemRed
-                }
-            }
-        }.store(in: &subscriptions)
-    }
-    
-    private func setTasks() {
-        tasks.append(Task { @MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Claim) {
-                guard let self = self,
-                      let instance = notification.object as? SurveyReference,
-                      self.surveyReference == instance
-                else { return }
-
-                self.onSuccessCallback()
-            }
-        })
-        //Error
-        tasks.append(Task { @MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.ClaimFailure) {
-                guard let self = self,
-                      let instance = notification.object as? SurveyReference,
-                      self.surveyReference == instance
-                else { return }
-
-                self.onFailureCallback()
-            }
-        })
-        tasks.append(Task { @MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Claim) {
-                guard let self = self,
-                      let instance = notification.object as? Comment,
-                      instance.survey?.reference == self.surveyReference
-                else { return }
-
-                self.onSuccessCallback()
-            }
-        })
-        tasks.append( Task { @MainActor [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ClaimFailure) {
-                guard let self = self,
-                      let instance = notification.object as? Comment,
-                      instance.survey?.reference == self.surveyReference
-                else { return }
-                
-                self.onFailureCallback()
-            }
-        })
-    }
-    
-    @objc
-    private func close() {
-        parent?.dismiss()
-    }
-    
-    @objc
-    private func send() {
-        guard state == .Send,
-              let item = item
-        else {
-            parent?.dismiss()
-            return
+    setupUI()
+    setTasks()
+    setSubscriptions()
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  override init(frame: CGRect) {
+    fatalError("init(frame:) has not been implemented")
+  }
+  
+  // MARK: - Private methods
+  private func setupUI() {
+    stack.place(inside: self)
+  }
+  
+  private func setSubscriptions() {
+    $item.sink { [weak self] in
+      guard let self = self,
+            !$0.isNil
+      else { return }
+      
+      UIView.animate(withDuration: 0.2) { [weak self] in
+        guard let self = self else { return
+          
         }
-        state = .Sending
-        
-        actionButton.isUserInteractionEnabled = false
-        claimPublisher.send(item)
-        claimPublisher.send(completion: .finished)
-        
         if #available(iOS 15, *) {
-            if !actionButton.configuration.isNil {
-                let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.white
-                ]))
-                UIView.transition(with: actionButton, duration: 0.15, options: .transitionCrossDissolve) {
-                    self.actionButton.configuration!.attributedTitle = attrString
-                }
-                actionButton.configuration!.showsActivityIndicator = true
-            }
+          self.actionButton.configuration?.baseBackgroundColor = .systemRed
         } else {
-            actionButton.setImage(UIImage(), for: .normal)
-            actionButton.setAttributedTitle(nil, for: .normal)
-            let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
-                                                                  size: CGSize(width: actionButton.frame.height,
-                                                                               height: actionButton.frame.height)))
-            indicator.alpha = 0
-            indicator.layoutCentered(in: actionButton)
-            indicator.startAnimating()
-            indicator.color = .white
-            indicator.accessibilityIdentifier = "indicator"
-            UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
+          self.actionButton.backgroundColor = .systemRed
         }
+      }
+    }.store(in: &subscriptions)
+  }
+  
+  private func setTasks() {
+    tasks.append(Task { @MainActor [weak self] in
+      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Claim) {
+        guard let self = self,
+              let instance = notification.object as? SurveyReference,
+              self.surveyReference == instance
+        else { return }
+        
+        self.onSuccessCallback()
+      }
+    })
+    //Error
+    tasks.append(Task { @MainActor [weak self] in
+      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.ClaimFailure) {
+        guard let self = self,
+              let instance = notification.object as? SurveyReference,
+              self.surveyReference == instance
+        else { return }
+        
+        self.onFailureCallback()
+      }
+    })
+    tasks.append(Task { @MainActor [weak self] in
+      for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Claim) {
+        guard let self = self,
+              let instance = notification.object as? Comment,
+              instance.survey?.reference == self.surveyReference
+        else { return }
+        
+        self.onSuccessCallback()
+      }
+    })
+    tasks.append( Task { @MainActor [weak self] in
+      for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ClaimFailure) {
+        guard let self = self,
+              let instance = notification.object as? Comment,
+              instance.survey?.reference == self.surveyReference
+        else { return }
+        
+        self.onFailureCallback()
+      }
+    })
+  }
+  
+  @objc
+  private func close() {
+    parent?.dismiss()
+  }
+  
+  @objc
+  private func send() {
+    guard state == .Send,
+          let item = item
+    else {
+      parent?.dismiss()
+      return
+    }
+    state = .Sending
+    
+    actionButton.isUserInteractionEnabled = false
+    claimPublisher.send(item)
+    claimPublisher.send(completion: .finished)
+    
+    if #available(iOS 15, *) {
+      if !actionButton.configuration.isNil {
+        let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
+          NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+          NSAttributedString.Key.foregroundColor: UIColor.white
+        ]))
+        UIView.transition(with: actionButton, duration: 0.15, options: .transitionCrossDissolve) {
+          self.actionButton.configuration!.attributedTitle = attrString
+        }
+        actionButton.configuration!.showsActivityIndicator = true
+      }
+    } else {
+      actionButton.setImage(UIImage(), for: .normal)
+      actionButton.setAttributedTitle(nil, for: .normal)
+      let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+                                                            size: CGSize(width: actionButton.frame.height,
+                                                                         height: actionButton.frame.height)))
+      indicator.alpha = 0
+      indicator.layoutCentered(in: actionButton)
+      indicator.startAnimating()
+      indicator.color = .white
+      indicator.accessibilityIdentifier = "indicator"
+      UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
+    }
+  }
+  
+  private func onSuccessCallback() {
+    state = .Close
+    actionButton.isUserInteractionEnabled = true
+    
+    //Path animation
+    let pathAnim = Animations.get(property: .Path, fromValue: (self.icon.icon as! CAShapeLayer).path!, toValue: (self.icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
+    self.icon.icon.add(pathAnim, forKey: nil)
+    
+    self.parent?.resize(400, animationDuration: 0.7)
+    
+    //Hide close btn
+    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, animations: { [weak self] in
+      guard let self = self else { return }
+      
+      self.collectionView.alpha = 0
+      self.closeButton.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+      self.closeButton.alpha = 0
+    }) { _ in
+      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.4, delay: 0) { [weak self] in
+        guard let self = self else { return }
+        
+        self._label.alpha = 1
+      }
     }
     
-    private func onSuccessCallback() {
-        state = .Close
-        actionButton.isUserInteractionEnabled = true
-        
-        //Path animation
-        let pathAnim = Animations.get(property: .Path, fromValue: (self.icon.icon as! CAShapeLayer).path!, toValue: (self.icon.getLayer(.Letter) as! CAShapeLayer).path!, duration: 0.5, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: nil, isRemovedOnCompletion: false)
-        self.icon.icon.add(pathAnim, forKey: nil)
-        
-        self.parent?.resize(400, animationDuration: 0.7)
-        
-        //Hide close btn
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, animations: { [weak self] in
-            guard let self = self else { return }
-            
-            self.collectionView.alpha = 0
-            self.closeButton.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-            self.closeButton.alpha = 0
-        }) { _ in
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.4, delay: 0) { [weak self] in
-                guard let self = self else { return }
-                
-                self.label.alpha = 1
-            }
-        }
-        
-        if #available(iOS 15, *) {
-            guard !actionButton.configuration.isNil else { return }
-            
-            let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.white
-            ]))
-            self.actionButton.configuration!.showsActivityIndicator = false
-            UIView.transition(with: self.actionButton, duration: 0.15, options: .transitionCrossDissolve) {
-                self.actionButton.configuration!.attributedTitle = attrString
-                self.actionButton.configuration!.image = UIImage(systemName: "arrow.forward", withConfiguration: UIImage.SymbolConfiguration(weight: .bold))
-            }
-        } else {
-            guard let indicator = actionButton.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator") else { return }
-            
-            UIView.animate(withDuration: 0.25) {
-                indicator.alpha = 0
-            } completion: { _ in
-                indicator.removeFromSuperview()
-                let attrString = NSMutableAttributedString(string: self.state.rawValue.localized.uppercased(), attributes: [
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.white
-                ])
-                self.actionButton.titleEdgeInsets.left = 20
-                self.actionButton.titleEdgeInsets.right = 20
-                self.actionButton.setImage(UIImage(systemName: "arrow.backward", withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
-                self.actionButton.imageView?.tintColor = .white
-                self.actionButton.imageEdgeInsets.left = 8
-                self.actionButton.setAttributedTitle(attrString, for: .normal)
-                self.actionButton.semanticContentAttribute = .forceRightToLeft
-            }
-        }
+    if #available(iOS 15, *) {
+      guard !actionButton.configuration.isNil else { return }
+      
+      let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.white
+      ]))
+      self.actionButton.configuration!.showsActivityIndicator = false
+      UIView.transition(with: self.actionButton, duration: 0.15, options: .transitionCrossDissolve) {
+        self.actionButton.configuration!.attributedTitle = attrString
+        self.actionButton.configuration!.image = UIImage(systemName: "arrow.forward", withConfiguration: UIImage.SymbolConfiguration(weight: .bold))
+      }
+    } else {
+      guard let indicator = actionButton.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator") else { return }
+      
+      UIView.animate(withDuration: 0.25) {
+        indicator.alpha = 0
+      } completion: { _ in
+        indicator.removeFromSuperview()
+        let attrString = NSMutableAttributedString(string: self.state.rawValue.localized.uppercased(), attributes: [
+          NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+          NSAttributedString.Key.foregroundColor: UIColor.white
+        ])
+        self.actionButton.titleEdgeInsets.left = 20
+        self.actionButton.titleEdgeInsets.right = 20
+        self.actionButton.setImage(UIImage(systemName: "arrow.backward", withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
+        self.actionButton.imageView?.tintColor = .white
+        self.actionButton.imageEdgeInsets.left = 8
+        self.actionButton.setAttributedTitle(attrString, for: .normal)
+        self.actionButton.semanticContentAttribute = .forceRightToLeft
+      }
     }
-
-    private func onFailureCallback() {
-        state = .Send
-        actionButton.isUserInteractionEnabled = true
-        
-        showBanner(bannerDelegate: self, text: "", content: PlainBannerContent(text: AppError.server.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 1)
-        
-//        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
-//        banner.present(content: PlainBannerContent(text: AppError.server.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 1)
-        
-        if #available(iOS 15, *) {
-            guard !actionButton.configuration.isNil else { return }
-            
-            let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
-                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
-                NSAttributedString.Key.foregroundColor: UIColor.white
-            ]))
-            self.actionButton.configuration!.showsActivityIndicator = false
-            UIView.transition(with: self.actionButton, duration: 0.15, options: .transitionCrossDissolve) {
-                self.actionButton.configuration!.attributedTitle = attrString
-                self.actionButton.setImage(UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
-            }
-        } else {
-            guard let indicator = actionButton.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator") else { return }
-            
-            UIView.animate(withDuration: 0.2) {
-                indicator.alpha = 0
-            } completion: { _ in
-                indicator.removeFromSuperview()
-                let attrString = NSMutableAttributedString(string: self.state.rawValue.localized.uppercased(), attributes: [
-                    NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
-                    NSAttributedString.Key.foregroundColor: UIColor.white
-                ])
-                self.actionButton.titleEdgeInsets.left = 20
-                self.actionButton.titleEdgeInsets.right = 20
-                self.actionButton.setImage(UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
-                self.actionButton.imageView?.tintColor = .white
-                self.actionButton.imageEdgeInsets.left = 8
-                self.actionButton.setAttributedTitle(attrString, for: .normal)
-                self.actionButton.semanticContentAttribute = .forceRightToLeft
-            }
-        }
-    }
+  }
+  
+  private func onFailureCallback() {
+    state = .Send
+    actionButton.isUserInteractionEnabled = true
     
-    // MARK: - Public methods
-    public func onChildHeightChange(_ height: CGFloat) {
-//        parent?.onContainerHeightChange(height + title.bounds.height*2)
-    }
+    showBanner(bannerDelegate: self, text: "", content: PlainBannerContent(text: AppError.server.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 1)
     
-//    // MARK: - Overriden methods
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        super.traitCollectionDidChange(previousTraitCollection)
-//
-////        closeButton.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
-////        icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed)
-//
-//        if #available(iOS 15, *) {
-//            guard !actionButton.configuration.isNil else { return }
-//            actionButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-//        } else {
-//            actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-//        }
-//
-//        //Set dynamic font size
-//        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-//
-//
-////        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
-////                                            forTextStyle: .title1)
-////        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-////                                            forTextStyle: .caption2)
-////        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-////                                            forTextStyle: .caption2)
-////        commentsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-////                                            forTextStyle: .caption2)
-////        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-////                                            forTextStyle: .callout)
-////        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
-////                                            forTextStyle: .footnote)
-//////        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-//////                                                forTextStyle: .caption2)
-//////        lastnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-//////                                               forTextStyle: .caption2)
-////        dateLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-////                                               forTextStyle: .caption2)
-////
-////        if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
-////            label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
-////        }
-////
-////
-////        guard let constraint_1 = titleLabel.getConstraint(identifier: "height"),
-////              let constraint_2 = statsView.getConstraint(identifier: "height"),
-////              let constraint_3 = descriptionLabel.getConstraint(identifier: "height"),
-////              let constraint_4 = topicView.getConstraint(identifier: "height"),
-//////              let constraint_5 = progressView.getConstraint(identifier: "width"),
-////              let item = item
-////        else { return }
-////
-////        setNeedsLayout()
-////        constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
-////                                                  font: titleLabel.font)
-////        constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
-////                                                                       font: ratingLabel.font)
-////        constraint_3.constant = item.truncatedDescription.height(withConstrainedWidth: ratingLabel.bounds.width,
-////                                                                       font: ratingLabel.font)
-////        constraint_4.constant = item.topic.title.height(withConstrainedWidth: ratingLabel.bounds.width,
-////                                                                       font: ratingLabel.font)
-////        layoutIfNeeded()
-////        topicLabel.frame.origin = .zero
+    //        let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
+    //        banner.present(content: PlainBannerContent(text: AppError.server.localizedDescription.localized, imageContent: ImageSigns.exclamationMark, color: .systemRed), isModal: false, dismissAfter: 1)
+    
+    if #available(iOS 15, *) {
+      guard !actionButton.configuration.isNil else { return }
+      
+      let attrString = AttributedString(state.rawValue.localized.uppercased(), attributes: AttributeContainer([
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.white
+      ]))
+      self.actionButton.configuration!.showsActivityIndicator = false
+      UIView.transition(with: self.actionButton, duration: 0.15, options: .transitionCrossDissolve) {
+        self.actionButton.configuration!.attributedTitle = attrString
+        self.actionButton.setImage(UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+      }
+    } else {
+      guard let indicator = actionButton.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator") else { return }
+      
+      UIView.animate(withDuration: 0.2) {
+        indicator.alpha = 0
+      } completion: { _ in
+        indicator.removeFromSuperview()
+        let attrString = NSMutableAttributedString(string: self.state.rawValue.localized.uppercased(), attributes: [
+          NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2) as Any,
+          NSAttributedString.Key.foregroundColor: UIColor.white
+        ])
+        self.actionButton.titleEdgeInsets.left = 20
+        self.actionButton.titleEdgeInsets.right = 20
+        self.actionButton.setImage(UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+        self.actionButton.imageView?.tintColor = .white
+        self.actionButton.imageEdgeInsets.left = 8
+        self.actionButton.setAttributedTitle(attrString, for: .normal)
+        self.actionButton.semanticContentAttribute = .forceRightToLeft
+      }
+    }
+  }
+  
+  @objc
+  func handleTap(sender: UIButton) {
+//    if sender == confirmButton {
+//      actionPublisher.send([mode : .Confirm])
+//      actionPublisher.send(completion: .finished)
+//    } else {
+//      actionPublisher.send([mode : .Cancel])
+//      actionPublisher.send(completion: .finished)
 //    }
+  }
+  
+  // MARK: - Public methods
+  public func onChildHeightChange(_ height: CGFloat) {
+    //        parent?.onContainerHeightChange(height + title.bounds.height*2)
+  }
+  
+  //    // MARK: - Overriden methods
+  //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+  //        super.traitCollectionDidChange(previousTraitCollection)
+  //
+  ////        closeButton.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGray
+  ////        icon.setIconColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed)
+  //
+  //        if #available(iOS 15, *) {
+  //            guard !actionButton.configuration.isNil else { return }
+  //            actionButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+  //        } else {
+  //            actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+  //        }
+  //
+  //        //Set dynamic font size
+  //        guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+  //
+  //
+  ////        titleLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+  ////                                            forTextStyle: .title1)
+  ////        ratingLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+  ////                                            forTextStyle: .caption2)
+  ////        viewsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+  ////                                            forTextStyle: .caption2)
+  ////        commentsLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+  ////                                            forTextStyle: .caption2)
+  ////        descriptionLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+  ////                                            forTextStyle: .callout)
+  ////        topicLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+  ////                                            forTextStyle: .footnote)
+  //////        firstnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+  //////                                                forTextStyle: .caption2)
+  //////        lastnameLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+  //////                                               forTextStyle: .caption2)
+  ////        dateLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+  ////                                               forTextStyle: .caption2)
+  ////
+  ////        if let label = progressView.getSubview(type: UILabel.self, identifier: "progressLabel") {
+  ////            label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)
+  ////        }
+  ////
+  ////
+  ////        guard let constraint_1 = titleLabel.getConstraint(identifier: "height"),
+  ////              let constraint_2 = statsView.getConstraint(identifier: "height"),
+  ////              let constraint_3 = descriptionLabel.getConstraint(identifier: "height"),
+  ////              let constraint_4 = topicView.getConstraint(identifier: "height"),
+  //////              let constraint_5 = progressView.getConstraint(identifier: "width"),
+  ////              let item = item
+  ////        else { return }
+  ////
+  ////        setNeedsLayout()
+  ////        constraint_1.constant = item.title.height(withConstrainedWidth: titleLabel.bounds.width,
+  ////                                                  font: titleLabel.font)
+  ////        constraint_2.constant = String(describing: item.rating).height(withConstrainedWidth: ratingLabel.bounds.width,
+  ////                                                                       font: ratingLabel.font)
+  ////        constraint_3.constant = item.truncatedDescription.height(withConstrainedWidth: ratingLabel.bounds.width,
+  ////                                                                       font: ratingLabel.font)
+  ////        constraint_4.constant = item.topic.title.height(withConstrainedWidth: ratingLabel.bounds.width,
+  ////                                                                       font: ratingLabel.font)
+  ////        layoutIfNeeded()
+  ////        topicLabel.frame.origin = .zero
+  //    }
 }
 
 
 extension ClaimPopupContent: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let popup = sender as? Popup {
-            popup.removeFromSuperview()
-        }
+  func onBannerWillAppear(_ sender: Any) {}
+  
+  func onBannerWillDisappear(_ sender: Any) {}
+  
+  func onBannerDidAppear(_ sender: Any) {}
+  
+  func onBannerDidDisappear(_ sender: Any) {
+    if let banner = sender as? Banner {
+      banner.removeFromSuperview()
+    } else if let popup = sender as? Popup {
+      popup.removeFromSuperview()
     }
+  }
 }

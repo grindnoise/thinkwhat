@@ -39,6 +39,15 @@ class SurveyCell: UICollectionViewCell {
           self.descriptionLabel.textColor = self.item.isVisited ? .secondaryLabel : .label
         }
         .store(in: &subscriptions)
+      
+      item.progressPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.updateProgress()
+        }
+        .store(in: &subscriptions)
     }
   }
   //    public var updatePublisher = PassthroughSubject<SurveyReference, Never>()
@@ -492,7 +501,7 @@ class SurveyCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .white
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
     
     ratingLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     viewsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
@@ -539,7 +548,7 @@ class SurveyCell: UICollectionViewCell {
 private extension SurveyCell {
   @MainActor
   func setupUI() {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .white
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
     clipsToBounds = true
     
     let stackView = UIStackView(arrangedSubviews: [

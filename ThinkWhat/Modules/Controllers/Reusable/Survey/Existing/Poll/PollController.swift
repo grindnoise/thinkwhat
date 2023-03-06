@@ -797,11 +797,13 @@ extension PollController: PollViewInput {
 
 // MARK: - Output
 extension PollController: PollModelOutput {
-  func onLoadCallback(_ result: Result<Bool, Error>) {
+  @MainActor
+  func onLoadCallback(_ result: Result<Survey, Error>) {
     switch result {
-    case .success:
+    case .success(let instance):
       navigationController?.setNavigationBarHidden(false, animated: true)
       loadingIndicator.stop()
+//      controllerOutput?.item = instance
     case .failure:
       let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
                                                             text: AppError.server.localizedDescription,

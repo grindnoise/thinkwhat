@@ -7,5 +7,8 @@
 //
 
 import UIKit
+import Combine
 
-protocol Card: UIView {}
+protocol Card: UIView {
+  var subscriptions: Set<AnyCancellable> { get set }
+}

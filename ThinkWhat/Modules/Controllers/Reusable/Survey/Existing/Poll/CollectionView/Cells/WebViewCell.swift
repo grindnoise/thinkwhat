@@ -151,8 +151,9 @@ class WebViewCell: UICollectionViewCell {
   private lazy var webView: WKWebView = {
     let instance = WKWebView()
     instance.addEquallyTo(to: background)
+    instance.isOpaque = false
     //        instance.uiDelegate = self
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.navigationDelegate = self
     return instance
   }()

@@ -109,6 +109,10 @@ class YoutubeCell: UICollectionViewCell {
 //  }()
   private lazy var playerView: WKYTPlayerView = {
     let instance = WKYTPlayerView()
+    instance.webView?.isOpaque = false
+    instance.webView?.backgroundColor = .clear
+    instance.webView?.scrollView.isOpaque = false
+    instance.webView?.scrollView.backgroundColor = .clear
     instance.backgroundColor = .secondarySystemBackground
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
     instance.publisher(for: \.bounds)
@@ -175,7 +179,7 @@ class YoutubeCell: UICollectionViewCell {
       $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
     }
     //        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-    playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
+//    playerView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : color.withAlphaComponent(0.2)
     //        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     //        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     //        if let imageView = icon.get(all: UIImageView.self).first {
@@ -308,6 +312,21 @@ extension YoutubeCell: WKYTPlayerViewDelegate {
     
     shimmer.stopShimmering(animated: true)
     shimmer.removeFromSuperview()
+    playerView.webView?.scrollView.isOpaque = false
+    playerView.webView?.scrollView.backgroundColor = .clear
+    
+//    playerView.webView?.scrollView.subviews.forEach { view in
+//      view.isOpaque = false
+//      view.backgroundColor = .white
+//      view.subviews.forEach { v in
+//        v.isOpaque = false
+//        v.backgroundColor = .white
+//        v.subviews.forEach {
+//          $0.isOpaque = false
+//          $0.backgroundColor = .white
+//        }
+//      }
+//    }
 //    UIView.animate(withDuration: 0.2, animations: {
 //      self.loadingIndicator.alpha = 0
 //    }) {

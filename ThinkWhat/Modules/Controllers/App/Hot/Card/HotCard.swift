@@ -10,22 +10,25 @@ import UIKit
 import Combine
 
 class HotCard: UIView, Card {
-  
+  enum Action { case Next, Claim, Vote }
   // MARK: - Overridden properties
   
   
   
   // MARK: - Public properties
-  
+  ///**Logic**
+  public let item: Survey
+  ///**Publishers**
+  @Published public var action: Action?
   
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
-  private var subscriptions = Set<AnyCancellable>()
+  public var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  ///**Logic**
-  private let item: Survey
   ///**UI**
+  private let padding: CGFloat = 8
+  private let nextColor: UIColor
   private lazy var shadowView: UIView = {
     let instance = UIView()
     instance.clipsToBounds = false
@@ -49,11 +52,101 @@ class HotCard: UIView, Card {
       .store(in: &subscriptions)
     let collectionView = PollCollectionView(item: item)
     collectionView.place(inside: instance)
-    collectionView.isUserInteractionEnabled = false
+//    collectionView.isUserInteractionEnabled = false
+    featheredView.place(inside: instance)
     
     return instance
   }()
-  
+  private lazy var featheredView: UIView = {
+    let instance = UIView()
+    instance.accessibilityIdentifier = "feathered"
+    instance.layer.masksToBounds = true
+    instance.layer.addSublayer(featheredLayer)
+    instance.publisher(for: \.bounds)
+      .sink { [unowned self] in self.featheredLayer.frame = $0 }
+      .store(in: &subscriptions)
+
+    return instance
+  }()
+  private lazy var featheredLayer: CAGradientLayer = {
+    let instance = CAGradientLayer()
+    setGradient(instance)
+    
+    return instance
+  }()
+  private lazy var stack: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [
+      claimButton,
+      voteButton,
+      nextButton
+    ])
+    instance.axis = .horizontal
+    instance.spacing = padding*2
+    
+    return instance
+  }()
+  private lazy var voteButton: UIButton = {
+    let instance = UIButton()
+    instance.addTarget(self,
+                       action: #selector(self.handleTap(sender:)),
+                       for: .touchUpInside)
+    if #available(iOS 15, *) {
+      var config = UIButton.Configuration.filled()
+      config.cornerStyle = .small
+      config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+      config.baseBackgroundColor = item.topic.tagColor
+      config.contentInsets.top = padding
+      config.contentInsets.bottom = padding
+      config.contentInsets.leading = 20
+      config.contentInsets.trailing = 20
+      config.attributedTitle = AttributedString("hot_participate".localized.uppercased(),
+                                                attributes: AttributeContainer([
+                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                  .foregroundColor: UIColor.white as Any
+                                                ]))
+      instance.configuration = config
+    } else {
+      instance.publisher(for: \.bounds)
+        .sink { instance.cornerRadius = $0.width * 0.025 }
+        .store(in: &subscriptions)
+      instance.backgroundColor = item.topic.tagColor
+//      instance.contentEdgeInsets = .uniform(size: 0)
+      instance.setAttributedTitle(NSAttributedString(string: "hot_participate".localized.uppercased(),
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                      .foregroundColor: UIColor.white as Any
+                                                     ]),
+                                  for: .normal)
+    }
+    
+    return instance
+  }()
+  private lazy var nextButton: UIButton = {
+    let instance = UIButton()
+    instance.setImage(UIImage(systemName: "arrowshape.right.fill",
+                              withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+    //    instance.imageView?.contentMode = .scaleAspectFill
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1).isActive = true
+//    instance.imageView?.contentMode = .center
+    instance.tintColor = item.topic.tagColor//nextColor
+    instance.addTarget(self,
+                       action: #selector(self.handleTap(sender:)),
+                       for: .touchUpInside)
+    return instance
+  }()
+  private lazy var claimButton: UIButton = {
+    let instance = UIButton()
+    instance.setImage(UIImage(systemName: "exclamationmark.triangle.fill",
+                              withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1).isActive = true
+//    instance.imageView?.contentMode = .center
+
+    instance.tintColor = item.topic.tagColor
+    instance.addTarget(self,
+                       action: #selector(self.handleTap(sender:)),
+                       for: .touchUpInside)
+    return instance
+  }()
   
   
   
@@ -71,8 +164,10 @@ class HotCard: UIView, Card {
   
   
   // MARK: - Initialization
-  init(_ item: Survey) {
+  init(item: Survey,
+       nextColor: UIColor) {
     self.item = item
+    self.nextColor = nextColor
     
     super.init(frame: .zero)
     
@@ -91,7 +186,8 @@ class HotCard: UIView, Card {
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-   
+    
+    setGradient(featheredLayer)
     body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .secondarySystemBackground
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
@@ -104,6 +200,25 @@ private extension HotCard {
     clipsToBounds = false
     
     shadowView.place(inside: self)
+    
+    setNeedsLayout()
+    layoutIfNeeded()
+    
+    addSubview(stack)
+    stack.translatesAutoresizingMaskIntoConstraints = false
+//    stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2).isActive = true
+    stack.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+    
+    let constraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor)
+    constraint.isActive = true
+    publisher(for: \.bounds)
+      .sink { [unowned self] in
+        self.setNeedsLayout()
+        constraint.constant = -$0.height/32
+        self.layoutIfNeeded()
+        }
+      .store(in: &subscriptions)
+//    stack.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height/4).isActive = true
   }
   
   @MainActor
@@ -112,13 +227,29 @@ private extension HotCard {
   }
   
   func setTasks() {
-//    tasks.append( Task {@MainActor [weak self] in
-//      for await notification in NotificationCenter.default.notifications(for: <# notification #>) {
-//        guard let self = self else { return }
-//
-//
-//      }
-//    })
+    //    tasks.append( Task {@MainActor [weak self] in
+    //      for await notification in NotificationCenter.default.notifications(for: <# notification #>) {
+    //        guard let self = self else { return }
+    //
+    //
+    //      }
+    //    })
+  }
+  
+  func setGradient(_ layer: CAGradientLayer) {
+    let outerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+    let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
+    layer.colors = [outerColor, outerColor, innerColor]
+    layer.locations = [0.0, 0.8, 0.925]
+  }
+  
+  @objc
+  func handleTap(sender: UIButton) {
+    if sender == voteButton {
+      action = .Vote
+    } else {
+      action = sender == claimButton ? .Claim : .Next
+    }
   }
 }
 

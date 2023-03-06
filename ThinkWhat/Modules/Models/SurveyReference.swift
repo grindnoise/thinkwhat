@@ -111,13 +111,13 @@ class SurveyReference: Decodable {// NSObject,
     }
   }
   var votesLimit: Int
-  var survey: Survey? {
-    return Surveys.shared.all.filter{ $0.reference == self }.first
-  }
+  var survey: Survey? { Surveys.shared[id] }
   var progress: Int {
     didSet {
       guard oldValue != progress else { return }
-      NotificationCenter.default.post(name: Notifications.Surveys.Progress, object: self)
+      
+      progressPublisher.send(progress)
+//      NotificationCenter.default.post(name: Notifications.Surveys.Progress, object: self)
       survey?.progress = progress
     }
   }
@@ -220,6 +220,7 @@ class SurveyReference: Decodable {// NSObject,
   }
   ///**Publishers
   public let ratingPublisher         = PassthroughSubject<Double, Never>()
+  public let progressPublisher       = PassthroughSubject<Int, Never>()
   public let isActivePublisher       = PassthroughSubject<Bool, Never>()
   public let isFavoritePublisher     = PassthroughSubject<Bool, Never>()
   public let isCompletePublisher     = PassthroughSubject<Bool, Never>()

@@ -176,28 +176,34 @@ private extension PollCollectionView {
       cell.text = text
       
       cell.boundsPublisher
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.source.refresh(animatingDifferences: false)//commentsCellBoundsPublisher.send($0)
-        }
+        .eraseToAnyPublisher()
+        .filter { $0 != .zero }
+        .sink { [unowned self] _ in self.source.refresh(animatingDifferences: false) }//commentsCellBoundsPublisher.send($0)
         .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
     }
     
     let imagesCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.item = self.item
       
       cell.imagePublisher
-        .sink {[weak self] in
-          guard let self = self else { return }
-          
-          self.imagePublisher.send($0)
-        }
+        .sink {[unowned self] in self.imagePublisher.send($0) }
         .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
     }
     
     let youtubeCellRegistration = UICollectionView.CellRegistration<YoutubeCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.item = self.item
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
     }
     
     let webCellRegistration = UICollectionView.CellRegistration<LinkPreviewCell, AnyHashable> { [unowned self] cell, _, _ in
@@ -209,6 +215,10 @@ private extension PollCollectionView {
           self.webPublisher.send($0)
         }
         .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
     }
     
     let questionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
@@ -229,6 +239,13 @@ private extension PollCollectionView {
         .paragraphStyle: paragraphStyle
       ]
       cell.text = text
+      cell.boundsPublisher
+        .sink { [unowned self] _ in self.source.refresh(animatingDifferences: false) }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
     }
     
     let answersCellRegistration = UICollectionView.CellRegistration<AnswersCell, AnyHashable> { [weak self] cell, _, _ in
@@ -274,6 +291,10 @@ private extension PollCollectionView {
           cell.isVotingPublisher.send($0)
         }
         .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
     }
     
     let commentsCellRegistration = UICollectionView.CellRegistration<CommentsSectionCell, AnyHashable> { [weak self] cell, _, _ in
@@ -468,6 +489,7 @@ private extension PollCollectionView {
     snapshot.appendSections([.comments])
     snapshot.appendItems([7], toSection: .comments)
     source.apply(snapshot, animatingDifferences: false)
+    source.refresh(animatingDifferences: false)
     
     //        snapshot.appendSections([.title, .description,])
     //        snapshot.appendItems([0], toSection: .title)

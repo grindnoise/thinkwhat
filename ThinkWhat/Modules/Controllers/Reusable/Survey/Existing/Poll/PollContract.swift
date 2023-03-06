@@ -55,7 +55,7 @@ protocol PollControllerInput: AnyObject {
 protocol PollModelOutput: AnyObject {
   var item: SurveyReference { get }
   
-  func onLoadCallback(_: Result<Bool, Error>)
+  func onLoadCallback(_: Result<Survey, Error>)
   func onAddFavoriteCallback(_: Result<Bool, Error>)
   func onVoteCallback(_: Result<Bool, Error>)
   func commentPostCallback(_: Result<Comment, Error>)

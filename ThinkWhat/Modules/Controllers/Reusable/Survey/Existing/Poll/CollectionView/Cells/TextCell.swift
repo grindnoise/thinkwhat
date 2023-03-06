@@ -22,8 +22,8 @@ class TextCell: UICollectionViewCell {
   }
   public var attributes: [NSAttributedString.Key: Any] = [:]
   public var insets: UIEdgeInsets = .uniform(size: 8)
-  ///`Publishers`
-  public let boundsPublisher = PassthroughSubject<Bool, Never>()
+  ///**Publishers**
+  public let boundsPublisher = PassthroughSubject<CGRect, Never>()
   
   
   
@@ -66,14 +66,15 @@ class TextCell: UICollectionViewCell {
     observers.append(instance.observe(\.contentSize, options: .new) { [weak self] _, change in
       guard let self = self,
             let value = change.newValue,
-            value.height > 0,
+//            !value.height.isZero,
+//            !value.width.isZero,
             constraint.constant != value.height
       else { return }
       
       self.setNeedsLayout()
       constraint.constant = value.height
       self.layoutIfNeeded()
-      self.boundsPublisher.send(true)
+//      self.boundsPublisher.send(.init(origin: .zero, size: value))
     })
     
     return instance

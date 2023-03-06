@@ -114,7 +114,6 @@ private extension AnswersCollectionView {
       guard let self = self else { return }
       
       cell.item = item
-      
       cell.selectionPublisher
         .sink { [unowned self] in
           self.selectionPublisher.send($0)

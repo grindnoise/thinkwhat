@@ -16,13 +16,16 @@ protocol HotViewInput: AnyObject {
   var navBarHeight: CGFloat { get }
   
   func deque() -> Survey?
-  
+  func vote(_: Survey)
+  func claim(_: [Survey: Claim])
+  func reject(_: Survey)
 }
 
 protocol HotControllerInput: AnyObject {
   var modelOutput: HotModelOutput? { get set }
  
   func getSurveys(_:[Survey])
+  func reject(_: Survey)
 }
 
 protocol HotModelOutput: AnyObject {

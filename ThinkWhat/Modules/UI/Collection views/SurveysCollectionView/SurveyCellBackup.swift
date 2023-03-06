@@ -1036,27 +1036,27 @@ private extension SurveyCellBackup {
                 }
             })
 
-            tasks.append(Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
-                    await MainActor.run {
-                        guard let self = self,
-                              let item = self.item,
-                              let object = notification.object as? SurveyReference,
-                              item === object,
-                              let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
-                              let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
-                              let constraint = progressIndicator.getConstraint(identifier: "width")
-                        else { return }
-
-                        progressLabel.text = String(describing: item.progress) + "%"
-                        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
-                            self.progressView.setNeedsLayout()
-                            constraint.constant = constraint.constant * CGFloat(item.progress)/100
-                            self.progressView.layoutIfNeeded()
-                        }
-                    }
-                }
-            })
+//            tasks.append(Task { [weak self] in
+//                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
+//                    await MainActor.run {
+//                        guard let self = self,
+//                              let item = self.item,
+//                              let object = notification.object as? SurveyReference,
+//                              item === object,
+//                              let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
+//                              let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
+//                              let constraint = progressIndicator.getConstraint(identifier: "width")
+//                        else { return }
+//
+//                        progressLabel.text = String(describing: item.progress) + "%"
+//                        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
+//                            self.progressView.setNeedsLayout()
+//                            constraint.constant = constraint.constant * CGFloat(item.progress)/100
+//                            self.progressView.layoutIfNeeded()
+//                        }
+//                    }
+//                }
+//            })
 
         tasks.append(Task { [weak self] in
             for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {

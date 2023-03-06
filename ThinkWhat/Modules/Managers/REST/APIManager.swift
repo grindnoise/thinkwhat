@@ -1132,14 +1132,12 @@ class API {
         decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
                                                    DateFormatter.dateTimeFormatter,
                                                    DateFormatter.dateFormatter ]
-        let instance = try decoder.decode(Survey.self, from: json.rawData())
-        guard let existing = Surveys.shared.all.filter({ $0 == instance }).first else {
-          instance.isVisited = true
-          return instance
-        }
+        Surveys.shared.append([try decoder.decode(Survey.self, from: json.rawData())])
         
-        existing.isVisited = true
-        return existing
+        let instance = Surveys.shared[surveyReference.id]
+        instance!.isVisited = true
+        
+        return instance!
       } catch let error {
         throw error
       }

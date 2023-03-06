@@ -111,6 +111,7 @@ extension PollModel: PollControllerInput {
   }
   
   func vote(_ answer: Answer) {
+    fatalError()
 //    Task {
 //      guard let survey = answer.survey else { return }
 //      do {
@@ -198,14 +199,10 @@ extension PollModel: PollControllerInput {
   func load(_ reference: SurveyReference, incrementViewCounter: Bool = true) {
     Task {
       do {
-        try await API.shared.surveys.getSurvey(byReference: reference, incrementCounter: incrementViewCounter)
-        await MainActor.run {
-          modelOutput?.onLoadCallback(.success(true))
-        }
+        let instance = try await API.shared.surveys.getSurvey(byReference: reference, incrementCounter: incrementViewCounter)
+        await MainActor.run { modelOutput?.onLoadCallback(.success(instance)) }
       } catch {
-        await MainActor.run {
-          modelOutput?.onLoadCallback(.failure(error))
-        }
+        await MainActor.run { modelOutput?.onLoadCallback(.failure(error)) }
       }
     }
   }

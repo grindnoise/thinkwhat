@@ -625,6 +625,9 @@ private extension MainController {
     view.isUserInteractionEnabled = false
     tabBar.backgroundColor = .systemBackground
     tabBar.tintColor = Colors.Logo.Flame.rawValue
+    tabBar.shadowImage = UIImage()
+    tabBar.backgroundImage = UIImage()
+    tabBar.clipsToBounds = true
     
     UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 11)], for: .normal)
     UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11)], for: .selected)

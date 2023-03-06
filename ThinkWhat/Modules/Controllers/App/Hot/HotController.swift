@@ -21,7 +21,7 @@ class HotController: UIViewController, TintColorable {
   var shouldSkipCurrentCard = false
   var tintColor: UIColor = .clear {
     didSet {
-      setNavigationBarTintColor(tintColor)
+      initialColor = tintColor
     }
   }
   ///**UI**
@@ -41,6 +41,7 @@ class HotController: UIViewController, TintColorable {
   private var isViewLayedOut = false
   private var isNetworking = false
   private var timer: Timer?
+  private var initialColor: UIColor = .clear
   
   
   override func viewDidLoad() {
@@ -61,6 +62,7 @@ class HotController: UIViewController, TintColorable {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
+    setNavigationBarTintColor(initialColor)
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -74,6 +76,8 @@ class HotController: UIViewController, TintColorable {
     
     tabBarController.setLogoInitialFrame(size: navigationBar.bounds.size,
                                          y: abs(navigationBar.center.y))
+    
+    tabBarController.toggleLogo(on: true)
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -109,8 +113,10 @@ private extension HotController {
   func setTasks() {
     Surveys.shared.instancesPublisher
       .filter { !$0.isEmpty }
+      .receive(on: DispatchQueue.main)
       .map { array in array.filter { $0.isHot && $0.isRejected && !$0.isClaimed }}
-      .sink { [unowned self] in if self.queue.enqueue($0) { self.controllerOutput?.peek(self.queue.dequeue()) }}
+      .sink { [unowned self] in self.queue.enqueue($0) }
+//      .sink { [unowned self] in if self.queue.enqueue($0) { self.controllerOutput?.peek(self.queue.dequeue()) }}
       .store(in: &subscriptions)
     
     tasks.append(Task { @MainActor [weak self] in
@@ -150,6 +156,23 @@ private extension HotController {
 
 // MARK: - View Input
 extension HotController: HotViewInput {
+  func reject(_ survey: Survey) {
+    self.controllerInput?.reject(survey)
+  }
+  
+  func vote(_ instance: Survey) {
+    navigationController?.navigationBar.backItem?.title = ""
+    navigationController?.pushViewController(PollController(surveyReference: instance.reference), animated: true)
+    
+    guard let main = tabBarController as? MainController else { return }
+    
+    main.toggleLogo(on: false)
+  }
+  
+  func claim(_ dict: [Survey: Claim]) {
+    print("")
+  }
+  
   func deque() -> Survey? {
     guard let instance = queue.dequeue() else {
       controllerInput?.getSurveys([])

@@ -34,7 +34,39 @@ class HotView: UIView {
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
   private var current: HotCard?
-  private var incoming: HotCard?
+  private var incoming: HotCard? {
+    didSet {
+      guard let incoming = incoming else { return }
+      
+      incoming.$action
+        .filter { !$0.isNil }
+        .sink { [unowned self] action in
+          switch action {
+          case .Vote:
+            self.viewInput?.vote(incoming.item)
+          case .Next:
+            self.viewInput?.reject(incoming.item)
+            self.next(self.viewInput?.deque())
+          case .Claim:
+            let banner = Popup(heightScaleFactor: 0.7)
+            let claimContent = ClaimPopupContent(parent: banner, surveyReference: incoming.item.reference)
+            
+            claimContent.claimPublisher
+              .sink { [unowned self] in self.viewInput?.claim([incoming.item: $0]) }
+              .store(in: &incoming.subscriptions)
+            
+            banner.present(content: claimContent)
+            banner.didDisappearPublisher
+              .sink { _ in banner.removeFromSuperview() }
+              .store(in: &incoming.subscriptions)
+            
+          case .none:
+            fatalError()
+          }
+        }
+        .store(in: &incoming.subscriptions)
+    }
+  }
   private var outgoing: HotCard?
   ///**UI**
   @IBOutlet var contentView: HotView!
@@ -104,7 +136,7 @@ private extension HotView {
         return
       }
       
-      incoming = HotCard(instance)
+      incoming = HotCard(item: instance, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance.topic.tagColor)
       incoming?.placeXCentered(inside: self,
                                insets: UIEdgeInsets(top: viewInput.navBarHeight + statusBarFrame.height + padding,
                                                     left: padding,
@@ -127,7 +159,7 @@ private extension HotView {
       incoming?.transform = .init(scaleX: 0.75, y: 0.75)
       
       UIView.animate(
-        withDuration: 0.4,
+        withDuration: 0.5,
         delay: 0,
         usingSpringWithDamping: 0.8,
         initialSpringVelocity: 0.3,
@@ -153,7 +185,7 @@ private extension HotView {
       current = nil
       
       UIView.animate(
-        withDuration: 0.4,
+        withDuration: 0.5,
         delay: 0,
         usingSpringWithDamping: 0.8,
         initialSpringVelocity: 0.3,
@@ -162,6 +194,7 @@ private extension HotView {
           self.setNeedsLayout()
           constraint.constant -= instance.bounds.width + self.padding*2
           instance.transform = .init(scaleX: 0.75, y: 0.75)
+          instance.alpha = 0
           self.layoutIfNeeded()
         }) { [unowned self] _ in
           self.outgoing = nil
