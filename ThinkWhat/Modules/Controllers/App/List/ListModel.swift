@@ -10,61 +10,67 @@ import Foundation
 import SwiftyJSON
 
 class ListModel {
-    
-    weak var modelOutput: ListModelOutput?
+  
+  weak var modelOutput: ListModelOutput?
 }
 
 // MARK: - Controller Input
 extension ListModel: ListControllerInput {
-    func unsubscribe(from userprofile: Userprofile) {
-        Task {
-            try await API.shared.profiles.unsubscribe(from: [userprofile])
-        }
+  func unsubscribe(from userprofile: Userprofile) {
+    Task {
+      try await API.shared.profiles.unsubscribe(from: [userprofile])
     }
-    
-    func subscribe(to userprofile: Userprofile) {
-        Task {
-            try await API.shared.profiles.subscribe(at: [userprofile])
-        }
+  }
+  
+  func subscribe(to userprofile: Userprofile) {
+    Task {
+      try await API.shared.profiles.subscribe(at: [userprofile])
     }
+  }
+  
+  func claim(_ dict: [SurveyReference: Claim]) {
+    guard let instance = dict.keys.first,
+          let reason = dict.values.first
+    else { return }
     
-    func claim(surveyReference: SurveyReference, claim: Claim) {
-        Task {
-            try await API.shared.surveys.claim(surveyReference: surveyReference, reason: claim)
-        }
+    Task {
+      try await API.shared.surveys.claim(surveyReference: instance, reason: reason)
     }
-    
-    func addFavorite(surveyReference: SurveyReference) {
-        Task {
-            try await API.shared.surveys.markFavorite(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
-        }
+  }
+  
+  func addFavorite(surveyReference: SurveyReference) {
+    Task {
+      await API.shared.surveys.markFavorite(mark: !surveyReference.isFavorite,
+                                            surveyReference: surveyReference)
     }
-    
-    func updateSurveyStats(_ instances: [SurveyReference]) {
-        Task {
-            do {
-                try await API.shared.surveys.updateSurveyStats(instances)
-            } catch {
+  }
+  
+  func updateSurveyStats(_ instances: [SurveyReference]) {
+    Task {
+      do {
+        try await API.shared.surveys.updateSurveyStats(instances)
+      } catch {
 #if DEBUG
-                error.printLocalized(class: type(of: self), functionName: #function)
+        error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-            }
-        }
+      }
     }
-    
-    func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
-
-        Task {
-            do {
-                try await API.shared.surveys.surveyReferences(category: source, dateFilter: dateFilter, topic: topic)
-                await MainActor.run {
-                    modelOutput?.onRequestCompleted(.success(true))
-                }
-            } catch {
-                await MainActor.run {
-                    modelOutput?.onRequestCompleted(.failure(error))
-                }
-            }
+  }
+  
+  func onDataSourceRequest(source: Survey.SurveyCategory,
+                           dateFilter: Period?,
+                           topic: Topic?) {
+    Task {
+      do {
+        try await API.shared.surveys.surveyReferences(category: source, dateFilter: dateFilter, topic: topic)
+        await MainActor.run {
+          modelOutput?.onRequestCompleted(.success(true))
         }
+      } catch {
+        await MainActor.run {
+          modelOutput?.onRequestCompleted(.failure(error))
+        }
+      }
     }
+  }
 }

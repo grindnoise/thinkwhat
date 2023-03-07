@@ -12,9 +12,7 @@ import Combine
 
 
 class HotController: UIViewController, TintColorable {
-  
-  
-  
+
   // MARK: - Public properties
   var controllerOutput: HotControllerOutput?
   var controllerInput: HotControllerInput?
@@ -24,6 +22,7 @@ class HotController: UIViewController, TintColorable {
       initialColor = tintColor
     }
   }
+  var isDataReady: Bool = false
   ///**UI**
   public private(set) var isOnScreen = true
   public private(set) var tabBarHeight: CGFloat = .zero
@@ -37,6 +36,7 @@ class HotController: UIViewController, TintColorable {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
+  ///**Logic**
   ///**UI**
   private var isViewLayedOut = false
   private var isNetworking = false
@@ -63,12 +63,17 @@ class HotController: UIViewController, TintColorable {
     super.viewWillAppear(animated)
     
     setNavigationBarTintColor(initialColor)
+    
+    guard isDataReady else { return }
+    
+    tabBarController?.setTabBarVisible(visible: true, animated: true)
   }
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
     isOnScreen = true
+    controllerOutput?.didAppear()
     
     guard let navigationBar = navigationController?.navigationBar,
           let tabBarController = tabBarController as? MainController
@@ -114,7 +119,7 @@ private extension HotController {
     Surveys.shared.instancesPublisher
       .filter { !$0.isEmpty }
       .receive(on: DispatchQueue.main)
-      .map { array in array.filter { $0.isHot && $0.isRejected && !$0.isClaimed }}
+      .map { array in array.filter { $0.isHot && !$0.isRejected && !$0.isClaimed }}
       .sink { [unowned self] in self.queue.enqueue($0) }
 //      .sink { [unowned self] in if self.queue.enqueue($0) { self.controllerOutput?.peek(self.queue.dequeue()) }}
       .store(in: &subscriptions)
@@ -161,16 +166,19 @@ extension HotController: HotViewInput {
   }
   
   func vote(_ instance: Survey) {
+//    navigationController?.delegate = appDelegate.transitionCoordinator
     navigationController?.navigationBar.backItem?.title = ""
     navigationController?.pushViewController(PollController(surveyReference: instance.reference), animated: true)
+    navigationController?.delegate = nil
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let main = tabBarController as? MainController else { return }
     
     main.toggleLogo(on: false)
   }
   
-  func claim(_ dict: [Survey: Claim]) {
-    print("")
+  func claim(_ dict: [SurveyReference: Claim]) {
+    controllerInput?.claim(dict)
   }
   
   func deque() -> Survey? {
@@ -191,6 +199,7 @@ extension HotController: HotModelOutput {
 
 extension HotController: DataObservable {
   func onDataLoaded() {
+    isDataReady = true
     navigationController?.setNavigationBarHidden(false, animated: true)
     
     if tabBarHeight.isZero,
@@ -208,7 +217,7 @@ extension HotController: DataObservable {
     
     setData()
     setTasks()
-    controllerOutput?.peek(queue.dequeue())
+    controllerOutput?.setSurvey(queue.dequeue())
   }
 }
 

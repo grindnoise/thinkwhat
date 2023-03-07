@@ -30,7 +30,7 @@ class Popup: UIView {
   }
   @IBOutlet weak var body: UIView! {
     didSet {
-      body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+      body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? darkColor : lightColor
       body.publisher(for: \.bounds)
         .receive(on: DispatchQueue.main)
         .sink { [weak self] in
@@ -58,6 +58,9 @@ class Popup: UIView {
       }
     }
   }
+  ///**UI**
+  private let lightColor: UIColor
+  private let darkColor: UIColor
   private var originalContainerHeight = CGFloat.zero
   private var padding: CGFloat = 16
   private var lastHeight: CGFloat = 0
@@ -100,8 +103,12 @@ class Popup: UIView {
   init(contentPadding: CGFloat = 8,
        heightScaleFactor: CGFloat = 0.5,
        shouldDismissAfter: TimeInterval = .greatestFiniteMagnitude,
-       useContentViewHeight: Bool = false) {
+       useContentViewHeight: Bool = false,
+       lightColor: UIColor = .red,
+       darkColor: UIColor = .tertiarySystemBackground) {
     
+    self.lightColor = lightColor
+    self.darkColor = darkColor
     self.shouldDismissAfter = shouldDismissAfter
     self.padding = contentPadding
     self.heightScaleFactor = heightScaleFactor
@@ -118,7 +125,8 @@ class Popup: UIView {
   
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+    super.traitCollectionDidChange(previousTraitCollection)
+    body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? darkColor : lightColor
   }
   
   
@@ -383,6 +391,13 @@ class NewPopup: UIView {
   
   required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
   
+  
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .tertiarySystemBackground
+  }
   
   
   // MARK: - Public methods

@@ -19,9 +19,9 @@ class SubscriptionsController: UIViewController, TintColorable {
   // MARK: - Public properties
   public var controllerOutput: SubsciptionsControllerOutput?
   public var controllerInput: SubsciptionsControllerInput?
-  //UI
+  ///**Logic**
+  var isDataReady = false
   public private(set) var isOnScreen = false
-  public var tintColor: UIColor = .clear
   public private(set) var isUserSelected = false {
     didSet {
       guard oldValue != isUserSelected,
@@ -37,12 +37,16 @@ class SubscriptionsController: UIViewController, TintColorable {
       controller.setLogoCentered(animated: true)
     }
   }
+  ///**UI**
+  public var tintColor: UIColor = .clear
+
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //Logic
+  ///**Logic**
   private var userprofile: Userprofile? {
     didSet {
       guard !userprofile.isNil else { return }
@@ -82,34 +86,6 @@ class SubscriptionsController: UIViewController, TintColorable {
                                        animated: true)
     }
   }
-  //    private lazy var titleLabel: UILabel = {
-  //        let instance = UILabel()
-  //        instance.font = UIFont(name: Fonts.Bold,
-  //                               size: 32)
-  //        instance.textAlignment = .left
-  //        instance.adjustsFontSizeToFitWidth = true
-  //        instance.minimumScaleFactor = 0.4
-  //        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-  //
-  //        return instance
-  //    }()
-  //    private lazy var logo: AppLogoWithText = {
-  //        let instance = AppLogoWithText(color: Colors.Logo.LightSteelBlue.main,
-  //                                       minusToneColor: Colors.Logo.LightSteelBlue.minusTone)
-  //        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 6/1).isActive = true
-  //        instance.isOpaque = false
-  //
-  //        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
-  //        constraint.isActive = true
-  //
-  //        navigationController?.navigationBar.publisher(for: \.bounds)
-  //            .sink { rect in
-  //                constraint.constant = rect.height * 0.75
-  //            }
-  //            .store(in: &subscriptions)
-  //
-  //        return instance
-  //    }()
   
   
   // MARK: - Overridden properties
@@ -604,8 +580,8 @@ extension SubscriptionsController: SubscriptionsViewInput {
                  completion: nil)
   }
   
-  func claim(surveyReference: SurveyReference, claim: Claim) {
-    controllerInput?.claim(surveyReference: surveyReference, claim: claim)
+  func claim(_ dict: [SurveyReference: Claim]) {
+    controllerInput?.claim(dict)
   }
   
   func addFavorite(_ surveyReference: SurveyReference) {
@@ -696,6 +672,7 @@ extension SubscriptionsController: SubsciptionsModelOutput {
 
 extension SubscriptionsController: DataObservable {
   func onDataLoaded() {
+    isDataReady = true
     navigationController?.setNavigationBarHidden(false, animated: true)
   }
 }

@@ -18,6 +18,8 @@ class TextCell: UICollectionViewCell {
       
       textView.attributedText = NSAttributedString(string: text, attributes: attributes)
       setupUI()
+      setNeedsLayout()
+      layoutIfNeeded()
     }
   }
   public var attributes: [NSAttributedString.Key: Any] = [:]

@@ -31,26 +31,26 @@ class CommentsView: UIView {
             else { return }
             
             let comment = $0
-            let banner = Popup(heightScaleFactor: 0.7)
-            banner.accessibilityIdentifier = "claim"
-            let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
-            
-            claimContent.claimPublisher
-                .sink { [weak self] in
-                    guard let self = self else { return }
-                    
-                    self.viewInput?.postClaim(comment: comment, reason: $0)
-                }
-                .store(in: &self.subscriptions)
-            
-            banner.present(content: claimContent)
-            
-            banner.didDisappearPublisher
-                .sink { [weak self] _ in
-                    guard let self = self else { return }
-                    banner.removeFromSuperview()
-                }
-                .store(in: &self.subscriptions)
+//            let banner = Popup(heightScaleFactor: 0.7)
+//            banner.accessibilityIdentifier = "claim"
+//            let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
+//            
+//            claimContent.claimPublisher
+//                .sink { [weak self] in
+//                    guard let self = self else { return }
+//                    
+//                    self.viewInput?.postClaim(comment: comment, reason: $0)
+//                }
+//                .store(in: &self.subscriptions)
+//            
+//            banner.present(content: claimContent)
+//            
+//            banner.didDisappearPublisher
+//                .sink { [weak self] _ in
+//                    guard let self = self else { return }
+//                    banner.removeFromSuperview()
+//                }
+//                .store(in: &self.subscriptions)
             
         }.store(in: &subscriptions)
         

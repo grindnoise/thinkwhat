@@ -48,7 +48,8 @@ class ListView: UIView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
+  ///**UI**
+  private let padding: CGFloat = 8
   private var isDateFilterHidden = false {
     didSet {
       guard oldValue != isDateFilterHidden else { return }
@@ -234,20 +235,17 @@ class ListView: UIView {
               let surveyReference = $0
         else { return }
         
-        let banner = Popup()
-        let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
-        
-        claimContent.claimPublisher
-          .sink { [weak self] in
-            guard let self = self else { return }
-            
-            self.viewInput?.claim(surveyReference: surveyReference, claim: $0)
-          }
-          .store(in: &self.subscriptions)
-        
-        banner.present(content: claimContent)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
+        let popup = NewPopup(padding: self.padding,
+                              contentPadding: .uniform(size: self.padding*2))
+        let content = ClaimPopupContent(parent: popup,
+                                        surveyReference: surveyReference)
+        content.$claim
+          .filter { !$0.isNil }
+          .sink { [unowned self] in self.viewInput?.claim($0!) }
+          .store(in: &popup.subscriptions)
+        popup.setContent(content)
+        popup.didDisappearPublisher
+          .sink { _ in popup.removeFromSuperview() }
           .store(in: &self.subscriptions)
       }
       .store(in: &self.subscriptions)

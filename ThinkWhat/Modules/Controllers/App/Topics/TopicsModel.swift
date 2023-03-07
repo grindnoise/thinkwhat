@@ -78,9 +78,13 @@ extension TopicsModel: TopicsControllerInput {
     }
   }
   
-  func claim(surveyReference: SurveyReference, claim: Claim) {
+  func claim(_ dict: [SurveyReference: Claim]) {
+    guard let instance = dict.keys.first,
+          let reason = dict.values.first
+    else { return }
+    
     Task {
-      try await API.shared.surveys.claim(surveyReference: surveyReference, reason: claim)
+      try await API.shared.surveys.claim(surveyReference: instance, reason: reason)
     }
   }
   

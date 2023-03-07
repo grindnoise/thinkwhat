@@ -33,41 +33,50 @@ class HotView: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private var current: HotCard?
-  private var incoming: HotCard? {
+  private var current: Card?
+  private var incoming: Card? {
     didSet {
       guard let incoming = incoming else { return }
       
-      incoming.$action
-        .filter { !$0.isNil }
-        .sink { [unowned self] action in
-          switch action {
-          case .Vote:
-            self.viewInput?.vote(incoming.item)
-          case .Next:
-            self.viewInput?.reject(incoming.item)
-            self.next(self.viewInput?.deque())
-          case .Claim:
-            let banner = Popup(heightScaleFactor: 0.7)
-            let claimContent = ClaimPopupContent(parent: banner, surveyReference: incoming.item.reference)
-            
-            claimContent.claimPublisher
-              .sink { [unowned self] in self.viewInput?.claim([incoming.item: $0]) }
-              .store(in: &incoming.subscriptions)
-            
-            banner.present(content: claimContent)
-            banner.didDisappearPublisher
-              .sink { _ in banner.removeFromSuperview() }
-              .store(in: &incoming.subscriptions)
-            
-          case .none:
-            fatalError()
+      if let hotCard = incoming as? HotCard {
+        hotCard.$action
+          .filter { !$0.isNil }
+          .sink { [unowned self] action in
+            switch action {
+            case .Vote:
+              self.viewInput?.vote(hotCard.item)
+            case .Next:
+              self.viewInput?.reject(hotCard.item)
+              self.next(self.viewInput?.deque())
+            case .Claim:
+              let popup = NewPopup(padding: self.padding,
+                                   contentPadding: .uniform(size: self.padding*2))
+              let content = ClaimPopupContent(parent: popup,
+                                              surveyReference: hotCard.item.reference)
+              content.$claim
+                .filter { !$0.isNil }
+                .sink { [unowned self] in self.viewInput?.claim($0!) }
+                .store(in: &hotCard.subscriptions)
+              popup.setContent(content)
+              popup.didDisappearPublisher
+                .sink { [unowned self] _ in
+                  popup.removeFromSuperview()
+                  delayAsync(delay: 0.25) { [unowned self] in
+                    self.next(self.viewInput?.deque())
+                  }
+                }
+                .store(in: &self.subscriptions)
+            case .none:
+              fatalError()
+            }
           }
-        }
-        .store(in: &incoming.subscriptions)
+          .store(in: &incoming.subscriptions)
+      } else {
+        fatalError()
+      }
     }
   }
-  private var outgoing: HotCard?
+  private var outgoing: Card?
   ///**UI**
   @IBOutlet var contentView: HotView!
   private let padding: CGFloat = 8
@@ -108,7 +117,7 @@ class HotView: UIView {
 private extension HotView {
   @MainActor
   func setupUI() {
-    backgroundColor = .clear
+    backgroundColor = .systemBackground
   }
   
   @MainActor
@@ -138,15 +147,10 @@ private extension HotView {
       
       incoming = HotCard(item: instance, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance.topic.tagColor)
       incoming?.placeXCentered(inside: self,
-                               insets: UIEdgeInsets(top: viewInput.navBarHeight + statusBarFrame.height + padding,
-                                                    left: padding,
-                                                    bottom: viewInput.tabBarHeight + padding,
-                                                    right: padding))
-//      incoming?.place(inside: self,
-//                             insets: UIEdgeInsets(top: viewInput.navBarHeight + statusBarFrame.height + padding,
-//                                                  left: padding,
-//                                                  bottom: viewInput.tabBarHeight + padding,
-//                                                  right: padding))
+                               topInset: viewInput.navBarHeight + statusBarFrame.height + padding,
+                               size: CGSize(width: bounds.width - padding*2,
+                                            height: bounds.height - (viewInput.navBarHeight + statusBarFrame.height + viewInput.tabBarHeight + padding*2)))
+
       guard let constraint = incoming?.getConstraint(identifier: "centerXAnchor" ) else { return }
       
       setNeedsLayout()
@@ -212,10 +216,19 @@ private extension HotView {
 }
 
 extension HotView: HotControllerOutput {
-  func peek(_ instance: Survey?) {
+  func setSurvey(_ instance: Survey?) {
     guard let instance = instance else { return }
     
     next(instance)
+  }
+  
+  func didAppear() {
+    ///Check up
+    guard let current = current as? HotCard,
+          (current.item.isBanned || current.item.isClaimed || current.item.isComplete)
+    else { return }
+    
+    next(viewInput?.deque())
   }
 }
 

@@ -40,12 +40,14 @@ class TopicsController: UIViewController, TintColorable {
       controllerOutput?.onDefaultMode(color: color)
     }
   }
+  ///**Logic**
+  var isDataReady = false
   public var tintColor: UIColor = .clear {
     didSet {
       setNavigationBarTintColor(tintColor)
     }
   }
-  ///`UI`
+  ///**UI**
   public private(set) var isOnScreen = false
   
   
@@ -54,7 +56,7 @@ class TopicsController: UIViewController, TintColorable {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  ///`Logic`
+  ///**Logic**
   private var topic: Topic? {
     didSet {
       guard !topic.isNil else { return }
@@ -62,7 +64,7 @@ class TopicsController: UIViewController, TintColorable {
       mode = .Topic
     }
   }
-  ///`Publishers`
+  ///**Publishers**
   private var searchGlobalPublisher = CurrentValueSubject<String?, Never>(nil)
   private var searchTopicPublisher = CurrentValueSubject<[String: Topic]?, Never>(nil)
   
@@ -685,8 +687,8 @@ extension TopicsController: TopicsViewInput {
                  completion: nil)
   }
   
-  func claim(surveyReference: SurveyReference, claim: Claim) {
-    controllerInput?.claim(surveyReference: surveyReference, claim: claim)
+  func claim(_ dict: [SurveyReference: Claim]) {
+    controllerInput?.claim(dict)
   }
   
   func addFavorite(_ surveyReference: SurveyReference) {
@@ -763,6 +765,7 @@ extension TopicsController: TopicsModelOutput {
 
 extension TopicsController: DataObservable {
   func onDataLoaded() {
+    isDataReady = true
     navigationController?.setNavigationBarHidden(false, animated: true)
   }
 }

@@ -188,11 +188,13 @@ extension PollModel: PollControllerInput {
 //    }
   }
   
-  func claim(_ reason: Claim) {
-    guard let survey = item else { return }
+  func claim(_ dict: [SurveyReference: Claim]) {
+    guard let instance = dict.keys.first,
+          let reason = dict.values.first
+    else { return }
     
     Task {
-      try await API.shared.surveys.claim(surveyReference: survey, reason: reason)
+      try await API.shared.surveys.claim(surveyReference: instance, reason: reason)
     }
   }
   

@@ -1,13 +1,14 @@
 //
-//  FadeTransition.swift
+//  Transitions.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 09.06.2020.
-//  Copyright © 2020 Pavel Bukharov. All rights reserved.
+//  Created by Pavel Bukharov on 07.03.2023.
+//  Copyright © 2023 Pavel Bukharov. All rights reserved.
 //
+
 import UIKit
 
-class FadeTransition: NSObject, UIViewControllerAnimatedTransitioning {
+class Transition: NSObject, UIViewControllerAnimatedTransitioning {
     var operation: UINavigationController.Operation!
     var navigationController: UINavigationController!
     var duration = 0.2

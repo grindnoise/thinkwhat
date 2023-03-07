@@ -17,7 +17,7 @@ protocol HotViewInput: AnyObject {
   
   func deque() -> Survey?
   func vote(_: Survey)
-  func claim(_: [Survey: Claim])
+  func claim(_: [SurveyReference: Claim])
   func reject(_: Survey)
 }
 
@@ -26,14 +26,16 @@ protocol HotControllerInput: AnyObject {
  
   func getSurveys(_:[Survey])
   func reject(_: Survey)
+  func claim(_: [SurveyReference: Claim])
 }
 
 protocol HotModelOutput: AnyObject {
-  
+  var queue: QueueArray<Survey> { get }
 }
 
 protocol HotControllerOutput: AnyObject {
   var viewInput: (UIViewController & HotViewInput)? { get set }
   
-  func peek(_: Survey?)
+  func setSurvey(_: Survey?)
+  func didAppear()
 }

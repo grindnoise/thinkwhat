@@ -526,10 +526,16 @@ class Surveys {
   private var timer:  Timer?
   var all: [Survey] = [] {
     didSet {
+      guard !oldValue.isEmpty else {
+        instancesPublisher.send(all)
+        return
+      }
+      
       let existingSet = Set(oldValue)
       let appendingSet = Set(all)
       
-      instancesPublisher.send(Array(existingSet.symmetricDifference(appendingSet)))
+      ///Difference
+      instancesPublisher.send(Array(appendingSet.subtracting(existingSet)))
     }
   }
   var hot: [Survey] { return all.filter { $0.isHot && !$0.isClaimed && !$0.isRejected && !$0.isBanned && !$0.isComplete }}
@@ -609,70 +615,15 @@ class Surveys {
   }
   
   func load(_ json: JSON) {
-    let decoder                                 = JSONDecoder()
-    var notifications: [NSNotification.Name]    = []
-    decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                               DateFormatter.dateTimeFormatter,
-                                               DateFormatter.dateFormatter ]
-    //        decoder.keyDecodingStrategy                 = .convertFromSnakeCase
+    let decoder = JSONDecoder.withDateTimeDecodingStrategyFormatters()
     do {
-      //            if let dict = json.dictionary {
-      //                if dict.isEmpty {
-      //                    notifications.append(Notifications.Surveys.Empty)
-      //                    Notification.send(names: notifications.uniqued())
-      //                    return
-      //                }
-      //            }
-      
       for (key, value) in json {
         if key == Category.Hot.rawValue {
           append(try decoder.decode([Survey].self, from: value.rawData()))
         } else {
-          let instances = try decoder.decode([SurveyReference].self, from: value.rawData())
-          
-          if instances.isEmpty {
-            SurveyReferences.shared.instancesPublisher.send([])
-          }
-          
-          for instance in instances {
-//            let instance = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first ?? instance
-//
-//            if key == Category.Top.rawValue {
-//              if topReferences.filter({ $0 == instance }).isEmpty {
-//                NotificationCenter.default.post(name: Notifications.Surveys.TopAppend, object: instance)
-//                topReferences.append(instance)
-//              }
-//            } else if key == Category.New.rawValue {
-//              if newReferences.filter({ $0 == instance }).isEmpty {
-//                NotificationCenter.default.post(name: Notifications.Surveys.NewAppend, object: instance)
-//                newReferences.append(instance)
-//              }
-//            } else if key == Category.Own.rawValue {
-//              if ownReferences.filter({ $0 == instance }).isEmpty {
-//                NotificationCenter.default.post(name: Notifications.Surveys.OwnAppend, object: instance)
-//                ownReferences.append(instance)
-//              }
-//            } else if key == Category.Subscriptions.rawValue {
-//              if subscriptions.filter({ $0 == instance }).isEmpty {
-//                NotificationCenter.default.post(name: Notifications.Surveys.SubscriptionAppend, object: instance)
-//                subscriptions.append(instance)
-//              }
-//            } else if key == Category.Favorite.rawValue {
-//              if favoriteReferences.filter({ $0 == instance }).isEmpty {
-//                NotificationCenter.default.post(name: Notifications.Surveys.FavoriteAppend, object: instance)
-//                favoriteReferences.append(instance)
-//              }
-//            } else if key == Category.Topic.rawValue {
-//              SurveyReferences.shared.instancesByTopicPublisher.send([instance])
-//              //              NotificationCenter.default.post(name: Notifications.Surveys.TopicAppend, object: instance)
-//              SurveyReferences.shared.all.append(instance)
-//            } else if key == Category.Userprofile.rawValue {
-//              SurveyReferences.shared.all.append(instance)
-//            }
-          }
+          SurveyReferences.shared.append(try decoder.decode([SurveyReference].self, from: value.rawData()))
         }
       }
-      Notification.send(names: notifications.uniqued())
     } catch {
 #if DEBUG
       fatalError("Survey init() threw error: \(error)")
@@ -683,9 +634,11 @@ class Surveys {
   func append(_ instances: [Survey]) {
     guard !instances.isEmpty else { instancesPublisher.send([]); return }
     
+    guard !all.isEmpty else { all.append(contentsOf: instances); return }
+    
     let existingSet = Set(all)
-    let appendingSet = Set(instances)
-    let difference = Array(existingSet.symmetricDifference(appendingSet))
+    let appendingSet = Set(replaceWithExisting(instances))
+    let difference = Array(appendingSet.subtracting(existingSet))
     
     guard !difference.isEmpty else { return }
     
@@ -743,5 +696,13 @@ private extension Surveys {
                                  userInfo: nil,
                                  repeats: true)
     timer?.fire()
+  }
+  
+  func replaceWithExisting(_ instances: [Survey]) -> [Survey] {
+//    var output = [Survey]()
+    instances.reduce(into: [Survey]()) { result, instance in result.append(all.filter({ $0 == instance }).first ?? instance) }
+//    instances.map { instance in
+//      output.append(all.filter({ $0 == instance }).first ?? instance)
+//    }
   }
 }

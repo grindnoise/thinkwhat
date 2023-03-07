@@ -44,9 +44,9 @@ class NewBanner: UIView {
   private let padding: CGFloat = 8
   private let contentPadding: UIEdgeInsets
   private let isModal: Bool
+  private let isShadowed: Bool
   ///`UI`
   private let contentView: UIView
-  //  private let useShadows: Bool
   private let useContentViewHeight: Bool
   private lazy var background: UIView = {
     let instance = UIView()
@@ -62,7 +62,7 @@ class NewBanner: UIView {
     instance.accessibilityIdentifier = "shadow"
     body.addEquallyTo(to: instance)
     
-    if !isModal && traitCollection.userInterfaceStyle != .dark {
+    if isShadowed && !isModal && traitCollection.userInterfaceStyle != .dark {
       instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
       instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.7).cgColor
       instance.layer.shadowRadius = 16
@@ -112,8 +112,10 @@ class NewBanner: UIView {
   init(contentView: UIView,
        contentPadding: UIEdgeInsets = .uniform(size: 8),
        isModal: Bool,
+       isShadowed: Bool = true,
        useContentViewHeight: Bool = false,
        shouldDismissAfter: TimeInterval = .greatestFiniteMagnitude) {
+    self.isShadowed = isShadowed
     self.isModal = isModal
     self.contentView = contentView
     self.useContentViewHeight = useContentViewHeight
@@ -163,6 +165,9 @@ class NewBanner: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    guard isShadowed && !isModal else { return }
+    
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
 }
 

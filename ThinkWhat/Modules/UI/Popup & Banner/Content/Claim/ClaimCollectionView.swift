@@ -14,7 +14,7 @@ class ClaimCollectionView: UICollectionView, UICollectionViewDelegate {
     private enum Section { case main }
     
     // MARK: - Public properties
-    public var claimSubject = CurrentValueSubject<Claim?, Never>(nil)
+  @Published public var claim: Claim?
     
     // MARK: - Private properties
     private var observers: [NSKeyValueObservation] = []
@@ -55,11 +55,11 @@ class ClaimCollectionView: UICollectionView, UICollectionViewDelegate {
             var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
             layoutConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
             layoutConfig.showsSeparators = false//true
-            layoutConfig.headerMode = .supplementary
+//            layoutConfig.headerMode = .supplementary
             layoutConfig.backgroundColor = .clear
             
             let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-            sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0)
+          sectionLayout.contentInsets = .uniform(size: 0)//NSDirectionalEdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0)
 //            sectionLayout.interGroupSpacing = 16
             return sectionLayout
         }
@@ -91,16 +91,14 @@ class ClaimCollectionView: UICollectionView, UICollectionViewDelegate {
         }
         
         source = UICollectionViewDiffableDataSource<Section, Claim>(collectionView: self) { collectionView, indexPath, itemIdentifier -> UICollectionViewCell in
-            
-            
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+            collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
         }
         
-        source.supplementaryViewProvider = {
-            collectionView, elementKind, indexPath -> UICollectionReusableView? in
-            
-            return collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistraition, for: indexPath)
-        }
+//        source.supplementaryViewProvider = {
+//            collectionView, elementKind, indexPath -> UICollectionReusableView? in
+//
+//            return collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistraition, for: indexPath)
+//        }
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Claim>()
         snapshot.appendSections([.main])
@@ -113,7 +111,7 @@ class ClaimCollectionView: UICollectionView, UICollectionViewDelegate {
               let item = cell.item
         else { return }
         
-        claimSubject.send(item)
+      claim = item
     }
 }
 

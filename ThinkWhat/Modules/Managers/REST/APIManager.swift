@@ -1184,22 +1184,33 @@ class API {
     }
     
     public func claim(surveyReference: SurveyReference,
-                      reason: Claim) async throws  {
+                      reason: Claim,
+                      requestHotExcept: [Survey] = []) async throws  {
       guard let url = API_URLS.Surveys.claim,
             !headers.isNil
       else { throw APIError.invalidURL }
       
-      let parameters: Parameters = ["survey_id": surveyReference.id, "claim_id": reason.id]
+      var parameters: Parameters = ["survey_id": surveyReference.id,
+                                    "claim_id": reason.id]
+      
+      if !requestHotExcept.isEmpty {
+        parameters["excluded_hot_list"] = requestHotExcept.map { $0.id }
+      }
       
       do {
-        let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
-        await MainActor.run {
-          surveyReference.isClaimed = true
-        }
+        let data = try await parent.requestAsync(url: url, httpMethod: .post,
+                                              parameters: parameters,
+                                              encoding: JSONEncoding.default,
+                                              headers: parent.headers())
+        surveyReference.isClaimed = true
+        
+        guard !requestHotExcept.isEmpty else { return }
+        
+        let json = try JSON(data: data, options: .mutableContainers)
+        Surveys.shared.load(json)
       } catch let error {
-        await MainActor.run {
-          NotificationCenter.default.post(name: Notifications.Surveys.ClaimFailure, object: surveyReference)
-        }
+        surveyReference.isClaimedPublisher.send(completion: .failure(error))
+        
         throw error
       }
     }

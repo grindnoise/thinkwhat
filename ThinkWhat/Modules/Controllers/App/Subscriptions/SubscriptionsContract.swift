@@ -24,7 +24,7 @@ protocol SubscriptionsViewInput: AnyObject {
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
-  func claim(surveyReference: SurveyReference, claim: Claim)
+  func claim(_: [SurveyReference: Claim])
   func setUserprofileFilter(_: Userprofile)
   func openUserprofile(_: Userprofile)
   func toggleUserSelected(_: Bool)
@@ -43,7 +43,7 @@ protocol SubsciptionsControllerInput: AnyObject {
   func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
-  func claim(surveyReference: SurveyReference, claim: Claim)
+  func claim(_: [SurveyReference: Claim])
   func switchNotifications(userprofile: Userprofile, notify: Bool)
   func unsubscribe(from: Userprofile)
 }

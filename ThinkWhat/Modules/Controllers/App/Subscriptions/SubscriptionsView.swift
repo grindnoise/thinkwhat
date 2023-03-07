@@ -87,7 +87,8 @@ class SubscriptionsView: UIView {
   private var isCollectionViewSetupCompleted = false
   private var needsAnimation = true
   private var isRevealed = false
-  //UI
+  ///**UI**
+  private let padding: CGFloat = 8
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
@@ -285,35 +286,36 @@ class SubscriptionsView: UIView {
       self.viewInput?.share(value)
     }.store(in: &self.subscriptions)
     
-    instance.claimSubject.sink {
-      print($0)
-    } receiveValue: { [weak self] in
+    instance.claimSubject
+      .sink { [weak self] in
       guard let self = self,
             let surveyReference = $0
       else { return }
       
-      let banner = Popup(heightScaleFactor: 0.7)
-      banner.accessibilityIdentifier = "claim"
-      let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
-      
-      claimContent.claimPublisher
+      instance.claimSubject
         .sink { [weak self] in
-          guard let self = self else { return }
+          guard let self = self,
+                let surveyReference = $0
+          else { return }
           
-          self.viewInput?.claim(surveyReference: surveyReference, claim: $0)
+          let popup = NewPopup(padding: self.padding,
+                                contentPadding: .uniform(size: self.padding*2))
+          let content = ClaimPopupContent(parent: popup,
+                                          surveyReference: surveyReference)
+          content.$claim
+            .filter { !$0.isNil }
+            .sink { [unowned self] in self.viewInput?.claim($0!) }
+            .store(in: &popup.subscriptions)
+          popup.setContent(content)
+          popup.didDisappearPublisher
+            .sink { _ in popup.removeFromSuperview() }
+            .store(in: &self.subscriptions)
         }
         .store(in: &self.subscriptions)
       
-      banner.present(content: claimContent)
-      banner.didDisappearPublisher
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          banner.removeFromSuperview()
-        }
-        .store(in: &self.subscriptions)
       
-      //            self.viewInput?.addFavorite(surveyReference: value)
-    }.store(in: &self.subscriptions)
+    }
+    .store(in: &self.subscriptions)
     
     instance.userprofilePublisher
       .sink { [weak self] in

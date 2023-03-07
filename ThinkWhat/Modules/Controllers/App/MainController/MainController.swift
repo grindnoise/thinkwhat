@@ -622,6 +622,7 @@ private extension MainController {
   
   @MainActor
   func setupUI() {
+//    tabBarController?.view.backgroundColor = .white
     view.isUserInteractionEnabled = false
     tabBar.backgroundColor = .systemBackground
     tabBar.tintColor = Colors.Logo.Flame.rawValue

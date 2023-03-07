@@ -14,9 +14,8 @@ class ListController: UIViewController, TintColorable {
   // MARK: - Public properties
   var controllerOutput: ListControllerOutput?
   var controllerInput: ListControllerInput?
-  //    var surveyCategory: Survey.SurveyCategory {
-  //        return category
-  //    }
+  ///**Logic**
+  var isDataReady: Bool = false
   public private(set) var category: Survey.SurveyCategory = .New {
     didSet {
       controllerOutput?.onDataSourceChanged()
@@ -28,7 +27,7 @@ class ListController: UIViewController, TintColorable {
       listSwitch.color = tintColor
     }
   }
-  //UI
+  ///**UI**
   public private(set) var isOnScreen = false {
     didSet {
       controllerOutput?.isOnScreen = isOnScreen
@@ -262,8 +261,8 @@ extension ListController: ListViewInput {
                  completion: nil)
   }
   
-  func claim(surveyReference: SurveyReference, claim: Claim) {
-    controllerInput?.claim(surveyReference: surveyReference, claim: claim)
+  func claim(_ dict: [SurveyReference: Claim]) {
+    controllerInput?.claim(dict)
   }
   
   func addFavorite(_ surveyReference: SurveyReference) {
@@ -406,6 +405,7 @@ extension ListController: ListModelOutput {
 
 extension ListController: DataObservable {
   func onDataLoaded() {
+    isDataReady = true
     navigationController?.setNavigationBarHidden(false, animated: true)
   }
 }

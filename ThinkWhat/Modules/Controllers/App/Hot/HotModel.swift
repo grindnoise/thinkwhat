@@ -10,7 +10,8 @@ import Foundation
 import SwiftyJSON
 
 class HotModel {
-    
+  ///**Logic**
+  private let minimumThreshold = 30
   weak var modelOutput: HotModelOutput?
 }
 
@@ -48,10 +49,6 @@ extension HotModel: HotControllerInput {
       }
     }
   }
-    
-    
-    
-    
   
   
   
@@ -62,55 +59,66 @@ extension HotModel: HotControllerInput {
   
   
   
-    func reject(_ survey: Survey) {
-        Task {
-            do {
-                try await API.shared.surveys.reject(survey: survey)
-            } catch {
+  
+  
+  
+  
+  func reject(_ survey: Survey) {
+    Task {
+      do {
+        try await API.shared.surveys.reject(survey: survey)
+      } catch {
 #if DEBUG
-                error.printLocalized(class: type(of: self), functionName: #function)
+        error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-
-            }
-        }
+        
+      }
     }
-    
-    func loadSurveys() {
-        Task {
-            do {
-                var parameters: [String: Any] = [:]
-                let stackList = Surveys.shared.hot.map { $0.id }
-              let rejectedList = Surveys.shared.all
-                .filter { $0.isRejected}
-                .map { $0.id }
-                let list = Array(Set(stackList + rejectedList))
-                if !list.isEmpty {
-                    parameters["exclude_ids"] = list
-                }
-
-                let data = try await API.shared.surveys.getSurveys(type: .Hot, parameters: parameters)
-                let json = try JSON(data: data, options: .mutableContainers)
+  }
+  
+  func loadSurveys() {
+    Task {
+      do {
+        var parameters: [String: Any] = [:]
+        let stackList = Surveys.shared.hot.map { $0.id }
+        let rejectedList = Surveys.shared.all
+          .filter { $0.isRejected}
+          .map { $0.id }
+        let list = Array(Set(stackList + rejectedList))
+        if !list.isEmpty {
+          parameters["exclude_ids"] = list
+        }
+        
+        let data = try await API.shared.surveys.getSurveys(type: .Hot, parameters: parameters)
+        let json = try JSON(data: data, options: .mutableContainers)
 #if DEBUG
-                print(json)
+        print(json)
 #endif
-                await MainActor.run {
-                    Surveys.shared.load(json)
-//                    modelOutput?.onRequestCompleted()
-                }
-            } catch {
-                await MainActor.run {
-//                    modelOutput?.onRequestCompleted()
-                }
+        await MainActor.run {
+          Surveys.shared.load(json)
+          //                    modelOutput?.onRequestCompleted()
+        }
+      } catch {
+        await MainActor.run {
+          //                    modelOutput?.onRequestCompleted()
+        }
 #if DEBUG
-                print(error.localizedDescription)
+        print(error.localizedDescription)
 #endif
-            }
-        }
+      }
     }
+  }
+  
+  func claim(_ dict: [SurveyReference: Claim]) {
+    guard let instance = dict.keys.first,
+          let reason = dict.values.first,
+          let modelOutput = modelOutput
+    else { return }
     
-    func claim(survey: Survey, reason: Claim) {
-        Task {
-            try await API.shared.surveys.claim(surveyReference: survey.reference, reason: reason)
-        }
+    Task {
+      try await API.shared.surveys.claim(surveyReference: instance,
+                                         reason: reason,
+                                         requestHotExcept: modelOutput.queue.length <= minimumThreshold ? modelOutput.queue.elements : [])
     }
+  }
 }

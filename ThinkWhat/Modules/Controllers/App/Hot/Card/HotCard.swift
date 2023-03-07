@@ -237,10 +237,14 @@ private extension HotCard {
   }
   
   func setGradient(_ layer: CAGradientLayer) {
-    let outerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let innerColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
-    layer.colors = [outerColor, outerColor, innerColor]
-    layer.locations = [0.0, 0.8, 0.925]
+    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+//    let quarterFeathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0.25).cgColor : UIColor.white.withAlphaComponent(0.25).cgColor
+//    let halfFeathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0.5).cgColor : UIColor.white.withAlphaComponent(0.5).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
+    layer.colors = [clear, clear, feathered]
+    layer.locations = [0.0, 0.75, 0.9]
+//    layer.colors = [clear, clear, quarterFeathered,  halfFeathered, feathered]
+//    layer.locations = [0.0, 0.8, 0.85, 0.925, 0.95]
   }
   
   @objc

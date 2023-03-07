@@ -361,6 +361,7 @@
 		AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */; };
 		AB93FD78247EA245009546DD /* EmptyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD77247EA245009546DD /* EmptyCard.swift */; };
 		AB93FD7A247EA255009546DD /* EmptyCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB93FD79247EA255009546DD /* EmptyCard.xib */; };
+		AB94E35529B734F300BC1821 /* Transition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB94E35429B734F300BC1821 /* Transition.swift */; };
 		AB98306927B5359B002C5132 /* ConditionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98306727B5359B002C5132 /* ConditionsViewController.swift */; };
 		AB98306A27B5359B002C5132 /* ConditionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB98306827B5359B002C5132 /* ConditionsViewController.xib */; };
 		AB98306C27B5382E002C5132 /* ConditionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98306B27B5382E002C5132 /* ConditionsModel.swift */; };
@@ -941,6 +942,7 @@
 		AB93FD74247BBC3D009546DD /* ArrayEncoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayEncoding.swift; sourceTree = "<group>"; };
 		AB93FD77247EA245009546DD /* EmptyCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyCard.swift; sourceTree = "<group>"; };
 		AB93FD79247EA255009546DD /* EmptyCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmptyCard.xib; sourceTree = "<group>"; };
+		AB94E35429B734F300BC1821 /* Transition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transition.swift; sourceTree = "<group>"; };
 		AB98306727B5359B002C5132 /* ConditionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionsViewController.swift; sourceTree = "<group>"; };
 		AB98306827B5359B002C5132 /* ConditionsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConditionsViewController.xib; sourceTree = "<group>"; };
 		AB98306B27B5382E002C5132 /* ConditionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionsModel.swift; sourceTree = "<group>"; };
@@ -1361,6 +1363,7 @@
 				AB8DA32A27A1578A00F92C18 /* old */,
 				AB8DA32B27A1591300F92C18 /* Auth.swift */,
 				AB8DA32D27A15BAD00F92C18 /* Basic.swift */,
+				AB94E35429B734F300BC1821 /* Transition.swift */,
 			);
 			path = Transitions;
 			sourceTree = "<group>";
@@ -3617,6 +3620,7 @@
 				AB6F4C03294CC362001BB40B /* LoaderCell.swift in Sources */,
 				ABC8270829AA4FE800E33074 /* AccountManagementCell.swift in Sources */,
 				AB72963427DB5EFB00D45B54 /* TopicsController.swift in Sources */,
+				AB94E35529B734F300BC1821 /* Transition.swift in Sources */,
 				ABAEEE5A27A5D4A100E4EF29 /* VKDelegate.swift in Sources */,
 				ABF3DF17283BA4A200309AA9 /* Int.swift in Sources */,
 				AB19B6432432282B00999917 /* PercentageLabel.swift in Sources */,

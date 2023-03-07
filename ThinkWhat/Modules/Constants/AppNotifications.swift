@@ -106,8 +106,8 @@ struct Notifications {
         static let AppendReference                  = Notification.Name("Notifications.Surveys.AppendReference")
         static let Remove                           = Notification.Name("Notifications.Surveys.Remove")
         static let RemoveReference                  = Notification.Name("Notifications.Surveys.RemoveReference")
-        static let Claim                            = Notification.Name("SurveyClaim")
-        static let ClaimFailure                     = Notification.Name("SurveyClaimFailure")
+//        static let Claim                            = Notification.Name("SurveyClaim")
+//        static let ClaimFailure                     = Notification.Name("SurveyClaimFailure")
         static let Ban                              = Notification.Name("SurveyBan")
         
         

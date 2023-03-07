@@ -22,6 +22,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
   // MARK: - Public properties
   var controllerOutput: SettingsControllerOutput?
   var controllerInput: SettingsControllerInput?
+  ///**Logic**
   var mode: SettingsController.Mode = .Profile {
     didSet {
       guard oldValue != mode else { return }
@@ -42,8 +43,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
       settingsSwitch.color = tintColor
     }
   }
-  //UI
-  public private(set) var isOnScreen = false
+  var isDataReady = false
   
   
   
@@ -51,7 +51,8 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
+  ///**UI**
+  public private(set) var isOnScreen = false
   private lazy var titleStack: UIStackView = {
     let opaque = UIView()
     opaque.backgroundColor = .clear
@@ -65,16 +66,6 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
     
     return instance
   }()
-  //    private lazy var titleLabel: UILabel = {
-  //       let instance = UILabel()
-  //        instance.font = UIFont(name: Fonts.Bold,
-  //                               size: 32)
-  //        instance.textAlignment = .left
-  //        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-  //        instance.text = ""
-  //
-  //        return instance
-  //    }()
   private lazy var settingsSwitch: SettingsSwitch = {
     let instance = SettingsSwitch()
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 2.1).isActive = true
@@ -504,6 +495,7 @@ extension SettingsController: SettingsModelOutput {
 
 extension SettingsController: DataObservable {
   func onDataLoaded() {
+    isDataReady = true
     navigationController?.setNavigationBarHidden(false, animated: true)
   }
 }

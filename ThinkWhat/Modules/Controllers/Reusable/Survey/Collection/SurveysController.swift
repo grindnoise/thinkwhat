@@ -406,8 +406,8 @@ extension SurveysController: SurveysViewInput {
                  completion: nil)
   }
   
-  func claim(surveyReference: SurveyReference, claim: Claim) {
-    controllerInput?.claim(surveyReference: surveyReference, claim: claim)
+  func claim(_ dict: [SurveyReference: Claim]) {
+    controllerInput?.claim(dict)
   }
   
   func addFavorite(_ surveyReference: SurveyReference) {

@@ -23,7 +23,7 @@ protocol ListViewInput: AnyObject {
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
-  func claim(surveyReference: SurveyReference, claim: Claim)
+  func claim(_: [SurveyReference: Claim])
   func openUserprofile(_: Userprofile)
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
@@ -40,7 +40,7 @@ protocol ListControllerInput: AnyObject {
   func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
-  func claim(surveyReference: SurveyReference, claim: Claim)
+  func claim(_: [SurveyReference: Claim])
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
 }

@@ -51,11 +51,12 @@ class PollController: UIViewController {
   private var observers: [NSKeyValueObservation] = []
   private var tasks: [Task<Void, Never>?] = []
   private var subscriptions = Set<AnyCancellable>()
-  //Logic
+  ///**Logic**
   private var userHasVoted = false
   private var isOnScreen = false
   private var surveyStateUpdater: AnyCancellable?
-  //UI
+  ///**UI**
+  private let padding: CGFloat = 8
   private lazy var avatar: Avatar = { Avatar() }()
   private lazy var topicIcon: Icon = {
     let instance = Icon(category: item.topic.iconCategory)
@@ -668,28 +669,22 @@ private extension PollController {
                                          attributes: .destructive,
                                          state: .off,
                                          handler: { [unowned self] _ in
-        let banner = Popup()
-        let claimContent = ClaimPopupContent(parent: banner, surveyReference: item)
         
-        claimContent.claimPublisher
-          .sink { [weak self] in
-            guard let self = self else { return }
-            
-            self.controllerInput?.claim($0)
-          }
-          .store(in: &self.subscriptions)
-        
-        banner.present(content: claimContent)
-        banner.didDisappearPublisher
-          .sink { [weak self] _ in
-            banner.removeFromSuperview()
-            
-            
-            guard let self = self,
-                  self.item.isClaimed
-            else { return }
-            
-            self.navigationController?.popViewController(animated: true)
+        let popup = NewPopup(padding: self.padding,
+                             contentPadding: .uniform(size: self.padding*2))
+        let content = ClaimPopupContent(parent: popup,
+                                        surveyReference: self.item)
+        content.$claim
+          .filter { !$0.isNil }
+          .sink { [unowned self] in self.controllerInput?.claim($0!) }
+          .store(in: &popup.subscriptions)
+        popup.setContent(content)
+        popup.didDisappearPublisher
+          .sink {[unowned self] _ in
+            popup.removeFromSuperview()
+            delayAsync(delay: 0.5) { [unowned self] in
+              self.navigationController?.popViewController(animated: true)
+            }
           }
           .store(in: &self.subscriptions)
       })
@@ -734,10 +729,6 @@ extension PollController: PollViewInput {
     
     navigationController?.pushViewController(UserprofileController(userprofile: item.owner, color: item.topic.tagColor), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
-  }
-  
-  func onClaim(_: Claim) {
-    
   }
   
   func onCommentClaim(comment: Comment, reason: Claim) {
@@ -800,10 +791,9 @@ extension PollController: PollModelOutput {
   @MainActor
   func onLoadCallback(_ result: Result<Survey, Error>) {
     switch result {
-    case .success(let instance):
+    case .success(_):
       navigationController?.setNavigationBarHidden(false, animated: true)
       loadingIndicator.stop()
-//      controllerOutput?.item = instance
     case .failure:
       let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
                                                             text: AppError.server.localizedDescription,

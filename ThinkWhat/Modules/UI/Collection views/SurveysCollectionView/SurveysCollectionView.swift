@@ -553,6 +553,18 @@ private extension SurveysCollectionView {
   }
   
   func setTasks() {
+    ///Survey claimed by user
+    SurveyReferences.shared.claimedPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in
+        guard self.source.snapshot().itemIdentifiers.contains($0) else { return }
+        
+        var snap = self.source.snapshot()
+        snap.deleteItems([$0])
+        self.source.apply(snap, animatingDifferences: true)
+      }
+      .store(in: &subscriptions)
+    
     //Filter bug fix
     Timer.publish(every: 5, on: .main, in: .common)
       .autoconnect()
@@ -645,43 +657,6 @@ private extension SurveysCollectionView {
         }
       }
       .store(in: &subscriptions)
-    
-    //    tasks.append(Task {@MainActor [weak self] in
-    //      for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.EmptyReceived) {
-    //        guard let self = self,
-    //              self.isLoading
-    //        else { return }
-    //
-    ////        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-    ////          guard let self = self else { return }
-    ////
-    //        delayAsync(delay: 0.5) { [weak self] in
-    //          guard let self = self else { return }
-    //
-    //          self.isLoading = false
-    //        }
-    ////        }
-    //
-    ////        guard self.indexPathsForVisibleItems.map({ $0.row }).contains(self.dataItems.count-1) else { return }
-    ////
-    ////        self.scrollToItem(at: IndexPath(row: self.numberOfItems(inSection: 0)-1, section: 0), at: .bottom, animated: true)
-    //      }
-    //    })
-    
-    //Survey claimed by user
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Claim) {
-        guard let self = self,
-              let instance = notification.object as? SurveyReference,
-              self.source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-        
-        var snap = self.source.snapshot()
-        snap.deleteItems([instance])
-        self.source.apply(snap, animatingDifferences: true)
-        //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-      }
-    })
     
     //Survey banned on server
     tasks.append(Task {@MainActor [weak self] in

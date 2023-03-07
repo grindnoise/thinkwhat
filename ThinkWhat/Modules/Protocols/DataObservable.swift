@@ -10,6 +10,7 @@ import Foundation
 
 protocol DataObservable {
     
+  var isDataReady: Bool { get set }
     /**
      Subscription if Bundle language changes on the fly.
      */

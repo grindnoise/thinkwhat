@@ -13,9 +13,7 @@ class TransitionCoordinator: NSObject, UINavigationControllerDelegate {
                               animationControllerFor operation: UINavigationController.Operation,
                               from fromVC: UIViewController,
                               to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-//        guard let nav = navigationController as? CustomNavigationController else { return nil }
-//        return nav.transitionStyle.transition(navigationController: nav, operation: operation)
-        FadeTransition(navigationController, operation)
+        Transition(navigationController, operation)
     }
 }
 

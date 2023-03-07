@@ -12,13 +12,13 @@ public struct QueueArray<T: Hashable>: Queue {
   private var array: [T] = []
   public init() {}
   
-  public var isEmpty: Bool {
-    array.isEmpty
-  }
+  public var elements: [T] { array }
   
-  public var peek: T? {
-    array.first
-  }
+  public var length: Int { return array.count }
+  
+  public var isEmpty: Bool { array.isEmpty }
+  
+  public var peek: T? { array.first }
   
   public mutating func enqueue(_ element: T) -> Bool {
     guard array.filter({ $0 == element }).isEmpty else {
@@ -32,10 +32,12 @@ public struct QueueArray<T: Hashable>: Queue {
   
   @discardableResult
   public mutating func enqueue(_ elements: [T]) -> Bool {
+    guard !array.isEmpty else { array.append(contentsOf: elements); return true }
+    
     let existingSet = Set(array)
     let appendingSet = Set(elements)
-    let difference = Array(existingSet.symmetricDifference(appendingSet))
-    
+    let difference = Array(appendingSet.subtracting(existingSet))
+
     guard !difference.isEmpty else { return false }
     
     array.append(contentsOf: difference)

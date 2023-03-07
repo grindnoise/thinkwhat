@@ -33,7 +33,7 @@ protocol SurveysViewInput: AnyObject {
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
-  func claim(surveyReference: SurveyReference, claim: Claim)
+  func claim(_: [SurveyReference: Claim])
   func openUserprofile(_: Userprofile)
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
@@ -50,7 +50,7 @@ protocol SurveysControllerInput: AnyObject {
                            compatibility: TopicCompatibility?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
-  func claim(surveyReference: SurveyReference, claim: Claim)
+  func claim(_: [SurveyReference: Claim])
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
   func search(substring: String,

@@ -489,7 +489,7 @@ private extension PollCollectionView {
     snapshot.appendSections([.comments])
     snapshot.appendItems([7], toSection: .comments)
     source.apply(snapshot, animatingDifferences: false)
-    source.refresh(animatingDifferences: false)
+//    source.refresh(animatingDifferences: false)
     
     //        snapshot.appendSections([.title, .description,])
     //        snapshot.appendItems([0], toSection: .title)

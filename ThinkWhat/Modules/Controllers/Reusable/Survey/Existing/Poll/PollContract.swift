@@ -19,7 +19,6 @@ protocol PollViewInput: AnyObject {
   func openURL(_: URL)
 //  func answerSelected(_: Answer)
   
-  func onClaim(_: Claim)
   func onCommentClaim(comment: Comment, reason: Claim)
   func onAddFavorite(_: Bool)
   func vote(_: Answer)
@@ -38,9 +37,9 @@ protocol PollControllerInput: AnyObject {
   var modelOutput: PollModelOutput? { get set }
   var item: SurveyReference? { get }
   
+  func claim(_: [SurveyReference :Claim])
   func load(_: SurveyReference, incrementViewCounter: Bool)
   func toggleFavorite(_: Bool)
-  func claim(_: Claim)
   func vote(_: Answer)
   func addView()
   func updateResultsStats(_: Survey)

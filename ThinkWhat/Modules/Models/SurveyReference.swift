@@ -205,9 +205,10 @@ class SurveyReference: Decodable {// NSObject,
       guard isClaimed, isClaimed != oldValue else { return }
       
       isClaimedPublisher.send(isClaimed)
+      SurveyReferences.shared.claimedPublisher.send(self)
       //            isClaimedPublisher.send(completion: .finished)
       
-      NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: self)
+//      NotificationCenter.default.post(name: Notifications.Surveys.Claim, object: self)
       survey?.isClaimed = isClaimed
     }
   }
@@ -224,7 +225,7 @@ class SurveyReference: Decodable {// NSObject,
   public let isActivePublisher       = PassthroughSubject<Bool, Never>()
   public let isFavoritePublisher     = PassthroughSubject<Bool, Never>()
   public let isCompletePublisher     = PassthroughSubject<Bool, Never>()
-  public let isClaimedPublisher      = PassthroughSubject<Bool, Never>()
+  public let isClaimedPublisher      = PassthroughSubject<Bool, Error>()
   public let isBannedPublisher       = PassthroughSubject<Bool, Never>()
   public let isVisitedPublisher      = PassthroughSubject<Bool, Never>()
   public let isHotPublisher          = PassthroughSubject<Bool, Never>()
@@ -461,9 +462,22 @@ class SurveyReferences {
   //Publishers
   public let instancesPublisher = PassthroughSubject<[SurveyReference], Never>()
   public let instancesByTopicPublisher = PassthroughSubject<[SurveyReference], Never>()
+  public let claimedPublisher = PassthroughSubject<SurveyReference, Never>()
   
   public func eraseData() {
     all.removeAll()
+  }
+  
+  public func append(_ instances: [SurveyReference]) {
+    guard !instances.isEmpty else { instancesPublisher.send([]); return }
+    
+    let existingSet = Set(all)
+    let appendingSet = Set(instances)
+    let difference = Array(existingSet.symmetricDifference(appendingSet))
+    
+    guard !difference.isEmpty else { return }
+    
+    all.append(contentsOf: difference)
   }
   
   subscript(ids: [Int]) -> [SurveyReference] {
