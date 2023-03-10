@@ -544,6 +544,7 @@
 		ABF3DF1D283BB13300309AA9 /* LargeCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABF3DF1C283BB13300309AA9 /* LargeCard.xib */; };
 		ABF3DF1F283BC2DA00309AA9 /* _HotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF3DF1E283BC2DA00309AA9 /* _HotCard.swift */; };
 		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
+		ABF888AB29BB38B900A37212 /* EmptySubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF888AA29BB38B900A37212 /* EmptySubscriptionsView.swift */; };
 		ABFB4222287320DE0066CFA0 /* YoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */; };
 		ABFB42242873443A0066CFA0 /* WebViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB42232873443A0066CFA0 /* WebViewCell.swift */; };
 		ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFD793D25F8CD99009A2824 /* RoundIcon.swift */; };
@@ -1126,6 +1127,7 @@
 		ABF3DF1C283BB13300309AA9 /* LargeCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LargeCard.xib; sourceTree = "<group>"; };
 		ABF3DF1E283BC2DA00309AA9 /* _HotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _HotCard.swift; sourceTree = "<group>"; };
 		ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysTableViewController.swift; sourceTree = "<group>"; };
+		ABF888AA29BB38B900A37212 /* EmptySubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptySubscriptionsView.swift; sourceTree = "<group>"; };
 		ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeCell.swift; sourceTree = "<group>"; };
 		ABFB42232873443A0066CFA0 /* WebViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewCell.swift; sourceTree = "<group>"; };
 		ABFD793D25F8CD99009A2824 /* RoundIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundIcon.swift; sourceTree = "<group>"; };
@@ -2087,6 +2089,7 @@
 				AB72961A27DA3F2C00D45B54 /* SubscriptionsView.swift */,
 				AB72961B27DA3F2C00D45B54 /* SubscriptionsModel.swift */,
 				AB72962027DA418700D45B54 /* SubscriptionsView.xib */,
+				ABF888AA29BB38B900A37212 /* EmptySubscriptionsView.swift */,
 			);
 			path = Subscriptions;
 			sourceTree = "<group>";
@@ -3642,6 +3645,7 @@
 				AB72964327DB60C800D45B54 /* SettingsController.swift in Sources */,
 				ABB0F6C828F5A4550068FDDF /* LanguageListModel.swift in Sources */,
 				AB52719E28EC1B1D0000F095 /* UserprofilesController.swift in Sources */,
+				ABF888AB29BB38B900A37212 /* EmptySubscriptionsView.swift in Sources */,
 				ABFB42242873443A0066CFA0 /* WebViewCell.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */,
 				AB54F47D285B127400C620B3 /* ChoiceEditingPopup.swift in Sources */,

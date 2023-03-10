@@ -535,6 +535,7 @@ class SurveyCell: UICollectionViewCell {
     imageView.image = nil
     progressView.alpha = 0
     avatar.removeInteraction(contextInteraction)
+    avatar.clearImage()
     
     guard let constraint = imageContainer.getConstraint(identifier: "imageContainer") else { return }
     

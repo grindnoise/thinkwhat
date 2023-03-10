@@ -375,7 +375,7 @@ private extension PollTitleCell {
     else { return }
     
     setNeedsLayout()
-    constraint.constant = item.title.height(withConstrainedWidth: windowScene.screen.bounds.width,
+    constraint.constant = item.title.height(withConstrainedWidth: bounds.width,
                                             font: titleLabel.font)
     layoutIfNeeded()
   }

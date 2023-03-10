@@ -402,7 +402,7 @@ class Userprofile: Decodable {
   var hashValue: Int {
     return ObjectIdentifier(self).hashValue
   }
-  var surveys: [SurveyReference] { Surveys.shared.all.filter { $0.owner == self && !$0.isBanned && !$0.isClaimed && !}}
+  var surveys: [SurveyReference] { SurveyReferences.shared.all.filter { $0.owner == self && !$0.isBanned && !$0.isClaimed && !$0.isAnonymous }}
   var favorites: [Date: [SurveyReference]]   = [:]
   var preferences: [[Topic: Int]] = [[:]] {
     didSet {
@@ -442,8 +442,11 @@ class Userprofile: Decodable {
       else { return }
                                             
       subscriptionFlagPublisher.send(subscribedAt)
-      Userprofiles.shared.newSubscriptionPublisher.send(self)
       subscribedAt ? { current.subscriptionsPublisher.send([self]) }() : { current.subscriptionsRemovePublisher.send([self]) }()
+      
+      guard subscribedAt else { return }
+      
+      Userprofiles.shared.newSubscriptionPublisher.send(self)
     }
   }
   var subscribedToMe: Bool {
@@ -643,23 +646,23 @@ class Userprofile: Decodable {
     }
   }
   
-  func loadSurveys(data: Data) {
-    let decoder = JSONDecoder()
-    do {
-      let instances = try decoder.decode([SurveyReference].self, from: data)
-      instances.forEach { instance in
-        if surveys.filter({ $0.hashValue == instance.hashValue }).isEmpty {
-          if let existing = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first {
-            surveys.append(existing)
-          } else {
-            surveys.append(instance)
-          }
-        }
-      }
-    } catch {
-      fatalError(error.localizedDescription)
-    }
-  }
+//  func loadSurveys(data: Data) {
+//    let decoder = JSONDecoder()
+//    do {
+//      let instances = try decoder.decode([SurveyReference].self, from: data)
+//      instances.forEach { instance in
+//        if surveys.filter({ $0.hashValue == instance.hashValue }).isEmpty {
+//          if let existing = SurveyReferences.shared.all.filter({ $0.hashValue == instance.hashValue }).first {
+//            surveys.append(existing)
+//          } else {
+//            surveys.append(instance)
+//          }
+//        }
+//      }
+//    } catch {
+//      fatalError(error.localizedDescription)
+//    }
+//  }
   
   //    func updateStats(_ json: JSON) {
   //        if let _surveysAnsweredTotal   = json[DjangoVariables.UserProfile.surveysAnsweredTotal].int,

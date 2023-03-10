@@ -329,6 +329,31 @@ extension UIView {
     ]
   }
   
+  @discardableResult
+  func placeXCentered(inside parent: UIView,
+                      topInset: CGFloat,
+                      bottomInset: CGFloat) -> [NSLayoutConstraint] {
+    
+    parent.addSubview(self)
+    translatesAutoresizingMaskIntoConstraints = false
+    
+    let centerXAnchorConstraint = centerXAnchor.constraint(equalTo: parent.centerXAnchor)
+    centerXAnchorConstraint.isActive = true
+    centerXAnchorConstraint.identifier = "centerXAnchor"
+    let topAnchorConstraint = topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset)
+    topAnchorConstraint.isActive = true
+    topAnchorConstraint.identifier = "topAnchor"
+    let bottomAnchorConstraint = bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: bottomInset)
+    bottomAnchorConstraint.isActive = true
+    bottomAnchorConstraint.identifier = "topAnchor"
+    
+    return [
+      centerXAnchorConstraint,
+      bottomAnchorConstraint,
+      topAnchorConstraint
+    ]
+  }
+  
   func placeInCenter(of parent: UIView,
                      topInset: CGFloat,
                      bottomInset: CGFloat) {

@@ -161,7 +161,10 @@ class UserSettingsCollectionView: UICollectionView {
       else { return }
       
       cell.userprofile = userprofile
-      cell.insets = UIEdgeInsets(top: self.padding*2, left: self.padding, bottom: self.padding, right: self.padding)
+//      cell.setInsets(UIEdgeInsets(top: self.padding*2,
+//                                  left: self.padding,
+//                                  bottom: self.padding,
+//                                  right: self.padding))
     }
     
     let infoCellRegistration = UICollectionView.CellRegistration<UserSettingsInfoCell, AnyHashable> { [unowned self] cell, _, _ in

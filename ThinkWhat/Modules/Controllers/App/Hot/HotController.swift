@@ -121,7 +121,15 @@ private extension HotController {
       .filter { !$0.isEmpty }
       .receive(on: DispatchQueue.main)
       .map { array in array.filter { $0.isHot && !$0.isRejected && !$0.isClaimed }}
-      .sink { [unowned self] in self.queue.enqueue($0) }
+      .sink { [unowned self] in
+        self.queue.enqueue($0)
+        
+        guard let controllerOutput = controllerOutput,
+              controllerOutput.currentSurvey.isNil
+        else { return }
+        
+        controllerOutput.next(queue.dequeue())
+      }
       .store(in: &subscriptions)
     
     SurveyReferences.shared.bannedPublisher
@@ -132,8 +140,30 @@ private extension HotController {
     
     Timer.publish(every: 5, on: .main, in: .common)
       .autoconnect()
-      .filter { [unowned self] _ in self.isOnScreen }
+      .filter { [unowned self] _ in
+        guard self.isOnScreen,
+              let controllerOutput = self.controllerOutput,
+              !self.queue.isEmpty || !controllerOutput.currentSurvey.isNil
+        else { return false }
+      
+        print(self.queue.isEmpty)
+        print(controllerOutput.currentSurvey.isNil)
+        return true
+      }
       .sink { [unowned self] _ in self.controllerInput?.updateData() }
+      .store(in: &subscriptions)
+    
+    Timer.publish(every: 5, on: .main, in: .common)
+      .autoconnect()
+      .filter { [unowned self] _ in
+        guard self.isOnScreen,
+              let controllerOutput = self.controllerOutput,
+              queue.isEmpty && controllerOutput.currentSurvey.isNil
+        else { return false }
+      
+        return true
+      }
+      .sink { [unowned self] _ in self.controllerInput?.getSurveys([])}
       .store(in: &subscriptions)
     
     tasks.append(Task { @MainActor [weak self] in

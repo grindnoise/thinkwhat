@@ -645,6 +645,8 @@ private extension MainController {
       rootViewController.navigationItem.title = title.localized
       rootViewController.tintColor = color
       
+      navigationController.viewControllers.forEach({ print($0) })
+      
       return navigationController
     }
     

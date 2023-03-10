@@ -61,7 +61,7 @@ extension TopicsModel: TopicsControllerInput {
   func onDataSourceRequest(dateFilter: Period, topic: Topic) {
     Task {
       try await API.shared.surveys.surveyReferences(category: .Topic,
-                                                    dateFilter: dateFilter,
+                                                    period: dateFilter,
                                                     topic: topic)
     }
   }

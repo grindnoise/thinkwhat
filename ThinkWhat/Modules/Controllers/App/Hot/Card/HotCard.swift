@@ -262,7 +262,7 @@ class HotCard: UIView, Card {
     super.traitCollectionDidChange(previousTraitCollection)
     
     setGradient(gradient)
-    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .secondarySystemBackground
+    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? UIColor.white.blended(withFraction: 0.025, of: item.topic.tagColor) : .secondarySystemBackground
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
 }
@@ -272,6 +272,8 @@ private extension HotCard {
   func setupUI() {
     backgroundColor = .clear
     clipsToBounds = false
+    
+    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? UIColor.white.blended(withFraction: 0.025, of: item.topic.tagColor) : .secondarySystemBackground
     
     shadowView.place(inside: self)
     
@@ -312,7 +314,7 @@ private extension HotCard {
   
   func setGradient(_ layer: CAGradientLayer) {
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
     layer.colors = [clear, clear, feathered]
     layer.locations = [0.0, 0.75, 0.9]
   }
@@ -325,6 +327,7 @@ private extension HotCard {
       action = .Vote
     } else {
       action = sender == claimButton ? .Claim : .Next
+      isUserInteractionEnabled = sender != nextButton
     }
   }
 }

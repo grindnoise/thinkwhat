@@ -163,6 +163,8 @@ class SurveysCollectionView: UICollectionView {
   private var lastStopYPoint: CGFloat = .zero
   private var lastContentOffsetY: CGFloat = 0 {
     didSet {
+      guard !source.snapshot().itemIdentifiers.isEmpty else { return }
+      
       let isScrollingDown = lastContentOffsetY > oldValue
       
       ///Pagination
@@ -173,7 +175,7 @@ class SurveysCollectionView: UICollectionView {
       let distance = lastStopYPoint - lastContentOffsetY
       let threshold: CGFloat = 30
       
-      guard abs(distance) > threshold else { return }
+      guard abs(distance) > threshold  else { return }
       
       scrollPublisher.send(distance > 0 ? false : true)
     }
@@ -649,7 +651,7 @@ private extension SurveysCollectionView {
         case .Top:            appendingSet = Set(instances.filter { $0.isTop && !$0.isBanned && !$0.isClaimed })//!$0.isRejected &&
         case .Own:            appendingSet = Set(instances.filter { $0.isOwn && !$0.isBanned })
         case .Favorite:       appendingSet = Set(instances.filter { $0.isFavorite && !$0.isBanned && !$0.isClaimed })
-        case .Subscriptions:  appendingSet = Set(instances.filter { $0.owner.subscribedAt && !$0.isBanned && !$0.isClaimed })
+        case .Subscriptions:  appendingSet = Set(instances.filter { $0.owner.subscribedAt && !$0.isBanned && !$0.isClaimed && !$0.isAnonymous })
         case .Topic:
           guard let topic = self.topic else { return }
           
@@ -682,7 +684,8 @@ private extension SurveysCollectionView {
       .filter { [weak self] in
         guard let self = self,
               self.category == .Subscriptions,
-              !$0.isBanned
+              !$0.isBanned,
+              $0.subscribedAt
         else { return false }
         
         return true
@@ -691,41 +694,40 @@ private extension SurveysCollectionView {
       .sink { [unowned self] newSubscription in
         var snap = self.source.snapshot()
         let existingSet = Set(snap.itemIdentifiers)
-        var appendingSet = Set(newSubscription.surveys.filter { $0.owner.subscribedAt && !$0.isBanned && !$0.isClaimed })
+        let appendingSet = Set(newSubscription.surveys)
         
+        let filteredByPeriod = appendingSet.filter({ $0.isValid(byBeriod: self.period) })
+        
+        snap.appendItems((existingSet.isEmpty ? Array(filteredByPeriod) : Array(filteredByPeriod.subtracting(existingSet)))
+          .sorted { $0.startDate > $1.startDate },
+                         toSection: .main)
+        
+        
+        self.source.apply(snap, animatingDifferences: true) { [weak self] in
+          guard let self = self else { return }
+          
+          self.isLoading = false
+        }
       }
       .store(in: &subscriptions)
     
-    //Filter bug fix
-    Timer.publish(every: 5, on: .main, in: .common)
-      .autoconnect()
-      .sink { [weak self] _ in
-        guard let self = self,
-              self.isOnScreen,
-              self.category != .ByOwner,
-              self.source.snapshot().itemIdentifiers.count != self.filterByPeriod(self.dataItems).count
-        else { return }
-        
-        var snap = Snapshot()
-        snap.appendSections([.main])
-        snap.appendItems(self.filterByPeriod(self.dataItems))//self.dataItems)
-        self.source.apply(snap, animatingDifferences: true)
-      }
-      .store(in: &subscriptions)
+//    //Filter bug fix
+//    Timer.publish(every: 5, on: .main, in: .common)
+//      .autoconnect()
+//      .sink { [weak self] _ in
+//        guard let self = self,
+//              self.isOnScreen,
+//              self.category != .ByOwner,
+//              self.source.snapshot().itemIdentifiers.count != self.filterByPeriod(self.dataItems).count
+//        else { return }
+//
+//        var snap = Snapshot()
+//        snap.appendSections([.main])
+//        snap.appendItems(self.filterByPeriod(self.dataItems))//self.dataItems)
+//        self.source.apply(snap, animatingDifferences: true)
+//      }
+//      .store(in: &subscriptions)
     
-    //    Timer.publish(every: 8, on: .main, in: .common)
-    //      .autoconnect()
-    //      .sink { [weak self] _ in
-    //        guard let self = self,
-    //              !self.isLoading,
-    //              self.isOnScreen,
-    //              self.visibleCells.count < 4,
-    //              self.dataItems.count < 4
-    //        else { return }
-    //
-    //        self.requestData()
-    //      }
-    //      .store(in: &subscriptions)
     
     ///If bottom spinner is on screen more than n seconds, then hide it
     Timer.publish(every: 8, on: .main, in: .common)
@@ -745,28 +747,6 @@ private extension SurveysCollectionView {
         self.isLoading = false
       }
       .store(in: &subscriptions)
-    
-    
-    
-//    //Subscribed at removed
-//    tasks.append(Task {@MainActor [weak self] in
-//      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
-//        guard let self = self,
-//              self.category == .Subscriptions,
-//              self.userprofile.isNil//Current user
-//        else { return }
-//
-//        var snap = Snapshot()
-//        snap.appendSections([.main])//, .loader])
-//        snap.appendItems(self.dataItems)
-//        self.source.apply(snap)
-//        //Append, sort
-//        //                var snap = self.source.snapshot()
-//        //                let ownerSurveys = SurveyReferences.shared.all.filter({ $0.owner == owner })
-//        //                snap.deleteItems(ownerSurveys)
-//        //                self.source.apply(snap)
-//      }
-//    })
   }
   
   @MainActor
@@ -780,11 +760,6 @@ private extension SurveysCollectionView {
       refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
     }
   }
-  
-//  @MainActor
-//  func setColors() {
-////    refreshControl?.tintColor = color
-//  }
   
   @objc
   func refresh() {
@@ -802,6 +777,7 @@ private extension SurveysCollectionView {
   func requestData() {
     guard !isLoading else { return }
     
+    isLoading = true
     if category == .Topic, let topic = topic {
       paginationByTopicPublisher.send([topic: period])
     } else if category == .ByOwner, let userprofile = userprofile {
@@ -813,10 +789,8 @@ private extension SurveysCollectionView {
     } else if category == .Compatibility, let compatibility = compatibility {
       paginationByCompatibilityPublisher.send(compatibility)
     } else {
-      //      isLoading = true
       paginationPublisher.send([category: period])
     }
-    isLoading = true
   }
   
   func appendToDataSource() {

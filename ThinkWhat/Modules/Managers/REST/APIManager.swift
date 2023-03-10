@@ -1185,7 +1185,7 @@ class API {
     }
     
     public func surveyReferences(category: Survey.SurveyCategory,
-                                 dateFilter: Period? = nil,
+                                 period: Period? = nil,
                                  topic: Topic? = nil,
                                  userprofile: Userprofile? = nil,
                                  compatibility: TopicCompatibility? = nil,
@@ -1213,8 +1213,8 @@ class API {
         parameters = ["exclude_ids": category.dataItems().map { $0.id }]
       }
       
-      if let dateFilter = dateFilter, let date = dateFilter.date() {
-        parameters["date_filter"] = date.toDateString()
+      if let period = period, period != .AllTime, let dateFrom = period.date() {
+        parameters["date_from"] = dateFrom.toDateString()
       }
       
       do {

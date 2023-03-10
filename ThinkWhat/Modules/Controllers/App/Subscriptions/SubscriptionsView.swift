@@ -55,7 +55,11 @@ class SubscriptionsView: UIView {
       //            }
     }
   }
-  private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
+  private var indexPath: IndexPath = IndexPath(row: 0, section: 0) {
+    didSet {
+      print(indexPath)
+    }
+  }
   private var userprofile: Userprofile! {
     didSet {
       guard let userprofile = userprofile else { return }
@@ -157,25 +161,13 @@ class SubscriptionsView: UIView {
     
     return instance
   }()
-  private lazy var subscriptionsLabel: UILabel = {
-    let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular,
-                                      forTextStyle: .headline)
-    instance.text = "zero_subscriptions".localized
-    instance.textColor = .secondaryLabel
-    instance.textAlignment = .center
-    instance.alpha = 0
-    
-    return instance
-  }()
+  private lazy var emptySubscriptionsView: EmptySubscriptionsView = { EmptySubscriptionsView() }()
   private lazy var surveysCollectionView: SurveysCollectionView = {
     let instance = SurveysCollectionView(category: .Subscriptions)
     
     //Pagination #1
-    let paginationPublisher = instance.paginationPublisher
+    instance.paginationPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-    
-    paginationPublisher
       .sink { [unowned self] in
         guard let source = $0.keys.first,
               let period = $0.values.first
@@ -186,10 +178,8 @@ class SubscriptionsView: UIView {
       .store(in: &subscriptions)
     
     //Pagination #2
-    let paginationByTopicPublisher = instance.paginationByTopicPublisher
+    instance.paginationByTopicPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-    
-    paginationByTopicPublisher
       .sink { [unowned self] in
         guard let topic = $0.keys.first,
               let period = $0.values.first
@@ -358,9 +348,8 @@ class SubscriptionsView: UIView {
     instance.userPublisher
       .sink { [weak self] in
         guard let self = self,
-              let dict = $0,
-              let userprofile = dict.keys.first,
-              let indexPath = dict.values.first
+              let userprofile = $0.keys.first,
+              let indexPath = $0.values.first
         else { return }
         
         
@@ -387,15 +376,27 @@ class SubscriptionsView: UIView {
         else { return }
         
         self.viewInput?.onSubcriptionsCountEvent(zeroSubscriptions: isEmpty)
-        self.subscriptionsLabel.addEquallyTo(to: self.topView)
-        if isEmpty { self.subscriptionsLabel.addEquallyTo(to: self.topView) }
+        self.emptySubscriptionsView.place(inside: self)
+        if isEmpty {
+          self.emptySubscriptionsView.addEquallyTo(to: self)
+          self.emptySubscriptionsView.transform = .init(scaleX: 0.75, y: 0.75)
+        }
         
-        UIView.animate(withDuration: 0.2) {
-          self.subscriptionsLabel.alpha =  isEmpty ? 1 : 0
+        UIView.animate(
+          withDuration: 0.4,
+          delay: 0,
+          usingSpringWithDamping: 0.8,
+          initialSpringVelocity: 0.3,
+          options: [.curveEaseInOut],
+          animations: { [weak self] in
+            guard let self = self else { return }
+            
+          self.emptySubscriptionsView.alpha =  isEmpty ? 1 : 0
+          self.emptySubscriptionsView.transform = isEmpty ? .identity : .init(scaleX: 0.75, y: 0.75)
           self.shadowView.alpha = isEmpty ? 0 : 1
           self.filterView.alpha = isEmpty ? 0 : 1
-        } completion: { _ in
-          if !isEmpty { self.subscriptionsLabel.removeFromSuperview() }
+        }) { _ in
+          if !isEmpty { self.emptySubscriptionsView.removeFromSuperview() }
         }
       }
       .store(in: &subscriptions)

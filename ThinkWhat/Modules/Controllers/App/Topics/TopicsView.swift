@@ -461,10 +461,11 @@ private extension TopicsView {
     setNeedsLayout()
     layoutIfNeeded()
     filterViewHeight = periodButton.bounds.height
-    let constraint = filterView.heightAnchor.constraint(equalToConstant: 0)
+    let constraint = filterView.heightAnchor.constraint(equalToConstant: filterViewHeight)
     constraint.identifier = "height"
     constraint.isActive = true
     constraint.priority = .defaultLow
+
     //        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
     //        constraint.identifier = "height"
     //        constraint.isActive = true

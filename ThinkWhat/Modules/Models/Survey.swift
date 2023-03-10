@@ -35,8 +35,8 @@ class Survey: Decodable {
         let referencesFromSurveys = Surveys.shared.all.filter { $0.isFavorite && !$0.isBanned }.map { $0.reference }
         return (SurveyReferences.shared.all.filter { $0.isFavorite && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .Subscriptions:
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned }.map { $0.reference }
-        return (SurveyReferences.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous }.map { $0.reference }
+        return (SurveyReferences.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous } + referencesFromSurveys).uniqued()
       case .All:
         let referencesFromSurveys = Surveys.shared.all.filter { !$0.isClaimed && !$0.isBanned }.map { $0.reference }//&& !$0.isRejected
         return (SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
@@ -47,8 +47,8 @@ class Survey: Decodable {
       case .ByOwner:
         guard let userprofile = userprofile else { return [] }
         
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned }.map { $0.reference }//&& !$0.isRejected
-        return (SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous }.map { $0.reference }//&& !$0.isRejected
+        return (SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous } + referencesFromSurveys).uniqued()//&& !$0.isRejected
       case .Search:
         fatalError()
       case .Compatibility:

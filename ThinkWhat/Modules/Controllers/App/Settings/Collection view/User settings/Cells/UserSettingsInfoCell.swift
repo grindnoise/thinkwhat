@@ -175,7 +175,7 @@ private extension UserSettingsInfoCell {
     
     collectionView.removeFromSuperview()
     collectionView.place(inside: self,
-                         insets: insets == .zero ? .uniform(size: .zero) : insets,
+                         insets: insets == .zero ? .uniform(size: padding) : insets,
                          bottomPriority: .defaultLow)
   }
 }

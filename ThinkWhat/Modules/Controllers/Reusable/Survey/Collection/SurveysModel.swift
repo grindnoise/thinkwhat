@@ -71,7 +71,7 @@ extension SurveysModel: SurveysControllerInput {
     Task {
       do {
         try await API.shared.surveys.surveyReferences(category: source,
-                                                      dateFilter: dateFilter,
+                                                      period: dateFilter,
                                                       topic: topic,
                                                       userprofile: userprofile,
                                                       compatibility: compatibility)

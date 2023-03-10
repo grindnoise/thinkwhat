@@ -42,4 +42,5 @@ protocol HotControllerOutput: AnyObject {
   
   func setSurvey(_: Survey?)
   func didAppear()
+  func next(_ survey: Survey?)
 }

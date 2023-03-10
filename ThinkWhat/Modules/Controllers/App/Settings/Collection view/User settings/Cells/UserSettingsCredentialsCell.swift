@@ -21,7 +21,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
       setupButtons()
     }
   }
-  ///`Publishers`
+  ///**Publishers**
   public var namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
   public var datePublisher = CurrentValueSubject<Date?, Never>(nil)
   public var genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
@@ -33,25 +33,20 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
       setColors()
     }
   }
-  ///`UI`
-  public var padding: CGFloat = 16 {
-    didSet {
-      updateUI()
-    }
-  }
-  public var insets: UIEdgeInsets? {
-    didSet {
-      updateUI()
-    }
-  }
-  
+  ///**UI**
+  public var padding: CGFloat = 16
   
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
+  ///**UI**
+  private lazy var insets = { UIEdgeInsets(top: self.padding*2,
+                                          left: self.padding,
+                                          bottom: self.padding,
+                                          right: self.padding) }()
+  private var currentConstraints = [NSLayoutConstraint]()
   private lazy var username: UILabel = {
     let instance = UILabel()
     instance.isUserInteractionEnabled = true
@@ -238,24 +233,25 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     
     return instance
   }()
-  private lazy var userView: UIView = {
-    let instance = UIView()
-    instance.clipsToBounds = false
-    instance.backgroundColor = .clear
-    instance.accessibilityIdentifier = "userView"
-    instance.addSubview(avatar)
-    
-    avatar.translatesAutoresizingMaskIntoConstraints = false
-    
-    NSLayoutConstraint.activate([
-      avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 4),
-      avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-      avatar.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -4),
-    ])
-    
-    return instance
-  }()
-  private lazy var verticalStack: UIStackView = {
+//  private lazy var userView: UIView = {
+//    let instance = UIView()
+//    instance.clipsToBounds = false
+//    instance.backgroundColor = .clear
+//    instance.accessibilityIdentifier = "userView"
+////    instance.translatesAutoresizingMaskIntoConstraints = false
+//    instance.addSubview(avatar)
+//
+//    avatar.translatesAutoresizingMaskIntoConstraints = false
+//
+//    NSLayoutConstraint.activate([
+//      avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 4),
+//      avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+//      avatar.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -4),
+//    ])
+//
+//    return instance
+//  }()
+  private lazy var stack: UIStackView = {
     let nested = UIStackView(arrangedSubviews: [
       genderButton,
       ageButton
@@ -265,25 +261,30 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     nested.spacing = padding
 //    nested.distribution = .fillEqually
     
+    let opaque = UIView.opaque()
+//    opaque.translatesAutoresizingMaskIntoConstraints = false
+    opaque.heightAnchor.constraint(equalToConstant: 200).isActive = true
+    avatar.placeInCenter(of: opaque, topInset: 4, bottomInset: 4)
+    
     
     let instance = UIStackView(arrangedSubviews: [
-      userView,
+      opaque,
       username,
       nested
     ])
     instance.axis = .vertical
     instance.alignment = .center
-    instance.clipsToBounds = false
+//    instance.clipsToBounds = false
     instance.spacing = padding
     
-    userView.translatesAutoresizingMaskIntoConstraints = false
-    username.translatesAutoresizingMaskIntoConstraints = false
+//    userView.translatesAutoresizingMaskIntoConstraints = false
+//    username.translatesAutoresizingMaskIntoConstraints = false
     
-    NSLayoutConstraint.activate([
-      userView.widthAnchor.constraint(equalTo: instance.widthAnchor),
-      userView.heightAnchor.constraint(equalToConstant: 200),
-      username.widthAnchor.constraint(equalTo: instance.widthAnchor),
-    ])
+//    NSLayoutConstraint.activate([
+//      userView.widthAnchor.constraint(equalTo: instance.widthAnchor),
+//      userView.heightAnchor.constraint(equalToConstant: 200),
+//      username.widthAnchor.constraint(equalTo: instance.widthAnchor),
+//    ])
     
     return instance
   }()
@@ -406,6 +407,22 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
     previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
   }
+  
+  
+  
+  // MARK: - Public methods
+  public func setInsets(_ insets: UIEdgeInsets) {
+    self.insets = insets
+
+    setupUI()
+  }
+  
+  public func setPadding(_ padding: CGFloat) {
+    self.insets = .zero
+    self.padding = padding
+    
+    setupUI()
+  }
 }
 
 // MARK: - Private
@@ -413,43 +430,26 @@ private extension UserSettingsCredentialsCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
-    clipsToBounds = true
-    
-//    verticalStack.place(inside: self)
-    
-    contentView.addSubview(verticalStack)
-    contentView.translatesAutoresizingMaskIntoConstraints = false
-    verticalStack.translatesAutoresizingMaskIntoConstraints = false
-    
-    NSLayoutConstraint.activate([
-      contentView.topAnchor.constraint(equalTo: topAnchor),
-      contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
-      verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-      verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-    ])
-    
-    let constraint = verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding*2)
-    constraint.priority = .defaultLow
-    constraint.identifier = "bottomAnchor"
-    constraint.isActive = true
+//    stack.removeConstraints(currentConstraints)
+//    stack.removeFromSuperview()
+    currentConstraints = stack.place(inside: self,
+                        insets: insets == .zero ? .uniform(size: padding) : insets,
+                        bottomPriority: .defaultLow)
   }
   
   @MainActor
   func updateUI() {
-    verticalStack.removeFromSuperview()
-
-    guard let insets = insets else {
-      verticalStack.place(inside: self,
-                          insets: .uniform(size: padding),
-                          bottomPriority: .defaultLow)
-      return
-    }
-    verticalStack.place(inside: self,
-                        insets: insets,
-                        bottomPriority: .defaultLow)
+//    stack.removeFromSuperview()
+//
+//    guard let insets = insets else {
+//      stack.place(inside: self,
+//                          insets: .uniform(size: padding),
+//                          bottomPriority: .defaultLow)
+//      return
+//    }
+//    stack.place(inside: self,
+//                        insets: insets,
+//                        bottomPriority: .defaultLow)
   }
   
   func setTasks() {

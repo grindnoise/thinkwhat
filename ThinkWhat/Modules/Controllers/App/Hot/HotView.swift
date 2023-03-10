@@ -27,7 +27,8 @@ class HotView: UIView {
     }
   }
   public var currentSurvey: Survey? {
-    guard let hotCard = current as? HotCard else { return nil }
+    guard let hotCard = current as? HotCard else {
+      return nil }
     
     return hotCard.item
   }
@@ -47,6 +48,7 @@ class HotView: UIView {
       if let hotCard = incoming as? HotCard {
         hotCard.$action
           .filter { !$0.isNil }
+//          .throttle(for: .seconds(0.75), scheduler: DispatchQueue.main, latest: false)
           .sink { [unowned self] action in
             switch action {
             case .Vote:
@@ -113,6 +115,84 @@ class HotView: UIView {
   
   
   // MARK: - Public methods
+  func next(_ survey: Survey?) {
+    guard let viewInput = viewInput else { return }
+    
+    func push(_ instance: Survey?) {
+      guard let instance = instance else {
+        self.current = nil
+        
+        return
+      }
+
+      incoming = HotCard(item: instance, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance.topic.tagColor)
+      current = self.incoming
+      incoming?.placeXCentered(inside: self,
+                               topInset: viewInput.navBarHeight + statusBarFrame.height + padding,
+                               size: CGSize(width: bounds.width - padding*2,
+                                            height: bounds.height - (viewInput.navBarHeight + statusBarFrame.height + viewInput.tabBarHeight + padding*2)))
+
+      guard let constraint = incoming?.getConstraint(identifier: "centerXAnchor" ) else { return }
+      
+      setNeedsLayout()
+      layoutIfNeeded()
+      
+      setNeedsLayout()
+      constraint.constant += incoming!.bounds.width + padding*2
+      layoutIfNeeded()
+      
+      incoming?.transform = .init(scaleX: 0.75, y: 0.75)
+      
+      UIView.animate(
+        withDuration: 0.5,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [unowned self] in
+          self.setNeedsLayout()
+          constraint.constant = .zero
+          self.layoutIfNeeded()
+          self.incoming?.transform = .identity
+        }) { [unowned self] _ in
+//          self.current = self.incoming
+          self.incoming = nil
+//          delayAsync(delay: 3) { [unowned self] in
+//            self.outgoing = current
+//            pop(self.outgoing!)
+//          }
+        }
+    }
+    
+    func pop(_ instance: Card) {
+      guard let constraint = instance.getConstraint(identifier: "centerXAnchor") else { return }
+      
+      UIView.animate(
+        withDuration: 0.5,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [unowned self] in
+          self.setNeedsLayout()
+          constraint.constant -= instance.bounds.width + self.padding*2
+          instance.transform = .init(scaleX: 0.75, y: 0.75)
+          instance.alpha = 0
+          self.layoutIfNeeded()
+        }) { [unowned self] _ in
+          self.outgoing = nil
+          instance.removeFromSuperview()
+        }
+    }
+    
+    ///**Pop outgoing**
+    if let current = current {
+      outgoing = current
+      self.current = nil
+      pop(outgoing!)
+    }
+    push(survey)
+  }
   
   
   
@@ -145,85 +225,6 @@ private extension HotView {
       .delay(for: .seconds(1), scheduler: DispatchQueue.main)
       .sink { [unowned self] _ in (self.current as! HotCard).setBanned() { [unowned self] in self.next(self.viewInput?.deque()) } }
       .store(in: &subscriptions)
-  }
-  
-  func next(_ survey: Survey?) {
-    guard let viewInput = viewInput else { return }
-    
-    func push(_ instance: Survey?) {
-      guard let instance = instance else {
-        
-        
-        return
-      }
-      
-      incoming = HotCard(item: instance, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance.topic.tagColor)
-      incoming?.placeXCentered(inside: self,
-                               topInset: viewInput.navBarHeight + statusBarFrame.height + padding,
-                               size: CGSize(width: bounds.width - padding*2,
-                                            height: bounds.height - (viewInput.navBarHeight + statusBarFrame.height + viewInput.tabBarHeight + padding*2)))
-
-      guard let constraint = incoming?.getConstraint(identifier: "centerXAnchor" ) else { return }
-      
-      setNeedsLayout()
-      layoutIfNeeded()
-      
-      setNeedsLayout()
-      constraint.constant += incoming!.bounds.width + padding*2
-      layoutIfNeeded()
-      
-      incoming?.transform = .init(scaleX: 0.75, y: 0.75)
-      
-      UIView.animate(
-        withDuration: 0.5,
-        delay: 0,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [unowned self] in
-          self.setNeedsLayout()
-          constraint.constant = .zero
-          self.layoutIfNeeded()
-          self.incoming?.transform = .identity
-        }) { [unowned self] _ in
-          self.current = self.incoming
-          self.incoming = nil
-//          delayAsync(delay: 3) { [unowned self] in
-//            self.outgoing = current
-//            pop(self.outgoing!)
-//          }
-        }
-    }
-    
-    func pop(_ instance: Card) {
-      guard let constraint = instance.getConstraint(identifier: "centerXAnchor") else { return }
-      
-      current = nil
-      
-      UIView.animate(
-        withDuration: 0.5,
-        delay: 0,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [unowned self] in
-          self.setNeedsLayout()
-          constraint.constant -= instance.bounds.width + self.padding*2
-          instance.transform = .init(scaleX: 0.75, y: 0.75)
-          instance.alpha = 0
-          self.layoutIfNeeded()
-        }) { [unowned self] _ in
-          self.outgoing = nil
-          instance.removeFromSuperview()
-        }
-    }
-    
-    ///**Pop outgoing**
-    if let current = current {
-      outgoing = current
-      pop(outgoing!)
-    }
-    push(survey)
   }
 }
 
