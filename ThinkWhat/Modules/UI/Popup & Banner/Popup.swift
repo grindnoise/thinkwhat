@@ -333,7 +333,7 @@ class NewPopup: UIView {
           guard let self = self else { return }
           
           instance.layer.shadowPath = UIBezierPath(roundedRect: $0,
-                                                   cornerRadius: $0.width*0.025).cgPath
+                                                   cornerRadius: $0.width*0.05).cgPath
         }
         .store(in: &subscriptions)
     }
@@ -347,7 +347,7 @@ class NewPopup: UIView {
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
       .filter { $0 != .zero }
-      .sink { instance.cornerRadius = $0.width*0.025 }
+      .sink { instance.cornerRadius = $0.width*0.05 }
       .store(in: &subscriptions)
     
     return instance
@@ -370,7 +370,7 @@ class NewPopup: UIView {
   
   // MARK: - Initialization
   init(contentView: UIView? = nil,
-       padding: CGFloat = 8,
+       padding: CGFloat = 16,
        contentPadding: UIEdgeInsets = .uniform(size: 8),
        isModal: Bool = true,
        useContentViewHeight: Bool = true,

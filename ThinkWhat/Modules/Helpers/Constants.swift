@@ -34,6 +34,10 @@ let dateFormatter: DateFormatter = {
     return formatter
 } ()
 
+func replaceWithExisting<T>(_ source: [T], _ elements: [T]) -> [T] where T: Equatable {
+  elements.reduce(into: [T]()) { result, instance in result.append(source.filter({ $0 == instance }).first ?? instance) }
+}
+
 func delay(seconds: Double, completion:@escaping ()->()) {
     let popTime = DispatchTime.now() + Double(Int64( Double(NSEC_PER_SEC) * seconds )) / Double(NSEC_PER_SEC)
     

@@ -34,7 +34,7 @@ class SubscriptionsView: UIView {
       }
     }
   }
-  
+  public private(set) var isCardOnScreen = false
   
   
   // MARK: - Private properties
@@ -60,6 +60,8 @@ class SubscriptionsView: UIView {
     didSet {
       guard let userprofile = userprofile else { return }
       
+//      assert(userprofile == Userprofiles.shared.current)
+//      setTasks()
       viewInput?.toggleUserSelected(true)
       viewInput?.setUserprofileFilter(userprofile)
       surveysCollectionView.userprofile = userprofile
@@ -377,6 +379,7 @@ class SubscriptionsView: UIView {
       }
       .store(in: &subscriptions)
     
+    ///If zero subscriptions -> show info label
     instance.dataItemsCountPublisher
       .sink { [weak self] in
         guard let self = self,
@@ -384,18 +387,15 @@ class SubscriptionsView: UIView {
         else { return }
         
         self.viewInput?.onSubcriptionsCountEvent(zeroSubscriptions: isEmpty)
-        switch isEmpty {
-        case true:
-          self.subscriptionsLabel.addEquallyTo(to: self.topView)
-          UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
-            self.subscriptionsLabel.alpha = 1
-          }
-        case false:
-          UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
-            self.subscriptionsLabel.alpha = 0
-          }) { _ in
-            self.subscriptionsLabel.removeFromSuperview()
-          }
+        self.subscriptionsLabel.addEquallyTo(to: self.topView)
+        if isEmpty { self.subscriptionsLabel.addEquallyTo(to: self.topView) }
+        
+        UIView.animate(withDuration: 0.2) {
+          self.subscriptionsLabel.alpha =  isEmpty ? 1 : 0
+          self.shadowView.alpha = isEmpty ? 0 : 1
+          self.filterView.alpha = isEmpty ? 0 : 1
+        } completion: { _ in
+          if !isEmpty { self.subscriptionsLabel.removeFromSuperview() }
         }
       }
       .store(in: &subscriptions)
@@ -725,14 +725,14 @@ class SubscriptionsView: UIView {
 
 private extension SubscriptionsView {
   func setTasks() {
-    //Subscription events
-    tasks.append( Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
-        guard let self = self,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let owner = dict.keys.first,
-              owner == Userprofiles.shared.current,
-              let userprofile = dict.values.first,
+    guard let userprofile = Userprofiles.shared.current else { return }
+    ///Subscription events
+    userprofile.subscriptionsRemovePublisher
+      .filter { !$0.isEmpty }
+      .receive(on: DispatchQueue.main)
+      .sink(receiveCompletion: { _ in },
+            receiveValue: { [unowned self] in
+        guard let unsubscribed = $0.first,
               let viewInput = self.viewInput
         else { return }
         
@@ -749,34 +749,47 @@ private extension SubscriptionsView {
             indicator.removeFromSuperview()
             imageView.tintColor = .systemRed
           }
-          delayAsync(delay: 0.45) {
-            self.feedCollectionView.removeItem(userprofile)
-          }
-          //                    self.setDefaultFilter { [unowned self] in
-          //
-          //                        self.subscriptionButton.isUserInteractionEnabled = true
-          //                        self.viewInput?.setDefaultMode()
-          //                        if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
-          //                            self.subscriptionButton.configuration!.showsActivityIndicator = false
-          //                        } else {
-          //                            guard let imageView = self.subscriptionButton.imageView,
-          //                                  let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
-          //                            else { return }
-          //
-          //                            indicator.removeFromSuperview()
-          //                            imageView.tintColor = .systemRed
-          //                        }
-          //                        delayAsync(delay: 0.45) {
-          //                            self.feedCollectionView.removeItem(userprofile)
-          //                        }
-          //                    }
+          delayAsync(delay: 0.45) { [unowned self] in self.feedCollectionView.removeItem(unsubscribed) }
         } else {
-          self.feedCollectionView.removeItem(userprofile)
+          self.feedCollectionView.removeItem(unsubscribed)
           self.feedCollectionView.alpha = 1
           self.userView.alpha = 0
         }
-      }
-    })
+      })
+      .store(in: &subscriptions)
+    
+    
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+//        guard let self = self,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let owner = dict.keys.first,
+//              owner == Userprofiles.shared.current,
+//              let userprofile = dict.values.first,
+//              let viewInput = self.viewInput
+//        else { return }
+//
+//        if viewInput.isOnScreen {
+//          self.subscriptionButton.isUserInteractionEnabled = true
+//          self.viewInput?.setDefaultMode()
+//          if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
+//            self.subscriptionButton.configuration!.showsActivityIndicator = false
+//          } else {
+//            guard let imageView = self.subscriptionButton.imageView,
+//                  let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+//            else { return }
+//
+//            indicator.removeFromSuperview()
+//            imageView.tintColor = .systemRed
+//          }
+//          delayAsync(delay: 0.45) { self.feedCollectionView.removeItem(userprofile) }
+//        } else {
+//          self.feedCollectionView.removeItem(userprofile)
+//          self.feedCollectionView.alpha = 1
+//          self.userView.alpha = 0
+//        }
+//      }
+//    })
     
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
@@ -861,6 +874,7 @@ private extension SubscriptionsView {
     let constraint = filterView.heightAnchor.constraint(equalToConstant: filterViewHeight)
     constraint.identifier = "height"
     constraint.isActive = true
+    constraint.priority = .defaultLow
   }
   
   @MainActor
@@ -869,6 +883,7 @@ private extension SubscriptionsView {
       delayAsync(delay: 0.075) { [weak self] in
         guard let self = self else { return }
         
+        self.isCardOnScreen = true
         self.userStack.arrangedSubviews.enumerated().forEach { index, item in
           item.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
           
@@ -1165,8 +1180,9 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
         
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
           cell.avatar.alpha = 1
-        }) { _ in
+        }) { [unowned self] _ in
           temp.removeFromSuperview()
+          self.isCardOnScreen = false
           
           guard let completion = completion else { return }
           

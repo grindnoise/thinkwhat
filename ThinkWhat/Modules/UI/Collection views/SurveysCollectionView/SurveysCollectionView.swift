@@ -553,7 +553,8 @@ private extension SurveysCollectionView {
   }
   
   func setTasks() {
-    ///Survey claimed by user
+    ///**Delete items**
+    ///Survey claimed
     SurveyReferences.shared.claimedPublisher
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] in
@@ -562,6 +563,136 @@ private extension SurveysCollectionView {
         var snap = self.source.snapshot()
         snap.deleteItems([$0])
         self.source.apply(snap, animatingDifferences: true)
+      }
+      .store(in: &subscriptions)
+    ///
+    ///Survey banned
+    SurveyReferences.shared.bannedPublisher
+      .collect(.byTimeOrCount(DispatchQueue.main, .seconds(1), 10))
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in
+        var snap = self.source.snapshot()
+        let existingSet = Set(self.source.snapshot().itemIdentifiers)
+        let deletingSet = Set($0)
+        let crossingSet = existingSet.intersection(deletingSet)
+        
+        guard !crossingSet.isEmpty else { return }
+        
+        snap.deleteItems(Array(deletingSet))
+        self.source.apply(snap, animatingDifferences: true)
+      }
+      .store(in: &subscriptions)
+    ///
+    ///Survey rejected
+    SurveyReferences.shared.rejectedPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in
+        guard self.source.snapshot().itemIdentifiers.contains($0) else { return }
+        
+        var snap = self.source.snapshot()
+        snap.deleteItems([$0])
+        self.source.apply(snap, animatingDifferences: true)
+      }
+      .store(in: &subscriptions)
+    ///
+    ///Survey removed from watchlist
+    SurveyReferences.shared.unmarkedFavoritePublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in
+        guard self.source.snapshot().itemIdentifiers.contains($0) else { return }
+        
+        var snap = self.source.snapshot()
+        snap.deleteItems([$0])
+        self.source.apply(snap, animatingDifferences: true)
+      }
+      .store(in: &subscriptions)
+    ///
+    ///Unsubscribed
+    Userprofiles.shared.unsubscribedPublisher
+      .filter { [weak self] _ in
+        guard let self = self,
+              self.category == .Subscriptions
+        else { return false }
+        
+        return true
+      }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] unsubscribed in
+        var snap = self.source.snapshot()
+        let itemsToDelete = snap.itemIdentifiers.filter { $0.owner == unsubscribed }
+        snap.deleteItems(itemsToDelete)
+        self.source.apply(snap, animatingDifferences: true)
+      }
+      .store(in: &subscriptions)
+    
+    ///**Append items**
+    SurveyReferences.shared.instancesPublisher
+      .eraseToAnyPublisher()
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] instances in
+        guard !instances.isEmpty else {
+          delayAsync(delay: 0.5) { [weak self] in
+            guard let self = self else { return }
+            
+            self.refreshControl?.endRefreshing()
+            self.isLoading = false
+          }
+          return
+        }
+        
+        var snap = self.source.snapshot()
+        let existingSet = Set(snap.itemIdentifiers)
+        var appendingSet = Set<SurveyReference>()
+        
+        switch self.category {
+        case .New:            appendingSet = Set(instances.filter { $0.isNew && !$0.isBanned && !$0.isClaimed })//!$0.isRejected &&
+        case .Top:            appendingSet = Set(instances.filter { $0.isTop && !$0.isBanned && !$0.isClaimed })//!$0.isRejected &&
+        case .Own:            appendingSet = Set(instances.filter { $0.isOwn && !$0.isBanned })
+        case .Favorite:       appendingSet = Set(instances.filter { $0.isFavorite && !$0.isBanned && !$0.isClaimed })
+        case .Subscriptions:  appendingSet = Set(instances.filter { $0.owner.subscribedAt && !$0.isBanned && !$0.isClaimed })
+        case .Topic:
+          guard let topic = self.topic else { return }
+          
+          appendingSet = Set(instances.filter { $0.topic == topic && !$0.isBanned && !$0.isClaimed })
+        case .ByOwner:
+          guard let userprofile = self.userprofile else { return }
+          
+          appendingSet = Set(instances.filter { $0.owner == userprofile && !$0.isBanned && !$0.isClaimed })
+        default: print("") }
+        
+        let filteredByPeriod = appendingSet.filter({ $0.isValid(byBeriod: self.period) })
+      
+        if existingSet.isEmpty {
+          snap.appendItems(Array(filteredByPeriod).sorted { $0.startDate > $1.startDate },
+                           toSection: .main)
+        } else {
+          snap.appendItems(Array(filteredByPeriod.subtracting(existingSet)).sorted { $0.startDate > $1.startDate },
+                           toSection: .main)
+        }
+        
+        self.source.apply(snap, animatingDifferences: true) { [weak self] in
+          guard let self = self else { return }
+          
+          self.isLoading = false
+        }
+      }
+      .store(in: &subscriptions)
+    ///Subscribed for user
+    Userprofiles.shared.newSubscriptionPublisher
+      .filter { [weak self] in
+        guard let self = self,
+              self.category == .Subscriptions,
+              !$0.isBanned
+        else { return false }
+        
+        return true
+      }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] newSubscription in
+        var snap = self.source.snapshot()
+        let existingSet = Set(snap.itemIdentifiers)
+        var appendingSet = Set(newSubscription.surveys.filter { $0.owner.subscribedAt && !$0.isBanned && !$0.isClaimed })
+        
       }
       .store(in: &subscriptions)
     
@@ -596,6 +727,7 @@ private extension SurveysCollectionView {
     //      }
     //      .store(in: &subscriptions)
     
+    ///If bottom spinner is on screen more than n seconds, then hide it
     Timer.publish(every: 8, on: .main, in: .common)
       .autoconnect()
       .sink { [weak self] _ in
@@ -614,330 +746,27 @@ private extension SurveysCollectionView {
       }
       .store(in: &subscriptions)
     
-    ///Empty received
-    SurveyReferences.shared.instancesPublisher
-      .sink { [weak self] instances in
-        guard let self = self else { return }
-        
-        if instances.isEmpty {
-          delayAsync(delay: 0.5) { [weak self] in
-            guard let self = self else { return }
-            
-            self.refreshControl?.endRefreshing()
-            self.isLoading = false
-          }
-        }
-      }
-      .store(in: &subscriptions)
-    
-    ///Surveys by topic received
-    SurveyReferences.shared.instancesByTopicPublisher
-      .sink { [weak self] instances in
-        guard let self = self,
-              self.category == .Topic
-        else { return }
-        
-        let snapshot = self.source.snapshot()
-        let currentSet = Set(snapshot.itemIdentifiers)
-        let appendingSet = Set(instances)
-        
-        let difference = Array(appendingSet.symmetricDifference(currentSet))
-        
-        guard difference.isEmpty else { return }
-        
-        ///Check by `period` filter
-        let appendingArray: [SurveyReference] = difference.filter({ $0.isValid(byBeriod: self.period) })
-        
-        var snap = self.source.snapshot()
-        snap.appendItems(appendingArray, toSection: .main)
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.isLoading = false
-        }
-      }
-      .store(in: &subscriptions)
-    
-    //Survey banned on server
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Ban) {
-        guard let self = self,
-              let instance = notification.object as? SurveyReference,
-              self.source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-        
-        var snap = self.source.snapshot()
-        snap.deleteItems([instance])
-        self.source.apply(snap, animatingDifferences: true)
-        //                    await MainActor.run { self.source.apply(snap, animatingDifferences: true) }
-      }
-    })
     
     
-    //Subscriptions added
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SubscriptionAppend) {
-        guard let self = self,
-              self.category == .Subscriptions,
-              let instance = notification.object as? SurveyReference,
-              !self.source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-        
-        //Check by date filter
-        guard instance.isValid(byBeriod: self.period) else {
-          return
-        }
-        
-        var snap = self.source.snapshot()
-        snap.appendItems([instance], toSection: .main)
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.isLoading = false
-        }
-      }
-    })
-    
-    //By userprofile added
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.AppendReference) {
-        guard let self = self,
-              self.category == .ByOwner,
-              let userprofile = self.userprofile,
-              let instance = notification.object as? SurveyReference,
-              instance.owner == userprofile,
-              !self.source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-        
-        //Check by date filter
-        guard instance.isValid(byBeriod: self.period) else {
-          return
-        }
-        
-        var snap = self.source.snapshot()
-        snap.appendItems([instance], toSection: .main)
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.isLoading = false
-        }
-      }
-    })
-    
-    //By userprofile removed
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.RemoveReference) {
-        guard let self = self,
-              self.category == .ByOwner,
-              let userprofile = self.userprofile,
-              let instance = notification.object as? SurveyReference,
-              instance.owner == userprofile,
-              self.source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-        
-        var snap = self.source.snapshot()
-        snap.deleteItems([instance])
-        self.source.apply(snap, animatingDifferences: true)
-      }
-    })
-    
-    //New added
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.NewAppend) {
-        guard let self = self,
-              self.category == .New,
-              let instance = notification.object as? SurveyReference,
-              !self.source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-        
-        //        delayAsync(delay: 1) {[weak self] in
-        //          guard let self = self else { return }
-        
-        //          self.isLoading = false
-        //        }
-        //        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-        //          guard let self = self else { return }
-        //
-        //          self.isLoading = false
-        //        }
-        
-        //Check by date filter
-        guard instance.isValid(byBeriod: self.period) else {
-          return
-        }
-        
-        var snap = self.source.snapshot()
-        snap.appendItems([instance], toSection: .main)
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          //          delayAsync(delay: 0.3) { [weak self] in
-          //            guard let self = self else { return }
-          
-          self.isLoading = false
-          //          }
-        }
-      }
-    })
-    
-    //Top added
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopAppend) {
-        guard let self = self,
-              self.category == .Top,
-              let instance = notification.object as? SurveyReference,
-              !self.source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-        
-        //Check by date filter
-        guard instance.isValid(byBeriod: self.period) else {
-          return
-        }
-        
-        var snap = self.source.snapshot()
-        snap.appendItems([instance], toSection: .main)
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.isLoading = false
-        }
-      }
-    })
-    
-    //Own added
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.OwnAppend) {
-        guard let self = self,
-              self.category == .Own,
-              let instance = notification.object as? SurveyReference,
-              !self.source.snapshot().itemIdentifiers.contains(instance)
-        else { return }
-        
-        //Check by date filter
-        guard instance.isValid(byBeriod: self.period) else {
-          return
-        }
-        
-        var snap = self.source.snapshot()
-        snap.appendItems([instance], toSection: .main)
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.isLoading = false
-        }
-      }
-    })
-    
-    //Favorite added
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
-        guard let self = self,
-              self.category == .Favorite,
-              let instance = notification.object as? SurveyReference
-        else { return }
-        
-        //Check by date filter
-        guard instance.isValid(byBeriod: self.period) else {
-          return
-        }
-        
-        var snap = self.source.snapshot()
-        snap.appendItems([instance], toSection: .main)
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.isLoading = false
-        }
-      }
-    })
-    
-    //Favorite toggle
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteRemove) {
-        guard let self = self,
-              self.category == .Favorite,
-              let instance = notification.object as? SurveyReference
-        else { return }
-        
-        var snap = self.source.snapshot()
-        snap.deleteItems([instance])
-        self.source.apply(snap, animatingDifferences: true)
-      }
-    })
-    
-//    //Topic added
+//    //Subscribed at removed
 //    tasks.append(Task {@MainActor [weak self] in
-//      for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.TopicAppend) {
-//        guard let self = self else { return }
-//
-//        guard self.category == .Topic,
-//              let instance = notification.object as? SurveyReference,
-//              !self.source.snapshot().itemIdentifiers.contains(instance)
+//      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+//        guard let self = self,
+//              self.category == .Subscriptions,
+//              self.userprofile.isNil//Current user
 //        else { return }
 //
-//        //Check by date filter
-//        guard instance.isValid(byBeriod: self.period) else {
-//          return
-//        }
-//
-//        var snap = self.source.snapshot()
-//        snap.appendItems([instance], toSection: .main)
-//        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.isLoading = false
-//        }
+//        var snap = Snapshot()
+//        snap.appendSections([.main])//, .loader])
+//        snap.appendItems(self.dataItems)
+//        self.source.apply(snap)
+//        //Append, sort
+//        //                var snap = self.source.snapshot()
+//        //                let ownerSurveys = SurveyReferences.shared.all.filter({ $0.owner == owner })
+//        //                snap.deleteItems(ownerSurveys)
+//        //                self.source.apply(snap)
 //      }
 //    })
-    
-    //Subscribed at added
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
-        guard let self = self,
-              self.category == .Subscriptions,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              self.userprofile.isNil,//Current user
-              let userprofile = dict.values.first
-        else { return }
-        
-        //Append, sort
-        let snap = self.source.snapshot()
-        var items = snap.itemIdentifiers
-        let difference = SurveyReferences.shared.all
-          .filter({ $0.owner == userprofile })
-          .filter({ !items.contains($0) })
-        items += difference
-        
-        var newSnap = Snapshot()
-        newSnap.appendSections([.main])//, .loader])
-        newSnap.appendItems(self.filterByPeriod(items.uniqued().sorted { $0.startDate > $1.startDate }))
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.isLoading = false
-        }
-      }
-    })
-    
-    //Subscribed at removed
-    tasks.append(Task {@MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
-        guard let self = self,
-              self.category == .Subscriptions,
-              self.userprofile.isNil//Current user
-        else { return }
-        
-        var snap = Snapshot()
-        snap.appendSections([.main])//, .loader])
-        snap.appendItems(self.dataItems)
-        self.source.apply(snap)
-        //Append, sort
-        //                var snap = self.source.snapshot()
-        //                let ownerSurveys = SurveyReferences.shared.all.filter({ $0.owner == owner })
-        //                snap.deleteItems(ownerSurveys)
-        //                self.source.apply(snap)
-      }
-    })
   }
   
   @MainActor

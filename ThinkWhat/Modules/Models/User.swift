@@ -18,16 +18,20 @@ class Userprofiles {
     shouldImportUserDefaults = true
   }
   
-  open var all: [Userprofile] = [] {
+  var all: [Userprofile] = [] {
     didSet {
-      //Check for duplicates
-      guard let lastInstance = all.last else { return }
-      if !oldValue.filter({ $0 == lastInstance }).isEmpty {
-        all.remove(object: lastInstance)
+      guard !oldValue.isEmpty else {
+        instancesPublisher.send(all)
+        return
       }
+      
+      let existingSet = Set(oldValue)
+      let appendingSet = Set(all)
+      
+      ///Difference
+      instancesPublisher.send(Array(appendingSet.subtracting(existingSet)))
     }
   }
-  
   var current: Userprofile? {
     didSet {
       guard shouldImportUserDefaults, !current.isNil else { return }
@@ -35,9 +39,13 @@ class Userprofiles {
       UserDefaults.Profile.importData(from: current!)
     }
   }
+  ///**Publishers**
+  public let unsubscribedPublisher = PassthroughSubject<Userprofile, Never>()
+  public let instancesPublisher = PassthroughSubject<[Userprofile], Never>()
+  public let newSubscriptionPublisher = PassthroughSubject<Userprofile, Never>()
   
   class func updateUserData(_ json: JSON) throws {
-    guard !Userprofiles.shared.current.isNil,
+    guard let current = Userprofiles.shared.current,
           let subscribersTotal = json["subscribers_count"].int,
           let subscriptionsTotal = json["subscribed_at_count"].int,
           let publicationsTotal = json["own_surveys_count"].int,
@@ -54,15 +62,15 @@ class Userprofiles {
           let description = json["description"].string
     else { return }
     
-    Userprofiles.shared.current!.description = description
-    Userprofiles.shared.current!.subscribersTotal = subscribersTotal
-    Userprofiles.shared.current!.subscriptionsTotal = subscriptionsTotal
-    Userprofiles.shared.current!.publicationsTotal = publicationsTotal
-    Userprofiles.shared.current!.favoritesTotal = favoritesTotal
-    Userprofiles.shared.current!.completeTotal = completeTotal
-    Userprofiles.shared.current!.balance = balance
-    Userprofiles.shared.current!.isBanned = isBanned
-    Userprofiles.shared.current!.updatePreferences(top_preferences)
+    current.description = description
+    current.subscribersTotal = subscribersTotal
+    current.subscriptionsTotal = subscriptionsTotal
+    current.publicationsTotal = publicationsTotal
+    current.favoritesTotal = favoritesTotal
+    current.completeTotal = completeTotal
+    current.balance = balance
+    current.isBanned = isBanned
+    current.updatePreferences(top_preferences)
     UserDefaults.App.contentLanguages = locales
   
     var decoder: JSONDecoder!
@@ -72,15 +80,14 @@ class Userprofiles {
     
     do {
       decoder = JSONDecoder.withDateTimeDecodingStrategyFormatters()
-      Userprofiles.shared.current!.subscriptions = try decoder.decode([Userprofile].self, from: subscriptionsData)
-      Userprofiles.shared.current!.subscribers = try decoder.decode([Userprofile].self, from: subscribersData)
-    } catch {
-      throw AppError.server
-    }
-    
-    guard let city = try json["city"].rawData() as? Data else { return }
-    
-    Userprofiles.shared.current!.city = try decoder.decode(City.self, from: city)
+      let subscriptions = try decoder.decode([Userprofile].self, from: subscriptionsData)
+      let subscribers = try decoder.decode([Userprofile].self, from: subscribersData)
+      shared.append((subscriptions + subscribers).uniqued())
+    } catch { throw AppError.server }
+//
+//    guard let city = try json["city"].rawData() as? Data else { return }
+//
+//    Userprofiles.shared.current!.city = try decoder.decode(City.self, from: city)
   }
   
   //    func loadSubscribedFor(_ data: Data) {
@@ -108,6 +115,22 @@ class Userprofiles {
   //            subscribers.append(userprofile)
   //        }
   //    }
+  func append(_ instances: [Userprofile]) {
+    guard !instances.isEmpty else {
+      instancesPublisher.send([]);
+      return
+    }
+    
+    guard !all.isEmpty else { all.append(contentsOf: instances); return }
+    
+    let existingSet = Set(all)
+    let appendingSet = Set(replaceWithExisting(all, instances))
+    let difference = Array(appendingSet.subtracting(existingSet))
+    
+    guard !difference.isEmpty else { return }
+    
+    all.append(contentsOf: difference)
+  }
   
   public func eraseData() {
     current = nil
@@ -160,6 +183,7 @@ class Userprofile: Decodable {
          wasEdited                = "is_edited",
          balance                  = "credit",
          subscribedAt             = "subscribed_at",
+         subscribedToMe           = "subscribed_to_me",
          notifyOnPublication      = "notify_on_publication"
   }
   enum UserSurveyType {
@@ -277,15 +301,6 @@ class Userprofile: Decodable {
       compatibilityPublisher.send(compatibility)
     }
   }
-  
-  //Publishers
-  public let imagePublisher = PassthroughSubject<UIImage, Error>()
-  public let cityFetchPublisher = PassthroughSubject<[City], Error>()
-  public let compatibilityPublisher = PassthroughSubject<UserCompatibility, Error>()
-  public let subscribersAppendPublisher = PassthroughSubject<[Userprofile], Never>()
-  public let subscribersRemovePublisher = PassthroughSubject<[Userprofile], Never>()
-  public let subscriptionsPublisher = PassthroughSubject<[Userprofile], Error>()
-  
   var image: UIImage? {
     didSet {
       guard !image.isNil else { return }
@@ -387,75 +402,7 @@ class Userprofile: Decodable {
   var hashValue: Int {
     return ObjectIdentifier(self).hashValue
   }
-  var surveys: [SurveyReference]   = []
-  var subscriptions: [Userprofile] = [] {
-    didSet {
-      //Remove
-      if oldValue.count > subscriptions.count {
-        let oldSet = Set(oldValue)
-        let newSet = Set(subscriptions)
-        
-        let difference = oldSet.symmetricDifference(newSet)
-        difference.forEach {
-          NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsRemove, object: [self: $0])
-          //                    subscriptionsTotal -= 1
-        }
-      } else {
-        //Append
-        let oldSet = Set(oldValue)
-        let newSet = Set(subscriptions)
-        
-        let difference = newSet.symmetricDifference(oldSet)
-        difference.forEach {
-          guard oldValue.contains($0), let index = subscriptions.lastIndex(of: $0) else {
-            //Notify
-            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsAppend, object: [self: $0])
-            //                        subscriptionsTotal += 1
-            return
-          }
-          //Duplicate removal
-          subscriptions.remove(at: index)
-          NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsEmpty, object: self)
-        }
-      }
-    }
-  }
-  var subscribers: [Userprofile] = [] {
-    didSet {
-      //Remove
-      if oldValue.count > subscribers.count {
-        let oldSet = Set(oldValue)
-        let newSet = Set(subscribers)
-        
-        let difference = oldSet.symmetricDifference(newSet)
-        difference.forEach {
-          subscribersRemovePublisher.send([$0])
-//          NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersRemove, object: [self: $0])
-          //                    subscribersTotal -= 1
-        }
-      } else {
-        //Append
-        let oldSet = Set(oldValue)
-        let newSet = Set(subscribers)
-        
-        let difference = newSet.symmetricDifference(oldSet)
-        subscribersAppendPublisher.send(Array(difference))
-//        difference.forEach {
-//          guard oldValue.contains($0), let index = subscribers.lastIndex(of: $0) else {
-//            //Notify
-//            subscribersAppendPublisher.send([$0])
-////            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersAppend, object: [self: $0])
-//            //                        subscribersTotal += 1
-//            return
-//          }
-//          //Duplicate removal
-//          subscribers.remove(at: index)
-//          subscribersRemovePublisher.send([])
-////          NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersEmpty, object: self)
-//        }
-      }
-    }
-  }
+  var surveys: [SurveyReference] { Surveys.shared.all.filter { $0.owner == self && !$0.isBanned && !$0.isClaimed && !}}
   var favorites: [Date: [SurveyReference]]   = [:]
   var preferences: [[Topic: Int]] = [[:]] {
     didSet {
@@ -481,8 +428,6 @@ class Userprofile: Decodable {
     }
     return components.first!
   }
-  
-  //Store user choice
   var choices: [Survey: Answer] = [:]
   var hasSocialMedia: Bool {
     guard !facebookURL.isNil || !instagramURL.isNil || !tiktokURL.isNil else {
@@ -492,11 +437,20 @@ class Userprofile: Decodable {
   }
   var subscribedAt: Bool {
     didSet {
+      guard oldValue != subscribedAt,
+            let current = Userprofiles.shared.current
+      else { return }
+                                            
+      subscriptionFlagPublisher.send(subscribedAt)
+      Userprofiles.shared.newSubscriptionPublisher.send(self)
+      subscribedAt ? { current.subscriptionsPublisher.send([self]) }() : { current.subscriptionsRemovePublisher.send([self]) }()
+    }
+  }
+  var subscribedToMe: Bool {
+    didSet {
       guard oldValue != subscribedAt else { return }
-      //
-      //            ///Event emitted when user taps 'Subscribe/unsubscribe'
-      //            NotificationCenter.default.post(name: subscribedAt ? Notifications.Userprofiles.Subscribed : Notifications.Userprofiles.Unsubscribed,
-      //                                            object: self)
+      
+      
     }
   }
   var notifyOnPublication: Bool? {
@@ -508,9 +462,19 @@ class Userprofile: Decodable {
   }
   var isCurrent: Bool { Userprofiles.shared.current == self }
   var isAnonymous: Bool { Userprofile.anonymous == self }
+  var subscribers: [Userprofile] { Userprofiles.shared.all.filter { $0.subscribedToMe && !$0.isBanned }}
+  var subscriptions: [Userprofile] { Userprofiles.shared.all.filter { $0.subscribedAt && !$0.isBanned }}
   //    var contentLocales: [String] = []
   
-  //Publishers
+  ///**Publishers**
+  public let imagePublisher = PassthroughSubject<UIImage, Error>()
+  public let cityFetchPublisher = PassthroughSubject<[City], Error>()
+  public let compatibilityPublisher = PassthroughSubject<UserCompatibility, Error>()
+  public let subscriptionFlagPublisher = PassthroughSubject<Bool, Never>()
+  public let subscribersPublisher = PassthroughSubject<[Userprofile], Never>()
+  public let subscribersRemovePublisher = PassthroughSubject<[Userprofile], Never>()
+  public let subscriptionsPublisher = PassthroughSubject<[Userprofile], Error>()
+  public let subscriptionsRemovePublisher = PassthroughSubject<[Userprofile], Error>()
   public let votesReceivedTotalPublisher = PassthroughSubject<Int, Never>()
   public let commentsTotalPublisher = PassthroughSubject<Int, Never>()
   public let commentsReceivedTotalPublisher = PassthroughSubject<Int, Never>()
@@ -539,6 +503,7 @@ class Userprofile: Decodable {
     isBanned    = _isBanned
     dateJoined  = UserDefaults.Profile.dateJoined ?? Date(timeIntervalSinceReferenceDate: 1)
     subscribedAt = false
+    subscribedToMe = false
     imageURL    = UserDefaults.Profile.imageURL
     if let path = UserDefaults.Profile.imagePath, let _image = UIImage(contentsOfFile: path) {
       image = _image
@@ -582,6 +547,7 @@ class Userprofile: Decodable {
       wasEdited           = try container.decodeIfPresent(Bool.self, forKey: .wasEdited)
       isBanned            = try container.decode(Bool.self, forKey: .isBanned)
       subscribedAt        = try container.decode(Bool.self, forKey: .subscribedAt)
+      subscribedToMe      = try container.decode(Bool.self, forKey: .subscribedToMe)
       notifyOnPublication = try container.decodeIfPresent(Bool.self, forKey: .notifyOnPublication)
       gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
       ///City decoding
@@ -752,6 +718,34 @@ class Userprofile: Decodable {
 #endif
     }
   }
+//
+//  public func appendSubscriptions(_ instances: [Userprofile]) {
+//    guard !instances.isEmpty else { subscriptionsPublisher.send([]); return }
+//
+//    guard !subscriptions.isEmpty else { subscriptions.append(contentsOf: instances); return }
+//
+//    let existingSet = Set(subscriptions)
+//    let appendingSet = Set(replaceWithExisting(subscriptions, instances))
+//    let difference = Array(appendingSet.subtracting(existingSet))
+//
+//    guard !difference.isEmpty else { return }
+//
+//    subscriptions.append(contentsOf: difference)
+//  }
+//
+//  public func appendSubscribers(_ instances: [Userprofile]) {
+//    guard !instances.isEmpty else { subscribersPublisher.send([]); return }
+//
+//    guard !subscribers.isEmpty else { subscribers.append(contentsOf: instances); return }
+//
+//    let existingSet = Set(subscribers)
+//    let appendingSet = Set(replaceWithExisting(subscribers, instances))
+//    let difference = Array(appendingSet.subtracting(existingSet))
+//
+//    guard !difference.isEmpty else { return }
+//
+//    subscribers.append(contentsOf: difference)
+//  }
 }
 
 extension Userprofile: Hashable {

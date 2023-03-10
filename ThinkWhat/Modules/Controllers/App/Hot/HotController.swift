@@ -12,7 +12,7 @@ import Combine
 
 
 class HotController: UIViewController, TintColorable {
-
+  
   // MARK: - Public properties
   var controllerOutput: HotControllerOutput?
   var controllerInput: HotControllerInput?
@@ -29,6 +29,7 @@ class HotController: UIViewController, TintColorable {
   public private(set) var navBarHeight: CGFloat = .zero
   ///**Logic**
   public private(set) var queue = QueueArray<Survey>()
+  public var currentSurvey: Survey? { controllerOutput?.currentSurvey }
   
   
   
@@ -121,7 +122,18 @@ private extension HotController {
       .receive(on: DispatchQueue.main)
       .map { array in array.filter { $0.isHot && !$0.isRejected && !$0.isClaimed }}
       .sink { [unowned self] in self.queue.enqueue($0) }
-//      .sink { [unowned self] in if self.queue.enqueue($0) { self.controllerOutput?.peek(self.queue.dequeue()) }}
+      .store(in: &subscriptions)
+    
+    SurveyReferences.shared.bannedPublisher
+      .receive(on: DispatchQueue.main)
+      .filter { !$0.survey.isNil }
+      .sink { [unowned self] in self.queue.remove($0.survey!) }
+      .store(in: &subscriptions)
+    
+    Timer.publish(every: 5, on: .main, in: .common)
+      .autoconnect()
+      .filter { [unowned self] _ in self.isOnScreen }
+      .sink { [unowned self] _ in self.controllerInput?.updateData() }
       .store(in: &subscriptions)
     
     tasks.append(Task { @MainActor [weak self] in

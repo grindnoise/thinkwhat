@@ -50,28 +50,36 @@ extension HotModel: HotControllerInput {
     }
   }
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  func reject(_ survey: Survey) {
+  func updateData() {
+    guard let modelOutput = modelOutput else { return }
+    
     Task {
       do {
-        try await API.shared.surveys.reject(survey: survey)
+        try await API.shared.surveys.updateSurveyStats(  modelOutput.queue.elements.map { $0.reference } + [modelOutput.currentSurvey].reduce(into: [SurveyReference]()) { result, next in
+          guard let instance = next?.reference else { return }
+          
+          result.append(instance)
+        })
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif
         
+      }
+    }
+  }
+  
+  func reject(_ survey: Survey) {
+    guard let modelOutput = modelOutput else { return }
+    
+    Task {
+      do {
+        try await API.shared.surveys.reject(survey: survey,
+                                            requestHotExcept: modelOutput.queue.length <= minimumThreshold ? modelOutput.queue.elements : [])
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
       }
     }
   }

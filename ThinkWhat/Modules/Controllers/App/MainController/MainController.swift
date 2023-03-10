@@ -419,6 +419,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
 
 private extension MainController {
   func setTasks() {
+    guard let userprofile = Userprofiles.shared.current else { return }
+    
     //Subscription push notifications
     tasks.append(Task {@MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
@@ -438,15 +440,22 @@ private extension MainController {
           .store(in: &self.subscriptions)
       }
     })
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
-        guard let self = self,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let userprofile = dict.values.first
-        else { return }
+    
+    userprofile.subscriptionsPublisher
+      .filter { !$0.isEmpty }
+      .first()
+      .receive(on: DispatchQueue.main)
+      .sink(receiveCompletion: {
+        if case .failure(let error) = $0 {
+#if DEBUG
+          print(error)
+#endif
+        }
+      }, receiveValue: { [unowned self] in
+        guard let new = $0.first else { return }
         
         let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
-                                                                    userprofile: userprofile),
+                                                                    userprofile: new),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
@@ -454,17 +463,24 @@ private extension MainController {
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
-      }
-    })
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
-        guard let self = self,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let userprofile = dict.values.first
-        else { return }
+      })
+      .store(in: &subscriptions)
+    
+    userprofile.subscriptionsRemovePublisher
+      .filter { !$0.isEmpty }
+      .first()
+      .receive(on: DispatchQueue.main)
+      .sink(receiveCompletion: {
+        if case .failure(let error) = $0 {
+#if DEBUG
+          print(error)
+#endif
+        }
+      }, receiveValue: { [unowned self] in
+        guard let new = $0.first else { return }
         
-        let banner = NewBanner(contentView: UserBannerContentView(mode: .Unsubscribe,
-                                                                    userprofile: userprofile),
+        let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
+                                                                    userprofile: new),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
@@ -472,12 +488,50 @@ private extension MainController {
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
-      }
-    })
-    tasks.append(Task {@MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: Notifications.Surveys.FavoriteAppend) {
-        guard let self = self else { return }
-        
+      })
+      .store(in: &subscriptions)
+    
+//    tasks.append(Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
+//        guard let self = self,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let userprofile = dict.values.first
+//        else { return }
+//        
+//        let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
+//                                                                    userprofile: userprofile),
+//                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                               isModal: false,
+//                               useContentViewHeight: true,
+//                               shouldDismissAfter: 1)
+//        banner.didDisappearPublisher
+//          .sink { _ in banner.removeFromSuperview() }
+//          .store(in: &self.subscriptions)
+//      }
+//    })
+//    tasks.append(Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+//        guard let self = self,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let userprofile = dict.values.first
+//        else { return }
+//        
+//        let banner = NewBanner(contentView: UserBannerContentView(mode: .Unsubscribe,
+//                                                                    userprofile: userprofile),
+//                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                               isModal: false,
+//                               useContentViewHeight: true,
+//                               shouldDismissAfter: 1)
+//        banner.didDisappearPublisher
+//          .sink { _ in banner.removeFromSuperview() }
+//          .store(in: &self.subscriptions)
+//      }
+//    })
+    
+    ///Notify when survey is marked favorite
+    SurveyReferences.shared.markedFavoritePublisher
+      .receive(on: DispatchQueue.main)
+      .sink { _ in
         let banner = Banner(fadeBackground: false)
         banner.present(content: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
                                                   text: "watch_survey_notification",
@@ -487,7 +541,7 @@ private extension MainController {
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
       }
-    })
+      .store(in: &subscriptions)
   }
   
   func updateUserData() {

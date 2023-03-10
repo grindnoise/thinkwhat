@@ -105,8 +105,8 @@ class UserprofilesView: UIView {
         switch self.viewInput?.mode {
         case .Subscriptions:
           self.viewInput?.unsubscribe(from: $0)
-        case .Subscribers:
-          self.viewInput?.removeSubscribers($0)
+//        case .Subscribers:
+//          self.viewInput?.removeSubscribers($0)
         default:
           print("")
         }

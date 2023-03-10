@@ -38,11 +38,13 @@ class PollCollectionView: UICollectionView {
     }
   }
   
+  enum Mode { case Default, Preview }
+  
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
   
   // MARK: - Public properties
-  ///`Publishers`
+  ///**Publishers**
   public let profileTapPublisher = PassthroughSubject<Bool, Never>()
   public var imagePublisher = PassthroughSubject<Mediafile, Never>()
   public var webPublisher = PassthroughSubject<URL, Never>()
@@ -50,7 +52,6 @@ class PollCollectionView: UICollectionView {
   public let answerDeselectionPublisher = PassthroughSubject<Bool, Never>()
   public let isVotingSubscriber = PassthroughSubject<Bool, Never>()
   public let votersPublisher = PassthroughSubject<Answer, Never>()
-  ///`Comments`
   public var commentPublisher = PassthroughSubject<String, Never>()
   public var commentsUpdateStatsPublisher = PassthroughSubject<[Comment], Never>()
 //  public let commentsCellBoundsPublisher = PassthroughSubject<Bool, Never>()
@@ -60,28 +61,40 @@ class PollCollectionView: UICollectionView {
 //  public var commentClaimPublisher = PassthroughSubject<Comment, Never>()
   public var deletePublisher = PassthroughSubject<Comment, Never>()
   public var threadPublisher = PassthroughSubject<Comment, Never>()
-//  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
-  
+  //  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
+  ///**Logic**
+  public var mode: Mode {
+    didSet {
+      guard oldValue != mode else { return }
+      
+      modeChangePublisher.send(mode)
+    }
+  }
   
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  ///`Logic`
-  private weak var item: Survey?
+  ///**Publishers**
+  private var modeChangePublisher = CurrentValueSubject<Mode?, Never>(nil)
+  ///**Logic**
+  private let item: Survey
   private var source: Source!
   private var isFirstAnswerSelection = true
-  ///`UI`
+  ///**UI**
   private let padding: CGFloat = 8
   
   
   
   // MARK: - Initialization
-  init(item: Survey) {
+  init(item: Survey,
+       mode: Mode = .Default) {
+    self.mode = mode
+    self.item = item
+    
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     
-    self.item = item
     item.reference.isCompletePublisher
       .receive(on: DispatchQueue.main)
       .filter { $0 }
@@ -146,6 +159,14 @@ private extension PollCollectionView {
           self.profileTapPublisher.send(true)
         }
         .store(in: &self.subscriptions)
+      cell.mode = self.mode
+      
+      ///Animation for transition
+      self.modeChangePublisher
+        .receive(on: DispatchQueue.main)
+        .filter { !$0.isNil }
+        .sink { _ in cell.onModeChanged(mode: .Default) }
+        .store(in: &self.subscriptions)
     }
     
     //        let descriptionCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, AnyHashable> { [unowned self] cell, _, _ in
@@ -158,8 +179,6 @@ private extension PollCollectionView {
     //            cell.contentConfiguration = content
     //        }
     let descriptionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
-      guard let text = self.item?.detailsDescription else { return }
-      
       let paragraphStyle = NSMutableParagraphStyle()
       paragraphStyle.firstLineHeadIndent = 20
       paragraphStyle.paragraphSpacing = 20
@@ -173,8 +192,7 @@ private extension PollCollectionView {
         .foregroundColor: UIColor.label,
         .paragraphStyle: paragraphStyle
       ]
-      cell.text = text
-      
+      cell.text = self.item.detailsDescription
       cell.boundsPublisher
         .eraseToAnyPublisher()
         .filter { $0 != .zero }
@@ -222,8 +240,6 @@ private extension PollCollectionView {
     }
     
     let questionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
-      guard let text = self.item?.question else { return }
-      
       let paragraphStyle = NSMutableParagraphStyle()
       paragraphStyle.firstLineHeadIndent = 20
       paragraphStyle.paragraphSpacing = 20
@@ -238,7 +254,7 @@ private extension PollCollectionView {
         .foregroundColor: UIColor.secondaryLabel,
         .paragraphStyle: paragraphStyle
       ]
-      cell.text = text
+      cell.text = self.item.question
       cell.boundsPublisher
         .sink { [unowned self] _ in self.source.refresh(animatingDifferences: false) }
         .store(in: &self.subscriptions)
@@ -463,8 +479,6 @@ private extension PollCollectionView {
   }
   
   func applySnapshot(animated: Bool = false) {
-    guard let item = item else { return }
-    
     var snapshot = Snapshot()
     snapshot.appendSections([.title, .description,])
     snapshot.appendItems([0], toSection: .title)

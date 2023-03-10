@@ -18,6 +18,7 @@ class UserCredentialsCell: UICollectionViewListCell {
       
       setupUI()
       updateUI()
+      setTasks()
     }
   }
   //Publishers
@@ -252,8 +253,6 @@ class UserCredentialsCell: UICollectionViewListCell {
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
-    
-    setTasks()
   }
   
   required init?(coder: NSCoder) {
@@ -309,32 +308,40 @@ private extension UserCredentialsCell {
   
   @MainActor
   func setTasks() {
-    //Subscription events
-    //Subscribed at added
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
-        guard let self = self,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let userprofile = dict.values.first,
-              self.userprofile == userprofile
-        else { return }
-        
-        self.toggleSubscription()
-      }
-    })
+    ///**Subscription events**
+    ///Subscribed at added
+    userprofile.subscriptionFlagPublisher
+      .receive(on: DispatchQueue.main )
+      .sink { [unowned self] _ in self.toggleSubscription() }
+      .store(in: &subscriptions)
     
-    //Subscribed at removed
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
-        guard let self = self,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let userprofile = dict.values.first,
-              self.userprofile == userprofile
-        else { return }
-        
-        self.toggleSubscription()
-      }
-    })
+    
+    
+    
+//    tasks.append(Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
+//        guard let self = self,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let userprofile = dict.values.first,
+//              self.userprofile == userprofile
+//        else { return }
+//
+//        self.toggleSubscription()
+//      }
+//    })
+//
+//    //Subscribed at removed
+//    tasks.append(Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+//        guard let self = self,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let userprofile = dict.values.first,
+//              self.userprofile == userprofile
+//        else { return }
+//
+//        self.toggleSubscription()
+//      }
+//    })
     
     //Subscription api error
     tasks.append(Task {@MainActor [weak self] in

@@ -25,7 +25,7 @@ protocol UserprofilesViewInput: AnyObject {
     func loadVoters(for: Answer)
     func subscribe(at: [Userprofile])
     func unsubscribe(from: [Userprofile])
-    func removeSubscribers(_: [Userprofile])
+//    func removeSubscribers(_: [Userprofile])
     func onSelection(_: [Userprofile])
 }
 
@@ -40,7 +40,7 @@ protocol UserprofilesControllerInput: AnyObject {
     func loadVoters(for: Answer)
     func subscribe(at: [Userprofile])
     func unsubscribe(from: [Userprofile])
-    func removeSubscribers(_: [Userprofile])
+//    func removeSubscribers(_: [Userprofile])
 }
 
 /// *Model* returns the result to the *Controller*

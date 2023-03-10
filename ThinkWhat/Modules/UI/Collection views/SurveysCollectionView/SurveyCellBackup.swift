@@ -890,189 +890,189 @@ private extension SurveyCellBackup {
     
     func setTasks() {
 
-            tasks.append(Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
-                    await MainActor.run {
-                        guard let self = self,
-                              let item = self.item,
-                              let object = notification.object as? SurveyReference,
-                              item === object
-                        else { return }
-                        self.viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-                    }
-                }
-            })
-        
-            tasks.append(Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Rating) {
-                    await MainActor.run {
-                        guard let self = self,
-                              let item = self.item,
-                              let object = notification.object as? SurveyReference,
-                              item === object
-                        else { return }
-                        self.ratingLabel.text = String(describing: String(describing: item.rating))
-                    }
-                }
-            })
-        
-            tasks.append(Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
-                    await MainActor.run {
-                        guard let self = self,
-                              let item = self.item,
-                              let object = notification.object as? SurveyReference,
-                              item === object
-                        else { return }
-
-                        self.menuButton.menu = self.prepareMenu()
-
-                        switch item.isFavorite {
-                        case true:
-                            var stackView: UIStackView!
-                            if let _stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
-                                stackView = _stackView
-                            } else {
-                                stackView = UIStackView()
-                                stackView.spacing = 2
-                                stackView.backgroundColor = .clear
-                                stackView.accessibilityIdentifier = "marksStackView"
-                                stackView.publisher(for: \.bounds, options: .new)
-                                    .sink { rect in
-                                        
-                                        stackView.cornerRadius = rect.height/2.25
-                                    }
-                                    .store(in: &self.subscriptions)
-                                
-                                self.topicHorizontalStackView.addArrangedSubview(stackView)
-                            }
-                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isFavorite"}).isEmpty else { return }
-                            let container = UIView()
-                            container.backgroundColor = .clear
-                            container.accessibilityIdentifier = "isFavorite"
-                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-                            
-                            let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
-                            instance.contentMode = .scaleAspectFit
-                            instance.addEquallyTo(to: container)
-                            stackView.insertArrangedSubview(container,
-                                                            at: stackView.arrangedSubviews.isEmpty ? 0 : stackView.arrangedSubviews.count > 1 ? stackView.arrangedSubviews.count-1 : stackView.arrangedSubviews.count)
-                        case false:
-                            guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
-                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isFavorite" }).first else { return }
-                            stackView.removeArrangedSubview(mark)
-                            mark.removeFromSuperview()
-                        }
-                    }
-                }
-            })
-            tasks.append(Task { [weak self] in
-                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
-                    await MainActor.run {
-                        
-                        guard let self = self,
-                              let item = self.item,
-                              let object = notification.object as? SurveyReference,
-                              item === object
-                        else { return }
-
-                        self.menuButton.menu = self.prepareMenu()
-                        switch item.isComplete {
-                        case true:
-                            self.titleLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
-                            self.descriptionLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
-                            self.topicHorizontalStackView.insertArrangedSubview(self.progressView, at: 1)
-
-                            var stackView: UIStackView!
-                            if let _stackView = self.topicHorizontalStackView.getSubview(type: UIStackView.self, identifier: "marksStackView") {
-                                stackView = _stackView
-                            } else {
-                                stackView = UIStackView()
-                                stackView.spacing = 2
-                                stackView.backgroundColor = .clear
-                                stackView.accessibilityIdentifier = "marksStackView"
-                                stackView.publisher(for: \.bounds, options: .new)
-                                    .sink { rect in
-                                        
-                                        stackView.cornerRadius = rect.height/2.25
-                                }
-                                    .store(in: &self.subscriptions)
-                                
-                                self.topicHorizontalStackView.addArrangedSubview(stackView)
-                            }
-                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty else { return }
-                            let container = UIView()
-                            container.backgroundColor = .clear
-                            container.accessibilityIdentifier = "isComplete"
-                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-
-
-
-                            let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
-                            instance.contentMode = .center
-                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .white : self.item.topic.tagColor
-                            instance.contentMode = .scaleAspectFit
-                            instance.addEquallyTo(to: container)
-                            stackView.insertArrangedSubview(container, at: 0)
-                            
-                            instance.publisher(for: \.bounds, options: .new)
-                                .sink { rect in
-                                    
-                                    instance.cornerRadius = rect.height/2
-                                    let largeConfig = UIImage.SymbolConfiguration(pointSize: rect.height * 1.9, weight: .semibold, scale: .medium)
-                                    let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
-                                    instance.image = image
-                                }
-                                .store(in: &self.subscriptions)
-                            
-                        case false:
-                            guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
-                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isComplete" }).first else { return }
-                            stackView.removeArrangedSubview(mark)
-                            mark.removeFromSuperview()
-                        }
-                    }
-                }
-            })
-
 //            tasks.append(Task { [weak self] in
-//                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
+//                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Views) {
 //                    await MainActor.run {
 //                        guard let self = self,
 //                              let item = self.item,
 //                              let object = notification.object as? SurveyReference,
-//                              item === object,
-//                              let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
-//                              let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
-//                              let constraint = progressIndicator.getConstraint(identifier: "width")
+//                              item === object
+//                        else { return }
+//                        self.viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
+//                    }
+//                }
+//            })
+//
+//            tasks.append(Task { [weak self] in
+//                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Rating) {
+//                    await MainActor.run {
+//                        guard let self = self,
+//                              let item = self.item,
+//                              let object = notification.object as? SurveyReference,
+//                              item === object
+//                        else { return }
+//                        self.ratingLabel.text = String(describing: String(describing: item.rating))
+//                    }
+//                }
+//            })
+//
+//            tasks.append(Task { [weak self] in
+//                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
+//                    await MainActor.run {
+//                        guard let self = self,
+//                              let item = self.item,
+//                              let object = notification.object as? SurveyReference,
+//                              item === object
 //                        else { return }
 //
-//                        progressLabel.text = String(describing: item.progress) + "%"
-//                        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
-//                            self.progressView.setNeedsLayout()
-//                            constraint.constant = constraint.constant * CGFloat(item.progress)/100
-//                            self.progressView.layoutIfNeeded()
+//                        self.menuButton.menu = self.prepareMenu()
+//
+//                        switch item.isFavorite {
+//                        case true:
+//                            var stackView: UIStackView!
+//                            if let _stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first {
+//                                stackView = _stackView
+//                            } else {
+//                                stackView = UIStackView()
+//                                stackView.spacing = 2
+//                                stackView.backgroundColor = .clear
+//                                stackView.accessibilityIdentifier = "marksStackView"
+//                                stackView.publisher(for: \.bounds, options: .new)
+//                                    .sink { rect in
+//
+//                                        stackView.cornerRadius = rect.height/2.25
+//                                    }
+//                                    .store(in: &self.subscriptions)
+//
+//                                self.topicHorizontalStackView.addArrangedSubview(stackView)
+//                            }
+//                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isFavorite"}).isEmpty else { return }
+//                            let container = UIView()
+//                            container.backgroundColor = .clear
+//                            container.accessibilityIdentifier = "isFavorite"
+//                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+//
+//                            let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
+//                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+//                            instance.contentMode = .scaleAspectFit
+//                            instance.addEquallyTo(to: container)
+//                            stackView.insertArrangedSubview(container,
+//                                                            at: stackView.arrangedSubviews.isEmpty ? 0 : stackView.arrangedSubviews.count > 1 ? stackView.arrangedSubviews.count-1 : stackView.arrangedSubviews.count)
+//                        case false:
+//                            guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
+//                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isFavorite" }).first else { return }
+//                            stackView.removeArrangedSubview(mark)
+//                            mark.removeFromSuperview()
 //                        }
 //                    }
 //                }
 //            })
-
-        tasks.append(Task { [weak self] in
-            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {
-                await MainActor.run {
-                    guard let self = self,
-                          let item = self.item,
-                          let object = notification.object as? SurveyReference,
-                          item === object
-                    else { return }
-                    
-                    self.commentsView.alpha = 1
-                    self.commentsLabel.alpha = 1
-                    self.commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
-                }
-            }
-        })
+//            tasks.append(Task { [weak self] in
+//                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
+//                    await MainActor.run {
+//
+//                        guard let self = self,
+//                              let item = self.item,
+//                              let object = notification.object as? SurveyReference,
+//                              item === object
+//                        else { return }
+//
+//                        self.menuButton.menu = self.prepareMenu()
+//                        switch item.isComplete {
+//                        case true:
+//                            self.titleLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+//                            self.descriptionLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+//                            self.topicHorizontalStackView.insertArrangedSubview(self.progressView, at: 1)
+//
+//                            var stackView: UIStackView!
+//                            if let _stackView = self.topicHorizontalStackView.getSubview(type: UIStackView.self, identifier: "marksStackView") {
+//                                stackView = _stackView
+//                            } else {
+//                                stackView = UIStackView()
+//                                stackView.spacing = 2
+//                                stackView.backgroundColor = .clear
+//                                stackView.accessibilityIdentifier = "marksStackView"
+//                                stackView.publisher(for: \.bounds, options: .new)
+//                                    .sink { rect in
+//
+//                                        stackView.cornerRadius = rect.height/2.25
+//                                }
+//                                    .store(in: &self.subscriptions)
+//
+//                                self.topicHorizontalStackView.addArrangedSubview(stackView)
+//                            }
+//                            guard stackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty else { return }
+//                            let container = UIView()
+//                            container.backgroundColor = .clear
+//                            container.accessibilityIdentifier = "isComplete"
+//                            container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
+//
+//
+//
+//                            let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
+//                            instance.contentMode = .center
+//                            instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .white : self.item.topic.tagColor
+//                            instance.contentMode = .scaleAspectFit
+//                            instance.addEquallyTo(to: container)
+//                            stackView.insertArrangedSubview(container, at: 0)
+//
+//                            instance.publisher(for: \.bounds, options: .new)
+//                                .sink { rect in
+//
+//                                    instance.cornerRadius = rect.height/2
+//                                    let largeConfig = UIImage.SymbolConfiguration(pointSize: rect.height * 1.9, weight: .semibold, scale: .medium)
+//                                    let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
+//                                    instance.image = image
+//                                }
+//                                .store(in: &self.subscriptions)
+//
+//                        case false:
+//                            guard let stackView = self.topicHorizontalStackView.get(all: UIStackView.self).filter({ $0.accessibilityIdentifier == "marksStackView" }).first,
+//                                  let mark = stackView.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "isComplete" }).first else { return }
+//                            stackView.removeArrangedSubview(mark)
+//                            mark.removeFromSuperview()
+//                        }
+//                    }
+//                }
+//            })
+//
+////            tasks.append(Task { [weak self] in
+////                for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
+////                    await MainActor.run {
+////                        guard let self = self,
+////                              let item = self.item,
+////                              let object = notification.object as? SurveyReference,
+////                              item === object,
+////                              let progressIndicator = self.progressView.getSubview(type: UIView.self, identifier: "progress"),
+////                              let progressLabel = self.progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
+////                              let constraint = progressIndicator.getConstraint(identifier: "width")
+////                        else { return }
+////
+////                        progressLabel.text = String(describing: item.progress) + "%"
+////                        let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) {
+////                            self.progressView.setNeedsLayout()
+////                            constraint.constant = constraint.constant * CGFloat(item.progress)/100
+////                            self.progressView.layoutIfNeeded()
+////                        }
+////                    }
+////                }
+////            })
+//
+//        tasks.append(Task { [weak self] in
+//            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.CommentsTotal) {
+//                await MainActor.run {
+//                    guard let self = self,
+//                          let item = self.item,
+//                          let object = notification.object as? SurveyReference,
+//                          item === object
+//                    else { return }
+//
+//                    self.commentsView.alpha = 1
+//                    self.commentsLabel.alpha = 1
+//                    self.commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
+//                }
+//            }
+//        })
     }
     
     func setProgress() {

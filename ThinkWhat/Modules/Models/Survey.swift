@@ -23,10 +23,10 @@ class Survey: Decodable {
         let referencesFromSurveys = Surveys.shared.hot.map { $0.reference }
         return (SurveyReferences.shared.all.filter { $0.isHot && !$0.isClaimed && !$0.isBanned && !$0.isRejected } + referencesFromSurveys).uniqued()
       case .New:
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned && $0.isRejected }.map { $0.reference }
-        return (SurveyReferences.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned && !$0.isRejected } + referencesFromSurveys).uniqued()
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned }.map { $0.reference }// && $0.isRejected
+        return (SurveyReferences.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
       case .Top:
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.isTop && !$0.isClaimed && !$0.isBanned && !$0.isRejected }.map { $0.reference }
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.isTop && !$0.isClaimed && !$0.isBanned && !$0.isRejected }.map { $0.reference }//&& !$0.isRejected
         return (SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .Own:
         let referencesFromSurveys = Surveys.shared.all.filter { $0.isOwn && !$0.isBanned }.map { $0.reference }
@@ -38,17 +38,17 @@ class Survey: Decodable {
         let referencesFromSurveys = Surveys.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned }.map { $0.reference }
         return (SurveyReferences.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .All:
-        let referencesFromSurveys = Surveys.shared.all.filter { !$0.isRejected && !$0.isClaimed && !$0.isBanned }.map { $0.reference }
-        return (SurveyReferences.shared.all.filter { !$0.isRejected && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
+        let referencesFromSurveys = Surveys.shared.all.filter { !$0.isClaimed && !$0.isBanned }.map { $0.reference }//&& !$0.isRejected
+        return (SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
       case .Topic:
         guard let topic = topic else { return [] }
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.topic == topic && !$0.isRejected && !$0.isClaimed && !$0.isBanned }.map { $0.reference }
-        return (SurveyReferences.shared.all.filter { $0.topic == topic && !$0.isRejected && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.topic == topic && !$0.isClaimed && !$0.isBanned }.map { $0.reference }//&& !$0.isRejected
+        return (SurveyReferences.shared.all.filter { $0.topic == topic && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
       case .ByOwner:
         guard let userprofile = userprofile else { return [] }
         
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner == userprofile && !$0.isRejected && !$0.isClaimed && !$0.isBanned }.map { $0.reference }
-        return (SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isRejected && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
+        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned }.map { $0.reference }//&& !$0.isRejected
+        return (SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
       case .Search:
         fatalError()
       case .Compatibility:
@@ -637,7 +637,7 @@ class Surveys {
     guard !all.isEmpty else { all.append(contentsOf: instances); return }
     
     let existingSet = Set(all)
-    let appendingSet = Set(replaceWithExisting(instances))
+    let appendingSet = Set(replaceWithExisting(all, instances))
     let difference = Array(appendingSet.subtracting(existingSet))
     
     guard !difference.isEmpty else { return }
@@ -698,11 +698,9 @@ private extension Surveys {
     timer?.fire()
   }
   
-  func replaceWithExisting(_ instances: [Survey]) -> [Survey] {
-//    var output = [Survey]()
-    instances.reduce(into: [Survey]()) { result, instance in result.append(all.filter({ $0 == instance }).first ?? instance) }
-//    instances.map { instance in
-//      output.append(all.filter({ $0 == instance }).first ?? instance)
+//  func replaceWithExisting(_ instances: [Survey]) -> [Survey] {
+//    instances.reduce(into: [Survey]()) { result, instance in
+//      result.append(all.filter({ $0 == instance }).first ?? instance)
 //    }
-  }
+//  }
 }

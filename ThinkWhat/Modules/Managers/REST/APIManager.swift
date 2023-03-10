@@ -865,24 +865,7 @@ class API {
                                                    DateFormatter.dateTimeFormatter,
                                                    DateFormatter.dateFormatter ]
         
-        let instances = try decoder.decode([Userprofile].self, from: data)
-        
-        await MainActor.run {
-          guard !instances.isEmpty else {
-            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsEmpty, object: userprofile)
-            return
-          }
-          
-          instances.forEach { instance in
-            if userprofile.subscriptions.filter({ $0 == instance }).isEmpty {
-              if let existing = Userprofiles.shared.all.filter({ $0 == instance }).first {
-                userprofile.subscriptions.append(existing)
-              } else {
-                userprofile.subscriptions.append(instance)
-              }
-            }
-          }
-        }
+        Userprofiles.shared.append(try decoder.decode([Userprofile].self, from: data))
       } catch let error {
 #if DEBUG
         print(error)
@@ -914,25 +897,7 @@ class API {
                                                    DateFormatter.dateTimeFormatter,
                                                    DateFormatter.dateFormatter ]
         
-        let instances = try decoder.decode([Userprofile].self, from: data)
-        
-        await MainActor.run {
-          guard !instances.isEmpty else {
-            userprofile.subscribersRemovePublisher.send([])
-//            NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersEmpty, object: userprofile)
-            return
-          }
-          
-          instances.forEach { instance in
-            if userprofile.subscribers.filter({ $0 == instance }).isEmpty {
-              if let existing = Userprofiles.shared.all.filter({ $0 == instance }).first {
-                userprofile.subscribers.append(existing)
-              } else {
-                userprofile.subscribers.append(instance)
-              }
-            }
-          }
-        }
+        Userprofiles.shared.append(try decoder.decode([Userprofile].self, from: data))
       } catch let error {
 #if DEBUG
         print(error)
@@ -942,20 +907,17 @@ class API {
     }
     
     public func subscribe(at userprofiles: [Userprofile]) async throws {
-      guard let url = API_URLS.Profiles.subscribe,
-            let userprofile = Userprofiles.shared.current
-      else { throw APIError.invalidURL }
+      guard let url = API_URLS.Profiles.subscribe else { throw APIError.invalidURL }
       
       let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
       
       do {
-        let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
-        await MainActor.run {
-          userprofiles.forEach {
-            userprofile.subscriptions.append($0)
-            $0.subscribedAt = true
-          }
-        }
+        let _ = try await parent.requestAsync(url: url,
+                                              httpMethod: .post,
+                                              parameters: parameters,
+                                              encoding: JSONEncoding.default,
+                                              headers: parent.headers())
+          userprofiles.forEach { $0.subscribedAt = true }
       } catch let error {
         NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
 #if DEBUG
@@ -965,46 +927,40 @@ class API {
       }
     }
     
-    public func removeSubscribers(_ userprofiles: [Userprofile]) async throws {
-      guard let url = API_URLS.Profiles.removeSubscribers,
-            let userprofile = Userprofiles.shared.current
-      else { throw APIError.invalidURL }
-      
-      let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
-      
-      do {
-        let _ = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
-        await MainActor.run {
-          userprofiles.forEach {
-            userprofile.subscribers.remove(object: ($0))
-          }
-        }
-      } catch let error {
-#if DEBUG
-        error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-        throw error
-      }
-    }
+//    public func removeSubscribers(_ userprofiles: [Userprofile]) async throws {
+//      guard let url = API_URLS.Profiles.removeSubscribers else { throw APIError.invalidURL }
+//
+//      let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
+//
+//      do {
+//        let _ = try await parent.requestAsync(url: url,
+//                                              httpMethod: .post,
+//                                              parameters: parameters,
+//                                              encoding: JSONEncoding.default,
+//                                              headers: parent.headers())
+//          userprofiles.forEach { $0.subscribedAt = false }
+//      } catch let error {
+//#if DEBUG
+//        error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//        throw error
+//      }
+//    }
     
     public func unsubscribe(from userprofiles: [Userprofile]) async throws {
-      guard let url = API_URLS.Profiles.unsubscribe,
-            let userprofile = Userprofiles.shared.current
-      else { throw APIError.invalidURL }
+      guard let url = API_URLS.Profiles.unsubscribe else { throw APIError.invalidURL }
       
       let parameters: Parameters = ["ids": userprofiles.map{$0.id}]
       
       do {
-        try await parent.requestAsync(url: url,
-                                      httpMethod: .post,
-                                      parameters: parameters,
-                                      encoding: JSONEncoding.default,
-                                      headers: parent.headers())
-        await MainActor.run {
-          userprofiles.forEach {
-            userprofile.subscriptions.remove(object: $0)
-            $0.subscribedAt = false
-          }
+        let _ = try await parent.requestAsync(url: url,
+                                              httpMethod: .post,
+                                              parameters: parameters,
+                                              encoding: JSONEncoding.default,
+                                              headers: parent.headers())
+        userprofiles.forEach {
+          $0.subscribedAt = false
+          Userprofiles.shared.unsubscribedPublisher.send($0)
         }
       } catch let error {
         NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
@@ -1143,23 +1099,19 @@ class API {
       }
     }
     
-    public func reject(survey: Survey) async throws {
+    public func reject(survey: Survey,
+                       requestHotExcept: [Survey] = []) async throws {
+      
       guard let url = API_URLS.Surveys.reject,
             !headers.isNil
       else { throw APIError.invalidURL }
       
-      var parameters: Parameters = ["survey": survey.id]
-      if Surveys.shared.hot.count <= MIN_STACK_SIZE {
-        let stackList = Surveys.shared.hot.map { $0.id }
-        let rejectedList = Surveys.shared.all
-          .filter { $0.isRejected}
-          .map { $0.id }
-        let list = Array(Set(stackList + rejectedList))//Surveys.shared.stackObjects.filter({ $0.ID != nil }).map(){ $0.ID!}
-        if !list.isEmpty {
-          let dict = list.asParameters(arrayParametersKey: "exclude_ids")
-          parameters.merge(dict) {(current, _) in current}
-        }
+      var parameters: Parameters = ["survey_id": survey.id]
+      
+      if !requestHotExcept.isEmpty {
+        parameters["exclude_ids"] = requestHotExcept.map { $0.id }
       }
+      
       do {
         ///JSON with hot surveys returned
         let data = try await parent.requestAsync(url: url,
@@ -1168,16 +1120,16 @@ class API {
                                                  encoding: JSONEncoding.default,
                                                  headers: headers,
                                                  accessControl: true)
-        do {
-          let json = try JSON(data: data, options: .mutableContainers)
-          await MainActor.run {
-            Surveys.shared.load(json)
-          }
-        } catch {}
+        survey.isRejected = true
         
-      } catch {
+        guard !requestHotExcept.isEmpty else { return }
+        
+        let json = try JSON(data: data, options: .mutableContainers)
+        Surveys.shared.load(json)
+      } catch let error {
 #if DEBUG
-        print(error.localizedDescription)
+        error.printLocalized(class: type(of: self), functionName: #function)
+        fatalError()
 #endif
         throw error
       }

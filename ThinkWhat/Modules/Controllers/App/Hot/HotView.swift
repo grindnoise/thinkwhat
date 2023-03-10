@@ -26,6 +26,12 @@ class HotView: UIView {
       setupUI()
     }
   }
+  public var currentSurvey: Survey? {
+    guard let hotCard = current as? HotCard else { return nil }
+    
+    return hotCard.item
+  }
+  
   
   
   // MARK: - Private properties
@@ -49,8 +55,7 @@ class HotView: UIView {
               self.viewInput?.reject(hotCard.item)
               self.next(self.viewInput?.deque())
             case .Claim:
-              let popup = NewPopup(padding: self.padding,
-                                   contentPadding: .uniform(size: self.padding*2))
+              let popup = NewPopup(contentPadding: .uniform(size: self.padding*2))
               let content = ClaimPopupContent(parent: popup,
                                               surveyReference: hotCard.item.reference)
               content.$claim
@@ -61,6 +66,10 @@ class HotView: UIView {
               popup.didDisappearPublisher
                 .sink { [unowned self] _ in
                   popup.removeFromSuperview()
+                  
+                  ///Next if claimed
+                  guard hotCard.item.isClaimed else { return }
+                  
                   delayAsync(delay: 0.25) { [unowned self] in
                     self.next(self.viewInput?.deque())
                   }
@@ -126,13 +135,16 @@ private extension HotView {
   }
   
   func setTasks() {
-//    tasks.append( Task {@MainActor [weak self] in
-//      for await notification in NotificationCenter.default.notifications(for: <# notification #>) {
-//        guard let self = self else { return }
-//
-//
-//      }
-//    })
+    ///Check if current card gets banned
+    Timer.publish(every: 1, on: .main, in: .common)
+      .autoconnect()
+      .filter { [unowned self] _ in self.viewInput?.isOnScreen == true }
+      .filter { [unowned self] _ in !self.current.isNil && current!.isKind(of: HotCard.self) }
+      .filter { [unowned self] _ in !(self.current! as! HotCard).isBanned }
+      .filter { [unowned self] _ in (self.current! as! HotCard).item.isBanned }
+      .delay(for: .seconds(1), scheduler: DispatchQueue.main)
+      .sink { [unowned self] _ in (self.current as! HotCard).setBanned() { [unowned self] in self.next(self.viewInput?.deque()) } }
+      .store(in: &subscriptions)
   }
   
   func next(_ survey: Survey?) {

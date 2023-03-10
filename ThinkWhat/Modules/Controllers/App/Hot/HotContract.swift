@@ -14,6 +14,7 @@ protocol HotViewInput: AnyObject {
   var queue: QueueArray<Survey> { get }
   var tabBarHeight: CGFloat { get }
   var navBarHeight: CGFloat { get }
+  var isOnScreen: Bool { get }
   
   func deque() -> Survey?
   func vote(_: Survey)
@@ -27,14 +28,17 @@ protocol HotControllerInput: AnyObject {
   func getSurveys(_:[Survey])
   func reject(_: Survey)
   func claim(_: [SurveyReference: Claim])
+  func updateData()
 }
 
 protocol HotModelOutput: AnyObject {
   var queue: QueueArray<Survey> { get }
+  var currentSurvey: Survey? { get }
 }
 
 protocol HotControllerOutput: AnyObject {
   var viewInput: (UIViewController & HotViewInput)? { get set }
+  var currentSurvey: Survey? { get }
   
   func setSurvey(_: Survey?)
   func didAppear()

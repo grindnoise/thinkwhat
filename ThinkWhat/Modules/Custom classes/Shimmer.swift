@@ -27,7 +27,7 @@ class Shimmer: UIView {
     instance.colors = [dark, light, dark]
     instance.startPoint = CGPoint(x: 0.0, y: 0.5)
     instance.endPoint = CGPoint(x: 1.0, y: 0.5)
-    instance.locations = [0.4, 0.55, 0.7]
+    instance.locations = [0.2, 0.5, 0.9]
     instance.zPosition = 100//.greatestFiniteMagnitude
     layer.addSublayer(instance)
     
@@ -65,10 +65,9 @@ class Shimmer: UIView {
   
   
   // MARK: - Initialization
-  init(lightColor: UIColor = .tertiarySystemBackground,
-       darkColor: UIColor = .secondarySystemBackground) {
-    self.lightColor = lightColor
-    self.darkColor = darkColor
+  init(color: UIColor = .secondarySystemFill) {
+    self.lightColor = color.lighter(0.25)
+    self.darkColor = color
     
     super.init(frame: .zero)
     

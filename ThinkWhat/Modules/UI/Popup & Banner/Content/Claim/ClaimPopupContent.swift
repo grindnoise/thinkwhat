@@ -274,6 +274,7 @@ private extension ClaimPopupContent {
       .store(in: &subscriptions)
     
     surveyReference.isClaimedPublisher
+      .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] in
         if case .failure(let error) = $0 {
@@ -476,7 +477,9 @@ private extension ClaimPopupContent {
     
     switch state {
     case .Send:
-      if let item = item, sender == confirmButton {
+      if sender == confirmButton {
+        guard let item = item else { return }
+        
         state = .Sending
         collectionView.isUserInteractionEnabled = false
         confirmButton.isUserInteractionEnabled = false

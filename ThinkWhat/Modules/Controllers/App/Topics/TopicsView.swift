@@ -464,7 +464,7 @@ private extension TopicsView {
     let constraint = filterView.heightAnchor.constraint(equalToConstant: 0)
     constraint.identifier = "height"
     constraint.isActive = true
-    
+    constraint.priority = .defaultLow
     //        let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
     //        constraint.identifier = "height"
     //        constraint.isActive = true

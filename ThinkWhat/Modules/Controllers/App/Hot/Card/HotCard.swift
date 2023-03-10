@@ -18,13 +18,14 @@ class HotCard: UIView, Card {
   // MARK: - Public properties
   ///**Logic**
   public let item: Survey
+  public var subscriptions = Set<AnyCancellable>()
+  public private(set) var isBanned = false
   ///**Publishers**
   @Published public var action: Action?
   
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
-  public var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
@@ -42,6 +43,7 @@ class HotCard: UIView, Card {
     
     return instance
   }()
+  private lazy var collectionView: PollCollectionView  = { PollCollectionView(item: item, mode: .Preview) }()
   private lazy var body: UIView = {
     let instance = UIView()
     instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .secondarySystemBackground
@@ -50,7 +52,6 @@ class HotCard: UIView, Card {
       .filter { $0 != .zero }
       .sink { instance.cornerRadius = $0.width*0.05 }
       .store(in: &subscriptions)
-    let collectionView = PollCollectionView(item: item)
     collectionView.place(inside: instance)
 //    collectionView.isUserInteractionEnabled = false
     featheredView.place(inside: instance)
@@ -59,16 +60,16 @@ class HotCard: UIView, Card {
   }()
   private lazy var featheredView: UIView = {
     let instance = UIView()
-    instance.accessibilityIdentifier = "feathered"
+    instance.accessibilityIdentifier = "featheredView"
     instance.layer.masksToBounds = true
-    instance.layer.addSublayer(featheredLayer)
+    instance.layer.addSublayer(gradient)
     instance.publisher(for: \.bounds)
-      .sink { [unowned self] in self.featheredLayer.frame = $0 }
+      .sink { [unowned self] in self.gradient.frame = $0 }
       .store(in: &subscriptions)
 
     return instance
   }()
-  private lazy var featheredLayer: CAGradientLayer = {
+  private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
     setGradient(instance)
     
@@ -180,14 +181,87 @@ class HotCard: UIView, Card {
   
   
   // MARK: - Public methods
-  
+  public func setBanned(_ completion: @escaping () -> ()) {
+    guard !isBanned else { return }
+    
+    isBanned = true
+    
+    UIView.animate(withDuration: 0.25,
+                   delay: 0,
+                   options: .curveEaseInOut) { [unowned self] in
+      self.stack.alpha = 0
+      self.stack.transform = .init(scaleX: 0.75, y: 0.75)
+      self.collectionView.alpha = 0
+    }
+    
+//    let attrString = NSMutableAttributedString(string: "".localized,
+//                                               attributes: [
+//
+//                                               ])
+    
+    let label = UILabel()
+    label.backgroundColor = .clear
+    label.alpha = 0
+    label.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle)
+    label.text = "survey_banned_notification".localized// + "\n⚠︎"
+    label.textColor = .white
+    label.numberOfLines = 0
+    label.textAlignment = .center
+//    label.attributedText = attrString
+    
+    
+    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
+    let colorAnimation = Animations.get(property: .Colors,
+                                        fromValue: [clear, clear, feathered] as Any,
+                                        toValue: [clear, UIColor.systemRed.cgColor, UIColor.systemRed.cgColor] as Any,
+                                        duration: 0.4,
+                                        timingFunction: CAMediaTimingFunctionName.easeIn,
+                                        delegate: self,
+                                        isRemovedOnCompletion: false,
+                                        completionBlocks: [
+                                          {[weak self] in
+                                            guard let self = self else { return }
+                                            
+                                            self.gradient.colors = [clear, UIColor.systemRed.cgColor, UIColor.systemRed.cgColor]
+                                            label.place(inside: self,
+                                                        insets: .uniform(size: self.padding*2))
+                                            label.transform = .init(scaleX: 1.25, y: 1.25)
+                                            UIView.animate(
+                                              withDuration: 0.6,
+                                              delay: 0,
+                                              usingSpringWithDamping: 0.8,
+                                              initialSpringVelocity: 0.3,
+                                              options: [.curveEaseInOut],
+                                              animations: {
+                                                label.transform = .identity
+                                                label.alpha = 1
+                                              }) { _ in delay(seconds: 1) { completion() } }
+                                          }])
+    let locationAnimation = Animations.get(property: .Locations,
+                                           fromValue: [0.0, 0.5, 0.9] as Any,
+                                           toValue: [-1.0, 0, 1] as Any,
+                                           duration: 0.4,
+                                           timingFunction: CAMediaTimingFunctionName.easeIn,
+                                           delegate: self,
+                                           isRemovedOnCompletion: false,
+                                           completionBlocks: [
+                                            {[weak self] in
+                                              guard let self = self else { return }
+                                              
+                                              self.gradient.locations = [-1.0, 0, 1]
+                                            }])
+    
+    gradient.add(locationAnimation, forKey: nil)
+    gradient.add(colorAnimation, forKey: nil)
+  }
   
   
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    setGradient(featheredLayer)
+    setGradient(gradient)
     body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .secondarySystemBackground
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
@@ -238,17 +312,15 @@ private extension HotCard {
   
   func setGradient(_ layer: CAGradientLayer) {
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-//    let quarterFeathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0.25).cgColor : UIColor.white.withAlphaComponent(0.25).cgColor
-//    let halfFeathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0.5).cgColor : UIColor.white.withAlphaComponent(0.5).cgColor
     let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
     layer.colors = [clear, clear, feathered]
     layer.locations = [0.0, 0.75, 0.9]
-//    layer.colors = [clear, clear, quarterFeathered,  halfFeathered, feathered]
-//    layer.locations = [0.0, 0.8, 0.85, 0.925, 0.95]
   }
   
   @objc
   func handleTap(sender: UIButton) {
+//    setBanned {}
+//    collectionView.mode = .Default
     if sender == voteButton {
       action = .Vote
     } else {
@@ -257,3 +329,17 @@ private extension HotCard {
   }
 }
 
+extension HotCard: CAAnimationDelegate {
+  func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
+      completionBlocks.forEach{ $0() }
+    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
+      completionBlocks.forEach{ $0() }
+    } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
+      initialLayer.path = path as! CGPath
+      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
+        completionBlock()
+      }
+    }
+  }
+}

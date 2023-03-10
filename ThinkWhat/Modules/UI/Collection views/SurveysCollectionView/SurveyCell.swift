@@ -301,7 +301,7 @@ class SurveyCell: UICollectionViewCell {
   private lazy var imageView: UIImageView = {
     let instance = UIImageView()
     instance.clipsToBounds = true
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    instance.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.translatesAutoresizingMaskIntoConstraints = false
     instance.contentMode = .scaleAspectFill
     
@@ -761,6 +761,7 @@ private extension SurveyCell {
               shimmer.removeFromSuperview()
             }
             self.imageView.image = $0
+            self.imageView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
           })
           .store(in: &subscriptions)
         media.downloadImage()

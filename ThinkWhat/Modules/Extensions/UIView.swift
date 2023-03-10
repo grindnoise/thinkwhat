@@ -383,6 +383,25 @@ extension UIView {
     centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
   }
   
+  func placeTopLeading(inside parent: UIView,
+                    leadingInset: CGFloat = .zero,
+                    topInset: CGFloat = .zero) {
+    parent.addSubview(self)
+    translatesAutoresizingMaskIntoConstraints = false
+    
+    leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: leadingInset).isActive = true
+    topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
+  }
+  
+  func placeLeadingYCentered(inside parent: UIView,
+                    leadingInset: CGFloat = .zero) {
+    parent.addSubview(self)
+    translatesAutoresizingMaskIntoConstraints = false
+    
+    leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: leadingInset).isActive = true
+    centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
+  }
+  
   func addEquallyTo(to view: UIView, multiplier: CGFloat) {
     
     self.translatesAutoresizingMaskIntoConstraints = false

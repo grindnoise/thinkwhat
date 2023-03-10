@@ -181,28 +181,67 @@ private extension UserprofileController {
     })
     
     //Subscriptions
-    tasks.append(Task { [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
-        guard let self = self,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let userprofile = dict.values.first,
-              self.userprofile == userprofile
-        else { return }
-        
-        self.setBarItems()
-      }
-    })
-    tasks.append(Task { @MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
-        guard let self = self,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let userprofile = dict.values.first,
-              self.userprofile == userprofile
-        else { return }
-        
-        self.setBarItems()
-      }
-    })
+    userprofile.subscriptionsRemovePublisher
+//      .filter { }
+      .receive(on: DispatchQueue.main)
+      .sink(receiveCompletion: {
+        if case .failure(let error) = $0 {
+#if DEBUG
+          print(error)
+#endif
+        }
+      }, receiveValue: { instances in
+        print(instances)
+      })
+      .store(in: &subscriptions)
+    
+    userprofile.subscriptionsPublisher
+//      .filter { }
+      .receive(on: DispatchQueue.main)
+      .sink(receiveCompletion: {
+        if case .failure(let error) = $0 {
+#if DEBUG
+          print(error)
+#endif
+        }
+      }, receiveValue: { instances in
+        print(instances)
+      })
+      .store(in: &subscriptions)
+    
+//      .sink(receiveCompletion: {
+//        if case .failure(let error) = $0 {
+//#if DEBUG
+//          print(error)
+//#endif
+//        }
+//      }, receiveValue: { [unowned self] in
+//        fatalError()
+//      }
+//      .store(in: &subscriptions)
+    
+//    tasks.append(Task { [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
+//        guard let self = self,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let userprofile = dict.values.first,
+//              self.userprofile == userprofile
+//        else { return }
+//
+//        self.setBarItems()
+//      }
+//    })
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+//        guard let self = self,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let userprofile = dict.values.first,
+//              self.userprofile == userprofile
+//        else { return }
+//
+//        self.setBarItems()
+//      }
+//    })
   }
   
   @MainActor

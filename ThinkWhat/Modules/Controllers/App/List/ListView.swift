@@ -453,6 +453,7 @@ private extension ListView {
     let constraint = filterView.heightAnchor.constraint(equalToConstant: filterViewHeight)
     constraint.identifier = "height"
     constraint.isActive = true
+    constraint.priority = .defaultLow
   }
   
   @MainActor

@@ -524,8 +524,8 @@ private extension UserprofilesController {
     controllerOutput?.setEditingMode(false)
     if mode == .Subscriptions {
       controllerInput?.unsubscribe(from: selectedItems)
-    } else if mode == .Subscribers {
-      controllerInput?.removeSubscribers(selectedItems)
+//    } else if mode == .Subscribers {
+//      controllerInput?.removeSubscribers(selectedItems)
     }
     selectedItems.removeAll()
   }
@@ -560,9 +560,9 @@ private extension UserprofilesController {
 }
 
 extension UserprofilesController: UserprofilesViewInput {
-  func removeSubscribers(_ userprofiles: [Userprofile]) {
-    controllerInput?.removeSubscribers(userprofiles)
-  }
+//  func removeSubscribers(_ userprofiles: [Userprofile]) {
+//    controllerInput?.removeSubscribers(userprofiles)
+//  }
   
   func onSelection(_ userprofiles: [Userprofile]) {
     guard let toolbar = navigationController?.toolbar,

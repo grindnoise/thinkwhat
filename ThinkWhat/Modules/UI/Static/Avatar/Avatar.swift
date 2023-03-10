@@ -275,7 +275,7 @@ class Avatar: UIView {
   }
   public var lightBorderColor: UIColor {
     didSet {
-      shimmer.backgroundColor = lightBorderColor
+//      shimmer.backgroundColor = lightBorderColor
       
       guard let coloredBg = background.getSubview(type: UIView.self, identifier: "coloredBg") else { return }
       

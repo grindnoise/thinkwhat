@@ -337,42 +337,74 @@ private extension UserprofilesCollectionView {
   func setTasks() {
     guard let userprofile = userprofile else { return }
     
-    userprofile.subscribersAppendPublisher
+    ///**Append**
+    userprofile.subscribersPublisher
       .receive(on: DispatchQueue.main)
       .sink { [weak self] subscribers in
         guard let self = self,
               self.mode == .Subscribers
         else { return }
         
-        let snapshot = self.source.snapshot()
-        let currentSet = Set(snapshot.itemIdentifiers)
-        let appendingSet = Set(subscribers)
+        var snap = self.source.snapshot()
+        let existingSet = Set(snap.itemIdentifiers)
+        var appendingSet = Set(subscribers.filter { !$0.isBanned })
+        snap.appendItems(existingSet.isEmpty ? Array(appendingSet) : Array(appendingSet.subtracting(existingSet)),
+                         toSection: .Main)
         
-        let difference = appendingSet.symmetricDifference(currentSet)
-#if DEBUG
-        print("symmetricDifference", difference)
-#endif
-        
-        self.appendToDataSource(items: Array(difference))
-        self.loadingIndicator.stopAnimating()
+        self.source.apply(snap, animatingDifferences: true) { [weak self] in
+          guard let self = self else { return }
+          
+          self.loadingIndicator.stopAnimating()
+        }
       }
       .store(in: &subscriptions)
-    //    //Subscriber append
-    //    tasks.append( Task {@MainActor [weak self] in
-    //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersAppend) {
-    //        guard let self = self,
-    //              self.mode == .Subscribers,
-    //              let dict = notification.object as? [Userprofile: Userprofile],
-    //              let owner = dict.keys.first,
-    //              owner == self.userprofile,
-    //              let subscriber = dict.values.first,
-    //              self.source.snapshot().itemIdentifiers.contains(subscriber)
-    //        else { return }
-    //
-    //        self.appendToDataSource(item: subscriber)
-    //        self.loadingIndicator.stopAnimating()
-    //      }
-    //    })
+    ///
+    userprofile.subscriptionsPublisher
+      .receive(on: DispatchQueue.main)
+      .sink(receiveCompletion: {
+        if case .failure(let error) = $0 {
+#if DEBUG
+          print(error)
+#endif
+        }
+      }, receiveValue: { [weak self] subscribers in
+        guard let self = self,
+              self.mode == .Subscriptions
+        else { return }
+        
+        var snap = self.source.snapshot()
+        let existingSet = Set(snap.itemIdentifiers)
+        let appendingSet = Set(subscribers.filter { !$0.isBanned })
+        snap.appendItems(existingSet.isEmpty ? Array(appendingSet) : Array(appendingSet.subtracting(existingSet)),
+                         toSection: .Main)
+        
+        self.source.apply(snap, animatingDifferences: true) { [weak self] in
+          guard let self = self else { return }
+          
+          self.loadingIndicator.stopAnimating()
+        }
+      })
+      .store(in: &subscriptions)
+    
+    ///**Remove**
+    Userprofiles.shared.unsubscribedPublisher
+      .filter { [weak self] in
+        guard let self = self,
+              let userprofile = self.userprofile,
+              userprofile.isCurrent,
+              self.source.snapshot().itemIdentifiers.contains($0)
+        else { return false }
+        
+        return true
+      }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in
+        var snap = self.source.snapshot()
+        snap.deleteItems([$0])
+        self.source.apply(snap, animatingDifferences: true)
+      }
+      .store(in: &subscriptions)
+    
     //    //Subscriber remove
     //    tasks.append( Task {@MainActor [weak self] in
     //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersRemove) {
@@ -389,59 +421,21 @@ private extension UserprofilesCollectionView {
     //        self.loadingIndicator.stopAnimating()
     //      }
     //    })
-    //    //Subscription append
-    //    tasks.append( Task {@MainActor [weak self] in
-    //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsAppend) {
-    //        guard let self = self,
-    //              self.mode == .Subscriptions,
-    //              let dict = notification.object as? [Userprofile: Userprofile],
-    //              let owner = dict
-    //          .keys.first,
-    //              owner == self.userprofile,
-    //              let userprofile = dict.values.first,
-    //              self.source.snapshot().itemIdentifiers.contains(userprofile)
-    //        else { return }
-    //
-    //        self.appendToDataSource(item: userprofile)
-    //        self.loadingIndicator.stopAnimating()
-    //      }
-    //    })
-    //Subscription remove
-    tasks.append( Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
-        guard let self = self,
-              self.mode == .Subscriptions,
-              let dict = notification.object as? [Userprofile: Userprofile],
-              let owner = dict.keys.first,
-              owner == self.userprofile,
-              let userprofile = dict.values.first,
-              self.source.snapshot().itemIdentifiers.contains(userprofile)
-        else { return }
-        
-        self.removeFromDataSource(item: userprofile)
-      }
-    })
-    //    //End refreshing
-    //    tasks.append( Task {@MainActor [weak self] in
-    //      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersEmpty) {
-    //        guard let self = self,
-    //              self.mode == .Subscribers
-    //        else { return }
-    //
-    ////        self.endRefreshing()
-    //        self.loadingIndicator.stopAnimating()
-    //      }
-    //    })
-    tasks.append( Task {@MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsEmpty) {
-        guard let self = self,
-              self.mode == .Subscriptions
-        else { return }
-        
-        //        self.endRefreshing()
-        self.loadingIndicator.stopAnimating()
-      }
-    })
+//    //Subscription remove
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+//        guard let self = self,
+//              self.mode == .Subscriptions,
+//              let dict = notification.object as? [Userprofile: Userprofile],
+//              let owner = dict.keys.first,
+//              owner == self.userprofile,
+//              let userprofile = dict.values.first,
+//              self.source.snapshot().itemIdentifiers.contains(userprofile)
+//        else { return }
+//        
+//        self.removeFromDataSource(item: userprofile)
+//      }
+//    })
   }
   
   @MainActor

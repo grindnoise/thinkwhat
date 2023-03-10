@@ -290,8 +290,8 @@ private extension ImageCell {
                                                             action: #selector(self.imageTapped(recognizer:))))
       
       //            imageView.place(inside: imageContainer)
-      let shimmer = Shimmer(lightColor: .secondarySystemBackground,
-                            darkColor: .tertiarySystemBackground)
+      let shimmer = Shimmer()//.secondarySystemBackground,
+//                            darkColor: .systemGray5)//.tertiarySystemBackground)
       shimmer.place(inside: container)
       shimmer.startShimmering()
       

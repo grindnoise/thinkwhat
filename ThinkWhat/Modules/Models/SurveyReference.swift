@@ -164,19 +164,11 @@ class SurveyReference: Decodable {// NSObject,
       guard oldValue != isFavorite else { return }
       
       isFavoritePublisher.send(isFavorite)
-      //            isFavoritePublisher.send(completion: .finished)
-      NotificationCenter.default.post(name: Notifications.Surveys.SwitchFavorite, object: self)
+      isFavorite ? { SurveyReferences.shared.markedFavoritePublisher.send(self) }(): { SurveyReferences.shared.unmarkedFavoritePublisher.send(self) }()
       
       guard let userprofile = Userprofiles.shared.current else { return }
       
-      if isFavorite {
-        NotificationCenter.default.post(name: Notifications.Surveys.FavoriteAppend, object: self)
-        userprofile.favoritesTotal += 1
-      } else {
-        NotificationCenter.default.post(name: Notifications.Surveys.FavoriteRemove, object: self)
-        userprofile.favoritesTotal -= 1
-      }
-      
+      isFavorite ? { userprofile.favoritesTotal += 1 }() : { userprofile.favoritesTotal -= 1 }()
       survey?.isFavorite = isFavorite
     }
   }
@@ -186,9 +178,10 @@ class SurveyReference: Decodable {// NSObject,
       
       survey?.isBanned = isBanned
       isBannedPublisher.send(isBanned)
+      SurveyReferences.shared.bannedPublisher.send(self)
       //            isBannedPublisher.send(completion: .finished)
       
-      NotificationCenter.default.post(name: Notifications.Surveys.Ban, object: self)
+//      NotificationCenter.default.post(name: Notifications.Surveys.Ban, object: self)
     }
   }
   var isVisited: Bool {
@@ -217,6 +210,7 @@ class SurveyReference: Decodable {// NSObject,
       guard isRejected != oldValue else { return }
       
       isRejectedPublisher.send(isRejected)
+      SurveyReferences.shared.rejectedPublisher.send(self)
     }
   }
   ///**Publishers
@@ -421,48 +415,66 @@ class SurveyReferences {
   private init() {}
   var all: [SurveyReference] = [] {
     didSet {
-      //Remove
-      if oldValue.count > all.count {
-        let oldSet = Set(oldValue)
-        let newSet = Set(all)
-        
-        let difference = oldSet.symmetricDifference(newSet)
-        difference.forEach {
-          NotificationCenter.default.post(name: Notifications.Surveys.RemoveReference, object: $0)
-        }
-      } else {
-        //Append
-        let oldSet = Set(oldValue)
-        let newSet = Set(all)
-        
-        let difference = newSet.symmetricDifference(oldSet)
-        difference.forEach { item in
-          guard !oldValue.filter({ $0 == item }).isEmpty, let index = all.lastIndex(of: item) else {
-            //Notify
-            NotificationCenter.default.post(name: Notifications.Surveys.AppendReference, object: item)
-            return
-          }
-          //Duplicate removal
-          all.remove(at: index)
-          SurveyReferences.shared.instancesPublisher.send([])
-//          NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
-        }
+      guard !oldValue.isEmpty else {
+        instancesPublisher.send(all)
+        return
       }
       
-      ////            Check for duplicates
-      //            guard let lastInstance = all.last else { return }
-      //            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
-      //                all.remove(object: lastInstance)
-      //            }
-      //            NotificationCenter.default.post(name: Notifications.Surveys.Append, object: instance)
-      ////            guard oldValue.count != all.count else { return }
-      //            Notification.send(names: [Notifications.Surveys.UpdateAll])
+      let existingSet = Set(oldValue)
+      let appendingSet = Set(all)
+      
+      ///Difference
+      instancesPublisher.send(Array(appendingSet.subtracting(existingSet)))
     }
   }
-  //Publishers
+//  var all: [SurveyReference] = [] {
+//    didSet {
+//      //Remove
+//      if oldValue.count > all.count {
+//        let oldSet = Set(oldValue)
+//        let newSet = Set(all)
+//
+//        let difference = oldSet.symmetricDifference(newSet)
+//        difference.forEach {
+//          NotificationCenter.default.post(name: Notifications.Surveys.RemoveReference, object: $0)
+//        }
+//      } else {
+//        //Append
+//        let oldSet = Set(oldValue)
+//        let newSet = Set(all)
+//
+//        let difference = newSet.symmetricDifference(oldSet)
+//        difference.forEach { item in
+//          guard !oldValue.filter({ $0 == item }).isEmpty, let index = all.lastIndex(of: item) else {
+//            //Notify
+//            NotificationCenter.default.post(name: Notifications.Surveys.AppendReference, object: item)
+//            return
+//          }
+//          //Duplicate removal
+//          all.remove(at: index)
+//          SurveyReferences.shared.instancesPublisher.send([])
+////          NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
+//        }
+//      }
+//
+//      ////            Check for duplicates
+//      //            guard let lastInstance = all.last else { return }
+//      //            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
+//      //                all.remove(object: lastInstance)
+//      //            }
+//      //            NotificationCenter.default.post(name: Notifications.Surveys.Append, object: instance)
+//      ////            guard oldValue.count != all.count else { return }
+//      //            Notification.send(names: [Notifications.Surveys.UpdateAll])
+//    }
+//  }
+  ///**Publishers**
   public let instancesPublisher = PassthroughSubject<[SurveyReference], Never>()
   public let instancesByTopicPublisher = PassthroughSubject<[SurveyReference], Never>()
   public let claimedPublisher = PassthroughSubject<SurveyReference, Never>()
+  public let bannedPublisher = PassthroughSubject<SurveyReference, Never>()
+  public let rejectedPublisher = PassthroughSubject<SurveyReference, Never>()
+  public let markedFavoritePublisher = PassthroughSubject<SurveyReference, Never>()
+  public let unmarkedFavoritePublisher = PassthroughSubject<SurveyReference, Never>()
   
   public func eraseData() {
     all.removeAll()
@@ -471,9 +483,11 @@ class SurveyReferences {
   public func append(_ instances: [SurveyReference]) {
     guard !instances.isEmpty else { instancesPublisher.send([]); return }
     
+    guard !all.isEmpty else { all.append(contentsOf: instances); return }
+    
     let existingSet = Set(all)
-    let appendingSet = Set(instances)
-    let difference = Array(existingSet.symmetricDifference(appendingSet))
+    let appendingSet = Set(replaceWithExisting(instances))
+    let difference = Array(appendingSet.subtracting(existingSet))
     
     guard !difference.isEmpty else { return }
     
@@ -489,6 +503,12 @@ class SurveyReferences {
       }
     }
     return array
+  }
+  
+  func replaceWithExisting(_ instances: [SurveyReference]) -> [SurveyReference] {
+    instances.reduce(into: [SurveyReference]()) { result, instance in
+      result.append(all.filter({ $0 == instance }).first ?? instance)
+    }
   }
 }
 

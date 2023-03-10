@@ -37,15 +37,58 @@ class PollTitleCell: UICollectionViewCell {
       updateUI()
     }
   }
-  //Publishers
+  public var mode: PollCollectionView.Mode = .Default {
+    didSet {
+      guard let leftStack = headerView.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }
+      
+      leftStack.alpha = mode == .Default ? 1 : 0
+      
+      guard mode == .Preview else { return }
+      
+      leftStack.transform = .init(scaleX: 0.75, y: 0.75)
+      topicView.placeLeadingYCentered(inside: headerView)
+      topicView.alpha = 1
+    }
+  }
+  ///**Publishers**
   public var profileTapPublisher = PassthroughSubject<Bool, Never>()
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
+  ///**UI**
   private let padding: CGFloat = 8
+  private lazy var topicView: UIStackView = {
+    let topicTitle = InsetLabel()
+    topicTitle.font = UIFont(name: Fonts.Bold, size: 20)
+    topicTitle.text = item.topic.title.uppercased()
+    topicTitle.textColor = .white
+    topicTitle.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+    
+    let topicIcon = Icon(category: item.topic.iconCategory)
+    topicIcon.iconColor = .white
+    topicIcon.isRounded = false
+    topicIcon.clipsToBounds = false
+    topicIcon.scaleMultiplicator = 1.65
+    topicIcon.heightAnchor.constraint(equalTo: topicIcon.widthAnchor, multiplier: 1/1).isActive = true
+    
+    let instance = UIStackView(arrangedSubviews: [
+      topicIcon,
+      topicTitle
+    ])
+    instance.backgroundColor = item.topic.tagColor
+    instance.axis = .horizontal
+    instance.spacing = 2
+    instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
+    instance.publisher(for: \.bounds)
+      .receive(on: DispatchQueue.main)
+      .filter { $0 != .zero}
+      .sink { instance.cornerRadius = $0.height/2.25 }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
   private lazy var avatar: Avatar = {
     let instance = Avatar(isShadowed: true)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
@@ -66,10 +109,12 @@ class PollTitleCell: UICollectionViewCell {
       dateLabel,
       statsStack,
     ])
+    leftStack.accessibilityIdentifier = "leftStack"
     leftStack.axis = .vertical
     leftStack.alignment = .leading
     leftStack.spacing = 4
     leftStack.distribution = .fillEqually
+    leftStack.clipsToBounds = false
     
     let spacer = UIView()
     spacer.backgroundColor = .clear
@@ -277,6 +322,25 @@ class PollTitleCell: UICollectionViewCell {
     super.prepareForReuse()
     
     profileTapPublisher = PassthroughSubject<Bool, Never>()
+  }
+  
+  
+  
+  // MARK: - Public methods
+  public func onModeChanged(mode: PollCollectionView.Mode,
+                            duration: TimeInterval = 0.4) {
+    guard let leftStack = headerView.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }
+    
+    UIView.animate(withDuration: duration,
+                   delay: 0,
+                   options: .curveEaseInOut) { [weak self] in
+      guard let self = self else { return }
+      
+      self.topicView.alpha = mode == .Preview ? 1 : 0
+      self.topicView.transform = mode == .Default ? .init(scaleX: 0.75, y: 0.75) : .identity
+      leftStack.alpha = mode == .Default ? 1 : 0
+      leftStack.transform = mode == .Preview ? .init(scaleX: 0.75, y: 0.75) : .identity
+    } completion: { [unowned self] _ in self.mode = mode }
   }
 }
 
