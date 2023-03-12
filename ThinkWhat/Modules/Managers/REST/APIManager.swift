@@ -1022,7 +1022,10 @@ class API {
                                       headers: parent.headers())
         userprofile.notifyOnPublication = notify
       } catch {
-        NotificationCenter.default.post(name: Notifications.Userprofiles.NotifyOnPublicationsFailure, object: userprofile)
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+//        NotificationCenter.default.post(name: Notifications.Userprofiles.NotifyOnPublicationsFailure, object: userprofile)
         throw error
       }
     }

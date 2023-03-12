@@ -277,7 +277,7 @@ class TopicsView: UIView {
       self.setBackgroundColor()//.secondarySystemBackground)
       self.surveysCollectionView.alpha = 1
       //            self.surveysCollectionView.backgroundColor = self.background.backgroundColor
-      self.reveal(present: true, location: point, view: self.surveysCollectionView, color: self.surveysCollectionView.topic!.tagColor, fadeView: self.collectionView, duration: 0.5)//, animateOpacity: false)
+      self.reveal(present: true, location: point, view: self.surveysCollectionView, color: self.surveysCollectionView.topic!.tagColor, fadeView: self.collectionView, duration: 0.35)//, animateOpacity: false)
     }.store(in: &subscriptions)
     
     return instance
@@ -319,6 +319,19 @@ class TopicsView: UIView {
     
     return instance
   }()
+  private lazy var emptyLabel: UILabel = {
+    let label = UILabel()
+    label.accessibilityIdentifier = "emptyLabel"
+    label.backgroundColor = .clear
+    label.alpha = 0
+    label.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3)
+    label.text = "publications_not_found".localized// + "\n⚠︎"
+    label.textColor = .secondaryLabel
+    label.numberOfLines = 0
+    label.textAlignment = .center
+    
+    return label
+  }()
   private lazy var filterViewHeight: CGFloat = .zero
   private var color = UIColor.clear {
     didSet {
@@ -330,7 +343,7 @@ class TopicsView: UIView {
       opaque_2.backgroundColor = color
     }
   }
-  ///`Logic`
+  ///**Logic**
   private var touchLocation: CGPoint = .zero
   private var period: Period = .AllTime {
     didSet {
@@ -345,6 +358,13 @@ class TopicsView: UIView {
       guard oldValue != isDateFilterOnScreen else { return }
       
       toggleDateFilter(on: isDateFilterOnScreen)
+    }
+  }
+  private var isEmpty = false {
+    didSet {
+      guard isEmpty != oldValue else { return }
+      
+      switchEmptyLabel(isEmpty: isEmpty)
     }
   }
   
@@ -670,6 +690,43 @@ private extension TopicsView {
                                                ])
     periodButton.setAttributedTitle(attrString, for: .normal)
   }
+  
+  func switchEmptyLabel(isEmpty: Bool) {
+    guard viewInput?.mode != .Default else { return }
+    
+    if isEmpty {
+      emptyLabel.place(inside: shadowView,
+                  insets: .uniform(size: self.padding*2))
+      emptyLabel.transform = .init(scaleX: 0.75, y: 0.75)
+      UIView.animate(
+        withDuration: 0.4,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          self.emptyLabel.transform = .identity
+          self.emptyLabel.alpha = 1
+          self.collectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .clear
+        }) { _ in }
+    } else {
+      UIView.animate(
+        withDuration: 0.4,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          self.emptyLabel.transform = .init(scaleX: 0.75, y: 0.75)
+          self.emptyLabel.alpha = 0
+          self.collectionView.backgroundColor = .clear
+        }) { _ in self.emptyLabel.removeFromSuperview() }
+    }
+  }
 }
 
 // MARK: - Controller Output
@@ -677,6 +734,11 @@ extension TopicsView: TopicsControllerOutput {
   var topic: Topic? { surveysCollectionView.topic }
   
   func setTopicMode(_ topic: Topic) {
+    UIView.animate(withDuration: 0.2) { [unowned self] in
+      if self.isEmpty {
+        self.emptyLabel.alpha = 1
+      }
+    }
     surveysCollectionView.topic = topic
   }
   
@@ -697,6 +759,11 @@ extension TopicsView: TopicsControllerOutput {
   //    }
   
   func onDefaultMode(color: UIColor? = nil) {
+    UIView.animate(withDuration: 0.2) { [unowned self] in
+      if self.isEmpty {
+        self.emptyLabel.alpha = 0
+      }
+    }
     surveysCollectionView.isOnScreen = false
     surveysCollectionView.alpha = 1
     //        collectionView.backgroundColor = background.backgroundColor

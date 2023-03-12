@@ -305,6 +305,14 @@ class ListView: UIView {
       }
       .store(in: &subscriptions)
     
+    instance.emptyPublicationsPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.isEmpty = $0
+      }
+      .store(in: &subscriptions)
+    
     return instance
   }()
   private lazy var shadowView: UIView = {
@@ -340,7 +348,7 @@ class ListView: UIView {
     return instance
   }()
   private lazy var filterViewHeight: CGFloat = .zero
-  //Logic
+  ///**Logic**
   private var period: Period = .AllTime {
     didSet {
       guard oldValue != period,
@@ -351,6 +359,13 @@ class ListView: UIView {
       
       periodButton.menu = prepareMenu()
       setTitle(category: category, animated: true)
+    }
+  }
+  private var isEmpty = false {
+    didSet {
+      guard isEmpty != oldValue else { return }
+      
+      switchEmptyLabel(isEmpty: isEmpty)
     }
   }
   
@@ -642,6 +657,56 @@ private extension ListView {
 //        self.layoutIfNeeded()
 //      }
 //    }
+  }
+
+  func switchEmptyLabel(isEmpty: Bool) {
+    func emptyLabel() -> UILabel {
+      let label = UILabel()
+      label.accessibilityIdentifier = "emptyLabel"
+      label.backgroundColor = .clear
+      label.alpha = 0
+      label.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3)
+      label.text = "publications_not_found".localized// + "\n⚠︎"
+      label.textColor = .secondaryLabel
+      label.numberOfLines = 0
+      label.textAlignment = .center
+      
+      return label
+    }
+    
+    if isEmpty {
+      let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") ?? emptyLabel()
+      label.place(inside: shadowView,
+                  insets: .uniform(size: self.padding*2))
+      label.transform = .init(scaleX: 0.75, y: 0.75)
+      UIView.animate(
+        withDuration: 0.4,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          label.transform = .identity
+          label.alpha = 1
+          self.collectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .clear
+        }) { _ in }
+    } else if let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") {
+      UIView.animate(
+        withDuration: 0.4,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          label.transform = .init(scaleX: 0.75, y: 0.75)
+          label.alpha = 0
+          self.collectionView.backgroundColor = .clear
+        }) { _ in label.removeFromSuperview() }
+    }
   }
 }
 

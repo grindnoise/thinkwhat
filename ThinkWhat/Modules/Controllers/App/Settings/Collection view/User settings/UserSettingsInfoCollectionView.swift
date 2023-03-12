@@ -18,7 +18,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
   
   
   // MARK: - Public properties
-  ///`Publishers`
+  ///**Publishers**
   public let topicPublisher = PassthroughSubject<Topic, Never>()
   public let citySelectionPublisher = PassthroughSubject<City, Never>()
   public let cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
@@ -29,13 +29,15 @@ class UserSettingsInfoCollectionView: UICollectionView {
   public let googlePublisher = PassthroughSubject<String, Never>()
   public let twitterPublisher = PassthroughSubject<String, Never>()
   @Published public private(set) var scrollPublisher: CGPoint?
-  ///`UI`
+  ///**UI**
   public var color: UIColor = Colors.System.Red.rawValue {
     didSet {
       colorPublisher.send(color)
     }
   }
-
+  ///**Logic**
+  public private(set) var isAnimationEnabled = false
+  
   
   
   // MARK: - Private properties
@@ -43,6 +45,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   private var source: UICollectionViewDiffableDataSource<Section, Int>!
+  ///**Logic**
+  private var userprofile: Userprofile
+//  private let mode: EditingMode
   ///`UI`
   private let padding: CGFloat = 8
   ///`Publishers`
@@ -63,17 +68,24 @@ class UserSettingsInfoCollectionView: UICollectionView {
   
   
   // MARK: - Initialization
-  init() {
+  init(userprofile: Userprofile) {
+    self.userprofile = userprofile
+    
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     
     setupUI()
   }
+  init() { fatalError("init() has not been implemented") }
+//    super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout()) { }
+//
+//    setupUI()
+//  }
   
-  override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
-    super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
-    
-    setupUI()
-  }
+  override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) { fatalError("init(frame:, collectionViewLayout:) has not been implemented")  }
+//    super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
+//
+//    setupUI()
+//  }
   
   required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
   
@@ -93,7 +105,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
     }
     
     let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, indexPath, item in
-      guard let userprofile = Userprofiles.shared.current else { return }
+//      guard let userprofile = Userprofiles.shared.current else { return }
       
       cell.padding = self.padding
       cell.userprofile = userprofile
@@ -104,8 +116,11 @@ class UserSettingsInfoCollectionView: UICollectionView {
 //        .store(in: &self.subscriptions)
       cell.$boundsPublisher
         .eraseToAnyPublisher()
-        .filter { !$0.isNil && $0 != 0 }
-        .sink { [unowned self] _ in self.source.refresh(animatingDifferences: true)}
+        .filter { !$0.isNil }
+        .sink { [unowned self] in
+          self.isAnimationEnabled = $0!
+          self.source.refresh(animatingDifferences: $0!)
+        }
         .store(in: &self.subscriptions)
       cell.$scrollPublisher
         .eraseToAnyPublisher()
@@ -130,8 +145,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
     
     let cityCellRegistration = UICollectionView.CellRegistration<UserSettingsCityCell, AnyHashable> { [unowned self] cell, _, item in
       
+      cell.padding = self.padding
+      cell.userprofile = self.userprofile
       cell.color = self.color
-      cell.padding = .zero
       
       ///Fetch
       cell.cityFetchPublisher
@@ -157,10 +173,6 @@ class UserSettingsInfoCollectionView: UICollectionView {
         .filter { !$0.isNil }
         .sink { cell.color = $0! }
         .store(in: &self.subscriptions)
-      
-      guard let userprofile = Userprofiles.shared.current else { return }
-      
-      cell.userprofile = userprofile
     }
     
     let interestsCellRegistration = UICollectionView.CellRegistration<UserInterestsCell, AnyHashable> { [unowned self] cell, _, _ in

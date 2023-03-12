@@ -21,11 +21,10 @@ class UserInfoCell: UICollectionViewListCell {
 //      }
 //      setupUI()
       
-      mode = userprofile.isCurrent ? .Write : .ReadOnly
       setupUI()
     }
   }
-  ///`UI`
+  ///**UI**
   public var padding: CGFloat = 16
   public var insets: UIEdgeInsets = .zero
   public var color: UIColor = Colors.System.Red.rawValue {
@@ -33,9 +32,11 @@ class UserInfoCell: UICollectionViewListCell {
       textView.tintColor = color
     }
   }
-  ///`Publishers`
+  ///**Publishers**
   public private(set) var descriptionPublisher = PassthroughSubject<String, Never>()
-  @Published public private(set) var boundsPublisher: CGFloat?
+  ///**Logic**
+  ///`true` - animated
+  @Published public private(set) var boundsPublisher: Bool?
   @Published public private(set) var scrollPublisher: CGPoint?
   
   
@@ -43,13 +44,9 @@ class UserInfoCell: UICollectionViewListCell {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  ///`Logic`
-  private var mode = EditingMode.ReadOnly {
-    didSet {
-//      setupTextView(textView)
-    }
-  }
-  ///`UI`
+  ///**Logic**
+  private var isAnimationEnabled = false
+  ///**UI**
   private lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
       disclosureLabel,
@@ -107,9 +104,8 @@ class UserInfoCell: UICollectionViewListCell {
                                                right: 0)
     let constraint = instance.heightAnchor.constraint(equalToConstant: 10)
     constraint.isActive = true
-
-    switch mode {
-    case .ReadOnly:
+    
+    if !userprofile.isCurrent {
       let paragraph = NSMutableParagraphStyle()
       if #available(iOS 15.0, *) {
         paragraph.usesDefaultHyphenation = true
@@ -118,21 +114,31 @@ class UserInfoCell: UICollectionViewListCell {
       }
       paragraph.alignment = .natural
       paragraph.firstLineHeadIndent = padding * 2
-      instance.attributedText = NSAttributedString(string: userprofile.description,
+      instance.attributedText = NSAttributedString(string: userprofile.description.isEmpty ? "-" : userprofile.description,
                                                    attributes: attributes())
       instance.backgroundColor = .clear
-    case .Write:
+    } else {
       instance.backgroundColor = Colors.textField(color: .white, traitCollection: traitCollection)
       instance.delegate = self
       instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
       instance.text = userprofile.description
     }
-    instance.isUserInteractionEnabled = mode == .Write ? true : false
+    instance.isUserInteractionEnabled = userprofile.isCurrent ? true : false
     
     observers.append(instance.observe(\.contentSize, options: .new) { [weak self] view, value in
-      guard let height = value.newValue?.height,
+      guard let self = self,
+            let height = value.newValue?.height,
             constraint.constant != height
       else { return }
+      
+      guard self.isAnimationEnabled else {
+        self.setNeedsLayout()
+        constraint.constant = max(height, 40)
+        self.layoutIfNeeded()
+        self.boundsPublisher = self.isAnimationEnabled
+        
+        return
+      }
       
       UIView.animate(withDuration: 0.3) {[weak self]  in
         guard let self = self else { return }
@@ -140,7 +146,7 @@ class UserInfoCell: UICollectionViewListCell {
         self.setNeedsLayout()
         constraint.constant = max(height, 40)
         self.layoutIfNeeded()
-        self.boundsPublisher = height
+        self.boundsPublisher = self.isAnimationEnabled
       }
     })
     
@@ -266,6 +272,7 @@ private extension UserInfoCell {
 
 extension UserInfoCell: UITextViewDelegate {
   func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+    self.isAnimationEnabled = true
     scrollPublisher = disclosureLabel.convert(disclosureLabel.frame.origin, to: self)
     
     return true

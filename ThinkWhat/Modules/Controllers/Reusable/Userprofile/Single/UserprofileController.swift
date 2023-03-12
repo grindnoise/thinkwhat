@@ -154,45 +154,46 @@ private extension UserprofileController {
   
   func setTasks() {
     controllerInput?.compatibility(with: userprofile)
-    //On notifications switch server callback
-    tasks.append(Task { @MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
-        guard let self = self,
-              let userprofile = notification.object as? Userprofile,
-              self.userprofile == userprofile
-        else { return }
-        
-        self.isRightButtonSpinning = false
-        self.setBarItems()
-      }
-    })
     
-    //On notifications switch server failure callback
-    tasks.append(Task { @MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublicationsFailure) {
-        guard let self = self,
-              let userprofile = notification.object as? Userprofile,
-              self.userprofile == userprofile
-        else { return }
+    ///On notifications switch server callback
+    userprofile.notificationPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] _ in
+        guard let self = self else { return }
         
         self.isRightButtonSpinning = false
         self.setBarItems()
       }
-    })
+      .store(in: &subscriptions)
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
+//        guard let self = self,
+//              let userprofile = notification.object as? Userprofile,
+//              self.userprofile == userprofile
+//        else { return }
+//
+//        self.isRightButtonSpinning = false
+//        self.setBarItems()
+//      }
+//    })
+    
+//    //On notifications switch server failure callback
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublicationsFailure) {
+//        guard let self = self,
+//              let userprofile = notification.object as? Userprofile,
+//              self.userprofile == userprofile
+//        else { return }
+//
+//        self.isRightButtonSpinning = false
+//        self.setBarItems()
+//      }
+//    })
     
     //Subscriptions
-    userprofile.subscriptionsRemovePublisher
-//      .filter { }
+    userprofile.subscriptionFlagPublisher
       .receive(on: DispatchQueue.main)
-      .sink(receiveCompletion: {
-        if case .failure(let error) = $0 {
-#if DEBUG
-          print(error)
-#endif
-        }
-      }, receiveValue: { instances in
-        print(instances)
-      })
+      .sink { [unowned self] _ in self.setBarItems() }
       .store(in: &subscriptions)
     
     userprofile.subscriptionsPublisher
@@ -253,17 +254,16 @@ private extension UserprofileController {
       return
     }
     
-    let notify = userprofile.notifyOnPublication ?? false
     let action = UIAction { [weak self] _ in
       guard let self = self else { return }
       
       self.isRightButtonSpinning = true
       self.controllerInput?.switchNotifications(userprofile: self.userprofile,
-                                                notify: !notify)
+                                                notify: !self.userprofile.notifyOnPublication)
     }
     
     navigationItem.setRightBarButton(UIBarButtonItem(title: nil,
-                                                     image: UIImage(systemName: notify ? "bell.fill" : "bell.slash.fill",
+                                                     image: UIImage(systemName: userprofile.notifyOnPublication ? "bell.fill" : "bell.slash.fill",
                                                                     withConfiguration: UIImage.SymbolConfiguration(weight: .regular)),
                                                      primaryAction: action,
                                                      menu: nil),

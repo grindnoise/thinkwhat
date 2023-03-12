@@ -41,7 +41,7 @@ class SubscriptionsView: UIView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //Logic
+  ///**Logic**
   private var mode: Mode = .Default {
     didSet {
       //            guard let constraint = filterView.getConstraint(identifier: "top_1") else { return }
@@ -93,6 +93,13 @@ class SubscriptionsView: UIView {
   private var isCollectionViewSetupCompleted = false
   private var needsAnimation = true
   private var isRevealed = false
+  private var isEmpty = false {
+    didSet {
+      guard isEmpty != oldValue else { return }
+      
+      switchEmptyLabel(isEmpty: isEmpty)
+    }
+  }
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var filterView: UIView = {
@@ -185,23 +192,27 @@ class SubscriptionsView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic, userprofile: nil)
+        self.viewInput?.onDataSourceRequest(source: .Topic,
+                                            dateFilter: period,
+                                            topic: topic,
+                                            userprofile: nil)
       }
       .store(in: &subscriptions)
     
-    //    //Pagination #3
-    //    let paginationByOwnerPublisher = instance.paginationByOwnerPublisher
-    //      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-    //
-    //    paginationByOwnerPublisher
-    //      .sink { [unowned self] in
-    //        guard let topic = $0.keys.first,
-    //              let period = $0.values.first
-    //        else { return }
-    //
-    //        self.viewInput?.onDataSourceRequest(userprofile: userprofile, dateFilter: period)
-    //      }
-    //      .store(in: &subscriptions)
+    //Pagination #3
+    instance.paginationByOwnerPublisher
+      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+      .sink { [unowned self] in
+        guard let userprofile = $0.keys.first,
+              let period = $0.values.first
+        else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .ByOwner,
+                                            dateFilter: period,
+                                            topic: nil,
+                                            userprofile: userprofile)
+      }
+      .store(in: &subscriptions)
     
     //Refresh #1
     instance.refreshPublisher
@@ -232,7 +243,10 @@ class SubscriptionsView: UIView {
               let period = $0.values.first
         else { return }
         
-        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: nil, userprofile: userprofile)
+        self.viewInput?.onDataSourceRequest(source: .ByOwner,
+                                            dateFilter: period,
+                                            topic: nil,
+                                            userprofile: userprofile)
       }
       .store(in: &subscriptions)
     
@@ -335,6 +349,14 @@ class SubscriptionsView: UIView {
         
         self.isDateFilterHidden = $0
         //                self.toggleDateFilter(on: !$0)
+      }
+      .store(in: &subscriptions)
+    
+    instance.emptyPublicationsPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.isEmpty = $0
       }
       .store(in: &subscriptions)
     
@@ -1119,23 +1141,85 @@ private extension SubscriptionsView {
       self.layoutIfNeeded()
     }
   }
+  
+  func switchEmptyLabel(isEmpty: Bool) {
+    func emptyLabel() -> UILabel {
+      let label = UILabel()
+      label.accessibilityIdentifier = "emptyLabel"
+      label.backgroundColor = .clear
+      label.alpha = 0
+      label.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3)
+      label.text = "publications_not_found".localized// + "\n⚠︎"
+      label.textColor = .secondaryLabel
+      label.numberOfLines = 0
+      label.textAlignment = .center
+      
+      return label
+    }
+    
+    if isEmpty {
+      let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") ?? emptyLabel()
+      label.place(inside: shadowView,
+                  insets: .uniform(size: self.padding*2))
+      label.transform = .init(scaleX: 0.75, y: 0.75)
+      UIView.animate(
+        withDuration: 0.4,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          label.transform = .identity
+          label.alpha = 1
+          self.surveysCollectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .clear
+        }) { _ in }
+    } else if let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") {
+      UIView.animate(
+        withDuration: 0.4,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          label.transform = .init(scaleX: 0.75, y: 0.75)
+          label.alpha = 0
+          self.surveysCollectionView.backgroundColor = .clear
+        }) { _ in label.removeFromSuperview() }
+    }
+  }
 }
 
 extension SubscriptionsView: SubsciptionsControllerOutput {
   func hideUserCard(_ completion: Closure? = nil) {
-    guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
+    mode = .Default
+    surveysCollectionView.category = .Subscriptions
+    guard let viewInput = viewInput,
+          viewInput.isOnScreen,
+          let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
           let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
           let constraint = subview.getConstraint(identifier: "trailing"),
           let userprofile = userprofile
     else {
-#if DEBUG
-      fatalError()
-#endif
+      guard let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
+            let constraint = subview.getConstraint(identifier: "trailing")
+      else { return }
+      
+      avatar.alpha = 0
+      isCardOnScreen = false
+      constraint.constant = 16
+      if let cells = feedCollectionView.visibleCells.filter({ $0.isKind(of: UserprofileCell.self )}) as? [UserprofileCell] {
+        cells.forEach { $0.avatar.alpha = 1 }
+      }
+      
       return
     }
     
-    mode = .Default
-    surveysCollectionView.category = .Subscriptions
+//    mode = .Default
+//    surveysCollectionView.category = .Subscriptions
     
     let temp = UIImageView(image: userprofile.image)
     temp.contentMode = .scaleAspectFill

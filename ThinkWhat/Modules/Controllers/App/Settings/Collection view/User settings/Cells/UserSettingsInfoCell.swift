@@ -23,6 +23,7 @@ class UserSettingsInfoCell: UICollectionViewListCell {
   ///`Publishers`
   @Published public private(set) var userprofileDescription: String?
   @Published public private(set) var scrollPublisher: CGPoint?
+  @Published public private(set) var boundsPublisher: Bool?
   public private(set) var cityFetchPublisher = PassthroughSubject<String, Never>()
   public private(set) var citySelectionPublisher = PassthroughSubject<City, Never>()
   public private(set) var topicPublisher = PassthroughSubject<Topic, Never>()
@@ -38,8 +39,15 @@ class UserSettingsInfoCell: UICollectionViewListCell {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///`UI`
+  public private(set) var isAnimationEnabled = false
+  ///**Logic**
+  public var userprofile: Userprofile! {
+    didSet {
+      setupUI()
+    }
+  }
   private lazy var collectionView: UserSettingsInfoCollectionView = {
-    let instance = UserSettingsInfoCollectionView()
+    let instance = UserSettingsInfoCollectionView(userprofile: userprofile)
     instance.clipsToBounds = true
     instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .secondarySystemBackground : .tertiarySystemBackground
     instance.publisher(for: \.bounds)
@@ -83,16 +91,18 @@ class UserSettingsInfoCell: UICollectionViewListCell {
     constraint.isActive = true
     
     instance.publisher(for: \.contentSize)
-      .filter { $0 != .zero && abs(constraint.constant) != $0.height }
+      .filter { $0 != .zero }// && abs(constraint.constant) != $0.height }
       .sink { [weak self] in
         guard let self = self else { return }
         
+        self.isAnimationEnabled = instance.isAnimationEnabled
         self.setNeedsLayout()
         constraint.constant = $0.height
         self.layoutIfNeeded()
+        self.boundsPublisher = self.isAnimationEnabled
       }
       .store(in: &subscriptions)
-
+    
     return instance
   }()
   
@@ -115,7 +125,7 @@ class UserSettingsInfoCell: UICollectionViewListCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {

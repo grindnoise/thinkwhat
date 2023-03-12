@@ -16,6 +16,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     didSet {
       guard let userprofile = userprofile else { return }
       
+      setupUI()
       avatar.userprofile = userprofile
       setupLabels()
       setupButtons()
@@ -47,6 +48,19 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
                                           bottom: self.padding,
                                           right: self.padding) }()
   private var currentConstraints = [NSLayoutConstraint]()
+  private lazy var titleLabel: UILabel = {
+    let instance = UILabel()
+    instance.numberOfLines = 1
+    instance.textAlignment = .center
+    instance.numberOfLines = 1
+    instance.textColor = .white
+    instance.text = "publications".localized.uppercased()
+    instance.font = UIFont(name: Fonts.Bold, size: 20)
+    instance.adjustsFontSizeToFitWidth = true
+    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
+    
+    return instance
+  }()
   private lazy var username: UILabel = {
     let instance = UILabel()
     instance.isUserInteractionEnabled = true
@@ -233,24 +247,6 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     
     return instance
   }()
-//  private lazy var userView: UIView = {
-//    let instance = UIView()
-//    instance.clipsToBounds = false
-//    instance.backgroundColor = .clear
-//    instance.accessibilityIdentifier = "userView"
-////    instance.translatesAutoresizingMaskIntoConstraints = false
-//    instance.addSubview(avatar)
-//
-//    avatar.translatesAutoresizingMaskIntoConstraints = false
-//
-//    NSLayoutConstraint.activate([
-//      avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 4),
-//      avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-//      avatar.bottomAnchor.constraint(equalTo: instance.bottomAnchor, constant: -4),
-//    ])
-//
-//    return instance
-//  }()
   private lazy var stack: UIStackView = {
     let nested = UIStackView(arrangedSubviews: [
       genderButton,
@@ -268,6 +264,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     
     
     let instance = UIStackView(arrangedSubviews: [
+      titleLabel,
       opaque,
       username,
       nested
@@ -346,8 +343,9 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
+    
     setTasks()
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -622,6 +620,8 @@ private extension UserSettingsCredentialsCell {
   
   @MainActor
   func setupLabels(animated: Bool = false) {
+    titleLabel.backgroundColor = color
+    
     guard let userprofile = Userprofiles.shared.current else { return }
     
     if !userprofile.firstNameSingleWord.isEmpty {

@@ -12,7 +12,7 @@ import Combine
 class UserprofileCollectionView: UICollectionView {
   
   enum Section: Int, CaseIterable {
-    case Credentials, About, Compatibility, Interests, Stats
+    case Credentials, Info, /*About,*/ Compatibility, Interests, Stats
   }
   
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
@@ -92,9 +92,7 @@ class UserprofileCollectionView: UICollectionView {
 private extension UserprofileCollectionView {
   @MainActor
   func setupUI() {
-    
     //        delegate = self
-    
     collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, environment -> NSCollectionLayoutSection in
       
       var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
@@ -109,10 +107,54 @@ private extension UserprofileCollectionView {
       return sectionLayout
     }
     
-    let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, _, _ in
-      guard let userprofile = self.userprofile else { return }
+//    let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, _, _ in
+//      guard let userprofile = self.userprofile else { return }
+//
+//      cell.userprofile = userprofile
+//      cell.$boundsPublisher
+////        .eraseToAnyPublisher()
+//        .filter { !$0.isNil }
+//        .sink { [unowned self] in
+//          self.source.refresh(animatingDifferences: $0!)}
+//        .store(in: &self.subscriptions)
+//    }
+    
+    let infoCellRegistration = UICollectionView.CellRegistration<UserSettingsInfoCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.userprofile = self.userprofile
+      cell.publisher(for: \.bounds)
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          self.source.refresh(animatingDifferences: cell.isAnimationEnabled) }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      cell.color = self.color
+      cell.$scrollPublisher
+        .eraseToAnyPublisher()
+        .filter { !$0.isNil }
+        .sink { [unowned self] in
+          let point = cell.convert($0!, to: self)
+          UIView.animate(withDuration: 0.2) { [unowned self] in
+            self.contentOffset.y = point.y
+          }
+        }
+        .store(in: &self.subscriptions)
+      cell.$boundsPublisher
+        .eraseToAnyPublisher()
+        .filter { !$0.isNil }
+        .sink { [unowned self] in
+          self.source.refresh(animatingDifferences: $0!)
+        }
+        .store(in: &self.subscriptions)
       
-      cell.userprofile = userprofile
+      guard cell.insets == .zero else { return }
+      
+      cell.setInsets(UIEdgeInsets(top: self.padding*2,
+                                  left: self.padding,
+                                  bottom: self.padding,
+                                  right: self.padding))
     }
     
     let compatibilityCellRegistration = UICollectionView.CellRegistration<UserCompatibilityCell, AnyHashable> { [unowned self] cell, _, _ in
@@ -188,9 +230,7 @@ private extension UserprofileCollectionView {
       
       self.colorPublisher
         .filter { !$0.isNil }
-        .sink {
-          cell.color = $0!
-        }
+        .sink { cell.color = $0! }
         .store(in: &self.subscriptions)
     }
     
@@ -282,8 +322,12 @@ private extension UserprofileCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: compatibilityCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
-      } else if section == .About {
-        return collectionView.dequeueConfiguredReusableCell(using: aboutCellRegistration,
+//      } else if section == .About {
+//        return collectionView.dequeueConfiguredReusableCell(using: aboutCellRegistration,
+//                                                            for: indexPath,
+//                                                            item: identifier)
+      } else if section == .Info {
+        return collectionView.dequeueConfiguredReusableCell(using: infoCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
       }
@@ -300,20 +344,25 @@ private extension UserprofileCollectionView {
     var snapshot = Snapshot()
     snapshot.appendSections([
       .Credentials,
-    ])
-    snapshot.appendItems([0], toSection: .Credentials)
-    if !userprofile.description.isEmpty {
-      snapshot.appendSections([
-        .About,
-      ])
-      snapshot.appendItems([1], toSection: .About)
-    }
-    snapshot.appendSections([
+      .Info,
       .Compatibility,
       .Interests,
       .Stats,
     ])
+    snapshot.appendItems([0], toSection: .Credentials)
+//    if !userprofile.description.isEmpty {
+//      snapshot.appendSections([
+//        .About,
+//      ])
+//      snapshot.appendItems([1], toSection: .About)
+//    }
+//    snapshot.appendSections([
+//      .Compatibility,
+//      .Interests,
+//      .Stats,
+//    ])
     //    snapshot.appendItems([1], toSection: .Credentials)
+    snapshot.appendItems([1], toSection: .Info)
     snapshot.appendItems([2], toSection: .Compatibility)
     snapshot.appendItems([3], toSection: .Interests)
     snapshot.appendItems([4], toSection: .Stats)

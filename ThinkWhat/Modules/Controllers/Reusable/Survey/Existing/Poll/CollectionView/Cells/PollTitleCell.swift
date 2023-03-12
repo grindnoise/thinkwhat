@@ -46,7 +46,7 @@ class PollTitleCell: UICollectionViewCell {
       guard mode == .Preview else { return }
       
       leftStack.transform = .init(scaleX: 0.75, y: 0.75)
-      topicView.placeLeadingYCentered(inside: headerView)
+      topicView.placeTopLeading(inside: headerView)
       topicView.alpha = 1
     }
   }
@@ -61,7 +61,7 @@ class PollTitleCell: UICollectionViewCell {
   private let padding: CGFloat = 8
   private lazy var topicView: UIStackView = {
     let topicTitle = InsetLabel()
-    topicTitle.font = UIFont(name: Fonts.Bold, size: 20)
+    topicTitle.font = UIFont(name: Fonts.Bold, size: 14)
     topicTitle.text = item.topic.title.uppercased()
     topicTitle.textColor = .white
     topicTitle.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
@@ -322,6 +322,7 @@ class PollTitleCell: UICollectionViewCell {
     super.prepareForReuse()
     
     profileTapPublisher = PassthroughSubject<Bool, Never>()
+    avatar.clearImage()
   }
   
   
@@ -367,12 +368,10 @@ private extension PollTitleCell {
     titleLabel.text = item.title
     ratingLabel.text = String(describing: item.rating)
     viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-    usernameLabel.text = item.owner.isAnonymous ? "" : item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n\(item.owner.lastNameSingleWord)")
-    avatar.userprofile = item.owner.isAnonymous ? Userprofile.anonymous : item.owner
+    usernameLabel.text = item.isAnonymous ? "" : item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n\(item.owner.lastNameSingleWord)")
+    avatar.userprofile = item.isAnonymous ? Userprofile.anonymous : item.owner
     
-    guard let constraint = titleLabel.getConstraint(identifier: "height"),
-          let windowScene = window?.windowScene
-    else { return }
+    guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
     
     setNeedsLayout()
     constraint.constant = item.title.height(withConstrainedWidth: bounds.width,

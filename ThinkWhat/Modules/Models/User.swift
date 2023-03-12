@@ -85,9 +85,9 @@ class Userprofiles {
       shared.append((subscriptions + subscribers).uniqued())
     } catch { throw AppError.server }
 //
-//    guard let city = try json["city"].rawData() as? Data else { return }
+    guard let city = try json["city"].rawData() as? Data else { return }
 //
-//    Userprofiles.shared.current!.city = try decoder.decode(City.self, from: city)
+    current.city = try decoder.decode(City.self, from: city)
   }
   
   //    func loadSubscribedFor(_ data: Data) {
@@ -456,11 +456,15 @@ class Userprofile: Decodable {
       
     }
   }
-  var notifyOnPublication: Bool? {
+  var notifyOnPublication: Bool {
     didSet {
       guard oldValue != notifyOnPublication else { return }
       
-      NotificationCenter.default.post(name: Notifications.Userprofiles.NotifyOnPublications, object: self)
+      notificationPublisher.send(notifyOnPublication)
+      
+      guard let current = Userprofiles.shared.current else { return }
+      
+      current.notificationPublisher.send(notifyOnPublication)
     }
   }
   var isCurrent: Bool { Userprofiles.shared.current == self }
@@ -481,6 +485,8 @@ class Userprofile: Decodable {
   public let votesReceivedTotalPublisher = PassthroughSubject<Int, Never>()
   public let commentsTotalPublisher = PassthroughSubject<Int, Never>()
   public let commentsReceivedTotalPublisher = PassthroughSubject<Int, Never>()
+  public let notificationPublisher = PassthroughSubject<Bool, Never>()
+  
   
   
   // MARK: - Private properties
@@ -508,6 +514,7 @@ class Userprofile: Decodable {
     subscribedAt = false
     subscribedToMe = false
     imageURL    = UserDefaults.Profile.imageURL
+    notifyOnPublication = false
     if let path = UserDefaults.Profile.imagePath, let _image = UIImage(contentsOfFile: path) {
       image = _image
     } else if let url = imageURL {  Task { image = try await API.shared.system.downloadImageAsync(from: url) } }
@@ -551,7 +558,7 @@ class Userprofile: Decodable {
       isBanned            = try container.decode(Bool.self, forKey: .isBanned)
       subscribedAt        = try container.decode(Bool.self, forKey: .subscribedAt)
       subscribedToMe      = try container.decode(Bool.self, forKey: .subscribedToMe)
-      notifyOnPublication = try container.decodeIfPresent(Bool.self, forKey: .notifyOnPublication)
+      notifyOnPublication = try container.decode(Bool.self, forKey: .notifyOnPublication)
       gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
       ///City decoding
       if !isCurrent, let decodedCity = try? container.decodeIfPresent(City.self, forKey: .city) {

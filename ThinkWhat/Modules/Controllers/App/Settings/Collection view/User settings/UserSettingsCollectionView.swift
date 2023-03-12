@@ -51,7 +51,9 @@ class UserSettingsCollectionView: UICollectionView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   private var source: UICollectionViewDiffableDataSource<Section, Int>!
-  ///`UI`
+  ///**Logic**
+  private let userprofile: Userprofile
+  ///**UI**
   private let padding: CGFloat = 8
   
   
@@ -69,19 +71,25 @@ class UserSettingsCollectionView: UICollectionView {
   
   
   // MARK: - Initialization
-  init() {
+  init(userprofile: Userprofile) {
+    self.userprofile = userprofile
+    
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
-  }
-  
-  override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
-    super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
     
     setupUI()
   }
   
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
+  init() { fatalError("init(coder:) has not been implemented") }
+//    super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
+//  }
+  
+override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) { fatalError("init(coder:) has not been implemented") }
+//    super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
+//
+//    setupUI()
+//  }
+  
+  required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
   
   
   
@@ -168,9 +176,11 @@ class UserSettingsCollectionView: UICollectionView {
     }
     
     let infoCellRegistration = UICollectionView.CellRegistration<UserSettingsInfoCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.userprofile = self.userprofile
       cell.publisher(for: \.bounds)
         .receive(on: DispatchQueue.main)
-        .sink { _ in self.source.refresh() }
+        .sink { [unowned self] _ in
+          self.source.refresh(animatingDifferences: cell.isAnimationEnabled) }
         .store(in: &self.subscriptions)
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
@@ -214,6 +224,13 @@ class UserSettingsCollectionView: UICollectionView {
           UIView.animate(withDuration: 0.2) { [unowned self] in
             self.contentOffset.y = point.y
           }
+        }
+        .store(in: &self.subscriptions)
+      cell.$boundsPublisher
+        .eraseToAnyPublisher()
+        .filter { !$0.isNil }
+        .sink { [unowned self] in
+          self.source.refresh(animatingDifferences: $0!)
         }
         .store(in: &self.subscriptions)
       

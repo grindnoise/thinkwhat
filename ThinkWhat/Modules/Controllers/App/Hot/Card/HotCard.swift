@@ -46,15 +46,19 @@ class HotCard: UIView, Card {
   private lazy var collectionView: PollCollectionView  = { PollCollectionView(item: item, mode: .Preview) }()
   private lazy var body: UIView = {
     let instance = UIView()
-    instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .secondarySystemBackground
+    instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .tertiarySystemBackground
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
       .filter { $0 != .zero }
       .sink { instance.cornerRadius = $0.width*0.05 }
       .store(in: &subscriptions)
+    instance.layer.addSublayer(gradient)
     collectionView.place(inside: instance)
 //    collectionView.isUserInteractionEnabled = false
     featheredView.place(inside: instance)
+    instance.publisher(for: \.bounds)
+      .sink { [unowned self] in self.gradient.frame = $0 }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -62,16 +66,30 @@ class HotCard: UIView, Card {
     let instance = UIView()
     instance.accessibilityIdentifier = "featheredView"
     instance.layer.masksToBounds = true
-    instance.layer.addSublayer(gradient)
+    instance.layer.addSublayer(fadeGradient)
     instance.publisher(for: \.bounds)
-      .sink { [unowned self] in self.gradient.frame = $0 }
+      .sink { [unowned self] in self.fadeGradient.frame = $0 }
       .store(in: &subscriptions)
 
     return instance
   }()
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
-    setGradient(instance)
+    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.blended(withFraction: 0.015, of: item.topic.tagColor).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
+    setGradient(layer: instance,
+                colors: [clear, feathered],
+                locations: [0.0, 0.5])
+    
+    return instance
+  }()
+  private lazy var fadeGradient: CAGradientLayer = {
+    let instance = CAGradientLayer()
+    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
+    setGradient(layer: instance,
+                colors: [clear, clear, feathered],
+                locations: [0.0, 0.75, 0.9])
     
     return instance
   }()
@@ -210,8 +228,8 @@ class HotCard: UIView, Card {
 //    label.attributedText = attrString
     
     
-    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.cgColor
+    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.cgColor
     let colorAnimation = Animations.get(property: .Colors,
                                         fromValue: [clear, clear, feathered] as Any,
                                         toValue: [clear, UIColor.systemRed.cgColor, UIColor.systemRed.cgColor] as Any,
@@ -223,7 +241,7 @@ class HotCard: UIView, Card {
                                           {[weak self] in
                                             guard let self = self else { return }
                                             
-                                            self.gradient.colors = [clear, UIColor.systemRed.cgColor, UIColor.systemRed.cgColor]
+                                            self.fadeGradient.colors = [clear, UIColor.systemRed.cgColor, UIColor.systemRed.cgColor]
                                             label.place(inside: self,
                                                         insets: .uniform(size: self.padding*2))
                                             label.transform = .init(scaleX: 1.25, y: 1.25)
@@ -249,11 +267,11 @@ class HotCard: UIView, Card {
                                             {[weak self] in
                                               guard let self = self else { return }
                                               
-                                              self.gradient.locations = [-1.0, 0, 1]
+                                              self.fadeGradient.locations = [-1.0, 0, 1]
                                             }])
     
-    gradient.add(locationAnimation, forKey: nil)
-    gradient.add(colorAnimation, forKey: nil)
+    fadeGradient.add(locationAnimation, forKey: nil)
+    fadeGradient.add(colorAnimation, forKey: nil)
   }
   
   
@@ -261,8 +279,15 @@ class HotCard: UIView, Card {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    setGradient(gradient)
-    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? UIColor.white.blended(withFraction: 0.025, of: item.topic.tagColor) : .secondarySystemBackground
+    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
+    
+    setGradient(layer: fadeGradient,
+                colors: [clear, clear, feathered],
+                locations: [0.0, 0.75, 0.9])
+    
+    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .white : .tertiarySystemBackground
+//    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? UIColor.white.blended(withFraction: 0.025, of: item.topic.tagColor) : .tertiarySystemBackground
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
 }
@@ -273,7 +298,7 @@ private extension HotCard {
     backgroundColor = .clear
     clipsToBounds = false
     
-    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? UIColor.white.blended(withFraction: 0.025, of: item.topic.tagColor) : .secondarySystemBackground
+    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .white : .tertiarySystemBackground
     
     shadowView.place(inside: self)
     
@@ -312,11 +337,13 @@ private extension HotCard {
     //    })
   }
   
-  func setGradient(_ layer: CAGradientLayer) {
-    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
-    layer.colors = [clear, clear, feathered]
-    layer.locations = [0.0, 0.75, 0.9]
+  func setGradient(layer: CAGradientLayer,
+                   colors: [CGColor],
+                   locations: [NSNumber]) {
+//    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+//    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
+    layer.colors = colors//[clear, clear, feathered]
+    layer.locations = locations//[0.0, 0.75, 0.9]
   }
   
   @objc

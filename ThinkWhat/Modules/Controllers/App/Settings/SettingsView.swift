@@ -55,7 +55,7 @@ class SettingsView: UIView {
     return instance
   }()
   private lazy var userSettingsView: UserSettingsCollectionView = {
-    let instance = UserSettingsCollectionView()
+    let instance = UserSettingsCollectionView(userprofile: Userprofiles.shared.current!)
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     
     instance.publisher(for: \.bounds, options: .new)

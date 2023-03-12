@@ -56,8 +56,8 @@ struct Notifications {
         static let SubscriptionOperationFailure     = Notification.Name("Notifications.Userprofiles.SubscriptionOperationFailure")
 //        static let SubscribersEmpty                 = Notification.Name("Notifications.Userprofiles.SubscribersEmpty")
 //        static let SubscriptionsEmpty               = Notification.Name("Notifications.Userprofiles.SubscriptionsEmpty")
-        static let NotifyOnPublications             = Notification.Name("Notifications.Userprofiles.NotifyOnPublications")
-        static let NotifyOnPublicationsFailure      = Notification.Name("Notifications.Userprofiles.NotifyOnPublicationsFailure")
+//        static let NotifyOnPublications             = Notification.Name("Notifications.Userprofiles.NotifyOnPublications")
+//        static let NotifyOnPublicationsFailure      = Notification.Name("Notifications.Userprofiles.NotifyOnPublicationsFailure")
     }
     
 //    struct Cities {

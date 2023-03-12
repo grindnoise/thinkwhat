@@ -16,6 +16,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
   // MARK: - Public properties
   public weak var userprofile: Userprofile! {
     didSet {
+      setupUI()
       userprofile.cityFetchPublisher
         .receive(on: DispatchQueue.main)
         .mapError { error -> AppError in
@@ -91,16 +92,16 @@ class UserSettingsCityCell: UICollectionViewListCell {
       textField.indicator.color = color
     }
   }
-  public var padding: CGFloat = 8 {
-    didSet {
-      updateUI()
-    }
-  }
-  public var insets: UIEdgeInsets? {
-    didSet {
-      updateUI()
-    }
-  }
+  public var padding: CGFloat = 8 //{
+//    didSet {
+//      updateUI()
+//    }
+//  }
+  public var insets: UIEdgeInsets? //{
+//    didSet {
+//      updateUI()
+//    }
+//  }
 
 
 
@@ -146,7 +147,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
       .sink { instance.cornerRadius = $0.width*0.025 }
       .store(in: &subscriptions)
     stack.place(inside: instance,
-                insets: .uniform(size: padding*2),
+                insets: .uniform(size: padding),
                 bottomPriority: .defaultLow)
 
     return instance
@@ -160,9 +161,10 @@ class UserSettingsCityCell: UICollectionViewListCell {
     headerStack.axis = .horizontal
 
     let leftSpacer = UIView.opaque()
-    leftSpacer.widthAnchor.constraint(equalToConstant: 8).isActive = true
+    leftSpacer.widthAnchor.constraint(equalToConstant: userprofile.isCurrent ? 8 : 0).isActive = true
 //    let rightSpacer = UIView.opaque()
 //    rightSpacer.widthAnchor.constraint(equalToConstant: 8).isActive = true
+    
     let contentStack = UIStackView(arrangedSubviews: [
       leftSpacer,
       textField,
@@ -180,7 +182,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
     instance.axis = .vertical
     instance.spacing = padding
 //    contentStack.backgroundColor = .secondarySystemFill
-    contentStack.backgroundColor = Colors.textField(color: .white, traitCollection: traitCollection)
+    contentStack.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
     contentStack.publisher(for: \.bounds, options: .new)
       .sink { contentStack.cornerRadius = $0.width*0.025 }
       .store(in: &subscriptions)
@@ -226,6 +228,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
                                    left: 0,
                                    bottom: 8,
                                    right: 0)
+    instance.isUserInteractionEnabled = userprofile.isCurrent ? true : false
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
     instance.indicator.color = color
     instance.spellCheckingType = .no
@@ -236,6 +239,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
     ])
     instance.forceNoFiltering = true
     instance.theme.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline)!
+//    instance.theme.bgColor = userprofile.isCurrent ? traitCollection.userInterfaceStyle != .dark ? .tertiarySystemBackground : .secondarySystemBackground : .clear
     instance.theme.bgColor = traitCollection.userInterfaceStyle != .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.theme.borderColor = .clear
     instance.theme.fontColor = .label
@@ -274,15 +278,9 @@ class UserSettingsCityCell: UICollectionViewListCell {
 
 
   // MARK: - Initialization
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  override init(frame: CGRect) { super.init(frame: frame) }
 
-    setupUI()
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
+  required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
 
   // MARK: - Overriden methods

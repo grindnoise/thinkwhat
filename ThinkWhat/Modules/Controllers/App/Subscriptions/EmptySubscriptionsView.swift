@@ -28,7 +28,7 @@ class EmptySubscriptionsView: UIView {
   private lazy var label: UILabel = {
     let instance = UILabel()
     instance.font = UIFont.scaledFont(fontName: Fonts.Semibold,
-                                      forTextStyle: .title1)
+                                      forTextStyle: .title3)
     instance.text = "zero_subscriptions".localized
     instance.textColor = .secondaryLabel
     instance.textAlignment = .center

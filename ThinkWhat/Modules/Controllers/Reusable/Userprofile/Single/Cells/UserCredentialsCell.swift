@@ -26,22 +26,19 @@ class UserCredentialsCell: UICollectionViewListCell {
   public var subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
   //UI
-  public var color: UIColor = .systemBlue {
+  public var color: UIColor = .gray {
     didSet {
+      subscriptionButton.backgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
       if #available(iOS 15, *) {
         subscriptionButton.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [unowned self] incoming in
           var outgoing = incoming
-          if self.userprofile.subscribedAt {
-            outgoing.foregroundColor = UIColor.systemRed
-          } else {
-            outgoing.foregroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-          }
+          outgoing.foregroundColor = self.userprofile.subscribedAt ? UIColor.systemRed : self.color
           outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
           
           return outgoing
         }
         subscriptionButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { [unowned self] _ in
-          return self.userprofile.subscribedAt ? UIColor.systemRed : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+          return self.userprofile.subscribedAt ? UIColor.systemRed : self.color
         }
       } else {
         
@@ -113,11 +110,7 @@ class UserCredentialsCell: UICollectionViewListCell {
       var config = UIButton.Configuration.filled()
       config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [unowned self] incoming in
         var outgoing = incoming
-        if self.userprofile.subscribedAt {
-          outgoing.foregroundColor = UIColor.systemRed
-        } else {
-          outgoing.foregroundColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-        }
+        outgoing.foregroundColor = self.userprofile.subscribedAt ? UIColor.systemRed : self.color
         outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
         
         return outgoing
@@ -131,7 +124,7 @@ class UserCredentialsCell: UICollectionViewListCell {
       config.imagePlacement = .trailing
       config.imagePadding = 4.0
       config.imageColorTransformer = UIConfigurationColorTransformer { [unowned self] _ in
-        return self.userprofile.subscribedAt ? UIColor.systemRed : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+        return self.userprofile.subscribedAt ? UIColor.systemRed : self.color
       }
       instance.configuration = config
     } else {
@@ -403,6 +396,7 @@ private extension UserCredentialsCell {
     username.text = userprofile.name
     avatar.userprofile = userprofile
     info.text = "\(userprofile.gender.rawValue.localized.lowercased()), \(userprofile.age), \(userprofile.cityTitle)"
+    subscriptionButton.backgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
     
     if #available(iOS 15, *) {
       subscriptionButton.configuration?.title = (userprofile.subscribedAt ? "unsubscribe" : "subscribe").localized.uppercased()
@@ -413,28 +407,19 @@ private extension UserCredentialsCell {
       }
       subscriptionButton.configuration?.image = UIImage(systemName: userprofile.subscribedAt ? "hand.raised.slash.fill" : "hand.point.left.fill",
                                                         withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
-      if userprofile.subscribedAt {
-        subscriptionButton.configuration?.baseBackgroundColor = .systemRed.withAlphaComponent(0.15)
-      } else {
-        subscriptionButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
-      }
+        subscriptionButton.configuration?.baseBackgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
     } else {
       let attrString = NSMutableAttributedString(string: (userprofile.subscribedAt ? "unsubscribe" : "subscribe").localized.uppercased(),
                                                  attributes: [
                                                   .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
                                                                            forTextStyle: .subheadline) as Any,
-                                                  .foregroundColor: self.userprofile.subscribedAt ? UIColor.systemRed : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+                                                  .foregroundColor: self.userprofile.subscribedAt ? UIColor.systemRed : color
                                                  ])
       subscriptionButton.setImage(UIImage(systemName: userprofile.subscribedAt ? "hand.raised.slash.fill" : "hand.point.left.fill",
                                           withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                   for: .normal)
       subscriptionButton.setAttributedTitle(attrString, for: .normal)
-      subscriptionButton.imageView?.tintColor = self.userprofile.subscribedAt ? UIColor.systemRed : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
-      if userprofile.subscribedAt {
-        subscriptionButton.backgroundColor = .systemRed.withAlphaComponent(0.15)
-      } else {
-        subscriptionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
-      }
+      subscriptionButton.imageView?.tintColor = self.userprofile.subscribedAt ? UIColor.systemRed : color
     }
     
     //Social network
@@ -471,11 +456,7 @@ private extension UserCredentialsCell {
       
       subscriptionButton.configuration?.title = (userprofile.subscribedAt ? "unsubscribe" : "subscribe").localized.uppercased()
       subscriptionButton.configuration?.image = UIImage(systemName: userprofile.subscribedAt ? "hand.raised.slash.fill" : "hand.point.left.fill")
-      if userprofile.subscribedAt {
-        subscriptionButton.configuration?.baseBackgroundColor = .systemRed.withAlphaComponent(0.15)
-      } else {
-        subscriptionButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
-      }
+      subscriptionButton.backgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
     } else {
       guard let imageView = subscriptionButton.imageView,
             let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
@@ -487,11 +468,9 @@ private extension UserCredentialsCell {
         guard let self = self else { return }
         
         indicator.alpha = 0
-        imageView.tintColor = self.userprofile.subscribedAt ? K_COLOR_RED : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self.color
-        self.subscriptionButton.backgroundColor = self.userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue.withAlphaComponent(0.15) : self.color.withAlphaComponent(0.15)
-      }) { _ in
-        indicator.removeFromSuperview()
-      }
+        imageView.tintColor = self.userprofile.subscribedAt ? K_COLOR_RED : self.color
+        self.subscriptionButton.backgroundColor = self.userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : self.color.withAlphaComponent(0.15)
+      }) { _ in indicator.removeFromSuperview() }
       
       guard !error else { return }
       
@@ -523,7 +502,7 @@ private extension UserCredentialsCell {
                                                             size: CGSize(width: imageView.bounds.height,
                                                                          height: imageView.bounds.height)))
       indicator.layoutCentered(in: imageView)
-      indicator.color = userprofile.subscribedAt ? UIColor.systemRed : self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
+      indicator.color = userprofile.subscribedAt ? UIColor.systemRed : self.color
       indicator.startAnimating()
       indicator.accessibilityIdentifier = "indicator"
       

@@ -421,16 +421,12 @@ private extension MainController {
   func setTasks() {
     guard let userprofile = Userprofiles.shared.current else { return }
     
-    //Subscription push notifications
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
-        guard let self = self,
-              let userprofile = notification.object as? Userprofile,
-              let notify = userprofile.notifyOnPublication
-        else { return }
-        
-        let banner = NewBanner(contentView: UserBannerContentView(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication,
-                                                                    userprofile: userprofile),
+    ///Subscription push notifications
+    userprofile.notificationPublisher
+      .receive(on: DispatchQueue.main)
+      .sink {
+        let banner = NewBanner(contentView: UserBannerContentView(mode: $0 ? .NotifyOnPublication : .DontNotifyOnPublication,
+                                                                  userprofile: userprofile),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
@@ -439,7 +435,26 @@ private extension MainController {
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
       }
-    })
+      .store(in: &subscriptions)
+    
+    //    tasks.append(Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
+//        guard let self = self,
+//              let userprofile = notification.object as? Userprofile,
+//              let notify = userprofile.notifyOnPublication
+//        else { return }
+//
+//        let banner = NewBanner(contentView: UserBannerContentView(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication,
+//                                                                    userprofile: userprofile),
+//                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                               isModal: false,
+//                               useContentViewHeight: true,
+//                               shouldDismissAfter: 1)
+//        banner.didDisappearPublisher
+//          .sink { _ in banner.removeFromSuperview() }
+//          .store(in: &self.subscriptions)
+//      }
+//    })
     
     userprofile.subscriptionsPublisher
       .filter { !$0.isEmpty }

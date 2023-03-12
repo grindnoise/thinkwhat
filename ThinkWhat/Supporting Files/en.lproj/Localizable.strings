@@ -308,6 +308,7 @@
 "added_to_watch_list" = "Poll was added to watch list";
 "votes_total" = "Votes";
 "voters" = "Voters";
+"publications_not_found" = "Publications not found";
 
 //Settings VC
 "location" = "Location";

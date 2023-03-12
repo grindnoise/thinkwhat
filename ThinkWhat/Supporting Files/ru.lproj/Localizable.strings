@@ -308,6 +308,7 @@
 "added_to_watch_list" = "Результаты опроса отслеживается";
 "votes_total" = "Голосов";
 "voters" = "Проголосовашие";
+"publications_not_found" = "Публикаций не найдено";
 
 //Settings VC
 "location" = "Местонахождение";

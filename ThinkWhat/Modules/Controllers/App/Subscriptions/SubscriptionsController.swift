@@ -49,10 +49,20 @@ class SubscriptionsController: UIViewController, TintColorable {
   ///**Logic**
   private var userprofile: Userprofile? {
     didSet {
-      guard !userprofile.isNil else { return }
+      guard let userprofile = userprofile else { return }
       
       mode = .Userprofile
-      //            navigationItem.title = ""//userprofile.name
+      
+      ///On notifications switch server callback
+      userprofile.notificationPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.isRightButtonSpinning = false
+          self.setBarItems()
+        }
+        .store(in: &subscriptions)
     }
   }
   private var mode: Mode = .Default {
@@ -164,36 +174,37 @@ private extension SubscriptionsController {
       }
     })
     
-    //On notifications switch server callback
-    tasks.append(Task { @MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
-        guard let self = self,
-              self.mode == .Userprofile
-        else { return }
-        
-        self.isRightButtonSpinning = false
-        self.setBarItems()
-      }
-    })
     
-    //On notifications switch server failure callback
-    tasks.append(Task { @MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublicationsFailure) {
-        guard let self = self else { return }
-        
-        showBanner(bannerDelegate: self,
-                   text: AppError.server.localizedDescription,
-                   content: UIImageView(
-                    image: UIImage(systemName: "exclamationmark.triangle.fill",
-                                   withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
-                   color: UIColor.white,
-                   textColor: .white,
-                   dismissAfter: 0.75,
-                   backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
-        self.isRightButtonSpinning = false
-        self.setBarItems()
-      }
-    })
+    
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
+//        guard let self = self,
+//              self.mode == .Userprofile
+//        else { return }
+//
+//        self.isRightButtonSpinning = false
+//        self.setBarItems()
+//      }
+//    })
+//
+//    //On notifications switch server failure callback
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublicationsFailure) {
+//        guard let self = self else { return }
+//
+//        showBanner(bannerDelegate: self,
+//                   text: AppError.server.localizedDescription,
+//                   content: UIImageView(
+//                    image: UIImage(systemName: "exclamationmark.triangle.fill",
+//                                   withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
+//                   color: UIColor.white,
+//                   textColor: .white,
+//                   dismissAfter: 0.75,
+//                   backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
+//        self.isRightButtonSpinning = false
+//        self.setBarItems()
+//      }
+//    })
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
         guard let self = self,
@@ -303,7 +314,7 @@ private extension SubscriptionsController {
       //                navigationBar.layoutIfNeeded()
       //            }
       
-      let notify = userprofile.notifyOnPublication ?? false
+      let notify = userprofile.notifyOnPublication
       let notifyAction = UIAction { [weak self] _ in
         guard let self = self else { return }
         
@@ -318,7 +329,7 @@ private extension SubscriptionsController {
                                                    withConfiguration: UIImage.SymbolConfiguration(weight: .regular)),
                                     primaryAction: notifyAction,
                                     menu: nil)
-      rightButton.tintColor = notify ? tintColor : .secondaryLabel
+      rightButton.tintColor = tintColor 
       
       let action = UIAction { [weak self] _ in
         guard let self = self else { return }
@@ -523,10 +534,6 @@ extension SubscriptionsController: SubscriptionsViewInput {
     guard let controller = tabBarController as? MainController else { return }
     
     controller.toggleLogo(on: false)
-  }
-  
-  func onDataSourceRequest(userprofile: Userprofile, dateFilter: Period?) {
-    controllerInput?.onDataSourceRequest(source: .ByOwner, dateFilter: dateFilter, topic: nil, userprofile: userprofile)
   }
   
   func setUserprofileFilter(_ userprofile: Userprofile) {
