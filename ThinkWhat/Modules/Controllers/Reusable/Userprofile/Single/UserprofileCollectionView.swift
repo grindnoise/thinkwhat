@@ -12,7 +12,7 @@ import Combine
 class UserprofileCollectionView: UICollectionView {
   
   enum Section: Int, CaseIterable {
-    case Credentials, Info, /*About,*/ Compatibility, Interests, Stats
+    case Credentials, Compatibility, Info, /*About,  Interests, */ Stats
   }
   
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
@@ -93,7 +93,7 @@ private extension UserprofileCollectionView {
   @MainActor
   func setupUI() {
     //        delegate = self
-    collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, environment -> NSCollectionLayoutSection in
+    collectionViewLayout = UICollectionViewCompositionalLayout { section, environment -> NSCollectionLayoutSection in
       
       var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
       configuration.backgroundColor = .clear
@@ -102,7 +102,7 @@ private extension UserprofileCollectionView {
       let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: environment)
       sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0,
                                                             leading: 0,
-                                                            bottom: section == Section.allCases.count-(!self.userprofile.description.isEmpty ? 1 : 2) ? 80 : 8,
+                                                            bottom: section == Section.allCases.count-1 ? 80 : 0,
                                                             trailing: 0)
       return sectionLayout
     }
@@ -120,6 +120,7 @@ private extension UserprofileCollectionView {
 //    }
     
     let infoCellRegistration = UICollectionView.CellRegistration<UserSettingsInfoCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.insets = .init(top: self.padding*2, left: self.padding*2, bottom: self.padding, right: self.padding*2)
       cell.userprofile = self.userprofile
       cell.publisher(for: \.bounds)
         .receive(on: DispatchQueue.main)
@@ -160,6 +161,7 @@ private extension UserprofileCollectionView {
     let compatibilityCellRegistration = UICollectionView.CellRegistration<UserCompatibilityCell, AnyHashable> { [unowned self] cell, _, _ in
       guard let userprofile = self.userprofile else { return }
       
+      cell.insets = .init(top: self.padding*2, left: self.padding*2, bottom: self.padding, right: self.padding*2)
       self.colorPublisher
         .filter { !$0.isNil }
         .sink { cell.color = $0! }
@@ -310,10 +312,10 @@ private extension UserprofileCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: credentialsCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
-      } else if section == .Interests {
-        return collectionView.dequeueConfiguredReusableCell(using: interestsCellRegistration,
-                                                            for: indexPath,
-                                                            item: identifier)
+//      } else if section == .Interests {
+//        return collectionView.dequeueConfiguredReusableCell(using: interestsCellRegistration,
+//                                                            for: indexPath,
+//                                                            item: identifier)
       } else if section == .Stats {
         return collectionView.dequeueConfiguredReusableCell(using: statsCellRegistration,
                                                             for: indexPath,
@@ -344,9 +346,8 @@ private extension UserprofileCollectionView {
     var snapshot = Snapshot()
     snapshot.appendSections([
       .Credentials,
-      .Info,
       .Compatibility,
-      .Interests,
+      .Info,
       .Stats,
     ])
     snapshot.appendItems([0], toSection: .Credentials)
@@ -362,10 +363,9 @@ private extension UserprofileCollectionView {
 //      .Stats,
 //    ])
     //    snapshot.appendItems([1], toSection: .Credentials)
-    snapshot.appendItems([1], toSection: .Info)
-    snapshot.appendItems([2], toSection: .Compatibility)
-    snapshot.appendItems([3], toSection: .Interests)
-    snapshot.appendItems([4], toSection: .Stats)
+    snapshot.appendItems([1], toSection: .Compatibility)
+    snapshot.appendItems([2], toSection: .Info)
+    snapshot.appendItems([3], toSection: .Stats)
     source.apply(snapshot, animatingDifferences: false)
   }
   

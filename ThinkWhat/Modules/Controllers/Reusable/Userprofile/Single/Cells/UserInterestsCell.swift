@@ -16,6 +16,7 @@ class UserInterestsCell: UICollectionViewListCell {
     didSet {
       guard let userprofile = userprofile else { return }
       
+      setupUI()
       collectionView.userprofile = userprofile
     }
   }
@@ -23,16 +24,16 @@ class UserInterestsCell: UICollectionViewListCell {
   public var topicPublisher = PassthroughSubject<Topic, Never>()
   ///`UI`
   public var color: UIColor = .clear
-  public var padding: CGFloat = 16 {
-    didSet {
-      updateUI()
-    }
-  }
-  public var insets: UIEdgeInsets? {
-    didSet {
-      updateUI()
-    }
-  }
+  public var padding: CGFloat = 16 //{
+//    didSet {
+//      updateUI()
+//    }
+//  }
+  public var insets: UIEdgeInsets? //{
+//    didSet {
+//      updateUI()
+//    }
+//  }
   
   
   
@@ -46,26 +47,27 @@ class UserInterestsCell: UICollectionViewListCell {
     instance.setImage(UIImage(systemName: "questionmark",
                               withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
                       for: .normal)
+    instance.alpha = 0
     instance.tintColor = .secondaryLabel
     instance.addTarget(self, action: #selector(self.hintTapped), for: .touchUpInside)
 //    instance.heightAnchor.constraint(equalTo: instance., multiplier: <#T##CGFloat#>)
     
     return instance
   }()
-  private lazy var background: UIView = {
-    let instance = UIView()
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    instance.publisher(for: \.bounds, options: .new)
-      .sink { rect in
-        instance.cornerRadius = rect.width*0.05
-      }
-      .store(in: &subscriptions)
-    stack.place(inside: instance,
-                insets: .uniform(size: padding),
-                bottomPriority: .defaultLow)
-    
-    return instance
-  }()
+//  private lazy var background: UIView = {
+//    let instance = UIView()
+//    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    instance.publisher(for: \.bounds, options: .new)
+//      .sink { rect in
+//        instance.cornerRadius = rect.width*0.05
+//      }
+//      .store(in: &subscriptions)
+//    stack.place(inside: instance,
+//                insets: .uniform(size: padding),
+//                bottomPriority: .defaultLow)
+//
+//    return instance
+//  }()
   private lazy var stack: UIStackView = {
     let stack = UIStackView(arrangedSubviews: [
       label,
@@ -157,7 +159,7 @@ class UserInterestsCell: UICollectionViewListCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -169,7 +171,7 @@ class UserInterestsCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
@@ -192,21 +194,22 @@ private extension UserInterestsCell {
     backgroundColor = .clear
     clipsToBounds = true
     
-    background.place(inside: self,
-                     insets: UIEdgeInsets(top: padding, left: padding, bottom: 0, right: padding))
+    stack.place(inside: self,
+                insets: insets ?? .uniform(size: padding),//UIEdgeInsets(top: padding, left: padding, bottom: 0, right: padding))
+                bottomPriority: .defaultLow)
   }
   
   @MainActor
   func updateUI() {
-    background.removeFromSuperview()
-    
-    guard let insets = insets else {
-      background.place(inside: self,
-                       insets: .uniform(size: padding))
-      return
-    }
-    background.place(inside: self,
-                     insets: insets)
+//    background.removeFromSuperview()
+//
+//    guard let insets = insets else {
+//      background.place(inside: self,
+//                       insets: .uniform(size: padding))
+//      return
+//    }
+//    background.place(inside: self,
+//                     insets: insets)
   }
   
   @objc

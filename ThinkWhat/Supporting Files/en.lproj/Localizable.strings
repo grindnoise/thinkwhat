@@ -379,6 +379,7 @@
 "survey_finished_notification" = "Survey finished!";
 "survey_finished_vote_notification" = "Survey finished. But you can vote!";
 "survey_banned_notification" = "Publication has been banned";
+"survey_complete_notification" = "Survey complete";
 "open_url_embedded" = "Open in app";
 "open_url_in_app" = "Open in ";
 "save_setting" = "Save";

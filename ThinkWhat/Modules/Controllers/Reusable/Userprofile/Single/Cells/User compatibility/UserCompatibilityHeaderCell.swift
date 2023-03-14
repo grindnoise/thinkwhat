@@ -61,7 +61,7 @@ class UserCompatibilityHeaderCell: UICollectionViewListCell {
   }()
   private lazy var compatibilityView: CompatibilityView = {
     let instance = CompatibilityView()
-    instance.heightAnchor.constraint(equalToConstant: 120).isActive = true
+    instance.heightAnchor.constraint(equalToConstant: 100).isActive = true
     instance.$showDetails
       .sink { [unowned self] in self.showDetails = $0 }
       .store(in: &subscriptions)

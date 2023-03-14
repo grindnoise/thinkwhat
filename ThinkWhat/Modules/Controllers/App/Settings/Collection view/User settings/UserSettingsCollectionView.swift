@@ -176,6 +176,7 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
     }
     
     let infoCellRegistration = UICollectionView.CellRegistration<UserSettingsInfoCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.insets = .uniform(size: 8)
       cell.userprofile = self.userprofile
       cell.publisher(for: \.bounds)
         .receive(on: DispatchQueue.main)

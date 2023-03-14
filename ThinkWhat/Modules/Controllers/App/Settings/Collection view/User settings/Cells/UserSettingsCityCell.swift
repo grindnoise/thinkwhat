@@ -128,7 +128,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
       }
     }
   }
-  ///`UI`
+  ///**UI**
   private lazy var hintButton: UIButton = {
     let instance = UIButton()
     instance.setImage(UIImage(systemName: "questionmark",
@@ -140,18 +140,18 @@ class UserSettingsCityCell: UICollectionViewListCell {
 
     return instance
   }()
-  private lazy var background: UIView = {
-    let instance = UIView()
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    instance.publisher(for: \.bounds, options: .new)
-      .sink { instance.cornerRadius = $0.width*0.025 }
-      .store(in: &subscriptions)
-    stack.place(inside: instance,
-                insets: .uniform(size: padding),
-                bottomPriority: .defaultLow)
-
-    return instance
-  }()
+//  private lazy var background: UIView = {
+//    let instance = UIView()
+//    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    instance.publisher(for: \.bounds, options: .new)
+//      .sink { instance.cornerRadius = $0.width*0.025 }
+//      .store(in: &subscriptions)
+//    stack.place(inside: instance,
+//                insets: .uniform(size: padding),
+//                bottomPriority: .defaultLow)
+//
+//    return instance
+//  }()
   private lazy var stack: UIStackView = {
     let headerStack = UIStackView(arrangedSubviews: [
       label,
@@ -287,10 +287,10 @@ class UserSettingsCityCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
 
-    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     
     if let contentStack = stack.arrangedSubviews.filter({ $0.accessibilityIdentifier == "contentStack"}).first {
-      contentStack.backgroundColor = Colors.textField(color: .white, traitCollection: traitCollection)
+      contentStack.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
     }
     
     //Set dynamic font size
@@ -311,9 +311,12 @@ private extension UserSettingsCityCell {
   func setupUI() {
     backgroundColor = .clear
     clipsToBounds = true
-
-    background.place(inside: self,
-                     insets: .init(top: padding*2, left: padding, bottom: padding*2, right: padding))
+    
+    stack.place(inside: self,
+                insets: insets ?? .uniform(size: padding),
+                bottomPriority: .defaultLow)
+    //    background.place(inside: self,
+    //                     insets: .init(top: padding*2, left: padding, bottom: padding*2, right: padding))
     
     setNeedsLayout()
     layoutIfNeeded()
@@ -329,15 +332,15 @@ private extension UserSettingsCityCell {
 
   @MainActor
   func updateUI() {
-    background.removeFromSuperview()
-
-    guard let insets = insets else {
-      background.place(inside: self,
-                       insets: .uniform(size: padding))
-      return
-    }
-    background.place(inside: self,
-                     insets: insets)
+//    background.removeFromSuperview()
+//
+//    guard let insets = insets else {
+//      background.place(inside: self,
+//                       insets: .uniform(size: padding))
+//      return
+//    }
+//    background.place(inside: self,
+//                     insets: insets)
   }
 
   @objc

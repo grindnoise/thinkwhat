@@ -48,9 +48,10 @@ class UserSettingsInfoCollectionView: UICollectionView {
   ///**Logic**
   private var userprofile: Userprofile
 //  private let mode: EditingMode
-  ///`UI`
+  ///**UI**
   private let padding: CGFloat = 8
-  ///`Publishers`
+  private var cellPadding = UIEdgeInsets.uniform(size: 16) //{ self.userprofile.isCurrent ? .uniform(size: padding*2) : .init(top: self.padding, left: self.padding*2, bottom: .zero, right: self.padding*2) }
+  ///**Publishers**
   private var colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
   @Published public private(set) var userprofileDescription: String?
   
@@ -107,8 +108,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
     let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, indexPath, item in
 //      guard let userprofile = Userprofiles.shared.current else { return }
       
-      cell.padding = self.padding
-      cell.userprofile = userprofile
+//      cell.padding = self.padding
+      cell.insets = self.cellPadding
+      cell.userprofile = self.userprofile
 //      cell.publisher(for: \.bounds)
 //        .receive(on: DispatchQueue.main)
 //        .sink { _ in
@@ -145,10 +147,10 @@ class UserSettingsInfoCollectionView: UICollectionView {
     
     let cityCellRegistration = UICollectionView.CellRegistration<UserSettingsCityCell, AnyHashable> { [unowned self] cell, _, item in
       
-      cell.padding = self.padding
+//      self.userprofile.isCurrent ? { cell.padding = self.padding }() : { cell.insets = .init(top: self.padding, left: self.padding*2, bottom: .zero, right: self.padding*2) }()
+      cell.insets = self.cellPadding
       cell.userprofile = self.userprofile
       cell.color = self.color
-      
       ///Fetch
       cell.cityFetchPublisher
         .filter { !$0.isNil }
@@ -176,11 +178,10 @@ class UserSettingsInfoCollectionView: UICollectionView {
     }
     
     let interestsCellRegistration = UICollectionView.CellRegistration<UserInterestsCell, AnyHashable> { [unowned self] cell, _, _ in
-      guard let userprofile = Userprofiles.shared.current else { return }
-      
-      cell.userprofile = userprofile
+      cell.insets = self.cellPadding
+      cell.userprofile = self.userprofile
       cell.color = self.color
-      cell.padding = .zero
+//      cell.padding = .zero
       cell.topicPublisher
         .sink { [unowned self] in self.topicPublisher.send($0) }
         .store(in: &self.subscriptions)
@@ -265,7 +266,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
     snapshot.appendSections([.About, .City, .SocialMedia, .Interests])
     snapshot.appendItems([0], toSection: .About)
     snapshot.appendItems([1], toSection: .City)
-    snapshot.appendItems([2], toSection: .SocialMedia)
+    if userprofile.isCurrent {
+      snapshot.appendItems([2], toSection: .SocialMedia)
+    }
     snapshot.appendItems([3], toSection: .Interests)
     source.apply(snapshot, animatingDifferences: false)
   }

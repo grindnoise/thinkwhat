@@ -665,7 +665,7 @@ private extension ListView {
       label.accessibilityIdentifier = "emptyLabel"
       label.backgroundColor = .clear
       label.alpha = 0
-      label.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3)
+      label.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title3)
       label.text = "publications_not_found".localized// + "\n⚠︎"
       label.textColor = .secondaryLabel
       label.numberOfLines = 0

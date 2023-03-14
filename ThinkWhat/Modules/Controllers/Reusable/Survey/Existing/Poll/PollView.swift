@@ -68,28 +68,47 @@ class PollView: UIView {
   //Logic
   private var selectedAnswer: Answer? {
     didSet {
-      guard oldValue != selectedAnswer,
-            let constraint = actionButton.getConstraint(identifier: "top")
-      else { return }
+//      print("selectedAnswer", selectedAnswer)
+//      assert(!selectedAnswer.isNil)
+      guard let constraint = actionButton.getConstraint(identifier: "top") else { return }
       
-      setNeedsLayout()
-      UIView.animate(
-        withDuration: 0.35,
-        delay: 0,//!selectedAnswer.isNil ? 0 : 0.25,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [weak self] in
-          guard let self = self else { return }
-          
-          self.actionButton.transform = self.selectedAnswer.isNil ? CGAffineTransform(scaleX: 0.75, y: 0.75) : .identity
-          self.actionButton.alpha = self.selectedAnswer.isNil ? 0 : 1
-          constraint.constant = self.selectedAnswer.isNil ? 0 : -(self.actionButton.bounds.height + tabBarHeight)
-          self.layoutIfNeeded()
-        }) { _ in }
+      if oldValue.isNil, !selectedAnswer.isNil {
+        toggleFade(true)
+        setNeedsLayout()
+        UIView.animate(
+          withDuration: 0.35,
+          delay: 0,//!selectedAnswer.isNil ? 0 : 0.25,
+          usingSpringWithDamping: 0.8,
+          initialSpringVelocity: 0.3,
+          options: [.curveEaseInOut],
+          animations: { [weak self] in
+            guard let self = self else { return }
+            
+            self.actionButton.transform = self.selectedAnswer.isNil ? CGAffineTransform(scaleX: 0.75, y: 0.75) : .identity
+            self.actionButton.alpha = self.selectedAnswer.isNil ? 0 : 1
+            constraint.constant = self.selectedAnswer.isNil ? 0 : -(self.actionButton.bounds.height + tabBarHeight)
+            self.layoutIfNeeded()
+          }) { _ in }
+      } else if selectedAnswer.isNil {
+        toggleFade(false)
+        setNeedsLayout()
+        UIView.animate(
+          withDuration: 0.35,
+          delay: 0,//!selectedAnswer.isNil ? 0 : 0.25,
+          usingSpringWithDamping: 0.8,
+          initialSpringVelocity: 0.3,
+          options: [.curveEaseInOut]) { [weak self] in
+            guard let self = self else { return }
+            
+            self.actionButton.transform = self.selectedAnswer.isNil ? CGAffineTransform(scaleX: 0.75, y: 0.75) : .identity
+            self.actionButton.alpha = self.selectedAnswer.isNil ? 0 : 1
+            constraint.constant = self.selectedAnswer.isNil ? 0 : -(self.actionButton.bounds.height + tabBarHeight)
+            self.layoutIfNeeded()
+          }
+      }
     }
   }
-  //UI
+  ///**UI**
   private let padding: CGFloat = 8
   private lazy var collectionView: PollCollectionView = {
     func makeHelper() -> AgrumePhotoLibraryHelper {
@@ -283,6 +302,7 @@ class PollView: UIView {
   private lazy var actionButton: UIButton = {
     let instance = UIButton()
     instance.alpha = 0
+    instance.layer.zPosition = 2
     instance.addTarget(self, action: #selector(self.vote), for: .touchUpInside)
     
     if #available(iOS 15, *) {
@@ -360,6 +380,19 @@ class PollView: UIView {
     
     return instance
   }()
+  private lazy var gradient: CAGradientLayer = {
+    let instance = CAGradientLayer()
+    let clear = UIColor.clear.cgColor
+    instance.colors = [clear, clear, clear]
+    instance.locations = [0.0, 1, 1]
+    instance.frame = frame
+    publisher(for: \.bounds)
+      .sink { instance.bounds = $0 }
+      .store(in: &subscriptions)
+    layer.addSublayer(instance)
+    
+    return instance
+  }()
   
   
   
@@ -387,7 +420,17 @@ class PollView: UIView {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+ 
   
+  
+  // MARK: - Overridden methods
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    let clear = UIColor.systemBackground.withAlphaComponent(0).cgColor
+    let feathered = UIColor.systemBackground.cgColor
+    gradient.colors = [clear, clear, feathered]
+  }
 }
 
 // MARK: - Private
@@ -433,6 +476,46 @@ private extension PollView {
       UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
     }
   }
+  
+  func toggleFade(_ enable: Bool) {
+    let clear = UIColor.systemBackground.withAlphaComponent(0).cgColor
+    let feathered = UIColor.systemBackground.cgColor
+    
+    let colorAnimation = Animations.get(property: .Colors,
+                                        fromValue: gradient.colors as Any,
+                                        toValue: enable ? [clear, clear, feathered] : [clear, clear, clear] as Any,
+                                        duration: 0.2,
+                                        timingFunction: enable ? CAMediaTimingFunctionName.easeOut : CAMediaTimingFunctionName.easeIn,
+                                        delegate: self,
+                                        isRemovedOnCompletion: false,
+                                        completionBlocks: [
+                                          { [weak self] in
+                                            guard let self = self else { return }
+                                            
+                                            self.gradient.colors = enable ? [clear, clear, feathered] : [clear, clear, clear]
+                                          }
+                                        ])
+    let locationAnimation = Animations.get(property: .Locations,
+                                           fromValue: gradient.locations as Any,
+                                           toValue: enable ? [0.0, 0.815, 0.875] : [0.0, 1, 1] as Any,
+                                           duration: 0.2,
+                                           timingFunction: enable ? CAMediaTimingFunctionName.easeOut : CAMediaTimingFunctionName.easeIn,
+                                           delegate: self,
+                                           isRemovedOnCompletion: false,
+                                           completionBlocks: [
+                                             { [weak self] in
+                                               guard let self = self else { return }
+                                               
+                                               self.gradient.locations = enable ? [0.0, 0.815, 0.875] : [0.0, 1, 1]
+                                               self.gradient.removeAllAnimations()
+                                             }
+                                           ])
+    
+    gradient.add(locationAnimation, forKey: nil)
+//    gradient.colors = enable ? [clear, clear, feathered] : [clear, clear, clear]
+    gradient.add(colorAnimation, forKey: nil)
+//    gradient.locations = enable ? [0.0, 0.815, 0.875] : [0.0, 1, 1]
+  }
 }
   
   // MARK: - Controller Output
@@ -464,5 +547,20 @@ private extension PollView {
   
   func commentDeleteError() {
     
+  }
+}
+
+extension PollView: CAAnimationDelegate {
+  func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
+      completionBlocks.forEach{ $0() }
+    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
+      completionBlocks.forEach{ $0() }
+    } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
+      initialLayer.path = path as! CGPath
+      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
+        completionBlock()
+      }
+    }
   }
 }

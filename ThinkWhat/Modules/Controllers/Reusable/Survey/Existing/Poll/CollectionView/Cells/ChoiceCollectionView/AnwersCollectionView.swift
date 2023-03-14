@@ -121,9 +121,7 @@ private extension AnswersCollectionView {
         }
         .store(in: &self.subscriptions)
       cell.deselectionPublisher
-        .sink { [unowned self] in
-          self.deselectionPublisher.send($0)
-        }
+        .sink { [unowned self] in self.deselectionPublisher.send($0) }
         .store(in: &self.subscriptions)
       cell.updatePublisher
         .sink { [unowned self] in

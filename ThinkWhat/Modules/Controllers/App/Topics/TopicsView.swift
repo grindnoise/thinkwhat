@@ -277,7 +277,26 @@ class TopicsView: UIView {
       self.setBackgroundColor()//.secondarySystemBackground)
       self.surveysCollectionView.alpha = 1
       //            self.surveysCollectionView.backgroundColor = self.background.backgroundColor
-      self.reveal(present: true, location: point, view: self.surveysCollectionView, color: self.surveysCollectionView.topic!.tagColor, fadeView: self.collectionView, duration: 0.35)//, animateOpacity: false)
+//      self.reveal(present: true, location: point, view: self.surveysCollectionView, color: self.surveysCollectionView.topic!.tagColor, fadeView: self.collectionView, duration: 0.35)//, animateOpacity: false)
+      Animations.reveal(present: true,
+                        location: point,
+                        view: self.surveysCollectionView,
+                        fadeView: self.collectionView,
+                        color: self.surveysCollectionView.topic!.tagColor,
+                        duration: 0.35,
+                        delegate: self)
+      if #available(iOS 15, *) {
+        self.periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return self.color }
+        self.periodButton.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+          var outcoming = incoming
+          outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+          outcoming.foregroundColor = self.color
+          return outcoming
+        }
+      } else {
+        self.periodButton.imageView?.tintColor = self.color
+        self.periodButton.tintColor = self.color
+      }
     }.store(in: &subscriptions)
     
     return instance
@@ -324,7 +343,7 @@ class TopicsView: UIView {
     label.accessibilityIdentifier = "emptyLabel"
     label.backgroundColor = .clear
     label.alpha = 0
-    label.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3)
+    label.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title3)
     label.text = "publications_not_found".localized// + "\n⚠︎"
     label.textColor = .secondaryLabel
     label.numberOfLines = 0
@@ -494,89 +513,89 @@ private extension TopicsView {
     
   }
   
-  func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, color: UIColor, fadeView: UIView, duration: TimeInterval, animateOpacity: Bool = true) {
-    
-    let circlePathLayer = CAShapeLayer()
-    
-    var circleFrameTouchPosition: CGRect {
-      return CGRect(origin: location, size: .zero)
-    }
-    
-    var circleFrameTopLeft: CGRect {
-      return CGRect.zero
-    }
-    
-    func circlePath(_ rect: CGRect) -> UIBezierPath {
-      return UIBezierPath(ovalIn: rect)
-    }
-    
-    circlePathLayer.frame = revealView.bounds
-    circlePathLayer.path = circlePath(location == .zero ? circleFrameTopLeft : circleFrameTouchPosition).cgPath
-    revealView.layer.mask = circlePathLayer
-    
-    let radiusInset =  sqrt(revealView.bounds.height*revealView.bounds.height + revealView.bounds.width*revealView.bounds.width + location.x*location.x + location.y*location.y)
-    
-    let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
-    
-    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
-    
-    let fromPath = circlePathLayer.path
-    
-    let anim = Animations.get(property: .Path,
-                              fromValue: present ? fromPath as Any : toPath,
-                              toValue: !present ? fromPath as Any : toPath,
-                              duration: duration,
-                              delay: 0,
-                              repeatCount: 0,
-                              autoreverses: false,
-                              timingFunction: present ? .easeInEaseOut : .easeOut,
-                              delegate: self,
-                              isRemovedOnCompletion: true,
-                              completionBlocks: [{
-      revealView.layer.mask = nil
-      if !present {
-        //                circlePathLayer.path = CGPath(rect: .zero, transform: nil)
-        revealView.layer.opacity = 0
-        //////                animatedView.alpha = 0
-        ////                            animatedView.layer.mask = nil
-      }
-    }])
-    
-    circlePathLayer.add(anim, forKey: "path")
-    circlePathLayer.path = !present ? fromPath : toPath
-    
-    let colorLayer = CALayer()
-    if let collectionView = fadeView as? UICollectionView {
-      colorLayer.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 3000))
-    } else {
-      colorLayer.frame = fadeView.layer.bounds
-    }
-    colorLayer.backgroundColor = color.cgColor
-    colorLayer.opacity = present ? 0 : 1
-    
-    fadeView.layer.addSublayer(colorLayer)
-    
-    let opacityAnim = Animations.get(property: .Opacity, fromValue: present ? 0 : 1, toValue: present ? 1 : 0, duration: duration*(present ? 1.15 : 1.35), timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, completionBlocks: [{
-      colorLayer.removeFromSuperlayer()
-    }])
-    colorLayer.add(opacityAnim, forKey: nil)
-    colorLayer.opacity = !present ? 0 : 1
-    
-    if #available(iOS 15, *) {
-      if !periodButton.configuration.isNil {
-        periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return color }
-        periodButton.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-          var outcoming = incoming
-          outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
-          outcoming.foregroundColor = color
-          return outcoming
-        }
-      }
-    } else {
-      periodButton.imageView?.tintColor = color
-      periodButton.tintColor = color
-    }
-  }
+//  func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, color: UIColor, fadeView: UIView, duration: TimeInterval, animateOpacity: Bool = true) {
+//
+//    let circlePathLayer = CAShapeLayer()
+//
+//    var circleFrameTouchPosition: CGRect {
+//      return CGRect(origin: location, size: .zero)
+//    }
+//
+//    var circleFrameTopLeft: CGRect {
+//      return CGRect.zero
+//    }
+//
+//    func circlePath(_ rect: CGRect) -> UIBezierPath {
+//      return UIBezierPath(ovalIn: rect)
+//    }
+//
+//    circlePathLayer.frame = revealView.bounds
+//    circlePathLayer.path = circlePath(location == .zero ? circleFrameTopLeft : circleFrameTouchPosition).cgPath
+//    revealView.layer.mask = circlePathLayer
+//
+//    let radiusInset =  sqrt(revealView.bounds.height*revealView.bounds.height + revealView.bounds.width*revealView.bounds.width + location.x*location.x + location.y*location.y)
+//
+//    let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
+//
+//    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
+//
+//    let fromPath = circlePathLayer.path
+//
+//    let anim = Animations.get(property: .Path,
+//                              fromValue: present ? fromPath as Any : toPath,
+//                              toValue: !present ? fromPath as Any : toPath,
+//                              duration: duration,
+//                              delay: 0,
+//                              repeatCount: 0,
+//                              autoreverses: false,
+//                              timingFunction: present ? .easeInEaseOut : .easeOut,
+//                              delegate: self,
+//                              isRemovedOnCompletion: true,
+//                              completionBlocks: [{
+//      revealView.layer.mask = nil
+//      if !present {
+//        //                circlePathLayer.path = CGPath(rect: .zero, transform: nil)
+//        revealView.layer.opacity = 0
+//        //////                animatedView.alpha = 0
+//        ////                            animatedView.layer.mask = nil
+//      }
+//    }])
+//
+//    circlePathLayer.add(anim, forKey: "path")
+//    circlePathLayer.path = !present ? fromPath : toPath
+//
+//    let colorLayer = CALayer()
+//    if let collectionView = fadeView as? UICollectionView {
+//      colorLayer.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 3000))
+//    } else {
+//      colorLayer.frame = fadeView.layer.bounds
+//    }
+//    colorLayer.backgroundColor = color.cgColor
+//    colorLayer.opacity = present ? 0 : 1
+//
+//    fadeView.layer.addSublayer(colorLayer)
+//
+//    let opacityAnim = Animations.get(property: .Opacity, fromValue: present ? 0 : 1, toValue: present ? 1 : 0, duration: duration*(present ? 1.15 : 1.35), timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, completionBlocks: [{
+//      colorLayer.removeFromSuperlayer()
+//    }])
+//    colorLayer.add(opacityAnim, forKey: nil)
+//    colorLayer.opacity = !present ? 0 : 1
+//
+//    if #available(iOS 15, *) {
+//      if !periodButton.configuration.isNil {
+//        periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return color }
+//        periodButton.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+//          var outcoming = incoming
+//          outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+//          outcoming.foregroundColor = color
+//          return outcoming
+//        }
+//      }
+//    } else {
+//      periodButton.imageView?.tintColor = color
+//      periodButton.tintColor = color
+//    }
+//  }
   
   func setBackgroundColor() {//_ color: UIColor) {
     
@@ -767,7 +786,13 @@ extension TopicsView: TopicsControllerOutput {
     surveysCollectionView.isOnScreen = false
     surveysCollectionView.alpha = 1
     //        collectionView.backgroundColor = background.backgroundColor
-    reveal(present: false, location: CGPoint(x: bounds.maxX, y: bounds.minY)/*touchLocation*/, view: surveysCollectionView, color: color ?? surveysCollectionView.topic!.tagColor, fadeView: collectionView, duration: 0.3)
+    Animations.reveal(present: false,
+                      location: CGPoint(x: bounds.maxX, y: bounds.minY)/*touchLocation*/,
+                      view: surveysCollectionView,
+                      fadeView: collectionView,
+                      color: color ?? surveysCollectionView.topic!.tagColor,
+                      duration: 0.3,
+                      delegate: self)
     setBackgroundColor()//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground)//)
 //    toggleDateFilter(on: false)
     isDateFilterOnScreen = false
@@ -786,12 +811,13 @@ extension TopicsView: TopicsControllerOutput {
     
     guard viewInput.mode == .GlobalSearch else { return }
     
-    reveal(present: true,
-           location: touchLocation,
-           view: surveysCollectionView,
-           color: viewInput.tintColor,
-           fadeView: collectionView,
-           duration: 0.35)
+    Animations.reveal(present: true,
+                      location: touchLocation,
+                      view: surveysCollectionView,
+                      fadeView: collectionView,
+                      color: viewInput.tintColor,
+                      duration: 0.35,
+                      delegate: self)
   }
   
   func onSearchCompleted(_ instances: [SurveyReference]) {

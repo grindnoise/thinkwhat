@@ -501,7 +501,7 @@ class SurveyCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white.blended(withFraction: 0.2, of: .gray)
     
     ratingLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     viewsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
@@ -549,7 +549,7 @@ class SurveyCell: UICollectionViewCell {
 private extension SurveyCell {
   @MainActor
   func setupUI() {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white.blended(withFraction: 0.2, of: .gray)
     clipsToBounds = true
     
     let stackView = UIStackView(arrangedSubviews: [

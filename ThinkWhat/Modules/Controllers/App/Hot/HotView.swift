@@ -241,7 +241,13 @@ extension HotView: HotControllerOutput {
           (current.item.isBanned || current.item.isClaimed || current.item.isComplete)
     else { return }
     
-    next(viewInput?.deque())
+    if current.item.isComplete {
+      current.setComplete() { [unowned self] in
+        self.next(viewInput?.deque())
+      }
+    } else {
+      next(viewInput?.deque())
+    }
   }
 }
 

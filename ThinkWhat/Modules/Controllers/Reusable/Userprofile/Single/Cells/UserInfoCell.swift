@@ -25,8 +25,8 @@ class UserInfoCell: UICollectionViewListCell {
     }
   }
   ///**UI**
-  public var padding: CGFloat = 16
-  public var insets: UIEdgeInsets = .zero
+  public var padding: CGFloat = 8
+  public var insets: UIEdgeInsets?
   public var color: UIColor = Colors.System.Red.rawValue {
     didSet {
       textView.tintColor = color
@@ -53,20 +53,20 @@ class UserInfoCell: UICollectionViewListCell {
       textView
     ])
     instance.axis = .vertical
-    instance.spacing = 16
+    instance.spacing = padding
     
     return instance
   }()
-  private lazy var background: UIView = {
-    let instance = UIView()
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    
-    stack.place(inside: instance,
-                insets: .uniform(size: padding),
-                bottomPriority: .defaultLow)
-    
-    return instance
-  }()
+//  private lazy var background: UIView = {
+//    let instance = UIView()
+//    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//
+//    stack.place(inside: instance,
+//                insets: .uniform(size: padding),
+//                bottomPriority: .defaultLow)
+//
+//    return instance
+//  }()
   private lazy var disclosureLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
@@ -116,13 +116,12 @@ class UserInfoCell: UICollectionViewListCell {
       paragraph.firstLineHeadIndent = padding * 2
       instance.attributedText = NSAttributedString(string: userprofile.description.isEmpty ? "-" : userprofile.description,
                                                    attributes: attributes())
-      instance.backgroundColor = .clear
     } else {
-      instance.backgroundColor = Colors.textField(color: .white, traitCollection: traitCollection)
       instance.delegate = self
       instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
       instance.text = userprofile.description
     }
+    instance.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
     instance.isUserInteractionEnabled = userprofile.isCurrent ? true : false
     
     observers.append(instance.observe(\.contentSize, options: .new) { [weak self] view, value in
@@ -182,8 +181,8 @@ class UserInfoCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    textView.backgroundColor = Colors.textField(color: .white, traitCollection: traitCollection)
+//    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    textView.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
     
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
@@ -216,19 +215,23 @@ private extension UserInfoCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
-    background.removeFromSuperview()
     
-    guard insets != .zero else {
-      background.place(inside: self,
-                       insets: .uniform(size: padding),
-                       bottomPriority: .defaultLow)
-      return
-    }
-    
-    background.place(inside: self,
-                     insets: insets,
+    stack.place(inside: self,
+                     insets: insets ?? .uniform(size: padding),
                      bottomPriority: .defaultLow)
-    
+//
+//    background.removeFromSuperview()
+//
+//    guard insets != .zero else {
+//      background.place(inside: self,
+//                       insets: .uniform(size: padding),
+//                       bottomPriority: .defaultLow)
+//      return
+//    }
+//
+//    background.place(inside: self,
+//                     insets: insets,
+//                     bottomPriority: .defaultLow)
   }
   
   func attributes() -> [NSAttributedString.Key: Any] {

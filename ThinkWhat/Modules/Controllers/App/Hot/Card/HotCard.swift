@@ -20,6 +20,7 @@ class HotCard: UIView, Card {
   public let item: Survey
   public var subscriptions = Set<AnyCancellable>()
   public private(set) var isBanned = false
+  public private(set) var isComplete = false
   ///**Publishers**
   @Published public var action: Action?
   
@@ -274,6 +275,80 @@ class HotCard: UIView, Card {
     fadeGradient.add(colorAnimation, forKey: nil)
   }
   
+  public func setComplete(_ completion: @escaping () -> ()) {
+    guard !isComplete else { return }
+    
+    isComplete = true
+    
+    UIView.animate(withDuration: 0.25,
+                   delay: 0,
+                   options: .curveEaseInOut) { [unowned self] in
+      self.stack.alpha = 0
+      self.stack.transform = .init(scaleX: 0.75, y: 0.75)
+      self.collectionView.alpha = 0.25
+    }
+    
+//    let attrString = NSMutableAttributedString(string: "".localized,
+//                                               attributes: [
+//
+//                                               ])
+    
+    let label = UILabel()
+    label.backgroundColor = .clear
+    label.alpha = 0
+    label.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle)
+    label.text = "survey_complete_notification".localized + "\n🥳"
+    label.textColor = .white
+    label.numberOfLines = 0
+    label.textAlignment = .center
+//    label.attributedText = attrString
+    
+    
+    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.cgColor
+    let colorAnimation = Animations.get(property: .Colors,
+                                        fromValue: [clear, clear, feathered] as Any,
+                                        toValue: [clear, UIColor.systemGreen.cgColor, UIColor.systemGreen.cgColor] as Any,
+                                        duration: 0.4,
+                                        timingFunction: CAMediaTimingFunctionName.easeIn,
+                                        delegate: self,
+                                        isRemovedOnCompletion: false,
+                                        completionBlocks: [
+                                          {[weak self] in
+                                            guard let self = self else { return }
+                                            
+                                            self.fadeGradient.colors = [clear, UIColor.systemGreen.cgColor, UIColor.systemGreen.cgColor]
+                                            label.place(inside: self,
+                                                        insets: .uniform(size: self.padding*2))
+                                            label.transform = .init(scaleX: 1.25, y: 1.25)
+                                            UIView.animate(
+                                              withDuration: 0.6,
+                                              delay: 0,
+                                              usingSpringWithDamping: 0.8,
+                                              initialSpringVelocity: 0.3,
+                                              options: [.curveEaseInOut],
+                                              animations: {
+                                                label.transform = .identity
+                                                label.alpha = 1
+                                              }) { _ in delay(seconds: 1) { completion() } }
+                                          }])
+    let locationAnimation = Animations.get(property: .Locations,
+                                           fromValue: [0.0, 0.5, 0.9] as Any,
+                                           toValue: [-1.0, 0, 1] as Any,
+                                           duration: 0.4,
+                                           timingFunction: CAMediaTimingFunctionName.easeIn,
+                                           delegate: self,
+                                           isRemovedOnCompletion: false,
+                                           completionBlocks: [
+                                            {[weak self] in
+                                              guard let self = self else { return }
+                                              
+                                              self.fadeGradient.locations = [-1.0, 0, 1]
+                                            }])
+    
+    fadeGradient.add(locationAnimation, forKey: nil)
+    fadeGradient.add(colorAnimation, forKey: nil)
+  }
   
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -285,6 +360,11 @@ class HotCard: UIView, Card {
     setGradient(layer: fadeGradient,
                 colors: [clear, clear, feathered],
                 locations: [0.0, 0.75, 0.9])
+    
+    let clear_2 = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.blended(withFraction: 0.015, of: item.topic.tagColor).cgColor
+    setGradient(layer: gradient,
+                colors: [clear_2, feathered],
+                locations: [0.0, 0.5])
     
     body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .white : .tertiarySystemBackground
 //    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? UIColor.white.blended(withFraction: 0.025, of: item.topic.tagColor) : .tertiarySystemBackground

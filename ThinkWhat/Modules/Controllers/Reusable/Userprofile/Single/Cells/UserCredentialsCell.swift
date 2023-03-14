@@ -395,7 +395,7 @@ private extension UserCredentialsCell {
     
     username.text = userprofile.name
     avatar.userprofile = userprofile
-    info.text = "\(userprofile.gender.rawValue.localized.lowercased()), \(userprofile.age), \(userprofile.cityTitle)"
+    info.text = "\(userprofile.gender.rawValue.localized.lowercased()), \(userprofile.age)"//, \(userprofile.cityTitle)"
     subscriptionButton.backgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
     
     if #available(iOS 15, *) {

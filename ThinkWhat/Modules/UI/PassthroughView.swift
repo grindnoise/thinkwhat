@@ -9,6 +9,18 @@
 import UIKit
 
 class PassthroughView: UIView {
+  
+  init(color: UIColor = .clear) {
+    super.init(frame: .zero)
+    
+    backgroundColor = color
+    accessibilityIdentifier = "PassthroughView"
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         subviews.filter { !$0.isHidden && $0.isUserInteractionEnabled && $0.point(inside: convert(point, to: $0), with: event) }.isEmpty
 //        for subview in subviews {

@@ -17,13 +17,15 @@ class UserCompatibilityCell: UICollectionViewListCell {
       guard let userprofile = userprofile else { return }
       
       collectionView.userprofile = userprofile
-//      setupUI()
+      setupUI()
     }
   }
   //Publishers
   public let refreshPublisher = PassthroughSubject<Bool, Never>()
   public let disclosurePublisher = PassthroughSubject<TopicCompatibility, Never>()
-  //UI
+  ///**UI**
+  public var insets: UIEdgeInsets?
+  public var padding: CGFloat = 8
   public var color: UIColor = .clear {
     didSet {
       collectionView.color = color
@@ -35,11 +37,10 @@ class UserCompatibilityCell: UICollectionViewListCell {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
+  ///**UI**
   private var wasUnfolded = false
   private var minHeight: CGFloat = .zero
   private var maxHeight: CGFloat = .zero
-  private let padding: CGFloat = 16
   private lazy var collectionView: UserCompatibilityCollectionView = {
     let instance = UserCompatibilityCollectionView()
     instance.clipsToBounds = true
@@ -115,8 +116,6 @@ class UserCompatibilityCell: UICollectionViewListCell {
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
-    
-    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -137,7 +136,7 @@ private extension UserCompatibilityCell {
   @MainActor
   func setupUI() {
     collectionView.place(inside: self,
-                         insets: UIEdgeInsets(top: padding, left: padding, bottom: 0, right: padding),
+                         insets: insets ?? .uniform(size: padding),
                          bottomPriority: .defaultLow)
   }
   

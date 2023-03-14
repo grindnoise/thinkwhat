@@ -14,13 +14,13 @@ class UserSettingsInfoCell: UICollectionViewListCell {
   // MARK: - Public properties
   ///`UI`
   public private(set) var padding: CGFloat = 16
-  public private(set) var insets: UIEdgeInsets = .zero
+  public var insets: UIEdgeInsets?
   public var color: UIColor = Colors.System.Red.rawValue {
     didSet {
       collectionView.color = color
     }
   }
-  ///`Publishers`
+  ///**Publishers**
   @Published public private(set) var userprofileDescription: String?
   @Published public private(set) var scrollPublisher: CGPoint?
   @Published public private(set) var boundsPublisher: Bool?
@@ -38,7 +38,7 @@ class UserSettingsInfoCell: UICollectionViewListCell {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  ///`UI`
+  ///**UI**
   public private(set) var isAnimationEnabled = false
   ///**Logic**
   public var userprofile: Userprofile! {
@@ -185,7 +185,7 @@ private extension UserSettingsInfoCell {
     
     collectionView.removeFromSuperview()
     collectionView.place(inside: self,
-                         insets: insets == .zero ? .uniform(size: padding) : insets,
+                         insets: insets ?? .uniform(size: padding),
                          bottomPriority: .defaultLow)
   }
 }

@@ -126,6 +126,10 @@ extension UIView {
   func get(all types: [UIView.Type]) -> [UIView] { return UIView.getAllSubviews(from: self, types: types) }
   
   func getSubview<T: UIView>(type: T.Type, identifier: String? = nil) -> T? {
+    guard let identifier = identifier else {
+      return self.get(all: type).first
+    }
+    
     return self.get(all: type).filter({ $0.accessibilityIdentifier == identifier }).first
   }
   
@@ -408,14 +412,41 @@ extension UIView {
     centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
   }
   
+  @discardableResult
   func placeTopLeading(inside parent: UIView,
-                    leadingInset: CGFloat = .zero,
-                    topInset: CGFloat = .zero) {
+                       leadingInset: CGFloat = .zero,
+                       topInset: CGFloat = .zero,
+                       width: CGFloat = .zero,
+                       height: CGFloat = .zero) -> [NSLayoutConstraint] {
     parent.addSubview(self)
     translatesAutoresizingMaskIntoConstraints = false
     
-    leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: leadingInset).isActive = true
-    topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
+    
+    let leading = leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: leadingInset)
+    leading.isActive = true
+    leading.identifier = "leadingAnchor"
+    
+    let top = topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset)
+    top.isActive = true
+    top.identifier = "topAnchor"
+//    topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
+    
+    var constraints = [leading, top]
+    
+    if height != .zero {
+      let height = heightAnchor.constraint(equalToConstant: height)
+      height.isActive = true
+      height.identifier = "heightAnchor"
+      constraints.append(height)
+    }
+    if width != .zero {
+      let width = widthAnchor.constraint(equalToConstant: width)
+      width.isActive = true
+      width.identifier = "widthAnchor"
+      constraints.append(width)
+    }
+    
+    return constraints
   }
   
   func placeLeadingYCentered(inside parent: UIView,

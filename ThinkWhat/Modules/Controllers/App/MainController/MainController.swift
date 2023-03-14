@@ -113,8 +113,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
     return instance
   }()
   private lazy var passthroughView: PassthroughView = {
-    let instance = PassthroughView(frame: UIScreen.main.bounds)
-    instance.backgroundColor = .clear
+    let instance = PassthroughView(color: .clear)
+    instance.frame = UIScreen.main.bounds
     instance.layer.zPosition = 99
     
     return instance

@@ -409,73 +409,28 @@ extension SettingsView: SettingsControllerOutput {
   func onAppSettings() {
     appSettingsView.alpha = 1
     //        touchLocation = CGPoint(x: bounds.maxX, y: bounds.minY)
-    reveal(present: true, location: CGPoint(x: bounds.maxX, y: bounds.minY), view: appSettingsView, fadeView: userSettingsView, color: viewInput?.tintColor ?? .systemGray, duration: 0.4)
+    Animations.reveal(present: true,
+                      location: CGPoint(x: bounds.maxX, y: bounds.minY),
+                      view: appSettingsView,
+                      fadeView: userSettingsView,
+                      color: viewInput?.tintColor ?? .systemGray,
+                      duration: 0.4,
+                      delegate: self)
   }
   
   func onUserSettings() {
     userSettingsView.alpha = 1
     //        collectionView.backgroundColor = background.backgroundColor
-    reveal(present: false, location: CGPoint(x: bounds.maxX, y: bounds.minY), view: appSettingsView, fadeView: userSettingsView, color: viewInput?.tintColor ?? .systemGray, duration: 0.35)
+    Animations.reveal(present: false,
+                      location: CGPoint(x: bounds.maxX, y: bounds.minY),
+                      view: appSettingsView,
+                      fadeView: userSettingsView,
+                      color: viewInput?.tintColor ?? .systemGray,
+                      duration: 0.35,
+                      delegate: self)
   }
   
-  func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, fadeView: UIView, color: UIColor, duration: TimeInterval, animateOpacity: Bool = true) {
-    
-    let circlePathLayer = CAShapeLayer()
-    
-    var circleFrameTouchPosition: CGRect {
-      return CGRect(origin: location, size: .zero)
-    }
-    
-    var circleFrameTopLeft: CGRect {
-      return CGRect.zero
-    }
-    
-    func circlePath(_ rect: CGRect) -> UIBezierPath {
-      return UIBezierPath(ovalIn: rect)
-    }
-    
-    circlePathLayer.frame = revealView.bounds
-    circlePathLayer.path = circlePath(location == .zero ? circleFrameTopLeft : circleFrameTouchPosition).cgPath
-    revealView.layer.mask = circlePathLayer
-    
-    let radiusInset =  sqrt(revealView.bounds.height*revealView.bounds.height + revealView.bounds.width*revealView.bounds.width + location.x*location.x + location.y*location.y)
-    
-    let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
-    
-    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
-    
-    let fromPath = circlePathLayer.path
-    
-    let anim = Animations.get(property: .Path, fromValue: present ? fromPath as Any : toPath, toValue: !present ? fromPath as Any : toPath, duration: duration, delay: 0, repeatCount: 0, autoreverses: false, timingFunction: present ? .easeInEaseOut : .easeOut, delegate: self, isRemovedOnCompletion: true, completionBlocks: [{
-      revealView.layer.mask = nil
-      if !present {
-        //                circlePathLayer.path = CGPath(rect: .zero, transform: nil)
-        revealView.layer.opacity = 0
-        //////                animatedView.alpha = 0
-        ////                            animatedView.layer.mask = nil
-      }
-    }])
-    
-    circlePathLayer.add(anim, forKey: "path")
-    circlePathLayer.path = !present ? fromPath : toPath
-    
-    let colorLayer = CALayer()
-    if let collectionView = fadeView as? UICollectionView {
-      colorLayer.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 3000))
-    } else {
-      colorLayer.frame = fadeView.layer.bounds
-    }
-    colorLayer.backgroundColor = color.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.systemGray.cgColor
-    colorLayer.opacity = present ? 0 : 1
-    
-    fadeView.layer.addSublayer(colorLayer)
-    
-    let opacityAnim = Animations.get(property: .Opacity, fromValue: present ? 0 : 1, toValue: present ? 1 : 0, duration: duration, timingFunction: CAMediaTimingFunctionName.easeInEaseOut, delegate: self, completionBlocks: [{
-      colorLayer.removeFromSuperlayer()
-    }])
-    colorLayer.add(opacityAnim, forKey: nil)
-    colorLayer.opacity = !present ? 0 : 1
-  }
+  
 }
 
 extension SettingsView: BannerObservable {

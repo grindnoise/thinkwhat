@@ -44,6 +44,11 @@ class AnswerCell: UICollectionViewCell {
           self.openConstraint.isActive = true
           self.updatePublisher.send(true)
           self.setChosen()
+//          self.setSelected(forceDeselect: true) { [weak self] _ in
+//            guard let self = self else { return }
+//
+//            self.setChosen()
+//          }
 //          DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
 //            guard let self = self else { return }
 //
@@ -78,18 +83,18 @@ class AnswerCell: UICollectionViewCell {
       observeVoters()
     }
   }
-  //Publishers
+  ///**Publishers**
   public let selectionPublisher = PassthroughSubject<Answer, Never>()
   public let deselectionPublisher = PassthroughSubject<Bool, Never>()
   ///Used to refresh `collectionView`
   public let updatePublisher = PassthroughSubject<Bool, Never>()
   public let votersPublisher = PassthroughSubject<Answer, Never>()
-  //Logic
+  ///**Logic**
   public var isAnswerSelected = false {
     didSet {
       guard oldValue != isAnswerSelected else { return }
-      
-      setSelected()
+
+      setSelected() { _ in }
     }
   }
   //Flag for user interaction
@@ -105,7 +110,7 @@ class AnswerCell: UICollectionViewCell {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  ///`Logic`
+  ///**Logic**
   private var isChosen: Bool {
     guard let survey = item.survey,
           let result = survey.result,
@@ -115,7 +120,8 @@ class AnswerCell: UICollectionViewCell {
     return true
   }
   private let avatarsThreshold = 5
-  ///`UI properties`
+  ///**UI**
+  private var touchLocation: CGPoint = .zero
   private let statsHeight: CGFloat = 44
   private let padding: CGFloat = 8
   private let lineSpacing: CGFloat = 4
@@ -140,7 +146,7 @@ class AnswerCell: UICollectionViewCell {
     
     return instance
   }()
-  ///`Top part`
+  ///Top part
   private lazy var textView: UITextView = {
     let instance = UITextView()
     instance.textContainerInset = UIEdgeInsets(top: padding,
@@ -184,7 +190,7 @@ class AnswerCell: UICollectionViewCell {
     //    instance.publisher(for: \.bounds)
     return instance
   }()
-  ///`Bottom part`
+  ///Bottom part
   private lazy var statsStack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
       percentageLabel,
@@ -265,7 +271,7 @@ class AnswerCell: UICollectionViewCell {
   private lazy var votersStack: VotersStack = {
     let instance = VotersStack(userprofiles: Array(item.voters.prefix(avatarsThreshold)),
                                capacity: avatarsThreshold,
-                               lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.1) : .clear,
+                               lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.2) : .clear,
                                darkBorderColor: (isChosen || isAnswerSelected) ? .tertiarySystemBackground : .clear,
                                height: statsHeight-padding)
     instance.tapPublisher
@@ -286,7 +292,7 @@ class AnswerCell: UICollectionViewCell {
     
     return instance
   }()
-  ///`Constraints`
+  ///Constraints
   private var openConstraint: NSLayoutConstraint!
   private var closedConstraint: NSLayoutConstraint!
   
@@ -323,7 +329,7 @@ class AnswerCell: UICollectionViewCell {
     super.traitCollectionDidChange(previousTraitCollection)
     
 //    updateUI(animated: false)
-    stackView.backgroundColor = !isChosen ? .clear : traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.1)
+    stackView.backgroundColor = !isChosen ? .clear : traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.2)
   }
 }
 
@@ -383,7 +389,7 @@ private extension AnswerCell {
       openConstraint.isActive = true
       percentageView.setPercent(value: item.percent, animated: false)
       votersCountLabel.alpha = 1
-      stackView.backgroundColor = !isChosen ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.1)
+      stackView.backgroundColor = !isChosen ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.2)
       if survey.isAnonymous {
 //        votersView.alpha = 0
         disclosureIndicator.alpha = 0
@@ -395,26 +401,95 @@ private extension AnswerCell {
   }
   
   @MainActor
-  func setSelected() {
-    UIView.animate(
-      withDuration: 0.3,
-      delay: 0,
-      usingSpringWithDamping: 0.8,
-      initialSpringVelocity: 0.3,
-      options: [.curveEaseInOut]) { [weak self] in
-        guard let self = self,
-              let survey = self.item.survey
-        else { return }
-        
-        self.imageView.tintColor = self.isAnswerSelected ? survey.topic.tagColor : .systemGray
-        self.textView.backgroundColor = !self.isAnswerSelected ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : survey.topic.tagColor.withAlphaComponent(0.1)
-      }
+  func setSelected(forceDeselect: Bool = false,
+                   completion: @escaping (Bool)-> ()) {
+    guard let survey = item.survey else { return }
+    
+    if forceDeselect {
+      guard let passView = stackView.getSubview(type: PassthroughView.self) else { return }
+      
+      UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut) {
+        passView.alpha = 0
+        passView.transform = .init(scaleX: 1, y: 0.01)
+      } completion: { _ in passView.removeFromSuperview(); completion(true) }
+      
+      return
+    }
+    
+    guard !item.survey!.isComplete else { return }
+    
+    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
+      guard let self = self else { return }
+      
+      self.imageView.tintColor = self.isAnswerSelected ? survey.topic.tagColor : .systemGray
+    }
+    
+    switch isAnswerSelected {
+    case true:
+      let passView = PassthroughView(color: survey.topic.tagColor.withAlphaComponent(0.2))
+      passView.alpha = 0
+      passView.placeTopLeading(inside: stackView,
+                               width: textView.bounds.width,
+                               height: textView.bounds.height)
+      passView.cornerRadius = textView.cornerRadius
+      stackView.setNeedsLayout()
+      stackView.layoutIfNeeded()
+      selectionPublisher.send(item)
+      Animations.unmaskCircled(view: passView,
+                               location: touchLocation,
+                               duration: 0.4,
+                               opacityDurationMultiplier: 0.5,
+                               delegate: self,
+                               completionBlocks: [{ completion(true) }])
+    case false:
+//      deselectionPublisher.send(true)
+      guard let passView = stackView.getSubview(type: PassthroughView.self) else { return }
+      
+      UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut) {
+        passView.alpha = 0
+        passView.transform = .init(scaleX: 1, y: 0.01)
+      } completion: { _ in passView.removeFromSuperview(); completion(true) }
+    }
+//    UIView.animate(
+//      withDuration: 0.3,
+//      delay: 0,
+//      usingSpringWithDamping: 0.8,
+//      initialSpringVelocity: 0.3,
+//      options: [.curveEaseInOut]) { [weak self] in
+//        guard let self = self,
+//              let survey = self.item.survey
+//        else { return }
+//
+//        self.imageView.tintColor = self.isAnswerSelected ? survey.topic.tagColor : .systemGray
+//        self.textView.backgroundColor = !self.isAnswerSelected ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : survey.topic.tagColor.withAlphaComponent(0.1)
+//      }
   }
   
   @MainActor
   func setChosen() {
-    votersStack.setColors(lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.1) : .clear,
+    votersStack.setColors(lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.2) : .clear,
                           darkBorderColor: (isChosen || isAnswerSelected) ? .tertiarySystemBackground : .clear)
+    
+    guard let passView = stackView.getSubview(type: PassthroughView.self),
+          let constraint = passView.getConstraint(identifier: "heightAnchor")
+    else {
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut]) { [weak self] in
+          guard let self = self else { return }
+          
+          self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.2) : .clear
+          self.imageView.tintColor = self.color
+          self.textView.backgroundColor = .clear
+          self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
+        }
+      return
+    }
+    
+    setNeedsLayout()
     UIView.animate(
       withDuration: 0.3,
       delay: 0,
@@ -423,12 +498,11 @@ private extension AnswerCell {
       options: [.curveEaseInOut]) { [weak self] in
         guard let self = self else { return }
         
-        self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.1) : .clear
+        passView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.2) : .clear
         self.imageView.tintColor = self.color
-        self.textView.backgroundColor = .clear
         self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
-        //        print(self.item.voters.count)
-        //        self.item.voters.prefix(5) { self.votersStack.push(userprofiles: $0)}
+        constraint.constant = self.stackView.bounds.height
+        self.layoutIfNeeded()
       }
   }
   
@@ -449,14 +523,11 @@ private extension AnswerCell {
   func handleGesture(sender: UITapGestureRecognizer) {
     guard let view = sender.view else { return }
     
+    touchLocation = sender.location(ofTouch: 0, in: self)
+    
     if view == textView {
-      guard !item.survey!.isComplete else { return }
-      
       isAnswerSelected = !isAnswerSelected
-      switch isAnswerSelected {
-      case true:
-        selectionPublisher.send(item)
-      case false:
+      if !isAnswerSelected {
         deselectionPublisher.send(true)
       }
     } else if let survey = item.survey,
@@ -469,7 +540,13 @@ private extension AnswerCell {
   }
 }
 
-
+extension AnswerCell: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
+            completionBlocks.forEach{ $0() }
+        }
+    }
+}
 
 
 

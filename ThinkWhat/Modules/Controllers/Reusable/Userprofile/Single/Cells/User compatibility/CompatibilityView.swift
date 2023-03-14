@@ -52,8 +52,8 @@ class CompatibilityView: UIView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
-  private let lineWidthMultiplier: CGFloat = 0.1
+  ///**UI**
+  private let lineWidthMultiplier: CGFloat = 0.125
   private lazy var descriptionLabel: UILabel = {
     let instance = UILabel()
     instance.textAlignment = .center
