@@ -40,7 +40,7 @@ class HotView: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private var current: Card?
+  public private(set) var current: Card?
   private var incoming: Card? {
     didSet {
       guard let incoming = incoming else { return }

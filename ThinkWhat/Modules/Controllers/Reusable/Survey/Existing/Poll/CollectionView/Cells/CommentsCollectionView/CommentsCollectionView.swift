@@ -367,11 +367,7 @@ class CommentsCollectionView: UICollectionView {
       
       //Thread disclosure
       cell.threadPublisher
-        .sink { [weak self] in
-          guard let self = self else { return }
-          
-          self.threadPublisher.send($0)
-        }
+        .sink { [unowned self] in self.threadPublisher.send($0) }
         .store(in: &self.subscriptions)
       
       //Claim tap

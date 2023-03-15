@@ -15,6 +15,7 @@ struct Animations {
     case ShadowPath      = "shadowPath"
     case ShadowOpacity   = "shadowOpacity"
     case Scale           = "transform.scale"
+    case ScaleY          = "transform.scale.Y"
     case Path            = "path"
     case BackgroundColor = "backgroundColor"
     case StrokeStart     = "strokeStart"
@@ -22,8 +23,9 @@ struct Animations {
     case StrokeColor     = "strokeColor"
     case LineWidth       = "lineWidth"
     case Opacity         = "opacity"
-    case Colors         = "colors"
-    case Locations         = "locations"
+    case Colors          = "colors"
+    case Locations       = "locations"
+    case Transform       = "transform"
   }
   static func group(animations: [CAAnimation], repeatCount: Float = 0, autoreverses: Bool = false, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true) -> CAAnimationGroup {
     
@@ -42,7 +44,18 @@ struct Animations {
     
   }
   
-  static func get(property: AnimationProperty, fromValue: Any, toValue: Any, duration: CFTimeInterval, delay beginTime: CFTimeInterval = 0.0, repeatCount: Float = 0, autoreverses: Bool = false, timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default, delegate: CAAnimationDelegate?, isRemovedOnCompletion: Bool = true, completionBlocks: [Closure]? = nil, delay: CFTimeInterval = 0.0) -> CAAnimation {
+  static func get(property: AnimationProperty,
+                  fromValue: Any,
+                  toValue: Any,
+                  duration: CFTimeInterval,
+                  delay beginTime: CFTimeInterval = 0.0,
+                  repeatCount: Float = 0,
+                  autoreverses: Bool = false,
+                  timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default,
+                  delegate: CAAnimationDelegate?,
+                  isRemovedOnCompletion: Bool = true,
+                  completionBlocks: [Closure]? = nil,
+                  delay: CFTimeInterval = 0.0) -> CAAnimation {
     
     let anim = CABasicAnimation(keyPath: property.rawValue)
     anim.beginTime = CACurrentMediaTime() + delay
@@ -197,6 +210,98 @@ struct Animations {
     
     animatedView.layer.add(opacityAnim, forKey: nil)
     animatedView.layer.opacity = 1
+  }
+  
+  static func unmaskLayerCircled(layer animatedlayer: CALayer,
+                            location: CGPoint,
+                            duration: TimeInterval,
+                            animateOpacity: Bool = true,
+                            opacityDurationMultiplier: Double = 1,
+                            delegate: CAAnimationDelegate,
+                            completionBlocks: [Closure] = []) {
+    
+    let circlePathLayer = CAShapeLayer()
+    var _completionBlocks = completionBlocks
+    var circleFrameTopCenter: CGRect {
+      var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+      let circlePathBounds = circlePathLayer.bounds
+      circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+      circleFrame.origin.y = circlePathBounds.minY - circleFrame.minY
+      return circleFrame
+    }
+    
+    var circleFrameTop: CGRect {
+      var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+      let circlePathBounds = circlePathLayer.bounds
+      circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+      circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+      return circleFrame
+    }
+    
+    var circleFrameTopLeft: CGRect {
+      return CGRect.zero
+    }
+    
+    var circleFrameTouchPosition: CGRect {
+      return CGRect(origin: location, size: .zero)
+    }
+    
+    var circleFrameCenter: CGRect {
+      var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
+      let circlePathBounds = circlePathLayer.bounds
+      circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
+      circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
+      return circleFrame
+    }
+    
+    func circlePath(_ rect: CGRect) -> UIBezierPath {
+      return UIBezierPath(ovalIn: rect)
+    }
+    
+    circlePathLayer.frame = animatedlayer.bounds
+    circlePathLayer.path = circlePath(circleFrameTouchPosition).cgPath
+    animatedlayer.mask = circlePathLayer
+    
+    //        let center = lastPoint//(x: animatedView.bounds.midX, y: animatedView.bounds.midY)
+    
+    let finalRadius = max(abs(animatedlayer.bounds.width - location.x),
+                          abs(animatedlayer.bounds.width - (animatedlayer.bounds.width - location.x)))//sqrt((center.x*center.x) + (center.y*center.y))
+    
+    let radiusInset = finalRadius * 1.5
+    
+    let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
+    
+    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
+    
+    let fromPath = circlePathLayer.path
+    
+    let anim = Animations.get(property: .Path,
+                              fromValue: fromPath as Any,
+                              toValue: toPath,
+                              duration: duration,
+                              delay: 0,
+                              repeatCount: 0,
+                              autoreverses: false,
+                              timingFunction: .easeOut,
+                              delegate: delegate,
+                              isRemovedOnCompletion: true,
+                              completionBlocks: [])
+    
+    circlePathLayer.add(anim, forKey: "path")
+    circlePathLayer.path = toPath
+   
+    guard animateOpacity else { return }
+//    animatedView.alpha = 1
+    animatedlayer.opacity = 1//0
+    let opacityAnim = Animations.get(property: .Opacity,
+                                     fromValue: 0,
+                                     toValue: 1,
+                                     duration: duration*opacityDurationMultiplier,
+                                     timingFunction: CAMediaTimingFunctionName.easeOut,
+                                     delegate: nil)
+    
+    animatedlayer.add(opacityAnim, forKey: nil)
+    animatedlayer.opacity = 1
   }
   
   static func reveal(present: Bool,

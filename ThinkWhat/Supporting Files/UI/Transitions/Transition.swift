@@ -30,39 +30,74 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                 transitionContext.completeTransition(false)
                 return
         }
+      
+      
+      if operation == .push {
         
         let containerView = transitionContext.containerView
         context = transitionContext
         toVC.view.alpha = 0
         containerView.addSubview(toVC.view)
         
-        toVC.view.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-//        toVC.view.setNeedsLayout()
-//        toVC.view.layoutIfNeeded()
+        //        toVC.view.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         
-//        UIView.animate(withDuration: duration) {
-//            fromVC.view.alpha = 0
-//        }
-//        UIView.animate(withDuration: self.duration,
-//                       delay: 0,
-//                       options: self.operation == .push ? .curveEaseIn : .curveEaseOut, animations: {
-        //                        fromVC.view.alpha = 0
-        //        })
-        UIView.animate(withDuration: self.duration,
-                       delay: 0,
-                       //                       options: operation == .pop ? .curveEaseOut : .curveEaseIn , animations: {
-                       options: .curveLinear, animations: {
-            toVC.view.transform = .identity
-            fromVC.view.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-            toVC.view.alpha = 1
-            fromVC.view.alpha = 0
-            //                    toVC.view.setNeedsDisplay()
-            //                    toVC.view.layoutIfNeeded()
-        }) {
-            _ in
-            fromVC.view.transform = .identity
-            fromVC.view.removeFromSuperview()
-            self.context?.completeTransition(true)
+        if let hotController = fromVC as? HotController,
+//           let mainController = navigationController.tabBarController as? MainController,
+           let pollController = toVC as? PollController,
+           let hotView = hotController.view as? HotView,
+           let card = hotView.current as? HotCard {
+          
+          pollController.view.setNeedsLayout()
+          pollController.view.layoutIfNeeded()
+          
+          let fakeCard = HotCard(item: card.item,
+                                nextColor: card.item.topic.tagColor,
+                                isReplica: true)
+          fakeCard.frame = card.frame
+          fakeCard.body.cornerRadius = card.body.cornerRadius
+          fakeCard.stack.alpha = 0
+          fakeCard.setNeedsLayout()
+          fakeCard.layoutIfNeeded()
+
+          delay(seconds: 0.1) { [weak self] in
+            guard let self = self else { return }
+            appDelegate.window?.addSubview(fakeCard)
+            hotView.alpha = 0
+//            mainController.tabBarController?.setTabBarVisible(visible: false, animated: true)
+            
+            UIView.animate(withDuration: 1,//self.duration,
+                           delay: 0,
+                           options: .curveLinear,
+                           animations: {
+
+//              fakeCard.stack.alpha = 0
+              fakeCard.body.cornerRadius = 0
+              
+              let topInset = hotController.view.statusBarFrame.height + self.navigationController.navigationBar.frame.height
+              fakeCard.frame.origin = CGPoint(x: 0, y: topInset)
+//              fakeCard.body.bounds.size.width += 20//appDelegate.window?.bounds.width ?? 0 // pollController.view.bounds.width// + 10
+//                                      size: CGSize(width: pollController.view.bounds.width,
+//                                                   height: fakeCard.bounds.height + 20 + self.navigationController.tabBarController!.tabBar.frame.height))
+              
+              pollController.view.alpha = 1
+              //            hotController.view.alpha = 0
+              //                    toVC.view.setNeedsDisplay()
+              //                    toVC.view.layoutIfNeeded()
+            }) {
+              _ in
+              //              fromVC.view.transform = .identity
+              hotController.view.removeFromSuperview()
+              hotController.view.alpha = 1
+              fakeCard.removeFromSuperview()
+              self.context?.completeTransition(true)
+            }
+          }
         }
+        
+        
+
+        
+          
+      } else { fatalError() }
     }
 }

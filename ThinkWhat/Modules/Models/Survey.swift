@@ -344,6 +344,8 @@ class Survey: Decodable {
       question                = try container.decode(String.self, forKey: .question)
       type                    = _type
       answers                 = try container.decode([Answer].self, forKey: .answers)
+      ///Import
+      Answers.shared.append(answers)
       votesLimit              = try container.decode(Int.self, forKey: .voteCapacity)
       votesTotal              = try container.decode(Int.self, forKey: .totalVotes)
       commentsTotal           = try container.decode(Int.self, forKey: .commentsTotal)

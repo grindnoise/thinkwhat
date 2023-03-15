@@ -53,16 +53,16 @@ class CommentsSectionCell: UICollectionViewCell {
     }
   }
   //Publishers
-  public let updateStatsPublisher = PassthroughSubject<[Comment], Never>()
-  public let commentPublisher = PassthroughSubject<String, Never>()
-  public let anonCommentPublisher = PassthroughSubject<[String: String], Never>()
-  public let replyPublisher = PassthroughSubject<[Comment: String], Never>()
-  public let anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
-  public let claimPublisher = PassthroughSubject<Comment, Never>()
-  public let deletePublisher = PassthroughSubject<Comment, Never>()
-  public let threadPublisher = PassthroughSubject<Comment, Never>()
-  public let paginationPublisher = PassthroughSubject<[Comment], Never>()
-  public let boundsPublisher = PassthroughSubject<Bool, Never>()
+  public var updateStatsPublisher = PassthroughSubject<[Comment], Never>()
+  public var commentPublisher = PassthroughSubject<String, Never>()
+  public var anonCommentPublisher = PassthroughSubject<[String: String], Never>()
+  public var replyPublisher = PassthroughSubject<[Comment: String], Never>()
+  public var anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
+  public var claimPublisher = PassthroughSubject<Comment, Never>()
+  public var deletePublisher = PassthroughSubject<Comment, Never>()
+  public var threadPublisher = PassthroughSubject<Comment, Never>()
+  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
+  public var boundsPublisher = PassthroughSubject<Bool, Never>()
   //Publishers
 //  public let commentSubject = CurrentValueSubject<String?, Never>(nil)
 //  public let anonCommentSubject = CurrentValueSubject<[String: String]?, Never>(nil)
@@ -284,6 +284,20 @@ class CommentsSectionCell: UICollectionViewCell {
   }
   
   
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    
+    threadPublisher = PassthroughSubject<Comment, Never>()
+    updateStatsPublisher = PassthroughSubject<[Comment], Never>()
+    commentPublisher = PassthroughSubject<String, Never>()
+    anonCommentPublisher = PassthroughSubject<[String: String], Never>()
+    replyPublisher = PassthroughSubject<[Comment: String], Never>()
+    anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
+    claimPublisher = PassthroughSubject<Comment, Never>()
+    deletePublisher = PassthroughSubject<Comment, Never>()
+    paginationPublisher = PassthroughSubject<[Comment], Never>()
+    boundsPublisher = PassthroughSubject<Bool, Never>()
+  }
   
   // MARK: - Private methods
   private func setupUI() {

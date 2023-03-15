@@ -133,21 +133,14 @@ extension UIView {
     return self.get(all: type).filter({ $0.accessibilityIdentifier == identifier }).first
   }
   
-  func getAllSuperviews<T: UIView>() -> [T] {
-    let all = UIView.getAllSuperviews(above: self)
-    
-    return UIView.getAllSuperviews(above: self).filter { $0 is T } as? [T] ?? []
-  }
+  func getLayer(identifier: String) -> CALayer? { self.layer.sublayers?.filter({ $0.name == identifier }).first }
+
   
-  func getSuperview<T: UIView>(type: T.Type) -> T? {
-    let all = UIView.getAllSuperviews(above: self)
-    
-    return UIView.getAllSuperviews(above: self).filter { $0 is T }.first as? T
-  }
+  func getAllSuperviews<T: UIView>() -> [T] { UIView.getAllSuperviews(above: self).filter { $0 is T } as? [T] ?? [] }
   
-  func addSubviews(_ items: [UIView]) {
-    items.forEach { addSubview($0) }
-  }
+  func getSuperview<T: UIView>(type: T.Type) -> T? { UIView.getAllSuperviews(above: self).filter { $0 is T }.first as? T }
+  
+  func addSubviews(_ items: [UIView]) { items.forEach { addSubview($0) } }
 }
 
 //UI

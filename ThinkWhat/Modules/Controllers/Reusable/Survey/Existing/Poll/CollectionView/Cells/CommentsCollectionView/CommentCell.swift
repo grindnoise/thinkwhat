@@ -432,10 +432,11 @@ class CommentCell: UICollectionViewListCell {
     super.prepareForReuse()
     
     item = nil
-    //    commentThreadSubject = .init(nil)
-    //    replySubject = .init(nil)
-    //    claimSubject = .init(nil)
-    //    deleteSubject = .init(nil)
+    replyPublisher = PassthroughSubject<Comment, Never>()
+    claimPublisher = PassthroughSubject<Comment, Never>()
+    deletePublisher = PassthroughSubject<Comment, Never>()
+    threadPublisher = PassthroughSubject<Comment, Never>()
+
     avatar.clearImage()
     //        supplementaryStack.removeArrangedSubview(menuButton)
     //        menuButton.removeFromSuperview()
@@ -561,10 +562,16 @@ private extension CommentCell {
     
     if let userprofile = item.userprofile {
       avatar.userprofile = userprofile.isCurrent ? Userprofiles.shared.current : userprofile
-      if let answer = item.answer,
+      if let usersChoice = avatar.userprofile!.answers[item.surveyId],
+         let answer = Answers.shared[usersChoice],
          let image = UIImage(systemName: "\(answer.order+1).circle.fill") {
         avatar.setChoiceBadge(image: image, color: Colors.getColor(forId: answer.order))
+        
       }
+      //      if let answer = item.answer,
+      //         let image = UIImage(systemName: "\(answer.order+1).circle.fill") {
+      //        avatar.setChoiceBadge(image: image, color: Colors.getColor(forId: answer.order))
+      //      }
     } else {
       avatar.userprofile = Userprofile.anonymous
     }

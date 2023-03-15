@@ -165,3 +165,44 @@ extension Answer: Hashable {
         hasher.combine(surveyID)
     }
 }
+
+class Answers {
+  
+  private var shouldImportUserDefaults = false
+  static let shared = Answers()
+  var all: [Answer] = [] {
+    didSet {
+      guard !oldValue.isEmpty else {
+        instancesPublisher.send(all)
+        return
+      }
+      
+      let existingSet = Set(oldValue)
+      let appendingSet = Set(all)
+      
+      ///Difference
+      instancesPublisher.send(Array(appendingSet.subtracting(existingSet)))
+    }
+  }
+  ///**Publishers**
+  public let instancesPublisher = PassthroughSubject<[Answer], Never>()
+  
+  func append(_ instances: [Answer]) {
+    guard !instances.isEmpty else {
+      instancesPublisher.send([]);
+      return
+    }
+    
+    guard !all.isEmpty else { all.append(contentsOf: instances); return }
+    
+    let existingSet = Set(all)
+    let appendingSet = Set(replaceWithExisting(all, instances))
+    let difference = Array(appendingSet.subtracting(existingSet))
+    
+    guard !difference.isEmpty else { return }
+    
+    all.append(contentsOf: difference)
+  }
+  
+  subscript(_ id: Int) -> Answer? { all.filter({ $0.id == id }).first }
+}

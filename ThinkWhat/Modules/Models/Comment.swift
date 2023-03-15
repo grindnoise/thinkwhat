@@ -91,7 +91,7 @@ class Comment: Decodable {
   
   let id: Int
   let body: String
-  let surveyId: Int?
+  let surveyId: Int
   let parentId: Int?
   var replies: Int {
     didSet {
@@ -107,6 +107,7 @@ class Comment: Decodable {
   let anonUsername: String
   let createdAt: Date
   let replyToId: Int?
+  let answerId: Int?
   //    let parentId: Int?
   var replyTo: Comment? {
     return Comments.shared.all.filter { $0.id == replyToId }.first
@@ -223,14 +224,19 @@ class Comment: Decodable {
       parentId        = try container.decodeIfPresent(Int.self, forKey: .parent)
       isBanned        = try container.decode(Bool.self, forKey: .isBanned)
       isDeleted       = try container.decode(Bool.self, forKey: .isDeleted)
+      answerId        = try container.decodeIfPresent(Int.self, forKey: .choice)
       
-      if let choice = try container.decodeIfPresent(Int.self, forKey: .choice),
-         let survey = self.survey,
-         let answer = survey.answers.filter({ $0.id == choice }).first,
-         let userprofile = self.userprofile {
-        userprofile.choices[survey] = answer
-        self.answer = answer
+      if let userprofile = userprofile,
+         !answerId.isNil {
+        (userprofile.isCurrent ? Userprofiles.shared.current! : userprofile).answers[surveyId] = answerId!
       }
+//      if let choice = try container.decodeIfPresent(Int.self, forKey: .choice),
+//         let survey = self.survey,
+//         let answer = survey.answers.filter({ $0.id == choice }).first,
+//         let userprofile = self.userprofile {
+//        userprofile.choices[survey] = answer
+//        self.answer = answer
+//      }
       
       if Comments.shared.all.filter({ $0 == self }).isEmpty {
         Comments.shared.all.append(self)

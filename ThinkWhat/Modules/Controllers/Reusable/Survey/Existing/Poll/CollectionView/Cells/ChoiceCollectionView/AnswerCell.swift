@@ -272,7 +272,7 @@ class AnswerCell: UICollectionViewCell {
     let instance = VotersStack(userprofiles: Array(item.voters.prefix(avatarsThreshold)),
                                capacity: avatarsThreshold,
                                lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.2) : .clear,
-                               darkBorderColor: (isChosen || isAnswerSelected) ? .tertiarySystemBackground : .clear,
+                               darkBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.4) : .clear,
                                height: statsHeight-padding)
     instance.tapPublisher
       .sink { [weak self] _ in
@@ -307,6 +307,9 @@ class AnswerCell: UICollectionViewCell {
 #if DEBUG
     print("\(String(describing: type(of: self))).\(#function)")
 #endif
+    guard let selection = stackView.getLayer(identifier: "selection") else { return }
+    
+    selection.removeAllAnimations()
   }
   
   
@@ -329,7 +332,8 @@ class AnswerCell: UICollectionViewCell {
     super.traitCollectionDidChange(previousTraitCollection)
     
 //    updateUI(animated: false)
-    stackView.backgroundColor = !isChosen ? .clear : traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.2)
+    
+    stackView.backgroundColor = !isChosen ? .clear : color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
   }
 }
 
@@ -389,14 +393,16 @@ private extension AnswerCell {
       openConstraint.isActive = true
       percentageView.setPercent(value: item.percent, animated: false)
       votersCountLabel.alpha = 1
-      stackView.backgroundColor = !isChosen ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.2)
+//      stackView.backgroundColor = !isChosen ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : color.withAlphaComponent(0.2)
+      stackView.backgroundColor = !isChosen ? .clear : color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
       if survey.isAnonymous {
 //        votersView.alpha = 0
         disclosureIndicator.alpha = 0
       }
     } else {
       closedConstraint.isActive = true
-      stackView.backgroundColor = !isChosen ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : survey.topic.tagColor.withAlphaComponent(0.1)
+      stackView.backgroundColor = !isChosen ? .clear : color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
+//      stackView.backgroundColor = !isChosen ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : survey.topic.tagColor.withAlphaComponent(0.1)
     }
   }
   
@@ -406,12 +412,12 @@ private extension AnswerCell {
     guard let survey = item.survey else { return }
     
     if forceDeselect {
-      guard let passView = stackView.getSubview(type: PassthroughView.self) else { return }
+      guard let selection = stackView.getLayer(identifier: "selection") else { return }
       
       UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut) {
-        passView.alpha = 0
-        passView.transform = .init(scaleX: 1, y: 0.01)
-      } completion: { _ in passView.removeFromSuperview(); completion(true) }
+        selection.opacity = 0
+        selection.transform = CATransform3DMakeTranslation(1, 0.01, 1)
+      } completion: { _ in selection.removeFromSuperlayer(); completion(true) }
       
       return
     }
@@ -426,53 +432,65 @@ private extension AnswerCell {
     
     switch isAnswerSelected {
     case true:
-      let passView = PassthroughView(color: survey.topic.tagColor.withAlphaComponent(0.2))
-      passView.alpha = 0
-      passView.placeTopLeading(inside: stackView,
-                               width: textView.bounds.width,
-                               height: textView.bounds.height)
-      passView.cornerRadius = textView.cornerRadius
-      stackView.setNeedsLayout()
-      stackView.layoutIfNeeded()
       selectionPublisher.send(item)
-      Animations.unmaskCircled(view: passView,
-                               location: touchLocation,
-                               duration: 0.4,
-                               opacityDurationMultiplier: 0.5,
-                               delegate: self,
-                               completionBlocks: [{ completion(true) }])
-    case false:
-//      deselectionPublisher.send(true)
-      guard let passView = stackView.getSubview(type: PassthroughView.self) else { return }
+      let selection = CALayer()
+      selection.name  = "selection"
+      selection.backgroundColor = survey.topic.tagColor.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+      selection.frame = CGRect(origin: .zero, size: textView.bounds.size)
+      selection.cornerRadius = stackView.cornerRadius
+      selection.opacity = 0
+      stackView.layer.insertSublayer(selection, at: 0)
       
-      UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut) {
-        passView.alpha = 0
-        passView.transform = .init(scaleX: 1, y: 0.01)
-      } completion: { _ in passView.removeFromSuperview(); completion(true) }
+      Animations.unmaskLayerCircled(layer: selection,
+                                    location: touchLocation,
+                                    duration: 0.4,
+                                    opacityDurationMultiplier: 0.5,
+                                    delegate: self,
+                                    completionBlocks: [{ completion(true) }])
+    case false:
+      guard let selection = stackView.getLayer(identifier: "selection") else { return }
+      
+      selection.add(Animations.get(property: .Opacity,
+                                   fromValue: 1,
+                                   toValue: 0,
+                                   duration: 0.2,
+                                   timingFunction: .easeOut,
+                                   delegate: self,
+                                   completionBlocks: [{ selection.removeFromSuperlayer() }]),
+                    forKey: nil)
+      selection.add(Animations.get(property: .Scale,
+                                   fromValue: selection.affineTransform(),
+                                   toValue: selection.setAffineTransform(CGAffineTransform(scaleX: 1, y: 0.1)),//0.1,
+                                   duration: 0.2,
+                                   timingFunction: .easeOut,
+                                   delegate: self,
+                                   completionBlocks: [{ selection.removeFromSuperlayer() }]),
+                    forKey: nil)
     }
-//    UIView.animate(
-//      withDuration: 0.3,
-//      delay: 0,
-//      usingSpringWithDamping: 0.8,
-//      initialSpringVelocity: 0.3,
-//      options: [.curveEaseInOut]) { [weak self] in
-//        guard let self = self,
-//              let survey = self.item.survey
-//        else { return }
-//
-//        self.imageView.tintColor = self.isAnswerSelected ? survey.topic.tagColor : .systemGray
-//        self.textView.backgroundColor = !self.isAnswerSelected ? .clear : self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : survey.topic.tagColor.withAlphaComponent(0.1)
-//      }
   }
   
   @MainActor
   func setChosen() {
     votersStack.setColors(lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.2) : .clear,
-                          darkBorderColor: (isChosen || isAnswerSelected) ? .tertiarySystemBackground : .clear)
+                          darkBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.4) : .clear)
+//    votersStack.setColors(lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.2) : .clear,
+//                          darkBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.4) : .clear)
     
-    guard let passView = stackView.getSubview(type: PassthroughView.self),
-          let constraint = passView.getConstraint(identifier: "heightAnchor")
-    else {
+    
+    UIView.animate(
+      withDuration: 0.3,
+      delay: 0,
+      usingSpringWithDamping: 0.8,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut]) { [weak self] in
+        guard let self = self else { return }
+
+        self.imageView.tintColor = self.color
+        self.textView.backgroundColor = .clear
+        self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
+      }
+    
+    guard let selection = stackView.getLayer(identifier: "selection") else {
       UIView.animate(
         withDuration: 0.3,
         delay: 0,
@@ -481,15 +499,14 @@ private extension AnswerCell {
         options: [.curveEaseInOut]) { [weak self] in
           guard let self = self else { return }
           
-          self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.2) : .clear
-          self.imageView.tintColor = self.color
-          self.textView.backgroundColor = .clear
-          self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
+          self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ?  self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2) : .clear
         }
+      
       return
     }
-    
-    setNeedsLayout()
+//    stackView.publisher(for: \.bounds)
+//      .sink { selection.bounds.size.height = $0.height }
+    //      .store(in: &subscriptions)
     UIView.animate(
       withDuration: 0.3,
       delay: 0,
@@ -498,12 +515,54 @@ private extension AnswerCell {
       options: [.curveEaseInOut]) { [weak self] in
         guard let self = self else { return }
         
-        passView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.2) : .clear
-        self.imageView.tintColor = self.color
-        self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
-        constraint.constant = self.stackView.bounds.height
-        self.layoutIfNeeded()
+        selection.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? self.color.withAlphaComponent(0.4).cgColor : self.color.withAlphaComponent(0.2).cgColor
+        selection.frame = self.stackView.frame
       }
+//    selection.add(Animations.get(property: .Colors,
+//                                 fromValue: 1,
+//                                 toValue: 0,
+//                                 duration: 0.2,
+//                                 timingFunction: .easeOut,
+//                                 delegate: self,
+//                                 completionBlocks: [{ selection.removeFromSuperlayer() }]),
+//                  forKey: nil)
+    
+    
+    //    guard let passView = stackView.getSubview(type: PassthroughView.self),
+//          let constraint = passView.getConstraint(identifier: "heightAnchor")
+//    else {
+//      ///
+//      UIView.animate(
+//        withDuration: 0.3,
+//        delay: 0,
+//        usingSpringWithDamping: 0.8,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut]) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.2) : .clear
+//          self.imageView.tintColor = self.color
+//          self.textView.backgroundColor = .clear
+//          self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
+//        }
+//      return
+//    }
+//
+//    setNeedsLayout()
+//    UIView.animate(
+//      withDuration: 0.3,
+//      delay: 0,
+//      usingSpringWithDamping: 0.8,
+//      initialSpringVelocity: 0.3,
+//      options: [.curveEaseInOut]) { [weak self] in
+//        guard let self = self else { return }
+//
+//        passView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.2) : .clear
+//        self.imageView.tintColor = self.color
+//        self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
+//        constraint.constant = self.stackView.bounds.height
+//        self.layoutIfNeeded()
+//      }
   }
   
   func observeVoters() {

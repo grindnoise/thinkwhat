@@ -115,6 +115,11 @@ extension PollModel: PollControllerInput {
       guard let survey = answer.survey else { return }
       do {
         let json = try await API.shared.surveys.vote(answer: answer)
+        
+        if let current = Userprofiles.shared.current {
+          current.answers[answer.surveyID] = answer.id
+        }
+        
         let resultDetails = SurveyResult(choice: answer)
         for i in json {
           if i.0 == "survey_result" {

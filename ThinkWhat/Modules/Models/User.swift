@@ -428,7 +428,9 @@ class Userprofile: Decodable {
     }
     return components.first!
   }
-  var choices: [Survey: Answer] = [:]
+//  var choices: [Survey: Answer] = [:]
+  ///Store answers`[Survey.id: Answer.id]`
+  var answers = [Int: Int]()
   var hasSocialMedia: Bool {
     guard !facebookURL.isNil || !instagramURL.isNil || !tiktokURL.isNil else {
       return false

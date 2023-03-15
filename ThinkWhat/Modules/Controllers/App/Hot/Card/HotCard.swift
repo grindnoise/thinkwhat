@@ -29,6 +29,7 @@ class HotCard: UIView, Card {
   private var observers: [NSKeyValueObservation] = []
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
+  private let isReplica: Bool
   private let padding: CGFloat = 8
   private let nextColor: UIColor
   private lazy var shadowView: UIView = {
@@ -45,14 +46,16 @@ class HotCard: UIView, Card {
     return instance
   }()
   private lazy var collectionView: PollCollectionView  = { PollCollectionView(item: item, mode: .Preview) }()
-  private lazy var body: UIView = {
+  public lazy var body: UIView = {
     let instance = UIView()
     instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .tertiarySystemBackground
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero }
-      .sink { instance.cornerRadius = $0.width*0.05 }
-      .store(in: &subscriptions)
+    if !isReplica {
+      instance.publisher(for: \.bounds)
+        .receive(on: DispatchQueue.main)
+        .filter { $0 != .zero }
+        .sink { instance.cornerRadius = $0.width*0.05 }
+        .store(in: &subscriptions)
+    }
     instance.layer.addSublayer(gradient)
     collectionView.place(inside: instance)
 //    collectionView.isUserInteractionEnabled = false
@@ -94,7 +97,7 @@ class HotCard: UIView, Card {
     
     return instance
   }()
-  private lazy var stack: UIStackView = {
+  public lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
       claimButton,
       voteButton,
@@ -185,7 +188,9 @@ class HotCard: UIView, Card {
   
   // MARK: - Initialization
   init(item: Survey,
-       nextColor: UIColor) {
+       nextColor: UIColor,
+       isReplica: Bool = false) {
+    self.isReplica = isReplica
     self.item = item
     self.nextColor = nextColor
     
@@ -330,7 +335,7 @@ class HotCard: UIView, Card {
                                               animations: {
                                                 label.transform = .identity
                                                 label.alpha = 1
-                                              }) { _ in delay(seconds: 1) { completion() } }
+                                              }) { _ in delay(seconds: 0.5) { completion() } }
                                           }])
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: [0.0, 0.5, 0.9] as Any,

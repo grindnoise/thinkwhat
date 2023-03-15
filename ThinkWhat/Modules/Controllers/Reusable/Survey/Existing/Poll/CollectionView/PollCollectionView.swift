@@ -105,8 +105,8 @@ class PollCollectionView: UICollectionView {
         
         source.refresh() { [weak self] in
           guard let self = self else { return }
-          self.scrollToItem(at: IndexPath(row: self.numberOfItems(inSection: self.numberOfSections - 1) - 1,
-                                          section: self.numberOfSections - 1),
+          self.scrollToItem(at: IndexPath(row: 0,
+                                          section: self.numberOfSections - 2),
                             at: .bottom,
                             animated: true)
         }

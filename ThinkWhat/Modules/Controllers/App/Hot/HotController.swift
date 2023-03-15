@@ -208,7 +208,7 @@ extension HotController: HotViewInput {
   }
   
   func vote(_ instance: Survey) {
-//    navigationController?.delegate = appDelegate.transitionCoordinator
+    navigationController?.delegate = appDelegate.transitionCoordinator
     navigationController?.navigationBar.backItem?.title = ""
     navigationController?.pushViewController(PollController(surveyReference: instance.reference), animated: true)
     navigationController?.delegate = nil
