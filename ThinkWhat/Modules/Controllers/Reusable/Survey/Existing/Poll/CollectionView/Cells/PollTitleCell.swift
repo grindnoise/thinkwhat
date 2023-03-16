@@ -34,24 +34,33 @@ class PollTitleCell: UICollectionViewCell {
         }
         .store(in: &subscriptions)
       
-      updateUI()
+      
+//      titleInsets = .init(top: 0,
+//                          left: mode == .Default ? padding : 0,
+//                          bottom: 0,
+//                          right: mode == .Default ? padding : 0)
+      setupUI()
     }
   }
   public var mode: PollCollectionView.Mode = .Default {
     didSet {
-      guard let leftStack = headerView.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }
-      
-      leftStack.alpha = mode == .Default ? 1 : 0
-      
-      guard mode == .Preview else { return }
-      
-      leftStack.transform = .init(scaleX: 0.75, y: 0.75)
-      topicView.placeTopLeading(inside: headerView)
-      topicView.alpha = 1
+//      guard let leftStack = headerStack.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }
+//
+//      leftStack.alpha = mode == .Default ? 1 : 0
+//
+//      if mode == .Preview || mode == .Transition {
+//        leftStack.transform = .init(scaleX: 0.75, y: 0.75)
+//        topicView.placeTopLeading(inside: headerStack)
+//        topicView.alpha = 1
+//      }
     }
   }
   ///**Publishers**
   public var profileTapPublisher = PassthroughSubject<Bool, Never>()
+  ///**UI**
+  public var titleInsets: UIEdgeInsets = .zero
+  
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -104,7 +113,7 @@ class PollTitleCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var headerView: UIStackView = {
+  private lazy var headerStack: UIStackView = {
     let leftStack = UIStackView(arrangedSubviews: [
       dateLabel,
       statsStack,
@@ -254,12 +263,27 @@ class PollTitleCell: UICollectionViewCell {
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .largeTitle)
     instance.numberOfLines = 0
     
-    let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
-    constraint.identifier = "height"
-    constraint.isActive = true
+//    let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
+//    constraint.identifier = "height"
+//    constraint.isActive = true
     
     return instance
   }()
+//  private lazy var stackView: UIStackView = {
+//    let opaque = UIView.opaque()
+//    titleLabel.place(inside: opaque,
+//                     insets: titleInsets,
+//                     bottomPriority: .defaultLow)
+//
+//    let instance = UIStackView(arrangedSubviews: [
+//      headerStack,
+//      opaque//titleLabel
+//    ])
+//    instance.axis = .vertical
+//    instance.spacing = padding*3
+//
+//    return instance
+//  }()
   
   
   
@@ -280,7 +304,7 @@ class PollTitleCell: UICollectionViewCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -329,19 +353,39 @@ class PollTitleCell: UICollectionViewCell {
   
   // MARK: - Public methods
   public func onModeChanged(mode: PollCollectionView.Mode,
-                            duration: TimeInterval = 0.4) {
-    guard let leftStack = headerView.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }
+                            duration: TimeInterval = 0.2) {
+    
+    guard let leftStack = headerStack.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }
+    
+    leftStack.alpha = 0
+    leftStack.transform = .init(scaleX: 0.75, y: 0.75)
+    topicView.placeTopLeading(inside: headerStack)
+    topicView.alpha = 1
     
     UIView.animate(withDuration: duration,
                    delay: 0,
                    options: .curveEaseInOut) { [weak self] in
       guard let self = self else { return }
       
-      self.topicView.alpha = mode == .Preview ? 1 : 0
-      self.topicView.transform = mode == .Default ? .init(scaleX: 0.75, y: 0.75) : .identity
-      leftStack.alpha = mode == .Default ? 1 : 0
-      leftStack.transform = mode == .Preview ? .init(scaleX: 0.75, y: 0.75) : .identity
-    } completion: { [unowned self] _ in self.mode = mode }
+      self.topicView.alpha = 0
+      self.topicView.transform = .init(scaleX: 0.75, y: 0.75)
+      leftStack.alpha = 1
+      leftStack.transform = .identity
+    } completion: { _ in }
+//    UIView.animate(withDuration: duration,
+//                   delay: 0,
+//                   options: .curveEaseInOut) { [weak self] in
+//      guard let self = self else { return }
+//
+//      self.topicView.alpha = mode == .Preview ? 1 : 0
+//      self.topicView.transform = mode == .Default ? .init(scaleX: 0.75, y: 0.75) : .identity
+//      leftStack.alpha = mode == .Default ? 1 : 0
+//      leftStack.transform = mode == .Preview ? .init(scaleX: 0.75, y: 0.75) : .identity
+//    } completion: { [weak self] _ in
+//      guard let self = self else { return }
+//
+//      self.mode = mode
+//    }
   }
 }
 
@@ -351,19 +395,28 @@ private extension PollTitleCell {
   func setupUI() {
     backgroundColor = .clear
     
-    let stackView = UIStackView(arrangedSubviews: [
-      headerView,
-      titleLabel
+//    stackView.place(inside: contentView,
+//                    insets: UIEdgeInsets(top: padding*2, left: padding, bottom: padding*3, right: padding),
+//                    bottomPriority: .defaultLow)
+    
+    contentView.addSubview(headerStack)
+    contentView.addSubview(titleLabel)
+    headerStack.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    
+    NSLayoutConstraint.activate([
+      headerStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
+      headerStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+      headerStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+      titleLabel.topAnchor.constraint(equalTo: headerStack.bottomAnchor, constant: padding*2),
+      titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding*2),
+      titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding*2),
     ])
-    stackView.axis = .vertical
-    stackView.spacing = padding*3
-    stackView.place(inside: contentView,
-                    insets: UIEdgeInsets(top: padding*2, left: padding, bottom: padding*3, right: padding),
-                    bottomPriority: .defaultLow)
-  }
-  
-  @MainActor
-  func updateUI() {
+    
+    let constraint = titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding*2)
+    constraint.priority = .defaultLow
+    constraint.isActive = true
+    
     dateLabel.text = item.startDate.timeAgoDisplay()
     titleLabel.text = item.title
     ratingLabel.text = String(describing: item.rating)
@@ -371,11 +424,21 @@ private extension PollTitleCell {
     usernameLabel.text = item.isAnonymous ? "" : item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n\(item.owner.lastNameSingleWord)")
     avatar.userprofile = item.isAnonymous ? Userprofile.anonymous : item.owner
     
-    guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
+    guard let leftStack = headerStack.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }
     
-    setNeedsLayout()
-    constraint.constant = item.title.height(withConstrainedWidth: bounds.width,
-                                            font: titleLabel.font)
-    layoutIfNeeded()
+    leftStack.alpha = mode == .Default ? 1 : 0
+    
+    if mode == .Preview || mode == .Transition {
+      leftStack.transform = .init(scaleX: 0.75, y: 0.75)
+      topicView.placeTopLeading(inside: headerStack)
+      topicView.alpha = 1
+    }
+
+//    guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }
+//
+//    setNeedsLayout()
+//    constraint.constant = item.title.height(withConstrainedWidth: bounds.width,
+//                                            font: titleLabel.font)
+//    layoutIfNeeded()
   }
 }

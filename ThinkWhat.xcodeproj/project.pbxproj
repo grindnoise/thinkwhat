@@ -1507,6 +1507,7 @@
 		AB309C7A27AFA41F005BBCB4 /* Remove */ = {
 			isa = PBXGroup;
 			children = (
+				AB3A47C6283F593F00106407 /* Create */,
 				ABA448D527E46F0C00F8E00D /* Card */,
 				AB19B6422432282B00999917 /* PercentageLabel.swift */,
 				ABCAC571235EE99B00E6A118 /* TagLabel.swift */,
@@ -2902,7 +2903,6 @@
 		ABDEE859237023B7009B52F3 /* Survey */ = {
 			isa = PBXGroup;
 			children = (
-				AB3A47C6283F593F00106407 /* Create */,
 				AB7CE6FA23A36123006FDBD8 /* Existing */,
 				AB25AC31282BBFB200050907 /* Collection */,
 				AB54865E2694521700D30235 /* New */,

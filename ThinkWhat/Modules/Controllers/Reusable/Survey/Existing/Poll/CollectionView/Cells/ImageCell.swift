@@ -372,17 +372,24 @@ private extension ImageCell {
         }, receiveValue: { [weak self] in
           guard let self = self else { return }
           
-          UIView.animate(withDuration: 0.15, delay: 0, animations: {
-            shimmer.alpha = 0
-          }) { _ in
-            shimmer.stopShimmering(animated: true)
-            self.showPageControl { _ in
-              guard !media.title.isEmpty else { return }
-              
-              self.showQuoteButton(button, animated: index == 0 ? true : false)
-            }
-            shimmer.removeFromSuperview()
+//          UIView.animate(withDuration: 0.15, delay: 0, animations: {
+//            shimmer.alpha = 0
+//          }) { _ in
+//            shimmer.stopShimmering(animated: true)
+//            self.showPageControl { _ in
+//              guard !media.title.isEmpty else { return }
+//
+//              self.showQuoteButton(button, animated: index == 0 ? true : false)
+//            }
+//            shimmer.removeFromSuperview()
+//          }
+          shimmer.stopShimmering(animated: true)
+          self.showPageControl(animated: false) { _ in
+            guard !media.title.isEmpty else { return }
+            
+            self.showQuoteButton(button, animated: false)
           }
+          shimmer.removeFromSuperview()
           imageView.image = $0
           imageView.isUserInteractionEnabled = true
         })

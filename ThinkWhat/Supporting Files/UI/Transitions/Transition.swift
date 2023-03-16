@@ -35,6 +35,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
       if operation == .push {
         
         let containerView = transitionContext.containerView
+        containerView.backgroundColor = .clear
         context = transitionContext
         toVC.view.alpha = 0
         containerView.addSubview(toVC.view)
@@ -50,46 +51,100 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           pollController.view.setNeedsLayout()
           pollController.view.layoutIfNeeded()
           
+//          let origin = hotController.view.convert(card.frame.origin, to: appDelegate.window!)
           let fakeCard = HotCard(item: card.item,
                                 nextColor: card.item.topic.tagColor,
                                 isReplica: true)
           fakeCard.frame = card.frame
-          fakeCard.body.cornerRadius = card.body.cornerRadius
+//          fakeCard.body.cornerRadius = card.body.cornerRadius
           fakeCard.stack.alpha = 0
           fakeCard.setNeedsLayout()
           fakeCard.layoutIfNeeded()
+          
+          let fakeAction = card.voteButton.copyView()!
+          fakeAction.layer.zPosition = 100
+          let fakeActionOrigin = card.voteButton.superview!.convert(card.voteButton.frame.origin,
+                                                                    to: containerView)
+          fakeAction.placeTopLeading(inside: appDelegate.window!,
+                                     leadingInset: fakeActionOrigin.x,
+                                     topInset: fakeActionOrigin.y,
+                                     width: fakeAction.frame.width,
+                                     height: fakeAction.frame.height)
+          let fakeClaim = card.claimButton.copyView()!
+          fakeClaim.layer.zPosition = 100
+          let fakeClaimOrigin = card.claimButton.superview!.convert(card.claimButton.frame.origin, to: appDelegate.window!)
+          fakeClaim.placeTopLeading(inside: appDelegate.window!,
+                                    leadingInset: fakeClaimOrigin.x,
+                                    topInset: fakeClaimOrigin.y,
+                                    width: fakeClaim.frame.width,
+                                    height: fakeClaim.frame.height)
+          
+          let fakeNext = card.nextButton.copyView()!
+          fakeNext.layer.zPosition = 100
+          let fakeNextOrigin = card.nextButton.superview!.convert(card.nextButton.frame.origin, to: appDelegate.window!)
+          fakeNext.placeTopLeading(inside: appDelegate.window!,
+                                   leadingInset: fakeNextOrigin.x,
+                                   topInset: fakeNextOrigin.y,
+                                   width: fakeNext.frame.width,
+                                   height: fakeNext.frame.height)
 
-          delay(seconds: 0.1) { [weak self] in
+          delay(seconds: 0.05) { [weak self] in
             guard let self = self else { return }
             appDelegate.window?.addSubview(fakeCard)
             hotView.alpha = 0
-//            mainController.tabBarController?.setTabBarVisible(visible: false, animated: true)
+            fakeCard.togglePollMode()
             
-            UIView.animate(withDuration: 1,//self.duration,
+            UIView.animate(withDuration: self.duration,//self.duration,
                            delay: 0,
-                           options: .curveLinear,
+                           options: .curveEaseOut,
                            animations: {
-
-//              fakeCard.stack.alpha = 0
+              fakeAction.transform = .init(scaleX: 0.75, y: 0.75)
+//              fakeAction.alpha = 0
+//              fakeNext.transform = .init(scaleX: 0.75, y: 0.75)
+//              fakeNext.alpha = 0
+//              fakeClaim.transform = .init(scaleX: 0.75, y: 0.75)
+//              fakeClaim.alpha = 0
+              
+              if let fakeNextConstraint = fakeNext.getConstraint(identifier: "leadingAnchor"),
+                 let fakeClaimConstraint = fakeClaim.getConstraint(identifier: "leadingAnchor"),
+                 let fakeActionConstraint = fakeAction.getConstraint(identifier: "topAnchor")
+              {
+                
+                //                              let padding = containerView.bounds.width/6
+                appDelegate.window!.setNeedsLayout()
+                fakeClaimConstraint.constant -= fakeClaimOrigin.x + fakeClaim.bounds.width//padding//
+                fakeNextConstraint.constant += UIScreen.main.bounds.width - fakeNextOrigin.x //fakeNext.bounds.width/2//padding//
+                fakeActionConstraint.constant += UIScreen.main.bounds.height - fakeActionOrigin.y
+                appDelegate.window!.layoutIfNeeded()
+              }
+            }) { _ in
+              fakeAction.removeFromSuperview()
+              fakeClaim.removeFromSuperview()
+              fakeCard.removeFromSuperview()
+//              self.context?.completeTransition(true)
+            }
+            
+            UIView.animate(withDuration: self.duration*0.9,//self.duration,
+                           delay: 0,
+                           options: .curveEaseOut,
+                           animations: {
+              fakeCard.frame.origin.y -= 8//CGPoint(x: 0, y: topInset)
+              fakeCard.bounds.size.width += 16
               fakeCard.body.cornerRadius = 0
-              
-              let topInset = hotController.view.statusBarFrame.height + self.navigationController.navigationBar.frame.height
-              fakeCard.frame.origin = CGPoint(x: 0, y: topInset)
-//              fakeCard.body.bounds.size.width += 20//appDelegate.window?.bounds.width ?? 0 // pollController.view.bounds.width// + 10
-//                                      size: CGSize(width: pollController.view.bounds.width,
-//                                                   height: fakeCard.bounds.height + 20 + self.navigationController.tabBarController!.tabBar.frame.height))
-              
-              pollController.view.alpha = 1
-              //            hotController.view.alpha = 0
-              //                    toVC.view.setNeedsDisplay()
-              //                    toVC.view.layoutIfNeeded()
+              fakeCard.body.backgroundColor = .clear
+              fakeCard.fadeOut(duration: self.duration)
             }) {
               _ in
-              //              fromVC.view.transform = .identity
-              hotController.view.removeFromSuperview()
-              hotController.view.alpha = 1
-              fakeCard.removeFromSuperview()
-              self.context?.completeTransition(true)
+//              UIView.animate(withDuration: 0.15,
+//                             animations: {
+                toVC.view.alpha = 1
+//              }) { _ in
+                self.context?.completeTransition(true)
+                hotController.view.removeFromSuperview()
+                hotController.view.alpha = 1
+                fakeCard.removeFromSuperview()
+  //              self.context?.completeTransition(true)
+//              }
             }
           }
         }

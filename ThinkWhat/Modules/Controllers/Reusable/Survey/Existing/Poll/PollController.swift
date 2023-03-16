@@ -103,6 +103,7 @@ class PollController: UIViewController {
               let survey = self.item.survey
         else { return }
         
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
         self.controllerOutput?.presentView(survey)
         instance.removeFromSuperview()
       }
@@ -793,7 +794,7 @@ extension PollController: PollModelOutput {
   func onLoadCallback(_ result: Result<Survey, Error>) {
     switch result {
     case .success(_):
-      navigationController?.setNavigationBarHidden(false, animated: true)
+//      navigationController?.setNavigationBarHidden(false, animated: true)
       loadingIndicator.stop()
     case .failure:
       let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,

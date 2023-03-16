@@ -38,7 +38,7 @@ class PollCollectionView: UICollectionView {
     }
   }
   
-  enum Mode { case Default, Preview }
+  enum Mode { case Default, Preview, Transition }
   
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
@@ -65,7 +65,7 @@ class PollCollectionView: UICollectionView {
   ///**Logic**
   public var mode: Mode {
     didSet {
-      guard oldValue != mode else { return }
+//      guard oldValue != mode else { return }
       
       modeChangePublisher.send(mode)
     }
@@ -157,6 +157,7 @@ private extension PollCollectionView {
     }
     
     let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.mode = self.mode
       cell.item = self.item
       cell.profileTapPublisher
         .sink { [weak self] _ in
@@ -165,7 +166,6 @@ private extension PollCollectionView {
           self.profileTapPublisher.send(true)
         }
         .store(in: &self.subscriptions)
-      cell.mode = self.mode
       
       ///Animation for transition
       self.modeChangePublisher
@@ -188,16 +188,25 @@ private extension PollCollectionView {
       let paragraphStyle = NSMutableParagraphStyle()
       paragraphStyle.firstLineHeadIndent = 20
       paragraphStyle.paragraphSpacing = 20
-      if #available(iOS 15.0, *) {
-        paragraphStyle.usesDefaultHyphenation = true
-      } else {
+//      if #available(iOS 15.0, *) {
+//        paragraphStyle.usesDefaultHyphenation = true
+//      } else {
         paragraphStyle.hyphenationFactor = 1
-      }
+//      }
       cell.attributes = [
         .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body) as Any,
         .foregroundColor: UIColor.label,
         .paragraphStyle: paragraphStyle
       ]
+      
+      cell.insets = .uniform(size: self.padding)
+      ///Set right text container inset if transition
+      cell.padding = self.mode == .Default ? self.padding*2 : self.mode == .Transition ? self.padding*2 : 0
+      
+//      cell.insets = .init(top: self.padding,
+//                          left: self.padding*(self.mode == .Default ? 2 : 1),
+//                          bottom: self.padding,
+//                          right: self.padding*(self.mode == .Default ? 2 : 1))
       cell.text = self.item.detailsDescription
       cell.boundsPublisher
         .eraseToAnyPublisher()
@@ -504,10 +513,12 @@ private extension PollCollectionView {
     }
     snapshot.appendSections([.question])
     snapshot.appendItems([5], toSection: .question)
-    snapshot.appendSections([.answers])
-    snapshot.appendItems([6], toSection: .answers)
-    snapshot.appendSections([.comments])
-    snapshot.appendItems([7], toSection: .comments)
+    if mode == .Default {
+      snapshot.appendSections([.answers])
+      snapshot.appendItems([6], toSection: .answers)
+      snapshot.appendSections([.comments])
+      snapshot.appendItems([7], toSection: .comments)
+    }
     source.apply(snapshot, animatingDifferences: false)
 //    source.refresh(animatingDifferences: false)
     

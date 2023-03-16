@@ -26,6 +26,8 @@ class TextCell: UICollectionViewCell {
   public var insets: UIEdgeInsets = .uniform(size: 8)
   ///**Publishers**
   public let boundsPublisher = PassthroughSubject<CGRect, Never>()
+  ///**UI**
+  public var padding: CGFloat = 8
   
   
   
@@ -34,7 +36,7 @@ class TextCell: UICollectionViewCell {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  ///`UI`
+  ///**UI**
 //  private let padding: CGFloat = 8
   private lazy var container: UIStackView = { UIStackView(arrangedSubviews: [textView]) }()
   private lazy var textView: UITextView = {
@@ -42,7 +44,7 @@ class TextCell: UICollectionViewCell {
     instance.textContainerInset = UIEdgeInsets(top: 0,
                                                left: 0,
                                                bottom: 0,
-                                               right: 0)
+                                               right: padding)
     instance.isUserInteractionEnabled = false
     instance.backgroundColor = .clear
     instance.isEditable = false
