@@ -110,6 +110,12 @@
 		AB39899728636A70004C958E /* CostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39899628636A70004C958E /* CostView.swift */; };
 		AB398999286370D9004C958E /* CostView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB398998286370D9004C958E /* CostView.xib */; };
 		AB39899B28637E4F004C958E /* CostCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39899A28637E4F004C958E /* CostCollectionView.swift */; };
+		AB39D3FB29C34BCE00892D58 /* NewPollContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39D3F729C34BCE00892D58 /* NewPollContract.swift */; };
+		AB39D3FC29C34BCE00892D58 /* NewPollController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39D3F829C34BCE00892D58 /* NewPollController.swift */; };
+		AB39D3FD29C34BCE00892D58 /* NewPollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39D3F929C34BCE00892D58 /* NewPollView.swift */; };
+		AB39D3FE29C34BCE00892D58 /* NewPollModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39D3FA29C34BCE00892D58 /* NewPollModel.swift */; };
+		AB39D40029C358D000892D58 /* ProgressCapsule.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39D3FF29C358D000892D58 /* ProgressCapsule.swift */; };
+		AB39D40229C362DB00892D58 /* CAGradientLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39D40129C362DB00892D58 /* CAGradientLayer.swift */; };
 		AB39F40F2847457200DEE0ED /* InsetTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F40E2847457200DEE0ED /* InsetTextField.swift */; };
 		AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F4112847830300DEE0ED /* ImageSelectionCollectionView.swift */; };
 		AB39F41428478B5C00DEE0ED /* ImageSelectionCellContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB39F41328478B5C00DEE0ED /* ImageSelectionCellContent.swift */; };
@@ -379,7 +385,7 @@
 		AB98308B27B9385B002C5132 /* RecoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98308727B9385B002C5132 /* RecoverView.swift */; };
 		AB98308C27B9385B002C5132 /* RecoverModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98308827B9385B002C5132 /* RecoverModel.swift */; };
 		AB98308E27B94BBA002C5132 /* RecoverView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB98308D27B94BBA002C5132 /* RecoverView.xib */; };
-		AB988A9E254811AB00E3C39A /* NewPollController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9D254811AB00E3C39A /* NewPollController.swift */; };
+		AB988A9E254811AB00E3C39A /* _NewPollController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9D254811AB00E3C39A /* _NewPollController.swift */; };
 		AB988AA02548663400E3C39A /* 2_BinarySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */; };
 		AB99676123D9AA210037CD6C /* HideKeyboardIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */; };
 		AB9998BC280585B9009D0E4F /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9998BB280585B9009D0E4F /* UILabel.swift */; };
@@ -681,6 +687,12 @@
 		AB39899628636A70004C958E /* CostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostView.swift; sourceTree = "<group>"; };
 		AB398998286370D9004C958E /* CostView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CostView.xib; sourceTree = "<group>"; };
 		AB39899A28637E4F004C958E /* CostCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostCollectionView.swift; sourceTree = "<group>"; };
+		AB39D3F729C34BCE00892D58 /* NewPollContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollContract.swift; sourceTree = "<group>"; };
+		AB39D3F829C34BCE00892D58 /* NewPollController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollController.swift; sourceTree = "<group>"; };
+		AB39D3F929C34BCE00892D58 /* NewPollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollView.swift; sourceTree = "<group>"; };
+		AB39D3FA29C34BCE00892D58 /* NewPollModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollModel.swift; sourceTree = "<group>"; };
+		AB39D3FF29C358D000892D58 /* ProgressCapsule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressCapsule.swift; sourceTree = "<group>"; };
+		AB39D40129C362DB00892D58 /* CAGradientLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CAGradientLayer.swift; sourceTree = "<group>"; };
 		AB39F40E2847457200DEE0ED /* InsetTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsetTextField.swift; sourceTree = "<group>"; };
 		AB39F4112847830300DEE0ED /* ImageSelectionCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionCollectionView.swift; sourceTree = "<group>"; };
 		AB39F41328478B5C00DEE0ED /* ImageSelectionCellContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelectionCellContent.swift; sourceTree = "<group>"; };
@@ -961,7 +973,7 @@
 		AB98308727B9385B002C5132 /* RecoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverView.swift; sourceTree = "<group>"; };
 		AB98308827B9385B002C5132 /* RecoverModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverModel.swift; sourceTree = "<group>"; };
 		AB98308D27B94BBA002C5132 /* RecoverView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RecoverView.xib; sourceTree = "<group>"; };
-		AB988A9D254811AB00E3C39A /* NewPollController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		AB988A9D254811AB00E3C39A /* _NewPollController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _NewPollController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 2_BinarySelectionViewController.swift; sourceTree = "<group>"; };
 		AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideKeyboardIcon.swift; sourceTree = "<group>"; };
 		AB9998BB280585B9009D0E4F /* UILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabel.swift; sourceTree = "<group>"; };
@@ -1308,6 +1320,7 @@
 				ABB7D048295A02CE00DF00B4 /* Publisher.swift */,
 				AB68111D29828CA900C14C32 /* CGSize.swift */,
 				AB6016FD29A6299000BF4365 /* JSONDecoder.swift */,
+				AB39D40129C362DB00892D58 /* CAGradientLayer.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1458,7 +1471,7 @@
 			isa = PBXGroup;
 			children = (
 				ABF01A6A25418E1F009E2BC4 /* UI */,
-				AB988A9D254811AB00E3C39A /* NewPollController.swift */,
+				AB988A9D254811AB00E3C39A /* _NewPollController.swift */,
 				AB868A6923EB04A3008DEB84 /* 1_CategorySelectionViewController.swift */,
 				AB988A9F2548663400E3C39A /* 2_BinarySelectionViewController.swift */,
 				ABDAE151258211D5007DD188 /* 3_VotesCountViewController.swift */,
@@ -1507,12 +1520,17 @@
 		AB309C7A27AFA41F005BBCB4 /* Remove */ = {
 			isa = PBXGroup;
 			children = (
+				AB28E5AF2535BB6E004CC4DD /* Poll */,
+				AB8C99552486760B00BC517B /* Claim */,
+				AB879047286D9F7600C069BA /* Navbar content */,
 				AB3A47C6283F593F00106407 /* Create */,
 				ABA448D527E46F0C00F8E00D /* Card */,
 				AB19B6422432282B00999917 /* PercentageLabel.swift */,
 				ABCAC571235EE99B00E6A118 /* TagLabel.swift */,
 				AB791D7C243B1BF00085E00E /* VoteAnimationView.swift */,
+				AB7CE6FA23A36123006FDBD8 /* Existing */,
 				ABE43694251C7FD300C1428D /* CustomSwitch.swift */,
+				AB54865E2694521700D30235 /* New */,
 				AB229D832464512400968D52 /* del_Segues.swift */,
 				AB016BFD26CA73BA005C5A87 /* ButtonWithImage.swift */,
 				ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */,
@@ -1582,6 +1600,34 @@
 				AB39899A28637E4F004C958E /* CostCollectionView.swift */,
 			);
 			path = Cost;
+			sourceTree = "<group>";
+		};
+		AB39D3F529C34B6200892D58 /* Polls */ = {
+			isa = PBXGroup;
+			children = (
+				AB39D3F629C34B8700892D58 /* Creation */,
+				ABA448E727EE02E600F8E00D /* Poll */,
+			);
+			path = Polls;
+			sourceTree = "<group>";
+		};
+		AB39D3F629C34B8700892D58 /* Creation */ = {
+			isa = PBXGroup;
+			children = (
+				AB39D3F729C34BCE00892D58 /* NewPollContract.swift */,
+				AB39D3F829C34BCE00892D58 /* NewPollController.swift */,
+				AB39D3F929C34BCE00892D58 /* NewPollView.swift */,
+				AB39D3FA29C34BCE00892D58 /* NewPollModel.swift */,
+			);
+			path = Creation;
+			sourceTree = "<group>";
+		};
+		AB39D40329C3640200892D58 /* Ratings */ = {
+			isa = PBXGroup;
+			children = (
+				AB54865F269452C200D30235 /* Rating */,
+			);
+			path = Ratings;
 			sourceTree = "<group>";
 		};
 		AB39F410284782AE00DEE0ED /* Images selection */ = {
@@ -1775,6 +1821,7 @@
 			children = (
 				AB3C682A223FD38E00B57580 /* LoadingIndicator.swift */,
 				AB334FB8270C423400DD7332 /* ClockIndicator.swift */,
+				AB39D3FF29C358D000892D58 /* ProgressCapsule.swift */,
 			);
 			path = "Progress indicators";
 			sourceTree = "<group>";
@@ -1921,10 +1968,6 @@
 			isa = PBXGroup;
 			children = (
 				AB6224A326BACB8700056097 /* Banners */,
-				AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */,
-				AB28E5AF2535BB6E004CC4DD /* Poll */,
-				AB54865F269452C200D30235 /* Rating */,
-				AB548663269724A200D30235 /* NewPollResultViewController.swift */,
 			);
 			name = New;
 			path = "New Group";
@@ -2221,9 +2264,6 @@
 		AB7CE6FA23A36123006FDBD8 /* Existing */ = {
 			isa = PBXGroup;
 			children = (
-				AB879047286D9F7600C069BA /* Navbar content */,
-				ABA448E727EE02E600F8E00D /* Poll */,
-				AB8C99552486760B00BC517B /* Claim */,
 				AB8C99512485321F00BC517B /* ClaimBarButton.swift */,
 				AB99A95524C6D1C700814F96 /* HeartExpandingView.swift */,
 				AB791D7E243B30D90085E00E /* VoteCompletionView */,
@@ -2636,9 +2676,13 @@
 		ABADF59927F7009400A26474 /* Reusable */ = {
 			isa = PBXGroup;
 			children = (
+				AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */,
+				AB548663269724A200D30235 /* NewPollResultViewController.swift */,
+				AB39D40329C3640200892D58 /* Ratings */,
+				AB39D3F529C34B6200892D58 /* Polls */,
 				AB235289290A9C1600C5382C /* Taget previews */,
 				ABCDC72328DC7787003B24F2 /* Userprofile */,
-				ABDEE859237023B7009B52F3 /* Survey */,
+				ABDEE859237023B7009B52F3 /* Surveys */,
 				ABDE82BE28B38ED5004E07BD /* Comments */,
 			);
 			path = Reusable;
@@ -2818,13 +2862,13 @@
 			isa = PBXGroup;
 			children = (
 				AB7FD68528F9672F003F38E4 /* Feed */,
-				ABCDC72D28DC77DF003B24F2 /* Single */,
-				ABCDC72428DC77A7003B24F2 /* Multiple */,
+				ABCDC72D28DC77DF003B24F2 /* Profile */,
+				ABCDC72428DC77A7003B24F2 /* Collection */,
 			);
 			path = Userprofile;
 			sourceTree = "<group>";
 		};
-		ABCDC72428DC77A7003B24F2 /* Multiple */ = {
+		ABCDC72428DC77A7003B24F2 /* Collection */ = {
 			isa = PBXGroup;
 			children = (
 				ABCDC71E28DC633E003B24F2 /* UserprofilesCollectionView.swift */,
@@ -2834,10 +2878,10 @@
 				ABCDC72828DC77BE003B24F2 /* UserprofilesModel.swift */,
 				AB52719C28EC1B1D0000F095 /* UserprofilesController.swift */,
 			);
-			path = Multiple;
+			path = Collection;
 			sourceTree = "<group>";
 		};
-		ABCDC72D28DC77DF003B24F2 /* Single */ = {
+		ABCDC72D28DC77DF003B24F2 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
 				AB592E222906C7A20082EE13 /* Cells */,
@@ -2847,7 +2891,7 @@
 				ABCDC73928DC7814003B24F2 /* UserprofileModel.swift */,
 				AB592E202906C3140082EE13 /* UserprofileCollectionView.swift */,
 			);
-			path = Single;
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		ABCE775728488C4F001E3413 /* Image selection */ = {
@@ -2900,14 +2944,12 @@
 			path = Comments;
 			sourceTree = "<group>";
 		};
-		ABDEE859237023B7009B52F3 /* Survey */ = {
+		ABDEE859237023B7009B52F3 /* Surveys */ = {
 			isa = PBXGroup;
 			children = (
-				AB7CE6FA23A36123006FDBD8 /* Existing */,
 				AB25AC31282BBFB200050907 /* Collection */,
-				AB54865E2694521700D30235 /* New */,
 			);
-			path = Survey;
+			path = Surveys;
 			sourceTree = "<group>";
 		};
 		ABDEE85C23702465009B52F3 /* Cells */ = {
@@ -3395,6 +3437,7 @@
 				AB9DBF7B26A58C8C00EFA66D /* Django.swift in Sources */,
 				AB889818240FA65B0087E5AD /* CopyPasteTextField.swift in Sources */,
 				AB7F4B8A25B5D7230017573D /* 5_ImagesSelectionViewController.swift in Sources */,
+				AB39D3FE29C34BCE00892D58 /* NewPollModel.swift in Sources */,
 				AB234F4828D7685500204EC8 /* SurveysContract.swift in Sources */,
 				ABB4C3F82653C40800C2B1BF /* delBasic.swift in Sources */,
 				AB90FAFA28D4B0390096B147 /* UserSettingsInterestsCell.swift in Sources */,
@@ -3432,6 +3475,7 @@
 				ABF1F19F22C253A6008913C3 /* FBWorker.swift in Sources */,
 				ABAEEE5C27A5D7ED00E4EF29 /* VKWorker.swift in Sources */,
 				AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */,
+				AB39D3FC29C34BCE00892D58 /* NewPollController.swift in Sources */,
 				AB72961627DA3F2300D45B54 /* SubscriptionsController.swift in Sources */,
 				ABA448EA27EE030B00F8E00D /* PollController.swift in Sources */,
 				ABE56C1B298AC4C8004C761D /* TopicCompatibilityCollectionView.swift in Sources */,
@@ -3530,6 +3574,7 @@
 				ABE884A62987CCA200ACEFC7 /* UserCompatibilityHeaderCell.swift in Sources */,
 				AB04144F244EF3A600336857 /* SurveyStackViewController.swift in Sources */,
 				ABB80C8928B8ED76003D6C20 /* CommentHeaderCell.swift in Sources */,
+				AB39D3FB29C34BCE00892D58 /* NewPollContract.swift in Sources */,
 				AB5CA11824F5418500F55DEC /* TransitionCoordinator.swift in Sources */,
 				AB0BFDF3252DC9E400BD5EFF /* MegaphoneIcon.swift in Sources */,
 				AB8F28B027C0DEEB008E4ED0 /* NSLayoutConstraint.swift in Sources */,
@@ -3541,6 +3586,7 @@
 				AB37B9B22774BF3A00C7DEBC /* APIManager.swift in Sources */,
 				ABCDE35F260C7D3300ACF5A6 /* VerticalTextLayer.swift in Sources */,
 				ABCBDA1028759F2500888F23 /* UIFont+.swift in Sources */,
+				AB39D3FD29C34BCE00892D58 /* NewPollView.swift in Sources */,
 				AB1C4B9228ABE96E003674E8 /* NetworkLogger.swift in Sources */,
 				AB463FBB27C7E65A007D7240 /* Avatar.swift in Sources */,
 				ABDA046429ADE82A0096175F /* UserSettingsInfoCell.swift in Sources */,
@@ -3581,6 +3627,7 @@
 				AB8DAB5423BA2A790089E25F /* PlainIcons.swift in Sources */,
 				AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */,
 				AB3C6848223FD3EE00B57580 /* Buttons.swift in Sources */,
+				AB39D40029C358D000892D58 /* ProgressCapsule.swift in Sources */,
 				AB72961C27DA3F2C00D45B54 /* SubscriptionsContract.swift in Sources */,
 				ABCDC71F28DC633E003B24F2 /* UserprofilesCollectionView.swift in Sources */,
 				AB0AB63B27B5001F006FD33F /* ConditionsContract.swift in Sources */,
@@ -3728,6 +3775,7 @@
 				AB3A47D1283F59D200106407 /* PollCreationContract.swift in Sources */,
 				AB090D85287727FA00FAFAB0 /* AnswerCell.swift in Sources */,
 				ABDA424F23B0D60500BAC3A5 /* NewAnswerIcons.swift in Sources */,
+				AB39D40229C362DB00892D58 /* CAGradientLayer.swift in Sources */,
 				AB8DA33527A17F0E00F92C18 /* GetStartedViewController.swift in Sources */,
 				AB156F6929AF891500F5397E /* QueueArray.swift in Sources */,
 				AB3A47CB283F599C00106407 /* PollCreationController.swift in Sources */,
@@ -3741,7 +3789,7 @@
 				AB4EE75828CE4AC40016EEC8 /* FlexibleTextField.swift in Sources */,
 				AB98307D27B68811002C5132 /* LoginModel.swift in Sources */,
 				ABADF5A227F7097F00A26474 /* BannerObservable.swift in Sources */,
-				AB988A9E254811AB00E3C39A /* NewPollController.swift in Sources */,
+				AB988A9E254811AB00E3C39A /* _NewPollController.swift in Sources */,
 				AB0AB63527B4E37C006FD33F /* TimeoutTask.swift in Sources */,
 				AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */,
 				AB75838224E6AB8A004367DF /* CompletedSign.swift in Sources */,

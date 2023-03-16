@@ -156,9 +156,8 @@ class HotCard: UIView, Card {
     let instance = CAGradientLayer()
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
     let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.1, of: item.topic.tagColor).cgColor
-    setGradient(layer: instance,
-                colors: [clear, feathered],
-                locations: [0.0, 0.5])
+    instance.setGradient(colors: [clear, feathered],
+                         locations: [0.0, 0.5])
     
     return instance
   }()
@@ -166,9 +165,8 @@ class HotCard: UIView, Card {
     let instance = CAGradientLayer()
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
     let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.1, of: item.topic.tagColor).cgColor
-    setGradient(layer: instance,
-                colors: [clear, clear, feathered],
-                locations: [0.0, 0.75, 0.9])
+    instance.setGradient(colors: [clear, clear, feathered],
+                         locations: [0.0, 0.75, 0.9])
     
     return instance
   }()
@@ -439,17 +437,15 @@ class HotCard: UIView, Card {
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
     let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.1, of: item.topic.tagColor).cgColor
     
-    setGradient(layer: fadeGradient,
-                colors: [clear, clear, feathered],
-                locations: [0.0, 0.75, 0.9])
+    fadeGradient.setGradient(colors: [clear, clear, feathered],
+                             locations: [0.0, 0.75, 0.9])
     
     let clear_2 = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
-    setGradient(layer: gradient,
-                colors: [clear_2, feathered],
-                locations: [0.0, 0.5])
+    gradient.setGradient(colors: [clear_2, feathered],
+                         locations: [0.0, 0.5])
     
     body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .white : .tertiarySystemBackground
-//    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? UIColor.white.blended(withFraction: 0.055, of: item.topic.tagColor) : .tertiarySystemBackground
+    //    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? UIColor.white.blended(withFraction: 0.055, of: item.topic.tagColor) : .tertiarySystemBackground
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
 }
@@ -499,14 +495,14 @@ private extension HotCard {
     //    })
   }
   
-  func setGradient(layer: CAGradientLayer,
-                   colors: [CGColor],
-                   locations: [NSNumber]) {
-//    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-//    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.1, of: item.topic.tagColor).cgColor
-    layer.colors = colors//[clear, clear, feathered]
-    layer.locations = locations//[0.0, 0.75, 0.9]
-  }
+//  func setGradient(layer: CAGradientLayer,
+//                   colors: [CGColor],
+//                   locations: [NSNumber]) {
+////    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+////    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.1, of: item.topic.tagColor).cgColor
+//    layer.colors = colors//[clear, clear, feathered]
+//    layer.locations = locations//[0.0, 0.75, 0.9]
+//  }
   
   @objc
   func handleTap(sender: UIButton) {

@@ -36,6 +36,24 @@ extension UIView {
     return opaque
   }
   
+  class func horizontalSpacer(_ width: CGFloat) -> UIView {
+    let instance = UIView()
+    instance.widthAnchor.constraint(equalToConstant: width).isActive = true
+    instance.accessibilityIdentifier = "horizontalSpacer"
+    instance.backgroundColor = .clear
+    
+    return instance
+  }
+  
+  class func verticalSpacer(_ height: CGFloat) -> UIView {
+    let instance = UIView()
+    instance.heightAnchor.constraint(equalToConstant: height).isActive = true
+    instance.accessibilityIdentifier = "verticalSpacer"
+    instance.backgroundColor = .clear
+    
+    return instance
+  }
+  
   //    var statusBarWindow: UIWindow {
   //        guard let window = window,
   //              let windowScene = window.windowScene,
@@ -362,17 +380,30 @@ extension UIView {
     bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -topInset).isActive = true
   }
   
+  @discardableResult
   func placeInCenter(of parent: UIView,
-                     heightMultiplier: CGFloat = .zero) {
+                     heightMultiplier: CGFloat = .zero) -> [NSLayoutConstraint] {
     parent.addSubview(self)
     translatesAutoresizingMaskIntoConstraints = false
     
-    centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
-    centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
-
-    guard heightMultiplier != .zero else { return }
+    let centerXAnchorConstraint = centerXAnchor.constraint(equalTo: parent.centerXAnchor)
+    centerXAnchorConstraint.isActive = true
+    centerXAnchorConstraint.identifier = "centerXAnchor"
     
-    heightAnchor.constraint(equalTo: parent.heightAnchor, multiplier: heightMultiplier).isActive = true
+    let centerYAnchorConstraint = centerYAnchor.constraint(equalTo: parent.centerYAnchor)
+    centerYAnchorConstraint.isActive = true
+    centerYAnchorConstraint.identifier = "centerYAnchor"
+
+    var constraints = [centerYAnchorConstraint, centerXAnchorConstraint]
+    
+    guard heightMultiplier != .zero else { return constraints }
+    
+    let heightAnchorConstraint = heightAnchor.constraint(equalTo: parent.heightAnchor, multiplier: heightMultiplier)
+    centerYAnchorConstraint.isActive = true
+    centerYAnchorConstraint.identifier = "heightAnchor"
+    
+    constraints.append(heightAnchorConstraint)
+    return constraints
   }
   
   func placeInCenter(of parent: UIView,

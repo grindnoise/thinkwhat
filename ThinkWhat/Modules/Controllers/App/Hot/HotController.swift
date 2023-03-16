@@ -102,8 +102,12 @@ private extension HotController {
       let backItem = UIBarButtonItem()
       backItem.title = ""
       self.navigationItem.backBarButtonItem = backItem
-      self.navigationController?.pushViewController(SurveyCreationController(), animated: true)
+      self.navigationController?.pushViewController(NewPollController(color: self.tintColor), animated: true)
       self.tabBarController?.setTabBarVisible(visible: false, animated: true)
+      
+      guard let main = self.tabBarController as? MainController else { return }
+      
+      main.toggleLogo(on: false)
     })
     
     navigationController?.navigationBar.prefersLargeTitles = false

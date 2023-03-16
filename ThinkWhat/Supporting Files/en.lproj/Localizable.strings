@@ -412,3 +412,6 @@
 "userprofile_compatibility_level_max" = "maximum";
 "userprofile_contrib_hint" = "Topics which user is interested in to discuss within community";
 "userprofile_сompatibility_hint" = "The indicator is calculated on the results of surveys in which you both participated";
+
+//New poll
+"new_poll_readiness" = "Readiness";

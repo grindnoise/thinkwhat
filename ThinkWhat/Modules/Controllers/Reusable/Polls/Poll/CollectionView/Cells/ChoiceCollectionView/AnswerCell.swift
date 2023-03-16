@@ -456,7 +456,11 @@ private extension AnswerCell {
                                    duration: 0.2,
                                    timingFunction: .easeOut,
                                    delegate: self,
-                                   completionBlocks: [{ selection.removeFromSuperlayer() }]),
+                                   isRemovedOnCompletion: false,
+                                   completionBlocks: [{
+//        selection.opacity = 0
+        selection.removeAllAnimations()
+        selection.removeFromSuperlayer() }]),
                     forKey: nil)
       selection.add(Animations.get(property: .Scale,
                                    fromValue: selection.affineTransform(),
@@ -464,7 +468,11 @@ private extension AnswerCell {
                                    duration: 0.2,
                                    timingFunction: .easeOut,
                                    delegate: self,
-                                   completionBlocks: [{ selection.removeFromSuperlayer() }]),
+                                   isRemovedOnCompletion: false,
+                                   completionBlocks: [{
+//        selection.setAffineTransform(CGAffineTransform(scaleX: 1, y: 0.1))
+        selection.removeAllAnimations()
+        selection.removeFromSuperlayer() }]),
                     forKey: nil)
     }
   }

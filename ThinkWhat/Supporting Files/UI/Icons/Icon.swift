@@ -188,6 +188,7 @@ class Icon: UIView {
         case Thumbdown = 10065
         case Oval = 10066
         case QuestionMarkCircleFill = 10067
+      case MegaphoneFill = 10068
     }
     
     
@@ -362,6 +363,40 @@ class Icon: UIView {
         let switchCase = _category == .Null ? category : _category
         
         switch switchCase {
+        case .MegaphoneFill:
+          iconPath.move(to: CGPoint(x: 37.66, y: 135.27))
+          iconPath.addLine(to: CGPoint(x: 55.54, y: 135.27))
+          iconPath.addLine(to: CGPoint(x: 55.54, y: 49.73))
+          iconPath.addLine(to: CGPoint(x: 37.66, y: 49.73))
+          iconPath.addCurve(to: CGPoint(x: 0, y: 86.22), controlPoint1: CGPoint(x: 13.21, y: 49.73), controlPoint2: CGPoint(x: 0, y: 62.6))
+          iconPath.addLine(to: CGPoint(x: 0, y: 98.8))
+          iconPath.addCurve(to: CGPoint(x: 37.66, y: 135.27), controlPoint1: CGPoint(x: 0, y: 122.42), controlPoint2: CGPoint(x: 13.21, y: 135.27))
+          iconPath.close()
+          iconPath.move(to: CGPoint(x: 68.17, y: 135.36))
+          iconPath.addCurve(to: CGPoint(x: 149.87, y: 158.37), controlPoint1: CGPoint(x: 93.47, y: 138.26), controlPoint2: CGPoint(x: 124.74, y: 145.9))
+          iconPath.addCurve(to: CGPoint(x: 149.81, y: 155.2), controlPoint1: CGPoint(x: 149.83, y: 157.33), controlPoint2: CGPoint(x: 149.81, y: 156.24))
+          iconPath.addLine(to: CGPoint(x: 149.81, y: 29.96))
+          iconPath.addCurve(to: CGPoint(x: 149.85, y: 26.65), controlPoint1: CGPoint(x: 149.81, y: 28.82), controlPoint2: CGPoint(x: 149.83, y: 27.78))
+          iconPath.addCurve(to: CGPoint(x: 68.17, y: 49.73), controlPoint1: CGPoint(x: 124.92, y: 39.12), controlPoint2: CGPoint(x: 91.31, y: 47.18))
+          iconPath.addLine(to: CGPoint(x: 68.17, y: 135.36))
+          iconPath.close()
+          iconPath.move(to: CGPoint(x: 181.19, y: 179.39))
+          iconPath.addCurve(to: CGPoint(x: 200, y: 160.41), controlPoint1: CGPoint(x: 192.23, y: 179.39), controlPoint2: CGPoint(x: 200, y: 171.52))
+          iconPath.addLine(to: CGPoint(x: 200, y: 23.98))
+          iconPath.addCurve(to: CGPoint(x: 181.19, y: 5), controlPoint1: CGPoint(x: 200, y: 12.89), controlPoint2: CGPoint(x: 192.23, y: 5))
+          iconPath.addCurve(to: CGPoint(x: 162.28, y: 23.98), controlPoint1: CGPoint(x: 170.14, y: 5), controlPoint2: CGPoint(x: 162.28, y: 12.89))
+          iconPath.addLine(to: CGPoint(x: 162.28, y: 160.41))
+          iconPath.addCurve(to: CGPoint(x: 181.19, y: 179.39), controlPoint1: CGPoint(x: 162.28, y: 171.52), controlPoint2: CGPoint(x: 170.14, y: 179.39))
+          iconPath.close()
+          iconPath.move(to: CGPoint(x: 73.4, y: 196))
+          iconPath.addCurve(to: CGPoint(x: 90.16, y: 173.75), controlPoint1: CGPoint(x: 84.8, y: 196), controlPoint2: CGPoint(x: 93.27, y: 187.65))
+          iconPath.addLine(to: CGPoint(x: 85.19, y: 151.02))
+          iconPath.addCurve(to: CGPoint(x: 43.71, y: 147.92), controlPoint1: CGPoint(x: 77.24, y: 149.43), controlPoint2: CGPoint(x: 66.27, y: 148.42))
+          iconPath.addCurve(to: CGPoint(x: 37.1, y: 147.76), controlPoint1: CGPoint(x: 42.15, y: 147.9), controlPoint2: CGPoint(x: 39.69, y: 147.78))
+          iconPath.addLine(to: CGPoint(x: 52.55, y: 180.29))
+          iconPath.addCurve(to: CGPoint(x: 73.4, y: 196), controlPoint1: CGPoint(x: 57.22, y: 190.21), controlPoint2: CGPoint(x: 62.77, y: 196))
+          iconPath.close()
+          
         case .Creativity:
             iconPath.move(to: CGPoint(x: 54.66, y: 12.6))
             iconPath.addCurve(to: CGPoint(x: 42.33, y: 23.82), controlPoint1: CGPoint(x: 47.8, y: 12.6), controlPoint2: CGPoint(x: 42.33, y: 17.49))

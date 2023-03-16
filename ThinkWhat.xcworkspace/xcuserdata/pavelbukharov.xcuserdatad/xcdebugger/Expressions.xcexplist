@@ -7622,6 +7622,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in ProgressCapsule.icon.getter:ProgressCapsule.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "iconCategory">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #2 in Avatar.setImage():Avatar.swift">
       </ContextState>
       <ContextState

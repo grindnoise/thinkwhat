@@ -2710,8 +2710,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Hot/HotController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "166"
-            endingLineNumber = "166"
+            startingLineNumber = "170"
+            endingLineNumber = "170"
             landmarkName = "setTasks()"
             landmarkType = "7">
             <Locations>
@@ -3033,6 +3033,22 @@
             startingLineNumber = "204"
             endingLineNumber = "204"
             landmarkName = "setupUI()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C1795A9F-56B7-44C4-BE80-1ACECA7789D5"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Extensions/UIView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "353"
+            endingLineNumber = "353"
+            landmarkName = "placeXCentered(inside:topInset:bottomInset:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

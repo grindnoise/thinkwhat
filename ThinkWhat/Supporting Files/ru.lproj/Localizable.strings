@@ -412,3 +412,6 @@
 "userprofile_compatibility_level_max" = "максимальный";
 "userprofile_contrib_hint" = "Интересующие пользователя темы, которые он обсудил с сообществом";
 "userprofile_сompatibility_hint" = "Индикатор расчитывается на основании результатов опросов, в которых вы оба участвовали";
+
+//New poll
+"new_poll_readiness" = "Готовность";
