@@ -399,8 +399,8 @@ extension UIView {
     guard heightMultiplier != .zero else { return constraints }
     
     let heightAnchorConstraint = heightAnchor.constraint(equalTo: parent.heightAnchor, multiplier: heightMultiplier)
-    centerYAnchorConstraint.isActive = true
-    centerYAnchorConstraint.identifier = "heightAnchor"
+    heightAnchorConstraint.isActive = true
+    heightAnchorConstraint.identifier = "heightAnchor"
     
     constraints.append(heightAnchorConstraint)
     return constraints

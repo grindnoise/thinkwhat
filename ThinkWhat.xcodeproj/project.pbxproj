@@ -312,6 +312,9 @@
 		AB7C6FB42865AE3000000429 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7C6FB32865AE3000000429 /* Error.swift */; };
 		AB7C95AD29B2281600F367B3 /* HotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7C95AC29B2281600F367B3 /* HotCard.swift */; };
 		AB7C95AF29B2322200F367B3 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7C95AE29B2322200F367B3 /* Card.swift */; };
+		AB7D14E629C475C80036FA7A /* NewPollCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7D14E529C475C80036FA7A /* NewPollCollectionView.swift */; };
+		AB7D14E929C47B4D0036FA7A /* NewPollTopicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7D14E829C47B4D0036FA7A /* NewPollTopicCell.swift */; };
+		AB7D14EB29C47DE40036FA7A /* TagCapsule.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7D14EA29C47DE40036FA7A /* TagCapsule.swift */; };
 		AB7F4B8A25B5D7230017573D /* 5_ImagesSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */; };
 		AB7FD68828F96764003F38E4 /* UserprofilesFeedCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7FD68728F96764003F38E4 /* UserprofilesFeedCollectionView.swift */; };
 		AB8238F927A914100061F7C6 /* URLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8238F827A914100061F7C6 /* URLs.swift */; };
@@ -897,6 +900,9 @@
 		AB7C6FB32865AE3000000429 /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		AB7C95AC29B2281600F367B3 /* HotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotCard.swift; sourceTree = "<group>"; };
 		AB7C95AE29B2322200F367B3 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
+		AB7D14E529C475C80036FA7A /* NewPollCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollCollectionView.swift; sourceTree = "<group>"; };
+		AB7D14E829C47B4D0036FA7A /* NewPollTopicCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollTopicCell.swift; sourceTree = "<group>"; };
+		AB7D14EA29C47DE40036FA7A /* TagCapsule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagCapsule.swift; sourceTree = "<group>"; };
 		AB7F4B8925B5D7230017573D /* 5_ImagesSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 5_ImagesSelectionViewController.swift; sourceTree = "<group>"; };
 		AB7FD68728F96764003F38E4 /* UserprofilesFeedCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserprofilesFeedCollectionView.swift; sourceTree = "<group>"; };
 		AB8238F827A914100061F7C6 /* URLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLs.swift; sourceTree = "<group>"; };
@@ -1614,6 +1620,7 @@
 		AB39D3F629C34B8700892D58 /* Creation */ = {
 			isa = PBXGroup;
 			children = (
+				AB7D14E429C4758F0036FA7A /* Collection */,
 				AB39D3F729C34BCE00892D58 /* NewPollContract.swift */,
 				AB39D3F829C34BCE00892D58 /* NewPollController.swift */,
 				AB39D3F929C34BCE00892D58 /* NewPollView.swift */,
@@ -2271,6 +2278,23 @@
 			path = Existing;
 			sourceTree = "<group>";
 		};
+		AB7D14E429C4758F0036FA7A /* Collection */ = {
+			isa = PBXGroup;
+			children = (
+				AB7D14E729C47B370036FA7A /* Cells */,
+				AB7D14E529C475C80036FA7A /* NewPollCollectionView.swift */,
+			);
+			path = Collection;
+			sourceTree = "<group>";
+		};
+		AB7D14E729C47B370036FA7A /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				AB7D14E829C47B4D0036FA7A /* NewPollTopicCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
 		AB7FD68528F9672F003F38E4 /* Feed */ = {
 			isa = PBXGroup;
 			children = (
@@ -2487,6 +2511,7 @@
 				AB7478C12428962700317EB6 /* CameraLoadingIndicator.swift */,
 				ABEF04962971600D001D9A2E /* PercentageView.swift */,
 				ABEF04982971A7C4001D9A2E /* Line.swift */,
+				AB7D14EA29C47DE40036FA7A /* TagCapsule.swift */,
 			);
 			path = "UI elements";
 			sourceTree = "<group>";
@@ -3481,6 +3506,7 @@
 				ABE56C1B298AC4C8004C761D /* TopicCompatibilityCollectionView.swift in Sources */,
 				ABA7829928589D3600964FDE /* AddChoiceContentView.swift in Sources */,
 				AB8DA34227A182D300F92C18 /* SignupModel.swift in Sources */,
+				AB7D14E629C475C80036FA7A /* NewPollCollectionView.swift in Sources */,
 				AB60B5BD285CD6150023C99B /* CommentsSelection.swift in Sources */,
 				ABB0F6D528F6D6B80068FDDF /* FeedbackViewController.swift in Sources */,
 				AB0B7FD6294384C200941FA1 /* TestViewController.swift in Sources */,
@@ -3530,6 +3556,7 @@
 				ABF3DF1B283BB11800309AA9 /* LargeCard.swift in Sources */,
 				AB9998BE28058FA5009D0E4F /* Double.swift in Sources */,
 				AB00FFD52587A6320071C7DE /* BlurTransition.swift in Sources */,
+				AB7D14E929C47B4D0036FA7A /* NewPollTopicCell.swift in Sources */,
 				ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */,
 				AB090D832876F06D00FAFAB0 /* AnwersCollectionView.swift in Sources */,
 				ABB46F372344B1F900AF212B /* CallbackObservable.swift in Sources */,
@@ -3747,6 +3774,7 @@
 				AB68111E29828CA900C14C32 /* CGSize.swift in Sources */,
 				AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */,
 				AB6B071F247688600095721B /* delUserViewController.swift in Sources */,
+				AB7D14EB29C47DE40036FA7A /* TagCapsule.swift in Sources */,
 				ABCE775928488C8E001E3413 /* ImageSelectionPopup.swift in Sources */,
 				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,

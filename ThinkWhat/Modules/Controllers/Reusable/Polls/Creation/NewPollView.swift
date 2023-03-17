@@ -13,6 +13,7 @@ class NewPollView: UIView {
   
   // MARK: - Public properties
   weak var viewInput: NewPollViewInput?
+  ///**Publishers**
   
   
   
@@ -20,6 +21,20 @@ class NewPollView: UIView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
+  ///**UI**
+  private lazy var collectionView: NewPollCollectionView = {
+    let instance = NewPollCollectionView()
+    instance.progressPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+      
+        self.viewInput?.setProgress($0)
+      }
+      .store(in: &subscriptions)
+    
+    
+    return instance
+  }()
   
   
   
@@ -45,8 +60,6 @@ class NewPollView: UIView {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
-  
 }
 
 extension NewPollView: NewPollControllerOutput {
@@ -57,6 +70,7 @@ extension NewPollView: NewPollControllerOutput {
 private extension NewPollView {
   func setupUI() {
     backgroundColor = .systemBackground
+    collectionView.place(inside: self)
   }
 }
 

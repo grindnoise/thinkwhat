@@ -46,7 +46,7 @@ class ProgressCapsule: UIView {
       .filter { $0 != .zero }
       .sink { [unowned self] in
         instance.cornerRadius = $0.height/2.25
-        self.progressLayer.frame = $0
+        self.progressLayer.frame.size.height = $0.height
       }
       .store(in: &subscriptions)
     instance.backgroundColor = .systemGray4
@@ -55,13 +55,6 @@ class ProgressCapsule: UIView {
     return instance
   }()
   private lazy var icon: Icon = {
-//    let instance = Icon(category: Icon.Category.Logo)
-//    instance.iconColor = .white//Colors.Logo.Flame.rawValue
-//    instance.isRounded = false
-//    instance.clipsToBounds = false
-//    instance.scaleMultiplicator = 1.65
-//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    
     let instance = Icon(category: iconCategory)
     instance.iconColor = .white
     instance.isRounded = false
@@ -74,20 +67,30 @@ class ProgressCapsule: UIView {
   private lazy var label: UILabel = {
     let instance = UILabel()
     instance.font = font
+    instance.textAlignment = .left
     instance.text = placeholder.isEmpty ? "100%" : placeholder + ": 100%"
     instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: font)).isActive = true
+    instance.text = placeholder.isEmpty ? "0%" : placeholder + ": 0%"
     instance.textColor = .white
     
     return instance
   }()
   private lazy var progressLayer: CAGradientLayer = {
     let instance = CAGradientLayer()
+//    instance.mask = maskLayer
     instance.startPoint = CGPoint(x: 0, y: 0.5)
     instance.endPoint = CGPoint(x: 1.0, y: 0.5)
-    let bleached = UIColor.white.blended(withFraction: 0.85, of: fgColor).cgColor
+    let bleached = UIColor.white.blended(withFraction: 0.75, of: fgColor).cgColor
     let saturated = UIColor.white.blended(withFraction: 1, of: fgColor).cgColor
     instance.setGradient(colors: [bleached, saturated],
                          locations: [0.0, 1])
+    
+    
+    return instance
+  }()
+  private let maskLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.path = UIBezierPath(ovalIn: CGRect(origin: .zero, size: .uniform(size: 10))).cgPath
     
     return instance
   }()
@@ -138,7 +141,26 @@ class ProgressCapsule: UIView {
   @MainActor
   public func setProgress(value: Double,
                           animated: Bool = true) {
-    // TODO: - implent
+    guard animated else {
+      self.label.text =  "\(self.placeholder.isEmpty ? "" : self.placeholder + ": ")\(String(describing: Int(value)*100))%"
+      self.progressLayer.frame = CGRect(origin: .zero,
+                                        size: CGSize(width: self.stack.bounds.width * value, height: self.stack.bounds.height))
+      return
+    }
+    UIView.transition(with: label, duration: 0.3, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.label.text = "\(self.placeholder.isEmpty ? "" : self.placeholder + ": ")\(String(describing: Int(value*100)))%"
+    } completion: { _ in }
+
+    UIView.animate(withDuration: 0.3,
+                   delay: 0,
+                   options: .curveEaseInOut) { [weak self] in
+      guard let self = self else { return }
+      
+      self.progressLayer.frame = CGRect(origin: .zero,
+                                        size: CGSize(width: self.stack.bounds.width * value, height: self.stack.bounds.height))
+    }
   }
   
   
@@ -155,11 +177,6 @@ private extension ProgressCapsule {
     backgroundColor = .clear
     stack.place(inside: self,
                 bottomPriority: .defaultLow)
-  }
-  
-  @MainActor
-  func updateUI() {
-    
   }
 }
 

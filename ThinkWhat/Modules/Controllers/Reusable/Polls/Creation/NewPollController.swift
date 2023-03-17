@@ -11,6 +11,24 @@ import Combine
 
 class NewPollController: UIViewController, TintColorable {
   
+  ///Sequence of stages to post new survey
+  enum Stage: Int, CaseIterable {
+    case Topic, Options, Title, Description, Question, Hyperlink, Images, Choices, Comments, Limits, Hot, Ready
+    
+    func next() -> Stage? { Stage(rawValue: (self.rawValue + 1)) }
+    
+    func title() -> String {
+      switch self {
+      case .Topic: return "new_poll_survey_topic".localized
+      default: return ""
+      }
+    }
+    
+    func percent() -> Double {  Double(self.rawValue * 100 / Stage.allCases.count) / 100 }
+  }
+  
+  
+  
   // MARK: - Public properties
   var controllerOutput: NewPollControllerOutput?
   var controllerInput: NewPollControllerInput?
@@ -100,6 +118,17 @@ class NewPollController: UIViewController, TintColorable {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
+//    Publishers.countdown(queue: .main,
+//                         interval: .milliseconds(700),
+//                         times: .max(Int(7)))
+//    .sink { [weak self] element in
+//      guard let self = self else { return }
+//
+//      self.progressCapsule.setProgress(value: Double(7 - element)/7)
+//    }
+//    .store(in: &subscriptions)
+
+    
     guard !isTitleOnScreen,
           let constraint = progressCapsule.getConstraint(identifier: "centerYAnchor")
     else { return }
@@ -119,6 +148,10 @@ class NewPollController: UIViewController, TintColorable {
 }
 
 extension NewPollController: NewPollViewInput {
+  func setProgress(_ value: Double) {
+    progressCapsule.setProgress(value: value)
+  }
+  
   
 }
 

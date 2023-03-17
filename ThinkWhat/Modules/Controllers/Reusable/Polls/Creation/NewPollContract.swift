@@ -8,39 +8,28 @@
 
 import UIKit
 
-/// *View* sends user actions to the *Controller*.
-///
-/// **Controller** conforms to this protocol
-protocol NewPollViewInput: class {
-    
-    var controllerOutput: NewPollControllerOutput? { get set }
-    var controllerInput: NewPollControllerInput? { get set }
-    
-    // View input methods here
+
+protocol NewPollViewInput: AnyObject {
+  
+  var controllerOutput: NewPollControllerOutput? { get set }
+  var controllerInput: NewPollControllerInput? { get set }
+  
+  func setProgress(_: Double)
 }
 
-/// *Controller* tells the *Model* what to do based on the input
-///
-/// **Model** conforms to this protocol
-protocol NewPollControllerInput: class {
-    
-    var modelOutput: NewPollModelOutput? { get set }
-    
-    // Controller input methods here
+protocol NewPollControllerInput: AnyObject {
+  
+  var modelOutput: NewPollModelOutput? { get set }
+  
+  
 }
 
-/// *Model* returns the result to the *Controller*
-///
-/// **Controller** conforms to this protocol
-protocol NewPollModelOutput: class {
-    // Model output methods here
+protocol NewPollModelOutput: AnyObject {
+  
 }
 
-/// *Controller* returns a UI-representable result to the *View*
-///
-/// **View** conforms to this protocol
-protocol NewPollControllerOutput: class {
-    var viewInput: NewPollViewInput? { get set }
-    
-    // Controller output methods here
+protocol NewPollControllerOutput: AnyObject {
+  var viewInput: NewPollViewInput? { get set }
+  
+  
 }

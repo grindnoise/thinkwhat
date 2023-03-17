@@ -415,3 +415,4 @@
 
 //New poll
 "new_poll_readiness" = "Readiness";
+"new_poll_survey_topic" = "Survey topic";

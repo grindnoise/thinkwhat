@@ -331,14 +331,15 @@ class CompatibilityView: UIView {
       return
     }
     
-    let timer = Publishers.countdown(queue: .main,
-                                     interval: .milliseconds(Int((animDuration/percent)*1000)),
-                                     times: .max(Int(percent)))
-    timer.sink { [weak self] element in
+    Publishers.countdown(queue: .main,
+                         interval: .milliseconds(Int((animDuration/percent)*1000)),
+                         times: .max(Int(percent)))
+    .sink { [weak self] element in
       guard let self = self else { return }
       
       self.percentageLabel.text = "\(Int(self.percent) - element)%"
-    }.store(in: &subscriptions)
+    }
+    .store(in: &subscriptions)
       
     //    timer.sink(receiveCompletion: { _ in print("completed", to: &logger)} , receiveValue: { _ in print("started", to: &logger)} )//
     

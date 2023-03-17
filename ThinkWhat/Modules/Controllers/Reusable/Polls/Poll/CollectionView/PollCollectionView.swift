@@ -103,13 +103,13 @@ class PollCollectionView: UICollectionView {
               let source = self.source
         else { return }
         
-        source.refresh() { [weak self] in
-          guard let self = self else { return }
-          self.scrollToItem(at: IndexPath(row: 0,
-                                          section: self.numberOfSections - 2),
-                            at: .bottom,
-                            animated: true)
-        }
+        source.refresh()// { [weak self] in
+//          guard let self = self else { return }
+//          self.scrollToItem(at: IndexPath(row: 0,
+//                                          section: self.numberOfSections - 2),
+//                            at: .bottom,
+//                            animated: true)
+//        }
       }
       .store(in: &subscriptions)
     
