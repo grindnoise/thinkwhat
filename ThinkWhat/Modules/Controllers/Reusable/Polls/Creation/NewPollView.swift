@@ -54,6 +54,7 @@ class NewPollView: UIView {
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
+    
     setupUI()
   }
   
@@ -63,14 +64,26 @@ class NewPollView: UIView {
 }
 
 extension NewPollView: NewPollControllerOutput {
+  func willMoveToParent() {
+    collectionView.isMovingToParent = true
+  }
+  
   
 }
 
 
 private extension NewPollView {
+  @MainActor
   func setupUI() {
     backgroundColor = .systemBackground
     collectionView.place(inside: self)
+    let touch = UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard))
+    addGestureRecognizer(touch)
+  }
+  
+  @objc
+  func hideKeyboard() {
+    endEditing(true)
   }
 }
 

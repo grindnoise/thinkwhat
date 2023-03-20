@@ -10,14 +10,18 @@ import UIKit
 import Combine
 
 class TopicsCollectionView: UICollectionView {
-  
+  enum Mode { case Default, Selection }
   // MARK: - Public properties
+  ///**Publishers**
+  public let topicSelected = PassthroughSubject<Topic, Never>()
   public let touchSubject = CurrentValueSubject<[Topic: CGPoint]?, Never>(nil)
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
+  ///**Logic**
+  private var mode: Mode
   private var source: UICollectionViewDiffableDataSource<TopicHeaderItem, TopicListItem>!
   private let modelObjects: [TopicHeaderItem] = {
     Topics.shared.all.filter({ $0.isParentNode }).map { topic in
@@ -38,7 +42,9 @@ class TopicsCollectionView: UICollectionView {
   }
   
   // MARK: - Initialization
-  init() {
+  init(mode: Mode = .Default) {
+    self.mode = mode
+    
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     
     setupUI()
@@ -53,7 +59,7 @@ class TopicsCollectionView: UICollectionView {
 private extension TopicsCollectionView {
   @MainActor
   func setupUI() {
-    //        delegate = self
+    delegate = self.mode == .Selection ? self : nil
     collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
       var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
       layoutConfig.headerMode = .firstItemInSection
@@ -73,6 +79,8 @@ private extension TopicsCollectionView {
     
     let cellRegistration = UICollectionView.CellRegistration<TopicCell, TopicItem> { [weak self] cell, indexPath, item in
       guard let self = self else { return }
+      
+      cell.mode = self.mode
       cell.item = item
       var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
       backgroundConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.1)
@@ -89,8 +97,16 @@ private extension TopicsCollectionView {
         }
         .store(in: &self.subscriptions)
       
+      if self.mode == .Default {
+        cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: item.topic.tagColor))]
+//      } else {
+//        cell.accessories = [.checkmark(displayed: .always,
+//                                       options: UICellAccessory.CheckmarkOptions(isHidden: false,
+//                                                                                 reservedLayoutWidth: nil,
+//                                                                                 tintColor: item.topic.tagColor))]
+      }
       //            let headerDisclosureOption = UICellAccessory.DisclosureIndicatorOptions()// OutlineDisclosureOptions(style: .header)
-      cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: item.topic.tagColor))]//.outlineDisclosure(options:headerDisclosureOption)]
+//      cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: item.topic.tagColor))]//.outlineDisclosure(options:headerDisclosureOption)]
       //            let accessoryConfig = UICellAccessory.CustomViewConfiguration(customView: UIImageView(image: UIImage(systemName: "arrow.right",
       //                                                                                                                 withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
       //                                                                          placement: .trailing(displayed: .always, at: { _ in 0 }),
@@ -120,9 +136,9 @@ private extension TopicsCollectionView {
     ////            footerView
     //        }
     
-    let headerCellRegistration = UICollectionView.CellRegistration<TopicCellHeader, TopicHeaderItem> {
-      (cell, indexPath, headerItem) in
+    let headerCellRegistration = UICollectionView.CellRegistration<TopicCellHeader, TopicHeaderItem> { [unowned self] cell, _, headerItem in
       
+      cell.mode = self.mode
       cell.item = headerItem
       let headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
       var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
@@ -201,9 +217,12 @@ private extension TopicsCollectionView {
   //    }
 }
 
-//extension TopicsCollectionView: UICollectionViewDelegate {
-//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        cell.setNeedsLayout()
-//        cell.layoutIfNeeded()
-//    }
-//}
+extension TopicsCollectionView: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    guard let cell = cellForItem(at: indexPath) as? TopicCell,
+          let topic = cell.item?.topic
+    else { return }
+    
+    topicSelected.send(topic)
+  }
+}

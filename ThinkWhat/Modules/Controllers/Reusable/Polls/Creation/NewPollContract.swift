@@ -31,5 +31,6 @@ protocol NewPollModelOutput: AnyObject {
 protocol NewPollControllerOutput: AnyObject {
   var viewInput: NewPollViewInput? { get set }
   
-  
+//  var isMovingToParent
+  func willMoveToParent()
 }

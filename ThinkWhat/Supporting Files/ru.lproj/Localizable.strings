@@ -104,6 +104,7 @@
 "per" = "За";
 "more_info" = "Подробнее";
 "confirm" = "Подтвердить";
+"select" = "Выбрать";
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в ThinkWhat!";
@@ -415,4 +416,12 @@
 
 //New poll
 "new_poll_readiness" = "Готовность";
-"new_poll_survey_topic" = "Тема опроса";
+"new_poll_survey_topic" = "Тема";
+"new_poll_survey_title" = "Титул";
+"new_poll_survey_enter_title" = "Введите название";
+"new_poll_survey_title_error_begin" = "Название должно состоять минимум из ";
+"new_poll_survey_title_error_end" = " знаков";
+"new_poll_survey_description" = "Подробности";
+"new_poll_survey_enter_description" = "Введите подробности";
+"new_poll_survey_question" = "Вопрос";
+"new_poll_survey_enter_question" = "Сформулируйте вопрос";

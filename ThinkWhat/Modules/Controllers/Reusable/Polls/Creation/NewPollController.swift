@@ -13,7 +13,7 @@ class NewPollController: UIViewController, TintColorable {
   
   ///Sequence of stages to post new survey
   enum Stage: Int, CaseIterable {
-    case Topic, Options, Title, Description, Question, Hyperlink, Images, Choices, Comments, Limits, Hot, Ready
+    case Topic, Title, Description, Question, Choices, Options, Hyperlink, Images, Comments, Limits, Hot, Ready
     
     func next() -> Stage? { Stage(rawValue: (self.rawValue + 1)) }
     
@@ -46,7 +46,6 @@ class NewPollController: UIViewController, TintColorable {
                                                                  padding: 4,
                                                                  font: UIFont(name: Fonts.Bold, size: 20)!,
                                                                  iconCategory: .MegaphoneFill)
-  
   
 
   // MARK: - Initialization
@@ -93,6 +92,12 @@ class NewPollController: UIViewController, TintColorable {
     self.view = view as UIView
     
     setupUI()
+  }
+  
+  override func willMove(toParent parent: UIViewController?) {
+    controllerOutput?.willMoveToParent()
+    
+    super.willMove(toParent: parent)
   }
   
   override func viewWillDisappear(_ animated: Bool) {

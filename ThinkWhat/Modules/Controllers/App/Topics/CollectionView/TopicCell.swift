@@ -12,6 +12,7 @@ import Combine
 struct TopicCellConfiguration: UIContentConfiguration, Hashable {
   
   var topicItem: TopicItem!
+  var mode: TopicsCollectionView.Mode!
   
   func makeContentView() -> UIView & UIContentView {
     return TopicCellContent(configuration: self)
@@ -32,8 +33,14 @@ class TopicCell: UICollectionViewListCell {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
+  private lazy var tapRecognizer: UITapGestureRecognizer = { UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))) }()
   
   // MARK: - Public properties
+  public var mode: TopicsCollectionView.Mode = .Default {
+    didSet {
+      tapRecognizer.isEnabled = mode == .Default
+    }
+  }
   public var item: TopicItem!
   public var callback: Closure?
   public var touchSubject = PassthroughSubject<[Topic: CGPoint], Never>()
@@ -52,7 +59,9 @@ class TopicCell: UICollectionViewListCell {
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
-    let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:)))
+    
+    guard mode == .Default else { return }
+    
     addGestureRecognizer(tapRecognizer)
   }
   
@@ -63,11 +72,19 @@ class TopicCell: UICollectionViewListCell {
   // MARK: - Overriden methods
   override func updateConfiguration(using state: UICellConfigurationState) {
     automaticallyUpdatesBackgroundConfiguration = false
-    //        accessories = state.isSelected ? [.checkmark(displayed: .always, options: UICellAccessory.CheckmarkOptions(isHidden: false, reservedLayoutWidth: nil, tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor))] : []
+    automaticallyUpdatesContentConfiguration = mode == .Default ? false : true
+    
+    if mode == .Selection {
+      accessories = state.isSelected ? [.checkmark(displayed: .always,
+                                                   options: UICellAccessory.CheckmarkOptions(isHidden: false,
+                                                                                             reservedLayoutWidth: nil,
+                                                                                             tintColor: item.topic.tagColor))] : []
+    }
     
     if state.isSelected, !callback.isNil { callback!() }
     
     var newConfiguration = TopicCellConfiguration().updated(for: state)
+    newConfiguration.mode = mode
     newConfiguration.topicItem = item
     tintColor = item.topic.tagColor
     
@@ -230,6 +247,7 @@ class TopicCellContent: UIView, UIContentView {
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
     instance.textAlignment = .right
     instance.textColor = .label
+    instance.alpha = 0
     
     return instance
   }()
@@ -318,13 +336,18 @@ private extension TopicCellContent {
     topicTitle.text = currentConfiguration.topicItem.title.uppercased()
     topicDescription.text = currentConfiguration.topicItem.description
     //        topicDescription.textColor = traitCollection.userInterfaceStyle == .dark ? .darkGray : .label
-    viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.activeCount.roundedWithAbbreviations)
-    viewsLabel.textColor = configuration.topicItem.topic.activeCount > 0 ? color : .secondaryLabel
-    currentConfiguration.topicItem.topic.activeCountPublisher
-      .receive(on: DispatchQueue.main)
-      .sink { [unowned self] in self.viewsLabel.text = $0.roundedWithAbbreviations }
-      .store(in: &subscriptions)
+    if currentConfiguration.mode == .Default {
+      viewsLabel.alpha = 1
+      viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.activeCount.roundedWithAbbreviations)
+      viewsLabel.textColor = configuration.topicItem.topic.activeCount > 0 ? color : .secondaryLabel
+      currentConfiguration.topicItem.topic.activeCountPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.viewsLabel.text = $0.roundedWithAbbreviations }
+        .store(in: &subscriptions)
+    }
+    
     //        topicLabel.backgroundColor = currentConfiguration.topicItem.topic.tagColor
+    
     
     guard let constraint = topicTitle.getConstraint(identifier: "height") else { return }
     

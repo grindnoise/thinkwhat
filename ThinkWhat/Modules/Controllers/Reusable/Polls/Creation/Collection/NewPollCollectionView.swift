@@ -21,7 +21,8 @@ class NewPollCollectionView: UICollectionView {
   public var imagePublisher = PassthroughSubject<Mediafile, Never>()
   public var webPublisher = PassthroughSubject<URL, Never>()
   ///**Logic**
-  public private(set) var stage: NewPollController.Stage = .Topic {
+  @Published var isMovingToParent: Bool?
+  @Published public private(set) var stage: NewPollController.Stage = .Topic {
     didSet {
       guard oldValue != stage else { return }
       
@@ -38,6 +39,36 @@ class NewPollCollectionView: UICollectionView {
       self.stage = stage
     }
   }
+  @Published public private(set) var title: String! {
+    didSet {
+      guard oldValue.isNil,
+            !title.isNil,
+            let stage = stage.next()
+      else { return }
+      
+      self.stage = stage
+    }
+  }
+  @Published public private(set) var pollDescription: String! {
+    didSet {
+      guard oldValue.isNil,
+            !pollDescription.isNil,
+            let stage = stage.next()
+      else { return }
+      
+      self.stage = stage
+    }
+  }
+  @Published public private(set) var question: String! {
+    didSet {
+      guard oldValue.isNil,
+            !question.isNil,
+            let stage = stage.next()
+      else { return }
+      
+      self.stage = stage
+    }
+  }
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -48,7 +79,8 @@ class NewPollCollectionView: UICollectionView {
   private var isFirstAnswerSelection = true
   ///**UI**
   private let padding: CGFloat = 8
-  
+  ///**Publishers**
+  @Published private(set) var stageAnimationFinished: NewPollController.Stage!
   
   
   // MARK: - Initialization
@@ -100,23 +132,183 @@ private extension NewPollCollectionView {
     
     let topicCellRegistration = UICollectionView.CellRegistration<NewPollTopicCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.stage = .Topic
+      cell.topic = self.topic
       cell.$topic
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
 //        .delay(for: .milliseconds(, scheduler: <#T##Scheduler#>)
         .sink { [unowned self] in self.topic = $0 }
         .store(in: &self.subscriptions)
-//      cell.color = self.topic.isNil ? Colors.Logo.Flame.rawValue : self.topic.tagColor
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Topic }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.clipsToBounds = false
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      guard self.stage == .Topic else { return }
+      
+      cell.present(seconds: 0.5)
+    }
+    
+    let titleCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.textAlignment = .center
+      cell.placeholderText = "new_poll_survey_enter_title".localized
+      cell.labelText = "new_poll_survey_title".localized
+      cell.minHeight = 60
+      cell.stage = .Title
+      cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .largeTitle)
+      cell.text = self.title
+      self.$topic
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$isMovingToParent
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isMovingToParent = $0! }
+        .store(in: &self.subscriptions)
+      cell.$text
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.title = $0 }
+        .store(in: &self.subscriptions)
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Title }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .sink { [unowned self] _ in
+          self.source.refresh() }
+        .store(in: &self.subscriptions)
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
       
-      guard self.stage == .Topic else { return }
-      
-      cell.present()
+      self.$stageAnimationFinished
+        .filter { $0 == .Topic }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
+      self.$stage
+        .filter { $0 == .Title }
+        .filter { _ in cell.text.isNil || cell.text.isEmpty }
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .sink { _ in cell.present() }
+        .store(in: &self.subscriptions)
     }
     
+    let descriptionCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.textAlignment = .natural
+      cell.placeholderText = "new_poll_survey_enter_description".localized
+      cell.labelText = "new_poll_survey_description".localized
+      cell.minHeight = 100
+      cell.stage = .Title
+      cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+      cell.text = self.pollDescription
+      self.$topic
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$isMovingToParent
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isMovingToParent = $0! }
+        .store(in: &self.subscriptions)
+      cell.$text
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.pollDescription = $0 }
+        .store(in: &self.subscriptions)
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Title }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          self.source.refresh() }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.$stageAnimationFinished
+        .filter { $0 == .Title }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
+      self.$stage
+        .filter { $0 == .Description }
+        .filter { _ in cell.text.isNil || cell.text.isEmpty }
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .sink { _ in cell.present() }
+        .store(in: &self.subscriptions)
+    }
+    
+    let questionCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.textAlignment = .natural
+      cell.placeholderText = "new_poll_survey_enter_question".localized
+      cell.labelText = "new_poll_survey_question".localized
+      cell.minHeight = 60
+      cell.stage = .Title
+      cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+      cell.text = self.pollDescription
+      self.$topic
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$isMovingToParent
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isMovingToParent = $0! }
+        .store(in: &self.subscriptions)
+      cell.$text
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.question = $0 }
+        .store(in: &self.subscriptions)
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Title }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          self.source.refresh() }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.$stageAnimationFinished
+        .filter { $0 == .Description }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
+      self.$stage
+        .filter { $0 == .Question }
+        .filter { _ in cell.text.isNil || cell.text.isEmpty }
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .sink { _ in cell.present() }
+        .store(in: &self.subscriptions)
+    }
 //    let descriptionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
 //      let paragraphStyle = NSMutableParagraphStyle()
 //      paragraphStyle.firstLineHeadIndent = 20
@@ -260,10 +452,18 @@ private extension NewPollCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: topicCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
-//      } else if section == .description {
-//        return collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
+      } else if section == .Title {
+        return collectionView.dequeueConfiguredReusableCell(using: titleCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .Description {
+        return collectionView.dequeueConfiguredReusableCell(using: descriptionCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .Question {
+        return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
 //      } else if section == .image {
 //        return collectionView.dequeueConfiguredReusableCell(using: imagesCellRegistration,
 //                                                            for: indexPath,
@@ -288,14 +488,17 @@ private extension NewPollCollectionView {
       return UICollectionViewCell()
     }
     
-    delay(seconds: 0.5) { [weak self] in
-      guard let self = self else { return }
-      
-      var snapshot = Snapshot()
-      snapshot.appendSections([.Topic])
-      snapshot.appendItems([self.stage.rawValue], toSection: .Topic)
-      self.source.apply(snapshot, animatingDifferences: true)
-    }
+    var snapshot = Snapshot()
+    snapshot.appendSections([.Topic,
+                             .Title,
+                             .Description,
+                             .Question])
+    snapshot.appendItems([0], toSection: .Topic)
+    snapshot.appendItems([1], toSection: .Title)
+    snapshot.appendItems([2], toSection: .Description)
+    snapshot.appendItems([3], toSection: .Question)
+    source.apply(snapshot, animatingDifferences: true)
+    
   }
   
 //  func applySnapshot(animated: Bool = false) {

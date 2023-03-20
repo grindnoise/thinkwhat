@@ -21,44 +21,34 @@ class NewPollTopicCell: UICollectionViewCell {
     }
   }
   ///**Publishers**
-  @Published public private(set) var topic: Topic! {
+  @Published public private(set) var isAnimationComplete: Bool?
+  @Published public var topic: Topic! {
     didSet {
       guard let topic = topic,
             topic != oldValue
       else { return }
       
-      line.layer.add(Animations.get(property: .StrokeEnd,
-                                    fromValue: 0,
-                                    toValue: 1,
-                                    duration: 0.3,
-                                    timingFunction: .easeInEaseOut,
-                                    delegate: self,
-                                    isRemovedOnCompletion: false,
-                                    completionBlocks: [{ [weak self] in
-        guard let self = self else { return }
+      if oldValue.isNil {
+        CATransaction.begin()
+        CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
+        fgLine.layer.strokeColor = topic.tagColor.cgColor
+        fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
+        CATransaction.commit()
+      } else {
+        let colorAnim = CABasicAnimation(path: "strokeColor", fromValue: fgLine.layer.strokeColor, toValue: topic.tagColor.cgColor, duration: 0.4)
+        colorAnim.delegate = self
+        colorAnim.setValue({ [weak self] in
+          guard let self = self else { return }
           
-        self.line.layer.strokeEnd = 1
-      }]),
-                     forKey: nil)
-      line.layer.add(Animations.get(property: .StrokeColor,
-                                    fromValue: line.layer.strokeColor as Any,
-                                    toValue: topic.tagColor.cgColor,
-                                    duration: 0.3,
-                                    timingFunction: .easeInEaseOut,
-                                    delegate: self,
-                                    isRemovedOnCompletion: false,
-                                    completionBlocks: [{ [weak self] in
-        guard let self = self else { return }
-          
-        self.line.layer.strokeColor = topic.tagColor.cgColor
-        self.line.layer.removeAllAnimations()
-      }]),
-                     forKey: nil)
-      
+          self.fgLine.layer.removeAnimation(forKey: "color")
+        }, forKey: "completion")
+        
+        fgLine.layer.strokeColor = topic.tagColor.cgColor
+      }
       tagCapsule.color = topic.tagColor
       tagCapsule.text = topic.title
       tagCapsule.iconCategory = topic.iconCategory
-      UIView.animate(withDuration: 0.3) { [weak self] in
+      UIView.animate(withDuration: 0.4) { [weak self] in
         guard let self = self else { return }
         
         self.imageView.tintColor = self.topic.tagColor
@@ -99,16 +89,24 @@ class NewPollTopicCell: UICollectionViewCell {
   }()
   private lazy var stageStack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [imageView, label])
-//    let constraint = instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: contentView.bounds.width,
-//                                                                                     font: label.font)*22)
-//    constraint.identifier = "heightAnchor"
-//    constraint.isActive = true
     instance.spacing = 4
     instance.axis = .horizontal
     instance.alignment = .center
     return instance
   }()
-  private let line = Line()
+  private lazy var fgLine: Line = {
+    let instance = Line()
+    instance.layer.strokeColor = Colors.Logo.Flame.rawValue.cgColor
+    
+    return instance
+  }()
+  private lazy var bgLine: Line = {
+    let instance = Line()
+    instance.layer.strokeColor = UIColor.systemGray4.cgColor
+    
+    return instance
+  }()
+  
     
   
   
@@ -148,28 +146,35 @@ class NewPollTopicCell: UICollectionViewCell {
 //    topicPublisher = PassthroughSubject<Topic, Never>()
   }
   
-  
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    
+    self.drawLine(line: self.bgLine, strokeEnd: 1)
+    self.drawLine(line: self.fgLine)
+  }
   
   // MARK: - Public methods
-  func present() {
-    delay(seconds: 0.5) { [weak self] in
+  func present(seconds: Double = .zero) {
+    delay(seconds: seconds) { [weak self] in
       guard let self = self else { return }
+      
       let banner = NewPopup(padding: self.padding*2,
                             contentPadding: .uniform(size: self.padding*2))
-      let content = AccountManagementPopupContent(mode: .Delete,
-                                                  color: Colors.Logo.Flame.rawValue)
-      content.actionPublisher
-        .sink { _ in banner.dismiss() }
+      let content = TopicSelectionPopupContent(mode: self.topic.isNil ? .ForceSelect : .Default,
+                                               color: Colors.Logo.Flame.rawValue)
+      content.topicPublisher
+        .sink { topic in
+          banner.dismiss()
+
+          delay(seconds: 0.15) { [unowned self] in
+            self.topic = topic
+          }
+        }
         .store(in: &banner.subscriptions)
-      
+
       banner.setContent(content)
       banner.didDisappearPublisher
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.topic = Topics.shared[80]
-          banner.removeFromSuperview()
-        }
+        .sink { _ in banner.removeFromSuperview() }
         .store(in: &self.subscriptions)
     }
   }
@@ -180,6 +185,7 @@ private extension NewPollTopicCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
+    clipsToBounds = false
     stageStack.placeTopLeading(inside: self,
                                leadingInset: 8,
                                topInset: 16)
@@ -193,10 +199,14 @@ private extension NewPollTopicCell {
       tagCapsule.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32),
     ])
     
-    layer.insertSublayer(line.layer, at: 0)
-    publisher(for: \.bounds)
-      .sink { [unowned self] _ in self.drawLine() }
-      .store(in: &subscriptions)
+    layer.insertSublayer(bgLine.layer, at: 0)
+    layer.insertSublayer(fgLine.layer, at: 1)
+//    publisher(for: \.bounds)
+//      .sink { [unowned self] _ in
+////        self.drawLine(line: self.fgLine)
+//        self.drawLine(line: self.bgLine, strokeEnd: 1)
+//      }
+//      .store(in: &subscriptions)
   }
   
   @objc
@@ -204,37 +214,31 @@ private extension NewPollTopicCell {
     present()
   }
   
-  func drawLine() {
+  func drawLine(line: Line,
+                strokeEnd: CGFloat = 0,
+                lineCap: CAShapeLayerLineCap = .round) {
     let lineWidth = imageView.bounds.width*0.1
-    let imageCenter = stageStack.convert(imageView.center, to: contentView)
+    let imageCenter = imageView.convert(imageView.center, to: contentView)
     let xPos = imageCenter.x //- lineWidth/2
-    let yPos = imageCenter.y + imageView.bounds.height/2 - lineWidth/2
+    let yPos = imageCenter.y + imageView.bounds.height/2 - lineWidth
     
     let path = UIBezierPath()
     path.move(to: CGPoint(x: xPos, y: yPos))
-    path.addLine(to: CGPoint(x: xPos, y: bounds.maxY))
+    path.addLine(to: CGPoint(x: xPos, y: bounds.maxY + lineWidth))
     
     line.path = path
     line.layer.strokeStart = 0
-    line.layer.strokeEnd = 0
-    line.layer.lineCap = .round
+    line.layer.strokeEnd = strokeEnd
+    line.layer.lineCap = lineCap
     line.layer.lineWidth = lineWidth
-    line.layer.strokeColor = topic.isNil ? Colors.Logo.Flame.rawValue.cgColor : topic.tagColor.cgColor
     line.layer.path = line.path.cgPath
   }
 }
 
 extension NewPollTopicCell: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
-    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
-    } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
-      initialLayer.path = path as! CGPath
-      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
-        completionBlock()
-      }
-    }
+    guard flag, let completion = anim.value(forKey: "completion") as? Closure else { return }
+    
+    completion()
   }
 }

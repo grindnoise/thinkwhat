@@ -104,6 +104,7 @@
 "per" = "Per";
 "more_info" = "More info";
 "confirm" = "Confirm";
+"select" = "Select";
 
 //Welcome VC
 "welcomeLabel" = "Welcome to ThinkWhat!";
@@ -415,4 +416,13 @@
 
 //New poll
 "new_poll_readiness" = "Readiness";
-"new_poll_survey_topic" = "Survey topic";
+"new_poll_survey_topic" = "Topic";
+"new_poll_survey_title" = "Title";
+"new_poll_survey_enter_title" = "Enter title";
+"new_poll_survey_title_error_begin" = "The name must be at least ";
+"new_poll_survey_title_error_end" = " characters";
+"new_poll_survey_description" = "Description";
+"new_poll_survey_enter_description" = "Enter description";
+"new_poll_survey_question" = "Question";
+"new_poll_survey_enter_question" = "Ask question";
+

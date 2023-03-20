@@ -12,6 +12,7 @@ import Combine
 struct TopicCellHeaderConfiguration: UIContentConfiguration, Hashable {
   
   var topicItem: TopicHeaderItem!
+  var mode: TopicsCollectionView.Mode!
   
   func makeContentView() -> UIView & UIContentView {
     return TopicCellHeaderContent(configuration: self)
@@ -31,6 +32,7 @@ class TopicCellHeader: UICollectionViewListCell {
   // MARK: - Public properties
   public var item: TopicHeaderItem!
   public var callback: Closure?
+  public var mode: TopicsCollectionView.Mode = .Default
   
   // MARK: - Initialization
   override init(frame: CGRect) {
@@ -43,13 +45,14 @@ class TopicCellHeader: UICollectionViewListCell {
   
   // MARK: - Overriden methods
   override func updateConfiguration(using state: UICellConfigurationState) {
-    automaticallyUpdatesContentConfiguration = false
+    automaticallyUpdatesContentConfiguration = mode == .Default ? false : true
     //        automaticallyUpdatesBackgroundConfiguration = false
     //        accessories = state.isSelected ? [.checkmark(displayed: .always, options: UICellAccessory.CheckmarkOptions(isHidden: false, reservedLayoutWidth: nil, tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : item.topic.tagColor))] : []
     //
     //        if state.isSelected, !callback.isNil { callback!() }
     
     var newConfiguration = TopicCellHeaderConfiguration().updated(for: state)
+    newConfiguration.mode = mode 
     newConfiguration.topicItem = item
     
     contentConfiguration = newConfiguration
@@ -122,6 +125,7 @@ class TopicCellHeaderContent: UIView, UIContentView {
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
     instance.textAlignment = .right
     instance.textColor = .label
+    instance.alpha = 0
     
     return instance
   }()
@@ -396,13 +400,16 @@ private extension TopicCellHeaderContent {
     topicDescription.text = currentConfiguration.topicItem.description
     titleGradient.colors = getGradientColors(color: color)
     iconGradient.colors = getGradientColors(color: color)
-    viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.activeCount.roundedWithAbbreviations)
-    viewsLabel.textColor = configuration.topicItem.topic.activeCount > 0 ? color : .secondaryLabel
-    
-    currentConfiguration.topicItem.topic.activeCountPublisher
-      .receive(on: DispatchQueue.main)
-      .sink { [unowned self] in self.viewsLabel.text = $0.roundedWithAbbreviations }
-      .store(in: &subscriptions)
+    if currentConfiguration.mode == .Default {
+      viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.activeCount.roundedWithAbbreviations)
+      viewsLabel.textColor = configuration.topicItem.topic.activeCount > 0 ? color : .secondaryLabel
+      
+      currentConfiguration.topicItem.topic.activeCountPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.viewsLabel.text = $0.roundedWithAbbreviations }
+        .store(in: &subscriptions)
+      viewsLabel.alpha = 1
+    }
     //        viewsLabel.text = String(describing: currentConfiguration.topicItem.topic.active.roundedWithAbbreviations)
     
     //        if currentConfiguration.topicItem.topic.hotTotal == 0 {

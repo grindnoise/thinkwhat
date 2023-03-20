@@ -25,7 +25,7 @@ class TextCell: UICollectionViewCell {
   public var attributes: [NSAttributedString.Key: Any] = [:]
   public var insets: UIEdgeInsets = .uniform(size: 8)
   ///**Publishers**
-  public let boundsPublisher = PassthroughSubject<CGRect, Never>()
+  public private(set) var boundsPublisher = PassthroughSubject<CGRect, Never>()
   ///**UI**
   public var padding: CGFloat = 8
   
@@ -120,6 +120,12 @@ class TextCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+  }
+  
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    
+    boundsPublisher = PassthroughSubject<CGRect, Never>()
   }
 }
 

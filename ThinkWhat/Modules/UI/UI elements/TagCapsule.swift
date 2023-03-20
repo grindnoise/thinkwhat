@@ -69,6 +69,8 @@ class TagCapsule: UIView {
       }
     }
   }
+  ///**UI**
+  public let font: UIFont
   
   
   
@@ -78,8 +80,6 @@ class TagCapsule: UIView {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat
-  private let font: UIFont
-  
   private lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
 //      UIView.horizontalSpacer(padding),

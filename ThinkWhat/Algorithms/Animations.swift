@@ -51,6 +51,7 @@ struct Animations {
                   delay beginTime: CFTimeInterval = 0.0,
                   repeatCount: Float = 0,
                   autoreverses: Bool = false,
+                  fillMode: CAMediaTimingFillMode = .forwards,
                   timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default,
                   delegate: CAAnimationDelegate?,
                   isRemovedOnCompletion: Bool = true,

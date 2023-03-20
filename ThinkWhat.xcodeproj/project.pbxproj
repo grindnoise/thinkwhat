@@ -524,6 +524,7 @@
 		ABE56C1B298AC4C8004C761D /* TopicCompatibilityCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE56C1A298AC4C8004C761D /* TopicCompatibilityCollectionView.swift */; };
 		ABE56C1D298AC4FB004C761D /* TopicCompatibilityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE56C1C298AC4FB004C761D /* TopicCompatibilityCell.swift */; };
 		ABE56C1F298AC623004C761D /* TopicCompatibilityHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE56C1E298AC623004C761D /* TopicCompatibilityHeaderCell.swift */; };
+		ABE72A7529C5BF5B003260EE /* NewPollTitleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE72A7429C5BF5B003260EE /* NewPollTitleCell.swift */; };
 		ABE884A42987B46800ACEFC7 /* UserCompatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE884A32987B46800ACEFC7 /* UserCompatibility.swift */; };
 		ABE884A62987CCA200ACEFC7 /* UserCompatibilityHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE884A52987CCA200ACEFC7 /* UserCompatibilityHeaderCell.swift */; };
 		ABE884A82987D61400ACEFC7 /* CompatibilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE884A72987D61400ACEFC7 /* CompatibilityView.swift */; };
@@ -554,6 +555,7 @@
 		ABF3DF1F283BC2DA00309AA9 /* _HotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF3DF1E283BC2DA00309AA9 /* _HotCard.swift */; };
 		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
 		ABF888AB29BB38B900A37212 /* EmptySubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF888AA29BB38B900A37212 /* EmptySubscriptionsView.swift */; };
+		ABF9952529C77734007D7578 /* TopicSelectionPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF9952429C77734007D7578 /* TopicSelectionPopupContent.swift */; };
 		ABFB4222287320DE0066CFA0 /* YoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */; };
 		ABFB42242873443A0066CFA0 /* WebViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB42232873443A0066CFA0 /* WebViewCell.swift */; };
 		ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFD793D25F8CD99009A2824 /* RoundIcon.swift */; };
@@ -1115,6 +1117,7 @@
 		ABE56C1A298AC4C8004C761D /* TopicCompatibilityCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCompatibilityCollectionView.swift; sourceTree = "<group>"; };
 		ABE56C1C298AC4FB004C761D /* TopicCompatibilityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCompatibilityCell.swift; sourceTree = "<group>"; };
 		ABE56C1E298AC623004C761D /* TopicCompatibilityHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCompatibilityHeaderCell.swift; sourceTree = "<group>"; };
+		ABE72A7429C5BF5B003260EE /* NewPollTitleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollTitleCell.swift; sourceTree = "<group>"; };
 		ABE884A32987B46800ACEFC7 /* UserCompatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompatibility.swift; sourceTree = "<group>"; };
 		ABE884A52987CCA200ACEFC7 /* UserCompatibilityHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompatibilityHeaderCell.swift; sourceTree = "<group>"; };
 		ABE884A72987D61400ACEFC7 /* CompatibilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompatibilityView.swift; sourceTree = "<group>"; };
@@ -1146,6 +1149,7 @@
 		ABF3DF1E283BC2DA00309AA9 /* _HotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _HotCard.swift; sourceTree = "<group>"; };
 		ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysTableViewController.swift; sourceTree = "<group>"; };
 		ABF888AA29BB38B900A37212 /* EmptySubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptySubscriptionsView.swift; sourceTree = "<group>"; };
+		ABF9952429C77734007D7578 /* TopicSelectionPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelectionPopupContent.swift; sourceTree = "<group>"; };
 		ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeCell.swift; sourceTree = "<group>"; };
 		ABFB42232873443A0066CFA0 /* WebViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewCell.swift; sourceTree = "<group>"; };
 		ABFD793D25F8CD99009A2824 /* RoundIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundIcon.swift; sourceTree = "<group>"; };
@@ -2291,6 +2295,7 @@
 			isa = PBXGroup;
 			children = (
 				AB7D14E829C47B4D0036FA7A /* NewPollTopicCell.swift */,
+				ABE72A7429C5BF5B003260EE /* NewPollTitleCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -2716,6 +2721,7 @@
 		ABADF5A327F73C7400A26474 /* Content */ = {
 			isa = PBXGroup;
 			children = (
+				ABF9952329C77700007D7578 /* TopicSelection */,
 				AB411AD029AC93AB00C43547 /* Account management */,
 				AB41F71F28E345A80037C628 /* Users filter */,
 				AB90FAF628D490270096B147 /* Popup content */,
@@ -3109,6 +3115,14 @@
 				ABBA73F32382BCCC00540ECF /* StatisticsViewController.xib */,
 			);
 			path = Own;
+			sourceTree = "<group>";
+		};
+		ABF9952329C77700007D7578 /* TopicSelection */ = {
+			isa = PBXGroup;
+			children = (
+				ABF9952429C77734007D7578 /* TopicSelectionPopupContent.swift */,
+			);
+			path = TopicSelection;
 			sourceTree = "<group>";
 		};
 		E9FBECDA3D06FB129E6BE92E /* Pods */ = {
@@ -3507,6 +3521,7 @@
 				ABA7829928589D3600964FDE /* AddChoiceContentView.swift in Sources */,
 				AB8DA34227A182D300F92C18 /* SignupModel.swift in Sources */,
 				AB7D14E629C475C80036FA7A /* NewPollCollectionView.swift in Sources */,
+				ABE72A7529C5BF5B003260EE /* NewPollTitleCell.swift in Sources */,
 				AB60B5BD285CD6150023C99B /* CommentsSelection.swift in Sources */,
 				ABB0F6D528F6D6B80068FDDF /* FeedbackViewController.swift in Sources */,
 				AB0B7FD6294384C200941FA1 /* TestViewController.swift in Sources */,
@@ -3717,6 +3732,7 @@
 				AB7478C22428962700317EB6 /* CameraLoadingIndicator.swift in Sources */,
 				ABE56C17298AA681004C761D /* UserCompatibilityCell.swift in Sources */,
 				AB72964327DB60C800D45B54 /* SettingsController.swift in Sources */,
+				ABF9952529C77734007D7578 /* TopicSelectionPopupContent.swift in Sources */,
 				ABB0F6C828F5A4550068FDDF /* LanguageListModel.swift in Sources */,
 				AB52719E28EC1B1D0000F095 /* UserprofilesController.swift in Sources */,
 				ABF888AB29BB38B900A37212 /* EmptySubscriptionsView.swift in Sources */,

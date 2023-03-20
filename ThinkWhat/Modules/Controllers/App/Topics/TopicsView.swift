@@ -259,45 +259,46 @@ class TopicsView: UIView {
     let instance = TopicsCollectionView()
     instance.backgroundColor = .clear
     
-    instance.touchSubject.sink { [weak self] in
-      guard let self = self,
-            let dict = $0,
-            let point = dict.values.first,
-            let topic = dict.keys.first
-      else { return }
-      
-      self.viewInput?.onTopicSelected(topic)
-      self.color = topic.tagColor
-      self.viewInput?.setNavigationBarTintColor(topic.tagColor)
-      self.touchLocation = point
-      self.surveysCollectionView.topic = topic
-      self.surveysCollectionView.isOnScreen = true
-      self.isDateFilterOnScreen = true
-//      self.toggleDateFilter(on: true)
-      self.setBackgroundColor()//.secondarySystemBackground)
-      self.surveysCollectionView.alpha = 1
-      //            self.surveysCollectionView.backgroundColor = self.background.backgroundColor
-//      self.reveal(present: true, location: point, view: self.surveysCollectionView, color: self.surveysCollectionView.topic!.tagColor, fadeView: self.collectionView, duration: 0.35)//, animateOpacity: false)
-      Animations.reveal(present: true,
-                        location: point,
-                        view: self.surveysCollectionView,
-                        fadeView: self.collectionView,
-                        color: self.surveysCollectionView.topic!.tagColor,
-                        duration: 0.35,
-                        delegate: self)
-      if #available(iOS 15, *) {
-        self.periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return self.color }
-        self.periodButton.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-          var outcoming = incoming
-          outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
-          outcoming.foregroundColor = self.color
-          return outcoming
+    instance.touchSubject
+      .sink { [weak self] in
+        guard let self = self,
+              let dict = $0,
+              let point = dict.values.first,
+              let topic = dict.keys.first
+        else { return }
+        
+        self.viewInput?.onTopicSelected(topic)
+        self.color = topic.tagColor
+        self.viewInput?.setNavigationBarTintColor(topic.tagColor)
+        self.touchLocation = point
+        self.surveysCollectionView.topic = topic
+        self.surveysCollectionView.isOnScreen = true
+        self.isDateFilterOnScreen = true
+        //      self.toggleDateFilter(on: true)
+        self.setBackgroundColor()//.secondarySystemBackground)
+        self.surveysCollectionView.alpha = 1
+        //            self.surveysCollectionView.backgroundColor = self.background.backgroundColor
+        //      self.reveal(present: true, location: point, view: self.surveysCollectionView, color: self.surveysCollectionView.topic!.tagColor, fadeView: self.collectionView, duration: 0.35)//, animateOpacity: false)
+        Animations.reveal(present: true,
+                          location: point,
+                          view: self.surveysCollectionView,
+                          fadeView: self.collectionView,
+                          color: self.surveysCollectionView.topic!.tagColor,
+                          duration: 0.35,
+                          delegate: self)
+        if #available(iOS 15, *) {
+          self.periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return self.color }
+          self.periodButton.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outcoming = incoming
+            outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+            outcoming.foregroundColor = self.color
+            return outcoming
+          }
+        } else {
+          self.periodButton.imageView?.tintColor = self.color
+          self.periodButton.tintColor = self.color
         }
-      } else {
-        self.periodButton.imageView?.tintColor = self.color
-        self.periodButton.tintColor = self.color
-      }
-    }.store(in: &subscriptions)
+      }.store(in: &subscriptions)
     
     return instance
   }()
