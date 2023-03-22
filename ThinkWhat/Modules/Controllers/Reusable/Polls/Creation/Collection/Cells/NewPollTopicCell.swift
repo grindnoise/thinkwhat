@@ -20,6 +20,7 @@ class NewPollTopicCell: UICollectionViewCell {
       setupUI()
     }
   }
+  public var stageGlobal: NewPollController.Stage!
   ///**Publishers**
   @Published public private(set) var isAnimationComplete: Bool?
   @Published public var topic: Topic! {
@@ -211,6 +212,8 @@ private extension NewPollTopicCell {
   
   @objc
   func handleTap() {
+    guard stageGlobal == .Ready || stage == stageGlobal else { return }
+    
     present()
   }
   

@@ -149,9 +149,7 @@ private extension HotController {
               let controllerOutput = self.controllerOutput,
               !self.queue.isEmpty || !controllerOutput.currentSurvey.isNil
         else { return false }
-      
-        print(self.queue.isEmpty)
-        print(controllerOutput.currentSurvey.isNil)
+
         return true
       }
       .sink { [unowned self] _ in self.controllerInput?.updateData() }

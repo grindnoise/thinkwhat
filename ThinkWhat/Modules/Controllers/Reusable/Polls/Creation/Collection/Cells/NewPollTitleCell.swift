@@ -20,7 +20,11 @@ class NewPollTextCell: UICollectionViewCell {
       setupUI()
     }
   }
+  public var stageGlobal: NewPollController.Stage!
+  public var isKeyboardOnScreen: Bool = false
   ///**UI**
+  public var minLength: Int = 0
+  public var maxLength: Int = 0
   public var textAlignment: NSTextAlignment = .center
   public var font: UIFont! {
     didSet {
@@ -34,10 +38,17 @@ class NewPollTextCell: UICollectionViewCell {
     didSet {
       guard !stage.isNil else { return }
       
-      label.text = labelText
+      label.text = labelText.uppercased()
     }
   }
   public var minHeight: CGFloat = 0
+  public var topicColor: UIColor = .systemGray4 {
+    didSet {
+      guard let toolBar = textView.inputAccessoryView as? UIToolbar else { return }
+      
+      toolBar.tintColor = topicColor
+    }
+  }
   public var color = UIColor.systemGray4 {
     didSet {
       guard oldValue != color else { return }
@@ -143,17 +154,47 @@ class NewPollTextCell: UICollectionViewCell {
 //    instance.textContainerInset = .uniform(size: .zero)
     instance.isUserInteractionEnabled = true
 //    instance.isScrollEnabled = false
-    instance.backgroundColor = .clear
+    instance.backgroundColor = color.withAlphaComponent(0.2)
     instance.isEditable = true
     instance.isSelectable = true
     instance.font = font
     instance.text = "new_poll_survey_enter_title".localized
     instance.textColor = .clear
     instance.textAlignment = textAlignment
+    let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 44))
+    toolBar.accessibilityIdentifier = "toolBar"
+    toolBar.isTranslucent = true
+    toolBar.backgroundColor = .tertiarySystemBackground
+    toolBar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
+    toolBar.superview?.backgroundColor = .tertiarySystemBackground
+    let doneButton = UIBarButtonItem(title: "ready".localized, style: .done, target: nil, action: #selector(self.hideKeyboard))
+    doneButton.accessibilityIdentifier = "ready"
+    let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+    toolBar.items = [space, doneButton]
+    toolBar.barStyle = .default
+    toolBar.tintColor = topicColor
+    instance.inputAccessoryView = toolBar
     instance.publisher(for: \.bounds)
       .sink { instance.cornerRadius = $0.width*0.05 }
       .store(in: &subscriptions)
-    placeholder.placeXCentered(inside: instance, topInset: 1, bottomInset: 1)
+    
+//    let v = UIView()
+//    v.backgroundColor = .red
+//    v.placeXCentered(inside: instance, topInset: 0, size: .uniform(size: 50))
+//    placeholder.placeInCenter(of: instance, heightMultiplier: 1.1)
+    
+//    placeholder.translatesAutoresizingMaskIntoConstraints = false
+//    instance.addSubview(placeholder)
+//    NSLayoutConstraint.activate([
+//      placeholder.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+//      placeholder.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+//      placeholder.topAnchor.constraint(equalTo: instance.topAnchor),
+////      placeholder.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+//    ])
+//
+//    let placeholderConstraint = placeholder.heightAnchor.constraint(equalToConstant: 10)
+//    placeholderConstraint.isActive = true
+    
     
     let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
     constraint.identifier = "height"
@@ -177,8 +218,9 @@ class NewPollTextCell: UICollectionViewCell {
   }()
   private lazy var placeholder: UILabel = {
     let instance = UILabel()
+//    instance.backgroundColor = .red
     instance.numberOfLines = 10
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .largeTitle)
+    instance.font = font//UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)
     instance.text = placeholderText
     instance.textColor = .secondaryLabel
     instance.textAlignment = .center
@@ -227,15 +269,22 @@ class NewPollTextCell: UICollectionViewCell {
   
   // MARK: - Public methods
   func present(seconds: Double = .zero) {
+    textView.becomeFirstResponder()
+    
     UIView.animate(withDuration: 0.2, animations: { [weak self] in
       guard let self = self else { return }
       
+      print(self.placeholder.frame)
+      print(self.placeholder.alpha)
       self.placeholder.alpha = 0
       self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
     }) { [weak self] _ in
       guard let self = self else { return }
       
       self.placeholder.removeFromSuperview()
+
+      guard !self.textView.isFirstResponder else { return }
+      
       self.textView.becomeFirstResponder()
     }
   }
@@ -252,17 +301,22 @@ private extension NewPollTextCell {
     addSubview(textView)
     textView.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      textView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: 16),
-      textView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*4),
-      textView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*4),
+      textView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
+      textView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+      textView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = textView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32)
+    let constraint = textView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
     constraint.isActive = true
     constraint.priority = .defaultLow
     
     layer.insertSublayer(bgLine.layer, at: 0)
     layer.insertSublayer(fgLine.layer, at: 1)
+    
+    setNeedsLayout()
+    layoutIfNeeded()
+    
+    placeholder.placeInCenter(of: textView)
   }
 
   func drawLine(line: Line,
@@ -283,9 +337,13 @@ private extension NewPollTextCell {
     line.layer.strokeEnd = strokeEnd
     line.layer.lineCap = lineCap
     line.layer.lineWidth = lineWidth
-//    fgLine.layer.strokeColor = topic.isNil ? Colors.Logo.Flame.rawValue.cgColor : topic.tagColor.cgColor
     line.layer.path = line.path.cgPath
   }
+  
+    @objc
+    func hideKeyboard() {
+      endEditing(true)
+    }
 }
 
 extension NewPollTextCell: CAAnimationDelegate {
@@ -298,6 +356,9 @@ extension NewPollTextCell: CAAnimationDelegate {
 
 extension NewPollTextCell: UITextViewDelegate {
   func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+//    guard !isKeyboardOnScreen else { return false }
+    guard stageGlobal == .Ready || stage == stageGlobal else { return false }
+    
     if text.isNil || text.isEmpty {
       textView.text = ""
       textView.textColor = .label
@@ -305,7 +366,7 @@ extension NewPollTextCell: UITextViewDelegate {
     
     UIView.animate(withDuration: 0.2) { [weak self] in
       guard let self = self else { return }
-      
+
       textView.backgroundColor = self.color.withAlphaComponent(0.2)
     }
     
@@ -314,15 +375,14 @@ extension NewPollTextCell: UITextViewDelegate {
   
   func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
     guard !isMovingToParent else {
-      UIView.animate(withDuration: 0.2) { textView.backgroundColor = .clear }
+      UIView.animate(withDuration: 0.2) { [unowned self] in
+        textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground }//.systemGray4.withAlphaComponent(0.2) }
       return true
     }
     
-    let minLength = ModelProperties.shared.surveyDescriptionMinLength ?? 3
-    
-    guard textView.text.count > minLength else {
+    guard textView.text.count >= minLength else {
       let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                            text: "new_poll_survey_title_error_begin".localized + String(describing: minLength) + "new_poll_survey_title_error_end".localized,
+                                                            text: "new_poll_survey_min_text_length_error_begin".localized + String(describing: minLength) + "new_poll_survey_min_text_length_error_end".localized,
                                                             tintColor: .systemOrange,
                                                             fontName: Fonts.Semibold,
                                                             textStyle: .headline,
@@ -341,16 +401,20 @@ extension NewPollTextCell: UITextViewDelegate {
       drawLine(line: bgLine, strokeEnd: 1)
       drawLine(line: fgLine)
     }
-    UIView.animate(withDuration: 0.2) { textView.backgroundColor = .clear }
+    UIView.animate(withDuration: 0.2) { [unowned self] in
+      textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    }//.systemGray4.withAlphaComponent(0.2) }
     return true
   }
   
-  func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+  func textView(_ textView: UITextView,
+                shouldChangeTextIn range: NSRange,
+                replacementText text: String) -> Bool {
       let currentText = textView.text ?? ""
       guard let stringRange = Range(range, in: currentText) else { return false }
       let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
     
-    return updatedText.count <= ModelProperties.shared.surveyDescriptionMaxLength
+    return updatedText.count <= maxLength
   }
   
   func textViewDidEndEditing(_ textView: UITextView) {

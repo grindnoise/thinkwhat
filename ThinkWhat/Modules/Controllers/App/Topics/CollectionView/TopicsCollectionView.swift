@@ -136,7 +136,7 @@ private extension TopicsCollectionView {
     ////            footerView
     //        }
     
-    let headerCellRegistration = UICollectionView.CellRegistration<TopicCellHeader, TopicHeaderItem> { [unowned self] cell, _, headerItem in
+    let headerCellRegistration = UICollectionView.CellRegistration<TopicCellHeader, TopicHeaderItem> { [unowned self] cell, indexPath, headerItem in
       
       cell.mode = self.mode
       cell.item = headerItem
@@ -144,10 +144,12 @@ private extension TopicsCollectionView {
       var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
       backgroundConfig.backgroundColor = .clear
       cell.backgroundConfiguration = backgroundConfig
-      cell.accessories = [.outlineDisclosure(options:headerDisclosureOption) {
+      cell.accessories = [.outlineDisclosure(options:headerDisclosureOption) { [unowned self] in
         var currentSectionSnapshot = self.source.snapshot(for: headerItem)
         if currentSectionSnapshot.items.filter({ currentSectionSnapshot.isExpanded($0) }).isEmpty {
-//          self.scrollToItem(at: indexPath, at: .top, animated: true)
+          if self.mode == .Selection {
+            self.scrollToItem(at: indexPath, at: .top, animated: true)
+          }
           currentSectionSnapshot.expand(currentSectionSnapshot.items)
           let otherHeaders = self.source.snapshot().sectionIdentifiers.filter({ $0 != headerItem })
           otherHeaders.forEach { otherHeader in

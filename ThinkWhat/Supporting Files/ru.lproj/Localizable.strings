@@ -34,6 +34,7 @@
 "api_not_supported" = "Вы используете устаревшую версию приложения. Пожалуйста, обновите Thinkwhat";
 
 //Common
+"ready" = "Готово";
 "all" = "Все";
 "title" = "Титул";
 "caption" = "Подпись";
@@ -419,9 +420,14 @@
 "new_poll_survey_topic" = "Тема";
 "new_poll_survey_title" = "Титул";
 "new_poll_survey_enter_title" = "Введите название";
-"new_poll_survey_title_error_begin" = "Название должно состоять минимум из ";
-"new_poll_survey_title_error_end" = " знаков";
+"new_poll_survey_min_text_length_error_begin" = "Поле должно состоять минимум из ";
+"new_poll_survey_min_text_length_error_end" = " знаков";
 "new_poll_survey_description" = "Подробности";
 "new_poll_survey_enter_description" = "Введите подробности";
 "new_poll_survey_question" = "Вопрос";
 "new_poll_survey_enter_question" = "Сформулируйте вопрос";
+"new_poll_survey_choices" = "Варианты ответов";
+"new_poll_survey_choice_placeholder" = "Ответ №";
+"new_poll_survey_choice_add" = "Добавить вариант";
+"new_poll_survey_images" = "Изображения";
+"new_poll_survey_image_add" = "Добавить изображение";

@@ -56,6 +56,7 @@ class NewPollView: UIView {
     super.init(frame: frame)
     
     setupUI()
+//    setTasks()
   }
   
   required init?(coder: NSCoder) {
@@ -77,14 +78,37 @@ private extension NewPollView {
   func setupUI() {
     backgroundColor = .systemBackground
     collectionView.place(inside: self)
-    let touch = UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard))
-    addGestureRecognizer(touch)
+//    let touch = UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard))
+//    addGestureRecognizer(touch)
   }
   
-  @objc
-  func hideKeyboard() {
-    endEditing(true)
-  }
+//  func setTasks() {
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await _ in NotificationCenter.default.notifications(for: UIApplication.keyboardWillHideNotification) {
+//        guard let self = self else { return }
+//
+//        collectionView.isKeyboardOnScreen = false
+//        self.getSubview(type: UIView.self, identifier: "opaque")?.removeFromSuperview()
+//      }
+//    })
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await _ in NotificationCenter.default.notifications(for: UIApplication.keyboardWillShowNotification) {
+//        guard let self = self else { return }
+//
+//        collectionView.isKeyboardOnScreen = true
+//        let opaque = UIView.opaque()
+//        opaque.place(inside: self)
+//        self.setNeedsLayout()
+//        self.layoutIfNeeded()
+//        opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.hideKeyboard)))
+//      }
+//    })
+//  }
+//
+//  @objc
+//  func hideKeyboard() {
+//    endEditing(true)
+//  }
 }
 
 

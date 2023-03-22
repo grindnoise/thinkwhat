@@ -21,12 +21,15 @@ class NewPollCollectionView: UICollectionView {
   public var imagePublisher = PassthroughSubject<Mediafile, Never>()
   public var webPublisher = PassthroughSubject<URL, Never>()
   ///**Logic**
-  @Published var isMovingToParent: Bool?
+  @Published public var isMovingToParent: Bool?
+  @Published public var isKeyboardOnScreen: Bool = false
   @Published public private(set) var stage: NewPollController.Stage = .Topic {
     didSet {
       guard oldValue != stage else { return }
       
       progressPublisher.send(stage.percent())
+      
+      isScrollEnabled = stage == .Ready
     }
   }
   @Published public private(set) var topic: Topic! {
@@ -69,6 +72,17 @@ class NewPollCollectionView: UICollectionView {
       self.stage = stage
     }
   }
+  @Published public private(set) var choices: [NewPollChoice] = (0...1).map { NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: $0 + 1)) } {
+    didSet {
+//      guard oldValue.isNil,
+//            !question.isNil,
+//            let stage = stage.next()
+//      else { return }
+//
+//      self.stage = stage
+    }
+  }
+  @Published public private(set) var images = [NewPollImage]()
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -88,6 +102,7 @@ class NewPollCollectionView: UICollectionView {
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
 
     setupUI()
+    setTasks()
   }
   
   required init?(coder: NSCoder) {
@@ -117,8 +132,8 @@ class NewPollCollectionView: UICollectionView {
 private extension NewPollCollectionView {
   @MainActor
   func setupUI() {
+//    isScrollEnabled = false
     delegate = self
-    allowsMultipleSelection = true
     collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
       var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
       layoutConfig.backgroundColor = .clear
@@ -132,6 +147,7 @@ private extension NewPollCollectionView {
     
     let topicCellRegistration = UICollectionView.CellRegistration<NewPollTopicCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.stage = .Topic
+      cell.stageGlobal = self.stage
       cell.topic = self.topic
       cell.$topic
         .filter { !$0.isNil }
@@ -144,6 +160,11 @@ private extension NewPollCollectionView {
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in self.stageAnimationFinished = .Topic }
         .store(in: &self.subscriptions)
+      
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
       cell.backgroundConfiguration = config
@@ -152,21 +173,37 @@ private extension NewPollCollectionView {
       
       guard self.stage == .Topic else { return }
       
-      cell.present(seconds: 0.5)
+//      cell.present(seconds: 0.5)
     }
     
     let titleCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.textAlignment = .center
+      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
       cell.placeholderText = "new_poll_survey_enter_title".localized
       cell.labelText = "new_poll_survey_title".localized
-      cell.minHeight = 60
+      cell.minLength = ModelProperties.shared.surveyTitleMinLength
+      cell.maxLength = ModelProperties.shared.surveyTitleMaxLength
+      cell.minHeight = 0//60
+      cell.stageGlobal = self.stage
       cell.stage = .Title
-      cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .largeTitle)
+      cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title1)
       cell.text = self.title
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$isKeyboardOnScreen
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isKeyboardOnScreen = $0 }
+        .store(in: &self.subscriptions)
       self.$topic
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.topicColor = $0!.tagColor }
         .store(in: &self.subscriptions)
       self.$isMovingToParent
         .filter { !$0.isNil }
@@ -201,21 +238,37 @@ private extension NewPollCollectionView {
       self.$stage
         .filter { $0 == .Title }
         .filter { _ in cell.text.isNil || cell.text.isEmpty }
-        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
         .sink { _ in cell.present() }
         .store(in: &self.subscriptions)
     }
     
     let descriptionCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.textAlignment = .natural
+      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
       cell.placeholderText = "new_poll_survey_enter_description".localized
       cell.labelText = "new_poll_survey_description".localized
-      cell.minHeight = 100
-      cell.stage = .Title
+      cell.minHeight = 0//100
+      cell.minLength = ModelProperties.shared.surveyDescriptionMinLength
+      cell.maxLength = ModelProperties.shared.surveyDescriptionMaxLength
+      cell.stage = .Description
+      cell.stageGlobal = self.stage
       cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
       cell.text = self.pollDescription
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$isKeyboardOnScreen
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isKeyboardOnScreen = $0 }
+        .store(in: &self.subscriptions)
       self.$topic
         .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.topicColor = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Description.rawValue }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -232,7 +285,7 @@ private extension NewPollCollectionView {
       cell.$isAnimationComplete
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stageAnimationFinished = .Title }
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Description }
         .store(in: &self.subscriptions)
       cell.boundsPublisher
         .eraseToAnyPublisher()
@@ -253,21 +306,37 @@ private extension NewPollCollectionView {
       self.$stage
         .filter { $0 == .Description }
         .filter { _ in cell.text.isNil || cell.text.isEmpty }
-        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
         .sink { _ in cell.present() }
         .store(in: &self.subscriptions)
     }
     
     let questionCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.textAlignment = .natural
+      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
       cell.placeholderText = "new_poll_survey_enter_question".localized
       cell.labelText = "new_poll_survey_question".localized
-      cell.minHeight = 60
-      cell.stage = .Title
-      cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+      cell.minLength = ModelProperties.shared.surveyQuestionMinLength
+      cell.maxLength = ModelProperties.shared.surveyQuestionMaxLength
+      cell.minHeight = 0//60
+      cell.stage = .Question
+      cell.stageGlobal = self.stage
+      cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
       cell.text = self.pollDescription
       self.$topic
         .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.topicColor = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$isKeyboardOnScreen
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isKeyboardOnScreen = $0 }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Question.rawValue }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -284,7 +353,7 @@ private extension NewPollCollectionView {
       cell.$isAnimationComplete
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stageAnimationFinished = .Title }
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Question }
         .store(in: &self.subscriptions)
       cell.boundsPublisher
         .eraseToAnyPublisher()
@@ -305,144 +374,154 @@ private extension NewPollCollectionView {
       self.$stage
         .filter { $0 == .Question }
         .filter { _ in cell.text.isNil || cell.text.isEmpty }
-        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
         .sink { _ in cell.present() }
         .store(in: &self.subscriptions)
     }
-//    let descriptionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
-//      let paragraphStyle = NSMutableParagraphStyle()
-//      paragraphStyle.firstLineHeadIndent = 20
-//      paragraphStyle.paragraphSpacing = 20
-//      paragraphStyle.hyphenationFactor = 1
-//      cell.attributes = [
-//        .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body) as Any,
-//        .foregroundColor: UIColor.label,
-//        .paragraphStyle: paragraphStyle
-//      ]
-//
-//      cell.insets = .uniform(size: self.padding)
-//      ///Set right text container inset if transition
-//      cell.padding = self.padding
-//      cell.text = self.item.detailsDescription
-//      cell.boundsPublisher
-//        .eraseToAnyPublisher()
-//        .filter { $0 != .zero }
-//        .sink { [unowned self] _ in self.source.refresh(animatingDifferences: false) }//commentsCellBoundsPublisher.send($0)
-//        .store(in: &self.subscriptions)
-//      var config = UIBackgroundConfiguration.listPlainCell()
-//      config.backgroundColor = .clear
-//      cell.backgroundConfiguration = config
-//      cell.automaticallyUpdatesBackgroundConfiguration = false
-//    }
-//
-//    let imagesCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [unowned self] cell, _, _ in
-//      cell.item = self.item
-//
-//      cell.imagePublisher
-//        .sink {[unowned self] in self.imagePublisher.send($0) }
-//        .store(in: &self.subscriptions)
-//      var config = UIBackgroundConfiguration.listPlainCell()
-//      config.backgroundColor = .clear
-//      cell.backgroundConfiguration = config
-//      cell.automaticallyUpdatesBackgroundConfiguration = false
-//    }
-//
-//    let youtubeCellRegistration = UICollectionView.CellRegistration<YoutubeCell, AnyHashable> { [unowned self] cell, _, _ in
-//      cell.item = self.item
-//      var config = UIBackgroundConfiguration.listPlainCell()
-//      config.backgroundColor = .clear
-//      cell.backgroundConfiguration = config
-//      cell.automaticallyUpdatesBackgroundConfiguration = false
-//    }
-//
-//    let webCellRegistration = UICollectionView.CellRegistration<LinkPreviewCell, AnyHashable> { [unowned self] cell, _, _ in
-//      cell.item = self.item
-//      cell.tapPublisher
-//        .sink {[weak self] in
-//          guard let self = self else { return }
-//
-//          self.webPublisher.send($0)
-//        }
-//        .store(in: &self.subscriptions)
-//      var config = UIBackgroundConfiguration.listPlainCell()
-//      config.backgroundColor = .clear
-//      cell.backgroundConfiguration = config
-//      cell.automaticallyUpdatesBackgroundConfiguration = false
-//    }
-//
-//    let questionCellRegistration = UICollectionView.CellRegistration<TextCell, AnyHashable> { [unowned self] cell, _, _ in
-//      let paragraphStyle = NSMutableParagraphStyle()
-//      paragraphStyle.firstLineHeadIndent = 20
-//      paragraphStyle.paragraphSpacing = 20
-//      if #available(iOS 15.0, *) {
-//        paragraphStyle.usesDefaultHyphenation = true
-//      } else {
-//        paragraphStyle.hyphenationFactor = 1
-//      }
-//      cell.insets = .init(top: padding*3, left: padding, bottom: padding, right: padding)
-//      cell.attributes = [
-//        .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body) as Any,
-//        .foregroundColor: UIColor.secondaryLabel,
-//        .paragraphStyle: paragraphStyle
-//      ]
-//      cell.text = self.item.question
-//      cell.boundsPublisher
-//        .sink { [unowned self] _ in self.source.refresh(animatingDifferences: false) }
-//        .store(in: &self.subscriptions)
-//      var config = UIBackgroundConfiguration.listPlainCell()
-//      config.backgroundColor = .clear
-//      cell.backgroundConfiguration = config
-//      cell.automaticallyUpdatesBackgroundConfiguration = false
-//    }
-//
-//    let answersCellRegistration = UICollectionView.CellRegistration<AnswersCell, AnyHashable> { [weak self] cell, _, _ in
-//      guard let self = self else { return }
-//
-//      cell.item = self.item
-//      cell.selectionPublisher
-//        .sink { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.answerSelectionPublisher.send($0)
-//
-//          guard self.isFirstAnswerSelection else { return }
-//
-//          self.isFirstAnswerSelection = false
-//          self.scrollToItem(at: IndexPath(row: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
-//        }
-//        .store(in: &self.subscriptions)
-//      cell.deselectionPublisher
-//        .sink { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.answerDeselectionPublisher.send($0)
-//        }
-//        .store(in: &self.subscriptions)
-//      cell.updatePublisher
+    
+    let choicesCellRegistration = UICollectionView.CellRegistration<NewPollChoicesCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.labelText = "new_poll_survey_choices".localized
+      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
+      cell.stage = .Choices
+      cell.stageGlobal = self.stage
+//      cell.topicColor = self.topic.isNil ? .systemGray : self.topic!.tagColor
+      cell.choices = self.choices
+      cell.addChoicePublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.addChoice() }
+        .store(in: &self.subscriptions)
+      cell.$removedChoice
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.choices.remove(object: $0!) }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.topicColor = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$choices
+        .receive(on: DispatchQueue.main)
+        .sink { cell.refreshChoices($0) }
+        .store(in: &self.subscriptions)
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Choices.rawValue }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$isMovingToParent
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isMovingToParent = $0! }
+        .store(in: &self.subscriptions)
+      self.$isKeyboardOnScreen
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isKeyboardOnScreen = $0 }
+        .store(in: &self.subscriptions)
+//      cell.$text
+//        .filter { !$0.isNil }
 //        .receive(on: DispatchQueue.main)
-//        .sink { [weak self] _ in
-//          guard let self = self else { return }
-//
-//          self.source.refresh()
-//        }
+//        .sink { [unowned self] in self.question = $0 }
 //        .store(in: &self.subscriptions)
-//      cell.votersPublisher
-//        .sink { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.votersPublisher.send($0)
-//        }
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Question }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          self.source.refresh() }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.$stageAnimationFinished
+        .filter { $0 == .Question }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
+//      self.$stage
+//        .filter { $0 == .Choices }
+//        .filter { _ in cell.text.isNil || cell.text.isEmpty }
+//        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
+//        .sink { _ in cell.present() }
 //        .store(in: &self.subscriptions)
-//      self.isVotingSubscriber
-//        .sink {
-//          cell.isVotingPublisher.send($0)
-//        }
+    }
+    
+    let imagesCellRegistration = UICollectionView.CellRegistration<NewPollImagesCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.labelText = "new_poll_survey_images".localized
+      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
+      cell.stage = .Images
+      cell.stageGlobal = self.stage
+      cell.images = self.images
+      cell.addImagePublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.addImage() }
+        .store(in: &self.subscriptions)
+      cell.$removedImage
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.images.remove(object: $0!) }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.topicColor = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$images
+        .receive(on: DispatchQueue.main)
+        .sink { cell.update($0) }
+        .store(in: &self.subscriptions)
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Images.rawValue }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$isMovingToParent
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isMovingToParent = $0! }
+        .store(in: &self.subscriptions)
+      self.$isKeyboardOnScreen
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isKeyboardOnScreen = $0 }
+        .store(in: &self.subscriptions)
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Choices }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          self.source.refresh() }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.$stageAnimationFinished
+        .filter { $0 == .Choices }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
+//      self.$stage
+//        .filter { $0 == .Choices }
+//        .filter { _ in cell.text.isNil || cell.text.isEmpty }
+//        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
+//        .sink { _ in cell.present() }
 //        .store(in: &self.subscriptions)
-//      var config = UIBackgroundConfiguration.listPlainCell()
-//      config.backgroundColor = .clear
-//      cell.backgroundConfiguration = config
-//      cell.automaticallyUpdatesBackgroundConfiguration = false
-//    }
+    }
     
     
     source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
@@ -464,26 +543,14 @@ private extension NewPollCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
-//      } else if section == .image {
-//        return collectionView.dequeueConfiguredReusableCell(using: imagesCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
-//      } else if section == .youtube {
-//        return collectionView.dequeueConfiguredReusableCell(using: youtubeCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
-//      } else if section == .web {
-//        return collectionView.dequeueConfiguredReusableCell(using: webCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
-//      } else if section == .question {
-//        return collectionView.dequeueConfiguredReusableCell(using: questionCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
-//      } else if section == .answers {
-//        return collectionView.dequeueConfiguredReusableCell(using: answersCellRegistration,
-//                                                            for: indexPath,
-//                                                            item: identifier)
+      } else if section == .Choices {
+        return collectionView.dequeueConfiguredReusableCell(using: choicesCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .Images {
+        return collectionView.dequeueConfiguredReusableCell(using: imagesCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
       }
       return UICollectionViewCell()
     }
@@ -492,15 +559,34 @@ private extension NewPollCollectionView {
     snapshot.appendSections([.Topic,
                              .Title,
                              .Description,
-                             .Question])
+                             .Question,
+                             .Choices,
+                             .Images])
     snapshot.appendItems([0], toSection: .Topic)
     snapshot.appendItems([1], toSection: .Title)
     snapshot.appendItems([2], toSection: .Description)
     snapshot.appendItems([3], toSection: .Question)
-    source.apply(snapshot, animatingDifferences: true)
-    
+    snapshot.appendItems([4], toSection: .Choices)
+    snapshot.appendItems([5], toSection: .Images)
+    source.apply(snapshot, animatingDifferences: false)
   }
   
+  func setTasks() {
+    tasks.append( Task {@MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.keyboardWillHideNotification) {
+        guard let self = self else { return }
+
+        self.isKeyboardOnScreen = false
+      }
+    })
+    tasks.append( Task {@MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.keyboardWillShowNotification) {
+        guard let self = self else { return }
+        
+        self.isKeyboardOnScreen = true
+      }
+    })
+  }
 //  func applySnapshot(animated: Bool = false) {
 //    var snapshot = Snapshot()
 //    snapshot.appendSections([.title, .description,])
@@ -553,6 +639,13 @@ private extension NewPollCollectionView {
 //    //        snapshot.appendSections([.comments])
 //    //        snapshot.appendItems([8], toSection: .comments)
 //  }
+  func addChoice() {
+    choices.append(NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: choices.count + 1)))
+  }
+  
+  func addImage() {
+    images.append(NewPollImage(image: UIImage(), text: ""))
+  }
 }
 
 extension NewPollCollectionView: UICollectionViewDelegate {

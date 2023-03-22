@@ -13,7 +13,7 @@ class NewPollController: UIViewController, TintColorable {
   
   ///Sequence of stages to post new survey
   enum Stage: Int, CaseIterable {
-    case Topic, Title, Description, Question, Choices, Options, Hyperlink, Images, Comments, Limits, Hot, Ready
+    case Topic, Title, Description, Question, Choices, Images, Hyperlink, Comments, Limits, Hot, Ready
     
     func next() -> Stage? { Stage(rawValue: (self.rawValue + 1)) }
     
