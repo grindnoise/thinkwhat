@@ -17,9 +17,10 @@ class NewPollCollectionView: UICollectionView {
   // MARK: - Public properties
   ///**Publishers**
   public let progressPublisher = PassthroughSubject<Double, Never>()
-  public let profileTapPublisher = PassthroughSubject<Bool, Never>()
-  public var imagePublisher = PassthroughSubject<Mediafile, Never>()
-  public var webPublisher = PassthroughSubject<URL, Never>()
+  public private(set) var addImagePublisher = PassthroughSubject<Void, Never>()
+//  public let profileTapPublisher = PassthroughSubject<Bool, Never>()
+//  public var imagePublisher = PassthroughSubject<Mediafile, Never>()
+//  public var webPublisher = PassthroughSubject<URL, Never>()
   ///**Logic**
   @Published public var isMovingToParent: Bool?
   @Published public var isKeyboardOnScreen: Bool = false
@@ -72,16 +73,17 @@ class NewPollCollectionView: UICollectionView {
       self.stage = stage
     }
   }
-  @Published public private(set) var choices: [NewPollChoice] = (0...1).map { NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: $0 + 1)) } {
-    didSet {
+    @Published public private(set) var choices: [NewPollChoice] = (0...0).map { NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: $0 + 1)) }
+//  @Published public private(set) var choices: [NewPollChoice] = (0...1).map { NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: $0 + 1)) } {
+//    didSet {
 //      guard oldValue.isNil,
 //            !question.isNil,
 //            let stage = stage.next()
 //      else { return }
 //
 //      self.stage = stage
-    }
-  }
+//    }
+//  }
   @Published public private(set) var images = [NewPollImage]()
   
   // MARK: - Private properties
@@ -126,6 +128,10 @@ class NewPollCollectionView: UICollectionView {
   public func onImageScroll(_ index: Int) {
     guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
     cell.scrollToImage(at: index)
+  }
+  
+  public func addImage(_ image: UIImage) {
+    images.append(NewPollImage(image: image, text: ""))
   }
 }
 
@@ -394,6 +400,12 @@ private extension NewPollCollectionView {
         .filter { !$0.isNil }
         .sink { [unowned self] in self.choices.remove(object: $0!) }
         .store(in: &self.subscriptions)
+      ///Monitor 1st choice to add 2nd - necessary
+      cell.$wasEdited
+        .filter { !$0.isNil }
+        .filter { [unowned self] _ in self.choices.count == 1 }
+        .sink { _ in cell.addSecondChoice() }
+        .store(in: &self.subscriptions)
       self.$topic
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
@@ -401,8 +413,19 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
       self.$choices
         .receive(on: DispatchQueue.main)
-        .sink { cell.refreshChoices($0) }
+        .sink {
+          cell.refreshChoices($0)
+          guard  $0.count == 2 else { return }
+            
+          cell.present(first: false, seconds: 0.5)
+        }
         .store(in: &self.subscriptions)
+//      self.$choices
+//        .filter { [unowned self] _ in self.choices.count == 2 }
+//        .receive(on: DispatchQueue.main)
+//        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+//        .sink { _ in cell.present(first: false) }
+//        .store(in: &self.subscriptions)
       self.$stage
         .sink { cell.stageGlobal = $0 }
         .store(in: &self.subscriptions)
@@ -428,7 +451,7 @@ private extension NewPollCollectionView {
       cell.$isAnimationComplete
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stageAnimationFinished = .Question }
+        .sink { [unowned self] _ in self.stage = .Images; self.stageAnimationFinished = .Choices }
         .store(in: &self.subscriptions)
       cell.boundsPublisher
         .eraseToAnyPublisher()
@@ -446,12 +469,12 @@ private extension NewPollCollectionView {
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor }
         .store(in: &self.subscriptions)
-//      self.$stage
-//        .filter { $0 == .Choices }
-//        .filter { _ in cell.text.isNil || cell.text.isEmpty }
-//        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
-//        .sink { _ in cell.present() }
-//        .store(in: &self.subscriptions)
+      self.$stage
+        .filter { $0 == .Choices }
+        .filter { [unowned self] _ in self.choices.count == 1 }
+        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
+        .sink { _ in cell.present() }
+        .store(in: &self.subscriptions)
     }
     
     let imagesCellRegistration = UICollectionView.CellRegistration<NewPollImagesCell, AnyHashable> { [unowned self] cell, _, _ in
@@ -462,17 +485,18 @@ private extension NewPollCollectionView {
       cell.images = self.images
       cell.addImagePublisher
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] in self.addImage() }
+//        .sink { [unowned self] in self.addImage() }
+        .sink { [unowned self] in self.addImagePublisher.send() }
         .store(in: &self.subscriptions)
       cell.$removedImage
         .filter { !$0.isNil }
         .sink { [unowned self] in self.images.remove(object: $0!) }
         .store(in: &self.subscriptions)
-      self.$topic
-        .filter { !$0.isNil }
-        .receive(on: DispatchQueue.main)
-        .sink { cell.topicColor = $0!.tagColor }
-        .store(in: &self.subscriptions)
+//      self.$topic
+//        .filter { !$0.isNil }
+//        .receive(on: DispatchQueue.main)
+//        .sink { cell.topicColor = $0!.tagColor }
+//        .store(in: &self.subscriptions)
       self.$images
         .receive(on: DispatchQueue.main)
         .sink { cell.update($0) }
@@ -641,10 +665,6 @@ private extension NewPollCollectionView {
 //  }
   func addChoice() {
     choices.append(NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: choices.count + 1)))
-  }
-  
-  func addImage() {
-    images.append(NewPollImage(image: UIImage(), text: ""))
   }
 }
 

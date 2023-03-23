@@ -31,6 +31,13 @@ class NewPollView: UIView {
         self.viewInput?.setProgress($0)
       }
       .store(in: &subscriptions)
+    instance.addImagePublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+      
+        self.viewInput?.addImage()
+      }
+      .store(in: &subscriptions)
     
     
     return instance
@@ -65,6 +72,10 @@ class NewPollView: UIView {
 }
 
 extension NewPollView: NewPollControllerOutput {
+  func imageAdded(_ image: UIImage) {
+    collectionView.addImage(image)
+  }
+  
   func willMoveToParent() {
     collectionView.isMovingToParent = true
   }

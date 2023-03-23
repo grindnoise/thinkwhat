@@ -28,6 +28,10 @@ class NewPollImageCell: UICollectionViewCell {
     didSet {
       guard !item.isNil else { return }
       
+#if DEBUG
+      print(item.image)
+#endif
+      
       setupUI()
     }
   }
@@ -77,7 +81,7 @@ class NewPollImageCell: UICollectionViewCell {
     let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
     toolBar.items = [space, doneButton]
     toolBar.barStyle = .default
-    toolBar.tintColor = Colors.getColor(forId: order)
+    toolBar.tintColor = .red//Colors.getColor(forId: order)
     instance.inputAccessoryView = toolBar
     instance.attributedText = NSAttributedString(string: "", attributes: attributes())
     instance.publisher(for: \.bounds)
@@ -177,7 +181,7 @@ private extension NewPollImageCell {
     let inset = padding + lineSpacing/2
     backgroundColor = .clear
     textView.place(inside: contentView, bottomPriority: .defaultLow)
-    textView.attributedText = NSAttributedString(string: item.text, attributes: attributes())
+    textView.attributedText = NSAttributedString(string: "item.text", attributes: attributes())
     imageView.placeTopLeading(inside: contentView, leadingInset: inset, topInset: inset)
   }
   

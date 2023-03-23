@@ -32,7 +32,7 @@ class NewPollChoiceCell: UICollectionViewCell {
     }
   }
   ///**Publishers**
-//  @Published public private(set) var isAnimationComplete: Bool?
+  @Published public private(set) var wasEdited: Bool?
   public private(set) var boundsPublisher = PassthroughSubject<CGRect, Never>()
   ///**UI**
   public var minHeight: CGFloat = 0
@@ -60,7 +60,7 @@ class NewPollChoiceCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var textView: UITextView = {
+  public lazy var textView: UITextView = {
     let instance = UITextView()
     instance.textContainerInset = .uniform(size: padding)
     instance.delegate = self
@@ -292,6 +292,7 @@ extension NewPollChoiceCell: UITextViewDelegate {
           !text.isEmpty
     else { return }
     
-    self.item.text = text
+    item.text = text
+    wasEdited = true
   }
 }

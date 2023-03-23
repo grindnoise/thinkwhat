@@ -42,7 +42,7 @@ class NewPollImagesCell: UICollectionViewCell {
         self.imageView.tintColor = self.color
       }
       
-      button.setAttributedTitle(NSAttributedString(string: "new_poll_survey_choice_add".localized,
+      button.setAttributedTitle(NSAttributedString(string: "new_poll_survey_image_add".localized,
                                                      attributes: [
                                                       .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
                                                       .foregroundColor: topicColor as Any
@@ -102,7 +102,7 @@ class NewPollImagesCell: UICollectionViewCell {
       .sink { [weak self] in
         guard let self = self else { return }
         
-        constraint.constant = $0.height
+        constraint.constant = max(10, $0.height)
         self.layoutIfNeeded()
         self.boundsPublisher.send(true)
       }
@@ -164,7 +164,29 @@ class NewPollImagesCell: UICollectionViewCell {
                                                     .foregroundColor: topicColor as Any
                                                    ]),
                                 for: .normal)
-    instance.addTarget(self, action: #selector(self.addImage), for: .touchUpInside)
+    instance.addTarget(self,
+                       action: #selector(self.addImage),
+                       for: .touchUpInside)
+    
+    return instance
+  }()
+  private lazy var nextButton: UIButton = {
+    let instance = UIButton()
+    instance.setAttributedTitle(NSAttributedString(string: "new_poll_survey_choice_next".localized,
+                                                   attributes: [
+                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                    .foregroundColor: topicColor as Any
+                                                   ]),
+                                for: .normal)
+    instance.addTarget(self, action: #selector(self.nextStage), for: .touchUpInside)
+    
+    return instance
+  }()
+  private lazy var buttonsStack: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [button, nextButton])
+    instance.spacing = padding
+    instance.axis = .vertical
+//    instance.alignment = .center
     
     return instance
   }()
@@ -263,6 +285,19 @@ private extension NewPollImagesCell {
   func addImage() {
     addImagePublisher.send()
 //    collectionView.addChoice()
+  }
+  
+  @objc
+  func nextStage() {
+    buttonsStack.removeArrangedSubview(nextButton)
+    boundsPublisher.send(true)
+    nextButton.removeFromSuperview()
+    
+    CATransaction.begin()
+    CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
+    fgLine.layer.strokeColor = color.cgColor
+    fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
+    CATransaction.commit()
   }
   
   func drawLine(line: Line,

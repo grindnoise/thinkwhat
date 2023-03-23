@@ -429,5 +429,7 @@
 "new_poll_survey_choices" = "Сhoices";
 "new_poll_survey_choice_placeholder" = "Choice №";
 "new_poll_survey_choice_add" = "Add choice";
+"new_poll_survey_choice_next" = "Next";
+"new_poll_survey_choice_delete_notification" = "The survey must contain at least two possible answers";
 "new_poll_survey_images" = "Images";
 "new_poll_survey_image_add" = "Add image";

@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class NewPollController: UIViewController, TintColorable {
+class NewPollController: UIViewController, TintColorable, UINavigationControllerDelegate {
   
   ///Sequence of stages to post new survey
   enum Stage: Int, CaseIterable {
@@ -46,6 +46,12 @@ class NewPollController: UIViewController, TintColorable {
                                                                  padding: 4,
                                                                  font: UIFont(name: Fonts.Bold, size: 20)!,
                                                                  iconCategory: .MegaphoneFill)
+  private lazy var imagePicker: UIImagePickerController = {
+      let picker = UIImagePickerController()
+      picker.delegate = self
+      return picker
+  }()
+  
   
 
   // MARK: - Initialization
@@ -153,6 +159,45 @@ class NewPollController: UIViewController, TintColorable {
 }
 
 extension NewPollController: NewPollViewInput {
+  func addImage() {
+    imagePicker.allowsEditing = true
+    let alert = UIAlertController(title: nil,
+                                  message: nil,
+                                  preferredStyle: UIAlertController.Style.actionSheet)
+
+    let photo = UIAlertAction(title: "photo_album".localized, style: UIAlertAction.Style.default, handler: {
+      (action: UIAlertAction) in
+      self.imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
+      self.present(self.imagePicker, animated: true, completion: nil)
+    })
+    photo.setValue(UIColor { traitCollection in
+      switch traitCollection.userInterfaceStyle {
+      case .dark:
+        return UIColor.systemBlue
+      default:
+        return UIColor.label
+      }
+    }, forKey: "titleTextColor")
+    alert.addAction(photo)
+    let camera = UIAlertAction(title: "camera".localized, style: UIAlertAction.Style.default, handler: {
+      (action: UIAlertAction) in
+      self.imagePicker.sourceType = UIImagePickerController.SourceType.camera
+      self.present(self.imagePicker, animated: true, completion: nil)
+    })
+    camera.setValue(UIColor { traitCollection in
+      switch traitCollection.userInterfaceStyle {
+      case .dark:
+        return UIColor.systemBlue
+      default:
+        return UIColor.label
+      }
+    }, forKey: "titleTextColor")
+    alert.addAction(camera)
+    let cancel = UIAlertAction(title: "cancel".localized, style: UIAlertAction.Style.destructive, handler: nil)
+    alert.addAction(cancel)
+    present(alert, animated: true, completion: nil)
+  }
+  
   func setProgress(_ value: Double) {
     progressCapsule.setProgress(value: value)
   }
@@ -175,4 +220,16 @@ private extension NewPollController {
     navigationBar.setNeedsLayout()
     navigationBar.layoutIfNeeded()
   }
+}
+
+extension NewPollController: UIImagePickerControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let origImage = info[.editedImage] as? UIImage {
+            let resizedImage = origImage.resized(to: CGSize(width: 200, height: 200))
+            let imageData = resizedImage.jpegData(compressionQuality: 0.4)
+            
+            controllerOutput?.imageAdded(UIImage(data: imageData!)!)
+            dismiss(animated: true)
+        }
+    }
 }

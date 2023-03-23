@@ -23,6 +23,7 @@ class NewPollChoicesCollectionView: UICollectionView {
   @Published public var isKeyboardOnScreen: Bool!
   @Published public var isMovingToParent: Bool!
   @Published public var removedChoice: NewPollChoice?
+  @Published public private(set) var wasEdited: Bool?
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -62,9 +63,10 @@ class NewPollChoicesCollectionView: UICollectionView {
   }
   
   // MARK: - Public methods
-  public func present() {
+  public func present(first: Bool = true) {
+    guard let cell = cellForItem(at: IndexPath(item: first ? 0 : 1, section: 0)) as? NewPollChoiceCell else { return }
     
-    
+    cell.textView.becomeFirstResponder()
   }
   
   public func refreshChoices(_ instances: [NewPollChoice]) {
@@ -98,6 +100,7 @@ class NewPollChoicesCollectionView: UICollectionView {
 private extension NewPollChoicesCollectionView {
   @MainActor
   func setupUI() {
+    isScrollEnabled = false
     collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
       var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
       layoutConfig.backgroundColor = .clear
@@ -109,6 +112,22 @@ private extension NewPollChoicesCollectionView {
           guard let self = self,
                 let item = self.source.itemIdentifier(for: indexPath)
           else { return }
+          
+          guard self.dataItems.count > 2 else {
+            completion(false)
+            let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                                  text: "new_poll_survey_choice_delete_notification",
+                                                                  tintColor: .systemRed),
+                                   contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                   isModal: false,
+                                   useContentViewHeight: true,
+                                   shouldDismissAfter: 2)
+            banner.didDisappearPublisher
+              .sink { _ in banner.removeFromSuperview() }
+              .store(in: &self.subscriptions)
+            
+            return
+          }
           
 //          self.removedChoice = item
           self.dataItems.remove(object: item)
@@ -148,6 +167,9 @@ private extension NewPollChoicesCollectionView {
       
       cell.boundsPublisher
         .sink { [unowned self] _ in self.source.refresh() }
+        .store(in: &subscriptions)
+      cell.$wasEdited
+        .sink { [unowned self] in self.wasEdited = $0 }
         .store(in: &subscriptions)
 
       var config = UIBackgroundConfiguration.listPlainCell()

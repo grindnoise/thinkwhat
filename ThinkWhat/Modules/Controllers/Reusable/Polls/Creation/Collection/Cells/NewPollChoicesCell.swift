@@ -35,6 +35,7 @@ class NewPollChoicesCell: UICollectionViewCell {
 //    }
 //  }
   ///**Publishers**
+  @Published public private(set) var wasEdited: Bool?
   @Published public var removedChoice: NewPollChoice?
   @Published public private(set) var isAnimationComplete: Bool?
   @Published public private(set) var stageAnimationFinished: NewPollController.Stage!
@@ -94,6 +95,9 @@ class NewPollChoicesCell: UICollectionViewCell {
     
     instance.$removedChoice
       .sink { [unowned self] in self.removedChoice = $0 }
+      .store(in: &subscriptions)
+    instance.$wasEdited
+      .sink { [unowned self] in self.wasEdited = $0 }
       .store(in: &subscriptions)
     
     $isMovingToParent
@@ -179,7 +183,26 @@ class NewPollChoicesCell: UICollectionViewCell {
     
     return instance
   }()
+  private lazy var nextButton: UIButton = {
+    let instance = UIButton()
+    instance.setAttributedTitle(NSAttributedString(string: "new_poll_survey_choice_next".localized,
+                                                   attributes: [
+                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                    .foregroundColor: topicColor as Any
+                                                   ]),
+                                for: .normal)
+    instance.addTarget(self, action: #selector(self.nextStage), for: .touchUpInside)
     
+    return instance
+  }()
+  private lazy var buttonsStack: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [button])
+    instance.spacing = padding
+    instance.axis = .vertical
+//    instance.alignment = .center
+    
+    return instance
+  }()
   
   
   // MARK: - Destructor
@@ -227,12 +250,29 @@ class NewPollChoicesCell: UICollectionViewCell {
   }
   
   // MARK: - Public methods
-  public func present(seconds: Double = .zero) {
-    collectionView.present()
+  public func present(first: Bool = true, seconds: Double = .zero) {
+    if !first {
+      buttonsStack.addArrangedSubview(nextButton)
+      boundsPublisher.send(true)
+    }
+    
+    guard seconds != .zero else {
+      collectionView.present(first: first)
+      
+      return
+    }
+    
+    delay(seconds: seconds) { [unowned self] in
+      self.collectionView.present(first: first)
+    }
   }
   
   public func refreshChoices(_ instances: [NewPollChoice]) {
     collectionView.refreshChoices(instances)
+  }
+  
+  public func addSecondChoice() {
+    addChoice()
   }
 }
 
@@ -245,19 +285,19 @@ private extension NewPollChoicesCell {
                                leadingInset: 8,
                                topInset: -2)
     addSubview(collectionView)
-    addSubview(button)
+    addSubview(buttonsStack)
     collectionView.translatesAutoresizingMaskIntoConstraints = false
-    button.translatesAutoresizingMaskIntoConstraints = false
+    buttonsStack.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
       collectionView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
       collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      button.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding),
-      button.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding),
+      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
     ])
     
-    let constraint = button.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
     constraint.isActive = true
     constraint.priority = .defaultLow
     
@@ -268,6 +308,19 @@ private extension NewPollChoicesCell {
   @objc
   func handleTap() {
     present()
+  }
+  
+  @objc
+  func nextStage() {
+    buttonsStack.removeArrangedSubview(nextButton)
+    boundsPublisher.send(true)
+    nextButton.removeFromSuperview()
+    
+    CATransaction.begin()
+    CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
+    fgLine.layer.strokeColor = color.cgColor
+    fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
+    CATransaction.commit()
   }
   
   @objc

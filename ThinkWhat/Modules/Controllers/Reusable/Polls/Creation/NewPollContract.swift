@@ -15,6 +15,7 @@ protocol NewPollViewInput: AnyObject {
   var controllerInput: NewPollControllerInput? { get set }
   
   func setProgress(_: Double)
+  func addImage()
 }
 
 protocol NewPollControllerInput: AnyObject {
@@ -33,4 +34,5 @@ protocol NewPollControllerOutput: AnyObject {
   
 //  var isMovingToParent
   func willMoveToParent()
+  func imageAdded(_: UIImage)
 }

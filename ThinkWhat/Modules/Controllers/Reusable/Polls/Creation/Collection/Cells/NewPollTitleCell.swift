@@ -55,10 +55,14 @@ class NewPollTextCell: UICollectionViewCell {
       
       textView.tintColor = color
       
-      UIView.animate(withDuration: 0.4) { [weak self] in
+      UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
         
         self.imageView.tintColor = self.color
+        
+        guard let imageView = self.contentView.getSubview(type: UIImageView.self, identifier: "imageView") else { return }
+        
+        imageView.tintColor = self.color
       }
       
       let colorAnim = CABasicAnimation(path: "strokeColor", fromValue: fgLine.layer.strokeColor, toValue: color.cgColor, duration: 0.4)
@@ -87,7 +91,7 @@ class NewPollTextCell: UICollectionViewCell {
         CATransaction.commit()
       }
       
-      UIView.animate(withDuration: 0.4) { [weak self] in
+      UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
         
         self.imageView.tintColor = self.color
@@ -218,9 +222,8 @@ class NewPollTextCell: UICollectionViewCell {
   }()
   private lazy var placeholder: UILabel = {
     let instance = UILabel()
-//    instance.backgroundColor = .red
     instance.numberOfLines = 10
-    instance.font = font//UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)
+    instance.font = font
     instance.text = placeholderText
     instance.textColor = .secondaryLabel
     instance.textAlignment = .center
@@ -364,10 +367,17 @@ extension NewPollTextCell: UITextViewDelegate {
       textView.textColor = .label
     }
     
-    UIView.animate(withDuration: 0.2) { [weak self] in
-      guard let self = self else { return }
-
-      textView.backgroundColor = self.color.withAlphaComponent(0.2)
+    UIView.animate(withDuration: 0.2, animations: { [unowned self] in
+      textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiaryLabel : self.color.withAlphaComponent(0.2)
+      
+      guard let imageView = self.contentView.getSubview(type: UIImageView.self, identifier: "imageView") else { return }
+      
+      imageView.alpha = 0
+      imageView.transform = .init(scaleX: 0.75, y: 0.75)
+    }) { _ in
+      guard let imageView = self.contentView.getSubview(type: UIImageView.self, identifier: "imageView") else { return }
+      
+      imageView.removeFromSuperview()
     }
     
     return true
@@ -375,8 +385,17 @@ extension NewPollTextCell: UITextViewDelegate {
   
   func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
     guard !isMovingToParent else {
-      UIView.animate(withDuration: 0.2) { [unowned self] in
-        textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground }//.systemGray4.withAlphaComponent(0.2) }
+//      UIView.animate(withDuration: 0.2, animations: { [unowned self] in
+//        textView.backgroundColor = .clear//self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground }//.systemGray4.withAlphaComponent(0.2)
+//        guard let imageView = self.contentView.getSubview(type: UIImageView.self, identifier: "imageView") else { return }
+//
+//        imageView.alpha = 0
+//        imageView.transform = .init(scaleX: 0.75, y: 0.75)
+//      }) { _ in
+//        guard let imageView = self.contentView.getSubview(type: UIImageView.self, identifier: "imageView") else { return }
+//
+//        imageView.removeFromSuperview()
+//      }
       return true
     }
     
@@ -401,9 +420,38 @@ extension NewPollTextCell: UITextViewDelegate {
       drawLine(line: bgLine, strokeEnd: 1)
       drawLine(line: fgLine)
     }
-    UIView.animate(withDuration: 0.2) { [unowned self] in
-      textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    }//.systemGray4.withAlphaComponent(0.2) }
+    UIView.animate(withDuration: 0.2, animations: {
+      textView.backgroundColor = .clear//self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    }) { [unowned self] _ in
+      guard let endPosition = self.textView.position(from: self.textView.endOfDocument, offset: 0),
+            let textRange = self.textView.textRange(from: endPosition, to: endPosition)
+      else { return }
+      
+      let rect = self.textView.firstRect(for: textRange)
+      let test = UIView(frame: CGRect(origin: rect.origin, size: .uniform(size: rect.size.height)))
+      test.alpha = 0
+      self.textView.addSubview(test)
+      
+      let convertedOrigin = self.textView.convert(test.frame.origin, to: self.contentView)
+      test.removeFromSuperview()
+      
+      let imageView = UIImageView(frame: CGRect(origin: convertedOrigin,
+                                                size: .uniform(size: rect.size.height)))
+      imageView.image = UIImage(systemName: "pencil",
+                                withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.size.height * 0.75, weight: .bold))
+      imageView.accessibilityIdentifier = "imageView"
+      imageView.isUserInteractionEnabled = false
+      imageView.tintColor = self.color
+      imageView.alpha = 0
+      imageView.contentMode = .left
+      imageView.transform = .init(scaleX: 0.75, y: 0.75)
+      self.contentView.addSubview(imageView)
+      
+      UIView.animate(withDuration: 0.2) {
+        imageView.alpha = 1
+        imageView.transform = .identity
+      }
+    }
     return true
   }
   
