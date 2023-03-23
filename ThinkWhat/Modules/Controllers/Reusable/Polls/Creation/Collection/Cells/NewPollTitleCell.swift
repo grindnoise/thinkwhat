@@ -131,11 +131,11 @@ class NewPollTextCell: UICollectionViewCell {
     instance.alignment = .center
     instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: contentView.bounds.width,
                                                                     font: label.font)*1.5).isActive = true
-    instance.publisher(for: \.bounds)
-      .sink {
-        print($0)
-      }
-      .store(in: &subscriptions)
+//    instance.publisher(for: \.bounds)
+//      .sink {
+//        print($0)
+//      }
+//      .store(in: &subscriptions)
     
     return instance
   }()

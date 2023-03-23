@@ -177,6 +177,7 @@
 		AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */; };
 		AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */; };
 		AB3CCB3428376EDA0024372B /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3CCB3328376EDA0024372B /* Device.swift */; };
+		AB3D95C529CCAAE8009E846F /* NewPollHyperlinkCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3D95C429CCAAE8009E846F /* NewPollHyperlinkCell.swift */; };
 		AB3EF63E22F4213C004BA878 /* EmailResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF63D22F4213C004BA878 /* EmailResponse.swift */; };
 		AB3EF64222F45D8E004BA878 /* ValidationCodeTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */; };
 		AB3F8D1B294C4BE600C3980D /* TextCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3F8D1A294C4BE600C3980D /* TextCell.swift */; };
@@ -773,6 +774,7 @@
 		AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingTabBarUtils.swift; sourceTree = "<group>"; };
 		AB3C6862223FD89900B57580 /* CustomNotificationDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomNotificationDelegate.swift; sourceTree = "<group>"; };
 		AB3CCB3328376EDA0024372B /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		AB3D95C429CCAAE8009E846F /* NewPollHyperlinkCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollHyperlinkCell.swift; sourceTree = "<group>"; };
 		AB3EF63D22F4213C004BA878 /* EmailResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailResponse.swift; sourceTree = "<group>"; };
 		AB3EF64122F45D8E004BA878 /* ValidationCodeTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationCodeTextField.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3F8D1A294C4BE600C3980D /* TextCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextCell.swift; sourceTree = "<group>"; };
@@ -2318,6 +2320,7 @@
 				ABE72A7429C5BF5B003260EE /* NewPollTitleCell.swift */,
 				ABDEB65929C9AE540099C8A4 /* NewPollChoicesCell.swift */,
 				ABE912C229CB4AE900EABDFD /* NewPollImagesCell.swift */,
+				AB3D95C429CCAAE8009E846F /* NewPollHyperlinkCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -3505,6 +3508,7 @@
 				ABDA046829AE02AB0096175F /* UnderlinedInsetSignTextField.swift in Sources */,
 				AB883B2827FDB33600DBE4EF /* ImageSigns.swift in Sources */,
 				AB913F772806C8DF00609D51 /* ProtocolSubscriptions.swift in Sources */,
+				AB3D95C529CCAAE8009E846F /* NewPollHyperlinkCell.swift in Sources */,
 				AB543FFB284D05E400CCB7F1 /* TopicSelectionModernContainer.swift in Sources */,
 				AB0A41E528A28942002FA7B7 /* Date.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,

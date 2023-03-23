@@ -433,3 +433,6 @@
 "new_poll_survey_choice_delete_notification" = "Опрос должен содержать минимум два варианта ответа";
 "new_poll_survey_images" = "Изображения";
 "new_poll_survey_image_add" = "Добавить изображение";
+"new_poll_survey_image_placeholder" = "Добавьте описание (опционально)";
+"new_poll_survey_hyperlink" = "Ссылка";
+"new_poll_survey_hyperlink_placeholder" = "Добавьте ссылку (опционально)";

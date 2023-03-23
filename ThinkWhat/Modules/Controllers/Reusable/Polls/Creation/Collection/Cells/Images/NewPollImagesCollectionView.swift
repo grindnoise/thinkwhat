@@ -22,6 +22,7 @@ class NewPollImagesCollectionView: UICollectionView {
   @Published public var isKeyboardOnScreen: Bool!
   @Published public var isMovingToParent: Bool!
   @Published public var removedImage: NewPollImage?
+  @Published public var color: UIColor = .systemGray4
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -86,11 +87,11 @@ class NewPollImagesCollectionView: UICollectionView {
     //
     //      snap.deleteItems(Array(crossingSet)
     
-    source.apply(snap, animatingDifferences: true) { [unowned self] in
+    source.apply(snap, animatingDifferences: true) //{ [unowned self] in
 //      guard let cells = self.visibleCells as? [NewPollImageCell] else { return }
 //
 //      cells.forEach { $0.order = self.indexPath(for: $0)?.row ?? 0 }
-    }
+//    }
   }
 }
 
@@ -119,10 +120,10 @@ private extension NewPollImagesCollectionView {
           }
           self.source.apply(snap, animatingDifferences: true) { [unowned self] in
             self.removedImage = item
-            
-            guard let cells = self.visibleCells as? [NewPollImageCell] else { return }
-            
-            cells.forEach { $0.order = self.indexPath(for: $0)?.row ?? 0 }
+//
+//            guard let cells = self.visibleCells as? [NewPollImageCell] else { return }
+//
+//            cells.forEach { $0.order = self.indexPath(for: $0)?.row ?? 0 }
           }
           completion(true)
         }
@@ -134,16 +135,17 @@ private extension NewPollImagesCollectionView {
       
       let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
       sectionLayout.contentInsets = .uniform(size: .zero)//NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
-      sectionLayout.interGroupSpacing = 8
+      sectionLayout.interGroupSpacing = self.padding * 2
       return sectionLayout
     }
     
     let cellRegistration = UICollectionView.CellRegistration<NewPollImageCell, NewPollImage> { [unowned self] cell, indexPath, item in
-//      cell.minHeight = 50
-      cell.minLength = ModelProperties.shared.surveyAnswerTextMinLength
-      cell.maxLength = ModelProperties.shared.surveyAnswerTextMaxLength
-      cell.order = indexPath.row
+      cell.minHeight = 70
+      cell.minLength = ModelProperties.shared.surveyMediaTitleMinLength
+      cell.maxLength = ModelProperties.shared.surveyMediaTitleMaxLength
       cell.item = item
+      cell.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+      cell.color = self.color
       
       cell.boundsPublisher
         .sink { [unowned self] _ in self.source.refresh() }
@@ -164,9 +166,10 @@ private extension NewPollImagesCollectionView {
         .eraseToAnyPublisher()
         .sink { cell.isKeyboardOnScreen = $0!}
         .store(in: &self.subscriptions)
-//      guard self.stage == .Topic else { return }
-//
-//      cell.present(seconds: 0.5)
+      self.$color
+        .eraseToAnyPublisher()
+        .sink { cell.color = $0}
+        .store(in: &self.subscriptions)
     }
   
     source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in

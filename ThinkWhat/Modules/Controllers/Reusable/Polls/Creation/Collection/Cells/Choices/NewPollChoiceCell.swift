@@ -237,7 +237,7 @@ extension NewPollChoiceCell: UITextViewDelegate {
     UIView.animate(withDuration: 0.2) { [weak self] in
       guard let self = self else { return }
 
-      self.imageView.tintColor = self.color
+//      self.imageView.tintColor = self.color
       textView.backgroundColor = self.color.withAlphaComponent(0.2)
     }
     
@@ -248,7 +248,7 @@ extension NewPollChoiceCell: UITextViewDelegate {
     guard !isMovingToParent else {
       UIView.animate(withDuration: 0.2) { [unowned self] in
         textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        self.imageView.tintColor = .systemGray4
+//        self.imageView.tintColor = .systemGray4
       }//.systemGray4.withAlphaComponent(0.2) }
       return true
     }
@@ -272,7 +272,7 @@ extension NewPollChoiceCell: UITextViewDelegate {
     }
     UIView.animate(withDuration: 0.2) { [unowned self] in
       textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      self.imageView.tintColor = .systemGray4
+//      self.imageView.tintColor = .systemGray4
     }//.systemGray4.withAlphaComponent(0.2) }
     return true
   }

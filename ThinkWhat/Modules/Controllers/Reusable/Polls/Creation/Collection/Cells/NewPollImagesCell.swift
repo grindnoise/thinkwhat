@@ -45,7 +45,13 @@ class NewPollImagesCell: UICollectionViewCell {
       button.setAttributedTitle(NSAttributedString(string: "new_poll_survey_image_add".localized,
                                                      attributes: [
                                                       .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                      .foregroundColor: topicColor as Any
+                                                      .foregroundColor: color as Any
+                                                     ]),
+                                  for: .normal)
+      nextButton.setAttributedTitle(NSAttributedString(string: "new_poll_survey_choice_next".localized,
+                                                     attributes: [
+                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                      .foregroundColor: color as Any
                                                      ]),
                                   for: .normal)
       
@@ -256,19 +262,19 @@ private extension NewPollImagesCell {
                                leadingInset: 8,
                                topInset: -2)
     addSubview(collectionView)
-    addSubview(button)
+    addSubview(buttonsStack)
     collectionView.translatesAutoresizingMaskIntoConstraints = false
-    button.translatesAutoresizingMaskIntoConstraints = false
+    buttonsStack.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
       collectionView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
       collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      button.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding),
-      button.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding),
+      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
     ])
     
-    let constraint = button.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
     constraint.isActive = true
     constraint.priority = .defaultLow
     

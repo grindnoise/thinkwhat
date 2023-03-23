@@ -433,3 +433,6 @@
 "new_poll_survey_choice_delete_notification" = "The survey must contain at least two possible answers";
 "new_poll_survey_images" = "Images";
 "new_poll_survey_image_add" = "Add image";
+"new_poll_survey_image_placeholder" = "Add details (optional)";
+"new_poll_survey_hyperlink" = "Hyperlink";
+"new_poll_survey_hyperlink_placeholder" = "Add hyperlink (optional)";

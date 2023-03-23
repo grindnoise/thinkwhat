@@ -13,25 +13,10 @@ class NewPollImageCell: UICollectionViewCell {
   
   // MARK: - Public properties
   ///**Logic**
-  public var order: Int! {
-    didSet {
-      guard !item.isNil else { return }
-      
-      imageView.image = UIImage(systemName: "\(order + 1).circle.fill")
-      
-      guard let toolBar = textView.inputAccessoryView as? UIToolbar else { return }
-      
-      toolBar.tintColor = Colors.getColor(forId: order)
-    }
-  }
   public var item: NewPollImage! {
     didSet {
       guard !item.isNil else { return }
-      
-#if DEBUG
-      print(item.image)
-#endif
-      
+
       setupUI()
     }
   }
@@ -44,6 +29,14 @@ class NewPollImageCell: UICollectionViewCell {
   public var maxLength: Int = 0
   public var isMovingToParent = false
   public var isKeyboardOnScreen: Bool = false
+  public var font: UIFont!
+  public var color: UIColor = .systemGray4 {
+    didSet {
+      guard oldValue != color else { return }
+      
+      textView.tintColor = color
+    }
+  }
   
   
   
@@ -52,15 +45,15 @@ class NewPollImageCell: UICollectionViewCell {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
-  private let lineSpacing: CGFloat = 4
   private let padding: CGFloat = 8
-  private var color: UIColor { order.isNil ? .systemGray4 : Colors.getColor(forId: order) }
   private lazy var imageView: UIImageView = {
-    let instance = UIImageView(image: UIImage(systemName: "\(order + 1).circle.fill"))
+    let instance = UIImageView()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
-    instance.heightAnchor.constraint(equalToConstant: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!.pointSize + lineSpacing/2).isActive = true
-    instance.tintColor = .systemGray4
+    instance.backgroundColor = .systemGray4
     instance.contentMode = .scaleAspectFit
+//    instance.publisher(for: \.bounds)
+//      .sink { instance.cornerRadius = $0.width*0.05 }
+//      .store(in: &subscriptions)
     
     return instance
   }()
@@ -68,6 +61,7 @@ class NewPollImageCell: UICollectionViewCell {
     let instance = UITextView()
     instance.textContainerInset = .uniform(size: padding)
     instance.delegate = self
+    instance.font = font
     instance.isUserInteractionEnabled = true
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.isEditable = true
@@ -83,32 +77,35 @@ class NewPollImageCell: UICollectionViewCell {
     toolBar.barStyle = .default
     toolBar.tintColor = .red//Colors.getColor(forId: order)
     instance.inputAccessoryView = toolBar
-    instance.attributedText = NSAttributedString(string: "", attributes: attributes())
     instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.width*0.05 }
+      .sink { [unowned self] in instance.cornerRadius = $0.width*0.05; self.imageView.cornerRadius = instance.cornerRadius }
       .store(in: &subscriptions)
-    
-    let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
-    constraint.identifier = "height"
-    constraint.isActive = true
-    
-    observers.append(instance.observe(\.contentSize, options: .new) { [weak self] _, change in
-      guard let self = self,
-            let value = change.newValue,
-            constraint.constant != value.height
-      else { return }
-
-      UIView.animate(withDuration: 0.3) {
-        self.setNeedsLayout()
-        constraint.constant = value.height <= self.minHeight ? self.minHeight : value.height
-        self.layoutIfNeeded()
-      }
-      self.boundsPublisher.send(.zero)
-    })
     
     return instance
   }()
+  private lazy var stack: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [
+      imageView,
+      textView
+    ])
+    instance.spacing = padding*2
+    instance.axis = .horizontal
     
+    return instance
+  }()
+  private lazy var placeholder: UILabel = {
+    let instance = UILabel()
+    instance.numberOfLines = 10
+    instance.font = font
+    instance.text = "new_poll_survey_image_placeholder".localized
+    instance.textColor = .secondaryLabel
+    instance.textAlignment = .center
+    instance.isUserInteractionEnabled = true
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+    
+    return instance
+  }()
+  
   
   
   // MARK: - Destructor
@@ -178,16 +175,34 @@ class NewPollImageCell: UICollectionViewCell {
 private extension NewPollImageCell {
   @MainActor
   func setupUI() {
-    let inset = padding + lineSpacing/2
     backgroundColor = .clear
-    textView.place(inside: contentView, bottomPriority: .defaultLow)
-    textView.attributedText = NSAttributedString(string: "item.text", attributes: attributes())
-    imageView.placeTopLeading(inside: contentView, leadingInset: inset, topInset: inset)
+    
+    imageView.image = item.image
+    
+//    contentView.translatesAutoresizingMaskIntoConstraints = false
+//    contentView.heightAnchor.constraint(equalToConstant: minHeight).isActive = true
+//
+    stack.place(inside: contentView, bottomPriority: .defaultLow)
+    stack.heightAnchor.constraint(equalToConstant: minHeight).isActive = true
+    
+//
+//    stack.translatesAutoresizingMaskIntoConstraints = false
+//    stack.place(inside: contentView, insets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: <#T##CGFloat#>))
+    
+//    addSubview(stack)
+//    stack.translatesAutoresizingMaskIntoConstraints = false
+//    NSLayoutConstraint.activate([
+//      stack.topAnchor.constraint(equalTo: <#T##NSLayoutAnchor<NSLayoutYAxisAnchor>#>)
+//    ])
+    
+    guard item.text.isEmpty else { return }
+    
+    placeholder.placeInCenter(of: textView, leadingInset: padding, trailingInset: padding)
   }
   
   @objc
   func handleTap() {
-    present()
+    textView.becomeFirstResponder()
   }
   
   @objc
@@ -214,35 +229,19 @@ private extension NewPollImageCell {
     line.layer.lineWidth = lineWidth
     line.layer.path = line.path.cgPath
   }
-  
-  func attributes() -> [NSAttributedString.Key: Any] {
-    let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
-    let paragraphStyle = NSMutableParagraphStyle()
-    paragraphStyle.firstLineHeadIndent = font!.pointSize + padding + lineSpacing
-    paragraphStyle.lineSpacing = lineSpacing
-    if #available(iOS 15.0, *) {
-      paragraphStyle.usesDefaultHyphenation = true
-    } else {
-      paragraphStyle.hyphenationFactor = 1
-    }
-    
-    return [
-      .font: font as Any,
-      .foregroundColor: UIColor.label,
-      .paragraphStyle: paragraphStyle
-    ]
-  }
 }
 
 extension NewPollImageCell: UITextViewDelegate {
   func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-    guard !isKeyboardOnScreen else { return false }
-        
-    UIView.animate(withDuration: 0.2) { [weak self] in
+    UIView.animate(withDuration: 0.2, animations: { [weak self] in
       guard let self = self else { return }
-
-      self.imageView.tintColor = self.color
-      textView.backgroundColor = self.color.withAlphaComponent(0.2)
+      
+      self.placeholder.alpha = 0
+      self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
+    }) { [weak self] _ in
+      guard let self = self else { return }
+      
+      self.placeholder.removeFromSuperview()
     }
     
     return true
@@ -274,9 +273,19 @@ extension NewPollImageCell: UITextViewDelegate {
       
       return false
     }
+    
+    if textView.text.isEmpty {
+      placeholder.placeInCenter(of: textView, leadingInset: padding, trailingInset: padding)
+    }
+    
     UIView.animate(withDuration: 0.2) { [unowned self] in
       textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
       self.imageView.tintColor = .systemGray4
+      
+      if textView.text.isEmpty {
+        self.placeholder.alpha = 1
+        self.placeholder.transform = .identity
+      }
     }//.systemGray4.withAlphaComponent(0.2) }
     return true
   }

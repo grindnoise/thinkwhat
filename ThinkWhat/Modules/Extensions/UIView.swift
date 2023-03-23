@@ -380,6 +380,19 @@ extension UIView {
     bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: -topInset).isActive = true
   }
   
+  func placeInCenter(of parent: UIView,
+                     leadingInset: CGFloat,
+                     trailingInset: CGFloat) {
+    parent.addSubview(self)
+    translatesAutoresizingMaskIntoConstraints = false
+    
+    centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
+    heightAnchor.constraint(equalTo: parent.heightAnchor).isActive = true
+//    bottomAnchor.constraint(equalTo: parent.bottomAnchor).isActive = true
+    leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: leadingInset).isActive = true
+    trailingAnchor.constraint(equalTo: parent.trailingAnchor, constant: -trailingInset).isActive = true
+  }
+  
   @discardableResult
   func placeInCenter(of parent: UIView,
                      heightMultiplier: CGFloat = .zero) -> [NSLayoutConstraint] {
@@ -434,6 +447,18 @@ extension UIView {
       return
     }
     centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
+  }
+  
+  func placeLeadingV2(inside parent: UIView,
+                    leadingInset: CGFloat = .zero,
+                    topInset: CGFloat = .zero,
+                    bottomInset: CGFloat = .zero) {
+    parent.addSubview(self)
+    translatesAutoresizingMaskIntoConstraints = false
+    
+    leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: leadingInset).isActive = true
+    topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
+    bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: bottomInset).isActive = true
   }
   
   @discardableResult
