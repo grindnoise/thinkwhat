@@ -97,7 +97,7 @@ class NewPollImageCell: UICollectionViewCell {
     let instance = UILabel()
     instance.numberOfLines = 10
     instance.font = font
-    instance.text = "new_poll_survey_image_placeholder".localized
+    instance.text = "new_poll_image_placeholder".localized
     instance.textColor = .secondaryLabel
     instance.textAlignment = .center
     instance.isUserInteractionEnabled = true

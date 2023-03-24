@@ -54,7 +54,7 @@ class NewPollChoicesCell: UICollectionViewCell {
         self.imageView.tintColor = self.color
       }
       
-      button.setAttributedTitle(NSAttributedString(string: "new_poll_survey_choice_add".localized,
+      button.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
                                                      attributes: [
                                                       .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
                                                       .foregroundColor: topicColor as Any
@@ -70,13 +70,6 @@ class NewPollChoicesCell: UICollectionViewCell {
       }, forKey: "completion")
       
       fgLine.layer.strokeColor = color.cgColor
-    }
-  }
-  public var labelText: String! {
-    didSet {
-      guard !stage.isNil else { return }
-      
-      label.text = labelText
     }
   }
   
@@ -127,7 +120,7 @@ class NewPollChoicesCell: UICollectionViewCell {
     return instance
   }()
   private lazy var imageView: UIImageView = {
-    let instance = UIImageView(image: UIImage(systemName: "\(stage.rawValue + 1).circle.fill"))
+    let instance = UIImageView(image: stage.numImage)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: contentView.bounds.width,
                                                                     font: label.font)*1.5).isActive = true
@@ -140,7 +133,7 @@ class NewPollChoicesCell: UICollectionViewCell {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
-    instance.text = labelText.uppercased()
+    instance.text = stage.title.uppercased()
     
     return instance
   }()
@@ -173,7 +166,7 @@ class NewPollChoicesCell: UICollectionViewCell {
   }()
   private lazy var button: UIButton = {
     let instance = UIButton()
-    instance.setAttributedTitle(NSAttributedString(string: "new_poll_survey_choice_add".localized,
+    instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
                                                    attributes: [
                                                     .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
                                                     .foregroundColor: topicColor as Any
@@ -185,7 +178,7 @@ class NewPollChoicesCell: UICollectionViewCell {
   }()
   private lazy var nextButton: UIButton = {
     let instance = UIButton()
-    instance.setAttributedTitle(NSAttributedString(string: "new_poll_survey_choice_next".localized,
+    instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_next".localized,
                                                    attributes: [
                                                     .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
                                                     .foregroundColor: topicColor as Any

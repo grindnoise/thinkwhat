@@ -65,13 +65,13 @@ class NewPollTopicCell: UICollectionViewCell {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
-  private lazy var tagCapsule: TagCapsule = { TagCapsule(text: stage.title().uppercased(),
+  private lazy var tagCapsule: TagCapsule = { TagCapsule(text: stage.title.uppercased(),
                                                          padding: 4,
                                                          color: Colors.Logo.Flame.rawValue,
                                                          font: UIFont(name: Fonts.Bold, size: 20)!,
                                                          iconCategory: .Logo) }()
   private lazy var imageView: UIImageView = {
-    let instance = UIImageView(image: UIImage(systemName: "\(stage.rawValue + 1).circle.fill"))
+    let instance = UIImageView(image: stage.numImage)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: contentView.bounds.width,
                                                                     font: label.font)*1.5).isActive = true
@@ -84,7 +84,7 @@ class NewPollTopicCell: UICollectionViewCell {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
-    instance.text = "new_poll_survey_topic".localized.uppercased()
+    instance.text = "new_poll_topic".localized.uppercased()
     
     return instance
   }()
@@ -160,7 +160,7 @@ class NewPollTopicCell: UICollectionViewCell {
       guard let self = self else { return }
       
       let banner = NewPopup(padding: self.padding*2,
-                            contentPadding: .uniform(size: self.padding*2))
+                            contentPadding: .uniform(size: self.padding))
       let content = TopicSelectionPopupContent(mode: self.topic.isNil ? .ForceSelect : .Default,
                                                color: Colors.Logo.Flame.rawValue)
       content.topicPublisher

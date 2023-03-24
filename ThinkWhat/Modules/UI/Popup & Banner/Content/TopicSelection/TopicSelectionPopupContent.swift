@@ -75,7 +75,7 @@ class TopicSelectionPopupContent: UIView {
     
     return instance
   }()
-  private lazy var tagCapsule: TagCapsule = { TagCapsule(text: "new_poll_survey_topic".localized.uppercased(),
+  private lazy var tagCapsule: TagCapsule = { TagCapsule(text: "new_poll_topic".localized.uppercased(),
                                                          padding: 4,
                                                          color: Colors.Logo.Flame.rawValue,
                                                          font: UIFont(name: Fonts.Bold, size: 20)!,
@@ -83,7 +83,7 @@ class TopicSelectionPopupContent: UIView {
   private lazy var label: UIStackView = {
     let label = InsetLabel()
     label.font = UIFont(name: Fonts.Bold, size: 20)//.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title2)
-    label.text = "new_poll_survey_topic".localized.uppercased()
+    label.text = "new_poll_topic".localized.uppercased()
     label.textColor = .white
     label.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
 
@@ -115,6 +115,7 @@ class TopicSelectionPopupContent: UIView {
   }()
   private lazy var collectionView: TopicsCollectionView = {
     let instance = TopicsCollectionView(mode: .Selection)
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : .secondarySystemBackground
     let constraint = instance.heightAnchor.constraint(equalToConstant: 10)
     constraint.isActive = true
     instance.publisher(for: \.contentSize)
@@ -127,6 +128,9 @@ class TopicSelectionPopupContent: UIView {
       .store(in: &subscriptions)
     instance.topicSelected
       .sink { [unowned self] in self.topic = $0}
+      .store(in: &subscriptions)
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.width*0.05 }
       .store(in: &subscriptions)
     
     return instance

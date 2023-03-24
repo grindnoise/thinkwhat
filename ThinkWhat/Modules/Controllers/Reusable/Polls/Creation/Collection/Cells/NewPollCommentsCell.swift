@@ -1,15 +1,15 @@
 //
-//  NewPollHyperlinkCell.swift
+//  NewPollCommentsCell.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 23.03.2023.
+//  Created by Pavel Bukharov on 24.03.2023.
 //  Copyright © 2023 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 import Combine
 
-class NewPollHyperlinkCell: UICollectionViewCell {
+class NewPollCommentsCell: UICollectionViewCell {
   
   // MARK: - Public properties
   ///**Logic**
@@ -17,25 +17,14 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     didSet {
       guard !stage.isNil else { return }
       
-//      setupUI()
+      setupUI()
     }
   }
   public var stageGlobal: NewPollController.Stage!
-  public var isKeyboardOnScreen: Bool = false
   ///**UI**
-  public var font: UIFont! {
-    didSet {
-      guard !stage.isNil else { return }
-      
-      textField.font = font
-    }
-  }
-  public var minHeight: CGFloat = 0
   public var color = UIColor.systemGray4 {
     didSet {
       guard oldValue != color else { return }
-      
-      textField.tintColor = color
       
       UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
@@ -58,16 +47,9 @@ class NewPollHyperlinkCell: UICollectionViewCell {
       fgLine.layer.strokeColor = color.cgColor
     }
   }
-  public var isMovingToParent = false
   ///**Publishers**
   @Published public private(set) var isAnimationComplete: Bool?
-  @Published public var text: String! {
-    didSet {
-      guard !text.isNil else { return }
-      
-      setupUI()
-    }
-  }
+  @Published public var commentsEnabled: Bool!
   public private(set) var boundsPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
@@ -94,6 +76,15 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     
     return instance
   }()
+  private lazy var descriptionLabel: UILabel = {
+    let instance = UILabel()
+//    instance.alpha = 1
+    instance.textColor = commentsEnabled.isNil ? color : .label
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.text = commentsEnabled.isNil ? "new_poll_comments_placeholder".localized : commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
+    
+    return instance
+  }()
   private lazy var stageStack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [imageView, label])
     instance.spacing = 4
@@ -101,12 +92,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     instance.alignment = .center
     instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: contentView.bounds.width,
                                                                     font: label.font)*1.5).isActive = true
-//    instance.publisher(for: \.bounds)
-//      .sink {
-//        print($0)
-//      }
-//      .store(in: &subscriptions)
-    
+
     return instance
   }()
   private lazy var fgLine: Line = {
@@ -121,48 +107,14 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var textField: UnderlinedSignTextField = {
-    let instance = UnderlinedSignTextField()
-    instance.delegate = self
-    instance.backgroundColor = .clear
-    instance.font = font
-    instance.clipsToBounds = false
-//    instance.attributedPlaceholder = NSAttributedString(string: "new_poll_survey_hyperlink_placeholder".localized,
-//                                                        attributes: [
-//                                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any,
-//                                                          .foregroundColor: UIColor.systemGray4
-//                                                        ])
-    instance.textColor = .label
-//    instance.publisher(for: \.bounds)
-//      .sink { instance.cornerRadius = $0.width*0.05 }
-//      .store(in: &subscriptions)
-    
-    return instance
-  }()
   private lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
-      UIView.horizontalSpacer(padding*2),
-      textField,
-      UIView.horizontalSpacer(padding)
+      commentsOnIcon,
+      commentsOffIcon
     ])
-    instance.clipsToBounds = false
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.axis = .horizontal
-    instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.width*0.05 }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
-  private lazy var placeholder: UILabel = {
-    let instance = UILabel()
-    instance.numberOfLines = 1
-    instance.font = font
-    instance.text = stage.placeholder
-    instance.textColor = .secondaryLabel
-    instance.textAlignment = .center
-    instance.isUserInteractionEnabled = true
-    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+    instance.distribution = .fillEqually
+    instance.spacing = 35
     
     return instance
   }()
@@ -178,19 +130,35 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var buttonsStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      nextButton
-    ])
-    instance.axis = .horizontal
+  private lazy var buttonsStack: UIStackView = { UIStackView(arrangedSubviews: [nextButton]) }()
+  private lazy var commentsOnIcon: Icon = {
+    let instance = Icon(category: .Comments)
+    instance.iconColor = commentsEnabled.isNil ? color : .systemGray
+    instance.isRounded = false
+    instance.clipsToBounds = false
+    instance.scaleMultiplicator = 1
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+    instance.heightAnchor.constraint(equalToConstant: 70).isActive = true
+    instance.isUserInteractionEnabled = true
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     
     return instance
   }()
-  private var openedConstraint: NSLayoutConstraint!
-  private var closedConstraint: NSLayoutConstraint!
-  
-  
+  private lazy var commentsOffIcon: Icon = {
+    let instance = Icon(category: .CommentsDisabled)
+    instance.iconColor = commentsEnabled.isNil ? color : .systemGray
+    instance.isRounded = false
+    instance.clipsToBounds = false
+    instance.scaleMultiplicator = 1
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+    instance.isUserInteractionEnabled = true
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     
+    return instance
+  }()
+  
+  
+  
   // MARK: - Destructor
   deinit {
     observers.forEach { $0.invalidate() }
@@ -215,15 +183,12 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
 
-    guard !textField.isFirstResponder else { return }
-    
-    textField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
   }
   
   override func prepareForReuse() {
     super.prepareForReuse()
     
-    boundsPublisher = PassthroughSubject<Void, Never>()
+    
   }
   
   override func layoutSubviews() {
@@ -234,7 +199,9 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   }
   
   // MARK: - Public methods
-//  func present(seconds: Double = .zero) {
+  func present(seconds: Double = .zero) {
+    commentsOnIcon.setIconColor(UIColor.systemGray)
+    commentsOffIcon.setIconColor(UIColor.systemGray)
 //    textView.becomeFirstResponder()
 //
 //    UIView.animate(withDuration: 0.2, animations: { [weak self] in
@@ -253,45 +220,39 @@ class NewPollHyperlinkCell: UICollectionViewCell {
 //
 //      self.textView.becomeFirstResponder()
 //    }
-//  }
+  }
 }
 
 // MARK: - Private
-private extension NewPollHyperlinkCell {
+private extension NewPollCommentsCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
     stageStack.placeTopLeading(inside: self,
                                leadingInset: 8,
                                topInset: -2)
+
     addSubview(stack)
     addSubview(buttonsStack)
+    addSubview(descriptionLabel)
     stack.translatesAutoresizingMaskIntoConstraints = false
     buttonsStack.translatesAutoresizingMaskIntoConstraints = false
+    descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      stack.heightAnchor.constraint(equalToConstant: minHeight),
       stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
-      stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
-      stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      buttonsStack.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding),
+      stack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      descriptionLabel.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*2),
+      descriptionLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding),
       buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
     ])
     
-    openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
-    openedConstraint.isActive = true
-    openedConstraint.priority = .defaultLow
-    
-    closedConstraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
-    closedConstraint.priority = .defaultLow
+    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    constraint.isActive = true
+    constraint.priority = .defaultLow
     
     layer.insertSublayer(bgLine.layer, at: 0)
     layer.insertSublayer(fgLine.layer, at: 1)
-//    setNeedsLayout()
-//    layoutIfNeeded()
-//    print(stack.frame.size)
-//    placeholder.placeInCenter(of: stack)
-    placeholder.placeInCenter(of: stack, leadingInset: padding, trailingInset: padding)
-//    print(placeholder.frame.size)
   }
   
   func drawLine(line: Line,
@@ -316,20 +277,74 @@ private extension NewPollHyperlinkCell {
   }
   
   @objc
-  func hideKeyboard() {
-    endEditing(true)
-  }
-  
-  @objc
-  func handleTap() {
-    textField.becomeFirstResponder()
+  func handleTap(recognizer: UITapGestureRecognizer) {
+//    guard !commentsEnabled.isNil else { return }
+//    guard stageGlobal == .Ready || stage == stageGlobal else { return }
+    
+    guard let v = recognizer.view else { return }
+    if let icon = v as? Icon {
+        let selectedIcon: Icon! = icon == commentsOnIcon ? commentsOnIcon : commentsOffIcon
+        let deselectedIcon: Icon! = icon != commentsOnIcon ? commentsOnIcon : commentsOffIcon
+        
+      if !commentsEnabled.isNil {
+        if commentsEnabled && icon == commentsOnIcon || !commentsEnabled && icon == commentsOffIcon {
+          return
+        }
+      }
+        
+        let enableAnim  = Animations.get(property: .FillColor,
+                                         fromValue: selectedIcon.iconColor.cgColor,
+                                         toValue: color.cgColor,
+                                         duration: 0.3,
+                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                         delegate: nil,
+                                         isRemovedOnCompletion: true)
+        let disableAnim = Animations.get(property: .FillColor,
+                                         fromValue: deselectedIcon.iconColor.cgColor,
+                                         toValue: UIColor.systemGray.cgColor,
+                                         duration: 0.3,
+                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                         delegate: nil,
+                                         isRemovedOnCompletion: true)
+        
+        selectedIcon.icon.add(enableAnim, forKey: nil)
+        (selectedIcon.icon as! CAShapeLayer).fillColor = color.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
+        deselectedIcon.icon.add(disableAnim, forKey: nil)
+        (deselectedIcon.icon as! CAShapeLayer).fillColor = UIColor.systemGray.cgColor
+        
+        UIView.animate(
+            withDuration: 0.3,
+            delay: 0,
+            usingSpringWithDamping: 0.55,
+            initialSpringVelocity: 2.5,
+            options: [.curveEaseInOut],
+            animations: {
+                selectedIcon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            }) { _ in }
+      
+      if commentsEnabled.isNil {
+        commentsEnabled = selectedIcon == commentsOnIcon
+      } else {
+        commentsEnabled = !commentsEnabled
+      }
+      
+      UIView.transition(with: descriptionLabel, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+        guard let self = self else { return }
+        
+        self.descriptionLabel.textColor = .label
+        self.descriptionLabel.text = self.commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
+      } completion: { _ in }
+        
+        deselectedIcon.icon.add(disableAnim, forKey: nil)
+        UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
+            deselectedIcon.transform = .identity
+        })
+    }
   }
   
   @objc
   func nextStage() {
-//    buttonsStack.removeArrangedSubview(nextButton)
-    closedConstraint.isActive = true
-    openedConstraint.isActive = false
+    buttonsStack.removeArrangedSubview(nextButton)
     boundsPublisher.send()
     nextButton.removeFromSuperview()
     
@@ -341,72 +356,10 @@ private extension NewPollHyperlinkCell {
   }
 }
 
-extension NewPollHyperlinkCell: CAAnimationDelegate {
+extension NewPollCommentsCell: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
     guard flag, let completion = anim.value(forKey: "completion") as? Closure else { return }
     
     completion()
   }
 }
-
-extension NewPollHyperlinkCell: UITextFieldDelegate {
-  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    textField.resignFirstResponder()
-  }
-  
-  func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-    guard let textField = textField as? UnderlinedSignTextField ,
-          stageGlobal == .Ready || stage == stageGlobal
-    else { return false }
-    
-    textField.hideSign()
-    
-    UIView.animate(withDuration: 0.2, animations: { [weak self] in
-      guard let self = self else { return }
-      
-      self.placeholder.alpha = 0
-      self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
-    }) { [weak self] _ in
-      guard let self = self else { return }
-      
-      self.placeholder.removeFromSuperview()
-    }
-    
-    return true
-  }
-
-  func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-    guard let textField = textField as? UnderlinedSignTextField,
-          let text = textField.text
-    else { return true }
-    
-    guard !isMovingToParent else {
-      return true
-    }
-
-    if !text.isEmpty, !text.isValidURL {
-      stack.clipsToBounds = false
-      textField.showSign(state: .InvalidHyperlink)
-    }
-    
-    if textField.text!.isEmpty {
-      placeholder.placeInCenter(of: textField, leadingInset: padding, trailingInset: padding)
-      UIView.animate(withDuration: 0.2) { [unowned self] in
-        //      textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        self.placeholder.alpha = 1
-        self.placeholder.transform = .identity
-      }
-    }
-      
-    return true
-  }
-
-  func textFieldDidEndEditing(_ textField: UITextField) {
-    guard let text = textField.text,
-          !text.isEmpty
-    else { return }
-
-    self.text = text
-  }
-}
-

@@ -73,7 +73,7 @@ class NewPollCollectionView: UICollectionView {
       self.stage = stage
     }
   }
-    @Published public private(set) var choices: [NewPollChoice] = (0...0).map { NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: $0 + 1)) }
+    @Published public private(set) var choices: [NewPollChoice] = (0...0).map { NewPollChoice(text: "new_poll_choice_placeholder".localized + String(describing: $0 + 1)) }
 //  @Published public private(set) var choices: [NewPollChoice] = (0...1).map { NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: $0 + 1)) } {
 //    didSet {
 //      guard oldValue.isNil,
@@ -96,6 +96,17 @@ class NewPollCollectionView: UICollectionView {
       self.stage = stage
     }
   }
+  @Published public private(set) var commentsEnabled: Bool? //{
+//    didSet {
+//      guard oldValue.isNil,
+//            commentsEnabled != oldValue,
+//            stage.rawValue <= NewPollController.Stage.Comments.rawValue,
+//            let stage = stage.next()
+//      else { return }
+//
+//      self.stage = stage
+//    }
+//  }
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -190,16 +201,12 @@ private extension NewPollCollectionView {
       
       guard self.stage == .Topic else { return }
       
-//      cell.present(seconds: 0.5)
+      cell.present(seconds: 0.5)
     }
     
     let titleCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.textAlignment = .center
       cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
-      cell.placeholderText = "new_poll_survey_enter_title".localized
-      cell.labelText = "new_poll_survey_title".localized
-      cell.minLength = ModelProperties.shared.surveyTitleMinLength
-      cell.maxLength = ModelProperties.shared.surveyTitleMaxLength
       cell.minHeight = 0//60
       cell.stageGlobal = self.stage
       cell.stage = .Title
@@ -263,11 +270,6 @@ private extension NewPollCollectionView {
     let descriptionCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.textAlignment = .natural
       cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
-      cell.placeholderText = "new_poll_survey_enter_description".localized
-      cell.labelText = "new_poll_survey_description".localized
-      cell.minHeight = 0//100
-      cell.minLength = ModelProperties.shared.surveyDescriptionMinLength
-      cell.maxLength = ModelProperties.shared.surveyDescriptionMaxLength
       cell.stage = .Description
       cell.stageGlobal = self.stage
       cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
@@ -331,10 +333,6 @@ private extension NewPollCollectionView {
     let questionCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.textAlignment = .natural
       cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
-      cell.placeholderText = "new_poll_survey_enter_question".localized
-      cell.labelText = "new_poll_survey_question".localized
-      cell.minLength = ModelProperties.shared.surveyQuestionMinLength
-      cell.maxLength = ModelProperties.shared.surveyQuestionMaxLength
       cell.minHeight = 0//60
       cell.stage = .Question
       cell.stageGlobal = self.stage
@@ -397,7 +395,6 @@ private extension NewPollCollectionView {
     }
     
     let choicesCellRegistration = UICollectionView.CellRegistration<NewPollChoicesCell, AnyHashable> { [unowned self] cell, _, _ in
-      cell.labelText = "new_poll_survey_choices".localized
       cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
       cell.stage = .Choices
       cell.stageGlobal = self.stage
@@ -489,7 +486,6 @@ private extension NewPollCollectionView {
     }
     
     let imagesCellRegistration = UICollectionView.CellRegistration<NewPollImagesCell, AnyHashable> { [unowned self] cell, _, _ in
-      cell.labelText = "new_poll_survey_images".localized
       cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
       cell.stage = .Images
       cell.stageGlobal = self.stage
@@ -503,11 +499,6 @@ private extension NewPollCollectionView {
         .filter { !$0.isNil }
         .sink { [unowned self] in self.images.remove(object: $0!) }
         .store(in: &self.subscriptions)
-//      self.$topic
-//        .filter { !$0.isNil }
-//        .receive(on: DispatchQueue.main)
-//        .sink { cell.topicColor = $0!.tagColor }
-//        .store(in: &self.subscriptions)
       self.$images
         .receive(on: DispatchQueue.main)
         .sink { cell.update($0) }
@@ -532,7 +523,7 @@ private extension NewPollCollectionView {
       cell.$isAnimationComplete
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stageAnimationFinished = .Choices }
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Images; self.stage = .Hyperlink }
         .store(in: &self.subscriptions)
       cell.boundsPublisher
         .eraseToAnyPublisher()
@@ -549,63 +540,47 @@ private extension NewPollCollectionView {
         .filter { $0 == .Choices }
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor }
-        .store(in: &self.subscriptions)
-//      self.$stage
-//        .filter { $0 == .Choices }
-//        .filter { _ in cell.text.isNil || cell.text.isEmpty }
-//        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
-//        .sink { _ in cell.present() }
-//        .store(in: &self.subscriptions)
-    }
+        .store(in: &self.subscriptions)    }
     
     let hyperlinkCellRegistration = UICollectionView.CellRegistration<NewPollHyperlinkCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.color = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
-      cell.labelText = "new_poll_survey_hyperlink".localized
-//      cell.minLength = ModelProperties.shared.surveyQuestionMinLength
-//      cell.maxLength = ModelProperties.shared.surveyQuestionMaxLength
       cell.minHeight = 40
       cell.stage = .Hyperlink
       cell.stageGlobal = self.stage
       cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
       cell.text = self.hyperlink
-//      self.$topic
-//        .filter { !$0.isNil }
-//        .receive(on: DispatchQueue.main)
-//        .sink { cell.color = $0!.tagColor }
-//        .store(in: &self.subscriptions)
-//      self.$stage
-//        .sink { cell.stageGlobal = $0 }
-//        .store(in: &self.subscriptions)
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
 //      self.$isKeyboardOnScreen
 //        .receive(on: DispatchQueue.main)
 //        .sink { cell.isKeyboardOnScreen = $0 }
 //        .store(in: &self.subscriptions)
-//      self.$topic
-//        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Hyperlink.rawValue }
-//        .receive(on: DispatchQueue.main)
-//        .sink { cell.color = $0!.tagColor }
-//        .store(in: &self.subscriptions)
-//      self.$isMovingToParent
-//        .filter { !$0.isNil }
-//        .receive(on: DispatchQueue.main)
-//        .sink { cell.isMovingToParent = $0! }
-//        .store(in: &self.subscriptions)
-//      cell.$text
-//        .filter { !$0.isNil }
-//        .receive(on: DispatchQueue.main)
-//        .sink { [unowned self] in self.question = $0 }
-//        .store(in: &self.subscriptions)
-//      cell.$isAnimationComplete
-//        .filter { !$0.isNil }
-//        .receive(on: DispatchQueue.main)
-//        .sink { [unowned self] _ in self.stageAnimationFinished = .Hyperlink }
-//        .store(in: &self.subscriptions)
-//      cell.boundsPublisher
-//        .eraseToAnyPublisher()
-//        .receive(on: DispatchQueue.main)
-//        .sink { [unowned self] _ in
-//          self.source.refresh() }
-//        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Hyperlink.rawValue }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$isMovingToParent
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isMovingToParent = $0! }
+        .store(in: &self.subscriptions)
+      cell.$text
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.hyperlink = $0! }
+        .store(in: &self.subscriptions)
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Hyperlink }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.source.refresh() }
+        .store(in: &self.subscriptions)
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
       cell.backgroundConfiguration = config
@@ -622,6 +597,48 @@ private extension NewPollCollectionView {
 //        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
 //        .sink { _ in cell.present() }
 //        .store(in: &self.subscriptions)
+    }
+    
+    let commentsCellRegistration = UICollectionView.CellRegistration<NewPollCommentsCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.color = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
+      cell.stage = .Comments
+      cell.stageGlobal = self.stage
+      if !self.commentsEnabled.isNil {
+        cell.commentsEnabled = self.commentsEnabled!
+      }
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Hyperlink.rawValue }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      cell.$commentsEnabled
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.commentsEnabled = $0! }
+        .store(in: &self.subscriptions)
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Comments }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.source.refresh() }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.$stageAnimationFinished
+        .filter { $0 == .Images }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
     }
     
     source = Source(collectionView: self) { collectionView, indexPath, identifier -> UICollectionViewCell? in
@@ -655,6 +672,10 @@ private extension NewPollCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: hyperlinkCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
+      } else if section == .Comments {
+        return collectionView.dequeueConfiguredReusableCell(using: commentsCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
       }
       return UICollectionViewCell()
     }
@@ -666,7 +687,8 @@ private extension NewPollCollectionView {
                              .Question,
                              .Choices,
                              .Images,
-                             .Hyperlink])
+                             .Hyperlink,
+                             .Comments])
     snapshot.appendItems([0], toSection: .Topic)
     snapshot.appendItems([1], toSection: .Title)
     snapshot.appendItems([2], toSection: .Description)
@@ -674,6 +696,7 @@ private extension NewPollCollectionView {
     snapshot.appendItems([4], toSection: .Choices)
     snapshot.appendItems([5], toSection: .Images)
     snapshot.appendItems([6], toSection: .Hyperlink)
+    snapshot.appendItems([7], toSection: .Comments)
     source.apply(snapshot, animatingDifferences: false)
   }
   
@@ -746,7 +769,7 @@ private extension NewPollCollectionView {
 //    //        snapshot.appendItems([8], toSection: .comments)
 //  }
   func addChoice() {
-    choices.append(NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: choices.count + 1)))
+    choices.append(NewPollChoice(text: "new_poll_choice_placeholder".localized + String(describing: choices.count + 1)))
   }
 }
 

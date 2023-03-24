@@ -13,14 +13,55 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
   
   ///Sequence of stages to post new survey
   enum Stage: Int, CaseIterable {
-    case Topic, Title, Description, Question, Choices, Images, Hyperlink, Comments, Limits, Hot, Ready
+    case Topic, Title, Description, Question, Choices, Images, Hyperlink, Comments, Anonimity, Limits, Hot, Ready
     
     func next() -> Stage? { Stage(rawValue: (self.rawValue + 1)) }
     
-    func title() -> String {
+    var numImage: UIImage { UIImage(systemName: "\(self.rawValue + 1).circle.fill") ?? UIImage() }
+    
+    var title: String {
       switch self {
-      case .Topic: return "new_poll_survey_topic".localized
+      case .Topic: return "new_poll_topic".localized
+      case .Title: return "new_poll_title".localized
+      case .Description: return "new_poll_description".localized
+      case .Question: return "new_poll_question".localized
+      case .Choices: return "new_poll_choices".localized
+      case .Hyperlink: return "new_poll_hyperlink".localized
+      case .Comments: return "new_poll_comments".localized
       default: return ""
+      }
+    }
+    
+    var placeholder: String {
+      switch self {
+      case .Title: return "new_poll_title_placeholder".localized
+      case .Description: return "new_poll_description_placeholder".localized
+      case .Question: return "new_poll_question_placeholder".localized
+      case .Choices: return "new_poll_question_placeholder".localized
+      case .Hyperlink: return "new_poll_hyperlink_placeholder".localized
+      case .Comments: return "new_poll_comments_placeholder".localized
+      default: return ""
+      }
+    }
+    
+    var minLength: Int {
+      switch self {
+      case .Title: return ModelProperties.shared.surveyTitleMinLength
+      case .Description: return ModelProperties.shared.surveyDescriptionMinLength
+      case .Question: return ModelProperties.shared.surveyQuestionMinLength
+      case .Choices: return ModelProperties.shared.surveyAnswerTitleMinLength
+      default: return 0
+      }
+    }
+      
+    var maxLength: Int {
+      switch self {
+      case .Title: return ModelProperties.shared.surveyTitleMaxLength
+      case .Description: return ModelProperties.shared.surveyDescriptionMaxLength
+      case .Question: return ModelProperties.shared.surveyQuestionMaxLength
+      case .Choices: return ModelProperties.shared.surveyAnswerTitleMaxLength
+        
+      default: return 0
       }
     }
     

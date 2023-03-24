@@ -135,6 +135,9 @@ class NewPollChoiceCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
 
+    guard !textView.isFirstResponder else { return }
+    
+    textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
   }
   
   override func prepareForReuse() {

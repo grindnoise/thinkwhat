@@ -23,22 +23,12 @@ class NewPollTextCell: UICollectionViewCell {
   public var stageGlobal: NewPollController.Stage!
   public var isKeyboardOnScreen: Bool = false
   ///**UI**
-  public var minLength: Int = 0
-  public var maxLength: Int = 0
   public var textAlignment: NSTextAlignment = .center
   public var font: UIFont! {
     didSet {
       guard !stage.isNil else { return }
       
       textView.font = font
-    }
-  }
-  public var placeholderText: String!
-  public var labelText: String! {
-    didSet {
-      guard !stage.isNil else { return }
-      
-      label.text = labelText.uppercased()
     }
   }
   public var minHeight: CGFloat = 0
@@ -107,7 +97,7 @@ class NewPollTextCell: UICollectionViewCell {
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var imageView: UIImageView = {
-    let instance = UIImageView(image: UIImage(systemName: "\(stage.rawValue + 1).circle.fill"))
+    let instance = UIImageView(image: stage.numImage)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: contentView.bounds.width,
                                                                     font: label.font)*1.5).isActive = true
@@ -120,7 +110,7 @@ class NewPollTextCell: UICollectionViewCell {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
-    instance.text = labelText.uppercased()
+    instance.text = stage.title.uppercased()
     
     return instance
   }()
@@ -158,7 +148,7 @@ class NewPollTextCell: UICollectionViewCell {
 //    instance.textContainerInset = .uniform(size: .zero)
     instance.isUserInteractionEnabled = true
 //    instance.isScrollEnabled = false
-    instance.backgroundColor = color.withAlphaComponent(0.2)
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.isEditable = true
     instance.isSelectable = true
     instance.font = font
@@ -224,7 +214,7 @@ class NewPollTextCell: UICollectionViewCell {
     let instance = UILabel()
     instance.numberOfLines = 10
     instance.font = font
-    instance.text = placeholderText
+    instance.text = stage.placeholder
     instance.textColor = .secondaryLabel
     instance.textAlignment = .center
     
@@ -255,6 +245,9 @@ class NewPollTextCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
 
+    guard !textView.isFirstResponder else { return }
+    
+    textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
   }
   
   override func prepareForReuse() {
@@ -399,9 +392,9 @@ extension NewPollTextCell: UITextViewDelegate {
       return true
     }
     
-    guard textView.text.count >= minLength else {
+    guard textView.text.count >= stage.minLength else {
       let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                            text: "new_poll_survey_min_text_length_error_begin".localized + String(describing: minLength) + "new_poll_survey_min_text_length_error_end".localized,
+                                                            text: "new_poll_survey_min_text_length_error_begin".localized + String(describing: stage.minLength) + "new_poll_survey_min_text_length_error_end".localized,
                                                             tintColor: .systemOrange,
                                                             fontName: Fonts.Semibold,
                                                             textStyle: .headline,
@@ -462,7 +455,7 @@ extension NewPollTextCell: UITextViewDelegate {
       guard let stringRange = Range(range, in: currentText) else { return false }
       let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
     
-    return updatedText.count <= maxLength
+    return updatedText.count <= stage.maxLength
   }
   
   func textViewDidEndEditing(_ textView: UITextView) {
