@@ -33,18 +33,16 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   public var minHeight: CGFloat = 0
   public var color = UIColor.systemGray4 {
     didSet {
-      guard oldValue != color else { return }
+      guard !text.isNil, oldValue != color else { return }
       
+      nextButton.tintColor = color
       textField.tintColor = color
+      fgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
       
       UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
         
         self.imageView.tintColor = self.color
-        
-        guard let imageView = self.contentView.getSubview(type: UIImageView.self, identifier: "imageView") else { return }
-        
-        imageView.tintColor = self.color
       }
       
       let colorAnim = CABasicAnimation(path: "strokeColor", fromValue: fgLine.layer.strokeColor, toValue: color.cgColor, duration: 0.4)
@@ -68,6 +66,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
       setupUI()
     }
   }
+  @Published public var skip: Bool!
   public private(set) var boundsPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
@@ -76,6 +75,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
+  private var touchLocation: CGPoint = .zero
   private lazy var imageView: UIImageView = {
     let instance = UIImageView(image: stage.numImage)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
@@ -101,11 +101,11 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     instance.alignment = .center
     instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: contentView.bounds.width,
                                                                     font: label.font)*1.5).isActive = true
-//    instance.publisher(for: \.bounds)
-//      .sink {
-//        print($0)
-//      }
-//      .store(in: &subscriptions)
+    //    instance.publisher(for: \.bounds)
+    //      .sink {
+    //        print($0)
+    //      }
+    //      .store(in: &subscriptions)
     
     return instance
   }()
@@ -127,29 +127,39 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     instance.backgroundColor = .clear
     instance.font = font
     instance.clipsToBounds = false
-//    instance.attributedPlaceholder = NSAttributedString(string: "new_poll_survey_hyperlink_placeholder".localized,
-//                                                        attributes: [
-//                                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any,
-//                                                          .foregroundColor: UIColor.systemGray4
-//                                                        ])
+    //    instance.attributedPlaceholder = NSAttributedString(string: "new_poll_survey_hyperlink_placeholder".localized,
+    //                                                        attributes: [
+    //                                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote) as Any,
+    //                                                          .foregroundColor: UIColor.systemGray4
+    //                                                        ])
     instance.textColor = .label
-//    instance.publisher(for: \.bounds)
-//      .sink { instance.cornerRadius = $0.width*0.05 }
-//      .store(in: &subscriptions)
+    //    instance.publisher(for: \.bounds)
+    //      .sink { instance.cornerRadius = $0.width*0.05 }
+    //      .store(in: &subscriptions)
     
     return instance
   }()
   private lazy var stack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      UIView.horizontalSpacer(padding*2),
-      textField,
-      UIView.horizontalSpacer(padding)
-    ])
-    instance.clipsToBounds = false
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    let instance = UIStackView()
+    instance.layer.insertSublayer(bgLayer, at: 0)
+    instance.layer.insertSublayer(fgLayer, at: 1)
+    instance.addArrangedSubview(UIView.horizontalSpacer(padding*2))
+    instance.addArrangedSubview(textField)
+    instance.addArrangedSubview(UIView.horizontalSpacer(padding))
+    //    instance.clipsToBounds = false
+//    instance.layer.masksToBounds = false
+//    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.axis = .horizontal
+    
     instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.width*0.05 }
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bgLayer.frame = $0
+        self.bgLayer.cornerRadius = $0.width*0.025
+        self.fgLayer.frame = $0
+        self.fgLayer.cornerRadius = $0.width*0.025
+      }
       .store(in: &subscriptions)
     
     return instance
@@ -166,28 +176,43 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var nextButton: UIButton = {
-    let instance = UIButton()
-    instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_next".localized,
-                                                   attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                    .foregroundColor: color as Any
-                                                   ]),
-                                for: .normal)
-    instance.addTarget(self, action: #selector(self.nextStage), for: .touchUpInside)
+  private lazy var nextButton: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "arrow.down.circle.fill"))
+    instance.isUserInteractionEnabled = true
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+    instance.contentMode = .scaleAspectFill
+    instance.tintColor = color
+    instance.alpha = 0
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.nextStage)))
+    
     
     return instance
   }()
   private lazy var buttonsStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      nextButton
-    ])
-    instance.axis = .horizontal
+    let instance = UIStackView(arrangedSubviews: [nextButton])
+    instance.spacing = padding
+    instance.axis = .vertical
+    instance.alignment = .center
+    instance.distribution = .fillEqually
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: font) + padding*2).isActive = true
     
     return instance
   }()
   private var openedConstraint: NSLayoutConstraint!
   private var closedConstraint: NSLayoutConstraint!
+  private lazy var bgLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+
+    return instance
+  }()
+  private lazy var fgLayer: CALayer = {
+    let instance = CAShapeLayer()
+    instance.opacity = 0
+    instance.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+    
+    return instance
+  }()
   
   
     
@@ -217,7 +242,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
 
     guard !textField.isFirstResponder else { return }
     
-    textField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    stack.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
   }
   
   override func prepareForReuse() {
@@ -233,27 +258,33 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     self.drawLine(line: self.fgLine)
   }
   
+//  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//    super.touchesBegan(touches, with: event)
+//
+//    guard let touch = touches.first else { return }
+//
+//    touchLocation = touch.location(in: stack)
+//  }
+  
   // MARK: - Public methods
-//  func present(seconds: Double = .zero) {
+  func present(seconds: Double = .zero) {
 //    textView.becomeFirstResponder()
 //
-//    UIView.animate(withDuration: 0.2, animations: { [weak self] in
+//    buttonsStack.addArrangedSubview(nextButton)
+    closedConstraint.isActive = false
+    openedConstraint.isActive = true
+    boundsPublisher.send()
+    
+//    delay(seconds: 0.3) { [weak self] in
 //      guard let self = self else { return }
-//
-//      print(self.placeholder.frame)
-//      print(self.placeholder.alpha)
-//      self.placeholder.alpha = 0
-//      self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
-//    }) { [weak self] _ in
-//      guard let self = self else { return }
-//
-//      self.placeholder.removeFromSuperview()
-//
-//      guard !self.textView.isFirstResponder else { return }
-//
-//      self.textView.becomeFirstResponder()
+      
+      self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
+      UIView.animate(withDuration: 0.2) {
+        self.nextButton.transform = .identity
+        self.nextButton.alpha = 1
+      }
 //    }
-//  }
+  }
 }
 
 // MARK: - Private
@@ -273,15 +304,18 @@ private extension NewPollHyperlinkCell {
       stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
       stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      buttonsStack.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding),
-      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*2),
+//      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+      buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
     openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
-    openedConstraint.isActive = true
+    openedConstraint.isActive = false
     openedConstraint.priority = .defaultLow
     
     closedConstraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    closedConstraint.isActive = true
     closedConstraint.priority = .defaultLow
     
     layer.insertSublayer(bgLine.layer, at: 0)
@@ -290,8 +324,17 @@ private extension NewPollHyperlinkCell {
 //    layoutIfNeeded()
 //    print(stack.frame.size)
 //    placeholder.placeInCenter(of: stack)
-    placeholder.placeInCenter(of: stack, leadingInset: padding, trailingInset: padding)
-//    print(placeholder.frame.size)
+    if text.isNil || text.isEmpty {
+      placeholder.placeInCenter(of: stack, leadingInset: padding, trailingInset: padding)
+    }
+
+//    guard stack.getSubview(type: UIView.self, identifier: "opaque").isNil else { return }
+//
+//    let opaque = UIView.opaque()
+//    opaque.backgroundColor = .red
+//    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.detectLocation(sender:))))
+//    opaque.place(inside: stack)
+//    opaque.layer.zPosition = 10
   }
   
   func drawLine(line: Line,
@@ -332,6 +375,7 @@ private extension NewPollHyperlinkCell {
     openedConstraint.isActive = false
     boundsPublisher.send()
     nextButton.removeFromSuperview()
+    skip = true
     
     CATransaction.begin()
     CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
@@ -339,6 +383,11 @@ private extension NewPollHyperlinkCell {
     fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
     CATransaction.commit()
   }
+  
+//  @objc
+//  func detectLocation(sender: UITapGestureRecognizer) {
+//    touchLocation = sender.location(ofTouch: 0, in: self)
+//  }
 }
 
 extension NewPollHyperlinkCell: CAAnimationDelegate {
@@ -351,7 +400,14 @@ extension NewPollHyperlinkCell: CAAnimationDelegate {
 
 extension NewPollHyperlinkCell: UITextFieldDelegate {
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    textField.resignFirstResponder()
+      
+//    UIView.animate(withDuration: 0.2) { [weak self] in
+//      guard let self = self else { return }
+//
+//      self.stack.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    }
+    
+    return textField.resignFirstResponder()
   }
   
   func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
@@ -364,6 +420,7 @@ extension NewPollHyperlinkCell: UITextFieldDelegate {
     UIView.animate(withDuration: 0.2, animations: { [weak self] in
       guard let self = self else { return }
       
+//      self.stack.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
       self.placeholder.alpha = 0
       self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
     }) { [weak self] _ in
@@ -371,6 +428,14 @@ extension NewPollHyperlinkCell: UITextFieldDelegate {
       
       self.placeholder.removeFromSuperview()
     }
+    
+    Animations.unmaskLayerCircled(layer: fgLayer,
+                                  location: touchLocation,
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
+    
+    bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
     
     return true
   }
@@ -384,9 +449,14 @@ extension NewPollHyperlinkCell: UITextFieldDelegate {
       return true
     }
 
+//    stack.layer.masksToBounds = false
+//    stack.clipsToBounds = false
+    
     if !text.isEmpty, !text.isValidURL {
       stack.clipsToBounds = false
       textField.showSign(state: .InvalidHyperlink)
+//      stack.layer.masksToBounds = false
+//      stack.clipsToBounds = false
     }
     
     if textField.text!.isEmpty {
@@ -397,16 +467,26 @@ extension NewPollHyperlinkCell: UITextFieldDelegate {
         self.placeholder.transform = .identity
       }
     }
+    
+    Animations.unmaskLayerCircled(unmask: false,
+                                  layer: fgLayer,
+                                  location: touchLocation,
+                                  duration: 0.35,
+                                  animateOpacity: false,
+//                                  opacityDurationMultiplier: 2,
+                                  delegate: self)
+    
+    bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 0, toValue: 1, duration: 0.5), forKey: nil)
       
     return true
   }
 
   func textFieldDidEndEditing(_ textField: UITextField) {
     guard let text = textField.text,
-          !text.isEmpty
+          !text.isEmpty,
+          text.isValidURL
     else { return }
 
     self.text = text
   }
 }
-

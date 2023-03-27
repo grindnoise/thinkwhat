@@ -13,7 +13,14 @@ class NewPollImagesCell: UICollectionViewCell {
   
   // MARK: - Public properties
   ///**Logic**
-  public var stage: NewPollController.Stage!
+  public var stage: NewPollController.Stage! {
+    didSet {
+      guard !images.isNil else { return }
+      
+//      openedConstraint.isActive = stageGlobal.rawValue == stage.rawValue
+//      openedConstraint.isActive = stageGlobal.rawValue >= stage.rawValue
+    }
+  }
   public var stageGlobal: NewPollController.Stage!
   public var images: [NewPollImage]! {
     didSet {
@@ -36,24 +43,24 @@ class NewPollImagesCell: UICollectionViewCell {
     didSet {
       guard oldValue != color else { return }
       
+      if #available(iOS 15, *) {
+        button.configuration?.baseBackgroundColor = color
+      } else {
+        button.setAttributedTitle(NSAttributedString(string: "new_poll_image_add".localized,
+                                                       attributes: [
+                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                        .foregroundColor: color as Any
+                                                       ]),
+                                    for: .normal)
+      }
+      nextButton.tintColor = color
+      
       UIView.animate(withDuration: 0.4) { [weak self] in
         guard let self = self else { return }
         
         self.imageView.tintColor = self.color
       }
       
-      button.setAttributedTitle(NSAttributedString(string: "new_poll_image_add".localized,
-                                                     attributes: [
-                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                      .foregroundColor: color as Any
-                                                     ]),
-                                  for: .normal)
-      nextButton.setAttributedTitle(NSAttributedString(string: "new_poll_choice_next".localized,
-                                                     attributes: [
-                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                      .foregroundColor: color as Any
-                                                     ]),
-                                  for: .normal)
       
       let colorAnim = CABasicAnimation(path: "strokeColor", fromValue: fgLine.layer.strokeColor, toValue: color.cgColor, duration: 0.4)
       colorAnim.delegate = self
@@ -76,7 +83,7 @@ class NewPollImagesCell: UICollectionViewCell {
   private let padding: CGFloat = 8
   private lazy var collectionView: NewPollImagesCollectionView = {
     let instance = NewPollImagesCollectionView(images)
-    let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 1)
     constraint.isActive = true
     
     instance.$removedImage
@@ -100,7 +107,7 @@ class NewPollImagesCell: UICollectionViewCell {
       .sink { [weak self] in
         guard let self = self else { return }
         
-        constraint.constant = max(10, $0.height)
+        constraint.constant = max(1, $0.height)
         self.layoutIfNeeded()
         self.boundsPublisher.send(true)
       }
@@ -124,7 +131,9 @@ class NewPollImagesCell: UICollectionViewCell {
     instance.textColor = .secondaryLabel
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
     instance.text = stage.title.uppercased()
-    
+//    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100,
+//                                                                    font: instance.font)).isActive = true
+//
     return instance
   }()
   private lazy var stageStack: UIStackView = {
@@ -134,11 +143,7 @@ class NewPollImagesCell: UICollectionViewCell {
     instance.alignment = .center
     instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: contentView.bounds.width,
                                                                     font: label.font)*1.5).isActive = true
-    instance.publisher(for: \.bounds)
-      .sink {
-        print($0)
-      }
-      .store(in: &subscriptions)
+//    label.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     
     return instance
   }()
@@ -156,35 +161,67 @@ class NewPollImagesCell: UICollectionViewCell {
   }()
   private lazy var button: UIButton = {
     let instance = UIButton()
-    instance.setAttributedTitle(NSAttributedString(string: "new_poll_image_add".localized,
-                                                   attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                    .foregroundColor: topicColor as Any
-                                                   ]),
-                                for: .normal)
+    
+    if #available(iOS 15, *) {
+      let attrString = AttributedString("new_poll_image_add".localized.uppercased(), attributes: AttributeContainer([
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .body) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.white
+      ]))
+      var config = UIButton.Configuration.filled()
+      config.attributedTitle = attrString
+      config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+      config.image = UIImage(systemName: "photo.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .bold))
+      config.imagePlacement = .trailing
+      config.imagePadding = padding
+      config.contentInsets.top = padding
+      config.contentInsets.bottom = padding
+      config.contentInsets.leading = 20
+      config.contentInsets.trailing = 20
+      config.buttonSize = .large
+      
+      instance.configuration = config
+    } else {
+      instance.setAttributedTitle(NSAttributedString(string: "new_poll_image_add".localized,
+                                                     attributes: [
+                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                      .foregroundColor: topicColor as Any
+                                                     ]),
+                                  for: .normal)
+      instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground//color
+    }
+    
+//    instance.setAttributedTitle(NSAttributedString(string: "new_poll_image_add".localized,
+//                                                   attributes: [
+//                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+//                                                    .foregroundColor: topicColor as Any
+//                                                   ]),
+//                                for: .normal)
+//    instance.setImage(UIImage(systemName: "photo.fill"), for: .normal)
+//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!) + padding).isActive = true
     instance.addTarget(self,
                        action: #selector(self.addImage),
                        for: .touchUpInside)
     
     return instance
   }()
-  private lazy var nextButton: UIButton = {
-    let instance = UIButton()
-    instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_next".localized,
-                                                   attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                    .foregroundColor: topicColor as Any
-                                                   ]),
-                                for: .normal)
-    instance.addTarget(self, action: #selector(self.nextStage), for: .touchUpInside)
+  private lazy var nextButton: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "arrow.down.circle.fill"))
+    instance.isUserInteractionEnabled = true
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+    instance.contentMode = .scaleAspectFill
+    instance.tintColor = topicColor
+    instance.alpha = 0
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.nextStage)))
+    
     
     return instance
   }()
   private lazy var buttonsStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [button, nextButton])
+    let instance = UIStackView(arrangedSubviews: [button])
     instance.spacing = padding
     instance.axis = .vertical
-//    instance.alignment = .center
+    instance.alignment = .center
+    instance.distribution = .fillEqually
     
     return instance
   }()
@@ -238,6 +275,19 @@ class NewPollImagesCell: UICollectionViewCell {
   // MARK: - Public methods
   public func present(seconds: Double = .zero) {
     collectionView.present()
+    
+    buttonsStack.addArrangedSubview(nextButton)
+    boundsPublisher.send(true)
+    
+//    delay(seconds: 0.3) { [weak self] in
+//      guard let self = self else { return }
+      
+      self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
+      UIView.animate(withDuration: 0.2) {
+        self.nextButton.transform = .identity
+        self.nextButton.alpha = 1
+      }
+//    }
   }
   
   public func update(_ instances: [NewPollImage]) {
@@ -262,8 +312,10 @@ private extension NewPollImagesCell {
       collectionView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
       collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      buttonsStack.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding),
-      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding*2),
+//      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+      buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
     let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
@@ -288,8 +340,9 @@ private extension NewPollImagesCell {
   @objc
   func nextStage() {
     buttonsStack.removeArrangedSubview(nextButton)
-    boundsPublisher.send(true)
     nextButton.removeFromSuperview()
+    boundsPublisher.send(true)
+    
     
     CATransaction.begin()
     CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }

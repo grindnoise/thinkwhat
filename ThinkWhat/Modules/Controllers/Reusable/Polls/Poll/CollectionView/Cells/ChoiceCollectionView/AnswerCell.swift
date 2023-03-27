@@ -445,8 +445,7 @@ private extension AnswerCell {
                                     location: touchLocation,
                                     duration: 0.4,
                                     opacityDurationMultiplier: 0.5,
-                                    delegate: self,
-                                    completionBlocks: [{ completion(true) }])
+                                    delegate: self) { completion(true) }
     case false:
       guard let selection = stackView.getLayer(identifier: "selection") else { return }
       

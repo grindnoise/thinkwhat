@@ -63,8 +63,8 @@ class NewPollChoicesCollectionView: UICollectionView {
   }
   
   // MARK: - Public methods
-  public func present(first: Bool = true) {
-    guard let cell = cellForItem(at: IndexPath(item: first ? 0 : 1, section: 0)) as? NewPollChoiceCell else { return }
+  public func present(index: Int) {
+    guard let cell = cellForItem(at: IndexPath(item: index, section: 0)) as? NewPollChoiceCell else { return }
     
     cell.textView.becomeFirstResponder()
   }

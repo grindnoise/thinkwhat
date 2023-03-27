@@ -49,7 +49,25 @@ class NewPollCommentsCell: UICollectionViewCell {
   }
   ///**Publishers**
   @Published public private(set) var isAnimationComplete: Bool?
-  @Published public var commentsEnabled: Bool!
+  @Published public var commentsEnabled: Bool! {
+    didSet {
+      guard stage == stageGlobal, !commentsEnabled.isNil, !openedConstraint.isActive else { return }
+      
+      closedConstraint.isActive = false
+      openedConstraint.isActive = true
+      boundsPublisher.send()
+      nextButton.tintColor = color
+      delay(seconds: 0.3) { [weak self] in
+        guard let self = self else { return }
+        
+        self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
+        UIView.animate(withDuration: 0.2) {
+          self.nextButton.transform = .identity
+          self.nextButton.alpha = 1
+        }
+      }
+    }
+  }
   public private(set) var boundsPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
@@ -80,7 +98,7 @@ class NewPollCommentsCell: UICollectionViewCell {
     let instance = UILabel()
 //    instance.alpha = 1
     instance.textColor = commentsEnabled.isNil ? color : .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body)
     instance.text = commentsEnabled.isNil ? "new_poll_comments_placeholder".localized : commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
     
     return instance
@@ -118,22 +136,31 @@ class NewPollCommentsCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var nextButton: UIButton = {
-    let instance = UIButton()
-    instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_next".localized,
-                                                   attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                    .foregroundColor: color as Any
-                                                   ]),
-                                for: .normal)
-    instance.addTarget(self, action: #selector(self.nextStage), for: .touchUpInside)
+  private lazy var nextButton: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "arrow.down.circle.fill"))
+    instance.isUserInteractionEnabled = true
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+    instance.contentMode = .scaleAspectFill
+    instance.tintColor = color
+    instance.alpha = 0
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.nextStage)))
+    
     
     return instance
   }()
-  private lazy var buttonsStack: UIStackView = { UIStackView(arrangedSubviews: [nextButton]) }()
+  private lazy var buttonsStack: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [nextButton])
+    instance.spacing = padding
+    instance.axis = .vertical
+    instance.alignment = .center
+    instance.distribution = .fillEqually
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!) + padding*2).isActive = true
+    
+    return instance
+  }()
   private lazy var commentsOnIcon: Icon = {
     let instance = Icon(category: .Comments)
-    instance.iconColor = commentsEnabled.isNil ? color : .systemGray
+    instance.iconColor = commentsEnabled.isNil ? color : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1
@@ -146,7 +173,7 @@ class NewPollCommentsCell: UICollectionViewCell {
   }()
   private lazy var commentsOffIcon: Icon = {
     let instance = Icon(category: .CommentsDisabled)
-    instance.iconColor = commentsEnabled.isNil ? color : .systemGray
+    instance.iconColor = commentsEnabled.isNil ? color : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1
@@ -156,6 +183,8 @@ class NewPollCommentsCell: UICollectionViewCell {
     
     return instance
   }()
+  private var openedConstraint: NSLayoutConstraint!
+  private var closedConstraint: NSLayoutConstraint!
   
   
   
@@ -200,8 +229,10 @@ class NewPollCommentsCell: UICollectionViewCell {
   
   // MARK: - Public methods
   func present(seconds: Double = .zero) {
-    commentsOnIcon.setIconColor(UIColor.systemGray)
-    commentsOffIcon.setIconColor(UIColor.systemGray)
+    
+    
+    commentsOnIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
+    commentsOffIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
 //    textView.becomeFirstResponder()
 //
 //    UIView.animate(withDuration: 0.2, animations: { [weak self] in
@@ -243,13 +274,18 @@ private extension NewPollCommentsCell {
       stack.centerXAnchor.constraint(equalTo: centerXAnchor),
       descriptionLabel.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*2),
       descriptionLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding),
-      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*2),
+      buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+      buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
-    constraint.isActive = true
-    constraint.priority = .defaultLow
+    openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    openedConstraint.isActive = false
+    openedConstraint.priority = .defaultLow
+    
+    closedConstraint = descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    closedConstraint.isActive = true
+    closedConstraint.priority = .defaultLow
     
     layer.insertSublayer(bgLine.layer, at: 0)
     layer.insertSublayer(fgLine.layer, at: 1)
@@ -301,7 +337,7 @@ private extension NewPollCommentsCell {
                                          isRemovedOnCompletion: true)
         let disableAnim = Animations.get(property: .FillColor,
                                          fromValue: deselectedIcon.iconColor.cgColor,
-                                         toValue: UIColor.systemGray.cgColor,
+                                         toValue: UIColor.systemGray4.cgColor,//traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.secondarySystemBackground.cgColor,
                                          duration: 0.3,
                                          timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                          delegate: nil,
@@ -310,7 +346,7 @@ private extension NewPollCommentsCell {
         selectedIcon.icon.add(enableAnim, forKey: nil)
         (selectedIcon.icon as! CAShapeLayer).fillColor = color.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
         deselectedIcon.icon.add(disableAnim, forKey: nil)
-        (deselectedIcon.icon as! CAShapeLayer).fillColor = UIColor.systemGray.cgColor
+      (deselectedIcon.icon as! CAShapeLayer).fillColor = UIColor.systemGray4.cgColor// traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.secondarySystemBackground.cgColor
         
         UIView.animate(
             withDuration: 0.3,
@@ -331,7 +367,7 @@ private extension NewPollCommentsCell {
       UIView.transition(with: descriptionLabel, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
         guard let self = self else { return }
         
-        self.descriptionLabel.textColor = .label
+        self.descriptionLabel.textColor = .secondaryLabel
         self.descriptionLabel.text = self.commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
       } completion: { _ in }
         
@@ -344,7 +380,8 @@ private extension NewPollCommentsCell {
   
   @objc
   func nextStage() {
-    buttonsStack.removeArrangedSubview(nextButton)
+    closedConstraint.isActive = true
+    openedConstraint.isActive = false
     boundsPublisher.send()
     nextButton.removeFromSuperview()
     

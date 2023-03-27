@@ -48,18 +48,25 @@ class NewPollChoicesCell: UICollectionViewCell {
     didSet {
       guard oldValue != color else { return }
       
+      if choices.count >= 2 {
+        if #available(iOS 15, *) {
+          button.configuration?.baseBackgroundColor = topicColor
+        } else {
+          button.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
+                                                       attributes: [
+                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                        .foregroundColor: topicColor as Any
+                                                       ]),
+                                    for: .normal)
+        }
+      }
+      nextButton.tintColor = color
+      
       UIView.animate(withDuration: 0.4) { [weak self] in
         guard let self = self else { return }
         
         self.imageView.tintColor = self.color
       }
-      
-      button.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
-                                                     attributes: [
-                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                      .foregroundColor: topicColor as Any
-                                                     ]),
-                                  for: .normal)
       
       let colorAnim = CABasicAnimation(path: "strokeColor", fromValue: fgLine.layer.strokeColor, toValue: color.cgColor, duration: 0.4)
       colorAnim.delegate = self
@@ -166,33 +173,62 @@ class NewPollChoicesCell: UICollectionViewCell {
   }()
   private lazy var button: UIButton = {
     let instance = UIButton()
-    instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
-                                                   attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                    .foregroundColor: topicColor as Any
-                                                   ]),
-                                for: .normal)
+    
+    if #available(iOS 15, *) {
+      let attrString = AttributedString("new_poll_choice_add".localized.uppercased(), attributes: AttributeContainer([
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .body) as Any,
+        NSAttributedString.Key.foregroundColor: UIColor.white
+      ]))
+      var config = UIButton.Configuration.filled()
+      config.attributedTitle = attrString
+      config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+      config.image = UIImage(systemName: "plus", withConfiguration: UIImage.SymbolConfiguration(weight: .bold))
+      config.imagePlacement = .trailing
+      config.imagePadding = padding
+      config.contentInsets.top = padding
+      config.contentInsets.bottom = padding
+      config.contentInsets.leading = 20
+      config.contentInsets.trailing = 20
+      config.buttonSize = .large
+      
+      instance.configuration = config
+    } else {
+      instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
+                                                     attributes: [
+                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                      .foregroundColor: topicColor as Any
+                                                     ]),
+                                  for: .normal)
+      instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground//color
+    }
     instance.addTarget(self, action: #selector(self.addChoice), for: .touchUpInside)
     
     return instance
   }()
-  private lazy var nextButton: UIButton = {
-    let instance = UIButton()
-    instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_next".localized,
-                                                   attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                    .foregroundColor: topicColor as Any
-                                                   ]),
-                                for: .normal)
-    instance.addTarget(self, action: #selector(self.nextStage), for: .touchUpInside)
+  private lazy var nextButton: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "arrow.down.circle.fill"))
+    instance.isUserInteractionEnabled = true
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    instance.contentMode = .scaleAspectFill
+    instance.tintColor = topicColor
+    instance.alpha = 0
+//    instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_next".localized,
+//                                                   attributes: [
+//                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+//                                                    .foregroundColor: topicColor as Any
+//                                                   ]),
+//                                for: .normal)
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.nextStage)))
+    
     
     return instance
   }()
   private lazy var buttonsStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [button])
+    let instance = UIStackView(arrangedSubviews: [button])//button
     instance.spacing = padding
     instance.axis = .vertical
-//    instance.alignment = .center
+    instance.distribution = .fillEqually
+    instance.alignment = .center
     
     return instance
   }()
@@ -243,20 +279,44 @@ class NewPollChoicesCell: UICollectionViewCell {
   }
   
   // MARK: - Public methods
-  public func present(first: Bool = true, seconds: Double = .zero) {
-    if !first {
+  public func present(index: Int, seconds: Double = .zero) {
+    if index != 0 {
+      buttonsStack.addArrangedSubview(button)
       buttonsStack.addArrangedSubview(nextButton)
       boundsPublisher.send(true)
+      
+      if #available(iOS 15, *) {
+        button.configuration?.baseBackgroundColor = topicColor
+      } else {
+        button.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
+                                                     attributes: [
+                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                      .foregroundColor: topicColor as Any
+                                                     ]),
+                                  for: .normal)
+      }
+      
+      delay(seconds: 0.3) { [weak self] in
+        guard let self = self else { return }
+        
+        self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
+        UIView.animate(withDuration: 0.2) {
+          self.nextButton.transform = .identity
+          self.nextButton.alpha = 1
+        }
+      }
     }
     
+    
+    
     guard seconds != .zero else {
-      collectionView.present(first: first)
+      collectionView.present(index: index)
       
       return
     }
     
     delay(seconds: seconds) { [unowned self] in
-      self.collectionView.present(first: first)
+      self.collectionView.present(index: index)
     }
   }
   
@@ -283,11 +343,13 @@ private extension NewPollChoicesCell {
     buttonsStack.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      collectionView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
+      collectionView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*3),
       collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      buttonsStack.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding),
-      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding*2),
+//      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+      buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
     let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
@@ -299,12 +361,8 @@ private extension NewPollChoicesCell {
   }
   
   @objc
-  func handleTap() {
-    present()
-  }
-  
-  @objc
   func nextStage() {
+    endEditing(true)
     buttonsStack.removeArrangedSubview(nextButton)
     boundsPublisher.send(true)
     nextButton.removeFromSuperview()
@@ -318,8 +376,8 @@ private extension NewPollChoicesCell {
   
   @objc
   func addChoice() {
+    endEditing(true)
     addChoicePublisher.send()
-//    collectionView.addChoice()
   }
   
   func drawLine(line: Line,

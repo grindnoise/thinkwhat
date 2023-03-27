@@ -12,7 +12,7 @@ import Combine
 class NewPollView: UIView {
   
   // MARK: - Public properties
-  weak var viewInput: NewPollViewInput?
+  weak var viewInput: (NewPollViewInput & UIViewController)?
   ///**Publishers**
   
   
@@ -38,7 +38,10 @@ class NewPollView: UIView {
         self.viewInput?.addImage()
       }
       .store(in: &subscriptions)
-    
+    instance.$topic
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.viewInput?.setColor($0!.tagColor) }
+      .store(in: &subscriptions)
     
     return instance
   }()

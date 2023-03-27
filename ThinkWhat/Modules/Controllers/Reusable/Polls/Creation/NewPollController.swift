@@ -27,6 +27,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       case .Question: return "new_poll_question".localized
       case .Choices: return "new_poll_choices".localized
       case .Hyperlink: return "new_poll_hyperlink".localized
+      case .Images: return "new_poll_images".localized
       case .Comments: return "new_poll_comments".localized
       default: return ""
       }
@@ -39,6 +40,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       case .Question: return "new_poll_question_placeholder".localized
       case .Choices: return "new_poll_question_placeholder".localized
       case .Hyperlink: return "new_poll_hyperlink_placeholder".localized
+      case .Images: return "new_poll_image_placeholder".localized
       case .Comments: return "new_poll_comments_placeholder".localized
       default: return ""
       }
@@ -50,6 +52,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       case .Description: return ModelProperties.shared.surveyDescriptionMinLength
       case .Question: return ModelProperties.shared.surveyQuestionMinLength
       case .Choices: return ModelProperties.shared.surveyAnswerTitleMinLength
+      case .Images: return ModelProperties.shared.surveyMediaTitleMinLength
       default: return 0
       }
     }
@@ -60,7 +63,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       case .Description: return ModelProperties.shared.surveyDescriptionMaxLength
       case .Question: return ModelProperties.shared.surveyQuestionMaxLength
       case .Choices: return ModelProperties.shared.surveyAnswerTitleMaxLength
-        
+      case .Images: return ModelProperties.shared.surveyMediaTitleMaxLength
       default: return 0
       }
     }
@@ -200,6 +203,11 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
 }
 
 extension NewPollController: NewPollViewInput {
+  func setColor(_ color: UIColor) {
+    setNavigationBarTintColor(color)
+    progressCapsule.setColor(color)
+  }
+  
   func addImage() {
     imagePicker.allowsEditing = true
     let alert = UIAlertController(title: nil,

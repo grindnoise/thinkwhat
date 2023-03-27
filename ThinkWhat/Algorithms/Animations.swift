@@ -213,16 +213,17 @@ struct Animations {
     animatedView.layer.opacity = 1
   }
   
-  static func unmaskLayerCircled(layer animatedlayer: CALayer,
-                            location: CGPoint,
-                            duration: TimeInterval,
-                            animateOpacity: Bool = true,
-                            opacityDurationMultiplier: Double = 1,
-                            delegate: CAAnimationDelegate,
-                            completionBlocks: [Closure] = []) {
+  static func unmaskLayerCircled(unmask: Bool = true,
+                                 layer animatedlayer: CALayer,
+                                 location: CGPoint,
+                                 duration: TimeInterval,
+                                 animateOpacity: Bool = true,
+                                 opacityDurationMultiplier: Double = 1,
+                                 delegate: CAAnimationDelegate,
+                                 completion: Closure? = nil) {
     
     let circlePathLayer = CAShapeLayer()
-    var _completionBlocks = completionBlocks
+//    var _completionBlocks = completionBlocks
     var circleFrameTopCenter: CGRect {
       var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
       let circlePathBounds = circlePathLayer.bounds
@@ -277,32 +278,32 @@ struct Animations {
     let fromPath = circlePathLayer.path
     
     let anim = Animations.get(property: .Path,
-                              fromValue: fromPath as Any,
-                              toValue: toPath,
+                              fromValue: unmask ? fromPath : toPath as Any,
+                              toValue: unmask ? toPath : fromPath,
                               duration: duration,
                               delay: 0,
                               repeatCount: 0,
                               autoreverses: false,
-                              timingFunction: .easeOut,
+                              timingFunction: unmask ? .easeOut : .easeIn,
                               delegate: delegate,
                               isRemovedOnCompletion: true,
                               completionBlocks: [])
     
     circlePathLayer.add(anim, forKey: "path")
-    circlePathLayer.path = toPath
+    circlePathLayer.path = unmask ? toPath : fromPath
    
     guard animateOpacity else { return }
-//    animatedView.alpha = 1
-    animatedlayer.opacity = 1//0
+
+    animatedlayer.opacity = 1//unmask ? 1 : 0//0
     let opacityAnim = Animations.get(property: .Opacity,
-                                     fromValue: 0,
-                                     toValue: 1,
-                                     duration: duration*opacityDurationMultiplier,
-                                     timingFunction: CAMediaTimingFunctionName.easeOut,
+                                     fromValue: unmask ? 0 : 1,
+                                     toValue: unmask ? 1 : 0,
+                                     duration: unmask ? duration*opacityDurationMultiplier : duration/opacityDurationMultiplier,
+                                     timingFunction: unmask ? .easeOut : .easeIn,
                                      delegate: nil)
     
     animatedlayer.add(opacityAnim, forKey: nil)
-    animatedlayer.opacity = 1
+    animatedlayer.opacity = 1//unmask ? 1 : 0
   }
   
   static func reveal(present: Bool,

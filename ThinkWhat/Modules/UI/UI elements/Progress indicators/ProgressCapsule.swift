@@ -163,6 +163,17 @@ class ProgressCapsule: UIView {
     }
   }
   
+  @MainActor
+  public func setColor(_ color: UIColor) {
+    progressLayer.startPoint = CGPoint(x: 0, y: 0.5)
+    progressLayer.endPoint = CGPoint(x: 1.0, y: 0.5)
+    let bleached = UIColor.white.blended(withFraction: 0.75, of: color).cgColor
+    let saturated = UIColor.white.blended(withFraction: 1, of: color).cgColor
+    progressLayer.setGradient(colors: [bleached, saturated],
+                         locations: [0.0, 1])
+  }
+  
+  
   
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

@@ -81,7 +81,7 @@ class NewPollChoiceCell: UICollectionViewCell {
     instance.inputAccessoryView = toolBar
     instance.attributedText = NSAttributedString(string: "", attributes: attributes())
     instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.width*0.05 }
+      .sink { instance.cornerRadius = $0.width*0.025 }
       .store(in: &subscriptions)
     
     let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
@@ -137,7 +137,8 @@ class NewPollChoiceCell: UICollectionViewCell {
 
     guard !textView.isFirstResponder else { return }
     
-    textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    textView.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
+//    textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
   }
   
   override func prepareForReuse() {
@@ -235,28 +236,34 @@ private extension NewPollChoiceCell {
 
 extension NewPollChoiceCell: UITextViewDelegate {
   func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-    guard !isKeyboardOnScreen else { return false }
+//    guard !isKeyboardOnScreen else { return false }
         
     UIView.animate(withDuration: 0.2) { [weak self] in
       guard let self = self else { return }
 
-//      self.imageView.tintColor = self.color
-      textView.backgroundColor = self.color.withAlphaComponent(0.2)
+      self.imageView.tintColor = self.color
+      textView.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
     }
+    
+    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 0, toValue: 1.5, duration: 0.2), forKey: nil)
+    textView.layer.add(CABasicAnimation(path: "borderColor", fromValue: textView.layer.borderColor, toValue: color.cgColor, duration: 0.2), forKey: nil)
     
     return true
   }
   
   func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
     guard !isMovingToParent else {
-      UIView.animate(withDuration: 0.2) { [unowned self] in
-        textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//        self.imageView.tintColor = .systemGray4
-      }//.systemGray4.withAlphaComponent(0.2) }
+//      UIView.animate(withDuration: 0.2) { [unowned self] in
+//        textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+////        self.imageView.tintColor = .systemGray4
+//      }//.systemGray4.withAlphaComponent(0.2) }
       return true
     }
     
-    guard textView.text.count >= minLength else {
+    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 1.5, toValue: 0, duration: 0.2), forKey: nil)
+    
+    if textView.text.count <= minLength {
+      textView.text = "new_poll_choice_placeholder".localized + (order.isNil ? "" : String(describing: order!))
       let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
                                                             text: "new_poll_survey_min_text_length_error_begin".localized + String(describing: minLength) + "new_poll_survey_min_text_length_error_end".localized,
                                                             tintColor: .systemOrange,
@@ -270,13 +277,11 @@ extension NewPollChoiceCell: UITextViewDelegate {
       banner.didDisappearPublisher
         .sink { _ in banner.removeFromSuperview() }
         .store(in: &self.subscriptions)
-      
-      return false
     }
-    UIView.animate(withDuration: 0.2) { [unowned self] in
-      textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//      self.imageView.tintColor = .systemGray4
-    }//.systemGray4.withAlphaComponent(0.2) }
+//    UIView.animate(withDuration: 0.2) { [unowned self] in
+//      textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+////      self.imageView.tintColor = .systemGray4
+//    }//.systemGray4.withAlphaComponent(0.2) }
     return true
   }
   

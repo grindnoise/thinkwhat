@@ -88,7 +88,7 @@ class NewPollImageCell: UICollectionViewCell {
       imageView,
       textView
     ])
-    instance.spacing = padding*2
+    instance.spacing = padding
     instance.axis = .horizontal
     
     return instance
