@@ -13,7 +13,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
   
   ///Sequence of stages to post new survey
   enum Stage: Int, CaseIterable {
-    case Topic, Title, Description, Question, Choices, Images, Hyperlink, Comments, Anonimity, Limits, Hot, Ready
+    case Topic, Title, Description, Question, Choices, Images, Hyperlink, Comments, Anonymity, Hot, Limits, Ready
     
     func next() -> Stage? { Stage(rawValue: (self.rawValue + 1)) }
     
@@ -29,6 +29,8 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       case .Hyperlink: return "new_poll_hyperlink".localized
       case .Images: return "new_poll_images".localized
       case .Comments: return "new_poll_comments".localized
+      case .Anonymity: return "new_poll_anonymity".localized
+      case .Hot: return "new_poll_anonymity".localized
       default: return ""
       }
     }
@@ -42,6 +44,8 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       case .Hyperlink: return "new_poll_hyperlink_placeholder".localized
       case .Images: return "new_poll_image_placeholder".localized
       case .Comments: return "new_poll_comments_placeholder".localized
+      case .Anonymity: return "new_poll_anonymity_placeholder".localized
+      case .Hot: return "new_poll_anonymity_placeholder".localized
       default: return ""
       }
     }

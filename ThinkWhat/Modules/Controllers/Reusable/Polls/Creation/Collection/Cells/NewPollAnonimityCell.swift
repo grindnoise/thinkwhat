@@ -1,15 +1,15 @@
 //
-//  NewPollCommentsCell.swift
+//  NewPollAnonimityCell.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 24.03.2023.
+//  Created by Pavel Bukharov on 28.03.2023.
 //  Copyright © 2023 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 import Combine
 
-class NewPollCommentsCell: UICollectionViewCell {
+class NewPollAnonimityCell: UICollectionViewCell {
   
   // MARK: - Public properties
   ///**Logic**
@@ -49,9 +49,9 @@ class NewPollCommentsCell: UICollectionViewCell {
   }
   ///**Publishers**
   @Published public private(set) var isAnimationComplete: Bool?
-  @Published public var commentsEnabled: Bool! {
+  @Published public var anonimityEnabled: Bool! {
     didSet {
-      guard stage == stageGlobal, !commentsEnabled.isNil, !openedConstraint.isActive else { return }
+      guard stage == stageGlobal, !anonimityEnabled.isNil, !openedConstraint.isActive else { return }
       
       closedConstraint.isActive = false
       openedConstraint.isActive = true
@@ -98,10 +98,14 @@ class NewPollCommentsCell: UICollectionViewCell {
   private lazy var descriptionLabel: UILabel = {
     let instance = UILabel()
 //    instance.alpha = 1
+    instance.numberOfLines = 0
     instance.textAlignment = .center
-    instance.textColor = commentsEnabled.isNil ? color : .label
+    instance.textColor = anonimityEnabled.isNil ? color : .label
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body)
-    instance.text = commentsEnabled.isNil ? "new_poll_comments_placeholder".localized : commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
+    instance.text = anonimityEnabled.isNil ? "new_poll_comments_placeholder".localized : anonimityEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
+    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
+    constraint.identifier = "heightAnchor"
+    constraint.isActive = true
     
     return instance
   }()
@@ -129,8 +133,8 @@ class NewPollCommentsCell: UICollectionViewCell {
   }()
   private lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
-      commentsOnIcon,
-      commentsOffIcon
+      user,
+      anon
     ])
     instance.axis = .horizontal
     instance.distribution = .fillEqually
@@ -160,28 +164,92 @@ class NewPollCommentsCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var commentsOnIcon: Icon = {
-    let instance = Icon(category: .Comments)
-    instance.iconColor = commentsEnabled.isNil ? color : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    instance.heightAnchor.constraint(equalToConstant: 70).isActive = true
+  private lazy var anon: Avatar = {
+    let instance = Avatar(userprofile: Userprofile.anonymous, isShadowed: true)
+//    instance.setFilter(name: "CIPhotoEffectTonal", animated: false)
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.isUserInteractionEnabled = true
-    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+    instance.tapPublisher
+      .filter { [unowned self] _ in self.anonimityEnabled.isNil || !self.anonimityEnabled}
+      .sink { [unowned self] _ in
+        self.anonimityEnabled = true
+        UIView.transition(with: descriptionLabel, duration: 0.3, options: .transitionCrossDissolve) { [weak self] in
+          guard let self = self else { return }
+          
+          self.descriptionLabel.textColor = .secondaryLabel
+          self.descriptionLabel.text = self.anonimityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
+          
+          let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width, font: self.descriptionLabel.font)
+          
+          guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
+                constraint.constant != height
+          else { return }
+          
+          self.setNeedsLayout()
+          constraint.constant = height
+          self.layoutIfNeeded()
+          self.boundsPublisher.send()
+        } completion: { _ in }
+        UIView.animate(
+            withDuration: 0.3,
+            delay: 0,
+            usingSpringWithDamping: 0.55,
+            initialSpringVelocity: 2.5,
+            options: [.curveEaseInOut],
+            animations: { [unowned self] in
+              instance.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+              instance.alpha = 1
+              self.user.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+              self.user.alpha = 0.75
+            })
+        self.user.toggleFilter(name: "CIPhotoEffectNoir", duration: 0.15)
+      }
+      .store(in: &subscriptions)
     
     return instance
   }()
-  private lazy var commentsOffIcon: Icon = {
-    let instance = Icon(category: .CommentsDisabled)
-    instance.iconColor = commentsEnabled.isNil ? color : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+  private lazy var user: Avatar = {
+    let instance = Avatar(userprofile: Userprofiles.shared.current!, isShadowed: true)
+    instance.toggleFilter(name: "CIPhotoEffectNoir", duration: 0.3)
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.isUserInteractionEnabled = true
-    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+    instance.heightAnchor.constraint(equalToConstant: 100).isActive = true
+    instance.tapPublisher
+      .filter { [unowned self] _ in self.anonimityEnabled.isNil || self.anonimityEnabled}
+      .sink { [unowned self] _ in
+        self.anonimityEnabled = false
+        UIView.transition(with: descriptionLabel, duration: 0.3, options: .transitionCrossDissolve) { [weak self] in
+          guard let self = self else { return }
+          
+          self.descriptionLabel.textColor = .secondaryLabel
+          self.descriptionLabel.text = self.anonimityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
+          
+          let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width, font: self.descriptionLabel.font)
+          
+          guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
+                constraint.constant != height
+          else { return }
+          
+          self.setNeedsLayout()
+          constraint.constant = height
+          self.layoutIfNeeded()
+          self.boundsPublisher.send()
+        } completion: { _ in }
+        UIView.animate(
+            withDuration: 0.3,
+            delay: 0,
+            usingSpringWithDamping: 0.55,
+            initialSpringVelocity: 2.5,
+            options: [.curveEaseInOut],
+            animations: { [unowned self] in
+              instance.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+              instance.alpha = 1
+              self.anon.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+              self.anon.alpha = 0.75
+            })
+        self.user.toggleFilter(duration: 0.15)
+      }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -232,32 +300,11 @@ class NewPollCommentsCell: UICollectionViewCell {
   // MARK: - Public methods
   func present(seconds: Double = .zero) {
     
-    
-    commentsOnIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
-    commentsOffIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
-//    textView.becomeFirstResponder()
-//
-//    UIView.animate(withDuration: 0.2, animations: { [weak self] in
-//      guard let self = self else { return }
-//
-//      print(self.placeholder.frame)
-//      print(self.placeholder.alpha)
-//      self.placeholder.alpha = 0
-//      self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
-//    }) { [weak self] _ in
-//      guard let self = self else { return }
-//
-//      self.placeholder.removeFromSuperview()
-//
-//      guard !self.textView.isFirstResponder else { return }
-//
-//      self.textView.becomeFirstResponder()
-//    }
   }
 }
 
 // MARK: - Private
-private extension NewPollCommentsCell {
+private extension NewPollAnonimityCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
@@ -282,7 +329,7 @@ private extension NewPollCommentsCell {
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    openedConstraint = nextButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
+    openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
     openedConstraint.isActive = false
     openedConstraint.priority = .defaultLow
     
@@ -316,72 +363,6 @@ private extension NewPollCommentsCell {
   }
   
   @objc
-  func handleTap(recognizer: UITapGestureRecognizer) {
-//    guard !commentsEnabled.isNil else { return }
-//    guard stageGlobal == .Ready || stage == stageGlobal else { return }
-    
-    guard let v = recognizer.view else { return }
-    if let icon = v as? Icon {
-        let selectedIcon: Icon! = icon == commentsOnIcon ? commentsOnIcon : commentsOffIcon
-        let deselectedIcon: Icon! = icon != commentsOnIcon ? commentsOnIcon : commentsOffIcon
-        
-      if !commentsEnabled.isNil {
-        if commentsEnabled && icon == commentsOnIcon || !commentsEnabled && icon == commentsOffIcon {
-          return
-        }
-      }
-        
-        let enableAnim  = Animations.get(property: .FillColor,
-                                         fromValue: selectedIcon.iconColor.cgColor,
-                                         toValue: color.cgColor,
-                                         duration: 0.3,
-                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                         delegate: nil,
-                                         isRemovedOnCompletion: true)
-        let disableAnim = Animations.get(property: .FillColor,
-                                         fromValue: deselectedIcon.iconColor.cgColor,
-                                         toValue: UIColor.systemGray4.cgColor,//traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.secondarySystemBackground.cgColor,
-                                         duration: 0.3,
-                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                         delegate: nil,
-                                         isRemovedOnCompletion: true)
-        
-        selectedIcon.icon.add(enableAnim, forKey: nil)
-        (selectedIcon.icon as! CAShapeLayer).fillColor = color.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
-        deselectedIcon.icon.add(disableAnim, forKey: nil)
-      (deselectedIcon.icon as! CAShapeLayer).fillColor = UIColor.systemGray4.cgColor// traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.secondarySystemBackground.cgColor
-        
-        UIView.animate(
-            withDuration: 0.3,
-            delay: 0,
-            usingSpringWithDamping: 0.55,
-            initialSpringVelocity: 2.5,
-            options: [.curveEaseInOut],
-            animations: {
-              selectedIcon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
-            }) { _ in }
-      
-      if commentsEnabled.isNil {
-        commentsEnabled = selectedIcon == commentsOnIcon
-      } else {
-        commentsEnabled = !commentsEnabled
-      }
-      
-      UIView.transition(with: descriptionLabel, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
-        guard let self = self else { return }
-        
-        self.descriptionLabel.textColor = .secondaryLabel
-        self.descriptionLabel.text = self.commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
-      } completion: { _ in }
-        
-        deselectedIcon.icon.add(disableAnim, forKey: nil)
-        UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
-          deselectedIcon.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-        })
-    }
-  }
-  
-  @objc
   func nextStage() {
     closedConstraint.isActive = true
     openedConstraint.isActive = false
@@ -397,10 +378,11 @@ private extension NewPollCommentsCell {
   }
 }
 
-extension NewPollCommentsCell: CAAnimationDelegate {
+extension NewPollAnonimityCell: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
     guard flag, let completion = anim.value(forKey: "completion") as? Closure else { return }
     
     completion()
   }
 }
+

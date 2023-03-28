@@ -143,7 +143,7 @@ class Userprofiles {
 class Userprofile: Decodable {
   static let anonymous: Userprofile = {
     let instance = Userprofile()
-    instance!.image = nil
+    instance!.image = UIImage(named: "anon")
     instance!.firstName = ""
     instance!.lastName = ""
     instance!.id = 1010000110010011

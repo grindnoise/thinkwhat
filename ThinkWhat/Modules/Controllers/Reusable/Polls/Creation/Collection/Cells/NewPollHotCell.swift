@@ -1,15 +1,15 @@
 //
-//  NewPollCommentsCell.swift
+//  NewPollHotCell.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 24.03.2023.
+//  Created by Pavel Bukharov on 28.03.2023.
 //  Copyright © 2023 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
 import Combine
 
-class NewPollCommentsCell: UICollectionViewCell {
+class NewPollHotCell: UICollectionViewCell {
   
   // MARK: - Public properties
   ///**Logic**
@@ -68,7 +68,6 @@ class NewPollCommentsCell: UICollectionViewCell {
       }
     }
   }
-  @Published public private(set) var isStageComplete: Bool!
   public private(set) var boundsPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
@@ -98,7 +97,6 @@ class NewPollCommentsCell: UICollectionViewCell {
   private lazy var descriptionLabel: UILabel = {
     let instance = UILabel()
 //    instance.alpha = 1
-    instance.textAlignment = .center
     instance.textColor = commentsEnabled.isNil ? color : .label
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body)
     instance.text = commentsEnabled.isNil ? "new_poll_comments_placeholder".localized : commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
@@ -257,7 +255,7 @@ class NewPollCommentsCell: UICollectionViewCell {
 }
 
 // MARK: - Private
-private extension NewPollCommentsCell {
+private extension NewPollHotCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
@@ -272,21 +270,20 @@ private extension NewPollCommentsCell {
     buttonsStack.translatesAutoresizingMaskIntoConstraints = false
     descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*3),
+      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
       stack.centerXAnchor.constraint(equalTo: centerXAnchor),
       descriptionLabel.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*2),
-      descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
-      descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
+      descriptionLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
       buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*2),
       buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    openedConstraint = nextButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
+    openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
     openedConstraint.isActive = false
     openedConstraint.priority = .defaultLow
     
-    closedConstraint = descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
+    closedConstraint = descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
     closedConstraint.isActive = true
     closedConstraint.priority = .defaultLow
     
@@ -358,7 +355,7 @@ private extension NewPollCommentsCell {
             initialSpringVelocity: 2.5,
             options: [.curveEaseInOut],
             animations: {
-              selectedIcon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+                selectedIcon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
             }) { _ in }
       
       if commentsEnabled.isNil {
@@ -376,7 +373,7 @@ private extension NewPollCommentsCell {
         
         deselectedIcon.icon.add(disableAnim, forKey: nil)
         UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
-          deselectedIcon.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+            deselectedIcon.transform = .identity
         })
     }
   }
@@ -388,7 +385,6 @@ private extension NewPollCommentsCell {
     boundsPublisher.send()
     nextButton.removeFromSuperview()
     
-    isStageComplete = true
     CATransaction.begin()
     CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
     fgLine.layer.strokeColor = color.cgColor
@@ -397,10 +393,11 @@ private extension NewPollCommentsCell {
   }
 }
 
-extension NewPollCommentsCell: CAAnimationDelegate {
+extension NewPollHotCell: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
     guard flag, let completion = anim.value(forKey: "completion") as? Closure else { return }
     
     completion()
   }
 }
+

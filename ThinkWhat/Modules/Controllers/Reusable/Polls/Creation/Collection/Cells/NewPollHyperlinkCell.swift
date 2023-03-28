@@ -301,7 +301,7 @@ private extension NewPollHyperlinkCell {
     buttonsStack.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       stack.heightAnchor.constraint(equalToConstant: minHeight),
-      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
+      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*3),
       stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
       buttonsStack.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*2),
@@ -310,11 +310,11 @@ private extension NewPollHyperlinkCell {
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
     openedConstraint.isActive = false
     openedConstraint.priority = .defaultLow
     
-    closedConstraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    closedConstraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
     closedConstraint.isActive = true
     closedConstraint.priority = .defaultLow
     

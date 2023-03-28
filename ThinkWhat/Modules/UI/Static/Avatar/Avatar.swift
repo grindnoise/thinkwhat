@@ -498,6 +498,10 @@ class Avatar: UIView {
     self.frame = frame
     setTasks()
     setupUI()
+    
+    guard userprofile == Userprofile.anonymous else {return }
+    
+//    imageView.image = UIImage(named: "anon")!
   }
   
   required init?(coder: NSCoder) {
@@ -590,7 +594,29 @@ class Avatar: UIView {
 //    button.setImage(image.withConfiguration(UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
 //                                                                           weight: .semibold)),
 //                    for: .normal)
-//    button.imageView?.contentMode = .center
+    //    button.imageView?.contentMode = .center
+  }
+  
+  /**
+   Sets photo filter by using CICategoryColorEffect
+   - parameter name: CICategoryColorEffect string. If empty - sets back default image
+   - parameter duration: time interval to animate.
+   */
+  public func toggleFilter(name: String = "", duration: TimeInterval = .zero) {
+    guard let image = userprofile?.image,
+          let newImage = name.isEmpty ? image : image.setFilter(filter: name)
+    else { return }
+  
+    
+    guard !duration.isZero else {
+      imageView.image = newImage
+      
+      return
+    }
+    
+    Animations.changeImageCrossDissolve(imageView: imageView,
+                                        image: newImage,
+                                        duration: duration)
   }
   
   // MARK: - Overriden methods
@@ -653,6 +679,10 @@ private extension Avatar {
     let constraintY = button.centerYAnchor.constraint(equalTo: topAnchor)
     constraintY.isActive = true
     constraintY.identifier = "constraintY"
+    
+//    guard userprofile == Userprofile.anonymous else { return }
+//
+//    imageView.image = UIImage(named: "anon")
   }
   
   func setTasks() {
@@ -675,6 +705,12 @@ private extension Avatar {
   }
   
   func setImage(for userprofile: Userprofile) {
+    guard userprofile != Userprofile.anonymous else {
+      imageView.image = UIImage(named: "anon")
+      
+      return
+    }
+    
     guard let image = userprofile.image else {
       shimmer.startShimmering()
       userprofile.downloadImage()

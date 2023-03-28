@@ -440,3 +440,7 @@
 "new_poll_comments_placeholder" = "Availability of comments";
 "new_poll_comments_on" = "Сomments are allowed";
 "new_poll_comments_off" = "Comments are forbidden";
+"new_poll_anonymity" = "Anonymity";
+"new_poll_anonymity_placeholder" = "Anonymity option";
+"new_poll_anonymity_on" = "Author, voters and commentators are hidden";
+"new_poll_anonymity_off" = "Author, voters and commentators see each other";

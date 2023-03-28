@@ -440,4 +440,7 @@
 "new_poll_comments_placeholder" = "Доступность комментариев";
 "new_poll_comments_on" = "Комментарии разрешены";
 "new_poll_comments_off" = "Комментарии запрещены";
-
+"new_poll_anonymity" = "Анонимность";
+"new_poll_anonymity_placeholder" = "Анонимность автора";
+"new_poll_anonymity_on" = "Автор, голосующие и комментаторы скрыты";
+"new_poll_anonymity_off" = "Автор, голосующие и комментаторы видят друг друга";

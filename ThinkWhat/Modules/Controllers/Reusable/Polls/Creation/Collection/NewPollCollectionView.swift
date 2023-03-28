@@ -107,6 +107,7 @@ class NewPollCollectionView: UICollectionView {
 //      self.stage = stage
 //    }
 //  }
+  @Published public private(set) var anonimityEnabled: Bool?
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -640,6 +641,13 @@ private extension NewPollCollectionView {
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in self.source.refresh() }
         .store(in: &self.subscriptions)
+      cell.$isStageComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          guard let next = self.stage.next() else { return }
+          self.stage = next }
+        .store(in: &self.subscriptions)
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
       cell.backgroundConfiguration = config
@@ -647,6 +655,104 @@ private extension NewPollCollectionView {
       
       self.$stageAnimationFinished
         .filter { $0 == .Hyperlink }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
+    }
+    
+    let anonCellRegistration = UICollectionView.CellRegistration<NewPollAnonimityCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.stage = .Anonymity
+      cell.color = self.stage.rawValue >= NewPollController.Stage.Anonymity.rawValue ? self.topic!.tagColor : .systemGray4
+      cell.stageGlobal = self.stage
+      if !self.anonimityEnabled.isNil {
+        cell.anonimityEnabled = self.anonimityEnabled!
+      }
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Anonymity.rawValue }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      cell.$anonimityEnabled
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.anonimityEnabled = $0! }
+        .store(in: &self.subscriptions)
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Anonymity }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.source.refresh() }
+        .store(in: &self.subscriptions)
+      cell.$isStageComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          guard let next = self.stage.next() else { return }
+          self.stage = next }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.$stageAnimationFinished
+        .filter { $0 == .Comments }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
+    }
+    
+    let hotCellRegistration = UICollectionView.CellRegistration<NewPollHotCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.stage = .Anonymity
+      cell.color = self.stage.rawValue >= NewPollController.Stage.Hot.rawValue ? self.topic!.tagColor : .systemGray4
+      cell.stageGlobal = self.stage
+//      if !self.anonimityEnabled.isNil {
+//        cell.anonimityEnabled = self.anonimityEnabled!
+//      }
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Hot.rawValue }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+//      cell.$anonimityEnabled
+//        .filter { !$0.isNil }
+//        .receive(on: DispatchQueue.main)
+//        .sink { [unowned self] in self.anonimityEnabled = $0! }
+//        .store(in: &self.subscriptions)
+      cell.$isAnimationComplete
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Hot }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.source.refresh() }
+        .store(in: &self.subscriptions)
+//      cell.$isStageComplete
+//        .filter { !$0.isNil }
+//        .receive(on: DispatchQueue.main)
+//        .sink { [unowned self] _ in
+//          guard let next = self.stage.next() else { return }
+//          self.stage = next }
+//        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.$stageAnimationFinished
+        .filter { $0 == .Anonymity }
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor }
         .store(in: &self.subscriptions)
@@ -687,6 +793,14 @@ private extension NewPollCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: commentsCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
+      } else if section == .Anonymity {
+        return collectionView.dequeueConfiguredReusableCell(using: anonCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .Hot {
+        return collectionView.dequeueConfiguredReusableCell(using: hotCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
       }
       return UICollectionViewCell()
     }
@@ -699,7 +813,9 @@ private extension NewPollCollectionView {
                              .Choices,
                              .Images,
                              .Hyperlink,
-                             .Comments])
+                             .Comments,
+                             .Anonymity,
+                             .Hot])
     snapshot.appendItems([0], toSection: .Topic)
     snapshot.appendItems([1], toSection: .Title)
     snapshot.appendItems([2], toSection: .Description)
@@ -708,6 +824,8 @@ private extension NewPollCollectionView {
     snapshot.appendItems([5], toSection: .Images)
     snapshot.appendItems([6], toSection: .Hyperlink)
     snapshot.appendItems([7], toSection: .Comments)
+    snapshot.appendItems([8], toSection: .Anonymity)
+    snapshot.appendItems([9], toSection: .Hot)
     source.apply(snapshot, animatingDifferences: false)
   }
   

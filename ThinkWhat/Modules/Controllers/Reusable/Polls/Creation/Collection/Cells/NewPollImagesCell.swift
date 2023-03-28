@@ -312,13 +312,13 @@ private extension NewPollImagesCell {
       collectionView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
       collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      buttonsStack.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding*2),
+      buttonsStack.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: padding*3),
 //      buttonsStack.centerXAnchor.constraint(equalTo: centerXAnchor),
       buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
     constraint.isActive = true
     constraint.priority = .defaultLow
     

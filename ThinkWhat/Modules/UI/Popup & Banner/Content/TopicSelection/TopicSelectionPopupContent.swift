@@ -115,23 +115,23 @@ class TopicSelectionPopupContent: UIView {
   }()
   private lazy var collectionView: TopicsCollectionView = {
     let instance = TopicsCollectionView(mode: .Selection)
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : .secondarySystemBackground
+//    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .clear : .secondarySystemBackground
     let constraint = instance.heightAnchor.constraint(equalToConstant: 10)
     constraint.isActive = true
     instance.publisher(for: \.contentSize)
       .filter { $0 != .zero && constraint.constant != $0.height }
       .sink { [unowned self] in
         self.setNeedsLayout()
-        constraint.constant = min($0.height, UIScreen.main.bounds.height*0.5)
+        constraint.constant = min($0.height, UIScreen.main.bounds.height*0.6)
         self.layoutIfNeeded()
       }
       .store(in: &subscriptions)
     instance.topicSelected
       .sink { [unowned self] in self.topic = $0}
       .store(in: &subscriptions)
-    instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.width*0.05 }
-      .store(in: &subscriptions)
+//    instance.publisher(for: \.bounds)
+//      .sink { instance.cornerRadius = $0.width*0.05 }
+//      .store(in: &subscriptions)
     
     return instance
   }()

@@ -280,8 +280,9 @@ class NewPollChoicesCell: UICollectionViewCell {
   
   // MARK: - Public methods
   public func present(index: Int, seconds: Double = .zero) {
-    if index != 0 {
-      buttonsStack.addArrangedSubview(button)
+    if index != 0, stageGlobal == stage {
+//      button.transform = .init(scaleX: 0.75, y: 0.75)
+//      buttonsStack.addArrangedSubview(button)
       buttonsStack.addArrangedSubview(nextButton)
       boundsPublisher.send(true)
       
@@ -352,7 +353,7 @@ private extension NewPollChoicesCell {
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
+    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
     constraint.isActive = true
     constraint.priority = .defaultLow
     

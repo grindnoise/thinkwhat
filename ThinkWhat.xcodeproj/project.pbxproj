@@ -403,6 +403,9 @@
 		AB9CADC125F755CE002AFD19 /* CircleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9CADC025F755CE002AFD19 /* CircleButton.swift */; };
 		AB9DBF7826A197D600EFA66D /* Segues.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9DBF7726A197D600EFA66D /* Segues.swift */; };
 		AB9DBF7B26A58C8C00EFA66D /* Django.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9DBF7A26A58C8C00EFA66D /* Django.swift */; };
+		ABA16E8E29D2DAED002D63B6 /* NewPollAnonimityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA16E8D29D2DAED002D63B6 /* NewPollAnonimityCell.swift */; };
+		ABA16E9029D2DB36002D63B6 /* NewPollHotCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA16E8F29D2DB36002D63B6 /* NewPollHotCell.swift */; };
+		ABA16E9229D2E22D002D63B6 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA16E9129D2E22D002D63B6 /* UIImage.swift */; };
 		ABA282ED274FD16800ED583F /* RangeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA282EC274FD16700ED583F /* RangeSlider.swift */; };
 		ABA282F0274FD93E00ED583F /* RangeSliderTrackLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA282EF274FD93E00ED583F /* RangeSliderTrackLayer.swift */; };
 		ABA448D427E331B000F8E00D /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA448D327E331B000F8E00D /* UIView.swift */; };
@@ -1006,6 +1009,9 @@
 		AB9CADC025F755CE002AFD19 /* CircleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButton.swift; sourceTree = "<group>"; };
 		AB9DBF7726A197D600EFA66D /* Segues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segues.swift; sourceTree = "<group>"; };
 		AB9DBF7A26A58C8C00EFA66D /* Django.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Django.swift; sourceTree = "<group>"; };
+		ABA16E8D29D2DAED002D63B6 /* NewPollAnonimityCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollAnonimityCell.swift; sourceTree = "<group>"; };
+		ABA16E8F29D2DB36002D63B6 /* NewPollHotCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollHotCell.swift; sourceTree = "<group>"; };
+		ABA16E9129D2E22D002D63B6 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		ABA282EC274FD16700ED583F /* RangeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSlider.swift; sourceTree = "<group>"; };
 		ABA282EF274FD93E00ED583F /* RangeSliderTrackLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSliderTrackLayer.swift; sourceTree = "<group>"; };
 		ABA448D327E331B000F8E00D /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
@@ -1351,6 +1357,7 @@
 				AB68111D29828CA900C14C32 /* CGSize.swift */,
 				AB6016FD29A6299000BF4365 /* JSONDecoder.swift */,
 				AB39D40129C362DB00892D58 /* CAGradientLayer.swift */,
+				ABA16E9129D2E22D002D63B6 /* UIImage.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2324,6 +2331,8 @@
 				ABE912C229CB4AE900EABDFD /* NewPollImagesCell.swift */,
 				AB3D95C429CCAAE8009E846F /* NewPollHyperlinkCell.swift */,
 				AB4A0CA429CD95D600E6D57A /* NewPollCommentsCell.swift */,
+				ABA16E8D29D2DAED002D63B6 /* NewPollAnonimityCell.swift */,
+				ABA16E8F29D2DB36002D63B6 /* NewPollHotCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -3535,6 +3544,7 @@
 				AB548664269724A300D30235 /* NewPollResultViewController.swift in Sources */,
 				AB4054FC28785825000F7768 /* CommentsSectionCell.swift in Sources */,
 				ABA282F0274FD93E00ED583F /* RangeSliderTrackLayer.swift in Sources */,
+				ABA16E8E29D2DAED002D63B6 /* NewPollAnonimityCell.swift in Sources */,
 				AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */,
 				AB0AB63D27B5001F006FD33F /* AgreementView.swift in Sources */,
 				AB90FAFF28D4C6EF0096B147 /* InterestCell.swift in Sources */,
@@ -3904,6 +3914,7 @@
 				AB72962B27DB5A6D00D45B54 /* ListContract.swift in Sources */,
 				AB592E242906C8180082EE13 /* UserCredentialsCell.swift in Sources */,
 				AB43A56025E63BB800BF8749 /* PaddingLabel.swift in Sources */,
+				ABA16E9029D2DB36002D63B6 /* NewPollHotCell.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
 				AB791D80243B31040085E00E /* VoteCompletionView.swift in Sources */,
 				AB98307C27B68811002C5132 /* LoginView.swift in Sources */,
@@ -3943,6 +3954,7 @@
 				AB7478BF2428951F00317EB6 /* CircularIndicatorImageView.swift in Sources */,
 				ABB7D049295A02CF00DF00B4 /* Publisher.swift in Sources */,
 				ABDE82C128B38F18004E07BD /* CommentsController.swift in Sources */,
+				ABA16E9229D2E22D002D63B6 /* UIImage.swift in Sources */,
 				ABC8270629AA4F5900E33074 /* AccountManagementCollectionView.swift in Sources */,
 				ABEB5F7F285E1E0600C75C31 /* LimitsSelectionView.swift in Sources */,
 				AB234F4028D653B600204EC8 /* NSDirectionalEdgeInsets.swift in Sources */,

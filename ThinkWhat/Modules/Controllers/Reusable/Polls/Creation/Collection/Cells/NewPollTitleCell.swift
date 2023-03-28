@@ -154,8 +154,8 @@ class NewPollTextCell: UICollectionViewCell {
     let instance = UITextView()
     instance.textContainerInset = .uniform(size: padding)//.init(top: padding*2, left: padding, bottom: padding*2, right: padding)
     instance.delegate = self
-    instance.layer.borderWidth = 0
-    instance.layer.borderColor = UIColor.systemGray5.cgColor
+//    instance.layer.borderWidth = 0
+//    instance.layer.borderColor = UIColor.systemGray5.cgColor
     //    instance.textContainerInset = .uniform(size: .zero)
     instance.isUserInteractionEnabled = true
     //    instance.isScrollEnabled = false
@@ -224,7 +224,7 @@ class NewPollTextCell: UICollectionViewCell {
   private lazy var placeholder: UILabel = {
     let instance = UILabel()
     instance.numberOfLines = 0
-    instance.font = placeholderFont
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)//placeholderFont
     instance.text = stage.placeholder
     instance.textColor = .secondaryLabel
     instance.textAlignment = .center
@@ -351,7 +351,7 @@ private extension NewPollTextCell {
     if text.isNil || text.isEmpty {
       placeholder.placeInCenter(of: textView)
       textView.font = placeholderFont
-      placeholder.font = placeholderFont
+//      placeholder.font = placeholderFont
     } else {
       textView.font = font
     }
@@ -378,8 +378,8 @@ extension NewPollTextCell: UITextViewDelegate {
       textView.textColor = .label
     }
     
-    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 0, toValue: 1.5, duration: 0.2), forKey: nil)
-    textView.layer.add(CABasicAnimation(path: "borderColor", fromValue: textView.layer.borderColor, toValue: color.cgColor, duration: 0.2), forKey: nil)
+//    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 0, toValue: 1.5, duration: 0.2), forKey: nil)
+//    textView.layer.add(CABasicAnimation(path: "borderColor", fromValue: textView.layer.borderColor, toValue: color.cgColor, duration: 0.2), forKey: nil)
     
     UIView.animate(withDuration: 0.2, animations: { [unowned self] in
       textView.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
@@ -435,7 +435,7 @@ extension NewPollTextCell: UITextViewDelegate {
       drawLine(line: fgLine)
     }
     
-    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 1.5, toValue: 0, duration: 0.2), forKey: nil)
+//    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 1.5, toValue: 0, duration: 0.2), forKey: nil)
     
     UIView.animate(withDuration: 0.2, animations: {
       textView.backgroundColor = .clear//self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
