@@ -15,7 +15,7 @@ class NewPollHotCell: UICollectionViewCell {
   ///**Logic**
   public var stage: NewPollController.Stage! {
     didSet {
-      guard !stage.isNil else { return }
+      guard !stage.isNil, stage != oldValue else { return }
       
       setupUI()
     }
@@ -26,6 +26,7 @@ class NewPollHotCell: UICollectionViewCell {
     didSet {
       guard oldValue != color else { return }
       
+      nextButton.tintColor = color
       UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
         
@@ -48,26 +49,26 @@ class NewPollHotCell: UICollectionViewCell {
     }
   }
   ///**Publishers**
-  @Published public private(set) var isAnimationComplete: Bool?
-  @Published public var commentsEnabled: Bool! {
+  @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
+  @Published public var isHot: Bool! {
     didSet {
-      guard stage == stageGlobal, !commentsEnabled.isNil, !openedConstraint.isActive else { return }
+      guard stage == stageGlobal, !isHot.isNil else { return }//, !openedConstraint.isActive else { return }
       
-      closedConstraint.isActive = false
-      openedConstraint.isActive = true
-      boundsPublisher.send()
-      nextButton.tintColor = color
-      delay(seconds: 0.3) { [weak self] in
-        guard let self = self else { return }
-        
-        self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
-        UIView.animate(withDuration: 0.2) {
-          self.nextButton.transform = .identity
-          self.nextButton.alpha = 1
+      if let constraint = buttonsStack.getConstraint(identifier: "heightAnchor") {
+        setNeedsLayout()
+        UIView.animate(withDuration: 0.3) { [weak self] in
+          guard let self = self else { return }
+          
+          constraint.constant = "T".height(withConstrainedWidth: 100,
+                                           font: UIFont.scaledFont(fontName: Fonts.Regular,
+                                                                   forTextStyle: .body)!) + self.padding*2
+          self.layoutIfNeeded()
         }
       }
+      boundsPublisher.send()
     }
   }
+  public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
   public private(set) var boundsPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
@@ -76,6 +77,7 @@ class NewPollHotCell: UICollectionViewCell {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
+  private let stackHeight: CGFloat = 70
   private lazy var imageView: UIImageView = {
     let instance = UIImageView(image: stage.numImage)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
@@ -96,10 +98,14 @@ class NewPollHotCell: UICollectionViewCell {
   }()
   private lazy var descriptionLabel: UILabel = {
     let instance = UILabel()
-//    instance.alpha = 1
-    instance.textColor = commentsEnabled.isNil ? color : .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body)
-    instance.text = commentsEnabled.isNil ? "new_poll_comments_placeholder".localized : commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
+    instance.numberOfLines = 0
+    instance.textAlignment = .center
+    instance.textColor = isHot.isNil ? color : .label
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+    instance.text = isHot.isNil ? "new_poll_hot_placeholder".localized : isHot ? "new_poll_hot_on".localized : "new_poll_hot_off".localized
+    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
+    constraint.identifier = "heightAnchor"
+    constraint.isActive = true
     
     return instance
   }()
@@ -127,12 +133,12 @@ class NewPollHotCell: UICollectionViewCell {
   }()
   private lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
-      commentsOnIcon,
-      commentsOffIcon
+      hotOnIcon,
+      hotOffIcon
     ])
     instance.axis = .horizontal
     instance.distribution = .fillEqually
-    instance.spacing = 35
+    instance.spacing = stackHeight/1.5
     
     return instance
   }()
@@ -142,7 +148,7 @@ class NewPollHotCell: UICollectionViewCell {
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     instance.contentMode = .scaleAspectFill
     instance.tintColor = color
-    instance.alpha = 0
+//    instance.alpha = 0
     instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.nextStage)))
     
     
@@ -154,26 +160,29 @@ class NewPollHotCell: UICollectionViewCell {
     instance.axis = .vertical
     instance.alignment = .center
     instance.distribution = .fillEqually
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!) + padding*2).isActive = true
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
+    constraint.isActive = true
+    constraint.identifier = "heightAnchor"
     
     return instance
   }()
-  private lazy var commentsOnIcon: Icon = {
-    let instance = Icon(category: .Comments)
-    instance.iconColor = commentsEnabled.isNil ? color : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
+  private lazy var hotOnIcon: Icon = {
+    let instance = Icon(category: .Hot)
+    instance.iconColor = !isHot.isNil ? Colors.Logo.Flame.rawValue : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    instance.heightAnchor.constraint(equalToConstant: 70).isActive = true
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+    instance.translatesAutoresizingMaskIntoConstraints = false
+    instance.heightAnchor.constraint(equalToConstant: stackHeight).isActive = true
     instance.isUserInteractionEnabled = true
     instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     
     return instance
   }()
-  private lazy var commentsOffIcon: Icon = {
-    let instance = Icon(category: .CommentsDisabled)
-    instance.iconColor = commentsEnabled.isNil ? color : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
+  private lazy var hotOffIcon: Icon = {
+    let instance = Icon(category: .HotDisabled)
+    instance.iconColor = !isHot.isNil ? Colors.Logo.Flame.rawValue : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1
@@ -183,8 +192,8 @@ class NewPollHotCell: UICollectionViewCell {
     
     return instance
   }()
-  private var openedConstraint: NSLayoutConstraint!
-  private var closedConstraint: NSLayoutConstraint!
+//  private var openedConstraint: NSLayoutConstraint!
+//  private var closedConstraint: NSLayoutConstraint!
   
   
   
@@ -217,7 +226,9 @@ class NewPollHotCell: UICollectionViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
-    
+    animationCompletePublisher = PassthroughSubject<Void, Never>()
+    stageCompletePublisher = PassthroughSubject<Void, Never>()
+    boundsPublisher = PassthroughSubject<Void, Never>()
   }
   
   override func layoutSubviews() {
@@ -225,14 +236,37 @@ class NewPollHotCell: UICollectionViewCell {
     
     self.drawLine(line: self.bgLine, strokeEnd: 1, xPoint: 500)
     self.drawLine(line: self.fgLine)
+    
+    guard isHot.isNil else { return }
+    
+    let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width, font: self.descriptionLabel.font)
+    
+    guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
+          constraint.constant != height
+    else { return }
+    
+    self.setNeedsLayout()
+    constraint.constant = height
+    self.layoutIfNeeded()
+    self.boundsPublisher.send()
   }
   
   // MARK: - Public methods
   func present(seconds: Double = .zero) {
+    UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+    } completion: { _ in }
     
+    UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.descriptionLabel.textColor = .label
+    } completion: { _ in }
     
-    commentsOnIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
-    commentsOffIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
+    hotOnIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
+    hotOffIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
 //    textView.becomeFirstResponder()
 //
 //    UIView.animate(withDuration: 0.2, animations: { [weak self] in
@@ -258,6 +292,7 @@ class NewPollHotCell: UICollectionViewCell {
 private extension NewPollHotCell {
   @MainActor
   func setupUI() {
+//    contentView.translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
     stageStack.placeTopLeading(inside: self,
                                leadingInset: 8,
@@ -270,22 +305,20 @@ private extension NewPollHotCell {
     buttonsStack.translatesAutoresizingMaskIntoConstraints = false
     descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
-      stack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*4),
+      stack.centerXAnchor.constraint(equalTo: centerXAnchor, constant: padding*1),
       descriptionLabel.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*2),
-      descriptionLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*2),
+      descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+      descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
+      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*4),
       buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
-    openedConstraint.isActive = false
-    openedConstraint.priority = .defaultLow
-    
-    closedConstraint = descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
-    closedConstraint.isActive = true
-    closedConstraint.priority = .defaultLow
+    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
+    constraint.isActive = true
+    constraint.identifier = "bottomAnchor"
+    constraint.priority = .defaultLow
     
     layer.insertSublayer(bgLine.layer, at: 0)
     layer.insertSublayer(fgLine.layer, at: 1)
@@ -314,23 +347,23 @@ private extension NewPollHotCell {
   
   @objc
   func handleTap(recognizer: UITapGestureRecognizer) {
-//    guard !commentsEnabled.isNil else { return }
+//    guard !isHot.isNil else { return }
 //    guard stageGlobal == .Ready || stage == stageGlobal else { return }
     
     guard let v = recognizer.view else { return }
     if let icon = v as? Icon {
-        let selectedIcon: Icon! = icon == commentsOnIcon ? commentsOnIcon : commentsOffIcon
-        let deselectedIcon: Icon! = icon != commentsOnIcon ? commentsOnIcon : commentsOffIcon
+        let selectedIcon: Icon! = icon == hotOnIcon ? hotOnIcon : hotOffIcon
+        let deselectedIcon: Icon! = icon != hotOnIcon ? hotOnIcon : hotOffIcon
         
-      if !commentsEnabled.isNil {
-        if commentsEnabled && icon == commentsOnIcon || !commentsEnabled && icon == commentsOffIcon {
+      if !isHot.isNil {
+        if isHot && icon == hotOnIcon || !isHot && icon == hotOffIcon {
           return
         }
       }
         
         let enableAnim  = Animations.get(property: .FillColor,
                                          fromValue: selectedIcon.iconColor.cgColor,
-                                         toValue: color.cgColor,
+                                         toValue: Colors.Logo.Flame.rawValue.cgColor,
                                          duration: 0.3,
                                          timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                          delegate: nil,
@@ -344,7 +377,7 @@ private extension NewPollHotCell {
                                          isRemovedOnCompletion: true)
         
         selectedIcon.icon.add(enableAnim, forKey: nil)
-        (selectedIcon.icon as! CAShapeLayer).fillColor = color.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
+        (selectedIcon.icon as! CAShapeLayer).fillColor = Colors.Logo.Flame.rawValue.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
         deselectedIcon.icon.add(disableAnim, forKey: nil)
       (deselectedIcon.icon as! CAShapeLayer).fillColor = UIColor.systemGray4.cgColor// traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.secondarySystemBackground.cgColor
         
@@ -355,38 +388,69 @@ private extension NewPollHotCell {
             initialSpringVelocity: 2.5,
             options: [.curveEaseInOut],
             animations: {
-                selectedIcon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+              selectedIcon.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
             }) { _ in }
       
-      if commentsEnabled.isNil {
-        commentsEnabled = selectedIcon == commentsOnIcon
+      if isHot.isNil {
+        isHot = selectedIcon == hotOnIcon
       } else {
-        commentsEnabled = !commentsEnabled
+        isHot = !isHot
       }
       
-      UIView.transition(with: descriptionLabel, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
         guard let self = self else { return }
         
-        self.descriptionLabel.textColor = .secondaryLabel
-        self.descriptionLabel.text = self.commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
+        self.descriptionLabel.textColor = .label
+        self.descriptionLabel.text = self.isHot ? "new_poll_hot_on".localized : "new_poll_hot_off".localized
+        
+        let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width, font: self.descriptionLabel.font)
+        
+        guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
+              constraint.constant != height
+        else { return }
+        
+        self.setNeedsLayout()
+        constraint.constant = height
+        self.layoutIfNeeded()
+        self.boundsPublisher.send()
       } completion: { _ in }
         
         deselectedIcon.icon.add(disableAnim, forKey: nil)
         UIView.animate(withDuration: 0.15, delay: 0, options: [.curveEaseInOut], animations: {
-            deselectedIcon.transform = .identity
+          deselectedIcon.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         })
     }
   }
   
   @objc
   func nextStage() {
-    closedConstraint.isActive = true
-    openedConstraint.isActive = false
-    boundsPublisher.send()
-    nextButton.removeFromSuperview()
+    UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+    } completion: { _ in }
     
+    if let heightAnchor = buttonsStack.getConstraint(identifier: "heightAnchor"),
+       let bottomAnchor = buttonsStack.getConstraint(identifier: "bottomAnchor"){
+      setNeedsLayout()
+      UIView.animate(withDuration: 0.3) { [weak self] in
+        guard let self = self else { return }
+        
+        heightAnchor.constant = 0
+        bottomAnchor.constant = 0
+        self.layoutIfNeeded()
+      }
+    }
+    
+    boundsPublisher.send()
+    stageCompletePublisher.send()
+    stageCompletePublisher.send(completion: .finished)
+
     CATransaction.begin()
-    CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
+    CATransaction.setCompletionBlock() { [unowned self] in
+      self.animationCompletePublisher.send()
+      self.animationCompletePublisher.send(completion: .finished)
+    }
     fgLine.layer.strokeColor = color.cgColor
     fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
     CATransaction.commit()
@@ -400,4 +464,3 @@ extension NewPollHotCell: CAAnimationDelegate {
     completion()
   }
 }
-

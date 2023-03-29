@@ -15,7 +15,7 @@ class NewPollTextCell: UICollectionViewCell {
   ///**Logic**
   public var stage: NewPollController.Stage! {
     didSet {
-      guard !stage.isNil else { return }
+      guard !stage.isNil, oldValue != stage else { return }
       
       setupUI()
     }
@@ -76,15 +76,28 @@ class NewPollTextCell: UICollectionViewCell {
   }
   public var isMovingToParent = false
   ///**Publishers**
-  @Published public private(set) var isAnimationComplete: Bool?
+  public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
   @Published public var text: String! {
     didSet {
       updateUI()
       guard text != oldValue else { return }
       
+      stageCompletePublisher.send()
+      stageCompletePublisher.send(completion: .finished)
+      
+      UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+        guard let self = self else { return }
+        
+        self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+      } completion: { _ in }
+      
       if oldValue.isNil || oldValue.isEmpty {
         CATransaction.begin()
-        CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
+        CATransaction.setCompletionBlock() { [unowned self] in
+          self.animationCompletePublisher.send()
+          self.animationCompletePublisher.send(completion: .finished)
+        }
         fgLine.layer.strokeColor = color.cgColor
         fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
         CATransaction.commit()
@@ -246,6 +259,8 @@ class NewPollTextCell: UICollectionViewCell {
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
+    
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -256,7 +271,7 @@ class NewPollTextCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    guard !textView.isFirstResponder else { return }
+    guard textView.isFirstResponder else { return }
     
     textView.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
   }
@@ -265,6 +280,8 @@ class NewPollTextCell: UICollectionViewCell {
     super.prepareForReuse()
     
     boundsPublisher = PassthroughSubject<CGRect, Never>()
+    animationCompletePublisher = PassthroughSubject<Void, Never>()
+    stageCompletePublisher = PassthroughSubject<Void, Never>()
   }
   
   override func layoutSubviews() {
@@ -276,21 +293,31 @@ class NewPollTextCell: UICollectionViewCell {
   
   // MARK: - Public methods
   func present(seconds: Double = .zero) {
-    textView.becomeFirstResponder()
+    func disclose() {
+      UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+        guard let self = self else { return }
+        
+        self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+        self.placeholder.alpha = 0
+        self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
+      } completion: { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.textView.becomeFirstResponder()
+        self.placeholder.removeFromSuperview()
+        
+        guard !self.textView.isFirstResponder else { return }
+        
+        self.textView.becomeFirstResponder()
+      }
+    }
     
-    UIView.animate(withDuration: 0.2, animations: { [weak self] in
-      guard let self = self else { return }
-      
-      self.placeholder.alpha = 0
-      self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
-    }) { [weak self] _ in
-      guard let self = self else { return }
-      
-      self.placeholder.removeFromSuperview()
-      
-      guard !self.textView.isFirstResponder else { return }
-      
-      self.textView.becomeFirstResponder()
+    if seconds == .zero {
+      disclose()
+    } else {
+      delay(seconds: seconds) {
+        disclose()
+      }
     }
   }
 }
@@ -307,12 +334,12 @@ private extension NewPollTextCell {
     addSubview(textView)
     textView.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      textView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
+      textView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*3),
       textView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       textView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = textView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
+    let constraint = textView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
     constraint.isActive = true
     constraint.priority = .defaultLow
     

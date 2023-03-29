@@ -32,7 +32,7 @@ class NewPollImagesCell: UICollectionViewCell {
   public var topicColor: UIColor = .systemGray
   ///**Publishers**
   @Published public var removedImage: NewPollImage?
-  @Published public private(set) var isAnimationComplete: Bool?
+  @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
   @Published public private(set) var stageAnimationFinished: NewPollController.Stage!
   @Published public var isKeyboardOnScreen: Bool!
   @Published public var isMovingToParent: Bool!
@@ -261,8 +261,10 @@ class NewPollImagesCell: UICollectionViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
+    boundsPublisher = PassthroughSubject<Bool, Never>()
     addImagePublisher = PassthroughSubject<Void, Never>()
 //    topicPublisher = PassthroughSubject<Topic, Never>()
+    animationCompletePublisher = PassthroughSubject<Void, Never>()
   }
   
   override func layoutSubviews() {
@@ -274,6 +276,12 @@ class NewPollImagesCell: UICollectionViewCell {
   
   // MARK: - Public methods
   public func present(seconds: Double = .zero) {
+    UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+    } completion: { _ in }
+    
     collectionView.present()
     
     buttonsStack.addArrangedSubview(nextButton)
@@ -318,7 +326,7 @@ private extension NewPollImagesCell {
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
+    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
     constraint.isActive = true
     constraint.priority = .defaultLow
     
@@ -339,13 +347,22 @@ private extension NewPollImagesCell {
   
   @objc
   func nextStage() {
+    UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+    } completion: { _ in }
+    
     buttonsStack.removeArrangedSubview(nextButton)
     nextButton.removeFromSuperview()
     boundsPublisher.send(true)
     
     
     CATransaction.begin()
-    CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
+    CATransaction.setCompletionBlock() { [unowned self] in
+      self.animationCompletePublisher.send()
+      self.animationCompletePublisher.send(completion: .finished)
+    }
     fgLine.layer.strokeColor = color.cgColor
     fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
     CATransaction.commit()

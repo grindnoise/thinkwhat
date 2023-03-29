@@ -13,7 +13,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
   
   ///Sequence of stages to post new survey
   enum Stage: Int, CaseIterable {
-    case Topic, Title, Description, Question, Choices, Images, Hyperlink, Comments, Anonymity, Hot, Limits, Ready
+    case Topic, Title, Description, Question, Choices, Images, Hyperlink, Comments, Anonymity, Hot, Limits, Cost, Ready
     
     func next() -> Stage? { Stage(rawValue: (self.rawValue + 1)) }
     
@@ -30,7 +30,8 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       case .Images: return "new_poll_images".localized
       case .Comments: return "new_poll_comments".localized
       case .Anonymity: return "new_poll_anonymity".localized
-      case .Hot: return "new_poll_anonymity".localized
+      case .Hot: return "new_poll_hot".localized
+      case .Limits: return "new_poll_limit".localized
       default: return ""
       }
     }
@@ -45,7 +46,8 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       case .Images: return "new_poll_image_placeholder".localized
       case .Comments: return "new_poll_comments_placeholder".localized
       case .Anonymity: return "new_poll_anonymity_placeholder".localized
-      case .Hot: return "new_poll_anonymity_placeholder".localized
+      case .Hot: return "new_poll_hot_placeholder".localized
+      case .Limits: return "new_poll_limit_placeholder".localized
       default: return ""
       }
     }
@@ -72,7 +74,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       }
     }
     
-    func percent() -> Double {  Double(self.rawValue * 100 / Stage.allCases.count) / 100 }
+    func percent() -> Double {  Double(self.rawValue * 100 / Stage.allCases.count-1) / 100 }
   }
   
   
@@ -272,6 +274,16 @@ private extension NewPollController {
     progressCapsule.placeInCenter(of: navigationBar)
     navigationBar.setNeedsLayout()
     navigationBar.layoutIfNeeded()
+
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithDefaultBackground()
+    appearance.backgroundColor = .systemBackground
+    appearance.shadowColor = nil
+    navigationBar.standardAppearance = appearance
+    navigationBar.scrollEdgeAppearance = appearance
+    navigationBar.prefersLargeTitles = false
+
+    if #available(iOS 15.0, *) { navigationBar.compactScrollEdgeAppearance = appearance }
   }
 }
 

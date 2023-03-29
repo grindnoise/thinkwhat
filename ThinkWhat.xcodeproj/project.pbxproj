@@ -566,6 +566,8 @@
 		ABF3DF1B283BB11800309AA9 /* LargeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF3DF1A283BB11800309AA9 /* LargeCard.swift */; };
 		ABF3DF1D283BB13300309AA9 /* LargeCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABF3DF1C283BB13300309AA9 /* LargeCard.xib */; };
 		ABF3DF1F283BC2DA00309AA9 /* _HotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF3DF1E283BC2DA00309AA9 /* _HotCard.swift */; };
+		ABF4D14A29D47A8D00BCBFD8 /* NewPollLimitsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF4D14929D47A8D00BCBFD8 /* NewPollLimitsCell.swift */; };
+		ABF4D14D29D493DE00BCBFD8 /* SurveyLimitPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF4D14C29D493DE00BCBFD8 /* SurveyLimitPopupContent.swift */; };
 		ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */; };
 		ABF888AB29BB38B900A37212 /* EmptySubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF888AA29BB38B900A37212 /* EmptySubscriptionsView.swift */; };
 		ABF9952529C77734007D7578 /* TopicSelectionPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF9952429C77734007D7578 /* TopicSelectionPopupContent.swift */; };
@@ -1173,6 +1175,8 @@
 		ABF3DF1A283BB11800309AA9 /* LargeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeCard.swift; sourceTree = "<group>"; };
 		ABF3DF1C283BB13300309AA9 /* LargeCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LargeCard.xib; sourceTree = "<group>"; };
 		ABF3DF1E283BC2DA00309AA9 /* _HotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _HotCard.swift; sourceTree = "<group>"; };
+		ABF4D14929D47A8D00BCBFD8 /* NewPollLimitsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollLimitsCell.swift; sourceTree = "<group>"; };
+		ABF4D14C29D493DE00BCBFD8 /* SurveyLimitPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyLimitPopupContent.swift; sourceTree = "<group>"; };
 		ABF51D28237EB2790053EB75 /* UserSurveysTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSurveysTableViewController.swift; sourceTree = "<group>"; };
 		ABF888AA29BB38B900A37212 /* EmptySubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptySubscriptionsView.swift; sourceTree = "<group>"; };
 		ABF9952429C77734007D7578 /* TopicSelectionPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelectionPopupContent.swift; sourceTree = "<group>"; };
@@ -2333,6 +2337,7 @@
 				AB4A0CA429CD95D600E6D57A /* NewPollCommentsCell.swift */,
 				ABA16E8D29D2DAED002D63B6 /* NewPollAnonimityCell.swift */,
 				ABA16E8F29D2DB36002D63B6 /* NewPollHotCell.swift */,
+				ABF4D14929D47A8D00BCBFD8 /* NewPollLimitsCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -2758,6 +2763,7 @@
 		ABADF5A327F73C7400A26474 /* Content */ = {
 			isa = PBXGroup;
 			children = (
+				ABF4D14B29D493B200BCBFD8 /* Survey limit */,
 				ABF9952329C77700007D7578 /* TopicSelection */,
 				AB411AD029AC93AB00C43547 /* Account management */,
 				AB41F71F28E345A80037C628 /* Users filter */,
@@ -3146,6 +3152,14 @@
 			children = (
 			);
 			path = Small;
+			sourceTree = "<group>";
+		};
+		ABF4D14B29D493B200BCBFD8 /* Survey limit */ = {
+			isa = PBXGroup;
+			children = (
+				ABF4D14C29D493DE00BCBFD8 /* SurveyLimitPopupContent.swift */,
+			);
+			path = "Survey limit";
 			sourceTree = "<group>";
 		};
 		ABF51D26237EB2260053EB75 /* Feed */ = {
@@ -3540,12 +3554,14 @@
 				ABDFA749238C1B5D00321EE0 /* AddButton.swift in Sources */,
 				AB234F4A28D7685500204EC8 /* SurveysView.swift in Sources */,
 				AB0BFDF7253093B000BD5EFF /* FlameBadge.swift in Sources */,
+				ABF4D14A29D47A8D00BCBFD8 /* NewPollLimitsCell.swift in Sources */,
 				AB72960327DA0DD500D45B54 /* Common.swift in Sources */,
 				AB548664269724A300D30235 /* NewPollResultViewController.swift in Sources */,
 				AB4054FC28785825000F7768 /* CommentsSectionCell.swift in Sources */,
 				ABA282F0274FD93E00ED583F /* RangeSliderTrackLayer.swift in Sources */,
 				ABA16E8E29D2DAED002D63B6 /* NewPollAnonimityCell.swift in Sources */,
 				AB2495EF264A8A9900A6F555 /* MobileNet.mlmodel in Sources */,
+				ABF4D14D29D493DE00BCBFD8 /* SurveyLimitPopupContent.swift in Sources */,
 				AB0AB63D27B5001F006FD33F /* AgreementView.swift in Sources */,
 				AB90FAFF28D4C6EF0096B147 /* InterestCell.swift in Sources */,
 				ABE56C15298AA264004C761D /* UserCompatibilityCollectionView.swift in Sources */,

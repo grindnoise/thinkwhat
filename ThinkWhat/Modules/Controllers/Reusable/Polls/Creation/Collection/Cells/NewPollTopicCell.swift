@@ -22,16 +22,26 @@ class NewPollTopicCell: UICollectionViewCell {
   }
   public var stageGlobal: NewPollController.Stage!
   ///**Publishers**
-  @Published public private(set) var isAnimationComplete: Bool?
+  @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
   @Published public var topic: Topic! {
     didSet {
       guard let topic = topic,
             topic != oldValue
       else { return }
       
+      
+      UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+        guard let self = self else { return }
+        
+        self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+      } completion: { _ in }
+      
       if oldValue.isNil {
         CATransaction.begin()
-        CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
+        CATransaction.setCompletionBlock() { [unowned self] in
+          self.animationCompletePublisher.send()
+          self.animationCompletePublisher.send(completion: .finished)
+        }
         fgLine.layer.strokeColor = topic.tagColor.cgColor
         fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
         CATransaction.commit()
@@ -83,7 +93,7 @@ class NewPollTopicCell: UICollectionViewCell {
   private lazy var label: UILabel = {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+    instance.font = UIFont.scaledFont(fontName: stage == stageGlobal ? Fonts.OpenSans.Extrabold.rawValue : Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
     instance.text = "new_poll_topic".localized.uppercased()
     
     return instance
@@ -144,7 +154,7 @@ class NewPollTopicCell: UICollectionViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
-//    topicPublisher = PassthroughSubject<Topic, Never>()
+    animationCompletePublisher = PassthroughSubject<Void, Never>()
   }
   
   override func layoutSubviews() {

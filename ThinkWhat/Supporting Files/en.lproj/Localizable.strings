@@ -444,3 +444,9 @@
 "new_poll_anonymity_placeholder" = "Anonymity option";
 "new_poll_anonymity_on" = "Author, voters and commentators are hidden";
 "new_poll_anonymity_off" = "Author, voters and commentators see each other";
+"new_poll_hot" = "Hot feed";
+"new_poll_hot_placeholder" = "Opportunity for additional points to get into the Hot feed";
+"new_poll_hot_on" = "The poll will be published in the Hot feed";
+"new_poll_hot_off" = "The poll won't be published in the Hot feed";
+"new_poll_limit" = "Number of participants";
+"new_poll_limit_placeholder" = "The poll will close when the specified number of votes is reached";

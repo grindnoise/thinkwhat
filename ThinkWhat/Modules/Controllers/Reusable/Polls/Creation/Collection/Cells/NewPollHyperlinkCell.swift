@@ -15,9 +15,9 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   ///**Logic**
   public var stage: NewPollController.Stage! {
     didSet {
-      guard !stage.isNil else { return }
+      guard !stage.isNil, stage != oldValue else { return }
       
-//      setupUI()
+      setupUI()
     }
   }
   public var stageGlobal: NewPollController.Stage!
@@ -58,15 +58,15 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   }
   public var isMovingToParent = false
   ///**Publishers**
-  @Published public private(set) var isAnimationComplete: Bool?
-  @Published public var text: String! {
-    didSet {
-      guard !text.isNil else { return }
-      
-      setupUI()
-    }
-  }
-  @Published public var skip: Bool!
+  @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
+  @Published public var text: String! //{
+//    didSet {
+//      guard text.isNil,  else { return }
+//
+//      setupUI()
+//    }
+//  }
+  @Published public private(set) var nextPublisher = PassthroughSubject<Void, Never>()
   public private(set) var boundsPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
@@ -249,6 +249,8 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     super.prepareForReuse()
     
     boundsPublisher = PassthroughSubject<Void, Never>()
+    animationCompletePublisher = PassthroughSubject<Void, Never>()
+    nextPublisher = PassthroughSubject<Void, Never>()
   }
   
   override func layoutSubviews() {
@@ -268,6 +270,12 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   
   // MARK: - Public methods
   func present(seconds: Double = .zero) {
+    UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+    } completion: { _ in }
+    
 //    textView.becomeFirstResponder()
 //
 //    buttonsStack.addArrangedSubview(nextButton)
@@ -301,7 +309,7 @@ private extension NewPollHyperlinkCell {
     buttonsStack.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       stack.heightAnchor.constraint(equalToConstant: minHeight),
-      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*3),
+      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*4),
       stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
       buttonsStack.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*2),
@@ -310,11 +318,11 @@ private extension NewPollHyperlinkCell {
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
+    openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
     openedConstraint.isActive = false
     openedConstraint.priority = .defaultLow
     
-    closedConstraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
+    closedConstraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
     closedConstraint.isActive = true
     closedConstraint.priority = .defaultLow
     
@@ -370,15 +378,25 @@ private extension NewPollHyperlinkCell {
   
   @objc
   func nextStage() {
+    UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+    } completion: { _ in }
+    
 //    buttonsStack.removeArrangedSubview(nextButton)
     closedConstraint.isActive = true
     openedConstraint.isActive = false
     boundsPublisher.send()
     nextButton.removeFromSuperview()
-    skip = true
+    nextPublisher.send()
+    nextPublisher.send(completion: .finished)
     
     CATransaction.begin()
-    CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
+    CATransaction.setCompletionBlock() { [unowned self] in
+      self.animationCompletePublisher.send()
+      self.animationCompletePublisher.send(completion: .finished)
+    }
     fgLine.layer.strokeColor = color.cgColor
     fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
     CATransaction.commit()

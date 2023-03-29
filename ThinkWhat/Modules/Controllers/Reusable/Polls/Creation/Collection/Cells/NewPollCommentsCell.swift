@@ -15,7 +15,7 @@ class NewPollCommentsCell: UICollectionViewCell {
   ///**Logic**
   public var stage: NewPollController.Stage! {
     didSet {
-      guard !stage.isNil else { return }
+      guard !stage.isNil, stage != oldValue else { return }
       
       setupUI()
     }
@@ -26,6 +26,7 @@ class NewPollCommentsCell: UICollectionViewCell {
     didSet {
       guard oldValue != color else { return }
       
+      nextButton.tintColor = color
       UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
         
@@ -48,27 +49,26 @@ class NewPollCommentsCell: UICollectionViewCell {
     }
   }
   ///**Publishers**
-  @Published public private(set) var isAnimationComplete: Bool?
+  @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
+  @Published public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
   @Published public var commentsEnabled: Bool! {
     didSet {
-      guard stage == stageGlobal, !commentsEnabled.isNil, !openedConstraint.isActive else { return }
+      guard stage == stageGlobal, !commentsEnabled.isNil else { return }//, !openedConstraint.isActive else { return }
       
-      closedConstraint.isActive = false
-      openedConstraint.isActive = true
-      boundsPublisher.send()
-      nextButton.tintColor = color
-      delay(seconds: 0.3) { [weak self] in
-        guard let self = self else { return }
-        
-        self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
-        UIView.animate(withDuration: 0.2) {
-          self.nextButton.transform = .identity
-          self.nextButton.alpha = 1
+      if let constraint = buttonsStack.getConstraint(identifier: "heightAnchor") {
+        setNeedsLayout()
+        UIView.animate(withDuration: 0.3) { [weak self] in
+          guard let self = self else { return }
+          
+          constraint.constant = "T".height(withConstrainedWidth: 100,
+                                           font: UIFont.scaledFont(fontName: Fonts.Regular,
+                                                                   forTextStyle: .body)!) + self.padding*2
+          self.layoutIfNeeded()
         }
       }
+      boundsPublisher.send()
     }
   }
-  @Published public private(set) var isStageComplete: Bool!
   public private(set) var boundsPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
@@ -77,6 +77,7 @@ class NewPollCommentsCell: UICollectionViewCell {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
+  private let stackHeight: CGFloat = 70
   private lazy var imageView: UIImageView = {
     let instance = UIImageView(image: stage.numImage)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
@@ -100,7 +101,7 @@ class NewPollCommentsCell: UICollectionViewCell {
 //    instance.alpha = 1
     instance.textAlignment = .center
     instance.textColor = commentsEnabled.isNil ? color : .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
     instance.text = commentsEnabled.isNil ? "new_poll_comments_placeholder".localized : commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
     
     return instance
@@ -134,7 +135,7 @@ class NewPollCommentsCell: UICollectionViewCell {
     ])
     instance.axis = .horizontal
     instance.distribution = .fillEqually
-    instance.spacing = 35
+    instance.spacing = stackHeight/1.5
     
     return instance
   }()
@@ -144,7 +145,7 @@ class NewPollCommentsCell: UICollectionViewCell {
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     instance.contentMode = .scaleAspectFill
     instance.tintColor = color
-    instance.alpha = 0
+//    instance.alpha = 0
     instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.nextStage)))
     
     
@@ -156,7 +157,9 @@ class NewPollCommentsCell: UICollectionViewCell {
     instance.axis = .vertical
     instance.alignment = .center
     instance.distribution = .fillEqually
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)!) + padding*2).isActive = true
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
+    constraint.isActive = true
+    constraint.identifier = "heightAnchor"
     
     return instance
   }()
@@ -166,8 +169,9 @@ class NewPollCommentsCell: UICollectionViewCell {
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    instance.heightAnchor.constraint(equalToConstant: 70).isActive = true
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+    instance.translatesAutoresizingMaskIntoConstraints = false
+    instance.heightAnchor.constraint(equalToConstant: stackHeight).isActive = true
     instance.isUserInteractionEnabled = true
     instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     
@@ -185,8 +189,8 @@ class NewPollCommentsCell: UICollectionViewCell {
     
     return instance
   }()
-  private var openedConstraint: NSLayoutConstraint!
-  private var closedConstraint: NSLayoutConstraint!
+//  private var openedConstraint: NSLayoutConstraint!
+//  private var closedConstraint: NSLayoutConstraint!
   
   
   
@@ -219,7 +223,8 @@ class NewPollCommentsCell: UICollectionViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
-    
+    animationCompletePublisher = PassthroughSubject<Void, Never>()
+    stageCompletePublisher = PassthroughSubject<Void, Never>()
   }
   
   override func layoutSubviews() {
@@ -231,7 +236,17 @@ class NewPollCommentsCell: UICollectionViewCell {
   
   // MARK: - Public methods
   func present(seconds: Double = .zero) {
+    UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+    } completion: { _ in }
     
+    UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.descriptionLabel.textColor = .label
+    } completion: { _ in }
     
     commentsOnIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
     commentsOffIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
@@ -260,6 +275,7 @@ class NewPollCommentsCell: UICollectionViewCell {
 private extension NewPollCommentsCell {
   @MainActor
   func setupUI() {
+//    contentView.translatesAutoresizingMaskIntoConstraints = false
     backgroundColor = .clear
     stageStack.placeTopLeading(inside: self,
                                leadingInset: 8,
@@ -272,23 +288,20 @@ private extension NewPollCommentsCell {
     buttonsStack.translatesAutoresizingMaskIntoConstraints = false
     descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*3),
-      stack.centerXAnchor.constraint(equalTo: centerXAnchor),
+      stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*4),
+      stack.centerXAnchor.constraint(equalTo: centerXAnchor, constant: padding*1),
       descriptionLabel.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*2),
       descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*2),
+      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*4),
       buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    openedConstraint = nextButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
-    openedConstraint.isActive = false
-    openedConstraint.priority = .defaultLow
-    
-    closedConstraint = descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*3)
-    closedConstraint.isActive = true
-    closedConstraint.priority = .defaultLow
+    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
+    constraint.isActive = true
+    constraint.identifier = "bottomAnchor"
+    constraint.priority = .defaultLow
     
     layer.insertSublayer(bgLine.layer, at: 0)
     layer.insertSublayer(fgLine.layer, at: 1)
@@ -367,10 +380,10 @@ private extension NewPollCommentsCell {
         commentsEnabled = !commentsEnabled
       }
       
-      UIView.transition(with: descriptionLabel, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
         guard let self = self else { return }
         
-        self.descriptionLabel.textColor = .secondaryLabel
+        self.descriptionLabel.textColor = .label
         self.descriptionLabel.text = self.commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
       } completion: { _ in }
         
@@ -383,14 +396,32 @@ private extension NewPollCommentsCell {
   
   @objc
   func nextStage() {
-    closedConstraint.isActive = true
-    openedConstraint.isActive = false
-    boundsPublisher.send()
-    nextButton.removeFromSuperview()
+    UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+      guard let self = self else { return }
+      
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+    } completion: { _ in }
     
-    isStageComplete = true
+    if let heightAnchor = buttonsStack.getConstraint(identifier: "heightAnchor"),
+       let bottomAnchor = buttonsStack.getConstraint(identifier: "bottomAnchor"){
+      setNeedsLayout()
+      UIView.animate(withDuration: 0.3) { [weak self] in
+        guard let self = self else { return }
+        
+        heightAnchor.constant = 0
+        bottomAnchor.constant = 0
+        self.layoutIfNeeded()
+      }
+    }
+    
+    boundsPublisher.send()
+    stageCompletePublisher.send()
+    stageCompletePublisher.send(completion: .finished)
     CATransaction.begin()
-    CATransaction.setCompletionBlock() { [unowned self] in self.isAnimationComplete = true }
+    CATransaction.setCompletionBlock() { [unowned self] in
+      self.animationCompletePublisher.send()
+      self.animationCompletePublisher.send(completion: .finished)
+    }
     fgLine.layer.strokeColor = color.cgColor
     fgLine.layer.add(CABasicAnimation(path: "strokeEnd", fromValue: 0, toValue: 1, duration: 0.4), forKey: "strokeEnd")
     CATransaction.commit()

@@ -245,8 +245,8 @@ extension NewPollChoiceCell: UITextViewDelegate {
       textView.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
     }
     
-    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 0, toValue: 1.5, duration: 0.2), forKey: nil)
-    textView.layer.add(CABasicAnimation(path: "borderColor", fromValue: textView.layer.borderColor, toValue: color.cgColor, duration: 0.2), forKey: nil)
+//    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 0, toValue: 1.5, duration: 0.2), forKey: nil)
+//    textView.layer.add(CABasicAnimation(path: "borderColor", fromValue: textView.layer.borderColor, toValue: color.cgColor, duration: 0.2), forKey: nil)
     
     return true
   }
@@ -260,7 +260,7 @@ extension NewPollChoiceCell: UITextViewDelegate {
       return true
     }
     
-    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 1.5, toValue: 0, duration: 0.2), forKey: nil)
+//    textView.layer.add(CABasicAnimation(path: "borderWidth", fromValue: 1.5, toValue: 0, duration: 0.2), forKey: nil)
     
     if textView.text.count <= minLength {
       textView.text = "new_poll_choice_placeholder".localized + (order.isNil ? "" : String(describing: order!))
