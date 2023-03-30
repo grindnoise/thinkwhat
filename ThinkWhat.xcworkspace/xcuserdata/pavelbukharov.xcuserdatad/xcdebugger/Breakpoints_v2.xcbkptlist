@@ -2188,27 +2188,27 @@
             landmarkType = "24">
             <Locations>
                <Location
-                  uuid = "20782590-9CDA-47AB-A0F0-84175EF1A689 - ba867f6da18e0e87"
+                  uuid = "20782590-9CDA-47AB-A0F0-84175EF1A689 - b03aa153872afb91"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "ThinkWhat__local_.SubscriptionsView.viewInput.didset : Swift.Optional&lt;ThinkWhat__local_.SubscriptionsViewInput &amp; ThinkWhat__local_.TintColorable&gt;"
-                  moduleName = "ThinkWhat (local)"
+                  symbolName = "ThinkWhat__alpha_.SubscriptionsView.viewInput.didset : Swift.Optional&lt;ThinkWhat__alpha_.SubscriptionsViewInput &amp; ThinkWhat__alpha_.TintColorable&gt;"
+                  moduleName = "ThinkWhat (alpha)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "29"
                   endingLineNumber = "29"
-                  offsetFromSymbolStart = "552">
+                  offsetFromSymbolStart = "600">
                </Location>
                <Location
-                  uuid = "20782590-9CDA-47AB-A0F0-84175EF1A689 - 6db4a92b988e8618"
+                  uuid = "20782590-9CDA-47AB-A0F0-84175EF1A689 - 75a9b06ff41c251a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (__C.UIColor) -&gt; __C.UIColor in ThinkWhat__local_.SubscriptionsView.viewInput.didset : Swift.Optional&lt;ThinkWhat__local_.SubscriptionsViewInput &amp; ThinkWhat__local_.TintColorable&gt;"
-                  moduleName = "ThinkWhat (local)"
+                  symbolName = "closure #1 (__C.UIColor) -&gt; __C.UIColor in ThinkWhat__alpha_.SubscriptionsView.viewInput.didset : Swift.Optional&lt;ThinkWhat__alpha_.SubscriptionsViewInput &amp; ThinkWhat__alpha_.TintColorable&gt;"
+                  moduleName = "ThinkWhat (alpha)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
                   startingColumnNumber = "9223372036854775807"
@@ -2604,12 +2604,12 @@
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "805EE802-08E6-4431-AF81-EA025740E84B - bac1389ac5a376c3"
+                  uuid = "805EE802-08E6-4431-AF81-EA025740E84B - 4cea48fc569fbfc3"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "ThinkWhat__local_.FadeTransition.animateTransition(using: __C.UIViewControllerContextTransitioning) -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
+                  symbolName = "ThinkWhat__alpha_.FadeTransition.animateTransition(using: __C.UIViewControllerContextTransitioning) -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Supporting%20Files/UI/Transitions/old/FadeTransition.swift"
                   startingColumnNumber = "9223372036854775807"
@@ -2619,12 +2619,12 @@
                   offsetFromSymbolStart = "88">
                </Location>
                <Location
-                  uuid = "805EE802-08E6-4431-AF81-EA025740E84B - bac1389ac5a376c3"
+                  uuid = "805EE802-08E6-4431-AF81-EA025740E84B - 4cea48fc569fbfc3"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "ThinkWhat__local_.FadeTransition.animateTransition(using: __C.UIViewControllerContextTransitioning) -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
+                  symbolName = "ThinkWhat__alpha_.FadeTransition.animateTransition(using: __C.UIViewControllerContextTransitioning) -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Supporting%20Files/UI/Transitions/old/FadeTransition.swift"
                   startingColumnNumber = "9223372036854775807"
