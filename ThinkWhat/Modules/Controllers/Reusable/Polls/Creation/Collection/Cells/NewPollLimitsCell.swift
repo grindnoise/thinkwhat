@@ -55,21 +55,11 @@ class NewPollLimitsCell: UICollectionViewCell {
     didSet {
       guard stage == stageGlobal, !limit.isNil else { return }//, !openedConstraint.isActive else { return }
       
-      limitLabel.text = limit.isNil ? "" : String(describing: limit!)
+      limitLabel.text = limit.isNil ? "" : limit.formattedWithSeparator
+      
+      guard oldValue.isNil else { return }
+      
       nextStage()
-//
-//      if let constraint = buttonsStack.getConstraint(identifier: "heightAnchor") {
-//        setNeedsLayout()
-//        UIView.animate(withDuration: 0.3) { [weak self] in
-//          guard let self = self else { return }
-//
-//          constraint.constant = "T".height(withConstrainedWidth: 100,
-//                                           font: UIFont.scaledFont(fontName: Fonts.Regular,
-//                                                                   forTextStyle: .body)!) + self.padding*2
-//          self.layoutIfNeeded()
-//        }
-//      }
-//      boundsPublisher.send()
     }
   }
   public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
@@ -117,8 +107,8 @@ class NewPollLimitsCell: UICollectionViewCell {
     instance.numberOfLines = 1
     instance.isUserInteractionEnabled = true
     instance.textAlignment = .center
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .title1)
-    instance.text = "0"
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title1)
+    instance.text = limit.isNil ? 100.formattedWithSeparator : limit.formattedWithSeparator
     instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer:))))
     
     return instance
@@ -145,30 +135,6 @@ class NewPollLimitsCell: UICollectionViewCell {
     
     return instance
   }()
-//  private lazy var nextButton: UIImageView = {
-//    let instance = UIImageView(image: UIImage(systemName: "arrow.down.circle.fill"))
-//    instance.isUserInteractionEnabled = true
-//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
-//    instance.contentMode = .scaleAspectFill
-//    instance.tintColor = color
-////    instance.alpha = 0
-//    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.nextStage)))
-//
-//
-//    return instance
-//  }()
-//  private lazy var buttonsStack: UIStackView = {
-//    let instance = UIStackView(arrangedSubviews: [nextButton])
-//    instance.spacing = padding
-//    instance.axis = .vertical
-//    instance.alignment = .center
-//    instance.distribution = .fillEqually
-//    let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
-//    constraint.isActive = true
-//    constraint.identifier = "heightAnchor"
-//
-//    return instance
-//  }()
   private lazy var icon: Icon = {
     let instance = Icon(category: .Speedometer)
     instance.iconColor = UIColor.systemGray4
@@ -183,8 +149,6 @@ class NewPollLimitsCell: UICollectionViewCell {
     
     return instance
   }()
-//  private var openedConstraint: NSLayoutConstraint!
-//  private var closedConstraint: NSLayoutConstraint!
   
   
   
@@ -245,7 +209,7 @@ class NewPollLimitsCell: UICollectionViewCell {
     UIView.transition(with: label, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       
-      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
     
     UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
@@ -330,7 +294,7 @@ private extension NewPollLimitsCell {
   func edit() {
     let banner = NewPopup(padding: self.padding*2,
                           contentPadding: .uniform(size: self.padding))
-    let content = SurveyLimitPopupContent(limit: limit ?? 0,
+    let content = SurveyLimitPopupContent(limit: limit.isNil ? 100 : limit,
                                           mode: limit.isNil ? .ForceSelect : .Default,
                                           color: color)
     content.limitPublisher

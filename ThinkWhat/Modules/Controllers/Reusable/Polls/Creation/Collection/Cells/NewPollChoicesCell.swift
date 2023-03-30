@@ -41,7 +41,8 @@ class NewPollChoicesCell: UICollectionViewCell {
   @Published public private(set) var stageAnimationFinished: NewPollController.Stage!
   @Published public var isKeyboardOnScreen: Bool!
   @Published public var isMovingToParent: Bool!
-  public private(set) var addChoicePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var addChoicePublisher = PassthroughSubject<Bool, Never>()
   public private(set) var boundsPublisher = PassthroughSubject<Bool, Never>()
   ///**UI**
   @Published public var color = UIColor.systemGray4 {
@@ -268,7 +269,7 @@ class NewPollChoicesCell: UICollectionViewCell {
     super.prepareForReuse()
     
     boundsPublisher = PassthroughSubject<Bool, Never>()
-    addChoicePublisher = PassthroughSubject<Void, Never>()
+    addChoicePublisher = PassthroughSubject<Bool, Never>()
     animationCompletePublisher = PassthroughSubject<Void, Never>()
   }
   
@@ -285,7 +286,7 @@ class NewPollChoicesCell: UICollectionViewCell {
       UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
         guard let self = self else { return }
         
-        self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+        self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
       } completion: { _ in }
     } else if index != 0, stageGlobal == stage {
 //      button.transform = .init(scaleX: 0.75, y: 0.75)
@@ -380,7 +381,8 @@ private extension NewPollChoicesCell {
     buttonsStack.removeArrangedSubview(nextButton)
     boundsPublisher.send(true)
     nextButton.removeFromSuperview()
-    
+    stageCompletePublisher.send()
+    stageCompletePublisher.send(completion: .finished)
     CATransaction.begin()
     CATransaction.setCompletionBlock() { [unowned self] in
       self.animationCompletePublisher.send()
@@ -394,7 +396,7 @@ private extension NewPollChoicesCell {
   @objc
   func addChoice() {
     endEditing(true)
-    addChoicePublisher.send()
+    addChoicePublisher.send(true)
   }
   
   func drawLine(line: Line,

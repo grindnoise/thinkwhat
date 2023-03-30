@@ -450,3 +450,5 @@
 "new_poll_hot_off" = "The poll won't be published in the Hot feed";
 "new_poll_limit" = "Number of participants";
 "new_poll_limit_placeholder" = "The poll will close when the specified number of votes is reached";
+"new_poll_limit_hint" = "The poll will close when the specified number of votes is reached";
+"new_poll_limit" = "Publication cost";

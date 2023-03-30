@@ -22,13 +22,16 @@ class NewPollTopicCell: UICollectionViewCell {
   }
   public var stageGlobal: NewPollController.Stage!
   ///**Publishers**
-  @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
   @Published public var topic: Topic! {
     didSet {
       guard let topic = topic,
             topic != oldValue
       else { return }
       
+      stageCompletePublisher.send()
+      stageCompletePublisher.send(completion: .finished)
       
       UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
         guard let self = self else { return }
@@ -93,7 +96,7 @@ class NewPollTopicCell: UICollectionViewCell {
   private lazy var label: UILabel = {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
-    instance.font = UIFont.scaledFont(fontName: stage == stageGlobal ? Fonts.OpenSans.Extrabold.rawValue : Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
+    instance.font = UIFont.scaledFont(fontName: stage == stageGlobal ? Fonts.OpenSans.Bold.rawValue : Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
     instance.text = "new_poll_topic".localized.uppercased()
     
     return instance
@@ -155,6 +158,7 @@ class NewPollTopicCell: UICollectionViewCell {
     super.prepareForReuse()
     
     animationCompletePublisher = PassthroughSubject<Void, Never>()
+    stageCompletePublisher = PassthroughSubject<Void, Never>()
   }
   
   override func layoutSubviews() {

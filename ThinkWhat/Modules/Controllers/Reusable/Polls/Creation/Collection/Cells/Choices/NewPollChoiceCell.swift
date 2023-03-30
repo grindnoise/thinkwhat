@@ -68,6 +68,7 @@ class NewPollChoiceCell: UICollectionViewCell {
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.isEditable = true
     instance.isSelectable = true
+    instance.textColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
     let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 44))
     toolBar.isTranslucent = true
     toolBar.backgroundColor = .tertiarySystemBackground
@@ -79,7 +80,7 @@ class NewPollChoiceCell: UICollectionViewCell {
     toolBar.barStyle = .default
     toolBar.tintColor = Colors.getColor(forId: order)
     instance.inputAccessoryView = toolBar
-    instance.attributedText = NSAttributedString(string: "", attributes: attributes())
+    instance.attributedText = NSAttributedString(string: "", attributes: attributes(inactive: order == 0))
     instance.publisher(for: \.bounds)
       .sink { instance.cornerRadius = $0.width*0.025 }
       .store(in: &subscriptions)
@@ -181,7 +182,7 @@ private extension NewPollChoiceCell {
     let inset = padding + lineSpacing/2
     backgroundColor = .clear
     textView.place(inside: contentView, bottomPriority: .defaultLow)
-    textView.attributedText = NSAttributedString(string: item.text, attributes: attributes())
+    textView.attributedText = NSAttributedString(string: item.text, attributes: attributes(inactive: order == 0))
     imageView.placeTopLeading(inside: contentView, leadingInset: inset, topInset: inset)
   }
   
@@ -215,7 +216,7 @@ private extension NewPollChoiceCell {
     line.layer.path = line.path.cgPath
   }
   
-  func attributes() -> [NSAttributedString.Key: Any] {
+  func attributes(inactive: Bool = false) -> [NSAttributedString.Key: Any] {
     let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.firstLineHeadIndent = font!.pointSize + padding + lineSpacing
@@ -228,7 +229,7 @@ private extension NewPollChoiceCell {
     
     return [
       .font: font as Any,
-      .foregroundColor: UIColor.label,
+      .foregroundColor: inactive ? traitCollection.userInterfaceStyle == .dark ? .black : .white : UIColor.label,
       .paragraphStyle: paragraphStyle
     ]
   }
@@ -241,6 +242,7 @@ extension NewPollChoiceCell: UITextViewDelegate {
     UIView.animate(withDuration: 0.2) { [weak self] in
       guard let self = self else { return }
 
+      textView.attributedText = NSAttributedString(string: self.item.text, attributes: self.attributes(inactive: false))
       self.imageView.tintColor = self.color
       textView.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
     }

@@ -297,7 +297,7 @@ class NewPollTextCell: UICollectionViewCell {
       UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
         guard let self = self else { return }
         
-        self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+        self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
         self.placeholder.alpha = 0
         self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
       } completion: { [weak self] _ in

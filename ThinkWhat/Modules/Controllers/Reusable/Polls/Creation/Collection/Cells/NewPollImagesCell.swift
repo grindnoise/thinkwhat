@@ -32,7 +32,8 @@ class NewPollImagesCell: UICollectionViewCell {
   public var topicColor: UIColor = .systemGray
   ///**Publishers**
   @Published public var removedImage: NewPollImage?
-  @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
   @Published public private(set) var stageAnimationFinished: NewPollController.Stage!
   @Published public var isKeyboardOnScreen: Bool!
   @Published public var isMovingToParent: Bool!
@@ -279,7 +280,7 @@ class NewPollImagesCell: UICollectionViewCell {
     UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       
-      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
     
     collectionView.present()
@@ -356,8 +357,8 @@ private extension NewPollImagesCell {
     buttonsStack.removeArrangedSubview(nextButton)
     nextButton.removeFromSuperview()
     boundsPublisher.send(true)
-    
-    
+    stageCompletePublisher.send()
+    stageCompletePublisher.send(completion: .finished)
     CATransaction.begin()
     CATransaction.setCompletionBlock() { [unowned self] in
       self.animationCompletePublisher.send()

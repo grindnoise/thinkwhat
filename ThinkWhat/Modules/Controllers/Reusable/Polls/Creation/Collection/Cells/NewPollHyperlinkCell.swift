@@ -58,7 +58,8 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   }
   public var isMovingToParent = false
   ///**Publishers**
-  @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
   @Published public var text: String! //{
 //    didSet {
 //      guard text.isNil,  else { return }
@@ -251,6 +252,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     boundsPublisher = PassthroughSubject<Void, Never>()
     animationCompletePublisher = PassthroughSubject<Void, Never>()
     nextPublisher = PassthroughSubject<Void, Never>()
+    stageCompletePublisher = PassthroughSubject<Void, Never>()
   }
   
   override func layoutSubviews() {
@@ -273,7 +275,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       
-      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
     
 //    textView.becomeFirstResponder()
@@ -383,6 +385,9 @@ private extension NewPollHyperlinkCell {
       
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
+    
+    stageCompletePublisher.send()
+    stageCompletePublisher.send(completion: .finished)
     
 //    buttonsStack.removeArrangedSubview(nextButton)
     closedConstraint.isActive = true

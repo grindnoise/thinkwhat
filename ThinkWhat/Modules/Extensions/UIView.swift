@@ -421,14 +421,33 @@ extension UIView {
   
   func placeInCenter(of parent: UIView,
                      widthMultiplier: CGFloat = 1,
-                     xOffset: CGFloat = 0,
-                     yOffset: CGFloat = 0) {
+                     xOffset: CGFloat = .zero,
+                     yOffset: CGFloat = .zero) {
     parent.addSubview(self)
     translatesAutoresizingMaskIntoConstraints = false
     
     centerYAnchor.constraint(equalTo: parent.centerYAnchor, constant: yOffset).isActive = true
     centerXAnchor.constraint(equalTo: parent.centerXAnchor, constant: xOffset).isActive = true
     widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: widthMultiplier).isActive = true
+  }
+  
+  func placeXCentered(inside parent: UIView,
+                      widthMultiplier: CGFloat,
+                      topInset: CGFloat = .zero,
+                      bottomInset: CGFloat = .zero) {
+    parent.addSubview(self)
+    translatesAutoresizingMaskIntoConstraints = false
+    
+    centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
+    widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: widthMultiplier).isActive = true
+    
+    guard topInset != .zero, bottomInset != .zero else {
+      topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
+      bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: bottomInset).isActive = true
+      
+      return
+    }
+    centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
   }
   
   func placeLeading(inside parent: UIView,

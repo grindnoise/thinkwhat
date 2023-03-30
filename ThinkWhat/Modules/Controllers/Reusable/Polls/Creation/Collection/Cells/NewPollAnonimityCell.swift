@@ -50,9 +50,9 @@ class NewPollAnonimityCell: UICollectionViewCell {
   }
   ///**Publishers**
   public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
-  @Published public var anonimityEnabled: Bool! {
+  @Published public var anonymityEnabled: Bool! {
     didSet {
-      guard stage == stageGlobal, !anonimityEnabled.isNil else { return }//, !openedConstraint.isActive else { return }
+      guard stage == stageGlobal, !anonymityEnabled.isNil else { return }//, !openedConstraint.isActive else { return }
       
       if let constraint = buttonsStack.getConstraint(identifier: "heightAnchor") {
         setNeedsLayout()
@@ -101,9 +101,9 @@ class NewPollAnonimityCell: UICollectionViewCell {
 //    instance.alpha = 1
     instance.numberOfLines = 0
     instance.textAlignment = .center
-    instance.textColor = anonimityEnabled.isNil ? color : .label
+    instance.textColor = anonymityEnabled.isNil ? color : .label
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
-    instance.text = anonimityEnabled.isNil ? "new_poll_anonymity_placeholder".localized : anonimityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
+    instance.text = anonymityEnabled.isNil ? "new_poll_anonymity_placeholder".localized : anonymityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
     let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
     constraint.identifier = "heightAnchor"
     constraint.isActive = true
@@ -169,18 +169,19 @@ class NewPollAnonimityCell: UICollectionViewCell {
   }()
   private lazy var anon: Avatar = {
     let instance = Avatar(userprofile: Userprofile.anonymous, isShadowed: true)
-//    instance.setFilter(name: "CIPhotoEffectTonal", animated: false)
+    instance.alpha = anonymityEnabled.isNil ? 0.75 : anonymityEnabled == true ? 1 : 0.75
+    instance.transform = anonymityEnabled.isNil ? .identity : anonymityEnabled == true ? CGAffineTransform(scaleX: 1.1, y: 1.1) : CGAffineTransform(scaleX: 0.75, y: 0.75)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.isUserInteractionEnabled = true
     instance.tapPublisher
-      .filter { [unowned self] _ in self.anonimityEnabled.isNil || !self.anonimityEnabled}
+      .filter { [unowned self] _ in self.anonymityEnabled.isNil || !self.anonymityEnabled}
       .sink { [unowned self] _ in
-        self.anonimityEnabled = true
+        self.anonymityEnabled = true
         UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
           guard let self = self else { return }
           
           self.descriptionLabel.textColor = .label
-          self.descriptionLabel.text = self.anonimityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
+          self.descriptionLabel.text = self.anonymityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
           
           let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width, font: self.descriptionLabel.font)
           
@@ -213,19 +214,24 @@ class NewPollAnonimityCell: UICollectionViewCell {
   }()
   private lazy var user: Avatar = {
     let instance = Avatar(userprofile: Userprofiles.shared.current!, isShadowed: true)
-    instance.toggleFilter(name: "CIPhotoEffectNoir", duration: 0.3)
+//    instance.toggleFilter(name: "CIPhotoEffectNoir", duration: 0.3)
+//    if anonymityEnabled.isNil || anonymityEnabled == false {
+//      instance.toggleFilter(name: "CIPhotoEffectTonal")
+//    }
+    instance.alpha = anonymityEnabled.isNil ? 0.75 : anonymityEnabled == false ? 1 : 0.75
+    instance.transform = anonymityEnabled.isNil ? .identity : anonymityEnabled == false ? CGAffineTransform(scaleX: 1.1, y: 1.1) : CGAffineTransform(scaleX: 0.75, y: 0.75)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.isUserInteractionEnabled = true
     instance.heightAnchor.constraint(equalToConstant: stackHeight).isActive = true
     instance.tapPublisher
-      .filter { [unowned self] _ in self.anonimityEnabled.isNil || self.anonimityEnabled}
+      .filter { [unowned self] _ in self.anonymityEnabled.isNil || self.anonymityEnabled}
       .sink { [unowned self] _ in
-        self.anonimityEnabled = false
+        self.anonymityEnabled = false
         UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
           guard let self = self else { return }
           
           self.descriptionLabel.textColor = .label
-          self.descriptionLabel.text = self.anonimityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
+          self.descriptionLabel.text = self.anonymityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
           
           let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width, font: self.descriptionLabel.font)
           
@@ -304,7 +310,7 @@ class NewPollAnonimityCell: UICollectionViewCell {
     UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       
-      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Extrabold.rawValue, forTextStyle: .caption2)
+      self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
     
     UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in

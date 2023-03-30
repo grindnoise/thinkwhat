@@ -21,7 +21,11 @@ class SurveyLimitPopupContent: UIView {
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
   private let mode: Mode
-  private var limit: Int
+  private var limit: Int {
+    didSet {
+//      textField.text = limit.formattedWithSeparator
+    }
+  }
   ///**UI**
   private let padding: CGFloat
   private let color: UIColor
@@ -33,7 +37,12 @@ class SurveyLimitPopupContent: UIView {
 //                        bottomInset: padding)
     
     let middle = UIView.opaque()
-    textField.place(inside: middle, insets: .init(top: padding*2, left: padding*4, bottom: padding*2, right: padding*4))
+    textField.placeXCentered(inside: middle,
+                             widthMultiplier: 0.6,
+                             topInset: padding,
+                             bottomInset: padding)
+    let middle2 = UIView.opaque()
+    descriptionLabel.place(inside: middle2, insets: .init(top: padding*4, left: padding, bottom: padding, right: padding))
     let bottom = UIView.opaque()
     let buttonsStack = UIStackView(arrangedSubviews: [
       confirmButton,
@@ -52,10 +61,11 @@ class SurveyLimitPopupContent: UIView {
     let instance = UIStackView(arrangedSubviews: [
       top,
       middle,
+//      middle2,
       bottom
     ])
     instance.axis = .vertical
-    instance.spacing = padding
+    instance.spacing = padding*4
     bottom.translatesAutoresizingMaskIntoConstraints = false
     bottom.heightAnchor.constraint(equalTo: top.heightAnchor).isActive = true
     
@@ -99,10 +109,22 @@ class SurveyLimitPopupContent: UIView {
       .store(in: &subscriptions)
     return instance
   }()
+  private lazy var descriptionLabel: UILabel = {
+    let instance = UILabel()
+    instance.numberOfLines = 0
+    instance.attributedText = NSAttributedString(string: "new_poll_limit_hint".localized, attributes: attributes())
+//    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
+//    constraint.identifier = "heightAnchor"
+//    constraint.isActive = true
+    
+    return instance
+  }()
   private lazy var textField: UITextField = {
     let instance = UITextField()
+//    instance.delegate = self
+    instance.addTarget(self, action: #selector(self.textFieldDidChange(textField:)), for: .editingChanged)
     instance.textAlignment = .center
-    instance.text = String(describing: limit)
+    instance.text = limit.formattedWithSeparator
     instance.tintColor = color
     instance.keyboardType = .numberPad
     instance.font = UIFont.scaledFont(fontName: Fonts.Extrabold, forTextStyle: .title1)
@@ -197,6 +219,8 @@ class SurveyLimitPopupContent: UIView {
     super.init(frame: .zero)
     
     setupUI()
+    
+    textField.becomeFirstResponder()
   }
   
   required init?(coder: NSCoder) {
@@ -214,6 +238,13 @@ class SurveyLimitPopupContent: UIView {
     super.traitCollectionDidChange(previousTraitCollection)
     
   }
+  
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    
+    
+
+  }
 }
 
 private extension SurveyLimitPopupContent {
@@ -221,6 +252,23 @@ private extension SurveyLimitPopupContent {
   func setupUI() {
     backgroundColor = .clear
     stack.place(inside: self)
+    
+//    publisher(for: \.bounds)
+//      .sink { [weak self] in
+//        guard let self = self else { return }
+//
+//        let height = self.descriptionLabel.text!.height(withConstrainedWidth: $0.width,
+//                                                        font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)!)
+//
+//        guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
+//              constraint.constant != height
+//        else { return }
+//
+//        self.setNeedsLayout()
+//        constraint.constant = height
+//        self.layoutIfNeeded()
+//      }
+//      .store(in: &subscriptions)
   }
   
   @MainActor
@@ -231,8 +279,52 @@ private extension SurveyLimitPopupContent {
   @objc
   func handleTap(sender: UIButton) {
     endEditing(true)
-    limitPublisher.send(Int(textField.text!)!)
-    limitPublisher.send(completion: .finished)
+    if sender == confirmButton {
+      limitPublisher.send(limit)
+      limitPublisher.send(completion: .finished)
+    } else {
+      
+    }
+  }
+  
+  func attributes() -> [NSAttributedString.Key: Any] {
+    let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.firstLineHeadIndent = font!.pointSize + padding
+    if #available(iOS 15.0, *) {
+      paragraphStyle.usesDefaultHyphenation = true
+    } else {
+      paragraphStyle.hyphenationFactor = 1
+    }
+    
+    return [
+      .font: font as Any,
+      .foregroundColor: UIColor.label,
+      .paragraphStyle: paragraphStyle
+    ]
+  }
+  
+  @objc
+  func textFieldDidChange(textField: UITextField) {
+    guard let text = textField.text,
+          let int = Int(text.replacingOccurrences(of: " ", with: ""))
+    else { return }
+    
+    limit = int
+    textField.text = limit.formattedWithSeparator
   }
 }
 
+//extension SurveyLimitPopupContent: UITextFieldDelegate {
+//
+//
+//  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+//    guard let text = textField.text,
+//          let int = Int(text)
+//    else { return false }
+//
+//    limit = int
+//
+//    return false
+//  }
+//}

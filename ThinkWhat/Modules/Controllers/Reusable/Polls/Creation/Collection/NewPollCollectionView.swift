@@ -73,7 +73,13 @@ class NewPollCollectionView: UICollectionView {
       self.stage = stage
     }
   }
-    @Published public private(set) var choices: [NewPollChoice] = (0...0).map { NewPollChoice(text: "new_poll_choice_placeholder".localized + String(describing: $0 + 1)) }
+//    @Published
+  public private(set) var choices: [NewPollChoice] = (0...0).map { NewPollChoice(text: "new_poll_choice_placeholder".localized + String(describing: $0 + 1)) } {
+    didSet {
+      choicesPublisher.send(choices)
+    }
+  }
+  private let choicesPublisher = PassthroughSubject<[NewPollChoice], Never>()
 //  @Published public private(set) var choices: [NewPollChoice] = (0...1).map { NewPollChoice(text: "new_poll_survey_choice_placeholder".localized + String(describing: $0 + 1)) } {
 //    didSet {
 //      guard oldValue.isNil,
@@ -107,9 +113,13 @@ class NewPollCollectionView: UICollectionView {
 //      self.stage = stage
 //    }
 //  }
-  @Published public private(set) var anonimityEnabled: Bool?
+  @Published public private(set) var anonymityEnabled: Bool?
   @Published public private(set) var isHot: Bool?
   @Published public private(set) var limit: Int?
+  @Published public private(set) var costItems: [CostItem] = {
+    [CostItem(title: "voters_option".localized, cost: 100),
+     CostItem(title: "hot_option".localized, cost: 10)]
+  }()
   
   
   
@@ -154,6 +164,7 @@ class NewPollCollectionView: UICollectionView {
   // MARK: - Public methods
   public func onImageScroll(_ index: Int) {
     guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
+    
     cell.scrollToImage(at: index)
   }
   
@@ -173,12 +184,12 @@ private extension NewPollCollectionView {
       layoutConfig.showsSeparators = false
       
       let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == NewPollController.Stage.allCases.count-1 ? 30 : 0, trailing: 0)
+      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == NewPollController.Stage.allCases.count-1 ? 80 : 0, trailing: 0)
       sectionLayout.interGroupSpacing = 8
       return sectionLayout
     }
     
-    let topicCellRegistration = UICollectionView.CellRegistration<NewPollTopicCell, AnyHashable> { [unowned self] cell, _, _ in
+    let topicCellRegistration = UICollectionView.CellRegistration<NewPollTopicCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.stage = .Topic
       cell.stageGlobal = self.stage
       cell.topic = self.topic
@@ -191,6 +202,11 @@ private extension NewPollCollectionView {
       cell.animationCompletePublisher
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in self.stageAnimationFinished = .Topic }
+        .store(in: &self.subscriptions)
+      cell.stageCompletePublisher
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
         .store(in: &self.subscriptions)
       
       self.$stage
@@ -205,7 +221,7 @@ private extension NewPollCollectionView {
       
       guard self.stage == .Topic else { return }
       
-      cell.present(seconds: 1)
+      cell.present(seconds: 0.5)
     }
     
     let titleCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, indexPath, _ in
@@ -421,16 +437,15 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
     }
     
-    let choicesCellRegistration = UICollectionView.CellRegistration<NewPollChoicesCell, AnyHashable> { [unowned self] cell, _, _ in
+    let choicesCellRegistration = UICollectionView.CellRegistration<NewPollChoicesCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
       cell.stage = .Choices
       cell.stageGlobal = self.stage
 //      cell.topicColor = self.topic.isNil ? .systemGray : self.topic!.tagColor
       cell.choices = self.choices
       cell.addChoicePublisher
-        .print()
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] in self.addChoice() }
+        .sink { [unowned self] _ in self.addChoice() }
         .store(in: &self.subscriptions)
       cell.$removedChoice
         .filter { !$0.isNil }
@@ -442,12 +457,27 @@ private extension NewPollCollectionView {
         .filter { [unowned self] _ in self.choices.count == 1 }
         .sink { _ in cell.addSecondChoice() }
         .store(in: &self.subscriptions)
+      cell.stageCompletePublisher
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in  self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
+        .store(in: &self.subscriptions)
       self.$topic
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
         .sink { cell.topicColor = $0!.tagColor }
         .store(in: &self.subscriptions)
-      self.$choices
+//      self.$choices
+//        .filter { [unowned self] _ in self.stage.rawValue >= NewPollController.Stage.Choices.rawValue }
+//        .receive(on: DispatchQueue.main)
+//        .sink {
+//          cell.refreshChoices($0)
+//          cell.present(index: $0.count-1, seconds: $0.count == 2 ? 0.5 : 0)
+////          guard  $0.count == 2 else { return }
+////
+////          cell.present(first: false, seconds: 0.5)
+//        }
+      self.choicesPublisher
         .filter { [unowned self] _ in self.stage.rawValue >= NewPollController.Stage.Choices.rawValue }
         .receive(on: DispatchQueue.main)
         .sink {
@@ -514,7 +544,7 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
     }
     
-    let imagesCellRegistration = UICollectionView.CellRegistration<NewPollImagesCell, AnyHashable> { [unowned self] cell, _, _ in
+    let imagesCellRegistration = UICollectionView.CellRegistration<NewPollImagesCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
       cell.stage = .Images
       cell.stageGlobal = self.stage
@@ -549,6 +579,11 @@ private extension NewPollCollectionView {
         .receive(on: DispatchQueue.main)
         .sink { cell.isKeyboardOnScreen = $0 }
         .store(in: &self.subscriptions)
+      cell.stageCompletePublisher
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in  self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
+        .store(in: &self.subscriptions)
       cell.animationCompletePublisher
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in self.stageAnimationFinished = .Images; self.stage = .Hyperlink }
@@ -570,7 +605,7 @@ private extension NewPollCollectionView {
         .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
         .store(in: &self.subscriptions)    }
     
-    let hyperlinkCellRegistration = UICollectionView.CellRegistration<NewPollHyperlinkCell, AnyHashable> { [unowned self] cell, _, _ in
+    let hyperlinkCellRegistration = UICollectionView.CellRegistration<NewPollHyperlinkCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.color = self.stage.rawValue >= NewPollController.Stage.Hyperlink.rawValue ? self.topic!.tagColor : .systemGray4
       cell.minHeight = 40
       cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
@@ -598,6 +633,11 @@ private extension NewPollCollectionView {
         .filter { !$0.isNil && !$0!.isEmpty }
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] in self.hyperlink = $0! }
+        .store(in: &self.subscriptions)
+      cell.stageCompletePublisher
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
         .store(in: &self.subscriptions)
       cell.animationCompletePublisher
         .receive(on: DispatchQueue.main)
@@ -629,7 +669,7 @@ private extension NewPollCollectionView {
 //        .store(in: &self.subscriptions)
     }
     
-    let commentsCellRegistration = UICollectionView.CellRegistration<NewPollCommentsCell, AnyHashable> { [unowned self] cell, _, _ in
+    let commentsCellRegistration = UICollectionView.CellRegistration<NewPollCommentsCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.stage = .Comments
       cell.color = self.stage.rawValue >= NewPollController.Stage.Comments.rawValue ? self.topic!.tagColor : .systemGray4
       cell.stageGlobal = self.stage
@@ -660,7 +700,7 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
       cell.stageCompletePublisher
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stage = .Anonymity }
+        .sink { [unowned self] _ in self.stage = .Anonymity; self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
         .store(in: &self.subscriptions)
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
@@ -674,12 +714,12 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
     }
     
-    let anonCellRegistration = UICollectionView.CellRegistration<NewPollAnonimityCell, AnyHashable> { [unowned self] cell, _, _ in
+    let anonCellRegistration = UICollectionView.CellRegistration<NewPollAnonimityCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.stage = .Anonymity
       cell.color = self.stage.rawValue >= NewPollController.Stage.Anonymity.rawValue ? self.topic!.tagColor : .systemGray4
       cell.stageGlobal = self.stage
-      if !self.anonimityEnabled.isNil {
-        cell.anonimityEnabled = self.anonimityEnabled!
+      if !self.anonymityEnabled.isNil {
+        cell.anonymityEnabled = self.anonymityEnabled!
       }
       self.$stage
         .sink { cell.stageGlobal = $0 }
@@ -689,10 +729,10 @@ private extension NewPollCollectionView {
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
-      cell.$anonimityEnabled
+      cell.$anonymityEnabled
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] in self.anonimityEnabled = $0! }
+        .sink { [unowned self] in self.anonymityEnabled = $0! }
         .store(in: &self.subscriptions)
       cell.animationCompletePublisher
         .receive(on: DispatchQueue.main)
@@ -705,7 +745,7 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
       cell.stageCompletePublisher
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stage = .Hot }
+        .sink { [unowned self] _ in self.stage = .Hot; self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
         .store(in: &self.subscriptions)
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
@@ -719,7 +759,7 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
     }
     
-    let hotCellRegistration = UICollectionView.CellRegistration<NewPollHotCell, AnyHashable> { [unowned self] cell, _, _ in
+    let hotCellRegistration = UICollectionView.CellRegistration<NewPollHotCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.stage = .Hot
       cell.color = self.stage.rawValue >= NewPollController.Stage.Hot.rawValue ? self.topic!.tagColor : .systemGray4
       cell.stageGlobal = self.stage
@@ -750,7 +790,7 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
       cell.stageCompletePublisher
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stage = .Limits }
+        .sink { [unowned self] _ in self.stage = .Limits; self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
         .store(in: &self.subscriptions)
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
@@ -764,13 +804,11 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
     }
     
-    let limitsCellRegistration = UICollectionView.CellRegistration<NewPollLimitsCell, AnyHashable> { [unowned self] cell, _, _ in
+    let limitsCellRegistration = UICollectionView.CellRegistration<NewPollLimitsCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.stage = .Limits
       cell.color = self.stage.rawValue >= NewPollController.Stage.Limits.rawValue ? self.topic!.tagColor : .systemGray4
       cell.stageGlobal = self.stage
-      if !self.limit.isNil {
-        cell.limit = self.limit!
-      }
+      cell.limit = self.limit
       self.$stage
         .sink { cell.stageGlobal = $0 }
         .store(in: &self.subscriptions)
@@ -786,7 +824,7 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
       cell.animationCompletePublisher
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stageAnimationFinished = .Limits }
+        .sink { [unowned self] _ in self.stageAnimationFinished = .Ready }
         .store(in: &self.subscriptions)
       cell.boundsPublisher
         .eraseToAnyPublisher()
@@ -795,7 +833,7 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
       cell.stageCompletePublisher
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stage = .Limits }
+        .sink { [unowned self] _ in self.stage = .Limits; self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
         .store(in: &self.subscriptions)
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
@@ -806,6 +844,40 @@ private extension NewPollCollectionView {
         .filter { $0 == .Hot }
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
+        .store(in: &self.subscriptions)
+    }
+    
+    let costCellRegistration = UICollectionView.CellRegistration<NewPollCostCell, AnyHashable> { [unowned self] cell, indexPath, _ in
+      cell.stage = .Ready
+      cell.color = self.stage.rawValue >= NewPollController.Stage.Ready.rawValue ? self.topic!.tagColor : .systemGray4
+      cell.stageGlobal = self.stage
+      cell.costItems = self.costItems
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$topic
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Hot.rawValue }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.source.refresh() }
+        .store(in: &self.subscriptions)
+      cell.stageCompletePublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.stage = .Limits; }//self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.$stageAnimationFinished
+        .filter { $0 == .Hot }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
         .store(in: &self.subscriptions)
     }
     
@@ -856,6 +928,10 @@ private extension NewPollCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: limitsCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
+      } else if section == .Ready {
+        return collectionView.dequeueConfiguredReusableCell(using: costCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
       }
       return UICollectionViewCell()
     }
@@ -871,7 +947,8 @@ private extension NewPollCollectionView {
                              .Comments,
                              .Anonymity,
                              .Hot,
-                             .Limits])
+                             .Limits,
+                             .Ready])
     snapshot.appendItems([0], toSection: .Topic)
     snapshot.appendItems([1], toSection: .Title)
     snapshot.appendItems([2], toSection: .Description)
@@ -883,6 +960,7 @@ private extension NewPollCollectionView {
     snapshot.appendItems([8], toSection: .Anonymity)
     snapshot.appendItems([9], toSection: .Hot)
     snapshot.appendItems([10], toSection: .Limits)
+    snapshot.appendItems([11], toSection: .Ready)
     source.apply(snapshot, animatingDifferences: false) { [unowned self] in self.contentOffset.y = 0 }
   }
   

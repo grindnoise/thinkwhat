@@ -49,7 +49,7 @@ class CostView: UIView {
             contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
-        collectionView = CostCollectionView(dataProvider: dataProvider, parent: self)
+//        collectionView = CostCollectionView(dataProvider: dataProvider, parent: self)
         setObservers()
         setupUI()
     }
