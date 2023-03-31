@@ -1,4 +1,4 @@
-/* 
+/*
   Localizable.strings
   ThinkWhat
 
@@ -279,7 +279,6 @@
 "comments_on_description" = "Participants can post comments";
 "comments_off_description" = "Comments closed";
 "cost" = "Cost";
-"total_bill" = "Total:";
 "poll_launched" = "Poll has been launched";
 "poll_standart_question_button" = "Default question";
 "poll_standart_question" = "Choose the answer that best suits you";
@@ -327,7 +326,7 @@
 "instagram_link" = "Instagram link";
 "completed" = "Сompleted";
 "preferences" = "My preferences:";
-"my_balance" = "My balance:";
+
 //"points" = "Points";
 "top_up" = "Top up";
 "interests" = "Interests";
@@ -452,3 +451,5 @@
 "new_poll_limit_placeholder" = "The poll will close when the specified number of votes is reached";
 "new_poll_limit_hint" = "The poll will close when the specified number of votes is reached";
 "new_poll_limit" = "Publication cost";
+"balance" = "Balance:";
+"total_bill" = "Total";

@@ -279,7 +279,6 @@
 "comments_on_description" = "Проголосовавшие пользователи могут оставлять комментарии";
 "comments_off_description" = "Комментарии закрыты";
 "cost" = "Стоимость";
-"total_bill" = "Итого:";
 "poll_launched" = "Опрос стартовал";
 "poll_standart_question_button" = "Стандартный вопрос";
 "poll_standart_question" = "Выберите наиболее подходящий Вам вариант ответа";
@@ -327,7 +326,7 @@
 "instagram_link" = "профиль в Instagram";
 "completed" = "Публикаций пройдено";
 "preferences" = "Мои предпочтения:";
-"my_balance" = "Мой баланс:";
+
 //"points" = "Баллов";
 "top_up" = "Пополнить";
 "interests" = "Интересы";
@@ -452,3 +451,5 @@
 "new_poll_limit_placeholder" = "Опрос закроется при достижении указанного количества голосов";
 "new_poll_limit_hint" = "Опрос закроется при достижении указанного количества голосов";
 "new_poll_limit" = "Стоимость публикации";
+"balance" = "Баланс";
+"total_bill" = "Итого";

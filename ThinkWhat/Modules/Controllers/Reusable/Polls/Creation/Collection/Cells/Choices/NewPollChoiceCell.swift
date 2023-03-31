@@ -68,7 +68,7 @@ class NewPollChoiceCell: UICollectionViewCell {
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.isEditable = true
     instance.isSelectable = true
-    instance.textColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
+//    instance.textColor = traitCollection.userInterfaceStyle == .dark ? .black : .white
     let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 44))
     toolBar.isTranslucent = true
     toolBar.backgroundColor = .tertiarySystemBackground
@@ -229,7 +229,7 @@ private extension NewPollChoiceCell {
     
     return [
       .font: font as Any,
-      .foregroundColor: inactive ? traitCollection.userInterfaceStyle == .dark ? .black : .white : UIColor.label,
+      .foregroundColor: inactive ? UIColor.secondaryLabel : UIColor.label,
       .paragraphStyle: paragraphStyle
     ]
   }
@@ -242,6 +242,7 @@ extension NewPollChoiceCell: UITextViewDelegate {
     UIView.animate(withDuration: 0.2) { [weak self] in
       guard let self = self else { return }
 
+      textView.textColor = .label
       textView.attributedText = NSAttributedString(string: self.item.text, attributes: self.attributes(inactive: false))
       self.imageView.tintColor = self.color
       textView.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)

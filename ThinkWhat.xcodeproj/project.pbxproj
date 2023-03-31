@@ -1570,7 +1570,7 @@
 				AB28E5AF2535BB6E004CC4DD /* Poll */,
 				AB8C99552486760B00BC517B /* Claim */,
 				AB879047286D9F7600C069BA /* Navbar content */,
-				AB3A47C6283F593F00106407 /* Create */,
+				AB3A47C6283F593F00106407 /* Publication */,
 				ABA448D527E46F0C00F8E00D /* Card */,
 				AB19B6422432282B00999917 /* PercentageLabel.swift */,
 				ABCAC571235EE99B00E6A118 /* TagLabel.swift */,
@@ -1644,7 +1644,6 @@
 			children = (
 				AB39899628636A70004C958E /* CostView.swift */,
 				AB398998286370D9004C958E /* CostView.xib */,
-				AB39899A28637E4F004C958E /* CostCollectionView.swift */,
 			);
 			path = Cost;
 			sourceTree = "<group>";
@@ -1703,14 +1702,14 @@
 			path = Collection;
 			sourceTree = "<group>";
 		};
-		AB3A47C6283F593F00106407 /* Create */ = {
+		AB3A47C6283F593F00106407 /* Publication */ = {
 			isa = PBXGroup;
 			children = (
 				AB3A47C7283F596300106407 /* Type selection */,
 				AB3A47D7283F5BFA00106407 /* Ranking */,
 				AB3A47C8283F597800106407 /* Poll */,
 			);
-			path = Create;
+			path = Publication;
 			sourceTree = "<group>";
 		};
 		AB3A47C7283F596300106407 /* Type selection */ = {
@@ -2757,6 +2756,7 @@
 		ABADF59927F7009400A26474 /* Reusable */ = {
 			isa = PBXGroup;
 			children = (
+				AB39899A28637E4F004C958E /* CostCollectionView.swift */,
 				AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */,
 				AB548663269724A200D30235 /* NewPollResultViewController.swift */,
 				AB39D40329C3640200892D58 /* Ratings */,

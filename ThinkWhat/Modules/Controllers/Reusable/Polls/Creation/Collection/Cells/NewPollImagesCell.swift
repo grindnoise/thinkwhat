@@ -30,6 +30,7 @@ class NewPollImagesCell: UICollectionViewCell {
     }
   }
   public var topicColor: UIColor = .systemGray
+  public var externalSubscriptions = Set<AnyCancellable>()
   ///**Publishers**
   @Published public var removedImage: NewPollImage?
   public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
@@ -262,6 +263,7 @@ class NewPollImagesCell: UICollectionViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
+    externalSubscriptions.forEach { $0.cancel() }
     boundsPublisher = PassthroughSubject<Bool, Never>()
     addImagePublisher = PassthroughSubject<Void, Never>()
 //    topicPublisher = PassthroughSubject<Topic, Never>()

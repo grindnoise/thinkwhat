@@ -10,9 +10,12 @@ import UIKit
 
 class CostCollectionView: UICollectionView {
   
+  typealias Snapshot = NSDiffableDataSourceSnapshot<Section, CostItem>
+  typealias Source = UICollectionViewDiffableDataSource<Section, CostItem>
+  
   enum Section { case main }
   
-  private var source: UICollectionViewDiffableDataSource<Section, CostItem>!
+  private var source: Source!
   public var dataItems: [CostItem]
   
   init(dataItems: [CostItem]) {
@@ -33,12 +36,8 @@ class CostCollectionView: UICollectionView {
     let layoutConfig: UICollectionLayoutListConfiguration = {
       var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
       config.showsSeparators = false
-      if #available(iOS 14.5, *) {
-        var separatorConfig = UIListSeparatorConfiguration(listAppearance: .insetGrouped)
-        config.separatorConfiguration = separatorConfig
-      }
       config.backgroundColor = .clear
-//      config.headerMode = .supplementary
+      config.headerMode = .supplementary
       config.footerMode = .supplementary
       return config
     }()
@@ -62,39 +61,34 @@ class CostCollectionView: UICollectionView {
       return cell
     }
     
-    //    let headerRegistration = UICollectionView.SupplementaryRegistration<CostHeaderFooter>(elementKind: UICollectionView.elementKindSectionHeader) { [weak self] (headerView, elementKind, indexPath) in
-    //      guard let self = self else { return }
-    //
-    //      headerView.mode = .Header
-    //      guard let balance = self.dataProvider?.balance else {
-    //        headerView.intValue = 0
-    //        return
-    //      }
-    //      headerView.intValue = balance
-    //    }
+    let headerRegistration = UICollectionView.SupplementaryRegistration<CostHeaderFooter>(elementKind: UICollectionView.elementKindSectionHeader) { headerView, _, _ in
+      guard let balance = Userprofiles.shared.current?.balance else { return }
+      
+      headerView.mode = .Header
+      headerView.intValue = balance
+    }
     
-    let footerRegistration = UICollectionView.SupplementaryRegistration<CostHeaderFooter>(elementKind: UICollectionView.elementKindSectionFooter) { [weak self] (footerView, elementKind, indexPath) in
-      guard let self = self else { return }
+    let footerRegistration = UICollectionView.SupplementaryRegistration<CostHeaderFooter>(elementKind: UICollectionView.elementKindSectionFooter) { footerView, _, _ in
+      guard let balance = Userprofiles.shared.current?.balance else { return }
       
       footerView.mode = .Footer
       footerView.intValue = self.dataItems.reduce(into: 0) { $0 += $1.cost }
-      //      footerView.isNegative = self.dataProvider?.balance ?? 0 < footerView.intValue
+      footerView.isNegative = balance < footerView.intValue
     }
     
     
     source.supplementaryViewProvider = { [weak self] (supplementaryView, elementKind, indexPath) in
       guard let self = self else { return UICollectionReusableView() }
       
-      //      if elementKind == UICollectionView.elementKindSectionHeader {
-      //        return self.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
-      //      } else
-      if elementKind == UICollectionView.elementKindSectionFooter {
+      if elementKind == UICollectionView.elementKindSectionHeader {
+        return self.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+      } else if elementKind == UICollectionView.elementKindSectionFooter {
         return self.dequeueConfiguredReusableSupplementary(using: footerRegistration, for: indexPath)
       }
       return UICollectionReusableView()
     }
     
-    var snapshot = NSDiffableDataSourceSnapshot<Section, CostItem>()
+    var snapshot = Snapshot()
     snapshot.appendSections([.main])
     snapshot.appendItems(dataItems, toSection: .main)
     snapshot.reloadItems(dataItems)
@@ -102,7 +96,12 @@ class CostCollectionView: UICollectionView {
   }
   
   public func update(_ instances: [CostItem]) {
-    
+    dataItems = instances
+    var snap = Snapshot()
+    snap.appendSections([.main])
+    snap.appendItems(dataItems, toSection: .main)
+    snap.reloadItems(dataItems)
+    source.apply(snap)
   }
 }
 
@@ -319,7 +318,7 @@ class CostHeaderFooter: UICollectionReusableView {
   private func setText() {
     let fontSize = itemLabel.bounds.height * 0.4
     let titleString = NSMutableAttributedString()
-    titleString.append(NSAttributedString(string: mode == .Header ? "my_balance".localized : "total_bill".localized, attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
+    titleString.append(NSAttributedString(string: (mode == .Header ? "balance".localized : "total_bill".localized) + ":", attributes: StringAttributes.getAttributes(font: StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: fontSize), foregroundColor: .label, backgroundColor: .clear) as [NSAttributedString.Key : Any]))
     itemLabel.attributedText = titleString
     
     let balanceString = NSMutableAttributedString()

@@ -13,7 +13,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
   
   ///Sequence of stages to post new survey
   enum Stage: Int, CaseIterable {
-    case Topic, Title, Description, Question, Choices, Images, Hyperlink, Comments, Anonymity, Hot, Limits, Ready
+    case Topic, Title, Description, Question, Choices, Images, Hyperlink, Comments, Anonymity, Limits, Hot, Ready
     
     func next() -> Stage? { Stage(rawValue: (self.rawValue + 1)) }
     
@@ -74,7 +74,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       }
     }
     
-    func percent() -> Double {  Double(self.rawValue * 100 / Stage.allCases.count-1) / 100 }
+    func percent() -> Double {  Double((self.rawValue + 1) * 100 / Stage.allCases.count) / 100 }
   }
   
   

@@ -23,6 +23,8 @@ class NewPollCostCell: UICollectionViewCell {
     }
   }
   public var topicColor: UIColor = .systemGray
+  public var externalSubscriptions = Set<AnyCancellable>()
+  
   ///**Publishers**
   @Published public var removedImage: NewPollImage?
   public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
@@ -139,6 +141,7 @@ class NewPollCostCell: UICollectionViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
+    externalSubscriptions.forEach { $0.cancel() }
     boundsPublisher = PassthroughSubject<Bool, Never>()
     addImagePublisher = PassthroughSubject<Void, Never>()
 //    topicPublisher = PassthroughSubject<Topic, Never>()
@@ -166,7 +169,7 @@ private extension NewPollCostCell {
     
     NSLayoutConstraint.activate([
       collectionView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
-      collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+      collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*2),
       collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     

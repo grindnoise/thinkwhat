@@ -22,6 +22,7 @@ class NewPollChoicesCell: UICollectionViewCell {
       setupUI()
     }
   }
+  public var externalSubscriptions = Set<AnyCancellable>()
   public var topicColor: UIColor = .systemGray //{
 //    didSet {
 //      guard !stage.isNil else { return }
@@ -271,6 +272,7 @@ class NewPollChoicesCell: UICollectionViewCell {
     boundsPublisher = PassthroughSubject<Bool, Never>()
     addChoicePublisher = PassthroughSubject<Bool, Never>()
     animationCompletePublisher = PassthroughSubject<Void, Never>()
+    externalSubscriptions.forEach { $0.cancel() }
   }
   
   override func layoutSubviews() {

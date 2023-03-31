@@ -21,6 +21,8 @@ class NewPollTopicCell: UICollectionViewCell {
     }
   }
   public var stageGlobal: NewPollController.Stage!
+  public var externalSubscriptions = Set<AnyCancellable>()
+  
   ///**Publishers**
   public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
   public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
@@ -129,6 +131,7 @@ class NewPollTopicCell: UICollectionViewCell {
     observers.forEach { $0.invalidate() }
     tasks.forEach { $0?.cancel() }
     subscriptions.forEach { $0.cancel() }
+    externalSubscriptions.forEach { $0.cancel() }
     NotificationCenter.default.removeObserver(self)
 #if DEBUG
     print("\(String(describing: type(of: self))).\(#function)")
@@ -159,6 +162,7 @@ class NewPollTopicCell: UICollectionViewCell {
     
     animationCompletePublisher = PassthroughSubject<Void, Never>()
     stageCompletePublisher = PassthroughSubject<Void, Never>()
+    externalSubscriptions.forEach { $0.cancel() }
   }
   
   override func layoutSubviews() {

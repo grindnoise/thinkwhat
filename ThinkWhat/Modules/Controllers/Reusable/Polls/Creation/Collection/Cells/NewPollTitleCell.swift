@@ -22,6 +22,7 @@ class NewPollTextCell: UICollectionViewCell {
   }
   public var stageGlobal: NewPollController.Stage!
   public var isKeyboardOnScreen: Bool = false
+  public var externalSubscriptions = Set<AnyCancellable>()
   ///**UI**
   public var textAlignment: NSTextAlignment = .center
   public var placeholderFont: UIFont! {
@@ -282,6 +283,7 @@ class NewPollTextCell: UICollectionViewCell {
     boundsPublisher = PassthroughSubject<CGRect, Never>()
     animationCompletePublisher = PassthroughSubject<Void, Never>()
     stageCompletePublisher = PassthroughSubject<Void, Never>()
+    externalSubscriptions.forEach { $0.cancel() }
   }
   
   override func layoutSubviews() {

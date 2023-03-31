@@ -21,6 +21,8 @@ class NewPollHotCell: UICollectionViewCell {
     }
   }
   public var stageGlobal: NewPollController.Stage!
+  public var externalSubscriptions = Set<AnyCancellable>()
+  
   ///**UI**
   public var color = UIColor.systemGray4 {
     didSet {
@@ -101,7 +103,7 @@ class NewPollHotCell: UICollectionViewCell {
     instance.numberOfLines = 0
     instance.textAlignment = .center
     instance.textColor = isHot.isNil ? color : .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
     instance.text = isHot.isNil ? "new_poll_hot_placeholder".localized : isHot ? "new_poll_hot_on".localized : "new_poll_hot_off".localized
     let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
     constraint.identifier = "heightAnchor"
@@ -226,6 +228,7 @@ class NewPollHotCell: UICollectionViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
+    externalSubscriptions.forEach { $0.cancel() }
     animationCompletePublisher = PassthroughSubject<Void, Never>()
     stageCompletePublisher = PassthroughSubject<Void, Never>()
     boundsPublisher = PassthroughSubject<Void, Never>()
@@ -307,10 +310,10 @@ private extension NewPollHotCell {
     NSLayoutConstraint.activate([
       stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*4),
       stack.centerXAnchor.constraint(equalTo: centerXAnchor, constant: padding*1),
-      descriptionLabel.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*2),
+      descriptionLabel.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*3),
       descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*4),
+      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*3),
       buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])

@@ -22,6 +22,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   }
   public var stageGlobal: NewPollController.Stage!
   public var isKeyboardOnScreen: Bool = false
+  public var externalSubscriptions = Set<AnyCancellable>()
   ///**UI**
   public var font: UIFont! {
     didSet {
@@ -249,6 +250,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
+    externalSubscriptions.forEach { $0.cancel() }
     boundsPublisher = PassthroughSubject<Void, Never>()
     animationCompletePublisher = PassthroughSubject<Void, Never>()
     nextPublisher = PassthroughSubject<Void, Never>()

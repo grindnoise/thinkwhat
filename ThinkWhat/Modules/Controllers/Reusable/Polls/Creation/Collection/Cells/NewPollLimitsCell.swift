@@ -21,6 +21,8 @@ class NewPollLimitsCell: UICollectionViewCell {
     }
   }
   public var stageGlobal: NewPollController.Stage!
+  public var externalSubscriptions = Set<AnyCancellable>()
+  
   ///**UI**
   public var color = UIColor.systemGray4 {
     didSet {
@@ -94,7 +96,7 @@ class NewPollLimitsCell: UICollectionViewCell {
     instance.numberOfLines = 0
     instance.textAlignment = .center
     instance.textColor = limit.isNil ? color : .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
     instance.text = "new_poll_limit_placeholder".localized
     let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
     constraint.identifier = "heightAnchor"
@@ -181,6 +183,7 @@ class NewPollLimitsCell: UICollectionViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
+    externalSubscriptions.forEach { $0.cancel() }
     animationCompletePublisher = PassthroughSubject<Void, Never>()
     stageCompletePublisher = PassthroughSubject<Void, Never>()
     boundsPublisher = PassthroughSubject<Void, Never>()
@@ -218,10 +221,11 @@ class NewPollLimitsCell: UICollectionViewCell {
       self.descriptionLabel.textColor = .label
     } completion: { _ in }
     
-    delay(seconds: 0.75) { [weak self] in
+    delay(seconds: 0.25) { [weak self] in
       guard let self = self else { return }
       
       self.edit()
+      self.externalSubscriptions.forEach { $0.cancel() }
     }
   }
 }
@@ -245,10 +249,10 @@ private extension NewPollLimitsCell {
     NSLayoutConstraint.activate([
       icon.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*4),
       icon.centerXAnchor.constraint(equalTo: centerXAnchor, constant: padding*1),
-      limitLabel.topAnchor.constraint(equalTo: icon.bottomAnchor, constant: padding*2),
+      limitLabel.topAnchor.constraint(equalTo: icon.bottomAnchor, constant: padding*3),
       limitLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       limitLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      descriptionLabel.topAnchor.constraint(equalTo: limitLabel.bottomAnchor, constant: padding*2),
+      descriptionLabel.topAnchor.constraint(equalTo: limitLabel.bottomAnchor, constant: padding*3),
       descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
 //      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*4),
