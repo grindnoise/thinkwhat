@@ -130,6 +130,7 @@ class Survey: Decodable {
   }
   
   // MARK: - Properties
+  private let fakeId = 999999999999
   var isActive:               Bool {
     didSet {
       reference.isActive = isActive
@@ -139,22 +140,20 @@ class Survey: Decodable {
   var title:                  String
   var startDate:              Date
   var topic:                  Topic
-  var detailsDescription:            String
+  var detailsDescription:     String
   var question:               String
   var rating:                 Double
-  //Media
+  ///Media
   var media:                  [Mediafile] = []
   var mediaSortedByOrder: [Mediafile] { media.sorted { $0.order < $1.order }}
   var mediaWithImagesSortedByOrder: [Mediafile] { media.filter { $0.image != nil } .sorted { $0.order < $1.order }}
   var mediaWithImageURLs: [Mediafile] { media.filter { $0.imageURL != nil }}
-  //Images
   var images: [UIImage] {media.filter { $0.image != nil } .map { $0.image! }}
   var imagesCount: Int { max(media.filter({ $0.image != nil }).count, media.filter({ $0.imageURL != nil }).count)}
   //Answers
   var answers:                [Answer] = []
   var answersSortedByVotes:   [Answer] { answers.sorted { $0.totalVotes > $1.totalVotes }}
   var answersSortedByOrder:   [Answer] { answers.sorted { $0.order < $1.order }}
-  //    var comments:               [Comment] = []
   var shareHash:              String = ""
   var shareEncryptedString:   String = ""
   var url:                    URL? = nil///hlink
@@ -199,10 +198,7 @@ class Survey: Decodable {
       reference.views = views
     }
   }
-  var reference: SurveyReference {
-    return getReference()
-    //        return SurveyReferences.shared.all.filter({ $0.hashValue == hashValue}).first ?? createReference()
-  }
+  var reference: SurveyReference { getReference() }
   var progress: Int {
     didSet {
       guard oldValue != progress else { return }
@@ -276,7 +272,7 @@ class Survey: Decodable {
   var isPrivate: Bool
   var isAnonymous: Bool
   var isCommentingAllowed: Bool
-
+  
   
   
   //Publishers
@@ -371,10 +367,10 @@ class Survey: Decodable {
         result = [Int(dict.keys.first!)!: dict.values.first!]
       }
       
-//      ///Check for existing
-//      if Surveys.shared.all.filter({ $0 == self }).isEmpty {
-//        Surveys.shared.all.append(self)
-//      }
+      //      ///Check for existing
+      //      if Surveys.shared.all.filter({ $0 == self }).isEmpty {
+      //        Surveys.shared.all.append(self)
+      //      }
       
       ///**Import comments**
       let _ = try container.decode([Comment].self, forKey: .comments)
@@ -398,47 +394,61 @@ class Survey: Decodable {
     }
   }
   
-  //    init(type: SurveyType,
-  //         title: String,
-  //         topic: Topic,
-  //         description: String,
-  //         question: String,
-  //         answers: [String],
-  //         media: [Int: [UIImage: String]],
-  //         url: URL?,
-  //         voteCapacity: Int,
-  //         isPrivate: Bool,
-  //         isAnonymous: Bool,
-  //         isCommentingAllowed: Bool,
-  //         isHot: Bool,
-  //         isFavorite: Bool,
-  //         isOwn: Bool) {
-  //        self.rating              = 0
-  //        self.owner               = Userprofiles.shared.current!
-  //        self.topic               = topic
-  //        self.active              = true
-  //        self.id                  = tempId
-  //        self.title               = title
-  //        self.description         = description
-  //        self.startDate           = Date()
-  //        self.url                 = url
-  //        self.question            = question
-  //        self.type                = type
-  //        self.votesLimit          = voteCapacity
-  //        self.isPrivate           = isPrivate
-  //        self.isAnonymous         = isAnonymous
-  //        self.isCommentingAllowed = isCommentingAllowed
-  //        self.isFavorite          = isFavorite
-  //        self.isHot               = isHot
-  //        self.isOwn               = isOwn
-  //        self.progress            = 0
-  //        self.media = media.map({ number, dict in
-  //            return Mediafile(title: dict.first?.value ?? "", order: number, survey: self, image: dict.first?.key)
-  //        })
-  //        self.answers = answers.enumerated().map({ (index,title) in
-  //            return Answer(description: "", title: title, survey: self, order: index)
-  //        })
-  //    }
+  init(type: SurveyType,
+       title: String,
+       topic: Topic,
+       description: String,
+       question: String,
+       answers: [String],
+       //           media: [Int: [UIImage: String]],
+       media: [NewPollImage],
+       url: URL?,
+       voteCapacity: Int,
+       isPrivate: Bool,
+       isAnonymous: Bool,
+       isCommentingAllowed: Bool,
+       isHot: Bool,
+       isFavorite: Bool,
+       isOwn: Bool,
+       isNew: Bool,
+       isTop: Bool,
+       isBanned: Bool,
+       commentsTotal: Int) {
+    self.rating              = 0
+    self.owner               = Userprofiles.shared.current!
+    self.topic               = topic
+    self.id                  = fakeId
+    self.title               = title
+    self.detailsDescription  = description
+    self.startDate           = Date()
+    self.url                 = url
+    self.question            = question
+    self.type                = type
+    self.votesLimit          = voteCapacity
+    self.isActive            = true
+    self.isPrivate           = isPrivate
+    self.isAnonymous         = isAnonymous
+    self.isCommentingAllowed = isCommentingAllowed
+    self.isFavorite          = isFavorite
+    self.isHot               = isHot
+    self.isOwn               = isOwn
+    self.isNew               = isNew
+    self.isTop               = isTop
+    self.isBanned            = isBanned
+    self.isComplete          = false
+    self.isVisited           = false
+    self.progress            = 0
+    self.rating              = 0
+    self.commentsTotal       = commentsTotal
+    self.startDate           = Date()
+    //    self.media = []
+    //    self.answers = []
+    self.media               = media.enumerated().map { order, item in Mediafile(title: item.text, order: order, survey: self, image: item.image) }
+    ////        self.media = media.map({ number, dict in
+    ////            return Mediafile(title: dict.first?.value ?? "", order: number, survey: self, image: dict.first?.key)
+    ////        })
+    self.answers = answers.enumerated().map({ (index,title) in return Answer(description: title, title: "", survey: self, order: index) })
+  }
   
   //Creates SurveyReference
   private func getReference() -> SurveyReference {

@@ -17,7 +17,9 @@ class PollView: UIView {
   //Logic
   public weak var item: Survey? {
     didSet {
-      guard let item = item else { return }
+      guard !viewInput.isNil,
+            let item = item
+      else { return }
       
       collectionView.place(inside: self)
       
@@ -46,18 +48,40 @@ class PollView: UIView {
         actionButton.backgroundColor = item.topic.tagColor
       }
       actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+      
+      guard viewInput!.mode == .Preview,
+            let constraint = actionButton.getConstraint(identifier: "top")
+      else { return }
+      
+      toggleFade(true)
+      setNeedsLayout()
+      layoutIfNeeded()
+      UIView.animate(
+        withDuration: 0.35,
+        delay: 0.3,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          self.actionButton.transform = .identity
+          self.actionButton.alpha = 1
+          constraint.constant = -(self.actionButton.bounds.height + tabBarHeight)
+          self.layoutIfNeeded()
+        }) { _ in }
     }
   }
   
-//
-//  lazy var test: UIView = {
-//    let instance = UIView()
-//    instance.backgroundColor = .red
-//    instance.heightAnchor.constraint(equalTo: instanxce.widthAnchor, multiplier: 1/1).isActive = true
-//    instance.heightAnchor.constraint(equalToConstant: 50).isActive = true
-//    instance.layer.zPosition = 2
-//    return instance
-//  }()
+  //
+  //  lazy var test: UIView = {
+  //    let instance = UIView()
+  //    instance.backgroundColor = .red
+  //    instance.heightAnchor.constraint(equalTo: instanxce.widthAnchor, multiplier: 1/1).isActive = true
+  //    instance.heightAnchor.constraint(equalToConstant: 50).isActive = true
+  //    instance.layer.zPosition = 2
+  //    return instance
+  //  }()
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -124,7 +148,7 @@ class PollView: UIView {
       return helper
     }
     
-    let instance = PollCollectionView(item: item!)
+    let instance = PollCollectionView(item: item!, mode: viewInput!.mode)
     instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
     instance.layer.masksToBounds = false
     instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: 100, right: instance.contentInset.right)
@@ -303,17 +327,18 @@ class PollView: UIView {
     let instance = UIButton()
     instance.alpha = 0
     instance.layer.zPosition = 2
-    instance.addTarget(self, action: #selector(self.vote), for: .touchUpInside)
+    instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
     
     if #available(iOS 15, *) {
-      let attrString = AttributedString("vote".localized.uppercased(), attributes: AttributeContainer([
+      let attrString = AttributedString((viewInput!.mode == .Preview ? "post_poll" : "vote").localized.uppercased(), attributes: AttributeContainer([
         NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2) as Any,
         NSAttributedString.Key.foregroundColor: UIColor.white
       ]))
       var config = UIButton.Configuration.filled()
       config.attributedTitle = attrString
       config.baseBackgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-      config.image = UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large))
+      config.image = UIImage(systemName: viewInput!.mode == .Preview ? "play.fill" : "hand.point.left.fill",
+                             withConfiguration: UIImage.SymbolConfiguration(scale: .large))
       config.imagePlacement = .trailing
       config.imagePadding = padding
       config.contentInsets.top = padding
@@ -324,13 +349,15 @@ class PollView: UIView {
 
       instance.configuration = config
     } else {
-      let attrString = NSMutableAttributedString(string: "vote".localized.uppercased(), attributes: [
+      let attrString = NSMutableAttributedString(string: (viewInput!.mode == .Preview ? "post_poll" : "vote").localized.uppercased(), attributes: [
         NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2) as Any,
         NSAttributedString.Key.foregroundColor: UIColor.white
       ])
       instance.titleEdgeInsets.left = 20
       instance.titleEdgeInsets.right = 20
-      instance.setImage(UIImage(systemName: "hand.point.left.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+      instance.setImage(UIImage(systemName: viewInput!.mode == .Preview ? "play.fill" : "hand.point.left.fill",
+                                withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
+                        for: .normal)
       instance.imageView?.tintColor = .white
       instance.imageEdgeInsets.left = 8
       //            instance.imageEdgeInsets.right = 8
@@ -454,9 +481,12 @@ private extension PollView {
   }
   
   @objc
-  func vote() {
-    guard actionButtonState == .Send else { return }
-    isVotingPublisher.send(true)
+  func handleTap() {
+    guard actionButtonState == .Send,
+          let viewInput = viewInput
+    else { return }
+    
+    viewInput.mode == .Preview ? { viewInput.post() }() : { isVotingPublisher.send(true) }()
     actionButtonState = .Sending
     actionButton.isUserInteractionEnabled = false
     

@@ -25,6 +25,7 @@ class TopicSelectionPopupContent: UIView {
     didSet {
       guard let topic = topic else { return }
       
+      confirmButton.isEnabled = true
       tagCapsule.iconCategory = topic.iconCategory
       tagCapsule.text = topic.title
       tagCapsule.color = topic.tagColor
@@ -137,6 +138,7 @@ class TopicSelectionPopupContent: UIView {
   }()
   private lazy var confirmButton: UIButton = {
     let instance = UIButton()
+    instance.isEnabled = false
     instance.addTarget(self,
                        action: #selector(self.handleTap(sender:)),
                        for: .touchUpInside)

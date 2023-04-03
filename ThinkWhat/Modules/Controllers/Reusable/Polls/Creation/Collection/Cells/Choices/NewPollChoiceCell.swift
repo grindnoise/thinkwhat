@@ -13,6 +13,8 @@ class NewPollChoiceCell: UICollectionViewCell {
   
   // MARK: - Public properties
   ///**Logic**
+  public var stage: NewPollController.Stage! 
+  public var stageGlobal: NewPollController.Stage!
   public var order: Int! {
     didSet {
       guard !item.isNil else { return }
@@ -237,7 +239,7 @@ private extension NewPollChoiceCell {
 
 extension NewPollChoiceCell: UITextViewDelegate {
   func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-//    guard !isKeyboardOnScreen else { return false }
+    guard stageGlobal == .Ready || stage == stageGlobal else { return false }
         
     UIView.animate(withDuration: 0.2) { [weak self] in
       guard let self = self else { return }

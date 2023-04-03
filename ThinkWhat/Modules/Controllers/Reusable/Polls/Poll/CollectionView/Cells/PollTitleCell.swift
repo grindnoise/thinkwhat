@@ -42,7 +42,7 @@ class PollTitleCell: UICollectionViewCell {
       setupUI()
     }
   }
-  public var mode: PollCollectionView.Mode = .Default {
+  public var mode: PollCollectionView.ViewMode = .Default {
     didSet {
 //      guard let leftStack = headerStack.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }
 //
@@ -352,7 +352,7 @@ class PollTitleCell: UICollectionViewCell {
   
   
   // MARK: - Public methods
-  public func onModeChanged(mode: PollCollectionView.Mode,
+  public func onModeChanged(mode: PollCollectionView.ViewMode,
                             duration: TimeInterval = 0.2) {
     
     guard let leftStack = headerStack.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }

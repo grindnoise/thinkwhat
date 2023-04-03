@@ -479,6 +479,8 @@
 		ABC18339284E52A3005D1C31 /* ImageSelectionHeaderContent.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABC18338284E52A3005D1C31 /* ImageSelectionHeaderContent.xib */; };
 		ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C622E9B33700DEA9FD /* Mail.swift */; };
 		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
+		ABC5823529D8AE49000D4770 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09B8BE406BA85CE59BB01EDA /* Pods_ThinkWhat.framework */; };
+		ABC5823A29D8C0D2000D4770 /* CostCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC5823929D8C0D2000D4770 /* CostCell.swift */; };
 		ABC8270629AA4F5900E33074 /* AccountManagementCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC8270529AA4F5900E33074 /* AccountManagementCollectionView.swift */; };
 		ABC8270829AA4FE800E33074 /* AccountManagementCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC8270729AA4FE800E33074 /* AccountManagementCell.swift */; };
 		ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */; };
@@ -525,6 +527,7 @@
 		ABE000B227E0855300B6B4CB /* DataObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE000B127E0855300B6B4CB /* DataObservable.swift */; };
 		ABE065072844B57100877D92 /* OptionSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE065062844B57100877D92 /* OptionSelection.swift */; };
 		ABE065092844B58400877D92 /* OptionSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABE065082844B58400877D92 /* OptionSelection.xib */; };
+		ABE3A73429DAE80A008D8600 /* CostItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE3A73329DAE80A008D8600 /* CostItem.swift */; };
 		ABE43695251C7FD400C1428D /* CustomSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE43694251C7FD300C1428D /* CustomSwitch.swift */; };
 		ABE4927F28AD2B7400637A8B /* ClaimPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4927E28AD2B7400637A8B /* ClaimPopupContent.swift */; };
 		ABE4928228AD2DBF00637A8B /* ClaimCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE4928128AD2DBF00637A8B /* ClaimCollectionView.swift */; };
@@ -577,7 +580,6 @@
 		ABFB4222287320DE0066CFA0 /* YoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */; };
 		ABFB42242873443A0066CFA0 /* WebViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB42232873443A0066CFA0 /* WebViewCell.swift */; };
 		ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFD793D25F8CD99009A2824 /* RoundIcon.swift */; };
-		C3212E81A2EA594A2E6850AA /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09B8BE406BA85CE59BB01EDA /* Pods_ThinkWhat.framework */; };
 		EBF405C556FC541BF4736050 /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE3CFCD02802992F2CE99B57 /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -1090,6 +1092,7 @@
 		ABC18338284E52A3005D1C31 /* ImageSelectionHeaderContent.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageSelectionHeaderContent.xib; sourceTree = "<group>"; };
 		ABC3E7C622E9B33700DEA9FD /* Mail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mail.swift; sourceTree = "<group>"; };
 		ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarningSign.swift; sourceTree = "<group>"; };
+		ABC5823929D8C0D2000D4770 /* CostCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostCell.swift; sourceTree = "<group>"; };
 		ABC8270529AA4F5900E33074 /* AccountManagementCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountManagementCollectionView.swift; sourceTree = "<group>"; };
 		ABC8270729AA4FE800E33074 /* AccountManagementCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountManagementCell.swift; sourceTree = "<group>"; };
 		ABCA4DFF22E5F53F00250AA9 /* VKManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VKManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -1136,6 +1139,7 @@
 		ABE000B127E0855300B6B4CB /* DataObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataObservable.swift; sourceTree = "<group>"; };
 		ABE065062844B57100877D92 /* OptionSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionSelection.swift; sourceTree = "<group>"; };
 		ABE065082844B58400877D92 /* OptionSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OptionSelection.xib; sourceTree = "<group>"; };
+		ABE3A73329DAE80A008D8600 /* CostItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostItem.swift; sourceTree = "<group>"; };
 		ABE43694251C7FD300C1428D /* CustomSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSwitch.swift; sourceTree = "<group>"; };
 		ABE4927E28AD2B7400637A8B /* ClaimPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimPopupContent.swift; sourceTree = "<group>"; };
 		ABE4928128AD2DBF00637A8B /* ClaimCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaimCollectionView.swift; sourceTree = "<group>"; };
@@ -1199,7 +1203,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C3212E81A2EA594A2E6850AA /* Pods_ThinkWhat.framework in Frameworks */,
+				ABC5823529D8AE49000D4770 /* Pods_ThinkWhat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2756,7 +2760,7 @@
 		ABADF59927F7009400A26474 /* Reusable */ = {
 			isa = PBXGroup;
 			children = (
-				AB39899A28637E4F004C958E /* CostCollectionView.swift */,
+				ABC5823829D8BE3F000D4770 /* Cost collection */,
 				AB25E03F265FABA300EAA8AE /* NewSurveySelectionTypeController.swift */,
 				AB548663269724A200D30235 /* NewPollResultViewController.swift */,
 				AB39D40329C3640200892D58 /* Ratings */,
@@ -2922,6 +2926,16 @@
 				AB8DA31927A0325D00F92C18 /* Localizable.strings */,
 			);
 			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		ABC5823829D8BE3F000D4770 /* Cost collection */ = {
+			isa = PBXGroup;
+			children = (
+				AB39899A28637E4F004C958E /* CostCollectionView.swift */,
+				ABC5823929D8C0D2000D4770 /* CostCell.swift */,
+				ABE3A73329DAE80A008D8600 /* CostItem.swift */,
+			);
+			path = "Cost collection";
 			sourceTree = "<group>";
 		};
 		ABCDC71D28DC6302003B24F2 /* UserprofilesCollectionView */ = {
@@ -3555,6 +3569,7 @@
 				AB543FFB284D05E400CCB7F1 /* TopicSelectionModernContainer.swift in Sources */,
 				AB0A41E528A28942002FA7B7 /* Date.swift in Sources */,
 				AB3C6863223FD89900B57580 /* CustomNotificationDelegate.swift in Sources */,
+				ABE3A73429DAE80A008D8600 /* CostItem.swift in Sources */,
 				AB868A6A23EB04A3008DEB84 /* 1_CategorySelectionViewController.swift in Sources */,
 				AB10031C27BFBBDE00338EE4 /* FillUserModel.swift in Sources */,
 				ABCF3D012990F4FE001622AD /* UserInfoCell.swift in Sources */,
@@ -3993,6 +4008,7 @@
 				ABA16E9229D2E22D002D63B6 /* UIImage.swift in Sources */,
 				ABC8270629AA4F5900E33074 /* AccountManagementCollectionView.swift in Sources */,
 				ABEB5F7F285E1E0600C75C31 /* LimitsSelectionView.swift in Sources */,
+				ABC5823A29D8C0D2000D4770 /* CostCell.swift in Sources */,
 				AB234F4028D653B600204EC8 /* NSDirectionalEdgeInsets.swift in Sources */,
 				AB51075828F1CDD000CA0BFC /* AppSettingsLanguageCell.swift in Sources */,
 				AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */,

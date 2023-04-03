@@ -54,20 +54,21 @@ class NewPollHotCell: UICollectionViewCell {
   @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
   @Published public var isHot: Bool! {
     didSet {
-      guard stage == stageGlobal, !isHot.isNil else { return }//, !openedConstraint.isActive else { return }
+      guard oldValue.isNil, oldValue != isHot else { return }//, !openedConstraint.isActive else { return }
       
-      if let constraint = buttonsStack.getConstraint(identifier: "heightAnchor") {
-        setNeedsLayout()
-        UIView.animate(withDuration: 0.3) { [weak self] in
-          guard let self = self else { return }
-          
-          constraint.constant = "T".height(withConstrainedWidth: 100,
-                                           font: UIFont.scaledFont(fontName: Fonts.Regular,
-                                                                   forTextStyle: .body)!) + self.padding*2
-          self.layoutIfNeeded()
-        }
-      }
-      boundsPublisher.send()
+      nextStage()
+//      if let constraint = buttonsStack.getConstraint(identifier: "heightAnchor") {
+//        setNeedsLayout()
+//        UIView.animate(withDuration: 0.3) { [weak self] in
+//          guard let self = self else { return }
+//
+//          constraint.constant = "T".height(withConstrainedWidth: 100,
+//                                           font: UIFont.scaledFont(fontName: Fonts.Regular,
+//                                                                   forTextStyle: .body)!) + self.padding*2
+//          self.layoutIfNeeded()
+//        }
+//      }
+//      boundsPublisher.send()
     }
   }
   public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
@@ -302,10 +303,10 @@ private extension NewPollHotCell {
                                topInset: -2)
 
     addSubview(stack)
-    addSubview(buttonsStack)
+//    addSubview(buttonsStack)
     addSubview(descriptionLabel)
     stack.translatesAutoresizingMaskIntoConstraints = false
-    buttonsStack.translatesAutoresizingMaskIntoConstraints = false
+//    buttonsStack.translatesAutoresizingMaskIntoConstraints = false
     descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       stack.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*4),
@@ -313,12 +314,12 @@ private extension NewPollHotCell {
       descriptionLabel.topAnchor.constraint(equalTo: stack.bottomAnchor, constant: padding*3),
       descriptionLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
       descriptionLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
-      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*3),
-      buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
-      buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
+//      buttonsStack.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: padding*3),
+//      buttonsStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+//      buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
+    let constraint = descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)//buttonsStack
     constraint.isActive = true
     constraint.identifier = "bottomAnchor"
     constraint.priority = .defaultLow
@@ -351,7 +352,7 @@ private extension NewPollHotCell {
   @objc
   func handleTap(recognizer: UITapGestureRecognizer) {
 //    guard !isHot.isNil else { return }
-//    guard stageGlobal == .Ready || stage == stageGlobal else { return }
+    guard stageGlobal == .Ready || stage == stageGlobal else { return }
     
     guard let v = recognizer.view else { return }
     if let icon = v as? Icon {

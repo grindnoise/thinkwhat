@@ -32,6 +32,8 @@ class NewPollTopicCell: UICollectionViewCell {
             topic != oldValue
       else { return }
       
+      guard stageGlobal == stage else { return }
+      
       stageCompletePublisher.send()
       stageCompletePublisher.send(completion: .finished)
       

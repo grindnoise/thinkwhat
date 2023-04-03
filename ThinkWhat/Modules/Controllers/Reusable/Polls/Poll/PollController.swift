@@ -12,7 +12,7 @@ import Combine
 
 class PollController: UIViewController {
   
-  enum Mode { case Read, Vote }
+  enum Mode { case Read, Vote, Preview }
   
   // MARK: - Public properties
   var controllerOutput: PollControllerOutput?
@@ -44,6 +44,7 @@ class PollController: UIViewController {
       //            update()
     }
   }
+  public private(set) var mode: Mode
   
   
   
@@ -129,8 +130,11 @@ class PollController: UIViewController {
   
   
   // MARK: - Initialization
-  init(surveyReference: SurveyReference, showNext: Bool = false) {
+  init(surveyReference: SurveyReference,
+       mode: Mode = .Vote,
+       showNext: Bool = false) {
     self.item = surveyReference
+    self.mode = mode
     
     super.init(nibName: nil, bundle: nil)
     
@@ -286,6 +290,7 @@ private extension PollController {
   }
   
   func setTasks() {
+    guard mode != .Preview else { return }
 //    func updateResultsStats() {
 //      //Update survey stats every n seconds
 //      Timer
@@ -556,6 +561,8 @@ private extension PollController {
     
     guard item.survey.isNil else {
       controllerOutput?.item = item.survey
+      
+      guard mode != .Preview else { return }
       controllerInput?.addView()
       return
     }
@@ -567,6 +574,8 @@ private extension PollController {
   }
   
   func setBarButtonItems() {
+    guard mode != .Preview else { return }
+    
     let shareAction: UIAction = .init(title: "share".localized,
                                       image: UIImage(systemName: "square.and.arrow.up",
                                                      withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline,
@@ -717,6 +726,12 @@ private extension PollController {
 
 // MARK: - Input
 extension PollController: PollViewInput {
+  func post() {
+    guard let survey = item.survey else { return }
+    
+    controllerInput?.post(survey)
+  }
+  
   func updateCommentsStats(_ comments: [Comment]) {
     guard isOnScreen else { return }
     
@@ -896,6 +911,15 @@ extension PollController: PollModelOutput {
   
   func commentDeleteError() {
     
+  }
+  
+  func postCallback(_ result: Result<Bool, Error>) {
+    switch result {
+    case .success:
+      print("")
+    case .failure(let failure):
+      fatalError()
+    }
   }
 }
 

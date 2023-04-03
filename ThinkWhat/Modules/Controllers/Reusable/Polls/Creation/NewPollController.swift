@@ -32,7 +32,7 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
       case .Anonymity: return "new_poll_anonymity".localized
       case .Hot: return "new_poll_hot".localized
       case .Limits: return "new_poll_limit".localized
-      case .Ready: return "new_poll_limit".localized
+      case .Ready: return "new_poll_cost".localized
       }
     }
     
@@ -209,6 +209,16 @@ class NewPollController: UIViewController, TintColorable, UINavigationController
 }
 
 extension NewPollController: NewPollViewInput {
+  func preview(_ instance: Survey) {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.pushViewController(PollController(surveyReference: instance.reference,
+                                                            mode: .Preview,
+                                                            showNext: false),
+                                             animated: true)
+  }
+  
   func setColor(_ color: UIColor) {
     setNavigationBarTintColor(color)
     progressCapsule.setColor(color)

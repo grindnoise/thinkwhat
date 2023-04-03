@@ -344,6 +344,8 @@ private extension NewPollImagesCell {
   
   @objc
   func addImage() {
+    guard stageGlobal == .Ready || stage == stageGlobal else { return }
+    
     addImagePublisher.send()
 //    collectionView.addChoice()
   }

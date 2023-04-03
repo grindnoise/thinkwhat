@@ -18,6 +18,8 @@ class NewPollChoicesCollectionView: UICollectionView {
   
   // MARK: - Public properties
   ///**Publishers**
+  @Published public var stage: NewPollController.Stage
+  @Published public var stageGlobal: NewPollController.Stage
   @Published public private(set) var dataItems: [NewPollChoice]
   @Published public private(set) var stageAnimationFinished: NewPollController.Stage!
   @Published public var isKeyboardOnScreen: Bool!
@@ -37,8 +39,12 @@ class NewPollChoicesCollectionView: UICollectionView {
   
   
   // MARK: - Initialization
-  init(_ choices: [NewPollChoice]) {
-    self.dataItems = choices
+  init(dataItems: [NewPollChoice],
+       stage: NewPollController.Stage,
+       stageGlobal: NewPollController.Stage) {
+    self.dataItems = dataItems
+    self.stage = stage
+    self.stageGlobal = stageGlobal
     
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     
@@ -160,6 +166,8 @@ private extension NewPollChoicesCollectionView {
     
     let cellRegistration = UICollectionView.CellRegistration<NewPollChoiceCell, NewPollChoice> { [unowned self] cell, indexPath, item in
 //      cell.minHeight = 50
+      cell.stage = self.stage
+      cell.stageGlobal = self.stageGlobal
       cell.minLength = ModelProperties.shared.surveyAnswerTextMinLength
       cell.maxLength = ModelProperties.shared.surveyAnswerTextMaxLength
       cell.order = indexPath.row
@@ -187,6 +195,13 @@ private extension NewPollChoicesCollectionView {
         .eraseToAnyPublisher()
         .sink { cell.isKeyboardOnScreen = $0!}
         .store(in: &self.subscriptions)
+      self.$stage
+        .sink { cell.stage = $0 }
+        .store(in: &subscriptions)
+      self.$stageGlobal
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &subscriptions)
+      
 //      guard self.stage == .Topic else { return }
 //
 //      cell.present(seconds: 0.5)

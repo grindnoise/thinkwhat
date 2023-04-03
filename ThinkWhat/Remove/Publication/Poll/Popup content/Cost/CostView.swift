@@ -8,27 +8,6 @@
 
 import UIKit
 
-class CostItem: Hashable {
-  
-  let id = UUID()
-  var title: String
-  var cost: Int
-  
-  init(title: String, cost: Int) {
-    self.title = title
-    self.cost = cost
-  }
-  
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(title)
-    hasher.combine(cost)
-  }
-  
-  static func == (lhs: CostItem, rhs: CostItem) -> Bool {
-    lhs.id == rhs.id
-  }
-}
-
 class CostView: UIView {
   
   private weak var parent: Popup?

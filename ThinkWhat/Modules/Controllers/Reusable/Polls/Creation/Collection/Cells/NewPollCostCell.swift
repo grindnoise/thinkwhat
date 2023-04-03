@@ -13,17 +13,28 @@ class NewPollCostCell: UICollectionViewCell {
   
   // MARK: - Public properties
   ///**Logic**
-  public var stage: NewPollController.Stage!
-  public var stageGlobal: NewPollController.Stage!
-  public var costItems: [CostItem]! {
+  public var stage: NewPollController.Stage! {
     didSet {
-      guard !costItems.isNil else { return }
+      guard !stage.isNil, stage != oldValue else { return }
       
       setupUI()
     }
   }
+  public var stageGlobal: NewPollController.Stage!
+  public var costItems: [CostItem]! //{
+//    didSet {
+//      guard !costItems.isNil else { return }
+//
+//      setupUI()
+//    }
+//  }
   public var topicColor: UIColor = .systemGray
   public var externalSubscriptions = Set<AnyCancellable>()
+  public var isPresented = false {
+    didSet {
+      collectionView.isPresented = true
+    }
+  }
   
   ///**Publishers**
   @Published public var removedImage: NewPollImage?
@@ -48,6 +59,7 @@ class NewPollCostCell: UICollectionViewCell {
   }
   
   
+  
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
@@ -56,6 +68,7 @@ class NewPollCostCell: UICollectionViewCell {
   private let padding: CGFloat = 8
   private lazy var collectionView: CostCollectionView = {
     let instance = CostCollectionView(dataItems: costItems)
+    instance.alpha = stage == stageGlobal ? 1 : 0.3
     let constraint = instance.heightAnchor.constraint(equalToConstant: 1)
     constraint.isActive = true
     
@@ -69,6 +82,10 @@ class NewPollCostCell: UICollectionViewCell {
         self.layoutIfNeeded()
         self.boundsPublisher.send(true)
       }
+      .store(in: &subscriptions)
+    
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.width * 0.05 }
       .store(in: &subscriptions)
     
     
@@ -152,7 +169,15 @@ class NewPollCostCell: UICollectionViewCell {
   
   // MARK: - Public methods
   public func update(_ instances: [CostItem]) {
-    collectionView.update(instances)
+    collectionView.setDataSource(instances)
+  }
+  
+  public func present() {
+    collectionView.present() { [weak self] in
+      guard let self = self else { return }
+      
+      self.isPresented = true
+    }
   }
 }
 
@@ -168,12 +193,12 @@ private extension NewPollCostCell {
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      collectionView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*2),
-      collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*2),
-      collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
+      collectionView.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*4),
+      collectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*4),
+      collectionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*4),
     ])
     
-    let constraint = collectionView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
+    let constraint = collectionView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*10)
     constraint.isActive = true
     constraint.priority = .defaultLow
   }

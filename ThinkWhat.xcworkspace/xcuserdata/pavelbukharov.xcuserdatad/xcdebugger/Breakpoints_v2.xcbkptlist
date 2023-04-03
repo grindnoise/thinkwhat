@@ -2217,6 +2217,36 @@
                   endingLineNumber = "29"
                   offsetFromSymbolStart = "64">
                </Location>
+               <Location
+                  uuid = "20782590-9CDA-47AB-A0F0-84175EF1A689 - ba867f6da18e0e87"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.SubscriptionsView.viewInput.didset : Swift.Optional&lt;ThinkWhat__local_.SubscriptionsViewInput &amp; ThinkWhat__local_.TintColorable&gt;"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "29"
+                  endingLineNumber = "29"
+                  offsetFromSymbolStart = "560">
+               </Location>
+               <Location
+                  uuid = "20782590-9CDA-47AB-A0F0-84175EF1A689 - 6db4a92b988e8618"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (__C.UIColor) -&gt; __C.UIColor in ThinkWhat__local_.SubscriptionsView.viewInput.didset : Swift.Optional&lt;ThinkWhat__local_.SubscriptionsViewInput &amp; ThinkWhat__local_.TintColorable&gt;"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "29"
+                  endingLineNumber = "29"
+                  offsetFromSymbolStart = "64">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -2632,6 +2662,36 @@
                   startingLineNumber = "27"
                   endingLineNumber = "27"
                   offsetFromSymbolStart = "180">
+               </Location>
+               <Location
+                  uuid = "805EE802-08E6-4431-AF81-EA025740E84B - bac1389ac5a376c3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.FadeTransition.animateTransition(using: __C.UIViewControllerContextTransitioning) -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Supporting%20Files/UI/Transitions/old/FadeTransition.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "27"
+                  endingLineNumber = "27"
+                  offsetFromSymbolStart = "88">
+               </Location>
+               <Location
+                  uuid = "805EE802-08E6-4431-AF81-EA025740E84B - bac1389ac5a376c3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.FadeTransition.animateTransition(using: __C.UIViewControllerContextTransitioning) -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Supporting%20Files/UI/Transitions/old/FadeTransition.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "27"
+                  endingLineNumber = "27"
+                  offsetFromSymbolStart = "188">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -3142,8 +3202,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Polls/Creation/Collection/NewPollCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "302"
-            endingLineNumber = "302"
+            startingLineNumber = "398"
+            endingLineNumber = "398"
             landmarkName = "setupUI()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3158,8 +3218,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Polls/Creation/Collection/Cells/Choices/NewPollChoiceCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "246"
-            endingLineNumber = "246"
+            startingLineNumber = "248"
+            endingLineNumber = "248"
             landmarkName = "textViewShouldBeginEditing(_:)"
             landmarkType = "7">
          </BreakpointContent>

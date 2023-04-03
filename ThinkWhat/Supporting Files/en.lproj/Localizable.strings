@@ -20,7 +20,6 @@
 "images_limit" = "You can attach no maore than 3 images";
 "minimum_choices" = "2 choices are required at least";
 "minimum_limits" = "At least 10 participants required";
-"insufficient_balance" = "You don't have enough points for this publication";
 "replies" = "Replies";
 "replies_total" = "replies";
 "reply" = "Reply";
@@ -236,7 +235,6 @@
 "comments_disabled" = "Comments disabled";
 "voters_limit" = "Limits";
 "voters_limit_description" = "Voters limit";
-"hot_option" = "Hot start";
 "voters_option" = "Number of participants";
 
 
@@ -448,8 +446,12 @@
 "new_poll_hot_on" = "The poll will be published in the Hot feed";
 "new_poll_hot_off" = "The poll won't be published in the Hot feed";
 "new_poll_limit" = "Number of participants";
-"new_poll_limit_placeholder" = "The poll will close when the specified number of votes is reached";
-"new_poll_limit_hint" = "The poll will close when the specified number of votes is reached";
-"new_poll_limit" = "Publication cost";
+"new_poll_limit_placeholder" = "The publication will disappear from the feed when it reaches the received user votes";
+"new_poll_limit_hint" = "TThe publication will disappear from the feed when it reaches the received user votes";
+"new_poll_cost" = "Publication cost";
 "balance" = "Balance:";
 "total_bill" = "Total";
+"hot_option" = "Hot start";
+"publication_preview" = "Preview";
+"insufficient_balance" = "You don't have enough points for this publication";
+"insufficient_balance" = "У Вас недостаточно баллов для публикации";

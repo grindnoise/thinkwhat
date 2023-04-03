@@ -333,7 +333,7 @@ private extension NewPollCommentsCell {
   @objc
   func handleTap(recognizer: UITapGestureRecognizer) {
 //    guard !commentsEnabled.isNil else { return }
-//    guard stageGlobal == .Ready || stage == stageGlobal else { return }
+    guard stageGlobal == .Ready || stage == stageGlobal else { return }
     
     guard let v = recognizer.view else { return }
     if let icon = v as? Icon {

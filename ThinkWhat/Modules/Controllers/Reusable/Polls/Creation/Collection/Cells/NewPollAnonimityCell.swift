@@ -175,6 +175,7 @@ class NewPollAnonimityCell: UICollectionViewCell {
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.isUserInteractionEnabled = true
     instance.tapPublisher
+      .filter { [unowned self] _ in self.stageGlobal == .Ready || self.stage == self.stageGlobal }
       .filter { [unowned self] _ in self.anonymityEnabled.isNil || !self.anonymityEnabled}
       .sink { [unowned self] _ in
         self.anonymityEnabled = true
@@ -215,16 +216,16 @@ class NewPollAnonimityCell: UICollectionViewCell {
   }()
   private lazy var user: Avatar = {
     let instance = Avatar(userprofile: Userprofiles.shared.current!, isShadowed: true)
-//    instance.toggleFilter(name: "CIPhotoEffectNoir", duration: 0.3)
-//    if anonymityEnabled.isNil || anonymityEnabled == false {
-//      instance.toggleFilter(name: "CIPhotoEffectTonal")
-//    }
+    if anonymityEnabled.isNil || anonymityEnabled == false {
+      instance.toggleFilter(name: "CIPhotoEffectTonal")
+    }
     instance.alpha = anonymityEnabled.isNil ? 0.75 : anonymityEnabled == false ? 1 : 0.75
     instance.transform = anonymityEnabled.isNil ? .identity : anonymityEnabled == false ? CGAffineTransform(scaleX: 1.1, y: 1.1) : CGAffineTransform(scaleX: 0.75, y: 0.75)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.isUserInteractionEnabled = true
     instance.heightAnchor.constraint(equalToConstant: stackHeight).isActive = true
     instance.tapPublisher
+      .filter { [unowned self] _ in self.stageGlobal == .Ready || self.stage == self.stageGlobal }
       .filter { [unowned self] _ in self.anonymityEnabled.isNil || self.anonymityEnabled}
       .sink { [unowned self] _ in
         self.anonymityEnabled = false
@@ -381,7 +382,7 @@ private extension NewPollAnonimityCell {
   
   @objc
   func nextStage() {
-    UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+    UIView.transition(with: self.label, duration: 0.3, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)

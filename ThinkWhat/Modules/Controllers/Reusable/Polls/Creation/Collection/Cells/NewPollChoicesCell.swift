@@ -13,15 +13,20 @@ class NewPollChoicesCell: UICollectionViewCell {
   
   // MARK: - Public properties
   ///**Logic**
-  public var stage: NewPollController.Stage!
-  public var stageGlobal: NewPollController.Stage!
-  public var choices: [NewPollChoice]! {
+  public var stage: NewPollController.Stage! {
     didSet {
-      guard !choices.isNil else { return }
+      guard !stage.isNil, oldValue != stage else { return }
       
       setupUI()
     }
   }
+  public var choices: [NewPollChoice]! //{
+//    didSet {
+//      guard !choices.isNil else { return }
+//
+//      setupUI()
+//    }
+//  }
   public var externalSubscriptions = Set<AnyCancellable>()
   public var topicColor: UIColor = .systemGray //{
 //    didSet {
@@ -36,6 +41,7 @@ class NewPollChoicesCell: UICollectionViewCell {
 //    }
 //  }
   ///**Publishers**
+  @Published public var stageGlobal: NewPollController.Stage!
   @Published public private(set) var wasEdited: Bool?
   @Published public var removedChoice: NewPollChoice?
   @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
@@ -91,7 +97,9 @@ class NewPollChoicesCell: UICollectionViewCell {
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var collectionView: NewPollChoicesCollectionView = {
-    let instance = NewPollChoicesCollectionView(choices)
+    let instance = NewPollChoicesCollectionView(dataItems: choices,
+                                                stage: stage,
+                                                stageGlobal: stageGlobal)
     let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
     constraint.isActive = true
     
@@ -102,6 +110,11 @@ class NewPollChoicesCell: UICollectionViewCell {
       .sink { [unowned self] in self.wasEdited = $0 }
       .store(in: &subscriptions)
     
+    $stageGlobal
+      .filter { !$0.isNil }
+      .eraseToAnyPublisher()
+      .sink { instance.stageGlobal = $0! }
+      .store(in: &subscriptions)
     $isMovingToParent
       .filter { !$0.isNil }
       .eraseToAnyPublisher()
@@ -214,26 +227,24 @@ class NewPollChoicesCell: UICollectionViewCell {
     instance.contentMode = .scaleAspectFill
     instance.tintColor = topicColor
     instance.alpha = 0
-//    instance.setAttributedTitle(NSAttributedString(string: "new_poll_choice_next".localized,
-//                                                   attributes: [
-//                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-//                                                    .foregroundColor: topicColor as Any
-//                                                   ]),
-//                                for: .normal)
     instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.nextStage)))
     
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
+    constraint.isActive = true
+    constraint.identifier = "heightAnchor"
     
     return instance
   }()
   private lazy var buttonsStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [button])//button
+    let instance = UIStackView(arrangedSubviews: [button, nextButton])//button
     instance.spacing = padding
     instance.axis = .vertical
-    instance.distribution = .fillEqually
+//    instance.distribution = .fillEqually
     instance.alignment = .center
     
     return instance
   }()
+  
   
   
   // MARK: - Destructor
@@ -291,10 +302,33 @@ class NewPollChoicesCell: UICollectionViewCell {
         self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
       } completion: { _ in }
     } else if index != 0, stageGlobal == stage {
-//      button.transform = .init(scaleX: 0.75, y: 0.75)
-//      buttonsStack.addArrangedSubview(button)
-      buttonsStack.addArrangedSubview(nextButton)
-      boundsPublisher.send(true)
+      if index == 1 {
+        if let constraint = nextButton.getConstraint(identifier: "heightAnchor") {
+          setNeedsLayout()
+          UIView.animate(withDuration: 0.3) { [weak self] in
+            guard let self = self else { return }
+            
+            self.buttonsStack.spacing = self.padding
+            self.nextButton.alpha = 1
+            constraint.constant = "T".height(withConstrainedWidth: 100,
+                                             font: UIFont.scaledFont(fontName: Fonts.Regular,
+                                                                     forTextStyle: .body)!) + self.padding*2
+            self.layoutIfNeeded()
+          }
+        }
+        boundsPublisher.send(true)
+//        buttonsStack.addArrangedSubview(nextButton)
+//        delay(seconds: 0.3) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
+//          UIView.animate(withDuration: 0.2) {
+//            self.nextButton.transform = .identity
+//            self.nextButton.alpha = 1
+//          }
+//        }
+      }
+//      boundsPublisher.send(true)
       
       if #available(iOS 15, *) {
         button.configuration?.baseBackgroundColor = topicColor
@@ -305,16 +339,6 @@ class NewPollChoicesCell: UICollectionViewCell {
                                                       .foregroundColor: topicColor as Any
                                                      ]),
                                   for: .normal)
-      }
-      
-      delay(seconds: 0.3) { [weak self] in
-        guard let self = self else { return }
-        
-        self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
-        UIView.animate(withDuration: 0.2) {
-          self.nextButton.transform = .identity
-          self.nextButton.alpha = 1
-        }
       }
     }
     
@@ -332,11 +356,13 @@ class NewPollChoicesCell: UICollectionViewCell {
   }
   
   public func refreshChoices(_ instances: [NewPollChoice]) {
+    choices = instances
     collectionView.refreshChoices(instances)
   }
   
   public func addSecondChoice() {
-    addChoice()
+    endEditing(true)
+    addChoicePublisher.send(true)
   }
 }
 
@@ -363,9 +389,12 @@ private extension NewPollChoicesCell {
       buttonsStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
+    let constraint = nextButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
     constraint.isActive = true
+    constraint.identifier = "bottomAnchor"
     constraint.priority = .defaultLow
+    
+    buttonsStack.spacing = 0
     
     layer.insertSublayer(bgLine.layer, at: 0)
     layer.insertSublayer(fgLine.layer, at: 1)
@@ -380,9 +409,22 @@ private extension NewPollChoicesCell {
     } completion: { _ in }
     
     endEditing(true)
-    buttonsStack.removeArrangedSubview(nextButton)
+//    buttonsStack.removeArrangedSubview(nextButton)
+//    nextButton.removeFromSuperview()
+    if let heightAnchor = nextButton.getConstraint(identifier: "heightAnchor") { //,
+//       let bottomAnchor = buttonsStack.getConstraint(identifier: "bottomAnchor"){
+      setNeedsLayout()
+      UIView.animate(withDuration: 0.3) { [weak self] in
+        guard let self = self else { return }
+        
+        heightAnchor.constant = 0
+        self.buttonsStack.spacing = 0
+//        bottomAnchor.constant = 0
+        self.layoutIfNeeded()
+      }
+    }
+    
     boundsPublisher.send(true)
-    nextButton.removeFromSuperview()
     stageCompletePublisher.send()
     stageCompletePublisher.send(completion: .finished)
     CATransaction.begin()
@@ -397,6 +439,7 @@ private extension NewPollChoicesCell {
   
   @objc
   func addChoice() {
+    guard choices.count > 1 else { return }
     endEditing(true)
     addChoicePublisher.send(true)
   }

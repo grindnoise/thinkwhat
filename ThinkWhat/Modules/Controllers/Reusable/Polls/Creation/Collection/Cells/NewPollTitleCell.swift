@@ -84,6 +84,8 @@ class NewPollTextCell: UICollectionViewCell {
       updateUI()
       guard text != oldValue else { return }
       
+      guard stage == stageGlobal else { return }
+      
       stageCompletePublisher.send()
       stageCompletePublisher.send(completion: .finished)
       
@@ -245,6 +247,7 @@ class NewPollTextCell: UICollectionViewCell {
     
     return instance
   }()
+  private var isBannerOnScreen = false
   
   // MARK: - Destructor
   deinit {
@@ -443,6 +446,9 @@ extension NewPollTextCell: UITextViewDelegate {
     }
     
     guard textView.text.count >= stage.minLength else {
+      guard !isBannerOnScreen else { return false }
+      
+      isBannerOnScreen = true
       let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
                                                             text: "new_poll_survey_min_text_length_error_begin".localized + String(describing: stage.minLength) + "new_poll_survey_min_text_length_error_end".localized,
                                                             tintColor: .systemOrange,
@@ -454,7 +460,7 @@ extension NewPollTextCell: UITextViewDelegate {
                              useContentViewHeight: true,
                              shouldDismissAfter: 2)
       banner.didDisappearPublisher
-        .sink { _ in banner.removeFromSuperview() }
+        .sink { _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
         .store(in: &self.subscriptions)
       
       return false

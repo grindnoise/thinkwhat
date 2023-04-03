@@ -19,6 +19,10 @@ class PollModel {
 
 // MARK: - Controller Input
 extension PollModel: PollControllerInput {
+  func post(_ instance: Survey) {
+    
+  }
+  
   func updateSurveyState(_ instance: SurveyReference) {
     Task {
       do {

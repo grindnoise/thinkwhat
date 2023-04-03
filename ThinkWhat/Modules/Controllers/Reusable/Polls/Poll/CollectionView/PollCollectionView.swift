@@ -38,7 +38,7 @@ class PollCollectionView: UICollectionView {
     }
   }
   
-  enum Mode { case Default, Preview, Transition }
+  enum ViewMode { case Default, Preview, Transition }
   
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
@@ -63,13 +63,14 @@ class PollCollectionView: UICollectionView {
   public var threadPublisher = PassthroughSubject<Comment, Never>()
   //  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
   ///**Logic**
-  public var mode: Mode {
+  public var viewMode: ViewMode {
     didSet {
 //      guard oldValue != mode else { return }
       
-      modeChangePublisher.send(mode)
+      modeChangePublisher.send(viewMode)
     }
   }
+  public var mode: PollController.Mode
   
   
   // MARK: - Private properties
@@ -77,7 +78,7 @@ class PollCollectionView: UICollectionView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Publishers**
-  private var modeChangePublisher = CurrentValueSubject<Mode?, Never>(nil)
+  private var modeChangePublisher = CurrentValueSubject<ViewMode?, Never>(nil)
   ///**Logic**
   private let item: Survey
   private var source: Source!
@@ -89,8 +90,10 @@ class PollCollectionView: UICollectionView {
   
   // MARK: - Initialization
   init(item: Survey,
-       mode: Mode = .Default) {
+       mode: PollController.Mode,
+       viewMode: ViewMode = .Default) {
     self.mode = mode
+    self.viewMode = viewMode
     self.item = item
     
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
@@ -157,7 +160,7 @@ private extension PollCollectionView {
     }
     
     let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [unowned self] cell, _, _ in
-      cell.mode = self.mode
+      cell.mode = self.viewMode
       cell.item = self.item
       cell.profileTapPublisher
         .sink { [weak self] _ in
@@ -201,7 +204,7 @@ private extension PollCollectionView {
       
       cell.insets = .uniform(size: self.padding)
       ///Set right text container inset if transition
-      cell.padding = self.mode == .Default ? self.padding*2 : self.mode == .Transition ? self.padding*2 : 0
+      cell.padding = self.viewMode == .Default ? self.padding*2 : self.viewMode == .Transition ? self.padding*2 : 0
       
 //      cell.insets = .init(top: self.padding,
 //                          left: self.padding*(self.mode == .Default ? 2 : 1),
@@ -283,6 +286,7 @@ private extension PollCollectionView {
       guard let self = self else { return }
       
       cell.item = self.item
+      cell.isUserInteractionEnabled = self.mode != .Preview
       cell.selectionPublisher
         .sink { [weak self] in
           guard let self = self else { return }
@@ -332,7 +336,7 @@ private extension PollCollectionView {
       guard let self = self else { return }
       
       cell.item = self.item
-      
+      cell.isUserInteractionEnabled = self.mode != .Preview
       //Claim
       //      cell.claimPublisher
       //        .sink { [weak self] in
@@ -513,7 +517,7 @@ private extension PollCollectionView {
     }
     snapshot.appendSections([.question])
     snapshot.appendItems([5], toSection: .question)
-    if mode == .Default {
+    if viewMode == .Default {
       snapshot.appendSections([.answers])
       snapshot.appendItems([6], toSection: .answers)
       snapshot.appendSections([.comments])

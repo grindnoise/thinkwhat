@@ -140,7 +140,9 @@ class HotCard: UIView, Card {
     
     return instance
   }()
-  private lazy var collectionView: PollCollectionView  = { PollCollectionView(item: item, mode: isReplica ? .Transition : .Preview) }()
+  private lazy var collectionView: PollCollectionView  = { PollCollectionView(item: item,
+                                                                              mode: .Vote,
+                                                                              viewMode: isReplica ? .Transition : .Preview) }()
   private lazy var featheredView: UIView = {
     let instance = UIView()
     instance.accessibilityIdentifier = "featheredView"
@@ -427,7 +429,7 @@ class HotCard: UIView, Card {
   
   ///Animates
   public func togglePollMode() {
-    collectionView.mode = .Default
+    collectionView.viewMode = .Default
   }
   
   // MARK: - Overridden methods

@@ -30,23 +30,29 @@ class NewPollCollectionView: UICollectionView {
       
       progressPublisher.send(stage.percent())
       
-//      isScrollEnabled = stage == .Ready
+      isScrollEnabled = stage == .Ready
     }
   }
   @Published public private(set) var topic: Topic! {
     didSet {
       guard oldValue.isNil,
-            !topic.isNil,
-            let stage = stage.next()
+            !topic.isNil
       else { return }
+    
+      _preview?.topic = topic
+    
+      guard let stage = stage.next() else { return }
       
       self.stage = stage
     }
   }
   @Published public private(set) var title: String! {
     didSet {
+      guard let title = title else { return }
+      
+      _preview?.title = title
+      
       guard oldValue.isNil,
-            !title.isNil,
             let stage = stage.next()
       else { return }
       
@@ -55,8 +61,11 @@ class NewPollCollectionView: UICollectionView {
   }
   @Published public private(set) var pollDescription: String! {
     didSet {
+      guard let pollDescription = pollDescription else { return }
+      
+      _preview?.detailsDescription = pollDescription
+      
       guard oldValue.isNil,
-            !pollDescription.isNil,
             let stage = stage.next()
       else { return }
       
@@ -65,8 +74,11 @@ class NewPollCollectionView: UICollectionView {
   }
   @Published public private(set) var question: String! {
     didSet {
+      guard !question.isNil else { return }
+      
+      _preview?.question = question
+      
       guard oldValue.isNil,
-            !question.isNil,
             let stage = stage.next()
       else { return }
       
@@ -77,6 +89,10 @@ class NewPollCollectionView: UICollectionView {
   public private(set) var choices: [NewPollChoice] = (0...0).map { NewPollChoice(text: "new_poll_choice_placeholder".localized + String(describing: $0 + 1)) } {
     didSet {
       choicesPublisher.send(choices)
+      
+      guard !_preview.isNil else { return }
+      
+      _preview?.answers = choices.map { $0.text }.enumerated().map({ (index,title) in return Answer(description: "", title: title, survey: _preview!, order: index) })
     }
   }
   private let choicesPublisher = PassthroughSubject<[NewPollChoice], Never>()
@@ -90,9 +106,16 @@ class NewPollCollectionView: UICollectionView {
 //      self.stage = stage
 //    }
 //  }
-  @Published public private(set) var images = [NewPollImage]()
-  @Published public private(set) var hyperlink: String = "" //{
-//    didSet {
+  @Published public private(set) var images = [NewPollImage]() {
+    didSet {
+      guard !_preview.isNil else { return }
+      
+      _preview?.media =  images.enumerated().map { order, item in Mediafile(title: item.text, order: order, survey: _preview!, image: item.image) }
+    }
+  }
+  @Published public private(set) var hyperlink: String = "" {
+    didSet {
+      _preview?.url = URL(string: hyperlink)
 //      guard oldValue.isEmpty,
 ////            hyperlink != oldValue,
 //            stage.rawValue <= NewPollController.Stage.Hyperlink.rawValue,
@@ -100,35 +123,72 @@ class NewPollCollectionView: UICollectionView {
 //      else { return }
 //
 //      self.stage = stage
-//    }
-//  }
-  @Published public private(set) var commentsEnabled: Bool? //{
-//    didSet {
-//      guard oldValue.isNil,
-//            commentsEnabled != oldValue,
-//            stage.rawValue <= NewPollController.Stage.Comments.rawValue,
-//            let stage = stage.next()
-//      else { return }
-//
-//      self.stage = stage
-//    }
-//  }
-  @Published public private(set) var anonymityEnabled: Bool?
-  @Published public private(set) var isHot: Bool?
+    }
+  }
+  @Published public private(set) var commentsEnabled: Bool? {
+    didSet {
+      guard let commentsEnabled = commentsEnabled else { return }
+      
+      _preview?.isCommentingAllowed = commentsEnabled
+    }
+  }
+  @Published public private(set) var anonymityEnabled: Bool? {
+    didSet {
+      guard let anonymityEnabled = anonymityEnabled else { return }
+      
+      _preview?.isAnonymous = anonymityEnabled
+    }
+  }
+  @Published public private(set) var isHot: Bool? {
+    didSet {
+      guard let value = isHot,
+            oldValue != value,
+            let balance = costItems.filter({ $0.title == "balance".localized }).first,
+            let limit = costItems.filter({ $0.title == "voters_option".localized }).first,
+            let total = costItems.filter({ $0.title == "total_bill".localized }).first
+      else { return }
+      
+      _preview?.isHot = value
+      
+      if value {
+        let hot = costItems.filter({ $0.title == "hot_option".localized }).first ?? {
+          let item = CostItem(type: .Expense, title: "hot_option".localized, cost: PriceList.shared.hotPost)
+          costItems.append(item)
+          return item
+        }()
+        
+        hot.cost = PriceList.shared.hotPost
+        total.cost = limit.cost + hot.cost
+      } else {
+        if let hot = costItems.filter({ $0.title == "hot_option".localized }).first {
+          costItems.remove(object: hot)
+        }
+        
+        total.cost = limit.cost
+      }
+      hasEnoughtBudget = (balance.cost - total.cost) > 0
+    }
+  }
   @Published public private(set) var limit: Int? {
     didSet {
       guard let value = limit,
             oldValue != value,
-            let item = costItems.filter({ $0.title == "voters_option".localized }).first
+            let balance = costItems.filter({ $0.title == "balance".localized }).first,
+            let limit = costItems.filter({ $0.title == "voters_option".localized }).first,
+            let total = costItems.filter({ $0.title == "total_bill".localized }).first
       else { return }
       
-      item.cost = value
-      costPublisher.send()
+      _preview?.votesLimit = value
+      
+      limit.cost = value
+      total.cost = limit.cost + (costItems.filter({ $0.title == "hot_option".localized }).first?.cost ?? 0)
+      hasEnoughtBudget = (balance.cost - total.cost) > 0
     }
   }
   @Published public private(set) var costItems: [CostItem] = {
-    [CostItem(title: "voters_option".localized, cost: 100)]
-//     CostItem(title: "hot_option".localized, cost: 10)]
+    [CostItem(type: .Balance, title: "balance".localized, cost: Userprofiles.shared.current!.balance),
+     CostItem(type: .Expense, title: "voters_option".localized, cost: 100),
+     CostItem(type: .Total, title: "total_bill".localized, cost: Userprofiles.shared.current!.balance - 100)]
   }()
   
   
@@ -139,7 +199,13 @@ class NewPollCollectionView: UICollectionView {
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
   private var source: Source!
-  private var isFirstAnswerSelection = true
+  @Published public private(set) var hasEnoughtBudget = true {
+    didSet {
+      guard let total = costItems.filter({ $0.title == "total_bill".localized }).first else { return }
+      
+      total.isNegative = !hasEnoughtBudget
+    }
+  }
   ///**UI**
   private let padding: CGFloat = 8
   ///**Publishers**
@@ -161,6 +227,7 @@ class NewPollCollectionView: UICollectionView {
   private(set) var limitsStageAnimationFinished = PassthroughSubject<Void, Never>()
   private(set) var hotStageAnimationFinished = PassthroughSubject<Void, Never>()
   private(set) var costPublisher = PassthroughSubject<Void, Never>()
+  private var _preview: Survey?
   
   
   // MARK: - Initialization
@@ -198,13 +265,42 @@ class NewPollCollectionView: UICollectionView {
   public func addImage(_ image: UIImage) {
     images.append(NewPollImage(image: image, text: ""))
   }
+  
+  public func makePreview() -> Survey {
+    if let oldValue = _preview {
+      SurveyReferences.shared.all.remove(object: oldValue.reference)
+      Surveys.shared.all.remove(object: oldValue)
+    }
+    let instance = Survey(type: .Poll,
+                          title: title,
+                          topic: topic,
+                          description: pollDescription,
+                          question: question,
+                          answers: choices.map { $0.text },
+                          media: images,
+                          url: URL(string: hyperlink),
+                          voteCapacity: limit!,
+                          isPrivate: false,
+                          isAnonymous: anonymityEnabled!,
+                          isCommentingAllowed: commentsEnabled!,
+                          isHot: isHot!,
+                          isFavorite: false,
+                          isOwn: true,
+                          isNew: true,
+                          isTop: true,
+                          isBanned: false,
+                          commentsTotal: 0)
+    Surveys.shared.append([instance])
+    _preview = instance
+    
+    return instance
+  }
 }
 
 private extension NewPollCollectionView {
   @MainActor
   func setupUI() {
-//    isScrollEnabled = false
-    delegate = self
+    isScrollEnabled = false
     collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
       var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
       layoutConfig.backgroundColor = .clear
@@ -482,13 +578,18 @@ private extension NewPollCollectionView {
     
     let choicesCellRegistration = UICollectionView.CellRegistration<NewPollChoicesCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
-      cell.stage = .Choices
-      cell.stageGlobal = self.stage
-//      cell.topicColor = self.topic.isNil ? .systemGray : self.topic!.tagColor
       cell.choices = self.choices
+      cell.stageGlobal = self.stage
+      cell.stage = .Choices
       cell.addChoicePublisher
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.addChoice() }
+        .sink { [unowned self] _ in
+          self.addChoice()
+          
+          guard self.stage == .Ready else { return }
+          
+          self.scrollToItem(at: IndexPath(row: 0, section: 4), at: .top, animated: true)
+        }
         .store(in: &self.subscriptions)
       cell.$removedChoice
         .filter { !$0.isNil }
@@ -598,7 +699,13 @@ private extension NewPollCollectionView {
       cell.addImagePublisher
         .receive(on: DispatchQueue.main)
 //        .sink { [unowned self] in self.addImage() }
-        .sink { [unowned self] in self.addImagePublisher.send() }
+        .sink { [unowned self] in
+          self.addImagePublisher.send()
+          
+          guard self.stage == .Ready else { return }
+          
+          self.scrollToItem(at: IndexPath(row: 0, section: 5), at: .top, animated: true)
+        }
         .store(in: &self.subscriptions)
       cell.$removedImage
         .filter { !$0.isNil }
@@ -907,10 +1014,11 @@ private extension NewPollCollectionView {
     }
     
     let costCellRegistration = UICollectionView.CellRegistration<NewPollCostCell, AnyHashable> { [unowned self] cell, indexPath, _ in
+      cell.costItems = self.costItems
+      cell.stageGlobal = self.stage
       cell.stage = .Ready
       cell.color = self.stage.rawValue >= NewPollController.Stage.Ready.rawValue ? self.topic!.tagColor : .systemGray4
-      cell.stageGlobal = self.stage
-      cell.costItems = self.costItems
+      cell.isPresented = self.stage.rawValue == NewPollController.Stage.Ready.rawValue
       self.$stage
         .sink { cell.stageGlobal = $0 }
         .store(in: &self.subscriptions)
@@ -919,9 +1027,13 @@ private extension NewPollCollectionView {
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
-      self.costPublisher
+//      self.costPublisher
+//        .receive(on: DispatchQueue.main)
+//        .sink { [unowned self] in cell.update(self.costItems)}
+//        .store(in: &self.subscriptions)
+      self.$costItems
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] in cell.update(self.costItems)}
+        .sink { cell.update($0) }
         .store(in: &self.subscriptions)
       cell.boundsPublisher
         .eraseToAnyPublisher()
@@ -939,7 +1051,7 @@ private extension NewPollCollectionView {
       
       self.hotStageAnimationFinished
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
         .store(in: &self.subscriptions)
     }
     
@@ -1042,6 +1154,7 @@ private extension NewPollCollectionView {
       }
     })
   }
+  
 //  func applySnapshot(animated: Bool = false) {
 //    var snapshot = Snapshot()
 //    snapshot.appendSections([.title, .description,])
@@ -1086,67 +1199,15 @@ private extension NewPollCollectionView {
 //    //                snapshot.appendSections([.web])
 //    //                snapshot.appendItems([4], toSection: .web)
 //    //            }
-//    //        }
-//    //        snapshot.appendSections([.question])
-//    //        snapshot.appendItems([5], toSection: .question)
-//    //        ////        snapshot.appendSections([.choices])
-//    //        ////        snapshot.appendItems([6], toSection: .choices)
-//    //        snapshot.appendSections([.comments])
-//    //        snapshot.appendItems([8], toSection: .comments)
-//  }
+  //    //        }
+  //    //        snapshot.appendSections([.question])
+  //    //        snapshot.appendItems([5], toSection: .question)
+  //    //        ////        snapshot.appendSections([.choices])
+  //    //        ////        snapshot.appendItems([6], toSection: .choices)
+  //    //        snapshot.appendSections([.comments])
+  //    //        snapshot.appendItems([8], toSection: .comments)
+  //  }
   func addChoice() {
     choices.append(NewPollChoice(text: "new_poll_choice_placeholder".localized + String(describing: choices.count + 1)))
-  }
-}
-
-extension NewPollCollectionView: UICollectionViewDelegate {
-  func collectionView(_ collectionView: UICollectionView,
-                      shouldSelectItemAt indexPath: IndexPath) -> Bool {
-    if let cell = cellForItem(at: indexPath) as? CommentsSectionCell {
-      guard cell.item.isComplete else {
-        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                              text: "vote_to_view_comments",
-                                                              tintColor: .systemOrange),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 2)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
-          .store(in: &self.subscriptions)
-        
-        return false
-      }
-      
-      collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [.bottom])
-      source.refresh()
-      collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
-      return true
-    }
-    //        // Allows for closing an already open cell
-    //        if collectionView.indexPathsForSelectedItems?.contains(indexPath) ?? false {
-    //            collectionView.deselectItem(at: indexPath, animated: true)
-    //        } else {
-    //            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
-    //        }
-    //
-    //        source.refresh()
-    //
-    //        return false // The selecting or deselecting is already performed above
-    
-    //        guard let cell = collectionView.cellForItem(at: indexPath), !cell.isSelected else {
-    //            collectionView.deselectItem(at: indexPath, animated: true)
-    //            source.refresh()
-    //            return false
-    //        }
-    collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
-    source.refresh()
-    return true
-  }
-  
-  func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
-    collectionView.deselectItem(at: indexPath, animated: true)
-    source.refresh()
-    return false
   }
 }

@@ -55,7 +55,7 @@ class NewPollLimitsCell: UICollectionViewCell {
   @Published public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
   @Published public var limit: Int! {
     didSet {
-      guard stage == stageGlobal, !limit.isNil else { return }//, !openedConstraint.isActive else { return }
+      guard (stage == stageGlobal || stageGlobal == .Ready), !limit.isNil else { return }//, !openedConstraint.isActive else { return }
       
       limitLabel.text = limit.isNil ? "" : limit.formattedWithSeparator
       
@@ -98,6 +98,7 @@ class NewPollLimitsCell: UICollectionViewCell {
     instance.textColor = limit.isNil ? color : .label
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
     instance.text = "new_poll_limit_placeholder".localized
+    
     let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
     constraint.identifier = "heightAnchor"
     constraint.isActive = true
@@ -108,6 +109,7 @@ class NewPollLimitsCell: UICollectionViewCell {
     let instance = UILabel()
     instance.numberOfLines = 1
     instance.isUserInteractionEnabled = true
+    instance.textColor = .secondaryLabel
     instance.textAlignment = .center
     instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title1)
     instance.text = limit.isNil ? 100.formattedWithSeparator : limit.formattedWithSeparator
@@ -213,6 +215,7 @@ class NewPollLimitsCell: UICollectionViewCell {
       guard let self = self else { return }
       
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
+      self.limitLabel.textColor = .label
     } completion: { _ in }
     
     UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
@@ -292,6 +295,8 @@ private extension NewPollLimitsCell {
   
   @objc
   func handleTap(recognizer: UITapGestureRecognizer) {
+    guard stageGlobal == .Ready || stage == stageGlobal else { return }
+    
     edit()
   }
   
@@ -302,12 +307,9 @@ private extension NewPollLimitsCell {
                                           mode: limit.isNil ? .ForceSelect : .Default,
                                           color: color)
     content.limitPublisher
-      .sink { limit in
+      .sink { [unowned self] limit in
         banner.dismiss()
-        
-        delay(seconds: 0.15) { [unowned self] in
-          self.limit = limit
-        }
+        self.limit = limit
       }
       .store(in: &banner.subscriptions)
 

@@ -14,6 +14,7 @@ protocol PollViewInput: AnyObject {
   var controllerOutput: PollControllerOutput? { get set }
   var controllerInput: PollControllerInput? { get set }
   var item: SurveyReference { get }
+  var mode: PollController.Mode { get }
   
   func openUserprofile()
   func openURL(_: URL)
@@ -22,6 +23,7 @@ protocol PollViewInput: AnyObject {
   func onCommentClaim(comment: Comment, reason: Claim)
   func onAddFavorite(_: Bool)
   func vote(_: Answer)
+  func post()
   
   func onExitWithSkip()
   func showVoters(for: Answer)
@@ -41,6 +43,7 @@ protocol PollControllerInput: AnyObject {
   func load(_: SurveyReference, incrementViewCounter: Bool)
   func toggleFavorite(_: Bool)
   func vote(_: Answer)
+  func post(_: Survey)
   func addView()
   func updateResultsStats(_: Survey)
   func postComment(body: String, replyTo: Comment?, username: String?)
@@ -54,6 +57,7 @@ protocol PollControllerInput: AnyObject {
 protocol PollModelOutput: AnyObject {
   var item: SurveyReference { get }
   
+  func postCallback(_: Result<Bool, Error>)
   func onLoadCallback(_: Result<Survey, Error>)
   func onAddFavoriteCallback(_: Result<Bool, Error>)
   func onVoteCallback(_: Result<Bool, Error>)

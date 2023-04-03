@@ -878,11 +878,11 @@ class PollCreationView: UIView, UINavigationControllerDelegate {
     }
     @IBAction func publicationButtonTapped(_ sender: Any) {
         costItems.removeAll()
-        if hot == .On {
-            costItems.append(CostItem(title: "hot_option".localized, cost: PriceList.shared.hotPost))
-        }
-        costItems.append(CostItem(title: "voters_option".localized, cost: limits))
-        
+//        if hot == .On {
+//            costItems.append(CostItem(title: "hot_option".localized, cost: PriceList.shared.hotPost))
+//        }
+//        costItems.append(CostItem(title: "voters_option".localized, cost: limits))
+//        
         fatalError()
 //        let banner = Popup(callbackDelegate: self, bannerDelegate: self, heightScaleFactor: deviceType == .iPhoneSE ? 0.8 : 0.6)
 //        if viewInput?.balance ?? 0 <  costItems.reduce(into: 0) { $0 += $1.cost } {

@@ -17,6 +17,7 @@ protocol NewPollViewInput: AnyObject {
   func setProgress(_: Double)
   func addImage()
   func setColor(_: UIColor)
+  func preview(_: Survey)
 }
 
 protocol NewPollControllerInput: AnyObject {
