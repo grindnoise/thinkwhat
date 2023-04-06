@@ -27,6 +27,7 @@ class NewPollAnonimityCell: UICollectionViewCell {
     didSet {
       guard oldValue != color else { return }
       
+      fgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
       nextButton.tintColor = color
       UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
@@ -62,7 +63,7 @@ class NewPollAnonimityCell: UICollectionViewCell {
           
           constraint.constant = "T".height(withConstrainedWidth: 100,
                                            font: UIFont.scaledFont(fontName: Fonts.Regular,
-                                                                   forTextStyle: .body)!) + self.padding*2
+                                                                   forTextStyle: .headline)!) + self.padding*2
           self.layoutIfNeeded()
         }
       }
@@ -97,14 +98,28 @@ class NewPollAnonimityCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var descriptionLabel: UILabel = {
-    let instance = UILabel()
+  private lazy var descriptionLabel: InsetLabel = {
+    let instance = InsetLabel()
+    instance.insets = .uniform(size: padding)
 //    instance.alpha = 1
     instance.numberOfLines = 0
     instance.textAlignment = .center
     instance.textColor = anonymityEnabled.isNil ? color : .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
-    instance.text = anonymityEnabled.isNil ? "new_poll_anonymity_placeholder".localized : anonymityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+    instance.text = anonymityEnabled.isNil ? stage.placeholder : anonymityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
+    instance.layer.insertSublayer(bgLayer, at: 0)
+    instance.layer.insertSublayer(fgLayer, at: 1)
+    instance.publisher(for: \.bounds)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bgLayer.frame = $0
+        self.bgLayer.cornerRadius = $0.width*0.025
+        self.fgLayer.frame = $0
+        self.fgLayer.cornerRadius = $0.width*0.025
+      }
+      .store(in: &subscriptions)
+    
     let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
     constraint.identifier = "heightAnchor"
     constraint.isActive = true
@@ -169,7 +184,7 @@ class NewPollAnonimityCell: UICollectionViewCell {
     return instance
   }()
   private lazy var anon: Avatar = {
-    let instance = Avatar(userprofile: Userprofile.anonymous, isShadowed: true)
+    let instance = Avatar(userprofile: Userprofile.anonymous, isShadowed: true, filter: "CIPhotoEffectNoir")
     instance.alpha = anonymityEnabled.isNil ? 0.75 : anonymityEnabled == true ? 1 : 0.75
     instance.transform = anonymityEnabled.isNil ? .identity : anonymityEnabled == true ? CGAffineTransform(scaleX: 1.1, y: 1.1) : CGAffineTransform(scaleX: 0.75, y: 0.75)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
@@ -178,6 +193,7 @@ class NewPollAnonimityCell: UICollectionViewCell {
       .filter { [unowned self] _ in self.stageGlobal == .Ready || self.stage == self.stageGlobal }
       .filter { [unowned self] _ in self.anonymityEnabled.isNil || !self.anonymityEnabled}
       .sink { [unowned self] _ in
+        
         self.anonymityEnabled = true
         UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
           guard let self = self else { return }
@@ -185,7 +201,8 @@ class NewPollAnonimityCell: UICollectionViewCell {
           self.descriptionLabel.textColor = .label
           self.descriptionLabel.text = self.anonymityEnabled ? "new_poll_anonymity_on".localized : "new_poll_anonymity_off".localized
           
-          let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width, font: self.descriptionLabel.font)
+          let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width,
+                                                          font: self.descriptionLabel.font)
           
           guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
                 constraint.constant != height
@@ -208,16 +225,16 @@ class NewPollAnonimityCell: UICollectionViewCell {
               self.user.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
               self.user.alpha = 0.75
             })
-        self.user.toggleFilter(name: "CIPhotoEffectNoir", duration: 0.15)
+        self.user.toggleFilter(on: true, duration: 0.15)
       }
       .store(in: &subscriptions)
     
     return instance
   }()
   private lazy var user: Avatar = {
-    let instance = Avatar(userprofile: Userprofiles.shared.current!, isShadowed: true)
+    let instance = Avatar(userprofile: Userprofiles.shared.current!, isShadowed: true, filter: "CIPhotoEffectNoir")
     if anonymityEnabled.isNil || anonymityEnabled == false {
-      instance.toggleFilter(name: "CIPhotoEffectTonal")
+      instance.toggleFilter(on: false)
     }
     instance.alpha = anonymityEnabled.isNil ? 0.75 : anonymityEnabled == false ? 1 : 0.75
     instance.transform = anonymityEnabled.isNil ? .identity : anonymityEnabled == false ? CGAffineTransform(scaleX: 1.1, y: 1.1) : CGAffineTransform(scaleX: 0.75, y: 0.75)
@@ -258,9 +275,22 @@ class NewPollAnonimityCell: UICollectionViewCell {
               self.anon.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
               self.anon.alpha = 0.75
             })
-        self.user.toggleFilter(duration: 0.15)
+        self.user.toggleFilter(on: false, duration: 0.15)
       }
       .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var bgLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.backgroundColor = UIColor.clear.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+
+    return instance
+  }()
+  private lazy var fgLayer: CALayer = {
+    let instance = CAShapeLayer()
+    instance.opacity = 0
+    instance.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
     
     return instance
   }()
@@ -306,6 +336,22 @@ class NewPollAnonimityCell: UICollectionViewCell {
     
     self.drawLine(line: self.bgLine, strokeEnd: 1, xPoint: 500)
     self.drawLine(line: self.fgLine)
+    
+    let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width - padding*2, font: self.descriptionLabel.font) + padding*2
+    
+    guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
+          constraint.constant != height
+    else { return }
+    
+    UIView.animate(withDuration: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      self.setNeedsLayout()
+      constraint.constant = height
+      self.layoutIfNeeded()
+    }
+    
+    self.boundsPublisher.send()
   }
   
   // MARK: - Public methods
@@ -314,13 +360,16 @@ class NewPollAnonimityCell: UICollectionViewCell {
       guard let self = self else { return }
       
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
-    } completion: { _ in }
-    
-    UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
-      guard let self = self else { return }
-      
       self.descriptionLabel.textColor = .label
     } completion: { _ in }
+    
+    Animations.unmaskLayerCircled(layer: fgLayer,
+                                  location: CGPoint(x: descriptionLabel.bounds.midX, y: descriptionLabel.bounds.midY),
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
+    
+    bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
   }
 }
 
@@ -382,6 +431,15 @@ private extension NewPollAnonimityCell {
   
   @objc
   func nextStage() {
+    Animations.unmaskLayerCircled(unmask: false,
+                                  layer: self.fgLayer,
+                                  location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
+    
+    self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+    
     UIView.transition(with: self.label, duration: 0.3, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       
@@ -401,8 +459,12 @@ private extension NewPollAnonimityCell {
     }
     
     boundsPublisher.send()
-    stageCompletePublisher.send()
-    stageCompletePublisher.send(completion: .finished)
+    delay(seconds: 0.4) {[weak self] in
+      guard let self = self else { return }
+      
+      self.stageCompletePublisher.send()
+      self.stageCompletePublisher.send(completion: .finished)
+    }
     CATransaction.begin()
     CATransaction.setCompletionBlock() { [unowned self] in
       self.animationCompletePublisher.send()

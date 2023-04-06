@@ -20,19 +20,19 @@ class FillUserView: UIView {
     }
     @IBOutlet weak var scrollContentView: UIView!
     @IBOutlet weak var stackView: UIStackView!
-    @IBOutlet weak var avatar: delAvatar! {
-        didSet {
-//            avatar.delegate = self
-            avatar.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onImageTap)))
-            guard let path = UserDefaults.Profile.imagePath,
-                  let url = URL(string: path),
-                  let data = try? Data(contentsOf: url),
-                  let image = UIImage(data: data) else {
-                      return
-            }
-            avatar.image = image
-        }
-    }
+//    @IBOutlet weak var avatar: delAvatar! {
+//        didSet {
+////            avatar.delegate = self
+//            avatar.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onImageTap)))
+//            guard let path = UserDefaults.Profile.imagePath,
+//                  let url = URL(string: path),
+//                  let data = try? Data(contentsOf: url),
+//                  let image = UIImage(data: data) else {
+//                      return
+//            }
+//            avatar.image = image
+//        }
+//    }
     @IBOutlet weak var firstNameTF: UnderlinedSignTextField! {
         didSet {
             firstNameTF.placeholder = #keyPath(FillUserView.firstNameTF).localized
@@ -204,14 +204,14 @@ class FillUserView: UIView {
             return
         }
         
-        guard let image = avatar.image,
-              let firstName = firstNameTF.text,
-              let lastName = lastNameTF.text,
-              !birthDateTF.text.isNil else {
-#if DEBUG
-            fatalError()
-#endif
-        }
+//        guard let image = avatar.image,
+//              let firstName = firstNameTF.text,
+//              let lastName = lastNameTF.text,
+//              !birthDateTF.text.isNil else {
+//#if DEBUG
+//            fatalError()
+//#endif
+//        }
         continueButton.setTitle("", for: .normal)
         let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
                                                               size: CGSize(width: continueButton.frame.height,
@@ -222,16 +222,16 @@ class FillUserView: UIView {
         indicator.color = .white
         UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
         isUserInteractionEnabled = false
-        viewInput?.updateUserprofile(image: isImageChanged ? image : nil,
-                                     firstName: firstName,
-                                     lastName: lastName,
-                                     gender: genderControl.selectedSegmentIndex == 0 ? .Male : .Female,
-                                     birthDate: birthDateTF.text!,
-                                     city: city,
-                                     vkID: nil,
-                                     vkURL: links[SocialMedia.VK],
-                                     facebookID: nil,
-                                     facebookURL: links[SocialMedia.Facebook])
+//        viewInput?.updateUserprofile(image: isImageChanged ? image : nil,
+//                                     firstName: firstName,
+//                                     lastName: lastName,
+//                                     gender: genderControl.selectedSegmentIndex == 0 ? .Male : .Female,
+//                                     birthDate: birthDateTF.text!,
+//                                     city: city,
+//                                     vkID: nil,
+//                                     vkURL: links[SocialMedia.VK],
+//                                     facebookID: nil,
+//                                     facebookURL: links[SocialMedia.Facebook])
     }
     
     // MARK: - Public properties
@@ -327,9 +327,9 @@ class FillUserView: UIView {
     }
     
     override func layoutSubviews() {
-        if !continueButton.isNil { continueButton.cornerRadius = continueButton.frame.height/2.25 }
-        if !avatar.isNil { avatar.layoutIfNeeded() }
-        if !hyperlinkActionButton.isNil { hyperlinkActionButton.cornerRadius = hyperlinkActionButton.frame.height/2.25 }
+//        if !continueButton.isNil { continueButton.cornerRadius = continueButton.frame.height/2.25 }
+//        if !avatar.isNil { avatar.layoutIfNeeded() }
+//        if !hyperlinkActionButton.isNil { hyperlinkActionButton.cornerRadius = hyperlinkActionButton.frame.height/2.25 }
     }
     
     
@@ -371,7 +371,7 @@ extension FillUserView: FillUserControllerOutput {
     
     func onAvatarChange(_ image : UIImage) {
         isImageChanged = true
-        avatar.image = image
+//        avatar.image = image
     }
     
     func onCityFetchResults(_ cities: [City]) {

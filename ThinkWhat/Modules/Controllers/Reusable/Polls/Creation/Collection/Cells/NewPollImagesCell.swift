@@ -15,20 +15,13 @@ class NewPollImagesCell: UICollectionViewCell {
   ///**Logic**
   public var stage: NewPollController.Stage! {
     didSet {
-      guard !images.isNil else { return }
-      
-//      openedConstraint.isActive = stageGlobal.rawValue == stage.rawValue
-//      openedConstraint.isActive = stageGlobal.rawValue >= stage.rawValue
-    }
-  }
-  public var stageGlobal: NewPollController.Stage!
-  public var images: [NewPollImage]! {
-    didSet {
-      guard !images.isNil else { return }
+      guard !stage.isNil, stage != oldValue else { return }
       
       setupUI()
     }
   }
+  public var stageGlobal: NewPollController.Stage!
+  public var images: [NewPollImage]!
   public var topicColor: UIColor = .systemGray
   public var externalSubscriptions = Set<AnyCancellable>()
   ///**Publishers**
@@ -44,6 +37,8 @@ class NewPollImagesCell: UICollectionViewCell {
   @Published public var color = UIColor.systemGray4 {
     didSet {
       guard oldValue != color else { return }
+      
+      fgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
       
       if #available(iOS 15, *) {
         button.configuration?.baseBackgroundColor = color
@@ -227,7 +222,43 @@ class NewPollImagesCell: UICollectionViewCell {
     
     return instance
   }()
+  private lazy var placeholder: InsetLabel = {
+    let instance = InsetLabel()
+    instance.insets = .uniform(size: padding)
+    instance.numberOfLines = 0
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
+    instance.text = stage.placeholder
+    instance.textColor = .tertiaryLabel
+    instance.textAlignment = .center
+    instance.layer.insertSublayer(bgLayer, at: 0)
+    instance.layer.insertSublayer(fgLayer, at: 1)
+    instance.publisher(for: \.bounds)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bgLayer.frame = $0
+        self.bgLayer.cornerRadius = $0.width*0.025
+        self.fgLayer.frame = $0
+        self.fgLayer.cornerRadius = $0.width*0.025
+      }
+      .store(in: &subscriptions)
     
+    return instance
+  }()
+  private lazy var bgLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.backgroundColor = UIColor.clear.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+
+    return instance
+  }()
+  private lazy var fgLayer: CALayer = {
+    let instance = CAShapeLayer()
+    instance.opacity = 0
+    instance.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+    
+    return instance
+  }()
+  
   
   
   // MARK: - Destructor
@@ -285,20 +316,52 @@ class NewPollImagesCell: UICollectionViewCell {
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
     
-    collectionView.present()
+    Animations.unmaskLayerCircled(layer: fgLayer,
+                                  location: CGPoint(x: placeholder.bounds.midX, y: placeholder.bounds.midY),
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
     
-    buttonsStack.addArrangedSubview(nextButton)
-    boundsPublisher.send(true)
+    bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
     
-//    delay(seconds: 0.3) { [weak self] in
-//      guard let self = self else { return }
+    UIView.animate(withDuration: 0.3, animations: { [weak self] in
+      guard let self = self else { return }
       
-      self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
-      UIView.animate(withDuration: 0.2) {
-        self.nextButton.transform = .identity
-        self.nextButton.alpha = 1
+      self.placeholder.textColor = .label
+    }) { [weak self] _ in
+      guard let self = self else { return }
+      
+      delay(seconds: 1) {
+        Animations.unmaskLayerCircled(unmask: false,
+                                      layer: self.fgLayer,
+                                      location: CGPoint(x: self.placeholder.bounds.midX, y: self.placeholder.bounds.midY),
+                                      duration: 0.5,
+                                      opacityDurationMultiplier: 0.6,
+                                      delegate: self)
+        
+        self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
       }
-//    }
+      
+      UIView.animate(withDuration: 0.2, delay: 1.5, options: .curveEaseIn) {
+        self.placeholder.alpha = 0
+        self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
+      } completion: { _ in self.placeholder.removeFromSuperview()
+        self.collectionView.present()
+        self.buttonsStack.addArrangedSubview(self.nextButton)
+        self.boundsPublisher.send(true)
+        self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
+        self.collectionView.transform = .init(scaleX: 0.75, y: 0.75)
+        self.buttonsStack.transform = .init(scaleX: 0.75, y: 0.75)
+        UIView.animate(withDuration: 0.2) {
+          self.collectionView.alpha = 1
+          self.buttonsStack.alpha = 1
+          self.nextButton.alpha = 1
+          self.nextButton.transform = .identity
+          self.buttonsStack.transform = .identity
+          self.collectionView.transform = .identity
+        }
+      }
+    }
   }
   
   public func update(_ instances: [NewPollImage]) {
@@ -335,6 +398,22 @@ private extension NewPollImagesCell {
     
     layer.insertSublayer(bgLine.layer, at: 0)
     layer.insertSublayer(fgLine.layer, at: 1)
+    
+    guard stageGlobal.rawValue <= stage.rawValue else { return }
+    
+    addSubview(placeholder)
+    placeholder.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      placeholder.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*4),
+      placeholder.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+      placeholder.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
+    ])
+    
+    let constraint_2 = placeholder.bottomAnchor.constraint(equalTo: buttonsStack.bottomAnchor)
+    constraint_2.isActive = true
+    
+    collectionView.alpha = 0
+    buttonsStack.alpha = 0
   }
   
   @objc

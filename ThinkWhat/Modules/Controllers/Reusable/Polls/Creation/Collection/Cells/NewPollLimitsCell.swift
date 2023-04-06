@@ -29,6 +29,7 @@ class NewPollLimitsCell: UICollectionViewCell {
       guard oldValue != color else { return }
       
 //      nextButton.tintColor = color
+      fgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
       icon.setIconColor(color)
       UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
@@ -73,6 +74,7 @@ class NewPollLimitsCell: UICollectionViewCell {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
+  private var isBannerOnScreen = false
   private lazy var imageView: UIImageView = {
     let instance = UIImageView(image: stage.numImage)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
@@ -91,13 +93,26 @@ class NewPollLimitsCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var descriptionLabel: UILabel = {
-    let instance = UILabel()
+  private lazy var descriptionLabel: InsetLabel = {
+    let instance = InsetLabel()
+    instance.insets = .uniform(size: padding)
     instance.numberOfLines = 0
     instance.textAlignment = .center
     instance.textColor = limit.isNil ? color : .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
-    instance.text = "new_poll_limit_placeholder".localized
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+    instance.text = stage.placeholder
+    instance.layer.insertSublayer(bgLayer, at: 0)
+    instance.layer.insertSublayer(fgLayer, at: 1)
+    instance.publisher(for: \.bounds)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bgLayer.frame = $0
+        self.bgLayer.cornerRadius = $0.width*0.025
+        self.fgLayer.frame = $0
+        self.fgLayer.cornerRadius = $0.width*0.025
+      }
+      .store(in: &subscriptions)
     
     let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
     constraint.identifier = "heightAnchor"
@@ -153,6 +168,19 @@ class NewPollLimitsCell: UICollectionViewCell {
     
     return instance
   }()
+  private lazy var bgLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.backgroundColor = UIColor.clear.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+
+    return instance
+  }()
+  private lazy var fgLayer: CALayer = {
+    let instance = CAShapeLayer()
+    instance.opacity = 0
+    instance.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+    
+    return instance
+  }()
   
   
   
@@ -197,34 +225,41 @@ class NewPollLimitsCell: UICollectionViewCell {
     self.drawLine(line: self.bgLine, strokeEnd: 1, xPoint: 500)
     self.drawLine(line: self.fgLine)
     
-    let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width, font: self.descriptionLabel.font)
+    let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width - padding*2, font: self.descriptionLabel.font) + padding*2
     
     guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
           constraint.constant != height
     else { return }
     
-    self.setNeedsLayout()
-    constraint.constant = height
-    self.layoutIfNeeded()
+    UIView.animate(withDuration: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      self.setNeedsLayout()
+      constraint.constant = height
+      self.layoutIfNeeded()
+    }
     self.boundsPublisher.send()
   }
   
   // MARK: - Public methods
   func present(seconds: Double = .zero) {
-    UIView.transition(with: label, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
+    UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
       self.limitLabel.textColor = .label
-    } completion: { _ in }
-    
-    UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
-      guard let self = self else { return }
-      
       self.descriptionLabel.textColor = .label
     } completion: { _ in }
     
-    delay(seconds: 0.25) { [weak self] in
+    Animations.unmaskLayerCircled(layer: fgLayer,
+                                  location: CGPoint(x: descriptionLabel.bounds.midX, y: descriptionLabel.bounds.midY),
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
+    
+    bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+    
+    delay(seconds: seconds) { [weak self] in
       guard let self = self else { return }
       
       self.edit()
@@ -301,6 +336,9 @@ private extension NewPollLimitsCell {
   }
   
   func edit() {
+    guard !isBannerOnScreen else { return }
+    
+    isBannerOnScreen = true
     let banner = NewPopup(padding: self.padding*2,
                           contentPadding: .uniform(size: self.padding))
     let content = SurveyLimitPopupContent(limit: limit.isNil ? 100 : limit,
@@ -315,7 +353,11 @@ private extension NewPollLimitsCell {
 
     banner.setContent(content)
     banner.didDisappearPublisher
-      .sink { _ in banner.removeFromSuperview() }
+      .sink { [unowned self] _ in
+        banner.removeFromSuperview();
+        self.isBannerOnScreen = false
+        self.descriptionLabel.text = "new_poll_limit_hint".localized
+      }
       .store(in: &self.subscriptions)
   }
   
@@ -327,21 +369,22 @@ private extension NewPollLimitsCell {
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
     
-//    if let heightAnchor = buttonsStack.getConstraint(identifier: "heightAnchor"),
-//       let bottomAnchor = buttonsStack.getConstraint(identifier: "bottomAnchor"){
-//      setNeedsLayout()
-//      UIView.animate(withDuration: 0.3) { [weak self] in
-//        guard let self = self else { return }
-//
-//        heightAnchor.constant = 0
-//        bottomAnchor.constant = 0
-//        self.layoutIfNeeded()
-//      }
-//    }
+    Animations.unmaskLayerCircled(unmask: false,
+                                  layer: self.fgLayer,
+                                  location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
     
+    self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+
     boundsPublisher.send()
-    stageCompletePublisher.send()
-    stageCompletePublisher.send(completion: .finished)
+    delay(seconds: 0.4) {[weak self] in
+      guard let self = self else { return }
+      
+      self.stageCompletePublisher.send()
+      self.stageCompletePublisher.send(completion: .finished)
+    }
 
     CATransaction.begin()
     CATransaction.setCompletionBlock() { [unowned self] in

@@ -29,6 +29,8 @@ class NewPollHotCell: UICollectionViewCell {
       guard oldValue != color else { return }
       
       nextButton.tintColor = color
+      fgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+      
       UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
         
@@ -64,7 +66,7 @@ class NewPollHotCell: UICollectionViewCell {
 //
 //          constraint.constant = "T".height(withConstrainedWidth: 100,
 //                                           font: UIFont.scaledFont(fontName: Fonts.Regular,
-//                                                                   forTextStyle: .body)!) + self.padding*2
+//                                                                   forTextStyle: .headline)!) + self.padding*2
 //          self.layoutIfNeeded()
 //        }
 //      }
@@ -99,13 +101,27 @@ class NewPollHotCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var descriptionLabel: UILabel = {
-    let instance = UILabel()
+  private lazy var descriptionLabel: InsetLabel = {
+    let instance = InsetLabel()
+    instance.insets = .uniform(size: padding)
     instance.numberOfLines = 0
     instance.textAlignment = .center
     instance.textColor = isHot.isNil ? color : .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
     instance.text = isHot.isNil ? "new_poll_hot_placeholder".localized : isHot ? "new_poll_hot_on".localized : "new_poll_hot_off".localized
+    instance.layer.insertSublayer(bgLayer, at: 0)
+    instance.layer.insertSublayer(fgLayer, at: 1)
+    instance.publisher(for: \.bounds)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bgLayer.frame = $0
+        self.bgLayer.cornerRadius = $0.width*0.025
+        self.fgLayer.frame = $0
+        self.fgLayer.cornerRadius = $0.width*0.025
+      }
+      .store(in: &subscriptions)
+    
     let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
     constraint.identifier = "heightAnchor"
     constraint.isActive = true
@@ -195,8 +211,19 @@ class NewPollHotCell: UICollectionViewCell {
     
     return instance
   }()
-//  private var openedConstraint: NSLayoutConstraint!
-//  private var closedConstraint: NSLayoutConstraint!
+  private lazy var bgLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.backgroundColor = UIColor.clear.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+
+    return instance
+  }()
+  private lazy var fgLayer: CALayer = {
+    let instance = CAShapeLayer()
+    instance.opacity = 0
+    instance.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+    
+    return instance
+  }()
   
   
   
@@ -241,17 +268,19 @@ class NewPollHotCell: UICollectionViewCell {
     self.drawLine(line: self.bgLine, strokeEnd: 1, xPoint: 500)
     self.drawLine(line: self.fgLine)
     
-    guard isHot.isNil else { return }
-    
-    let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width, font: self.descriptionLabel.font)
+    let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width - padding*2, font: self.descriptionLabel.font) + padding*2
     
     guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
           constraint.constant != height
     else { return }
     
-    self.setNeedsLayout()
-    constraint.constant = height
-    self.layoutIfNeeded()
+    UIView.animate(withDuration: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      self.setNeedsLayout()
+      constraint.constant = height
+      self.layoutIfNeeded()
+    }
     self.boundsPublisher.send()
   }
   
@@ -261,13 +290,16 @@ class NewPollHotCell: UICollectionViewCell {
       guard let self = self else { return }
       
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
-    } completion: { _ in }
-    
-    UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
-      guard let self = self else { return }
-      
       self.descriptionLabel.textColor = .label
     } completion: { _ in }
+    
+    Animations.unmaskLayerCircled(layer: fgLayer,
+                                  location: CGPoint(x: descriptionLabel.bounds.midX, y: descriptionLabel.bounds.midY),
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
+    
+    bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
     
     hotOnIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
     hotOffIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
@@ -447,8 +479,22 @@ private extension NewPollHotCell {
     }
     
     boundsPublisher.send()
-    stageCompletePublisher.send()
-    stageCompletePublisher.send(completion: .finished)
+    Animations.unmaskLayerCircled(unmask: false,
+                                  layer: self.fgLayer,
+                                  location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
+    
+    self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+
+    boundsPublisher.send()
+    delay(seconds: 0.4) {[weak self] in
+      guard let self = self else { return }
+      
+      self.stageCompletePublisher.send()
+      self.stageCompletePublisher.send(completion: .finished)
+    }
 
     CATransaction.begin()
     CATransaction.setCompletionBlock() { [unowned self] in

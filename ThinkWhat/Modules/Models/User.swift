@@ -328,6 +328,7 @@ class Userprofile: Decodable {
       //            }
     }
   }
+  var filteredImage: UIImage?
   var completeTotal: Int = 0 {
     didSet {
       guard oldValue != completeTotal else { return }

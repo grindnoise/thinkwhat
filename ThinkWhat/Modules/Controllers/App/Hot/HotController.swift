@@ -124,7 +124,7 @@ private extension HotController {
     Surveys.shared.instancesPublisher
       .filter { !$0.isEmpty }
       .receive(on: DispatchQueue.main)
-      .map { array in array.filter { $0.isHot && !$0.isRejected && !$0.isClaimed }}
+      .map { array in array.filter { $0.isHot && !$0.isRejected && !$0.isClaimed && $0.id != Survey.fakeId }}
       .sink { [unowned self] in
         self.queue.enqueue($0)
         

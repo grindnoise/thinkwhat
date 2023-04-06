@@ -137,8 +137,10 @@ class NewPollChoiceCell: UICollectionViewCell {
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-
-    guard !textView.isFirstResponder else { return }
+    
+    guard !textView.isFirstResponder,
+          stage == stageGlobal || stage == .Ready
+    else { return }
     
     textView.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
 //    textView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground

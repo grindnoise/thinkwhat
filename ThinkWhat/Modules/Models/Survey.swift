@@ -129,8 +129,9 @@ class Survey: Decodable {
          shareLink = "share_link"
   }
   
+  static let fakeId = 999999999999
+  
   // MARK: - Properties
-  private let fakeId = 999999999999
   var isActive:               Bool {
     didSet {
       reference.isActive = isActive
@@ -417,7 +418,7 @@ class Survey: Decodable {
     self.rating              = 0
     self.owner               = Userprofiles.shared.current!
     self.topic               = topic
-    self.id                  = fakeId
+    self.id                  = Survey.fakeId
     self.title               = title
     self.detailsDescription  = description
     self.startDate           = Date()

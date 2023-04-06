@@ -53,7 +53,8 @@ class NewPollView: UIView {
         self.viewInput?.addImage()
       }
       .store(in: &subscriptions)
-    instance.$topic
+    //      instance.$topic
+    instance.topicPublisher
       .filter { !$0.isNil }
       .sink { [unowned self] in self.color = $0!.tagColor }
       .store(in: &subscriptions)
@@ -72,7 +73,7 @@ class NewPollView: UIView {
         setNeedsLayout()
         UIView.animate(
           withDuration: 0.35,
-          delay: 0.3,//!selectedAnswer.isNil ? 0 : 0.25,
+          delay: 0,//!selectedAnswer.isNil ? 0 : 0.25,
           usingSpringWithDamping: 0.8,
           initialSpringVelocity: 0.3,
           options: [.curveEaseInOut],

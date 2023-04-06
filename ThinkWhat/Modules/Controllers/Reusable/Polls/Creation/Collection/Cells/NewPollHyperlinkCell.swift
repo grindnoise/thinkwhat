@@ -39,6 +39,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
       nextButton.tintColor = color
       textField.tintColor = color
       fgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+      placeholderFgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
       
       UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
@@ -166,11 +167,11 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var placeholder: UILabel = {
+  private lazy var texFieldPlaceholder: UILabel = {
     let instance = UILabel()
     instance.numberOfLines = 1
     instance.font = font
-    instance.text = stage.placeholder
+    instance.text = "new_poll_hyperlink_tf_placeholder".localized//stage.placeholder
     instance.textColor = .secondaryLabel
     instance.textAlignment = .center
     instance.isUserInteractionEnabled = true
@@ -215,6 +216,43 @@ class NewPollHyperlinkCell: UICollectionViewCell {
     
     return instance
   }()
+  private lazy var placeholder: InsetLabel = {
+    let instance = InsetLabel()
+    instance.insets = .uniform(size: padding)
+    instance.accessibilityIdentifier = "placeholder"
+    instance.numberOfLines = 0
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
+    instance.text = stage.placeholder
+    instance.textColor = .tertiaryLabel
+    instance.textAlignment = .center
+    instance.layer.insertSublayer(placeholderBgLayer, at: 0)
+    instance.layer.insertSublayer(placeholderFgLayer, at: 1)
+    instance.publisher(for: \.bounds)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.placeholderBgLayer.frame = $0
+        self.placeholderBgLayer.cornerRadius = $0.width*0.025
+        self.placeholderFgLayer.frame = $0
+        self.placeholderFgLayer.cornerRadius = $0.width*0.025
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var placeholderBgLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.backgroundColor = UIColor.clear.cgColor
+
+    return instance
+  }()
+  private lazy var placeholderFgLayer: CALayer = {
+    let instance = CAShapeLayer()
+    instance.opacity = 0
+    instance.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+    
+    return instance
+  }()
   
   
     
@@ -242,9 +280,9 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
 
-    guard !textField.isFirstResponder else { return }
+//    guard !textField.isFirstResponder else { return }
     
-//    stack.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
+    fgLayer.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
   }
   
   override func prepareForReuse() {
@@ -280,22 +318,47 @@ class NewPollHyperlinkCell: UICollectionViewCell {
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
     
-//    textView.becomeFirstResponder()
-//
-//    buttonsStack.addArrangedSubview(nextButton)
-    closedConstraint.isActive = false
-    openedConstraint.isActive = true
-    boundsPublisher.send()
+    Animations.unmaskLayerCircled(layer: placeholderFgLayer,
+                                  location: CGPoint(x: placeholder.bounds.midX, y: placeholder.bounds.midY),
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
     
-//    delay(seconds: 0.3) { [weak self] in
-//      guard let self = self else { return }
+    placeholderBgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+    
+    UIView.animate(withDuration: 0.3, animations: { [weak self] in
+      guard let self = self else { return }
+
+      self.placeholder.textColor = .label
+    }) { [weak self] _ in
+      guard let self = self else { return }
       
-      self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
-      UIView.animate(withDuration: 0.2) {
-        self.nextButton.transform = .identity
-        self.nextButton.alpha = 1
+      delay(seconds: 1) {
+        Animations.unmaskLayerCircled(unmask: false,
+                                      layer: self.placeholderFgLayer,
+                                      location: CGPoint(x: self.placeholder.bounds.midX, y: self.placeholder.bounds.midY),
+                                      duration: 0.5,
+                                      opacityDurationMultiplier: 0.6,
+                                      delegate: self)
+        
+        self.placeholderBgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
       }
-//    }
+      
+      UIView.animate(withDuration: 0.2, delay: 1.5, options: .curveEaseIn) {
+        self.placeholder.alpha = 0
+        self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
+        
+      } completion: { _ in
+        self.boundsPublisher.send()
+        self.nextButton.transform = .init(scaleX: 0.75, y: 0.75)
+        UIView.animate(withDuration: 0.2) {
+          self.nextButton.transform = .identity
+          self.nextButton.alpha = 1
+          self.stack.alpha = 1
+          self.buttonsStack.alpha = 1
+        }
+      }
+    }
   }
 }
 
@@ -323,30 +386,33 @@ private extension NewPollHyperlinkCell {
     ])
     
     openedConstraint = buttonsStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
-    openedConstraint.isActive = false
+    openedConstraint.isActive = true
     openedConstraint.priority = .defaultLow
     
     closedConstraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*4)
-    closedConstraint.isActive = true
+    closedConstraint.isActive = false
     closedConstraint.priority = .defaultLow
     
     layer.insertSublayer(bgLine.layer, at: 0)
     layer.insertSublayer(fgLine.layer, at: 1)
-//    setNeedsLayout()
-//    layoutIfNeeded()
-//    print(stack.frame.size)
-//    placeholder.placeInCenter(of: stack)
+    
     if text.isNil || text.isEmpty {
-      placeholder.placeInCenter(of: stack, leadingInset: padding, trailingInset: padding)
+      texFieldPlaceholder.placeInCenter(of: stack, leadingInset: padding, trailingInset: padding)
     }
 
-//    guard stack.getSubview(type: UIView.self, identifier: "opaque").isNil else { return }
-//
-//    let opaque = UIView.opaque()
-//    opaque.backgroundColor = .red
-//    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.detectLocation(sender:))))
-//    opaque.place(inside: stack)
-//    opaque.layer.zPosition = 10
+    guard stageGlobal.rawValue <= stage.rawValue else { return }
+    
+    addSubview(placeholder)
+    placeholder.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      placeholder.topAnchor.constraint(equalTo: stageStack.bottomAnchor, constant: padding*4),
+      placeholder.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding*5),
+      placeholder.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding*2),
+      placeholder.bottomAnchor.constraint(equalTo: buttonsStack.bottomAnchor)
+    ])
+    
+    stack.alpha = 0
+    buttonsStack.alpha = 0
   }
   
   func drawLine(line: Line,
@@ -446,12 +512,12 @@ extension NewPollHyperlinkCell: UITextFieldDelegate {
       guard let self = self else { return }
       
 //      self.stack.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
-      self.placeholder.alpha = 0
-      self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
+      self.texFieldPlaceholder.alpha = 0
+      self.texFieldPlaceholder.transform = .init(scaleX: 0.75, y: 0.75)
     }) { [weak self] _ in
       guard let self = self else { return }
       
-      self.placeholder.removeFromSuperview()
+      self.texFieldPlaceholder.removeFromSuperview()
     }
     
     Animations.unmaskLayerCircled(layer: fgLayer,
@@ -485,11 +551,11 @@ extension NewPollHyperlinkCell: UITextFieldDelegate {
     }
     
     if textField.text!.isEmpty {
-      placeholder.placeInCenter(of: textField, leadingInset: padding, trailingInset: padding)
+      texFieldPlaceholder.placeInCenter(of: textField, leadingInset: padding, trailingInset: padding)
       UIView.animate(withDuration: 0.2) { [unowned self] in
         //      textView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-        self.placeholder.alpha = 1
-        self.placeholder.transform = .identity
+        self.texFieldPlaceholder.alpha = 1
+        self.texFieldPlaceholder.transform = .identity
       }
     }
     

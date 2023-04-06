@@ -55,7 +55,8 @@ class PollView: UIView {
       
       toggleFade(true)
       setNeedsLayout()
-      layoutIfNeeded()
+//      layoutIfNeeded()
+//      setNeedsLayout()
       UIView.animate(
         withDuration: 0.35,
         delay: 0.3,
@@ -337,7 +338,7 @@ class PollView: UIView {
       var config = UIButton.Configuration.filled()
       config.attributedTitle = attrString
       config.baseBackgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-      config.image = UIImage(systemName: viewInput!.mode == .Preview ? "play.fill" : "hand.point.left.fill",
+      config.image = UIImage(systemName: viewInput!.mode == .Preview ? "megaphone.fill" : "hand.point.left.fill",
                              withConfiguration: UIImage.SymbolConfiguration(scale: .large))
       config.imagePlacement = .trailing
       config.imagePadding = padding
@@ -355,7 +356,7 @@ class PollView: UIView {
       ])
       instance.titleEdgeInsets.left = 20
       instance.titleEdgeInsets.right = 20
-      instance.setImage(UIImage(systemName: viewInput!.mode == .Preview ? "play.fill" : "hand.point.left.fill",
+      instance.setImage(UIImage(systemName: viewInput!.mode == .Preview ? "megaphone.fill" : "hand.point.left.fill",
                                 withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
                         for: .normal)
       instance.imageView?.tintColor = .white

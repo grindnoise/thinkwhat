@@ -27,7 +27,14 @@ class NewPollCommentsCell: UICollectionViewCell {
     didSet {
       guard oldValue != color else { return }
       
+      fgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
       nextButton.tintColor = color
+      
+      if !commentsEnabled.isNil {
+        commentsOnIcon.setIconColor(commentsEnabled ? color : UIColor.systemGray4)
+        commentsOffIcon.setIconColor(!commentsEnabled ? color : UIColor.systemGray4)
+      }
+      
       UIView.animate(withDuration: 0.2) { [weak self] in
         guard let self = self else { return }
         
@@ -63,7 +70,7 @@ class NewPollCommentsCell: UICollectionViewCell {
           
           constraint.constant = "T".height(withConstrainedWidth: 100,
                                            font: UIFont.scaledFont(fontName: Fonts.Regular,
-                                                                   forTextStyle: .body)!) + self.padding*2
+                                                                   forTextStyle: .headline)!) + self.padding*2
           self.layoutIfNeeded()
         }
       }
@@ -79,6 +86,7 @@ class NewPollCommentsCell: UICollectionViewCell {
   ///**UI**
   private let padding: CGFloat = 8
   private let stackHeight: CGFloat = 70
+  private var isPresenting = true
   private lazy var imageView: UIImageView = {
     let instance = UIImageView(image: stage.numImage)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
@@ -97,13 +105,30 @@ class NewPollCommentsCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var descriptionLabel: UILabel = {
-    let instance = UILabel()
-//    instance.alpha = 1
+  private lazy var descriptionLabel: InsetLabel = {
+    let instance = InsetLabel()
+    instance.insets = .uniform(size: padding)
+    instance.numberOfLines = 0
     instance.textAlignment = .center
     instance.textColor = commentsEnabled.isNil ? color : .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
-    instance.text = commentsEnabled.isNil ? "new_poll_comments_placeholder".localized : commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+    instance.text = commentsEnabled.isNil ? stage.placeholder : commentsEnabled ? "new_poll_comments_on".localized : "new_poll_comments_off".localized
+    instance.layer.insertSublayer(bgLayer, at: 0)
+    instance.layer.insertSublayer(fgLayer, at: 1)
+    instance.publisher(for: \.bounds)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bgLayer.frame = $0
+        self.bgLayer.cornerRadius = $0.width*0.025
+        self.fgLayer.frame = $0
+        self.fgLayer.cornerRadius = $0.width*0.025
+      }
+      .store(in: &subscriptions)
+    
+    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font))
+    constraint.identifier = "heightAnchor"
+    constraint.isActive = true
     
     return instance
   }()
@@ -190,8 +215,22 @@ class NewPollCommentsCell: UICollectionViewCell {
     
     return instance
   }()
+  private lazy var bgLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.backgroundColor = UIColor.clear.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+
+    return instance
+  }()
+  private lazy var fgLayer: CALayer = {
+    let instance = CAShapeLayer()
+    instance.opacity = 0
+    instance.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+    
+    return instance
+  }()
 //  private var openedConstraint: NSLayoutConstraint!
 //  private var closedConstraint: NSLayoutConstraint!
+  
   
   
   
@@ -234,6 +273,22 @@ class NewPollCommentsCell: UICollectionViewCell {
     
     self.drawLine(line: self.bgLine, strokeEnd: 1, xPoint: 500)
     self.drawLine(line: self.fgLine)
+    
+    let height = self.descriptionLabel.text!.height(withConstrainedWidth: self.descriptionLabel.bounds.width - padding*2, font: self.descriptionLabel.font) + padding*2
+    
+    guard let constraint = self.descriptionLabel.getConstraint(identifier: "heightAnchor"),
+          constraint.constant != height
+    else { return }
+    
+    UIView.animate(withDuration: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      self.setNeedsLayout()
+      constraint.constant = height
+      self.layoutIfNeeded()
+    }
+    
+    boundsPublisher.send()
   }
   
   // MARK: - Public methods
@@ -241,35 +296,22 @@ class NewPollCommentsCell: UICollectionViewCell {
     UIView.transition(with: label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       
+      self.descriptionLabel.textColor = .label
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
     
-    UIView.transition(with: descriptionLabel, duration: 0.1, options: .transitionCrossDissolve) { [weak self] in
-      guard let self = self else { return }
-      
-      self.descriptionLabel.textColor = .label
-    } completion: { _ in }
+    Animations.unmaskLayerCircled(layer: fgLayer,
+                                  location: CGPoint(x: descriptionLabel.bounds.midX, y: descriptionLabel.bounds.midY),
+                                  duration: 0.5,
+                                  opacityDurationMultiplier: 0.6,
+                                  delegate: self)
     
+    bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+    
+    isPresenting = true
+  
     commentsOnIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
     commentsOffIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
-//    textView.becomeFirstResponder()
-//
-//    UIView.animate(withDuration: 0.2, animations: { [weak self] in
-//      guard let self = self else { return }
-//
-//      print(self.placeholder.frame)
-//      print(self.placeholder.alpha)
-//      self.placeholder.alpha = 0
-//      self.placeholder.transform = .init(scaleX: 0.75, y: 0.75)
-//    }) { [weak self] _ in
-//      guard let self = self else { return }
-//
-//      self.placeholder.removeFromSuperview()
-//
-//      guard !self.textView.isFirstResponder else { return }
-//
-//      self.textView.becomeFirstResponder()
-//    }
   }
 }
 
@@ -307,6 +349,9 @@ private extension NewPollCommentsCell {
     
     layer.insertSublayer(bgLine.layer, at: 0)
     layer.insertSublayer(fgLine.layer, at: 1)
+    
+//    setNeedsLayout()
+//    layoutIfNeeded()
   }
   
   func drawLine(line: Line,
@@ -398,6 +443,18 @@ private extension NewPollCommentsCell {
   
   @objc
   func nextStage() {
+    if isPresenting {
+      Animations.unmaskLayerCircled(unmask: false,
+                                    layer: self.fgLayer,
+                                    location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
+                                    duration: 0.5,
+                                    opacityDurationMultiplier: 0.6,
+                                    delegate: self)
+      
+      self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+      isPresenting = false
+    }
+    
     UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       
@@ -417,8 +474,12 @@ private extension NewPollCommentsCell {
     }
     
     boundsPublisher.send()
-    stageCompletePublisher.send()
-    stageCompletePublisher.send(completion: .finished)
+    delay(seconds: 0.4) {[weak self] in
+      guard let self = self else { return }
+      
+      self.stageCompletePublisher.send()
+      self.stageCompletePublisher.send(completion: .finished)
+    }
     CATransaction.begin()
     CATransaction.setCompletionBlock() { [unowned self] in
       self.animationCompletePublisher.send()

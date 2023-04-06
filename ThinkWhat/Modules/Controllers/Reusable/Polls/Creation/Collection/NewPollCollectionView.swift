@@ -33,8 +33,13 @@ class NewPollCollectionView: UICollectionView {
       isScrollEnabled = stage == .Ready
     }
   }
-  @Published public private(set) var topic: Topic! {
+//  @Published public private(set) var topic: Topic! {
+  public private(set) var topic: Topic! {
     didSet {
+      if oldValue != topic {
+        topicPublisher.send(topic)
+      }
+      
       guard oldValue.isNil,
             !topic.isNil
       else { return }
@@ -46,6 +51,7 @@ class NewPollCollectionView: UICollectionView {
       self.stage = stage
     }
   }
+  public private(set) var topicPublisher = CurrentValueSubject<Topic?, Never>(nil)
   @Published public private(set) var title: String! {
     didSet {
       guard let title = title else { return }
@@ -246,6 +252,10 @@ class NewPollCollectionView: UICollectionView {
   
   // MARK: - Destructor
   deinit {
+    if let instance = _preview {
+      SurveyReferences.shared.all.remove(object: instance.reference)
+      Surveys.shared.all.remove(object: instance)
+    }
     observers.forEach { $0.invalidate() }
     tasks.forEach { $0?.cancel() }
     subscriptions.forEach { $0.cancel() }
@@ -313,8 +323,8 @@ private extension NewPollCollectionView {
     }
     
     let topicCellRegistration = UICollectionView.CellRegistration<NewPollTopicCell, AnyHashable> { [unowned self] cell, indexPath, _ in
-      cell.stage = .Topic
       cell.stageGlobal = self.stage
+      cell.stage = .Topic
       cell.topic = self.topic
       cell.$topic
         .filter { !$0.isNil }
@@ -348,12 +358,14 @@ private extension NewPollCollectionView {
       
       guard self.stage == .Topic else { return }
       
-      cell.present(seconds: 0.5)
+      delay(seconds: 0.5) {
+        cell.present(seconds: 1.5)
+      }
     }
     
     let titleCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.textAlignment = .center
-      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
+//      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
       cell.minHeight = 0//60
       cell.stageGlobal = self.stage
       cell.stage = .Title
@@ -367,15 +379,12 @@ private extension NewPollCollectionView {
         .receive(on: DispatchQueue.main)
         .sink { cell.isKeyboardOnScreen = $0 }
         .store(in: &self.subscriptions)
-      self.$topic
+//      self.$topic
+      self.topicPublisher
         .filter { !$0.isNil }
+        .filter { cell.color != $0!.tagColor }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
-        .store(in: &self.subscriptions)
-      self.$topic
-        .filter { !$0.isNil }
-        .receive(on: DispatchQueue.main)
-        .sink { cell.topicColor = $0!.tagColor }
         .store(in: &self.subscriptions)
       self.$isMovingToParent
         .filter { !$0.isNil }
@@ -437,9 +446,9 @@ private extension NewPollCollectionView {
     
     let descriptionCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.textAlignment = .natural
-      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
-      cell.stage = .Description
+//      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
       cell.stageGlobal = self.stage
+      cell.stage = .Description
       cell.placeholderFont = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
       cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
       cell.text = self.pollDescription
@@ -450,13 +459,15 @@ private extension NewPollCollectionView {
         .receive(on: DispatchQueue.main)
         .sink { cell.isKeyboardOnScreen = $0 }
         .store(in: &self.subscriptions)
-      self.$topic
-        .filter { !$0.isNil }
-        .receive(on: DispatchQueue.main)
-        .sink { cell.topicColor = $0!.tagColor }
-        .store(in: &self.subscriptions)
-      self.$topic
+//      self.$topic
+//        .filter { !$0.isNil }
+//        .receive(on: DispatchQueue.main)
+//        .sink { cell.topicColor = $0!.tagColor }
+//        .store(in: &self.subscriptions)
+      //      self.$topic
+            self.topicPublisher
         .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Description.rawValue }
+        .filter { cell.color != $0!.tagColor }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -500,202 +511,16 @@ private extension NewPollCollectionView {
       self.$stage
         .filter { $0 == .Description }
         .filter { _ in cell.text.isNil || cell.text.isEmpty }
-        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
-        .sink { _ in cell.present(seconds: 0.5) }
-        .store(in: &self.subscriptions)
-    }
-    
-    let questionCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, indexPath, _ in
-      cell.textAlignment = .natural
-      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
-      cell.minHeight = 0//60
-      cell.stage = .Question
-      cell.stageGlobal = self.stage
-      cell.placeholderFont = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
-      cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
-      cell.text = self.pollDescription
-      self.$topic
-        .filter { !$0.isNil }
-        .receive(on: DispatchQueue.main)
-        .sink { cell.topicColor = $0!.tagColor }
-        .store(in: &self.subscriptions)
-      self.$stage
-        .sink { cell.stageGlobal = $0 }
-        .store(in: &self.subscriptions)
-      self.$isKeyboardOnScreen
-        .receive(on: DispatchQueue.main)
-        .sink { cell.isKeyboardOnScreen = $0 }
-        .store(in: &self.subscriptions)
-      self.$topic
-        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Question.rawValue }
-        .receive(on: DispatchQueue.main)
-        .sink { cell.color = $0!.tagColor }
-        .store(in: &self.subscriptions)
-      self.$isMovingToParent
-        .filter { !$0.isNil }
-        .receive(on: DispatchQueue.main)
-        .sink { cell.isMovingToParent = $0! }
-        .store(in: &self.subscriptions)
-      cell.$text
-        .filter { !$0.isNil }
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] in self.question = $0 }
-        .store(in: &self.subscriptions)
-      cell.animationCompletePublisher
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in
-          self.questionStageAnimationFinished.send()
-          self.questionStageAnimationFinished.send(completion: .finished)
-        }//  = .Question }
-        .store(in: &self.subscriptions)
-      cell.stageCompletePublisher
         .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in  self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
-        .store(in: &self.subscriptions)
-      cell.boundsPublisher
-        .eraseToAnyPublisher()
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in
-          self.source.refresh() }
-        .store(in: &self.subscriptions)
-      var config = UIBackgroundConfiguration.listPlainCell()
-      config.backgroundColor = .clear
-      cell.backgroundConfiguration = config
-      cell.automaticallyUpdatesBackgroundConfiguration = false
-      
-      self.descriptionStageAnimationFinished
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
-        .store(in: &self.subscriptions)
-      self.$stage
-        .filter { $0 == .Question }
-        .filter { _ in cell.text.isNil || cell.text.isEmpty }
-        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
         .sink { _ in cell.present(seconds: 0.5) }
-        .store(in: &self.subscriptions)
-    }
-    
-    let choicesCellRegistration = UICollectionView.CellRegistration<NewPollChoicesCell, AnyHashable> { [unowned self] cell, indexPath, _ in
-      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
-      cell.choices = self.choices
-      cell.stageGlobal = self.stage
-      cell.stage = .Choices
-      cell.addChoicePublisher
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in
-          self.addChoice()
-          
-          guard self.stage == .Ready else { return }
-          
-          self.scrollToItem(at: IndexPath(row: 0, section: 4), at: .top, animated: true)
-        }
-        .store(in: &self.subscriptions)
-      cell.$removedChoice
-        .filter { !$0.isNil }
-        .sink { [unowned self] in self.choices.remove(object: $0!) }
-        .store(in: &self.subscriptions)
-      ///Monitor 1st choice to add 2nd - necessary
-      cell.$wasEdited
-        .filter { !$0.isNil }
-        .filter { [unowned self] _ in self.choices.count == 1 }
-        .sink { _ in cell.addSecondChoice() }
-        .store(in: &self.subscriptions)
-      cell.stageCompletePublisher
-        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in  self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
-        .store(in: &self.subscriptions)
-      self.$topic
-        .filter { !$0.isNil }
-        .receive(on: DispatchQueue.main)
-        .sink { cell.topicColor = $0!.tagColor }
-        .store(in: &self.subscriptions)
-//      self.$choices
-//        .filter { [unowned self] _ in self.stage.rawValue >= NewPollController.Stage.Choices.rawValue }
-//        .receive(on: DispatchQueue.main)
-//        .sink {
-//          cell.refreshChoices($0)
-//          cell.present(index: $0.count-1, seconds: $0.count == 2 ? 0.5 : 0)
-////          guard  $0.count == 2 else { return }
-////
-////          cell.present(first: false, seconds: 0.5)
-//        }
-      self.choicesPublisher
-        .filter { [unowned self] _ in self.stage.rawValue >= NewPollController.Stage.Choices.rawValue }
-        .receive(on: DispatchQueue.main)
-        .sink {
-          cell.refreshChoices($0)
-          cell.present(index: $0.count-1, seconds: $0.count == 2 ? 0.5 : 0)
-//          guard  $0.count == 2 else { return }
-//
-//          cell.present(first: false, seconds: 0.5)
-        }
-        .store(in: &self.subscriptions)
-//      self.$choices
-//        .filter { [unowned self] _ in self.choices.count == 2 }
-//        .receive(on: DispatchQueue.main)
-//        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
-//        .sink { _ in cell.present(first: false) }
-//        .store(in: &self.subscriptions)
-      self.$stage
-        .sink { cell.stageGlobal = $0 }
-        .store(in: &self.subscriptions)
-      self.$topic
-        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Choices.rawValue }
-        .receive(on: DispatchQueue.main)
-        .sink { cell.color = $0!.tagColor }
-        .store(in: &self.subscriptions)
-      self.$isMovingToParent
-        .filter { !$0.isNil }
-        .receive(on: DispatchQueue.main)
-        .sink { cell.isMovingToParent = $0! }
-        .store(in: &self.subscriptions)
-      self.$isKeyboardOnScreen
-        .receive(on: DispatchQueue.main)
-        .sink { cell.isKeyboardOnScreen = $0 }
-        .store(in: &self.subscriptions)
-//      cell.$text
-//        .filter { !$0.isNil }
-//        .receive(on: DispatchQueue.main)
-//        .sink { [unowned self] in self.question = $0 }
-//        .store(in: &self.subscriptions)
-      cell.animationCompletePublisher
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in
-          self.stage = .Images
-          self.choicesStageAnimationFinished.send()
-          self.choicesStageAnimationFinished.send(completion: .finished)
-        }//  = .Choices }
-        .store(in: &self.subscriptions)
-      cell.boundsPublisher
-        .eraseToAnyPublisher()
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in
-          self.source.refresh() }
-        .store(in: &self.subscriptions)
-      var config = UIBackgroundConfiguration.listPlainCell()
-      config.backgroundColor = .clear
-      cell.backgroundConfiguration = config
-      cell.automaticallyUpdatesBackgroundConfiguration = false
-      
-      self.questionStageAnimationFinished
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
-        .store(in: &self.subscriptions)
-      self.$stage
-        .filter { $0 == .Choices }
-        .filter { [unowned self] _ in self.choices.count == 1 }
-        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
-        .sink { _ in cell.present(index: 0) }
         .store(in: &self.subscriptions)
     }
     
     let imagesCellRegistration = UICollectionView.CellRegistration<NewPollImagesCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
-      cell.stage = .Images
-      cell.stageGlobal = self.stage
       cell.images = self.images
+      cell.stageGlobal = self.stage
+      cell.stage = .Images
       cell.addImagePublisher
         .receive(on: DispatchQueue.main)
 //        .sink { [unowned self] in self.addImage() }
@@ -704,7 +529,7 @@ private extension NewPollCollectionView {
           
           guard self.stage == .Ready else { return }
           
-          self.scrollToItem(at: IndexPath(row: 0, section: 5), at: .top, animated: true)
+          self.scrollToItem(at: IndexPath(row: 0, section: NewPollController.Stage.Images.rawValue), at: .top, animated: true)
         }
         .store(in: &self.subscriptions)
       cell.$removedImage
@@ -718,8 +543,10 @@ private extension NewPollCollectionView {
       self.$stage
         .sink { cell.stageGlobal = $0 }
         .store(in: &self.subscriptions)
-      self.$topic
+      //      self.$topic
+            self.topicPublisher
         .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Images.rawValue }
+        .filter { cell.color != $0!.tagColor }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -756,8 +583,9 @@ private extension NewPollCollectionView {
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
       
-      self.choicesStageAnimationFinished
+      self.descriptionStageAnimationFinished
         .receive(on: DispatchQueue.main)
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
         .store(in: &self.subscriptions)    }
     
@@ -775,8 +603,10 @@ private extension NewPollCollectionView {
 //        .receive(on: DispatchQueue.main)
 //        .sink { cell.isKeyboardOnScreen = $0 }
 //        .store(in: &self.subscriptions)
-      self.$topic
+      //      self.$topic
+            self.topicPublisher
         .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Hyperlink.rawValue }
+        .filter { cell.color != $0!.tagColor }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -809,7 +639,7 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
       cell.nextPublisher
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in self.stage = .Comments }
+        .sink { [unowned self] _ in self.stage = .Question }
         .store(in: &self.subscriptions)
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
@@ -818,6 +648,7 @@ private extension NewPollCollectionView {
       
       self.imagesStageAnimationFinished
         .receive(on: DispatchQueue.main)
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
         .store(in: &self.subscriptions)
 //      self.$stage
@@ -825,6 +656,199 @@ private extension NewPollCollectionView {
 //        .delay(for: .seconds(0.75), scheduler: DispatchQueue.main)
 //        .sink { _ in cell.present() }
 //        .store(in: &self.subscriptions)
+    }
+    
+    let questionCellRegistration = UICollectionView.CellRegistration<NewPollTextCell, AnyHashable> { [unowned self] cell, indexPath, _ in
+      cell.textAlignment = .natural
+//      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
+      cell.minHeight = 0//60
+      cell.stageGlobal = self.stage
+      cell.stage = .Question
+      cell.placeholderFont = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
+      cell.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+      cell.text = self.pollDescription
+//      self.$topic
+//        .filter { !$0.isNil }
+//        .receive(on: DispatchQueue.main)
+//        .sink { cell.topicColor = $0!.tagColor }
+//        .store(in: &self.subscriptions)
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      self.$isKeyboardOnScreen
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isKeyboardOnScreen = $0 }
+        .store(in: &self.subscriptions)
+      //      self.$topic
+            self.topicPublisher
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Question.rawValue }
+        .filter { cell.color != $0!.tagColor }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$isMovingToParent
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isMovingToParent = $0! }
+        .store(in: &self.subscriptions)
+      cell.$text
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.question = $0 }
+        .store(in: &self.subscriptions)
+      cell.animationCompletePublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          self.questionStageAnimationFinished.send()
+          self.questionStageAnimationFinished.send(completion: .finished)
+        }//  = .Question }
+        .store(in: &self.subscriptions)
+      cell.stageCompletePublisher
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in  self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.source.refresh() }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.hyperlinkStageAnimationFinished
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
+      self.$stage
+        .filter { $0 == .Question }
+        .filter { _ in cell.text.isNil || cell.text.isEmpty }
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .sink { _ in cell.present(seconds: 0.25) }
+        .store(in: &self.subscriptions)
+    }
+    
+    let choicesCellRegistration = UICollectionView.CellRegistration<NewPollChoicesCell, AnyHashable> { [unowned self] cell, indexPath, _ in
+      cell.topicColor = self.topic.isNil ? .systemGray4 : self.topic!.tagColor
+      cell.choices = self.choices
+      cell.stageGlobal = self.stage
+      cell.stage = .Choices
+      cell.addChoicePublisher
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          self.addChoice()
+          
+          guard self.stage == .Ready else { return }
+          
+          self.scrollToItem(at: IndexPath(row: 0, section: 4), at: .top, animated: true)
+        }
+        .store(in: &self.subscriptions)
+      cell.$removedChoice
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.choices.remove(object: $0!) }
+        .store(in: &self.subscriptions)
+      ///Monitor 1st choice to add 2nd - necessary
+      cell.$wasEdited
+        .filter { !$0.isNil }
+        .filter { [unowned self] _ in self.choices.count == 1 }
+        .sink { _ in cell.addSecondChoice() }
+        .store(in: &self.subscriptions)
+      cell.stageCompletePublisher
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in  self.scrollToItem(at: IndexPath(row: 0, section: indexPath.section+1), at: .top, animated: true) }
+        .store(in: &self.subscriptions)
+//      self.$topic
+      //      self.$topic
+            self.topicPublisher
+        .filter { !$0.isNil }
+        .filter { cell.color != $0!.tagColor }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.topicColor = $0!.tagColor }
+        .store(in: &self.subscriptions)
+//      self.$choices
+//        .filter { [unowned self] _ in self.stage.rawValue >= NewPollController.Stage.Choices.rawValue }
+//        .receive(on: DispatchQueue.main)
+//        .sink {
+//          cell.refreshChoices($0)
+//          cell.present(index: $0.count-1, seconds: $0.count == 2 ? 0.5 : 0)
+////          guard  $0.count == 2 else { return }
+////
+////          cell.present(first: false, seconds: 0.5)
+//        }
+      self.choicesPublisher
+        .filter { [unowned self] _ in self.stage.rawValue >= NewPollController.Stage.Choices.rawValue }
+        .receive(on: DispatchQueue.main)
+        .sink {
+          cell.refreshChoices($0)
+          cell.present(index: $0.count-1, seconds: $0.count == 2 ? 0.5 : 0)
+//          guard  $0.count == 2 else { return }
+//
+//          cell.present(first: false, seconds: 0.5)
+        }
+        .store(in: &self.subscriptions)
+//      self.$choices
+//        .filter { [unowned self] _ in self.choices.count == 2 }
+//        .receive(on: DispatchQueue.main)
+//        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+//        .sink { _ in cell.present(first: false) }
+//        .store(in: &self.subscriptions)
+      self.$stage
+        .sink { cell.stageGlobal = $0 }
+        .store(in: &self.subscriptions)
+      //      self.$topic
+            self.topicPublisher
+        .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Choices.rawValue }
+        .filter { cell.color != $0!.tagColor }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.color = $0!.tagColor }
+        .store(in: &self.subscriptions)
+      self.$isMovingToParent
+        .filter { !$0.isNil }
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isMovingToParent = $0! }
+        .store(in: &self.subscriptions)
+      self.$isKeyboardOnScreen
+        .receive(on: DispatchQueue.main)
+        .sink { cell.isKeyboardOnScreen = $0 }
+        .store(in: &self.subscriptions)
+//      cell.$text
+//        .filter { !$0.isNil }
+//        .receive(on: DispatchQueue.main)
+//        .sink { [unowned self] in self.question = $0 }
+//        .store(in: &self.subscriptions)
+      cell.animationCompletePublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          self.stage = .Comments
+          self.choicesStageAnimationFinished.send()
+          self.choicesStageAnimationFinished.send(completion: .finished)
+        }//  = .Choices }
+        .store(in: &self.subscriptions)
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in
+          self.source.refresh() }
+        .store(in: &self.subscriptions)
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.questionStageAnimationFinished
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor }
+        .store(in: &self.subscriptions)
+      self.$stage
+        .filter { $0 == .Choices }
+        .filter { [unowned self] _ in self.choices.count == 1 }
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .sink { _ in cell.present(index: 0, seconds: 0.5) }
+        .store(in: &self.subscriptions)
     }
     
     let commentsCellRegistration = UICollectionView.CellRegistration<NewPollCommentsCell, AnyHashable> { [unowned self] cell, indexPath, _ in
@@ -837,8 +861,11 @@ private extension NewPollCollectionView {
       self.$stage
         .sink { cell.stageGlobal = $0 }
         .store(in: &self.subscriptions)
-      self.$topic
+      //      self.$topic
+      
+        self.topicPublisher
         .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Comments.rawValue }
+        .filter { cell.color != $0!.tagColor }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -852,10 +879,10 @@ private extension NewPollCollectionView {
         .sink { [unowned self] _ in
           self.commentsStageAnimationFinished.send()
           self.commentsStageAnimationFinished.send(completion: .finished)
-        }//  = .Comments }
+        }
         .store(in: &self.subscriptions)
       cell.boundsPublisher
-//        .eraseToAnyPublisher()
+        .eraseToAnyPublisher()
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in self.source.refresh() }
         .store(in: &self.subscriptions)
@@ -868,8 +895,9 @@ private extension NewPollCollectionView {
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
       
-      self.hyperlinkStageAnimationFinished
+      self.choicesStageAnimationFinished
         .receive(on: DispatchQueue.main)
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
         .store(in: &self.subscriptions)
     }
@@ -884,8 +912,10 @@ private extension NewPollCollectionView {
       self.$stage
         .sink { cell.stageGlobal = $0 }
         .store(in: &self.subscriptions)
-      self.$topic
+      //      self.$topic
+            self.topicPublisher
         .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Anonymity.rawValue }
+        .filter { cell.color != $0!.tagColor }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -917,6 +947,7 @@ private extension NewPollCollectionView {
       
       self.commentsStageAnimationFinished
         .receive(on: DispatchQueue.main)
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
         .store(in: &self.subscriptions)
     }
@@ -929,8 +960,10 @@ private extension NewPollCollectionView {
       self.$stage
         .sink { cell.stageGlobal = $0 }
         .store(in: &self.subscriptions)
-      self.$topic
+      //      self.$topic
+            self.topicPublisher
         .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Limits.rawValue }
+        .filter { cell.color != $0!.tagColor }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -963,7 +996,8 @@ private extension NewPollCollectionView {
       self.anonStageAnimationFinished
         .first()
         .receive(on: DispatchQueue.main)
-        .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
+        .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present(seconds: 1) }
         .store(in: &cell.externalSubscriptions)
     }
     
@@ -976,8 +1010,10 @@ private extension NewPollCollectionView {
       self.$stage
         .sink { cell.stageGlobal = $0 }
         .store(in: &self.subscriptions)
-      self.$topic
+      //      self.$topic
+            self.topicPublisher
         .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Hot.rawValue }
+        .filter { cell.color != $0!.tagColor }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -1009,6 +1045,7 @@ private extension NewPollCollectionView {
       
       self.limitsStageAnimationFinished
         .receive(on: DispatchQueue.main)
+        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
         .store(in: &self.subscriptions)
     }
@@ -1022,8 +1059,10 @@ private extension NewPollCollectionView {
       self.$stage
         .sink { cell.stageGlobal = $0 }
         .store(in: &self.subscriptions)
-      self.$topic
+      //      self.$topic
+            self.topicPublisher
         .filter { [unowned self] in !$0.isNil && self.stage.rawValue >= NewPollController.Stage.Hot.rawValue }
+        .filter { cell.color != $0!.tagColor }
         .receive(on: DispatchQueue.main)
         .sink { cell.color = $0!.tagColor }
         .store(in: &self.subscriptions)
@@ -1051,6 +1090,7 @@ private extension NewPollCollectionView {
       
       self.hotStageAnimationFinished
         .receive(on: DispatchQueue.main)
+//        .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
         .sink { [unowned self] _ in cell.color = self.topic.tagColor; cell.present() }
         .store(in: &self.subscriptions)
     }
@@ -1114,10 +1154,10 @@ private extension NewPollCollectionView {
     snapshot.appendSections([.Topic,
                              .Title,
                              .Description,
-                             .Question,
-                             .Choices,
                              .Images,
                              .Hyperlink,
+                             .Question,
+                             .Choices,
                              .Comments,
                              .Anonymity,
                              .Limits,
@@ -1126,10 +1166,10 @@ private extension NewPollCollectionView {
     snapshot.appendItems([0], toSection: .Topic)
     snapshot.appendItems([1], toSection: .Title)
     snapshot.appendItems([2], toSection: .Description)
-    snapshot.appendItems([3], toSection: .Question)
-    snapshot.appendItems([4], toSection: .Choices)
-    snapshot.appendItems([5], toSection: .Images)
-    snapshot.appendItems([6], toSection: .Hyperlink)
+    snapshot.appendItems([3], toSection: .Images)
+    snapshot.appendItems([4], toSection: .Hyperlink)
+    snapshot.appendItems([5], toSection: .Question)
+    snapshot.appendItems([6], toSection: .Choices)
     snapshot.appendItems([7], toSection: .Comments)
     snapshot.appendItems([8], toSection: .Anonymity)
     snapshot.appendItems([9], toSection: .Limits)
