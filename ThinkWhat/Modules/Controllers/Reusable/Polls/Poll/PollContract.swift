@@ -70,6 +70,7 @@ protocol PollControllerOutput: AnyObject {
   var item: Survey? { get set }
   
   func presentView(_: Survey)
+  func postCallback(_ result: Result<Bool, Error>)
   func onLoadCallback(_: Result<Bool, Error>)
   func onVoteCallback(_: Result<Bool, Error>)
   func commentPostCallback(_: Result<Comment, Error>)

@@ -439,8 +439,8 @@
 "new_poll_hyperlink_tf_placeholder" = "Add hyperlink (optional)";
 "new_poll_comments" = "Comments";
 "new_poll_comments_placeholder" = "You can enable the ability to leave comments under the publication";
-"new_poll_comments_on" = "Сomments are allowed✅";
-"new_poll_comments_off" = "Comments are forbidden⛔️";
+"new_poll_comments_on" = "Сomments are allowed";
+"new_poll_comments_off" = "Comments are forbidden";
 "new_poll_anonymity" = "Anonymity";
 "new_poll_anonymity_placeholder" = "You can turn on the anonymity mode, in this mode you can not see who exactly took part";
 "new_poll_anonymity_on" = "Author, voters and commentators are hidden";
@@ -457,5 +457,7 @@
 "total_bill" = "Total";
 "hot_option" = "Hot start";
 "publication_preview" = "Preview";
-"insufficient_balance" = "You don't have enough points for this publication";
-"insufficient_balance" = "У Вас недостаточно баллов для публикации";
+"insufficient_balance" = "You don't have enough points for this publication. ";
+"insufficient_balance_shortage" = "Missing ";
+"insufficient_balance_shortage_points" = " points";
+"insufficient_balance_shortage_hint" = "To earn points, take an active part in the publications of community members";

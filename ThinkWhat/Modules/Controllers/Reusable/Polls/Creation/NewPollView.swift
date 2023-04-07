@@ -240,7 +240,7 @@ private extension NewPollView {
                                         ])
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: gradient.locations as Any,
-                                           toValue: [0.0, 0.815, 0.875] as Any,
+                                           toValue: [0.0, 0.795, 0.875] as Any,
                                            duration: 0.2,
                                            timingFunction: CAMediaTimingFunctionName.easeOut,
                                            delegate: self,
@@ -249,7 +249,7 @@ private extension NewPollView {
                                             { [weak self] in
                                               guard let self = self else { return }
                                               
-                                              self.gradient.locations = [0.0, 0.815, 0.875]
+                                              self.gradient.locations = [0.0, 0.795, 0.875]
                                               self.gradient.removeAllAnimations()
                                             }
                                            ])
@@ -263,13 +263,18 @@ private extension NewPollView {
     endEditing(true)
     
     guard collectionView.hasEnoughtBudget else {
-      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                            text: "insufficient_balance",
-                                                            tintColor: .systemRed),
+      let text_1 = "insufficient_balance".localized + "insufficient_balance_shortage".localized + String(describing: abs(collectionView.shortage))
+      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "dollarsign.circle.fill")!,
+                                                            text: text_1 + "insufficient_balance_shortage_points".localized + ". " + "insufficient_balance_shortage_hint".localized,
+                                                            textColor: .label,
+                                                            tintColor: .systemRed,
+                                                            fontName: Fonts.Regular,
+                                                            textStyle: .headline,
+                                                            textAlignment: .natural),
                              contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                              isModal: false,
                              useContentViewHeight: true,
-                             shouldDismissAfter: 2)
+                             shouldDismissAfter: 3)
       banner.didDisappearPublisher
         .sink { _ in banner.removeFromSuperview() }
         .store(in: &self.subscriptions)

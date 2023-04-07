@@ -28,18 +28,24 @@ class NewPollChoicesCell: UICollectionViewCell {
 //    }
 //  }
   public var externalSubscriptions = Set<AnyCancellable>()
-  public var topicColor: UIColor = .systemGray //{
-//    didSet {
-//      guard !stage.isNil else { return }
-//
-//      button.setAttributedTitle(NSAttributedString(string: "new_poll_survey_choice_add".localized,
-//                                                     attributes: [
-//                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-//                                                      .foregroundColor: topicColor as Any
-//                                                     ]),
-//                                  for: .normal)
-//    }
-//  }
+  public var topicColor: UIColor = .systemGray {
+    didSet {
+      guard !stage.isNil else { return }
+      
+      if choices.count >= 2 {
+        if #available(iOS 15, *) {
+          button.configuration?.baseBackgroundColor = topicColor
+        } else {
+          button.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
+                                                       attributes: [
+                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                        .foregroundColor: topicColor as Any
+                                                       ]),
+                                    for: .normal)
+        }
+      }
+    }
+  }
   ///**Publishers**
   @Published public var stageGlobal: NewPollController.Stage!
   @Published public private(set) var wasEdited: Bool?
@@ -58,18 +64,18 @@ class NewPollChoicesCell: UICollectionViewCell {
       
       fgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
       
-      if choices.count >= 2 {
-        if #available(iOS 15, *) {
-          button.configuration?.baseBackgroundColor = topicColor
-        } else {
-          button.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
-                                                       attributes: [
-                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
-                                                        .foregroundColor: topicColor as Any
-                                                       ]),
-                                    for: .normal)
-        }
-      }
+//      if choices.count >= 2 {
+//        if #available(iOS 15, *) {
+//          button.configuration?.baseBackgroundColor = topicColor
+//        } else {
+//          button.setAttributedTitle(NSAttributedString(string: "new_poll_choice_add".localized,
+//                                                       attributes: [
+//                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+//                                                        .foregroundColor: topicColor as Any
+//                                                       ]),
+//                                    for: .normal)
+//        }
+//      }
       nextButton.tintColor = color
       
       UIView.animate(withDuration: 0.4) { [weak self] in
@@ -109,7 +115,10 @@ class NewPollChoicesCell: UICollectionViewCell {
       .sink { [unowned self] in self.removedChoice = $0 }
       .store(in: &subscriptions)
     instance.$wasEdited
-      .sink { [unowned self] in self.wasEdited = $0 }
+      .sink { [unowned self] in
+        print("$wasEdited")
+        self.wasEdited = $0
+      }
       .store(in: &subscriptions)
     
     $stageGlobal
@@ -419,7 +428,7 @@ class NewPollChoicesCell: UICollectionViewCell {
       return
     }
     
-    delay(seconds: seconds) { [weak self] in
+    delay(seconds: seconds + (index == 0 ? 0.6 : 0)) { [weak self] in
       guard let self = self else { return }
       
       self.collectionView.present(index: index)

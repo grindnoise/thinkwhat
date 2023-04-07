@@ -301,6 +301,17 @@ class NewPollHotCell: UICollectionViewCell {
     
     bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
     
+    delay(seconds: 1) {
+      Animations.unmaskLayerCircled(unmask: false,
+                                    layer: self.fgLayer,
+                                    location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
+                                    duration: 0.5,
+                                    opacityDurationMultiplier: 0.6,
+                                    delegate: self)
+      
+      self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+    }
+    
     hotOnIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
     hotOffIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
 //    textView.becomeFirstResponder()
@@ -478,16 +489,6 @@ private extension NewPollHotCell {
       }
     }
     
-    boundsPublisher.send()
-    Animations.unmaskLayerCircled(unmask: false,
-                                  layer: self.fgLayer,
-                                  location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
-                                  duration: 0.5,
-                                  opacityDurationMultiplier: 0.6,
-                                  delegate: self)
-    
-    self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
-
     boundsPublisher.send()
     delay(seconds: 0.4) {[weak self] in
       guard let self = self else { return }

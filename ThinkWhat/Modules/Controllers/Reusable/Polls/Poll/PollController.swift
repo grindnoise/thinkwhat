@@ -914,11 +914,47 @@ extension PollController: PollModelOutput {
   }
   
   func postCallback(_ result: Result<Bool, Error>) {
+    controllerOutput?.postCallback(result)
     switch result {
     case .success:
-      print("")
-    case .failure(let failure):
-      fatalError()
+      let banner = NewPopup(padding: self.padding*2,
+                            contentPadding: .uniform(size: self.padding),
+                            shouldDismissAfter: 5)
+//      let content = SurveyLimitPopupContent(limit: limit.isNil ? 100 : limit,
+//                                            mode: limit.isNil ? .ForceSelect : .Default,
+//                                            color: color)
+//      content.limitPublisher
+//        .sink { [unowned self] limit in
+//          banner.dismiss()
+//          self.limit = limit
+//        }
+//        .store(in: &banner.subscriptions)
+
+      banner.setContent(UIView())
+      banner.didDisappearPublisher
+        .sink { [unowned self] _ in
+          banner.removeFromSuperview();
+        }
+        .store(in: &self.subscriptions)
+    case .failure(let error):
+      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "dollarsign.circle.fill")!,
+                                                            text: error.localizedDescription,
+                                                            textColor: .label,
+                                                            tintColor: .systemRed,
+                                                            fontName: Fonts.Regular,
+                                                            textStyle: .headline,
+                                                            textAlignment: .natural),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 3)
+      banner.didDisappearPublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.navigationController?.popViewController(animated: true)
+          banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
     }
   }
 }

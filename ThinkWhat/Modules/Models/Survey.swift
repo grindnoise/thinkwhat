@@ -273,8 +273,30 @@ class Survey: Decodable {
   var isPrivate: Bool
   var isAnonymous: Bool
   var isCommentingAllowed: Bool
-  
-  
+  ///**Parameters**
+  var parameters: [String: Any] {
+    var instance: [String: Any] = [
+      "category": topic.id,
+      "type": type.rawValue,
+      "is_private": isPrivate,
+      "is_anonymous": isAnonymous,
+      "is_commenting_allowed": isCommentingAllowed,
+      "title": title,
+      "description": detailsDescription,
+      "question": question,
+      "answers": answers.map() { ["description": $0.description] },
+      "post_hot": isHot,
+      "vote_capacity": votesLimit,
+    ]
+    if !media.isEmpty {
+      instance["media"] = media.map() {[
+        "title": $0.title,
+        "image": $0.image as Any
+      ] as [String : Any]}
+    }
+    
+    return instance
+  }
   
   //Publishers
   public let commentPostedPublisher = PassthroughSubject<Comment, Never>()

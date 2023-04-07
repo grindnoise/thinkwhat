@@ -86,7 +86,6 @@ class NewPollCommentsCell: UICollectionViewCell {
   ///**UI**
   private let padding: CGFloat = 8
   private let stackHeight: CGFloat = 70
-  private var isPresenting = true
   private lazy var imageView: UIImageView = {
     let instance = UIImageView(image: stage.numImage)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
@@ -308,7 +307,16 @@ class NewPollCommentsCell: UICollectionViewCell {
     
     bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
     
-    isPresenting = true
+    delay(seconds: 1) {
+      Animations.unmaskLayerCircled(unmask: false,
+                                    layer: self.fgLayer,
+                                    location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
+                                    duration: 0.5,
+                                    opacityDurationMultiplier: 0.6,
+                                    delegate: self)
+      
+      self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+    }
   
     commentsOnIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
     commentsOffIcon.setIconColor(UIColor.systemGray4)//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground)
@@ -443,18 +451,6 @@ private extension NewPollCommentsCell {
   
   @objc
   func nextStage() {
-    if isPresenting {
-      Animations.unmaskLayerCircled(unmask: false,
-                                    layer: self.fgLayer,
-                                    location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
-                                    duration: 0.5,
-                                    opacityDurationMultiplier: 0.6,
-                                    delegate: self)
-      
-      self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
-      isPresenting = false
-    }
-    
     UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       

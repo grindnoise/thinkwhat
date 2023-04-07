@@ -77,6 +77,7 @@ class NewPollTextCell: UICollectionViewCell {
   ///**Publishers**
   public private(set) var animationCompletePublisher = PassthroughSubject<Void, Never>()
   public private(set) var stageCompletePublisher = PassthroughSubject<Void, Never>()
+  public private(set) var firstResponderPublisher = PassthroughSubject<Bool, Never>()
   @Published public var text: String! {
     didSet {
       updateUI()
@@ -313,6 +314,7 @@ class NewPollTextCell: UICollectionViewCell {
     animationCompletePublisher = PassthroughSubject<Void, Never>()
     stageCompletePublisher = PassthroughSubject<Void, Never>()
     externalSubscriptions.forEach { $0.cancel() }
+    firstResponderPublisher = PassthroughSubject<Bool, Never>()
   }
   
   override func layoutSubviews() {
@@ -486,7 +488,12 @@ extension NewPollTextCell: UITextViewDelegate {
       bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
     }
     
-    guard let imageView = self.contentView.getSubview(type: UIImageView.self, identifier: "imageView") else { return true }
+    guard let imageView = self.contentView.getSubview(type: UIImageView.self,
+                                                      identifier: "imageView")
+    else {
+      firstResponderPublisher.send(true)
+      return true
+    }
     
     UIView.animate(withDuration: 0.2, animations: { [unowned self] in
 //      textView.backgroundColor = self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
@@ -499,6 +506,7 @@ extension NewPollTextCell: UITextViewDelegate {
       imageView.removeFromSuperview()
     }
     
+    firstResponderPublisher.send(true)
     return true
   }
   

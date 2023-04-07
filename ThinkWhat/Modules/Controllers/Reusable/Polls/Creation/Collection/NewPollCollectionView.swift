@@ -172,7 +172,8 @@ class NewPollCollectionView: UICollectionView {
         
         total.cost = limit.cost
       }
-      hasEnoughtBudget = (balance.cost - total.cost) > 0
+      shortage = balance.cost - total.cost
+      hasEnoughtBudget = (balance.cost - total.cost) >= 0
     }
   }
   @Published public private(set) var limit: Int? {
@@ -188,7 +189,8 @@ class NewPollCollectionView: UICollectionView {
       
       limit.cost = value
       total.cost = limit.cost + (costItems.filter({ $0.title == "hot_option".localized }).first?.cost ?? 0)
-      hasEnoughtBudget = (balance.cost - total.cost) > 0
+      shortage = balance.cost - total.cost
+      hasEnoughtBudget = (balance.cost - total.cost) >= 0
     }
   }
   @Published public private(set) var costItems: [CostItem] = {
@@ -212,6 +214,7 @@ class NewPollCollectionView: UICollectionView {
       total.isNegative = !hasEnoughtBudget
     }
   }
+  public private(set) var shortage = 0
   ///**UI**
   private let padding: CGFloat = 8
   ///**Publishers**
@@ -396,6 +399,11 @@ private extension NewPollCollectionView {
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] in self.title = $0 }
         .store(in: &self.subscriptions)
+      cell.firstResponderPublisher
+        .filter { [unowned self] _ in self.stage == .Ready }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.scrollToItem(at: IndexPath(row: 0, section: NewPollController.Stage.Title.rawValue), at: .top, animated: true) }
+        .store(in: &self.subscriptions)
       cell.stageCompletePublisher
         .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
         .receive(on: DispatchQueue.main)
@@ -480,6 +488,11 @@ private extension NewPollCollectionView {
         .filter { !$0.isNil }
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] in self.pollDescription = $0 }
+        .store(in: &self.subscriptions)
+      cell.firstResponderPublisher
+        .filter { [unowned self] _ in self.stage == .Ready }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.scrollToItem(at: IndexPath(row: 0, section: NewPollController.Stage.Description.rawValue), at: .top, animated: true) }
         .store(in: &self.subscriptions)
       cell.stageCompletePublisher
         .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
@@ -703,6 +716,11 @@ private extension NewPollCollectionView {
           self.questionStageAnimationFinished.send(completion: .finished)
         }//  = .Question }
         .store(in: &self.subscriptions)
+      cell.firstResponderPublisher
+        .filter { [unowned self] _ in self.stage == .Ready }
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.scrollToItem(at: IndexPath(row: 0, section: NewPollController.Stage.Question.rawValue), at: .top, animated: true) }
+        .store(in: &self.subscriptions)
       cell.stageCompletePublisher
         .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
         .receive(on: DispatchQueue.main)
@@ -737,13 +755,14 @@ private extension NewPollCollectionView {
       cell.stage = .Choices
       cell.addChoicePublisher
         .filter { !$0.isNil }
+        .throttle(for: .seconds(0.5), scheduler: DispatchQueue.main, latest: false)
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in
           self.addChoice()
           
           guard self.stage == .Ready else { return }
           
-          self.scrollToItem(at: IndexPath(row: 0, section: 4), at: .top, animated: true)
+          self.scrollToItem(at: IndexPath(row: 0, section: 6), at: .top, animated: true)
         }
         .store(in: &self.subscriptions)
       cell.$removedChoice
@@ -752,6 +771,7 @@ private extension NewPollCollectionView {
         .store(in: &self.subscriptions)
       ///Monitor 1st choice to add 2nd - necessary
       cell.$wasEdited
+        .receive(on: DispatchQueue.main)
         .filter { !$0.isNil }
         .filter { [unowned self] _ in self.choices.count == 1 }
         .sink { _ in cell.addSecondChoice() }

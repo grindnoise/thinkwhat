@@ -370,6 +370,17 @@ class NewPollAnonimityCell: UICollectionViewCell {
                                   delegate: self)
     
     bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+    
+    delay(seconds: 1) {
+      Animations.unmaskLayerCircled(unmask: false,
+                                    layer: self.fgLayer,
+                                    location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
+                                    duration: 0.5,
+                                    opacityDurationMultiplier: 0.6,
+                                    delegate: self)
+      
+      self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+    }
   }
 }
 
@@ -431,15 +442,6 @@ private extension NewPollAnonimityCell {
   
   @objc
   func nextStage() {
-    Animations.unmaskLayerCircled(unmask: false,
-                                  layer: self.fgLayer,
-                                  location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
-                                  duration: 0.5,
-                                  opacityDurationMultiplier: 0.6,
-                                  delegate: self)
-    
-    self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
-    
     UIView.transition(with: self.label, duration: 0.3, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       

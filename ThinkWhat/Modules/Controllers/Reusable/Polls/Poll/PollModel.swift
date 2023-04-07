@@ -20,7 +20,21 @@ class PollModel {
 // MARK: - Controller Input
 extension PollModel: PollControllerInput {
   func post(_ instance: Survey) {
-    
+    Task {
+      do {
+        try await API.shared.surveys.post(instance.parameters)
+        await MainActor.run {
+          modelOutput?.postCallback(.success(true))
+        }
+      } catch {
+        await MainActor.run {
+          modelOutput?.postCallback(.failure(error))
+        }
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
   }
   
   func updateSurveyState(_ instance: SurveyReference) {

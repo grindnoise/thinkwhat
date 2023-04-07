@@ -162,6 +162,7 @@ private extension PollCollectionView {
     let titleCellRegistration = UICollectionView.CellRegistration<PollTitleCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.mode = self.viewMode
       cell.item = self.item
+      cell.isUserInteractionEnabled = self.mode != .Preview
       cell.profileTapPublisher
         .sink { [weak self] _ in
           guard let self = self else { return }
@@ -224,7 +225,7 @@ private extension PollCollectionView {
     
     let imagesCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.item = self.item
-      
+      cell.isUserInteractionEnabled = self.mode != .Preview
       cell.imagePublisher
         .sink {[unowned self] in self.imagePublisher.send($0) }
         .store(in: &self.subscriptions)
@@ -244,6 +245,7 @@ private extension PollCollectionView {
     
     let webCellRegistration = UICollectionView.CellRegistration<LinkPreviewCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.item = self.item
+      cell.isUserInteractionEnabled = self.mode != .Preview
       cell.tapPublisher
         .sink {[weak self] in
           guard let self = self else { return }

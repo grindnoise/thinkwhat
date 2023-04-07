@@ -34,9 +34,6 @@ class NewPollTopicCell: UICollectionViewCell {
       
       guard stageGlobal == stage || stageGlobal == .Ready else { return }
       
-      stageCompletePublisher.send()
-      stageCompletePublisher.send(completion: .finished)
-      
       UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
         guard let self = self else { return }
         
@@ -44,6 +41,8 @@ class NewPollTopicCell: UICollectionViewCell {
       } completion: { _ in }
       
       if oldValue.isNil {
+        stageCompletePublisher.send()
+        stageCompletePublisher.send(completion: .finished)
         CATransaction.begin()
         CATransaction.setCompletionBlock() { [unowned self] in
           self.animationCompletePublisher.send()

@@ -712,19 +712,19 @@ private extension SurveysCollectionView {
         var appendingSet = Set<SurveyReference>()
         
         switch self.category {
-        case .New:            appendingSet = Set(instances.filter { $0.isNew && !$0.isBanned && !$0.isClaimed })//!$0.isRejected &&
-        case .Top:            appendingSet = Set(instances.filter { $0.isTop && !$0.isBanned && !$0.isClaimed })//!$0.isRejected &&
-        case .Own:            appendingSet = Set(instances.filter { $0.isOwn && !$0.isBanned })
-        case .Favorite:       appendingSet = Set(instances.filter { $0.isFavorite && !$0.isBanned && !$0.isClaimed })
-        case .Subscriptions:  appendingSet = Set(instances.filter { $0.owner.subscribedAt && !$0.isBanned && !$0.isClaimed && !$0.isAnonymous })
+        case .New:            appendingSet = Set(instances.filter { $0.isNew && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })//!$0.isRejected &&
+        case .Top:            appendingSet = Set(instances.filter { $0.isTop && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })//!$0.isRejected &&
+        case .Own:            appendingSet = Set(instances.filter { $0.isOwn && !$0.isBanned && $0.id != Survey.fakeId })
+        case .Favorite:       appendingSet = Set(instances.filter { $0.isFavorite && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })
+        case .Subscriptions:  appendingSet = Set(instances.filter { $0.owner.subscribedAt && !$0.isBanned && !$0.isClaimed && !$0.isAnonymous && $0.id != Survey.fakeId })
         case .Topic:
           guard let topic = self.topic else { return }
           
-          appendingSet = Set(instances.filter { $0.topic == topic && !$0.isBanned && !$0.isClaimed })
+          appendingSet = Set(instances.filter { $0.topic == topic && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })
         case .ByOwner:
           guard let userprofile = self.userprofile else { return }
           
-          appendingSet = Set(instances.filter { $0.owner == userprofile && !$0.isBanned && !$0.isClaimed })
+          appendingSet = Set(instances.filter { $0.owner == userprofile && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })
         default: print("") }
         
         let filteredByPeriod = appendingSet.filter({ $0.isValid(byBeriod: self.period) })

@@ -34,7 +34,8 @@ class NewPollChoiceCell: UICollectionViewCell {
     }
   }
   ///**Publishers**
-  @Published public private(set) var wasEdited: Bool?
+//  @Published public private(set) var wasEdited: Bool?
+  public private(set) var wasEditedPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public private(set) var boundsPublisher = PassthroughSubject<CGRect, Never>()
   ///**UI**
   public var minHeight: CGFloat = 0
@@ -150,6 +151,7 @@ class NewPollChoiceCell: UICollectionViewCell {
     super.prepareForReuse()
     
 //    topicPublisher = PassthroughSubject<Topic, Never>()
+    wasEditedPublisher = CurrentValueSubject<Bool?, Never>(nil)
   }
   
   // MARK: - Public methods
@@ -308,6 +310,8 @@ extension NewPollChoiceCell: UITextViewDelegate {
     else { return }
     
     item.text = text
-    wasEdited = true
+//    wasEdited = true
+//    print("cell.wasEditedPublisher")
+    wasEditedPublisher.send(true)
   }
 }

@@ -497,7 +497,7 @@ class API {
             //TODO: Определиться с инициализацией JSON
             let json = try JSON(data: data, options: .mutableContainers)
             guard 200...299 ~= statusCode else {
-              completion(.failure(APIError.backend(code: statusCode, description: json.rawString())))
+              completion(.failure(APIError.backend(code: statusCode, value: json.rawString())))
               return
             }
             completion(saveTokenInKeychain(json: json))
@@ -542,7 +542,7 @@ class API {
           do {
             //TODO: Определиться с инициализацией JSON
             let json = try JSON(data: data, options: .mutableContainers)
-            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: json.rawString()))); return }
             completion(saveTokenInKeychain(json: json))
           } catch let error {
             completion(.failure(error))
@@ -618,7 +618,7 @@ class API {
           do {
             //TODO: Определиться с инициализацией JSON
             let json = try JSON(data: data, options: .mutableContainers)
-            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: json.rawString()))); return }
             self.loginViaMail(username: username, password: password) { completion($0) }
           }  catch let error {
             completion(.failure(error))
@@ -1745,6 +1745,7 @@ class API {
           let multipartFormData = MultipartFormData()
           multipartFormData.append("\(category)".data(using: .utf8)!, withName: "category")
           multipartFormData.append("\(type)".data(using: .utf8)!, withName: "type")
+          multipartFormData.append("\(true)".data(using: .utf8)!, withName: "active")
           multipartFormData.append("\(is_private)".data(using: .utf8)!, withName: "is_private")
           multipartFormData.append("\(is_anonymous)".data(using: .utf8)!, withName: "is_anonymous")
           multipartFormData.append("\(is_commenting_allowed)".data(using: .utf8)!, withName: "is_commenting_allowed")
@@ -1891,7 +1892,7 @@ private extension API {
               //TODO: Определиться с инициализацией JSON
               let json = try JSON(data: data, options: .mutableContainers)
               guard 200...299 ~= statusCode else {
-                continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString()))
+                continuation.resume(throwing: APIError.backend(code: statusCode, value: json.rawString()))
                 return
               }
               continuation.resume(returning: data)
@@ -1978,7 +1979,7 @@ private extension API {
         guard let data = value else { completion(.failure(APIError.badData)); return }
         do {
           let json = try JSON(data: data, options: .mutableContainers)
-          guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+          guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: json.rawString()))); return }
           completion(saveTokenInKeychain(json: json))
         } catch let _error {
           completion(.failure(_error))
@@ -2000,7 +2001,23 @@ private extension API {
             guard let statusCode = response.response?.statusCode else { continuation.resume(throwing: APIError.httpStatusCodeMissing); return }
             do {
               let json = try JSON(data: data, options: .mutableContainers)
-              guard 200...299 ~= statusCode else { continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString())); return }
+              guard 200...299 ~= statusCode else {
+//                var value: Any = ""
+//                if let string = json.string {
+//                  value = string
+//                } else if let dict = json.dictionary {
+//                  value = dict
+//                } else if let rawString =  json.rawString() {
+//                  value = rawString.replacingOccurrences(of: "\n", with: "")
+//                } else {
+//                  value = "backend_error".localized
+//                }
+                
+                continuation.resume(throwing: APIError.backend(code: statusCode, value: json))
+                
+                return
+              }
+              
               continuation.resume(returning: data)
               return
             } catch {
@@ -2040,11 +2057,11 @@ private extension API {
             case .success(let value):
               guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
               guard let data = value else { completion(.failure(APIError.badData)); return }
-              guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: String(decoding: data, as: UTF8.self)))); return }
+              guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: String(decoding: data, as: UTF8.self)))); return }
               do {
                 //TODO: Определиться с инициализацией JSON
                 let json = try JSON(data: data, options: .mutableContainers)
-                guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+                guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: json.rawString()))); return }
                 completion(.success(json))
               } catch let error {
                 completion(.failure(error))
@@ -2063,11 +2080,11 @@ private extension API {
         case .success(let value):
           guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
           guard let data = value else { completion(.failure(APIError.badData)); return }
-          guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: String(decoding: data, as: UTF8.self)))); return }
+          guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: String(decoding: data, as: UTF8.self)))); return }
           do {
             //TODO: Определиться с инициализацией JSON
             let json = try JSON(data: data, options: .mutableContainers)
-            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, description: json.rawString()))); return }
+            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: json.rawString()))); return }
             completion(.success(json))
           } catch let error {
             completion(.failure(error))

@@ -46,7 +46,12 @@ class GeoNamesWorker {
     }
   }
   
-  class func requestAsync(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, headers: HTTPHeaders? = nil) async throws -> Data {
+  class func requestAsync(url: URL,
+                          httpMethod: HTTPMethod,
+                          parameters: Parameters? = nil,
+                          encoding: ParameterEncoding = JSONEncoding.default,
+                          headers: HTTPHeaders? = nil) async throws -> Data {
+    
     try await withUnsafeThrowingContinuation { continuation in
       AF.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseData { response in
         switch response.result {
@@ -57,7 +62,7 @@ class GeoNamesWorker {
 #if DEBUG
             print(json)
 #endif
-            guard 200...299 ~= statusCode else { continuation.resume(throwing: APIError.backend(code: statusCode, description: json.rawString())); return }
+            guard 200...299 ~= statusCode else { continuation.resume(throwing: APIError.backend(code: statusCode, value: json.rawString())); return }
             continuation.resume(returning: data)
             return
           } catch {

@@ -26,6 +26,7 @@ class NewPollChoicesCollectionView: UICollectionView {
   @Published public var isMovingToParent: Bool!
   @Published public var removedChoice: NewPollChoice?
   @Published public private(set) var wasEdited: Bool?
+//  public private(set) wasEditedPublisher = CurrentValueSubject<Bool?, Never>(nil)
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -176,8 +177,8 @@ private extension NewPollChoicesCollectionView {
       cell.boundsPublisher
         .sink { [unowned self] _ in self.source.refresh() }
         .store(in: &subscriptions)
-      cell.$wasEdited
-        .sink { [unowned self] in self.wasEdited = $0 }
+      cell.wasEditedPublisher//$wasEdited
+        .sink { [unowned self] in self.wasEdited = $0; print("cell wasEdited") }
         .store(in: &subscriptions)
 
       var config = UIBackgroundConfiguration.listPlainCell()

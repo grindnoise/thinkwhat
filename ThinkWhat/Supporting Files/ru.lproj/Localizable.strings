@@ -439,8 +439,8 @@
 "new_poll_hyperlink_tf_placeholder" = "Добавьте ссылку (опционально)";
 "new_poll_comments" = "Комментарии";
 "new_poll_comments_placeholder" = "Вы можете включить возможность оставлять комментарии под публикацией";
-"new_poll_comments_on" = "Комментарии разрешены✅";
-"new_poll_comments_off" = "Комментарии запрещены⛔️";
+"new_poll_comments_on" = "Комментарии разрешены";
+"new_poll_comments_off" = "Комментарии запрещены";
 "new_poll_anonymity" = "Анонимность";
 "new_poll_anonymity_placeholder" = "Вы можете включить режим анонимности, в этом режиме нельзя увидеть кто именно принимал участие";
 "new_poll_anonymity_on" = "Автор, голосующие и комментаторы скрыты";
@@ -457,5 +457,7 @@
 "total_bill" = "Итого";
 "hot_option" = "Горячий старт";
 "publication_preview" = "Предпросмотр";
-"insufficient_balance" = "У Вас недостаточно баллов для публикации";
-"insufficient_balance" = "У Вас недостаточно баллов для публикации";
+"insufficient_balance" = "У Вас недостаточно баллов для публикации. ";
+"insufficient_balance_shortage" = "Не хватает ";
+"insufficient_balance_shortage_points" = " баллов";
+"insufficient_balance_shortage_hint" = "Для получения баллов принимайте активное участие в публикациях членов сообщества";

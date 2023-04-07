@@ -259,7 +259,17 @@ class NewPollLimitsCell: UICollectionViewCell {
     
     bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
     
-    delay(seconds: seconds) { [weak self] in
+    delay(seconds: seconds) {
+      Animations.unmaskLayerCircled(unmask: false,
+                                    layer: self.fgLayer,
+                                    location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
+                                    duration: 0.5,
+                                    opacityDurationMultiplier: 0.6,
+                                    delegate: self)
+      
+      self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
+    }
+    delay(seconds: seconds+0.6) { [weak self] in
       guard let self = self else { return }
       
       self.edit()
@@ -369,15 +379,6 @@ private extension NewPollLimitsCell {
       self.label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .caption2)
     } completion: { _ in }
     
-    Animations.unmaskLayerCircled(unmask: false,
-                                  layer: self.fgLayer,
-                                  location: CGPoint(x: self.descriptionLabel.bounds.midX, y: self.descriptionLabel.bounds.midY),
-                                  duration: 0.5,
-                                  opacityDurationMultiplier: 0.6,
-                                  delegate: self)
-    
-    self.bgLayer.add(CABasicAnimation(path: "opacity", fromValue: 1, toValue: 0, duration: 0.5), forKey: nil)
-
     boundsPublisher.send()
     delay(seconds: 0.4) {[weak self] in
       guard let self = self else { return }
