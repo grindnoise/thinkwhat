@@ -39,6 +39,7 @@ class NewPollImagesCell: UICollectionViewCell {
       guard oldValue != color else { return }
       
       fgLayer.backgroundColor = color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+      collectionView.color = color
       
       if #available(iOS 15, *) {
         button.configuration?.baseBackgroundColor = color
@@ -431,6 +432,7 @@ private extension NewPollImagesCell {
   
   @objc
   func nextStage() {
+    endEditing(true)
     UIView.transition(with: self.label, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
       guard let self = self else { return }
       

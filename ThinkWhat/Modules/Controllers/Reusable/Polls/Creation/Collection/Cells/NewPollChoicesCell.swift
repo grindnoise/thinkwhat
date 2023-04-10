@@ -376,7 +376,10 @@ class NewPollChoicesCell: UICollectionViewCell {
             
             self.collectionView.alpha = 1
             self.buttonsStack.alpha = 1
-          } completion: { _ in self.placeholder.removeFromSuperview() }
+          } completion: { _ in
+            self.placeholder.removeFromSuperview()
+            self.collectionView.present(index: index)
+          }
         }
       }
     } else if index != 0, stageGlobal == stage {
@@ -393,6 +396,17 @@ class NewPollChoicesCell: UICollectionViewCell {
                                                                      forTextStyle: .body)!) + self.padding*2
             self.layoutIfNeeded()
           }
+        }
+        guard seconds != .zero else {
+          self.collectionView.present(index: index)
+          
+          return
+        }
+        
+        delay(seconds: 0.3) { [weak self] in
+          guard let self = self else { return }
+          
+          self.collectionView.present(index: index)
         }
         boundsPublisher.send(true)
 //        buttonsStack.addArrangedSubview(nextButton)
@@ -422,17 +436,17 @@ class NewPollChoicesCell: UICollectionViewCell {
     
     
     
-    guard seconds != .zero else {
-      collectionView.present(index: index)
-      
-      return
-    }
-    
-    delay(seconds: seconds + (index == 0 ? 0.6 : 0)) { [weak self] in
-      guard let self = self else { return }
-      
-      self.collectionView.present(index: index)
-    }
+//    guard seconds != .zero else {
+//      collectionView.present(index: index)
+//
+//      return
+//    }
+//
+//    delay(seconds: seconds + (index == 0 ? 0.6 : 0)) { [weak self] in
+//      guard let self = self else { return }
+//
+//      self.collectionView.present(index: index)
+//    }
   }
   
   public func refreshChoices(_ instances: [NewPollChoice]) {

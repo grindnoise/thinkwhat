@@ -558,21 +558,24 @@ extension PollView: PollControllerOutput {
   func postCallback(_ result: Result<Bool, Error>) {
     guard let constraint = actionButton.getConstraint(identifier: "top") else { return }
     
-    toggleFade(false)
-    setNeedsLayout()
-    UIView.animate(
-      withDuration: 0.35,
-      delay: 0,
-      usingSpringWithDamping: 0.8,
-      initialSpringVelocity: 0.3,
-      options: [.curveEaseInOut]) { [weak self] in
-        guard let self = self else { return }
-        
-        self.actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-        self.actionButton.alpha = self.selectedAnswer.isNil ? 0 : 1
-        constraint.constant = 0
-        self.layoutIfNeeded()
-      }
+    delay(seconds: 0.5) {[weak self] in
+      guard let self = self else { return }
+      
+      self.toggleFade(false)
+      setNeedsLayout()
+      UIView.animate(
+        withDuration: 0.4,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut]) {
+          
+          self.actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+          self.actionButton.alpha = 0
+          constraint.constant = 0
+          self.layoutIfNeeded()
+        }
+    }
   }
   
   func presentView(_ item: Survey) {

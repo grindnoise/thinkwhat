@@ -917,23 +917,21 @@ extension PollController: PollModelOutput {
     controllerOutput?.postCallback(result)
     switch result {
     case .success:
-      let banner = NewPopup(padding: self.padding*2,
-                            contentPadding: .uniform(size: self.padding),
-                            shouldDismissAfter: 5)
-//      let content = SurveyLimitPopupContent(limit: limit.isNil ? 100 : limit,
-//                                            mode: limit.isNil ? .ForceSelect : .Default,
-//                                            color: color)
-//      content.limitPublisher
-//        .sink { [unowned self] limit in
-//          banner.dismiss()
-//          self.limit = limit
-//        }
-//        .store(in: &banner.subscriptions)
-
-      banner.setContent(UIView())
+      let banner = NewPopup(padding: padding*5,
+                            contentPadding: .uniform(size: padding*3),
+                            shouldDismissAfter: 3)
+      
+      banner.setContent(PollPostedPopupContent(сategory: item.topic.iconCategory,
+                                               color: item.topic.tagColor,
+                                               padding: padding))
       banner.didDisappearPublisher
-        .sink { [unowned self] _ in
-          banner.removeFromSuperview();
+        .sink { [weak self] _ in
+          guard let self = self,
+                let controller = self.navigationController?.viewControllers.filter({ $0 is HotController }).first
+          else { return }
+          
+          banner.removeFromSuperview()
+          self.navigationController?.popToViewController(controller, animated: true)
         }
         .store(in: &self.subscriptions)
     case .failure(let error):
@@ -944,7 +942,7 @@ extension PollController: PollModelOutput {
                                                             fontName: Fonts.Regular,
                                                             textStyle: .headline,
                                                             textAlignment: .natural),
-                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             contentPadding: UIEdgeInsets(top: padding*2, left: padding, bottom: padding*2, right: padding),
                              isModal: false,
                              useContentViewHeight: true,
                              shouldDismissAfter: 3)

@@ -35,6 +35,10 @@ class NewPollImageCell: UICollectionViewCell {
       guard oldValue != color else { return }
       
       textView.tintColor = color
+      
+      guard let toolBar = textView.inputAccessoryView as? UIToolbar else { return }
+      
+      toolBar.tintColor = color
     }
   }
   

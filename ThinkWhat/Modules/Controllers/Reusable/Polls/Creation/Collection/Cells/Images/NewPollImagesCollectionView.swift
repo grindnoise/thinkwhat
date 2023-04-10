@@ -75,8 +75,7 @@ class NewPollImagesCollectionView: UICollectionView {
     let existingSet = Set(snap.itemIdentifiers)
     let appendingSet = Set(instances)
     let items = Array(appendingSet.subtracting(existingSet))
-    snap.appendItems(items,
-                     toSection: .main)
+    snap.appendItems(items, toSection: .main)
     dataItems += items
     //    } else {
     //      let existingSet = Set(snap.itemIdentifiers)
@@ -143,9 +142,9 @@ private extension NewPollImagesCollectionView {
       cell.minHeight = 70
       cell.minLength = ModelProperties.shared.surveyMediaTitleMinLength
       cell.maxLength = ModelProperties.shared.surveyMediaTitleMaxLength
-      cell.item = item
       cell.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
       cell.color = self.color
+      cell.item = item
       
       cell.boundsPublisher
         .sink { [unowned self] _ in self.source.refresh() }

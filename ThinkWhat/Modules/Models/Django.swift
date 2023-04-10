@@ -131,6 +131,7 @@ class ModelProperties {
   public private(set) var feedbackDescriptionMaxLength:   Int!
   public private(set) var userprofileDescriptionMinLength:Int!
   public private(set) var userprofileDescriptionMaxLength:Int!
+  public private(set) var minVotes:                       Int!
   
   
   func importJson(_ json: JSON) {
@@ -146,6 +147,8 @@ class ModelProperties {
           } else if j.0 == "question", let dict = j.1.dictionaryObject as? Dictionary<String, Int>  {
             surveyQuestionMinLength = dict["min_length"]!
             surveyQuestionMaxLength = dict["max_length"]!
+          } else if j.0 == "min_votes", let value = j.1.int {
+            minVotes = value
           }
         }
       } else if i.0 == "survey_answer" {

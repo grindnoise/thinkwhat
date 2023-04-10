@@ -207,6 +207,7 @@
 		AB48E2B6287DA68B0020F81B /* SurveyResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB48E2B5287DA68B0020F81B /* SurveyResult.swift */; };
 		AB48E2B8287DD7D60020F81B /* UICollectionView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB48E2B7287DD7D60020F81B /* UICollectionView+.swift */; };
 		AB4A0CA529CD95D600E6D57A /* NewPollCommentsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4A0CA429CD95D600E6D57A /* NewPollCommentsCell.swift */; };
+		AB4AAA6129E3FE920044E971 /* PollPostedPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4AAA6029E3FE920044E971 /* PollPostedPopupContent.swift */; };
 		AB4BD892244DE52100D9A3F0 /* TopIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4BD891244DE52100D9A3F0 /* TopIcon.swift */; };
 		AB4EE75528CE49AF0016EEC8 /* UsernameInputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4EE75428CE49AF0016EEC8 /* UsernameInputTextField.swift */; };
 		AB4EE75828CE4AC40016EEC8 /* FlexibleTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4EE75728CE4AC40016EEC8 /* FlexibleTextField.swift */; };
@@ -808,6 +809,7 @@
 		AB48E2B5287DA68B0020F81B /* SurveyResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyResult.swift; sourceTree = "<group>"; };
 		AB48E2B7287DD7D60020F81B /* UICollectionView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+.swift"; sourceTree = "<group>"; };
 		AB4A0CA429CD95D600E6D57A /* NewPollCommentsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollCommentsCell.swift; sourceTree = "<group>"; };
+		AB4AAA6029E3FE920044E971 /* PollPostedPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollPostedPopupContent.swift; sourceTree = "<group>"; };
 		AB4B85DC27785ACE00884E65 /* libswiftCore.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftCore.tbd; path = usr/lib/swift/libswiftCore.tbd; sourceTree = SDKROOT; };
 		AB4BD891244DE52100D9A3F0 /* TopIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopIcon.swift; sourceTree = "<group>"; };
 		AB4EE75428CE49AF0016EEC8 /* UsernameInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameInputTextField.swift; sourceTree = "<group>"; };
@@ -1971,6 +1973,14 @@
 			path = Avatar;
 			sourceTree = "<group>";
 		};
+		AB4AAA5F29E3FE500044E971 /* Poll publication congratulations */ = {
+			isa = PBXGroup;
+			children = (
+				AB4AAA6029E3FE920044E971 /* PollPostedPopupContent.swift */,
+			);
+			path = "Poll publication congratulations";
+			sourceTree = "<group>";
+		};
 		AB4EE75628CE4AA30016EEC8 /* Text fields */ = {
 			isa = PBXGroup;
 			children = (
@@ -2736,6 +2746,7 @@
 		ABADF5A327F73C7400A26474 /* Content */ = {
 			isa = PBXGroup;
 			children = (
+				AB4AAA5F29E3FE500044E971 /* Poll publication congratulations */,
 				ABF4D14B29D493B200BCBFD8 /* Survey limit */,
 				ABF9952329C77700007D7578 /* TopicSelection */,
 				AB411AD029AC93AB00C43547 /* Account management */,
@@ -3563,6 +3574,7 @@
 				AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */,
 				AB39D3FC29C34BCE00892D58 /* NewPollController.swift in Sources */,
 				AB72961627DA3F2300D45B54 /* SubscriptionsController.swift in Sources */,
+				AB4AAA6129E3FE920044E971 /* PollPostedPopupContent.swift in Sources */,
 				ABA448EA27EE030B00F8E00D /* PollController.swift in Sources */,
 				ABE56C1B298AC4C8004C761D /* TopicCompatibilityCollectionView.swift in Sources */,
 				ABA7829928589D3600964FDE /* AddChoiceContentView.swift in Sources */,

@@ -29,6 +29,7 @@ class SurveyLimitPopupContent: UIView {
   ///**UI**
   private let padding: CGFloat
   private let color: UIColor
+  private var isBannerOnScreen = false
   private lazy var stack: UIStackView = {
     let top = UIView.opaque()
     top.heightAnchor.constraint(equalToConstant: 60).isActive = true
@@ -121,7 +122,7 @@ class SurveyLimitPopupContent: UIView {
   }()
   private lazy var textField: UITextField = {
     let instance = UITextField()
-//    instance.delegate = self
+    instance.delegate = self
     instance.addTarget(self, action: #selector(self.textFieldDidChange(textField:)), for: .editingChanged)
     instance.textAlignment = .center
     instance.text = limit.formattedWithSeparator
@@ -278,6 +279,29 @@ private extension SurveyLimitPopupContent {
   
   @objc
   func handleTap(sender: UIButton) {
+    let minLength = ModelProperties.shared.minVotes!
+    
+    guard limit >= minLength,
+          !isBannerOnScreen
+    else {
+      isBannerOnScreen = true
+      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                            text: "minimum_votes".localized + String(describing: minLength),
+                                                            tintColor: .systemOrange,
+                                                            fontName: Fonts.Semibold,
+                                                            textStyle: .headline,
+                                                            textAlignment: .natural),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: true,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 2)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
+        .store(in: &self.subscriptions)
+      
+      return
+    }
+    
     endEditing(true)
     if sender == confirmButton {
       limitPublisher.send(limit)
@@ -315,16 +339,32 @@ private extension SurveyLimitPopupContent {
   }
 }
 
-//extension SurveyLimitPopupContent: UITextFieldDelegate {
+extension SurveyLimitPopupContent: UITextFieldDelegate {
+  func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+    
+//    let minLength = ModelProperties.shared.minVotes!
 //
+//    guard limit > minLength,
+//          !isBannerOnScreen
+//    else {
+//      isBannerOnScreen = true
+//      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+//                                                            text: "minimum_votes".localized + String(describing: minLength),
+//                                                            tintColor: .systemOrange,
+//                                                            fontName: Fonts.Semibold,
+//                                                            textStyle: .headline,
+//                                                            textAlignment: .natural),
+//                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                             isModal: false,
+//                             useContentViewHeight: true,
+//                             shouldDismissAfter: 2)
+//      banner.didDisappearPublisher
+//        .sink { _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
+//        .store(in: &self.subscriptions)
 //
-//  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-//    guard let text = textField.text,
-//          let int = Int(text)
-//    else { return false }
-//
-//    limit = int
-//
-//    return false
-//  }
-//}
+//      return false
+//    }
+    
+    return true
+  }
+}

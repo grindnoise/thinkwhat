@@ -461,3 +461,5 @@
 "insufficient_balance_shortage" = "Missing ";
 "insufficient_balance_shortage_points" = " points";
 "insufficient_balance_shortage_hint" = "To earn points, take an active part in the publications of community members";
+"new_poll_posted" = "Poll has been published!";
+"minimum_votes" = "Minimum number of votes: ";

@@ -461,3 +461,5 @@
 "insufficient_balance_shortage" = "Не хватает ";
 "insufficient_balance_shortage_points" = " баллов";
 "insufficient_balance_shortage_hint" = "Для получения баллов принимайте активное участие в публикациях членов сообщества";
+"new_poll_posted" = "Опрос опубликован!";
+"minimum_votes" = "Минимальное количество голосов: ";
