@@ -448,6 +448,7 @@
 		ABB0F6D928F80E140068FDDF /* CALayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB0F6D828F80E140068FDDF /* CALayer.swift */; };
 		ABB1595D28B10C4A003ED9F5 /* Shimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB1595C28B10C4A003ED9F5 /* Shimmer.swift */; };
 		ABB19148286C526200C89142 /* ProcessInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB19147286C526200C89142 /* ProcessInfo.swift */; };
+		ABB1BE9129E5B34A006E757D /* EmptyHotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB1BE9029E5B34A006E757D /* EmptyHotCard.swift */; };
 		ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */; };
 		ABB46F372344B1F900AF212B /* CallbackObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46F362344B1F900AF212B /* CallbackObservable.swift */; };
 		ABB4AAA8266630D200D4738D /* NewSurveyTitle.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABB4AAA7266630D200D4738D /* NewSurveyTitle.xib */; };
@@ -1054,6 +1055,7 @@
 		ABB0F6D828F80E140068FDDF /* CALayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CALayer.swift; sourceTree = "<group>"; };
 		ABB1595C28B10C4A003ED9F5 /* Shimmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shimmer.swift; sourceTree = "<group>"; };
 		ABB19147286C526200C89142 /* ProcessInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessInfo.swift; sourceTree = "<group>"; };
+		ABB1BE9029E5B34A006E757D /* EmptyHotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyHotCard.swift; sourceTree = "<group>"; };
 		ABB46F342344ACB700AF212B /* NavigationControllerPreloaded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerPreloaded.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		ABB46F362344B1F900AF212B /* CallbackObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallbackObservable.swift; sourceTree = "<group>"; };
 		ABB4AAA7266630D200D4738D /* NewSurveyTitle.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewSurveyTitle.xib; sourceTree = "<group>"; };
@@ -2304,6 +2306,7 @@
 			children = (
 				AB7C95AC29B2281600F367B3 /* HotCard.swift */,
 				AB7C95AE29B2322200F367B3 /* Card.swift */,
+				ABB1BE9029E5B34A006E757D /* EmptyHotCard.swift */,
 			);
 			path = Card;
 			sourceTree = "<group>";
@@ -3668,6 +3671,7 @@
 				AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */,
 				AB3C6844223FD3EE00B57580 /* Google.swift in Sources */,
 				AB0AB63227B3DF2B006FD33F /* GoogleWorker.swift in Sources */,
+				ABB1BE9129E5B34A006E757D /* EmptyHotCard.swift in Sources */,
 				AB83A49F2948BDE700903DEA /* PollViewBackup.swift in Sources */,
 				AB1F34CE286B1D080086969E /* URLPasteView.swift in Sources */,
 				AB72964B27DB612000D45B54 /* SettingsView.swift in Sources */,

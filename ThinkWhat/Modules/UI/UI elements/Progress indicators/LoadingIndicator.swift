@@ -24,9 +24,10 @@ class LoadingIndicator: UIView {
   }
   ///`Publishers`
   public let didDisappearPublisher = PassthroughSubject<Bool, Never>()//: PassthroughSubject<Bool, Never>!
+  public let colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
   ///`UI`
   public var duration: TimeInterval
-  
+  public var isAnimating = false
   
   
   // MARK: - Private properties
@@ -58,11 +59,13 @@ class LoadingIndicator: UIView {
   private var scaleAnimationStopped = false
   private let animationsStopped = PassthroughSubject<Bool, Never>()
   private var shouldStopAnimating = false
-  private var isAnimating = false
+  private var isInfinite: Bool
+  private var animateTopics: Bool
   
   
   // MARK: - Deinitialization
   deinit {
+    logo.layer.removeAllAnimations()
     observers.forEach { $0.invalidate() }
     tasks.forEach { $0?.cancel() }
     subscriptions.forEach { $0.cancel() }
@@ -77,7 +80,12 @@ class LoadingIndicator: UIView {
   // MARK: - Initialization
   init(color: UIColor,
        duration: TimeInterval = 1,
-       shouldSendCompletion: Bool = true) {
+       shouldSendCompletion: Bool = true,
+       isInfinite: Bool = false,
+       animateTopics: Bool = false
+  ) {
+    self.animateTopics = animateTopics
+    self.isInfinite = isInfinite
     self.duration = duration
     self.color = color
     self.shouldSendCompletion = shouldSendCompletion
@@ -111,7 +119,7 @@ class LoadingIndicator: UIView {
     
     guard animated else {
       logo.alpha = 1
-      animate()
+      self.animateTopics ? self.animateWithTopics() : animate()
       
       return
     }
@@ -131,7 +139,13 @@ class LoadingIndicator: UIView {
       }) { [weak self] _ in
         guard let self = self else { return }
         
-        self.animate()
+        self.animateTopics ? {
+          self.animateWithTopics()
+          UIView.animate(withDuration: 0.75, delay: 0, options: [.autoreverse, .repeat]) {
+            self.logo.transform = .init(scaleX: 0.9, y: 0.9)
+            self.logo.alpha = 0.75
+          }
+        }() : animate()
       }
   }
   
@@ -165,6 +179,7 @@ class LoadingIndicator: UIView {
             
             self.logo.icon.removeAllAnimations()
             self.didDisappearPublisher.send(true)
+            self.isAnimating = false
             
             guard reset else { return }
             
@@ -179,8 +194,6 @@ class LoadingIndicator: UIView {
       }
       .store(in: &subscriptions)
   }
-  
-  
   
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -208,7 +221,7 @@ private extension LoadingIndicator {
                                     toValue: color.withAlphaComponent(0.75).cgColor as Any,
                                     duration: duration,
                                     delay: 0,
-                                    repeatCount: 1,
+                                    repeatCount: isInfinite ? .infinity : 1,
                                     autoreverses: true,
                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                     delegate: self,
@@ -232,7 +245,7 @@ private extension LoadingIndicator {
                                     toValue: (logo.icon as! CAShapeLayer).path?.getScaledPath(size: bounds.size, scaleMultiplicator: 1.15) as Any,
                                     duration: duration,
                                     delay: 0,
-                                    repeatCount: 1,
+                                    repeatCount: isInfinite ? .infinity : 1,
                                     autoreverses: true,
                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                     delegate: self,
@@ -251,8 +264,58 @@ private extension LoadingIndicator {
                                         }
                                       }])
     
-    logo.icon.add(scaleAnimation!, forKey: nil)
-    logo.icon.add(colorAnimation!, forKey: nil)
+    logo.icon.add(scaleAnimation!, forKey: "alpha")
+    logo.icon.add(colorAnimation!, forKey: "scale")
+  }
+  
+  @MainActor
+  func animateWithTopics() {
+    func getRandomTopic() -> Topic {
+      Topics.shared.all[Int.random(in: 0...Topics.shared.all.count - 1)]
+    }
+    
+    let random = getRandomTopic()
+    
+    guard random.iconCategory != .Logo else { animateWithTopics(); return }
+
+    colorPublisher.send(random.tagColor)
+    let pathAnimation = Animations.get(property: .Path,
+                                       fromValue: (logo.icon as! CAShapeLayer).path as Any,
+                                       toValue: (logo.getLayer(random.iconCategory) as! CAShapeLayer).path! as Any,
+                                       duration: 0.35,
+                                       delay: 0,
+                                       repeatCount: 1,
+                                       autoreverses: false,
+                                       timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                       delegate: self,
+                                       isRemovedOnCompletion: true,
+                                       completionBlocks: [
+                                        {[weak self] in
+                                          guard let self = self else { return }
+
+//                                          self.logo.category = random.iconCategory
+                                          delay(seconds: 2) { [weak self] in
+                                            guard let self = self else { return }
+                                            
+                                            self.animateWithTopics()
+                                          }
+                                        }])
+    let colorAnimation = Animations.get(property: .FillColor,
+                                        fromValue: logo.iconColor.cgColor as Any,
+                                        toValue: random.tagColor.cgColor as Any,
+                                        duration: 0.35,
+                                        delay: 0,
+                                        repeatCount: 1,
+                                        autoreverses: false,
+                                        timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                        delegate: nil,
+                                        isRemovedOnCompletion: true,
+                                        completionBlocks: [])
+    (self.logo.icon as! CAShapeLayer).fillColor = random.tagColor.cgColor
+    (self.logo.icon as! CAShapeLayer).path = (logo.getLayer(random.iconCategory) as! CAShapeLayer).path
+//
+    logo.icon.add(pathAnimation, forKey: "topics")
+    logo.icon.add(colorAnimation, forKey: "color")
   }
 }
 

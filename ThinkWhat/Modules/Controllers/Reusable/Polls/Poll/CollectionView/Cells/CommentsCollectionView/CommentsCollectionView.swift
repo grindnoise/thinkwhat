@@ -81,7 +81,9 @@ class CommentsCollectionView: UICollectionView {
   private var tasks: [Task<Void, Never>?] = []
   private var source: UICollectionViewDiffableDataSource<Section, Comment>!
   private lazy var textField: AccessoryInputTextField = {
-    let instance = AccessoryInputTextField(placeholder: "add_comment".localized,
+    let instance = AccessoryInputTextField(userprofile: survey.isAnonymous ? Userprofile.anonymous : Userprofiles.shared.current!,
+                                           placeholder: "add_comment".localized,
+                                           color: survey.topic.tagColor,
                                            font: UIFont.scaledFont(fontName: Fonts.Regular,
                                                                    forTextStyle: .body)!,
                                            //                                               delegate: self,
@@ -101,7 +103,7 @@ class CommentsCollectionView: UICollectionView {
         guard self.replyTo.isNil else {
           guard let item = self.replyTo else { return }
           
-          self.replyPublisher.send([item: $0.replacingOccurrences(of: self.textField.staticText + " ", with: "")])
+          self.replyPublisher.send([item: self.textField.staticText.isEmpty ? $0 : $0.replacingOccurrences(of: self.textField.staticText + " ", with: "")])
           
           return
         }
@@ -123,10 +125,10 @@ class CommentsCollectionView: UICollectionView {
         guard self.replyTo.isNil else {
           guard let item = self.replyTo else { return }
           
-          self.anonReplyPublisher.send([item: [username: text.replacingOccurrences(of: self.textField.staticText + " ", with: "")]])
+          self.anonReplyPublisher.send([item: [username: self.textField.staticText.isEmpty ? text : text.replacingOccurrences(of: self.textField.staticText + " ", with: "")]])
           return
         }
-        self.anonCommentPublisher.send([username: text.replacingOccurrences(of: self.textField.staticText + " ", with: "")])
+        self.anonCommentPublisher.send([username: self.textField.staticText.isEmpty ? text : text.replacingOccurrences(of: self.textField.staticText + " ", with: "")])
       }
       .store(in: &subscriptions)
     
@@ -337,12 +339,12 @@ class CommentsCollectionView: UICollectionView {
       }
       configuration.backgroundColor = .clear
       cell.backgroundConfiguration = configuration
-      cell.item = item
       cell.automaticallyUpdatesBackgroundConfiguration = false
       if self.mode == .Child {
         cell.mode = indexPath.row == 0 ? .Root : .Child
-        cell.hideDisclosure()
+//        cell.hideDisclosure()
       }
+      cell.item = item
       
       
       //Reply disclosure
@@ -432,7 +434,7 @@ class CommentsCollectionView: UICollectionView {
         
         let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "checkmark.bubble.fill")!,
                                                               text: "comment_posted",
-                                                              tintColor: .systemGreen),
+                                                              tintColor: survey.topic.tagColor),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,

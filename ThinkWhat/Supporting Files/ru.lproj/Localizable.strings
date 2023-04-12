@@ -161,7 +161,9 @@
 //Hot VC
 "hot" = "Горячие";
 "searching" = "Поиск";
+"waiting_for_new_posts" = "Ждём новых публикаций";
 "hot_participate" = "Участвовать";
+"create_post" = "Cоздать свою";
 
 //Subscriptions VC
 "subscriptions" = "Подписки";
@@ -354,7 +356,7 @@
 "licenses" = "Лицензии";
 "app_version" = "Версия";
 "feedback" = "Обратная связь";
-"feedback_hint" = "Отправьте пожелания или жалобы модераторам сервиса";
+"feedback_hint" = "Отправьте предложения или жалобы модераторам сервиса";
 "feedback_sent" = "Обращение отправлено";
 
 //Tutorials
@@ -390,6 +392,7 @@
 "claim" = "Жалоба";
 
 //Userprofile
+"userprofile" = "Профиль";
 "userprofile_is_in_community" = "В сообществе";
 "userprofile_subscribers" = "Подписчиков";
 "userprofile_about" = "Обо мне";

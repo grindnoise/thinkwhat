@@ -54,10 +54,13 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     instance.textAlignment = .center
     instance.numberOfLines = 1
     instance.textColor = .white
-    instance.text = "publications".localized.uppercased()
+    instance.text = "userprofile".localized.uppercased()
     instance.font = UIFont(name: Fonts.Bold, size: 20)
     instance.adjustsFontSizeToFitWidth = true
-    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
+    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font) + padding).isActive = true
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.height / 2.25 }
+      .store(in: &subscriptions)
     
     return instance
   }()

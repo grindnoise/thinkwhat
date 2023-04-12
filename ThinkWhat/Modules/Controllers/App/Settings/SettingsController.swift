@@ -291,7 +291,7 @@ extension SettingsController: SettingsViewInput {
     backItem.title = ""
     
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(FeedbackViewController(), animated: true)
+    navigationController?.pushViewController(FeedbackViewController(tintColor: tintColor), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let main = tabBarController as? MainController else { return }

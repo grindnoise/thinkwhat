@@ -28,7 +28,7 @@ protocol FeedbackModelOutput: AnyObject {
 }
 
 protocol FeedbackControllerOutput: AnyObject {
-    var viewInput: (UIViewController & FeedbackViewInput)? { get set }
+    var viewInput: (UIViewController & FeedbackViewInput & TintColorable)? { get set }
     
     
 }

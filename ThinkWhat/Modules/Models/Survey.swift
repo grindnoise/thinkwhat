@@ -27,7 +27,7 @@ class Survey: Decodable {
         return (SurveyReferences.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
       case .Top:
         let referencesFromSurveys = Surveys.shared.all.filter { $0.isTop && !$0.isClaimed && !$0.isBanned && !$0.isRejected }.map { $0.reference }//&& !$0.isRejected
-        return (SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
+        return (SurveyReferences.shared.all.filter { $0.isTop && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .Own:
         let referencesFromSurveys = Surveys.shared.all.filter { $0.isOwn && !$0.isBanned }.map { $0.reference }
         return (SurveyReferences.shared.all.filter { $0.isOwn && !$0.isBanned } + referencesFromSurveys).uniqued()

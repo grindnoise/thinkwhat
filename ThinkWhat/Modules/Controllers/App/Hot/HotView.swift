@@ -43,9 +43,10 @@ class HotView: UIView {
   public private(set) var current: Card?
   private var incoming: Card? {
     didSet {
-      guard let incoming = incoming else { return }
-      
-      if let hotCard = incoming as? HotCard {
+      guard let hotCard = incoming as? HotCard else { return }
+//      guard let incoming = incoming else { return }
+//
+//      if let hotCard = incoming as? HotCard {
         hotCard.$action
           .filter { !$0.isNil }
 //          .throttle(for: .seconds(0.75), scheduler: DispatchQueue.main, latest: false)
@@ -81,10 +82,11 @@ class HotView: UIView {
               fatalError()
             }
           }
-          .store(in: &incoming.subscriptions)
-      } else {
-        fatalError()
-      }
+          .store(in: &hotCard.subscriptions)
+//          .store(in: &incoming.subscriptions)
+//      } else {
+//        fatalError()
+//      }
     }
   }
   private var outgoing: Card?
@@ -119,13 +121,14 @@ class HotView: UIView {
     guard let viewInput = viewInput else { return }
     
     func push(_ instance: Survey?) {
-      guard let instance = instance else {
-        self.current = nil
-        
-        return
-      }
-
-      incoming = HotCard(item: instance, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance.topic.tagColor)
+      incoming = !instance.isNil ? {  HotCard(item: instance!, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance!.topic.tagColor) }() : { EmptyHotCard() }()
+//      guard let instance = instance else {
+//        self.current = nil
+//
+//        return
+//      }
+//
+//      incoming = HotCard(item: instance, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance.topic.tagColor)
       current = self.incoming
       incoming?.placeXCentered(inside: self,
                                topInset: viewInput.navBarHeight + statusBarFrame.height + padding,
@@ -230,12 +233,24 @@ private extension HotView {
 
 extension HotView: HotControllerOutput {
   func setSurvey(_ instance: Survey?) {
-    guard let instance = instance else { return }
+//    guard let instance = instance else { return }
     
     next(instance)
   }
   
   func didAppear() {
+    guard let card = current as? EmptyHotCard else { return }
+    
+    card.animate()
+  }
+  
+  func didDisappear() {
+    guard let card = current as? EmptyHotCard else { return }
+    
+    card.removeAllAnimations()
+  }
+  
+  func didLoad() {
     ///Check up
     guard let current = current as? HotCard,
           (current.item.isBanned || current.item.isClaimed || current.item.isComplete)

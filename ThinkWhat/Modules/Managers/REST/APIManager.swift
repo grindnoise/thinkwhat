@@ -1810,8 +1810,13 @@ class API {
           
           do {
             try await MainActor.run {
-              let instance = try decoder.decode(Survey.self, from: json["survey"].rawData())
-              Surveys.shared.append([instance])
+              Surveys.shared.append([try decoder.decode(Survey.self, from: json["survey"].rawData())])
+              
+              guard let currentUser = Userprofiles.shared.current,
+                    let balance = json["balance"].int
+              else { return }
+              
+              currentUser.balance = balance
             }
           } catch {
             guard let errorText = json["error"].string else {

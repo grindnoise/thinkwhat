@@ -43,7 +43,10 @@ final class AccessoryInputTextField: UITextField {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
+  ///**UI**
+  private let userprofile: Userprofile
+  ///**UI**
+  private let color: UIColor
   private let minLength: Int
   private let maxLength: Int
 //  private weak var customDelegate: AccessoryInputTextFieldDelegate?
@@ -54,9 +57,12 @@ final class AccessoryInputTextField: UITextField {
     instance.autoresizingMask = .flexibleHeight
     instance.addSubview(textView)
     instance.addSubview(sendButton)
+    let avatar = Avatar(userprofile: userprofile)
+    instance.addSubview(avatar)
     
     textView.translatesAutoresizingMaskIntoConstraints = false
     sendButton.translatesAutoresizingMaskIntoConstraints = false
+    avatar.translatesAutoresizingMaskIntoConstraints = false
     sendButton.setContentHuggingPriority(UILayoutPriority(rawValue: 1000), for: NSLayoutConstraint.Axis.horizontal)
     sendButton.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: NSLayoutConstraint.Axis.horizontal)
     
@@ -65,27 +71,34 @@ final class AccessoryInputTextField: UITextField {
       usernameTextView.translatesAutoresizingMaskIntoConstraints = false
       
       NSLayoutConstraint.activate([
-        usernameTextView.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
-        usernameTextView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.5),
+        avatar.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: textViewFont) + 16),
+        avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
+        avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+        usernameTextView.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 8),
+        usernameTextView.trailingAnchor.constraint(equalTo: textView.trailingAnchor),
+//        usernameTextView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.5),
         //                usernameTextView.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
         usernameTextView.topAnchor.constraint(equalTo: instance.topAnchor,constant: 8),
-        textView.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
-        textView.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: 0),
+        textView.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 8),
         textView.topAnchor.constraint(equalTo: usernameTextView.bottomAnchor,constant: 8),
         textView.bottomAnchor.constraint(equalTo: instance.layoutMarginsGuide.bottomAnchor, constant: -8),
         sendButton.leadingAnchor.constraint(equalTo: textView.trailingAnchor, constant: 0),
         sendButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
-        sendButton.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
+        sendButton.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
       ])
     } else {
+      
       NSLayoutConstraint.activate([
-        textView.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
+        avatar.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: textViewFont) + 16),
+        avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
+        avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+        textView.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 8),
         textView.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: 0),
         textView.topAnchor.constraint(equalTo: instance.topAnchor,constant: 8),
         textView.bottomAnchor.constraint(equalTo: instance.layoutMarginsGuide.bottomAnchor, constant: -8),
         sendButton.leadingAnchor.constraint(equalTo: textView.trailingAnchor, constant: 0),
         sendButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
-        sendButton.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
+        sendButton.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
       ])
     }
     
@@ -96,7 +109,7 @@ final class AccessoryInputTextField: UITextField {
     let instance = UIButton(type: .system)
     instance.isEnabled = true
     instance.setImage(UIImage(systemName: "paperplane.fill", withConfiguration: UIImage.SymbolConfiguration(font: textViewFont, scale: .large)), for: .normal)
-    instance.tintColor = .systemBlue
+    instance.tintColor = color
     instance.contentEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
     instance.addTarget(self, action: #selector(self.handleSend), for: .touchUpInside)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
@@ -108,6 +121,7 @@ final class AccessoryInputTextField: UITextField {
     instance.placeholder = "add_comment".localized
     instance.accessibilityIdentifier = "textView"
     instance.font = textViewFont
+    instance.tintColor = color
     instance.maxHeight = 80
     instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: 8, bottom: instance.contentInset.bottom, right: 8)
     
@@ -148,10 +162,16 @@ final class AccessoryInputTextField: UITextField {
 #endif
   }
   
-  init(placeholder: String = "", font: UIFont, //delegate: AccessoryInputTextFieldDelegate,
+  init(userprofile: Userprofile = Userprofile.anonymous,
+       placeholder: String = "",
+       color: UIColor = .systemBlue,
+       font: UIFont, //delegate: AccessoryInputTextFieldDelegate,
        minLength: Int = .zero,
        maxLength: Int = .max,
        isAnon: Bool = false) {
+    
+    self.userprofile = userprofile
+    self.color = color
     self.maxLength = maxLength
     self.minLength = minLength
 //    self.customDelegate = delegate

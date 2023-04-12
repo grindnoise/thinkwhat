@@ -20,8 +20,9 @@ class CommentCell: UICollectionViewListCell {
     didSet {
       guard let item = item else { return }
       
+      setupUI()
       updateUI()
-      
+
       item.repliesPublisher
         .receive(on: DispatchQueue.main)
 //        .filter { $0 > 0 }
@@ -36,8 +37,9 @@ class CommentCell: UICollectionViewListCell {
           }
           
 //          self.disclosureButton.alpha = $0 > 0 ? 1 : 0
-          let attrString = NSMutableAttributedString(string: " \(String(describing: $0)) " + "replies_total".localized.uppercased(), attributes: [
-            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+          let attrString = NSMutableAttributedString(string: " \(String(describing: $0)) ",// + "replies_total".localized.uppercased(),
+                                                     attributes: [
+            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote) as Any,
             NSAttributedString.Key.foregroundColor: UIColor.systemBlue
           ])
           self.disclosureButton.setAttributedTitle(attrString, for: .normal)
@@ -84,7 +86,8 @@ class CommentCell: UICollectionViewListCell {
     didSet {
       guard oldValue != mode else { return }
       
-      updateUI()
+      
+//      updateUI()
 //      setBody()
       
 //      if mode == .Tree {
@@ -228,7 +231,7 @@ class CommentCell: UICollectionViewListCell {
     let instance = UIButton()
     instance.setImage(UIImage(systemName: "bubble.right.fill", withConfiguration:  UIImage.SymbolConfiguration(font: UIFont.scaledFont(fontName: Fonts.OpenSans.Light.rawValue, forTextStyle: .footnote)!, scale: .medium)), for: .normal)
     //        instance.semanticContentAttribute = .forceRightToLeft
-    instance.tintColor = .systemBlue//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+    instance.tintColor = UIColor.systemBlue//item.survey?.topic.tagColor ?? .systemBlue//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
     instance.addTarget(self, action: #selector(self.replies), for: .touchUpInside)
 //    instance.imageEdgeInsets.right = padding
     //        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
@@ -248,26 +251,41 @@ class CommentCell: UICollectionViewListCell {
     //        instance.translatesAutoresizingMaskIntoConstraints = false
     
     
-    let innerView = UIView()
-    innerView.backgroundColor = .clear
-    innerView.addSubview(disclosureButton)
-    innerView.addSubview(replyButton)
+//    let innerView = UIView.opaque()
+    let stack = UIStackView()
+    stack.translatesAutoresizingMaskIntoConstraints = false
+    stack.axis = .horizontal
+    stack.alignment = .leading
+    stack.spacing = padding
+    switch mode {
+    case .Child:
+      stack.addArrangedSubview(replyButton)
+    default:
+      stack.addArrangedSubview(disclosureButton)
+      stack.addArrangedSubview(replyButton)
+    }
+    instance.addSubview(stack)
+//    if mode != .Child {
+//      stack.addArrangedSubview(replyLabel)
+//      innerView.addSubview(disclosureButton)
+//      disclosureButton.translatesAutoresizingMaskIntoConstraints = false
+//    }
+//    innerView.addSubview(replyButton)
+//
+//    instance.addSubview(innerView)
     
-    instance.addSubview(innerView)
-    
-    innerView.translatesAutoresizingMaskIntoConstraints = false
-    replyButton.translatesAutoresizingMaskIntoConstraints = false
-    disclosureButton.translatesAutoresizingMaskIntoConstraints = false
+//    innerView.translatesAutoresizingMaskIntoConstraints = false
+//    replyButton.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      innerView.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-      innerView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
-      innerView.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-      innerView.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
-      innerView.heightAnchor.constraint(equalTo: disclosureButton.heightAnchor),
-      replyButton.leadingAnchor.constraint(equalTo: innerView.leadingAnchor),
-      disclosureButton.leadingAnchor.constraint(equalTo: replyButton.trailingAnchor, constant: 16),
-      replyButton.heightAnchor.constraint(equalTo: disclosureButton.heightAnchor),
+      stack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+//      innerView.trailingAnchor.constraint(equalTo: instance.trailingAnchor),
+      stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+      stack.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+//      innerView.heightAnchor.constraint(equalTo: disclosureButton.heightAnchor),
+//      disclosureButton.leadingAnchor.constraint(equalTo: innerView.leadingAnchor),
+//      replyButton.leadingAnchor.constraint(equalTo: disclosureButton.trailingAnchor, constant: 16),
+//      replyButton.heightAnchor.constraint(equalTo: disclosureButton.heightAnchor),
       
       
       
@@ -288,17 +306,17 @@ class CommentCell: UICollectionViewListCell {
   private lazy var replyButton: UIButton = {
     let instance = UIButton()
     instance.setImage(UIImage(systemName: "arrowshape.turn.up.left.fill", withConfiguration:  UIImage.SymbolConfiguration(font: UIFont.scaledFont(fontName: Fonts.OpenSans.Light.rawValue, forTextStyle: .footnote)!, scale: .medium)), for: .normal)
-    instance.tintColor = .systemBlue //traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
+    instance.tintColor = UIColor.systemBlue//item.survey?.topic.tagColor ?? .systemBlue //traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
     instance.addTarget(self, action: #selector(self.reply), for: .touchUpInside)
     let attrString = NSMutableAttributedString(string: " " + "reply".localized.uppercased(), attributes: [
-      NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-      NSAttributedString.Key.foregroundColor: UIColor.systemBlue
+      NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote) as Any,
+      NSAttributedString.Key.foregroundColor: UIColor.systemBlue//item.survey?.topic.tagColor ?? UIColor.systemBlue
     ])
     instance.setAttributedTitle(attrString, for: .normal)
-    //        instance.contentVerticalAlignment = .fill
-    //        instance.contentHorizontalAlignment = .fill
-    //        instance.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-    let constraint = instance.heightAnchor.constraint(equalToConstant: "text".height(withConstrainedWidth: 1000, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)!))
+            instance.contentVerticalAlignment = .fill
+            instance.contentHorizontalAlignment = .fill
+            instance.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+    let constraint = instance.heightAnchor.constraint(equalToConstant: "text".height(withConstrainedWidth: 1000, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .footnote)!))
     constraint.identifier = "height"
     constraint.isActive = true
     
@@ -323,7 +341,7 @@ class CommentCell: UICollectionViewListCell {
     instance.axis = .vertical
     instance.alignment = .center
     instance.clipsToBounds = false
-    instance.spacing = 0
+    instance.spacing = padding/2
     
     supplementaryStack.translatesAutoresizingMaskIntoConstraints = false
     textView.translatesAutoresizingMaskIntoConstraints = false
@@ -394,7 +412,7 @@ class CommentCell: UICollectionViewListCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
 //    setTasks()
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -529,6 +547,11 @@ private extension CommentCell {
     
     switch mode {
     case .Plain, .Child:
+      if mode == .Child {
+//        cell.mode = indexPath.row == 0 ? .Root : .Child
+        hideDisclosure()
+      }
+
       verticalStack.addArrangedSubview(repliesView)
       repliesView.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
       let bottomAnchor = repliesView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
@@ -577,13 +600,15 @@ private extension CommentCell {
     }
 //    disclosureButton.alpha = 0
     
-//    if mode == .Root, item.replies != 0 {
-//      disclosureButton.alpha = 1
-    let attrString = NSMutableAttributedString(string: " \(item.replies) " + "replies_total".localized.uppercased(), attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.systemBlue
-      ])
-      disclosureButton.setAttributedTitle(attrString, for: .normal)
+    //    if mode == .Root, item.replies != 0 {
+    //      disclosureButton.alpha = 1
+    let attrString = NSMutableAttributedString(string: " \(item.replies)",// " + "replies_total".localized.uppercased(),
+                                               attributes: [
+                                                NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+                                                                                               forTextStyle: .footnote) as Any,
+                                                NSAttributedString.Key.foregroundColor: UIColor.systemBlue//item.survey?.topic.tagColor ?? UIColor.systemBlue
+                                               ])
+    disclosureButton.setAttributedTitle(attrString, for: .normal)
 //    }
     
     if mode == .Child {

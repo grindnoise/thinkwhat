@@ -254,7 +254,7 @@ class NewPollTextCell: UICollectionViewCell {
     let instance = InsetLabel()
     instance.insets = .uniform(size: padding)
     instance.numberOfLines = 0
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)//placeholderFont
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)//placeholderFont
     instance.text = stage.placeholder
     instance.textColor = .tertiaryLabel
     instance.textAlignment = .center

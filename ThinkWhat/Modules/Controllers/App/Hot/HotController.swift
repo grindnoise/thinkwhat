@@ -90,6 +90,7 @@ class HotController: UIViewController, TintColorable {
     super.viewDidDisappear(animated)
     
     isOnScreen = false
+    controllerOutput?.didDisappear()
   }
 }
 
@@ -258,7 +259,7 @@ extension HotController: DataObservable {
       navBarHeight = height
     }
 
-    
+    controllerOutput?.didLoad()
     setData()
     setTasks()
     controllerOutput?.setSurvey(queue.dequeue())

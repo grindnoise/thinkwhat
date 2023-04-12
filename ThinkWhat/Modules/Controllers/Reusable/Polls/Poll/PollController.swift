@@ -115,7 +115,6 @@ class PollController: UIViewController {
   
   
   
-  
   // MARK: - Destructor
   deinit {
     //        topicView.removeFromSuperview()
@@ -935,7 +934,7 @@ extension PollController: PollModelOutput {
         }
         .store(in: &self.subscriptions)
     case .failure(let error):
-      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "dollarsign.circle.fill")!,
+      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "xmark.circle.fill")!,
                                                             text: error.localizedDescription,
                                                             textColor: .label,
                                                             tintColor: .systemRed,

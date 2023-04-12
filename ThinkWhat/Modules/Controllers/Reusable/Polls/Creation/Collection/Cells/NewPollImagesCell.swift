@@ -227,7 +227,7 @@ class NewPollImagesCell: UICollectionViewCell {
     let instance = InsetLabel()
     instance.insets = .uniform(size: padding)
     instance.numberOfLines = 0
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
+    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
     instance.text = stage.placeholder
     instance.textColor = .tertiaryLabel
     instance.textAlignment = .center

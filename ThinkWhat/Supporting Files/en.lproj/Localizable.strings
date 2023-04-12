@@ -161,7 +161,9 @@
 //Hot VC
 "hot" = "Hot";
 "searching" = "Searching";
+"waiting_for_new_posts" = "Waiting for new posts";
 "hot_participate" = "Participate";
+"create_post" = "Create post";
 
 //Subscriptions VC
 "subscriptions" = "Subscriptions";
@@ -221,7 +223,7 @@
 "poll_rating_difference" = "What's the difference?";
 
 //PollCreationView
-"new_poll" = "Новый опрос";
+"new_poll" = "New poll";
 "topic" = "Topic";
 "options" = "Options";
 "accessibility" = "Accessibility";
@@ -390,6 +392,7 @@
 "claim" = "Claim";
 
 //Userprofile
+"userprofile" = "Profile";
 "userprofile_is_in_community" = "Is in community";
 "userprofile_subscribers" = "Subscribers";
 "userprofile_about" = "About me";

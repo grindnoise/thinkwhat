@@ -349,7 +349,7 @@ class ListView: UIView {
   }()
   private lazy var filterViewHeight: CGFloat = .zero
   ///**Logic**
-  private var period: Period = .AllTime {
+  private var period: Period = .PerMonth {
     didSet {
       guard oldValue != period,
             let category = viewInput?.category
@@ -546,6 +546,7 @@ private extension ListView {
   
   @MainActor
   func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
+    var items = [UIAction]()
     let perDay: UIAction = .init(title: "per_\(Period.PerDay.rawValue)".localized.lowercased(),
                                  image: nil,
                                  identifier: nil,
@@ -594,16 +595,18 @@ private extension ListView {
       self.period = .AllTime
     })
     
+    items.append(perDay)
+    items.append(perWeek)
+    items.append(perMonth)
+    if viewInput?.category != .New {
+      items.append(allTime)
+    }
+    
     return UIMenu(title: "",//"publications_per".localized,
                   image: nil,
                   identifier: nil,
                   options: .init(),
-                  children: [
-                    perDay,
-                    perWeek,
-                    perMonth,
-                    allTime
-                  ])
+                  children: items)
   }
   
   @MainActor
@@ -725,6 +728,7 @@ extension ListView: ListControllerOutput {
     setTitle(category: category, animated: true)
     toggleDateFilter(on: true)
     collectionView.category = category
+    periodButton.menu = prepareMenu()
   }
 }
 
