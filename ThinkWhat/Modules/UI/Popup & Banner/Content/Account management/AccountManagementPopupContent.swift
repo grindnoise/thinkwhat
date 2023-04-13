@@ -16,7 +16,7 @@ class AccountManagementPopupContent: UIView {
   
   
   // MARK: - Public properties
-  public var actionPublisher = PassthroughSubject<[AccountManagementCell.Mode: Action], Never>()
+  public var actionPublisher = PassthroughSubject<AccountManagementCell.Mode, Never>()
   
   
   // MARK: - Private properties
@@ -261,10 +261,10 @@ private extension AccountManagementPopupContent {
   @objc
   func handleTap(sender: UIButton) {
     if sender == confirmButton {
-      actionPublisher.send([mode : .Confirm])
+      actionPublisher.send(mode)
       actionPublisher.send(completion: .finished)
     } else {
-      actionPublisher.send([mode : .Cancel])
+      actionPublisher.send(mode)
       actionPublisher.send(completion: .finished)
     }
   }

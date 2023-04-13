@@ -265,6 +265,17 @@ private extension SettingsController {
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+  func manageAccount(_ mode: AccountManagementCell.Mode) {
+    guard let controller = tabBarController as? MainController else { return }
+    
+    switch mode {
+    case .Logout:
+      controller.logout()
+    case .Delete:
+      fatalError()
+    }
+  }
+  
   func updateDescription(_ string: String) {
     let parameters = API.prepareUserData(description: string)
     controllerInput?.updateUserprofile(parameters: parameters, image: nil)

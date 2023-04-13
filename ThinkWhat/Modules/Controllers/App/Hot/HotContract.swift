@@ -20,6 +20,8 @@ protocol HotViewInput: AnyObject {
   func vote(_: Survey)
   func claim(_: [SurveyReference: Claim])
   func reject(_: Survey)
+  func createPost()
+
 }
 
 protocol HotControllerInput: AnyObject {

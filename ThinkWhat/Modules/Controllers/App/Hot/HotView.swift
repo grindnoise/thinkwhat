@@ -121,7 +121,17 @@ class HotView: UIView {
     guard let viewInput = viewInput else { return }
     
     func push(_ instance: Survey?) {
-      incoming = !instance.isNil ? {  HotCard(item: instance!, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance!.topic.tagColor) }() : { EmptyHotCard() }()
+      incoming = !instance.isNil ? {  HotCard(item: instance!, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance!.topic.tagColor) }() : {
+        let empty = EmptyHotCard()
+        empty.tapPublisher
+          .sink { [unowned self] in
+            
+            self.viewInput?.createPost()
+          }
+          .store(in: &subscriptions)
+        
+        return empty
+      }()
 //      guard let instance = instance else {
 //        self.current = nil
 //

@@ -38,6 +38,7 @@ protocol SettingsViewInput: AnyObject {
   func showLicense()
   func showTerms()
   func feedback()
+  func manageAccount(_: AccountManagementCell.Mode)
 }
 
 protocol SettingsControllerInput: AnyObject {

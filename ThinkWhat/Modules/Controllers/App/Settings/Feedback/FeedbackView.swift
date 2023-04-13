@@ -39,7 +39,6 @@ class FeedbackView: UIView {
     instance.text = "feedback_hint".localized
     instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline)
 
-    
     return instance
   }()
   private lazy var textView: UITextView = {

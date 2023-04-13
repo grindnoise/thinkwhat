@@ -98,6 +98,20 @@ class SubscriptionsController: UIViewController, TintColorable {
   }
   
   
+  
+  // MARK: - Destructor
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
+#if DEBUG
+    print("\(String(describing: type(of: self))).\(#function)")
+#endif
+  }
+  
+  
+  
   // MARK: - Overridden properties
   override func viewDidLoad() {
     super.viewDidLoad()

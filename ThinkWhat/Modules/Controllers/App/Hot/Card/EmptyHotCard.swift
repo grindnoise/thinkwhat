@@ -75,6 +75,7 @@ class EmptyHotCard: UIView, Card {
     return instance
   }()
   public var subscriptions = Set<AnyCancellable>()
+  public var tapPublisher = PassthroughSubject<Void, Never>()
   
   
   // MARK: - Private properties
@@ -96,10 +97,10 @@ class EmptyHotCard: UIView, Card {
     return instance
   }()
   private lazy var loadingIndicator: LoadingIndicator = {
-    let instance = LoadingIndicator(color: Colors.Logo.Flame.rawValue,
+    let instance = LoadingIndicator(mode: .Topics,
+                                    color: Colors.Logo.Flame.rawValue,
                                     duration: 0.75,
-                                    isInfinite: true,
-                                    animateTopics: true)
+                                    isInfinite: true)
     instance.colorPublisher
       .filter { !$0.isNil }
       .sink { [weak self] in
@@ -144,9 +145,9 @@ class EmptyHotCard: UIView, Card {
           }
 //          self.label.textColor = color
         }
-        UIView.transition(with: self.label, duration: 0.5, options: .transitionCrossDissolve) {
-          self.label.textColor = color
-        }
+//        UIView.transition(with: self.label, duration: 0.1, options: .transitionCrossDissolve) {
+//          self.label.textColor = color
+//        }
 
       }
       .store(in: &subscriptions)
@@ -170,12 +171,49 @@ class EmptyHotCard: UIView, Card {
     instance.backgroundColor = .clear
     instance.textAlignment = .center
     instance.text = "waiting_for_new_posts".localized
-    instance.textColor = Colors.Logo.Flame.rawValue
-    instance.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title3)
+    instance.textColor = .secondaryLabel//Colors.Logo.Flame.rawValue
+    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title3)
+    
+    Timer
+      .publish(every: 1, on: .main, in: .common)
+      .autoconnect()
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        guard self.dots.count < 3 else {
+          self.dots = ""
+          UIView.setAnimationsEnabled(false)
+          self.label.text! = "waiting_for_new_posts".localized
+          UIView.setAnimationsEnabled(true)
+          
+          return
+        }
+        
+        self.dots += "."
+        UIView.setAnimationsEnabled(false)
+        self.label.text! = "waiting_for_new_posts".localized + self.dots
+        UIView.setAnimationsEnabled(true)
+      }
+      .store(in: &subscriptions)
 
     
     return instance
   }()
+  private lazy var stack: UIStackView = {
+    let top = UIView.opaque()
+    loadingIndicator.placeInCenter(of: top,
+                        topInset: 0,
+                        bottomInset: 0)
+    let instance = UIStackView(arrangedSubviews: [
+      top,
+      label
+    ])
+    instance.axis = .vertical
+    instance.spacing = 50
+    
+    return instance
+  }()
+  private var dots = ""
 //  private lazy var icon: Icon = {
 //    let instance = Icon(category: .Logo, iconColor: Colors.Logo.Flame.rawValue)
 //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
@@ -211,11 +249,11 @@ class EmptyHotCard: UIView, Card {
   
   // MARK: - Public
   public func animate() {
-    loadingIndicator.start()
+    loadingIndicator.start(animated: false)
   }
   
   public func removeAllAnimations() {
-    loadingIndicator.isAnimating = false
+    loadingIndicator.removeAllAnimations()
   }
 }
 
@@ -246,23 +284,28 @@ private extension EmptyHotCard {
       }
       .store(in: &subscriptions)
     
-    loadingIndicator.placeInCenter(of: body, widthMultiplier: 0.35)
+    stack.placeInCenter(of: body)
+    loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+    loadingIndicator.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
+    
     loadingIndicator.start()
     
-    addSubview(label)
-    label.translatesAutoresizingMaskIntoConstraints = false
-    
-    NSLayoutConstraint.activate([
-      label.topAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: padding),
-      label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
-      label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
-      label.bottomAnchor.constraint(equalTo: button.topAnchor, constant: -padding),
-    ])
+//    addSubview(label)
+//    label.translatesAutoresizingMaskIntoConstraints = false
+//
+//    NSLayoutConstraint.activate([
+//      label.topAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: padding),
+//      label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
+//      label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
+//      label.bottomAnchor.constraint(equalTo: button.topAnchor, constant: -padding),
+//    ])
   }
 
   
   @objc
-  func handleTap(sender: UIButton) { }
+  func handleTap(sender: UIButton) {
+    tapPublisher.send()
+  }
 }
 
 extension EmptyHotCard: CAAnimationDelegate {

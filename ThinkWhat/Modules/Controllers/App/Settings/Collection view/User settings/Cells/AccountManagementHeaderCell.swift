@@ -20,6 +20,7 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
       //            setColors()
     }
   }
+  public private(set) var actionPublisher = PassthroughSubject<AccountManagementCell.Mode, Never>()
   ///`UI`
   public var padding: CGFloat = 8 {
     didSet {
@@ -90,6 +91,10 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
   private lazy var collectionView: AccountManagementCollectionView = {
     let instance = AccountManagementCollectionView()
     instance.backgroundColor = .clear
+    
+    instance.actionPublisher
+      .sink { [unowned self] in self.actionPublisher.send($0)}
+      .store(in: &subscriptions)
     
     let constraint = instance.heightAnchor.constraint(equalToConstant: 50)
     constraint.priority = .defaultHigh

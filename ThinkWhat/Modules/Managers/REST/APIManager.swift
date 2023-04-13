@@ -1867,12 +1867,12 @@ class API {
     self.sessionManager.session.getAllTasks { (tasks) in
       tasks.forEach { $0.cancel() }
     }
-    //        self.session.session.getTasksWithCompletionHandler {
-    //            (sessionDataTask, uploadData, downloadData) in
-    //            sessionDataTask.forEach { $0.cancel() }
-    //            uploadData.forEach { $0.cancel() }
-    //            downloadData.forEach { $0.cancel() }
-    //        }
+            self.sessionManager.session.getTasksWithCompletionHandler {
+                (sessionDataTask, uploadData, downloadData) in
+                sessionDataTask.forEach { $0.cancel() }
+                uploadData.forEach { $0.cancel() }
+                downloadData.forEach { $0.cancel() }
+            }
   }
 }
 

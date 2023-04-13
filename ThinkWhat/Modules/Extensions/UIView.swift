@@ -431,6 +431,29 @@ extension UIView {
     widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: widthMultiplier).isActive = true
   }
   
+  func placeCentered(inside parent: UIView,
+                     withMultiplier multiplier: CGFloat) {
+    parent.addSubview(self)
+    translatesAutoresizingMaskIntoConstraints = false
+    
+    
+    let centerXAnchor = centerXAnchor.constraint(equalTo: parent.centerXAnchor)
+    centerXAnchor.identifier = "centerXAnchor"
+    centerXAnchor.isActive = true
+    
+    let centerYAnchor = centerYAnchor.constraint(equalTo: parent.centerYAnchor)
+    centerYAnchor.identifier = "centerYAnchor"
+    centerYAnchor.isActive = true
+    
+    let widthAnchor = widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: multiplier)
+    widthAnchor.identifier = "widthAnchor"
+    widthAnchor.isActive = true
+    
+    let heightAnchor = heightAnchor.constraint(equalTo: parent.heightAnchor, multiplier: multiplier)
+    heightAnchor.identifier = "heightAnchor"
+    heightAnchor.isActive = true
+  }
+  
   func placeXCentered(inside parent: UIView,
                       widthMultiplier: CGFloat,
                       topInset: CGFloat = .zero,
@@ -440,15 +463,63 @@ extension UIView {
     
     centerXAnchor.constraint(equalTo: parent.centerXAnchor).isActive = true
     widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: widthMultiplier).isActive = true
+    heightAnchor.constraint(equalTo: parent.heightAnchor, multiplier: widthMultiplier).isActive = true
     
     guard topInset != .zero, bottomInset != .zero else {
-      topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
-      bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: bottomInset).isActive = true
+//      topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
+//      bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: bottomInset).isActive = true
+      centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
       
       return
     }
-    centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
+    topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
+    bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: bottomInset).isActive = true
+//    centerYAnchor.constraint(equalTo: parent.centerYAnchor).isActive = true
   }
+  
+//  @discardableResult
+//  func placeInCenter(of parent: UIView,
+//                     widthMultiplier: CGFloat = 1,
+//                     xOffset: CGFloat = .zero,
+//                     yOffset: CGFloat = .zero) {
+//    parent.addSubview(self)
+//    translatesAutoresizingMaskIntoConstraints = false
+//
+//    centerYAnchor.constraint(equalTo: parent.centerYAnchor, constant: yOffset).isActive = true
+//    centerXAnchor.constraint(equalTo: parent.centerXAnchor, constant: xOffset).isActive = true
+//    widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: widthMultiplier).isActive = true
+//  }
+//
+//  func placeXCentered(inside parent: UIView,
+//                      widthMultiplier: CGFloat,
+//                      topInset: CGFloat = .zero,
+//                      bottomInset: CGFloat = .zero) -> [NSLayoutConstraint] {
+//    parent.addSubview(self)
+//    translatesAutoresizingMaskIntoConstraints = false
+//
+//    let centerXAnchor = centerXAnchor.constraint(equalTo: parent.centerXAnchor)
+//    centerXAnchor.isActive = true
+//    centerXAnchor.identifier = "centerXAnchor"
+//
+//    let widthAnchor = widthAnchor.constraint(equalTo: parent.widthAnchor, multiplier: widthMultiplier)
+//    widthAnchor.isActive = true
+//    widthAnchor.identifier = "widthAnchor"
+//
+//    var constraints = [centerXAnchor, widthAnchor]
+//
+//    if topInset != .zero, bottomInset != .zero  {
+//      topAnchor.constraint(equalTo: parent.topAnchor, constant: topInset).isActive = true
+//      bottomAnchor.constraint(equalTo: parent.bottomAnchor, constant: bottomInset).isActive = true
+//    } else {
+//      let centerYAnchor = centerYAnchor.constraint(equalTo: parent.centerYAnchor)
+//      centerYAnchor.isActive = true
+//      centerYAnchor.identifier = "centerYAnchor"
+//
+//      constraints.append(centerYAnchor)
+//    }
+//
+//    return constraints
+//  }
   
   func placeLeading(inside parent: UIView,
                     leadingInset: CGFloat = .zero,

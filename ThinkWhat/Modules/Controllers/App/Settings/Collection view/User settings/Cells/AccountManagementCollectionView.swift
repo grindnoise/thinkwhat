@@ -20,7 +20,7 @@ class AccountManagementCollectionView: UICollectionView {
   
   // MARK: - Public properties
   @Published public var color: UIColor?
-  
+  public private(set) var actionPublisher = PassthroughSubject<AccountManagementCell.Mode, Never>()
   
   
   // MARK: - Private properties
@@ -79,7 +79,9 @@ private extension AccountManagementCollectionView {
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
       cell.mode = section == .Logout ? .Logout : .Delete
-      
+      cell.actionPublisher
+        .sink { [unowned self] in self.actionPublisher.send($0) }
+        .store(in: &self.subscriptions)
       self.$color
         .filter { !$0.isNil }
         .sink { cell.color = $0! }

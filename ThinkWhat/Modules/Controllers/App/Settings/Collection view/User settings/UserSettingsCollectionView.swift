@@ -36,6 +36,7 @@ class UserSettingsCollectionView: UICollectionView {
   public var subscribersPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
+  public private(set) var accountManagementPublisher = PassthroughSubject<AccountManagementCell.Mode, Never>()
   @Published public private(set) var userprofileDescription: String?
   ///**UI
   public var color: UIColor = Colors.System.Red.rawValue {
@@ -285,6 +286,9 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
       backgroundConfig.backgroundColor = .clear
       cell.backgroundConfiguration = backgroundConfig
       cell.color = self.color
+      cell.actionPublisher
+        .sink { [unowned self] in self.accountManagementPublisher.send($0) }
+        .store(in: &self.subscriptions)
       
       guard let userprofile = Userprofiles.shared.current else { return }
       

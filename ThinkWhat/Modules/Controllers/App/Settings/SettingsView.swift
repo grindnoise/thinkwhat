@@ -214,6 +214,9 @@ class SettingsView: UIView {
         self.viewInput?.onWatchingSelected()
       }
       .store(in: &subscriptions)
+    instance.accountManagementPublisher
+      .sink { [unowned self] in self.viewInput?.manageAccount($0) }
+      .store(in: &self.subscriptions)
     
     return instance
   }()

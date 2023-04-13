@@ -17,6 +17,8 @@ class AccountManagementCell: UICollectionViewListCell {
   }
   
   // MARK: - Public properties
+  ///**Publishers**
+  public private(set) var actionPublisher = PassthroughSubject<Mode, Never>()
   ///`Logic`
   public var mode: Mode = .Logout {
     didSet {
@@ -180,8 +182,14 @@ private extension AccountManagementCell {
     let content = AccountManagementPopupContent(mode: mode,
                                                color: mode == .Logout ? color : .systemRed)
     content.actionPublisher
-      .sink {
-        print($0)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.actionPublisher.send($0)
+//        print($0)
+//        var controller = appDelegate.window?.rootViewController
+//        controller = nil
+//        appDelegate.window?.rootViewController = GetStartedViewController()
         banner.dismiss()
       }
       .store(in: &banner.subscriptions)

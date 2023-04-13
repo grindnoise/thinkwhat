@@ -45,6 +45,20 @@ class HotController: UIViewController, TintColorable {
   private var initialColor: UIColor = .clear
   
   
+  
+  // MARK: - Destructor
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
+#if DEBUG
+    print("\(String(describing: type(of: self))).\(#function)")
+#endif
+  }
+  
+  
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -103,12 +117,7 @@ private extension HotController {
       let backItem = UIBarButtonItem()
       backItem.title = ""
       self.navigationItem.backBarButtonItem = backItem
-      self.navigationController?.pushViewController(NewPollController(color: self.tintColor), animated: true)
-      self.tabBarController?.setTabBarVisible(visible: false, animated: true)
-      
-      guard let main = self.tabBarController as? MainController else { return }
-      
-      main.toggleLogo(on: false)
+      self.createPost()
     })
     
     navigationController?.navigationBar.prefersLargeTitles = false
@@ -206,6 +215,15 @@ private extension HotController {
 
 // MARK: - View Input
 extension HotController: HotViewInput {
+  func createPost() {
+    self.navigationController?.pushViewController(NewPollController(color: self.tintColor), animated: true)
+    self.tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard let main = self.tabBarController as? MainController else { return }
+    
+    main.toggleLogo(on: false)
+  }
+  
   func reject(_ survey: Survey) {
     self.controllerInput?.reject(survey)
   }
