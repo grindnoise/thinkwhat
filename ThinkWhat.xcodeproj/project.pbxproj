@@ -242,6 +242,10 @@
 		AB5DBB4629E9394D00855B49 /* StartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB4229E9394D00855B49 /* StartViewController.swift */; };
 		AB5DBB4729E9394D00855B49 /* StartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB4329E9394D00855B49 /* StartView.swift */; };
 		AB5DBB4829E9394D00855B49 /* StartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB4429E9394D00855B49 /* StartModel.swift */; };
+		AB5DBB5629E9678700855B49 /* SignInContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB5229E9678700855B49 /* SignInContract.swift */; };
+		AB5DBB5729E9678700855B49 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB5329E9678700855B49 /* SignInViewController.swift */; };
+		AB5DBB5829E9678700855B49 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB5429E9678700855B49 /* SignInView.swift */; };
+		AB5DBB5929E9678700855B49 /* SignInModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB5529E9678700855B49 /* SignInModel.swift */; };
 		AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5EB5FB2361DDEA000D4D96 /* CategoryTableViewCell.swift */; };
 		AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5EB5FC2361DDEA000D4D96 /* CategoryTableViewCell.xib */; };
 		AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5EB5FF23630AC0000D4D96 /* SubcategoryTableViewCell.swift */; };
@@ -850,6 +854,10 @@
 		AB5DBB4229E9394D00855B49 /* StartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartViewController.swift; sourceTree = "<group>"; };
 		AB5DBB4329E9394D00855B49 /* StartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartView.swift; sourceTree = "<group>"; };
 		AB5DBB4429E9394D00855B49 /* StartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartModel.swift; sourceTree = "<group>"; };
+		AB5DBB5229E9678700855B49 /* SignInContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInContract.swift; sourceTree = "<group>"; };
+		AB5DBB5329E9678700855B49 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
+		AB5DBB5429E9678700855B49 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		AB5DBB5529E9678700855B49 /* SignInModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInModel.swift; sourceTree = "<group>"; };
 		AB5EB5FB2361DDEA000D4D96 /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
 		AB5EB5FC2361DDEA000D4D96 /* CategoryTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategoryTableViewCell.xib; sourceTree = "<group>"; };
 		AB5EB5FF23630AC0000D4D96 /* SubcategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubcategoryTableViewCell.swift; sourceTree = "<group>"; };
@@ -2105,6 +2113,17 @@
 			path = "Start screen";
 			sourceTree = "<group>";
 		};
+		AB5DBB4929E9672A00855B49 /* Sign in */ = {
+			isa = PBXGroup;
+			children = (
+				AB5DBB5229E9678700855B49 /* SignInContract.swift */,
+				AB5DBB5329E9678700855B49 /* SignInViewController.swift */,
+				AB5DBB5429E9678700855B49 /* SignInView.swift */,
+				AB5DBB5529E9678700855B49 /* SignInModel.swift */,
+			);
+			path = "Sign in";
+			sourceTree = "<group>";
+		};
 		AB60B5BB285CD5E20023C99B /* Comments */ = {
 			isa = PBXGroup;
 			children = (
@@ -2887,6 +2906,7 @@
 		ABB9E86C279E9E6B0018BB2E /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				AB5DBB4929E9672A00855B49 /* Sign in */,
 				AB5DBB4029E9392400855B49 /* Start screen */,
 				AB5DBB3F29E9372E00855B49 /* del */,
 			);
@@ -3616,6 +3636,7 @@
 				ABB0F6D528F6D6B80068FDDF /* FeedbackViewController.swift in Sources */,
 				AB0B7FD6294384C200941FA1 /* TestViewController.swift in Sources */,
 				AB3A6F8A286F0F6B0073FFF7 /* PollDescriptionCell.swift in Sources */,
+				AB5DBB5729E9678700855B49 /* SignInViewController.swift in Sources */,
 				AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */,
 				AB98307027B54D43002C5132 /* ContentLoader.swift in Sources */,
 				ABDE82C728B3906A004E07BD /* CommentsContract.swift in Sources */,
@@ -3733,6 +3754,7 @@
 				ABD4FCAD29965E8F00F7E8EB /* Stack.swift in Sources */,
 				AB3C681B223FD04500B57580 /* Animations.swift in Sources */,
 				ABC18337284E502A005D1C31 /* ImageSelectionHeaderContent.swift in Sources */,
+				AB5DBB5929E9678700855B49 /* SignInModel.swift in Sources */,
 				AB649E2828A15A9C00978520 /* Comment.swift in Sources */,
 				AB2AA1BB235DDC6F0086D16C /* SurveysViewController.swift in Sources */,
 				ABF4D15429D5D61200BCBFD8 /* NewPollCostCollectionView.swift in Sources */,
@@ -3780,6 +3802,7 @@
 				AB39F41428478B5C00DEE0ED /* ImageSelectionCellContent.swift in Sources */,
 				AB7830AF28D86A7400D7C883 /* NavigationController.swift in Sources */,
 				AB51075628F02E6E00CA0BFC /* Enums.swift in Sources */,
+				AB5DBB5629E9678700855B49 /* SignInContract.swift in Sources */,
 				AB3C67E7223FBB6400B57580 /* ThinkWhat.xcdatamodeld in Sources */,
 				ABB6397628816B9000E4B4EF /* LinkPreviewCell.swift in Sources */,
 				ABDAE152258211D5007DD188 /* 3_VotesCountViewController.swift in Sources */,
@@ -3967,6 +3990,7 @@
 				ABB19148286C526200C89142 /* ProcessInfo.swift in Sources */,
 				ABF20FB624C993D60092B223 /* UserVotesCell.swift in Sources */,
 				ABF2756C280D62710023CD1F /* UITableView.swift in Sources */,
+				AB5DBB5829E9678700855B49 /* SignInView.swift in Sources */,
 				AB99A95624C6D1C700814F96 /* HeartExpandingView.swift in Sources */,
 				AB10031327BFAF2F00338EE4 /* FillProfileViewController.swift in Sources */,
 				AB41F72328E34F720037C628 /* UsersFilterAgeCell.swift in Sources */,

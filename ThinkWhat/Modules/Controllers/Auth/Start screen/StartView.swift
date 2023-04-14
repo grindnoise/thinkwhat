@@ -25,7 +25,6 @@ class StartView: UIView {
   }()
   private lazy var logoText: Icon = {
     let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
-    instance.scaleMultiplicator = 1.1
     instance.alpha = 0
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
     
@@ -156,7 +155,7 @@ extension StartView: StartControllerOutput {
           guard index < phrase.endIndex else { return nil }
           
           do {
-            try await Task.sleep(nanoseconds: 4_000_000_0)
+            try await Task.sleep(nanoseconds: 2_000_000_0)
           } catch {
             return ""
           }
@@ -223,7 +222,7 @@ private extension StartView {
     logoIcon.heightAnchor.constraint(equalTo: logoIcon.widthAnchor).isActive = true
     logoIcon.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
     logoText.translatesAutoresizingMaskIntoConstraints = false
-    logoText.widthAnchor.constraint(equalTo: logoIcon.widthAnchor).isActive = true
+    logoText.widthAnchor.constraint(equalTo: logoIcon.widthAnchor, multiplier: 1.2).isActive = true
   }
   
   @objc

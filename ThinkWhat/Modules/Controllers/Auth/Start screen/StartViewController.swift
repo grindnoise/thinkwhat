@@ -49,7 +49,7 @@ class StartViewController: UIViewController {
 
 extension StartViewController: StartViewInput {
   func nextScene() {
-//    navigationController?.pushViewController(SignupViewController(), animated: true)
+    navigationController?.pushViewController(SignInViewController(), animated: true)
   }
 }
 
