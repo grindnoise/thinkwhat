@@ -107,7 +107,7 @@
 "select" = "Выбрать";
 
 //Welcome VC
-"welcomeLabel" = "Добро пожаловать в ThinkWhat!";
+"welcomeLabel" = "Добро пожаловать в";
 "getStartedButton" = "Начать!";
 
 //Signup VC

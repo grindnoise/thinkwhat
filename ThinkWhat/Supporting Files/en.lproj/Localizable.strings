@@ -107,7 +107,7 @@
 "select" = "Select";
 
 //Welcome VC
-"welcomeLabel" = "Welcome to ThinkWhat!";
+"welcomeLabel" = "Welcome to";
 "getStartedButton" = "Get started!";
 
 //Signup VC

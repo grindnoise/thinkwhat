@@ -37,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             try UserDefaults.Profile.authorize()
             rootViewController = MainController()
         } catch {
-            rootViewController = UINavigationController(rootViewController: GetStartedViewController())
+            rootViewController = UINavigationController(rootViewController: StartViewController())
 //            rootViewController = CustomNavigationController(rootViewController: GetStartedViewController())
         }
         window = UIWindow()

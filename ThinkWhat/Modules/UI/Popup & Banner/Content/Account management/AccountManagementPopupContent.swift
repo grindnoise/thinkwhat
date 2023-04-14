@@ -16,7 +16,7 @@ class AccountManagementPopupContent: UIView {
   
   
   // MARK: - Public properties
-  public var actionPublisher = PassthroughSubject<AccountManagementCell.Mode, Never>()
+  public var actionPublisher = PassthroughSubject<[Action: AccountManagementCell.Mode], Never>()
   
   
   // MARK: - Private properties
@@ -224,6 +224,7 @@ class AccountManagementPopupContent: UIView {
   
   
   
+  
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
@@ -261,10 +262,10 @@ private extension AccountManagementPopupContent {
   @objc
   func handleTap(sender: UIButton) {
     if sender == confirmButton {
-      actionPublisher.send(mode)
+      actionPublisher.send([Action.Confirm: mode])
       actionPublisher.send(completion: .finished)
     } else {
-      actionPublisher.send(mode)
+      actionPublisher.send([Action.Cancel: mode])
       actionPublisher.send(completion: .finished)
     }
   }

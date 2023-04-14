@@ -238,6 +238,10 @@
 		AB5CA11624F53D4600F55DEC /* IconTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5CA11524F53D4600F55DEC /* IconTransition.swift */; };
 		AB5CA11824F5418500F55DEC /* TransitionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5CA11724F5418500F55DEC /* TransitionCoordinator.swift */; };
 		AB5CCBD62888228C00B970A7 /* EventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5CCBD52888228C00B970A7 /* EventEmitter.swift */; };
+		AB5DBB4529E9394D00855B49 /* StartContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB4129E9394D00855B49 /* StartContract.swift */; };
+		AB5DBB4629E9394D00855B49 /* StartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB4229E9394D00855B49 /* StartViewController.swift */; };
+		AB5DBB4729E9394D00855B49 /* StartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB4329E9394D00855B49 /* StartView.swift */; };
+		AB5DBB4829E9394D00855B49 /* StartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5DBB4429E9394D00855B49 /* StartModel.swift */; };
 		AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5EB5FB2361DDEA000D4D96 /* CategoryTableViewCell.swift */; };
 		AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5EB5FC2361DDEA000D4D96 /* CategoryTableViewCell.xib */; };
 		AB5EB60123630AC0000D4D96 /* SubcategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5EB5FF23630AC0000D4D96 /* SubcategoryTableViewCell.swift */; };
@@ -842,6 +846,10 @@
 		AB5CA11524F53D4600F55DEC /* IconTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconTransition.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB5CA11724F5418500F55DEC /* TransitionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionCoordinator.swift; sourceTree = "<group>"; };
 		AB5CCBD52888228C00B970A7 /* EventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEmitter.swift; sourceTree = "<group>"; };
+		AB5DBB4129E9394D00855B49 /* StartContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartContract.swift; sourceTree = "<group>"; };
+		AB5DBB4229E9394D00855B49 /* StartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartViewController.swift; sourceTree = "<group>"; };
+		AB5DBB4329E9394D00855B49 /* StartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartView.swift; sourceTree = "<group>"; };
+		AB5DBB4429E9394D00855B49 /* StartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartModel.swift; sourceTree = "<group>"; };
 		AB5EB5FB2361DDEA000D4D96 /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
 		AB5EB5FC2361DDEA000D4D96 /* CategoryTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategoryTableViewCell.xib; sourceTree = "<group>"; };
 		AB5EB5FF23630AC0000D4D96 /* SubcategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubcategoryTableViewCell.swift; sourceTree = "<group>"; };
@@ -2073,6 +2081,30 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		AB5DBB3F29E9372E00855B49 /* del */ = {
+			isa = PBXGroup;
+			children = (
+				AB10031027BFAC7F00338EE4 /* Profile */,
+				AB0AB63627B4FFF2006FD33F /* Agreement */,
+				AB98307127B687A6002C5132 /* Log in */,
+				AB98308027B935A6002C5132 /* Recover account */,
+				AB8DA31E27A1487500F92C18 /* Sign Up */,
+				ABB9E880279EA6090018BB2E /* Welcome */,
+			);
+			path = del;
+			sourceTree = "<group>";
+		};
+		AB5DBB4029E9392400855B49 /* Start screen */ = {
+			isa = PBXGroup;
+			children = (
+				AB5DBB4129E9394D00855B49 /* StartContract.swift */,
+				AB5DBB4229E9394D00855B49 /* StartViewController.swift */,
+				AB5DBB4329E9394D00855B49 /* StartView.swift */,
+				AB5DBB4429E9394D00855B49 /* StartModel.swift */,
+			);
+			path = "Start screen";
+			sourceTree = "<group>";
+		};
 		AB60B5BB285CD5E20023C99B /* Comments */ = {
 			isa = PBXGroup;
 			children = (
@@ -2852,17 +2884,13 @@
 			path = Modules;
 			sourceTree = "<group>";
 		};
-		ABB9E86C279E9E6B0018BB2E /* Authorization */ = {
+		ABB9E86C279E9E6B0018BB2E /* Auth */ = {
 			isa = PBXGroup;
 			children = (
-				AB10031027BFAC7F00338EE4 /* Profile */,
-				AB0AB63627B4FFF2006FD33F /* Agreement */,
-				AB98307127B687A6002C5132 /* Log in */,
-				AB98308027B935A6002C5132 /* Recover account */,
-				AB8DA31E27A1487500F92C18 /* Sign Up */,
-				ABB9E880279EA6090018BB2E /* Welcome */,
+				AB5DBB4029E9392400855B49 /* Start screen */,
+				AB5DBB3F29E9372E00855B49 /* del */,
 			);
-			path = Authorization;
+			path = Auth;
 			sourceTree = "<group>";
 		};
 		ABB9E880279EA6090018BB2E /* Welcome */ = {
@@ -2881,7 +2909,7 @@
 			isa = PBXGroup;
 			children = (
 				AB7295FE27DA068D00D45B54 /* App */,
-				ABB9E86C279E9E6B0018BB2E /* Authorization */,
+				ABB9E86C279E9E6B0018BB2E /* Auth */,
 				ABD6399A27A5B0590020958F /* Captcha */,
 				AB8DA31D27A1465700F92C18 /* Navigation */,
 				AB7830AE28D86A7400D7C883 /* NavigationController.swift */,
@@ -3808,6 +3836,7 @@
 				ABF888AB29BB38B900A37212 /* EmptySubscriptionsView.swift in Sources */,
 				ABFB42242873443A0066CFA0 /* WebViewCell.swift in Sources */,
 				AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */,
+				AB5DBB4729E9394D00855B49 /* StartView.swift in Sources */,
 				AB54F47D285B127400C620B3 /* ChoiceEditingPopup.swift in Sources */,
 				ABCE775D2848D378001E3413 /* InsetLabel.swift in Sources */,
 				AB38DD6D2819420000FFEB3F /* Notification.swift in Sources */,
@@ -3857,6 +3886,8 @@
 				ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */,
 				AB592E212906C3140082EE13 /* UserprofileCollectionView.swift in Sources */,
 				ABF01A6C25418E2C009E2BC4 /* BackRoundedButton.swift in Sources */,
+				AB5DBB4629E9394D00855B49 /* StartViewController.swift in Sources */,
+				AB5DBB4529E9394D00855B49 /* StartContract.swift in Sources */,
 				AB68111E29828CA900C14C32 /* CGSize.swift in Sources */,
 				AB39F4122847830300DEE0ED /* ImageSelectionCollectionView.swift in Sources */,
 				AB6B071F247688600095721B /* delUserViewController.swift in Sources */,
@@ -3977,6 +4008,7 @@
 				AB334FB9270C423400DD7332 /* ClockIndicator.swift in Sources */,
 				ABCDC73A28DC7814003B24F2 /* UserprofileContract.swift in Sources */,
 				ABADF59C27F7066300A26474 /* Banner.swift in Sources */,
+				AB5DBB4829E9394D00855B49 /* StartModel.swift in Sources */,
 				AB58F64428D23854002CB987 /* UserSettingsCityCell.swift in Sources */,
 				ABD2A2B628841B1100591568 /* SurveyCell.swift in Sources */,
 				AB3C67DF223FBB6400B57580 /* AppDelegate.swift in Sources */,

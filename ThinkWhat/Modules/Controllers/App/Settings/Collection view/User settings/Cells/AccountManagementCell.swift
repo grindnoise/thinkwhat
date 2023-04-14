@@ -183,14 +183,16 @@ private extension AccountManagementCell {
                                                color: mode == .Logout ? color : .systemRed)
     content.actionPublisher
       .sink { [weak self] in
-        guard let self = self else { return }
+        guard let self = self,
+              let action = $0.keys.first,
+              let mode = $0.values.first
+        else { return }
         
-        self.actionPublisher.send($0)
-//        print($0)
-//        var controller = appDelegate.window?.rootViewController
-//        controller = nil
-//        appDelegate.window?.rootViewController = GetStartedViewController()
         banner.dismiss()
+        
+        guard action == .Confirm else { return }
+        
+        self.actionPublisher.send(mode)
       }
       .store(in: &banner.subscriptions)
     

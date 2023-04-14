@@ -90,6 +90,11 @@ class Userprofiles {
     current.city = try decoder.decode(City.self, from: city)
   }
   
+  class func clear() {
+    shared.all.removeAll()
+    shared.current = nil
+  }
+
   //    func loadSubscribedFor(_ data: Data) {
   //        let decoder                                 = JSONDecoder()
   ////        var notifications: [NSNotification.Name]    = []

@@ -577,6 +577,10 @@ class Surveys {
   ///**Publishers**
   public let instancesPublisher = PassthroughSubject<[Survey], Never>()
   
+  class func clear() {
+    shared.all.removeAll()
+  }
+  
   //Updates rating, progress and views count
   func updateStats(_ json: JSON) {
     for i in json {
