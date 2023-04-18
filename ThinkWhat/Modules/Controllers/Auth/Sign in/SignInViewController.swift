@@ -36,11 +36,23 @@ class SignInViewController: UIViewController {
 }
 
 extension SignInViewController: SignInViewInput {
+  func mailLogin(username: String, password: String) {
+    controllerInput?.mailLogin(username: username, password: password)
+  }
   
+  func providerlogin(_ provider: AuthProvider) {
+    controllerInput?.providerlogin(provider)
+  }
+  
+  func signup() {
+    
+  }
 }
 
 extension SignInViewController: SignInModelOutput {
-  
+  func loginCallback(_ result: Result<Bool, Error>) {
+    print("loginCallback", result)
+  }
 }
 
 private extension SignInViewController {

@@ -147,6 +147,40 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
 //              }
             }
           }
+        } else if let fromView = fromVC.view as? StartView,
+                  let toView = toVC.view as? SignInView {
+          
+          toView.setNeedsLayout()
+          toView.layoutIfNeeded()
+          let logo = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.main)
+          logo.frame = CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
+                                                                            to: containerView),
+                               size: fromView.logoIcon.bounds.size)
+          containerView.addSubview(logo)
+          fromView.logoIcon.alpha = 0
+          toView.logoIcon.alpha = 0
+          logo.iconColor = Colors.main
+          logo.scaleMultiplicator = 1
+          logo.category = .Logo
+          
+          
+          UIView.animate(withDuration: 0.5,
+                         delay: 0,
+                         options: .curveEaseInOut,
+                         animations: { [weak self] in
+            guard let self = self else { return }
+
+            logo.frame = CGRect(origin: toView.logoIcon.superview!.convert(toView.logoIcon.frame.origin,
+                                                             to: containerView),
+                                 size: toView.logoIcon.bounds.size)
+          }) {
+            _ in
+
+              toVC.view.alpha = 1
+              toView.logoIcon.alpha = 0
+              self.context?.completeTransition(true)
+
+          }
         }
         
         

@@ -17,7 +17,7 @@ class StartView: UIView {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
-  private lazy var logoIcon: Icon = {
+  public private(set) lazy var logoIcon: Icon = {
     let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
     instance.alpha = 0
     

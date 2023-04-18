@@ -111,7 +111,7 @@
 "getStartedButton" = "Get started!";
 
 //Signup VC
-"providerLabel" = "or continue with";
+"providerLabel" = "or";
 "haveAccountLabel" = "Already have account?";
 "loginButton" = "Log in";
 "signupButton" = "Sign up";

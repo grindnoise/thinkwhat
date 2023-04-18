@@ -397,6 +397,8 @@ enum Colors {
                         traitCollection: UITraitCollection) -> UIColor {
     return color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.05 : 0.6)
   }
+  
+  static var main: UIColor { Colors.Logo.Flame.rawValue }
 }
 
 //extension Color: RawRepresentable {

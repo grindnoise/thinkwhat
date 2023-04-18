@@ -14,5 +14,25 @@ class SignInModel {
 }
 
 extension SignInModel: SignInControllerInput {
+  func providerlogin(_ provider: AuthProvider) {
+    
+  }
   
+  func mailLogin(username: String, password: String) {
+    Task {
+      do {
+        try await API.shared.auth.loginAsync(username: username, password: password)
+        let userData = try await API.shared.getUserDataAsync()
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                   DateFormatter.dateTimeFormatter,
+                                                   DateFormatter.dateFormatter ]
+        Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: userData)
+        modelOutput?.loginCallback(.success(true))
+      } catch {
+        UserDefaults.clear()
+        modelOutput?.loginCallback(.failure(error))
+      }
+    }
+  }
 }

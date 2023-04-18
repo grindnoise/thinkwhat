@@ -1575,6 +1575,7 @@
 		AB309C7A27AFA41F005BBCB4 /* Remove */ = {
 			isa = PBXGroup;
 			children = (
+				AB8DA31B27A1464F00F92C18 /* CustomNavigationController.swift */,
 				AB28E5AF2535BB6E004CC4DD /* Poll */,
 				AB8C99552486760B00BC517B /* Claim */,
 				AB879047286D9F7600C069BA /* Navbar content */,
@@ -2512,14 +2513,6 @@
 			path = Claim;
 			sourceTree = "<group>";
 		};
-		AB8DA31D27A1465700F92C18 /* Navigation */ = {
-			isa = PBXGroup;
-			children = (
-				AB8DA31B27A1464F00F92C18 /* CustomNavigationController.swift */,
-			);
-			path = Navigation;
-			sourceTree = "<group>";
-		};
 		AB8DA31E27A1487500F92C18 /* Sign Up */ = {
 			isa = PBXGroup;
 			children = (
@@ -2931,7 +2924,6 @@
 				AB7295FE27DA068D00D45B54 /* App */,
 				ABB9E86C279E9E6B0018BB2E /* Auth */,
 				ABD6399A27A5B0590020958F /* Captcha */,
-				AB8DA31D27A1465700F92C18 /* Navigation */,
 				AB7830AE28D86A7400D7C883 /* NavigationController.swift */,
 				ABADF59927F7009400A26474 /* Reusable */,
 			);

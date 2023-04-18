@@ -49,7 +49,10 @@ class StartViewController: UIViewController {
 
 extension StartViewController: StartViewInput {
   func nextScene() {
+    navigationController?.delegate = appDelegate.transitionCoordinator
+    navigationController?.navigationBar.backItem?.title = ""
     navigationController?.pushViewController(SignInViewController(), animated: true)
+    navigationController?.delegate = nil
   }
 }
 

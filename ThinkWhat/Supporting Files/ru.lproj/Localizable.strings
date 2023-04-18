@@ -111,11 +111,11 @@
 "getStartedButton" = "Начать!";
 
 //Signup VC
-"providerLabel" = "или продолжить с";
+"providerLabel" = "или";
 "haveAccountLabel" = "Уже зарегистрированы?";
 "loginButton" = "Войти";
 "signupButton" = "Создать аккаунт";
-"usernameTF" = "Логин пользователя";
+"usernameTF" = "Логин";
 "mailTF" = "Электронная почта";
 "passwordTF" = "Пароль";
 "username_is_busy" = "Пользователь существует";
