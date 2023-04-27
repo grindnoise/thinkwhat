@@ -253,7 +253,9 @@ private extension AppSettingsLanguageCell {
                 languages += (row == 0 ? text.capitalized : text) + ", "
             }
             
-            languageLabel.text = String(languages.prefix(languages.count-2))
+          guard !languages.isEmpty else { return }
+          
+          languageLabel.text = String(languages.prefix(languages.count-2))
         default:
             print("")
         }

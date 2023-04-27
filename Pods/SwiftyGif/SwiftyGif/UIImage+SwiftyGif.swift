@@ -53,11 +53,11 @@ public extension UIImage {
     ///
     /// - Parameter imageName: Filename
     /// - Parameter levelOfIntegrity: 0 to 1, 1 meaning no frame skipping
-    convenience init?(imageName: String, levelOfIntegrity: GifLevelOfIntegrity = .default) throws {
+    convenience init?(imageName: String, levelOfIntegrity: GifLevelOfIntegrity = .default, bundle: Bundle = Bundle.main) throws {
         self.init()
 
         do {
-            try setGif(imageName, levelOfIntegrity: levelOfIntegrity)
+            try setGif(imageName, levelOfIntegrity: levelOfIntegrity, bundle: bundle)
         } catch {
             self.init(named: imageName)
         }
@@ -81,9 +81,9 @@ public extension UIImage {
     ///
     /// - Parameter gifName: Filename
     /// - Parameter levelOfIntegrity: 0 to 1, 1 meaning no frame skipping
-    convenience init(gifName: String, levelOfIntegrity: GifLevelOfIntegrity = .default) throws {
+    convenience init(gifName: String, levelOfIntegrity: GifLevelOfIntegrity = .default, bundle: Bundle = Bundle.main) throws {
         self.init()
-        try setGif(gifName, levelOfIntegrity: levelOfIntegrity)
+        try setGif(gifName, levelOfIntegrity: levelOfIntegrity, bundle: bundle)
     }
     
     /// Set backing data for this gif. Overwrites any existing data.
@@ -102,8 +102,8 @@ public extension UIImage {
     /// Set backing data for this gif. Overwrites any existing data.
     ///
     /// - Parameter name: Filename
-    func setGif(_ name: String) throws {
-        try setGif(name, levelOfIntegrity: .default)
+    func setGif(_ name: String, bundle: Bundle = Bundle.main) throws {
+        try setGif(name, levelOfIntegrity: .default, bundle: bundle)
     }
     
     /// Check the number of frame for this gif
@@ -112,14 +112,18 @@ public extension UIImage {
     func framesCount() -> Int {
         return displayOrder?.count ?? 0
     }
+
+    private func giflog(_ msg: String) {
+        print("SwiftyGIF: \(msg)")
+    }
     
     /// Set backing data for this gif. Overwrites any existing data.
     ///
     /// - Parameter name: Filename
     /// - Parameter levelOfIntegrity: 0 to 1, 1 meaning no frame skipping
-    func setGif(_ name: String, levelOfIntegrity: GifLevelOfIntegrity) throws {
-        if let url = Bundle.main.url(forResource: name,
-                                     withExtension: name.pathExtension() == "gif" ? "" : "gif") {
+    func setGif(_ name: String, levelOfIntegrity: GifLevelOfIntegrity, bundle: Bundle = Bundle.main) throws {
+        giflog(bundle.debugDescription)
+        if let url = bundle.url(forResource: name, withExtension: name.pathExtension() == "gif" ? "" : "gif") {
             if let data = try? Data(contentsOf: url) {
                 try setGifFromData(data, levelOfIntegrity: levelOfIntegrity)
             }
@@ -210,30 +214,23 @@ public extension UIImage {
         let levelOfIntegrity = max(0, min(1, levelOfIntegrity))
         var delays = delaysArray
 
-        var displayRefreshFactors = [Int]()
-
-        if #available(iOS 10.3, *) {
-          // Will be 120 on devices with ProMotion display, 60 otherwise.
-          displayRefreshFactors.append(UIScreen.main.maximumFramesPerSecond)
+        var displayRefreshFactors = [60, 30, 20, 15, 12, 10, 6, 5, 4, 3, 2, 1]
+        
+        if #available(iOS 10.3, tvOS 10.3, *) {
+            // Will be 120 on devices with ProMotion display, 60 otherwise.
+            // TODO: Use CADisplayLink to get current framerate. This is still 120 on ProMotion dispays even in low power mode.
+            let maximumFramesPerSecond = UIScreen.main.maximumFramesPerSecond
+            if maximumFramesPerSecond == 120 {
+                displayRefreshFactors.insert(maximumFramesPerSecond, at: 0)
+            }
         }
-
-        if let first = displayRefreshFactors.first, first != 60 {
-          // Append 60 if needed.
-          displayRefreshFactors.append(60)
-        }
-
-        displayRefreshFactors.append(contentsOf: [30, 20, 15, 12, 10, 6, 5, 4, 3, 2, 1])
-
-        // maxFramePerSecond,default is 60
+        
         let maxFramePerSecond = displayRefreshFactors[0]
         
-        // frame numbers per second
-        let displayRefreshRates = displayRefreshFactors.map { maxFramePerSecond / $0 }
-        
         // time interval per frame
-        let displayRefreshDelayTime = displayRefreshRates.map { 1 / Float($0) }
+        let displayRefreshDelayTime = displayRefreshFactors.map { Float($0) / Float(maxFramePerSecond) }
         
-        // caclulate the time when each frame should be displayed at(start at 0)
+        // calculate the time when each frame should be displayed at(start at 0)
         for i in delays.indices.dropFirst() {
             delays[i] += delays[i - 1]
         }
@@ -241,6 +238,7 @@ public extension UIImage {
         //find the appropriate Factors then BREAK
         for (i, delayTime) in displayRefreshDelayTime.enumerated() {
             let displayPosition = delays.map { Int($0 / delayTime) }
+           
             var frameLoseCount: Float = 0
             
             for j in displayPosition.indices.dropFirst() where displayPosition[j] == displayPosition[j - 1] {
@@ -267,7 +265,6 @@ public extension UIImage {
                         oldIndex += 1
                     }
                 }
-                
                 break
             }
         }

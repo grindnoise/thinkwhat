@@ -96,16 +96,13 @@ extension SettingsModel: SettingsControllerInput {
           print(progress)
 #endif
         })
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                   DateFormatter.dateTimeFormatter,
-                                                   DateFormatter.dateFormatter ]
-        Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: data)
+        let instance = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self, from: data)
+        Userprofiles.shared.current?.update(from: instance)
         Userprofiles.shared.current?.image = image
-        await MainActor.run {
-          NotificationCenter.default.post(name: Notifications.Userprofiles.CurrentUserImageUpdated, object: nil)
-          //                                    NotificationCenter.default.post(name: Notifications.Userprofiles.ImageDownloaded, object: Userprofiles.shared.current)
-        }
+//        await MainActor.run {
+//          NotificationCenter.default.post(name: Notifications.Userprofiles.CurrentUserImageUpdated, object: nil)
+//          //                                    NotificationCenter.default.post(name: Notifications.Userprofiles.ImageDownloaded, object: Userprofiles.shared.current)
+//        }
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)

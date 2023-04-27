@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import UIKit
+import SwiftyJSON
 
 class SignInModel {
   
@@ -14,24 +16,202 @@ class SignInModel {
 }
 
 extension SignInModel: SignInControllerInput {
-  func providerlogin(_ provider: AuthProvider) {
+  /**
+   Performs sign in via providers token.
+   - parameter provider: Social media provider.
+   - parameter instance: For Google instance is `GIDGoogleUser`, for VK instance is.
+   - returns: Void. Completion is handled via `modelOutput.providerSignInCallback()` protocol func
+   */
+  func providerSignIn(provider: AuthProvider, accessToken: String) {
+    @Sendable
+    func providerLogout() {
+      switch provider {
+      case .VK:
+        VKWorker.logout()
+//      case .Facebook:
+//        FBWorker.logout()
+      case .Google:
+        GoogleWorker.logout()
+      default:
+#if DEBUG
+        fatalError("Not implemented")
+#endif
+      }
+    }
     
+    @Sendable
+    func getProviderData() async throws -> [String: Any] {
+      var userImage: UIImage?
+      
+      func prepareData(json: JSON) async throws -> [String: Any] {
+        switch provider {
+        case .VK:
+          guard let id = json[1]["user_id"].string,
+                let email = json[1]["email"].string,
+                let firstName = json[0]["first_name"].string,
+                let lastName = json[0]["last_name"].string,
+                let gender = json[0]["sex"].int,
+                let domain = json[0]["domain"].string else {
+            throw "VK json serialization failure"
+          }
+          let birthDate = json[0]["bdate"].string
+          if let pictureURL = json[0]["photo_400_orig"].string, let url = URL(string: pictureURL) {
+            do {
+              userImage = try await API.shared.system.downloadImageAsync(from: url)
+              return VKWorker.prepareDjangoData(id: id,
+                                                firstName: firstName,
+                                                lastName: lastName,
+                                                email: email,
+                                                gender: gender,
+                                                domain: domain,
+                                                birthDate: birthDate,
+                                                image: userImage)
+            } catch {
+              return VKWorker.prepareDjangoData(id: id,
+                                                firstName: firstName,
+                                                lastName: lastName,
+                                                email: email,
+                                                gender: gender,
+                                                domain: domain,
+                                                birthDate: birthDate)
+            }
+          } else {
+            return VKWorker.prepareDjangoData(id: id,
+                                              firstName: firstName,
+                                              lastName: lastName,
+                                              email: email,
+                                              gender: gender,
+                                              domain: domain,
+                                              birthDate: birthDate)
+          }
+//        case .Facebook:
+//          guard let id = json["id"].string,
+//                let email = json["email"].string,
+//                let firstName = json["first_name"].string,
+//                let lastName = json["last_name"].string else {
+//            throw "VK json serialization failure"
+//          }
+//          if let pictureURL = json["picture"]["data"]["url"].string, let url = URL(string: pictureURL) {
+//            do {
+//              userImage = try await API.shared.system.downloadImageAsync(from: url)
+//              return FBWorker.prepareDjangoData(id: id,
+//                                                firstName: firstName,
+//                                                lastName: lastName,
+//                                                email: email,
+//                                                image: userImage)
+//            } catch {
+//              return FBWorker.prepareDjangoData(id: id,
+//                                                firstName: firstName,
+//                                                lastName: lastName,
+//                                                email: email)
+//            }
+//          } else {
+//            return FBWorker.prepareDjangoData(id: id,
+//                                              firstName: firstName,
+//                                              lastName: lastName,
+//                                              email: email)
+//          }
+        default:
+          throw "Not implemented"
+        }
+      }
+      
+      do {
+        switch provider {
+        case .VK:
+          let json = try await VKWorker.accountInfoAsync()
+          return try await prepareData(json: json)
+//        case .Facebook:
+//          let json = try await FBWorker.accountInfoAsync()
+//          return try await prepareData(json: json)
+        case .Google:
+          var dict = try await GoogleWorker.accountInfoAsync()
+          if let url = dict[DjangoVariables.UserProfile.image] as? URL {
+            do {
+              userImage = try await API.shared.system.downloadImageAsync(from: url)
+              dict[DjangoVariables.UserProfile.image] = userImage
+              return dict
+            } catch {
+              return dict
+            }
+          } else {
+            return dict
+          }
+        default:
+          throw "Not implemented"
+        }
+      } catch let error {
+        throw error
+      }
+    }
+    
+    Task {
+      do {
+        ///API authorization
+        try await API.shared.auth.loginViaProviderAsync(provider: provider, token: accessToken)
+        
+        ///Get profile from API
+        let json = try JSON(data: try await API.shared.profiles.current(),
+                            options: .mutableContainers)
+        
+        guard let appData = json["app_data"] as? JSON,
+              let current = json["current_user"] as? JSON
+        else { throw AppError.server }
+        
+        ///Load necessary data before creating user
+        try AppData.loadData(appData)
+        
+        var userprofile = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self,
+                                                                                          from: current.rawData())
+        Userprofiles.shared.current = userprofile
+        guard let wasEdited = userprofile.wasEdited else { fatalError() }
+        
+        ///If profile wasn't prieviously edited by user, then update it with provider's data
+        if !wasEdited {
+          let providerData = try await getProviderData()
+          userprofile = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self,
+                                                                                        from:  try await API.shared.profiles.updateUserprofileAsync(data: providerData) { _ in })
+        }
+        
+//        UserDefaults.Profile.id = userprofile.id
+        try await Userprofiles.shared.current?.downloadImageAsync()
+        providerLogout()
+        
+        await MainActor.run {
+          modelOutput?.providerSignInCallback(result: .success(true))
+        }
+      } catch let error {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        providerLogout()
+        await MainActor.run {
+          modelOutput?.providerSignInCallback(result: .failure(error))
+        }
+      }
+    }
   }
   
-  func mailLogin(username: String, password: String) {
+  func mailSignIn(username: String, password: String) {
     Task {
       do {
         try await API.shared.auth.loginAsync(username: username, password: password)
-        let userData = try await API.shared.getUserDataAsync()
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                   DateFormatter.dateTimeFormatter,
-                                                   DateFormatter.dateFormatter ]
-        Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: userData)
-        modelOutput?.loginCallback(.success(true))
+        
+        let userData = try await API.shared.profiles.current()
+        Userprofiles.shared.current = try JSONDecoder.withDateTimeDecodingStrategyFormatters()
+          .decode(Userprofile.self, from: userData)
+        
+        await MainActor.run {
+          modelOutput?.mailSignInCallback(.success(true))
+        }
       } catch {
         UserDefaults.clear()
-        modelOutput?.loginCallback(.failure(error))
+        await MainActor.run {
+#if DEBUG
+          error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+          modelOutput?.mailSignInCallback(.failure(error))
+        }
       }
     }
   }

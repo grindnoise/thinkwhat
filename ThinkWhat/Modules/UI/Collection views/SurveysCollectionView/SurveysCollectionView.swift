@@ -716,6 +716,7 @@ private extension SurveysCollectionView {
         case .Top:            appendingSet = Set(instances.filter { $0.isTop && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })//!$0.isRejected &&
         case .Own:            appendingSet = Set(instances.filter { $0.isOwn && !$0.isBanned && $0.id != Survey.fakeId })
         case .Favorite:       appendingSet = Set(instances.filter { $0.isFavorite && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })
+        case .Compatibility:  appendingSet = Set(instances.filter { $0.id != Survey.fakeId && !$0.isBanned })
         case .Subscriptions:  appendingSet = Set(instances.filter { $0.owner.subscribedAt && !$0.isBanned && !$0.isClaimed && !$0.isAnonymous && $0.id != Survey.fakeId })
         case .Topic:
           guard let topic = self.topic else { return }

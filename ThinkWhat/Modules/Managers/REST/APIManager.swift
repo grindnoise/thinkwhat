@@ -321,54 +321,31 @@ class API {
     self.request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.GET_CONFIRMATION_CODE), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
   }
   
-  func getUserData(completion: @escaping(Result<JSON, Error>)->()) {
-    request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.CURRENT_USER), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
-  }
+//  func getUserData(completion: @escaping(Result<JSON, Error>)->()) {
+//    request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.CURRENT_USER), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
+//  }
+//
+//  func getUserDataAsync() async throws -> Data {
+//    guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CURRENT_USER) else { throw APIError.invalidURL }
+//    do {
+//      return try await requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: headers())
+//    } catch {
+//      throw error
+//    }
+//  }
   
-  func getUserDataAsync() async throws -> Data {
-    guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CURRENT_USER) else { throw APIError.invalidURL }
-    do {
-      return try await requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: headers())
-    } catch {
-      throw error
-    }
-  }
-  
-  func getUserDataOrNilAsync() async -> Data? {
-    guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.CURRENT_USER_OR_NULL) else { fatalError(APIError.invalidURL.localizedDescription) }
-    do {
-      return try await requestAsync(url: url, httpMethod: .get, parameters: nil, encoding: URLEncoding.default, headers: headers())
-    } catch {
-      return nil
-    }
-  }
-  
-  
-  func getProfileNeedsUpdate(completion: @escaping(Result<Bool, Error>)->()) {
-    request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.PROFILE_NEEDS_UPDATE), httpMethod: .get) { result in
-      switch result {
-      case .success(let json):
-        guard let id = json["userprofile_id"].int, let needsUpdate = json["needs_update"].bool else { completion(.failure("User id is not found in response")); return }
-        UserDefaults.Profile.id = id
-        completion(.success(needsUpdate))
-      case .failure(let error):
-        completion(.failure(error))
-      }
-    }
-  }
-  
-  func getProfileNeedsUpdateAsync() async throws -> Bool {
-    guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILE_NEEDS_UPDATE) else { throw APIError.invalidURL }
-    do {
-      let data = try await requestAsync(url: url, httpMethod: .get, headers: headers())
-      let json = try JSON(data: data, options: .mutableContainers)
-      guard let id = json["userprofile_id"].int, let needsUpdate = json["needs_update"].bool else { throw "Invalid JSON data" }
-      UserDefaults.Profile.id = id
-      return needsUpdate
-    } catch let error {
-      throw error
-    }
-  }
+//  func getProfileNeedsUpdate(completion: @escaping(Result<Bool, Error>)->()) {
+//    request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.PROFILE_NEEDS_UPDATE), httpMethod: .get) { result in
+//      switch result {
+//      case .success(let json):
+//        guard let id = json["userprofile_id"].int, let needsUpdate = json["needs_update"].bool else { completion(.failure("User id is not found in response")); return }
+//        UserDefaults.Profile.id = id
+//        completion(.success(needsUpdate))
+//      case .failure(let error):
+//        completion(.failure(error))
+//      }
+//    }
+//  }
   
   func isUsernameEmailAvailable(email: String, username: String, completion: @escaping(Result<Bool, Error>)->()) {
     self.request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(email.isEmpty ? API_URLS.USERNAME_EXISTS : API_URLS.EMAIL_EXISTS),
@@ -477,6 +454,9 @@ class API {
   
   final class Auth {
     weak var parent: API! = nil
+    var headers: HTTPHeaders? {
+      return parent.headers()
+    }
     
     public func loginViaMail(username: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
       guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { completion(.failure(APIError.invalidURL)); return }
@@ -513,12 +493,19 @@ class API {
     ///Email/username auhorization. Store access token if finished successful
     public func loginAsync(username: String, password: String) async throws  {
       guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN) else { throw APIError.invalidURL }
-      let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "password", "username": "\(username)", "password": "\(password)"]
+      let parameters = [
+        "client_id": API_URLS.CLIENT_ID,
+        "client_secret": API_URLS.CLIENT_SECRET,
+        "grant_type": "password", "username": "\(username)",
+        "password": "\(password)"
+      ]
+
       do {
         let data = try await parent.requestAsync(url: url,
                                                  httpMethod: .post,
                                                  parameters: parameters,
-                                                 encoding: URLEncoding())
+                                                 encoding: URLEncoding(),
+                                                 accessControl: false)
         let json = try JSON(data: data, options: .mutableContainers)
         let _ = saveTokenInKeychain(json: json)
       } catch let error {
@@ -572,7 +559,7 @@ class API {
         Surveys.shared.eraseData()
         Userprofiles.shared.eraseData()
         SurveyReferences.shared.eraseData()
-        FBWorker.logout()
+//        FBWorker.logout()
         VKWorker.logout()
         completion(.success(true))
         return
@@ -583,13 +570,13 @@ class API {
                                          parameters: parameters,
                                          encoding: URLEncoding.default).response { response in
         switch response.result {
-        case .success(let _):
+        case .success(_):
           guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
           UserDefaults.clear()
           Surveys.shared.eraseData()
           Userprofiles.shared.eraseData()
           SurveyReferences.shared.eraseData()
-          FBWorker.logout()
+//          FBWorker.logout()
           VKWorker.logout()
           completion(.success(true))
           //                if 200...299 ~= statusCode {
@@ -604,8 +591,12 @@ class API {
       }
     }
     
-    public func signup(email: String, password: String, username: String, completion: @escaping (Result<Bool,Error>) -> ()) {
-      guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.SIGNUP) else { completion(.failure(APIError.invalidURL)); return }
+    public func signUp(email: String,
+                       password: String,
+                       username: String,
+                       completion: @escaping (Result<Bool,Error>) -> ()) {
+      guard let url = API_URLS.Auth.signUp else { fatalError(APIError.invalidURL.localizedDescription) }
+      
       let parameters = ["client_id": API_URLS.CLIENT_ID, "grant_type": "password", "email": "\(email)", "password": "\(password)", "username": "\(username)"]
       self.parent.sessionManager.request(url,
                                          method: .post,
@@ -632,6 +623,9 @@ class API {
   
   final class System {
     weak var parent: API! = nil
+    var headers: HTTPHeaders? {
+      return parent.headers()
+    }
     
     public func appLaunch() async throws -> JSON {
       guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else {
@@ -667,7 +661,8 @@ class API {
         case .success(let json):
           guard let code = json["countryCode"].string else { return }
           
-          UserDefaults.App.countryByIP = code
+//          UserDefaults.App.countryByIP = code
+          AppData.shared.countryByIP = code
         case .failure(let error):
 #if DEBUG
           print(error)
@@ -813,11 +808,28 @@ class API {
       return parent.headers()
     }
     
+    func current() async throws -> Data {
+      guard let url = API_URLS.Auth.current else { fatalError(APIError.invalidURL.localizedDescription) }
+      
+      do {
+        return try await parent.requestAsync(url: url,
+                                             httpMethod: .get,
+                                             parameters: nil,
+                                             encoding: URLEncoding.default,
+                                             headers: parent.headers())
+      } catch {
+        throw error
+      }
+    }
     
-    public func updateUserprofileAsync(data: [String: Any], uploadProgress: @escaping(Double) -> ()) async throws -> Data {
-      guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.PROFILES + "\(UserDefaults.Profile.id!)" + "/"),
+    public func updateUserprofileAsync(data: [String: Any],
+                                       uploadProgress: @escaping(Double) -> ()) async throws -> Data {
+      guard let userprofile = Userprofiles.shared.current,
+            let base = API_URLS.Profiles.base,
             let headers = headers
       else { throw APIError.invalidURL }
+      
+      let url = base.appendingPathComponent("\(userprofile.id)/")
       
       var dict = data
       if let image = dict.removeValue(forKey: "image") as? UIImage {
@@ -832,8 +844,14 @@ class API {
           imageData = data
           fileFormat = .PNG
         }
-        guard imageData != nil, fileFormat != .Unknown else { throw APIError.badData }
-        multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: UserDefaults.Profile.id!)).\(fileFormat)", mimeType: "jpg/png")
+        
+        guard imageData != nil,
+              fileFormat != .Unknown
+        else {
+          throw APIError.badData
+        }
+        
+        multipartFormData.append(imageData, withName: "image", fileName: "\(String(describing: userprofile.id)).\(fileFormat)", mimeType: "jpg/png")
         for (key, value) in dict {
           if value is String || value is Int {
             multipartFormData.append("\(value)".data(using: .utf8)!, withName: key)
@@ -1128,11 +1146,10 @@ class API {
         guard !requestHotExcept.isEmpty else { return }
         
         let json = try JSON(data: data, options: .mutableContainers)
-        Surveys.shared.load(json)
+        try Surveys.shared.load(json)
       } catch let error {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
-        fatalError()
 #endif
         throw error
       }
@@ -1162,7 +1179,7 @@ class API {
         guard !requestHotExcept.isEmpty else { return }
         
         let json = try JSON(data: data, options: .mutableContainers)
-        Surveys.shared.load(json)
+        try Surveys.shared.load(json)
       } catch let error {
         surveyReference.isClaimedPublisher.send(completion: .failure(error))
         
@@ -1227,11 +1244,11 @@ class API {
                                                  encoding: JSONEncoding.default,
                                                  headers: headers)
         try await MainActor.run {
-          Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
+          try Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
         }
       } catch let error {
 #if DEBUG
-        print(error)
+        error.printLocalized(class: type(of: self), functionName: #function)
 #endif
         throw error
       }
@@ -2000,7 +2017,11 @@ private extension API {
     
     func request() async throws -> Data {
       try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data,Error>) in
-        self.sessionManager.request(url, method: httpMethod, parameters: parameters, encoding: encoding, headers: headers).responseData { response in
+        self.sessionManager.request(url,
+                                    method: httpMethod,
+                                    parameters: parameters,
+                                    encoding: encoding,
+                                    headers: headers).responseData { response in
           switch response.result {
           case .success(let data):
             guard let statusCode = response.response?.statusCode else { continuation.resume(throwing: APIError.httpStatusCodeMissing); return }
@@ -2017,7 +2038,6 @@ private extension API {
 //                } else {
 //                  value = "backend_error".localized
 //                }
-                
                 continuation.resume(throwing: APIError.backend(code: statusCode, value: json))
                 
                 return

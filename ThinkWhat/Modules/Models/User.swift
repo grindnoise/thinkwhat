@@ -46,31 +46,31 @@ class Userprofiles {
   
   class func updateUserData(_ json: JSON) throws {
     guard let current = Userprofiles.shared.current,
-          let subscribersTotal = json["subscribers_count"].int,
-          let subscriptionsTotal = json["subscribed_at_count"].int,
-          let publicationsTotal = json["own_surveys_count"].int,
-          let favoritesTotal = json["favorite_surveys_count"].int,
-          let completeTotal = json["completed_surveys_count"].int,
+//          let subscribersTotal = json["subscribers_count"].int,
+//          let subscriptionsTotal = json["subscribed_at_count"].int,
+//          let publicationsTotal = json["own_surveys_count"].int,
+//          let favoritesTotal = json["favorite_surveys_count"].int,
+//          let completeTotal = json["completed_surveys_count"].int,
 //          let votesReceivedTotal = json["votes_received_count"].int,
 //          let commentsTotal = json["comments_count"].int,
 //            let commentsReceivedTotal = json["comments_received_count"].int,
           let balance = json["balance"].int,
-          let top_preferences = json["top_preferences"] as? JSON,
+//          let top_preferences = json["top_preferences"] as? JSON,
 //          let city = try json["city"].rawData() as? Data,
-          let isBanned = json["is_banned"].bool,
-          let locales = json["locales"].arrayObject as? [String],
-          let description = json["description"].string
+//          let isBanned = json["is_banned"].bool,
+          let locales = json["locales"].arrayObject as? [String]
+//          let description = json["description"].string
     else { return }
     
-    current.description = description
-    current.subscribersTotal = subscribersTotal
-    current.subscriptionsTotal = subscriptionsTotal
-    current.publicationsTotal = publicationsTotal
-    current.favoritesTotal = favoritesTotal
-    current.completeTotal = completeTotal
+//    current.description = description
+//    current.subscribersTotal = subscribersTotal
+//    current.subscriptionsTotal = subscriptionsTotal
+//    current.publicationsTotal = publicationsTotal
+//    current.favoritesTotal = favoritesTotal
+//    current.completeTotal = completeTotal
     current.balance = balance
-    current.isBanned = isBanned
-    current.updatePreferences(top_preferences)
+//    current.isBanned = isBanned
+//    current.updatePreferences(top_preferences)
     UserDefaults.App.contentLanguages = locales
   
     var decoder: JSONDecoder!
@@ -83,11 +83,13 @@ class Userprofiles {
       let subscriptions = try decoder.decode([Userprofile].self, from: subscriptionsData)
       let subscribers = try decoder.decode([Userprofile].self, from: subscribersData)
       shared.append((subscriptions + subscribers).uniqued())
-    } catch { throw AppError.server }
-//
-    guard let city = try json["city"].rawData() as? Data else { return }
-//
-    current.city = try decoder.decode(City.self, from: city)
+    } catch {
+      throw AppError.server
+    }
+////
+//    guard let city = try json["city"].rawData() as? Data else { return }
+////
+//    current.city = try decoder.decode(City.self, from: city)
   }
   
   class func clear() {
@@ -309,8 +311,8 @@ class Userprofile: Decodable {
   var image: UIImage? {
     didSet {
       guard !image.isNil else { return }
-      imagePublisher.send(image!)
       
+      imagePublisher.send(image!)
       //#if DEBUG
       //            print("image for \(id)", image)
       //#endif
@@ -418,8 +420,12 @@ class Userprofile: Decodable {
     }
   }
   var preferencesSorted: [[Topic: Int]]? {
-    return preferences.sorted { (first, second) in
-      first.first!.value > second.first!.value
+    return preferences.sorted {
+      guard let first = $0.first?.value,
+            let second = $1.first?.value
+      else { return true }
+      
+      return first > second
     }
   }
   var firstNameSingleWord: String {
@@ -661,6 +667,44 @@ class Userprofile: Decodable {
     }
   }
   
+  func update(from instance: Userprofile) {
+    firstName = instance.firstName
+    lastName = instance.lastName
+    email = instance.email
+    description = instance.description
+    dateJoined = instance.dateJoined
+    birthDate = instance.birthDate
+    gender = instance.gender
+    imageURL = instance.imageURL
+    facebookURL = instance.facebookURL
+    instagramURL = instance.instagramURL
+    tiktokURL = instance.tiktokURL
+    vkURL = instance.vkURL
+    city = instance.city
+    cityId = instance.cityId
+    cityTitle = instance.cityTitle
+//    compatibility = instance.compatibility
+    image = instance.image
+    completeTotal = instance.completeTotal
+    votesReceivedTotal = instance.votesReceivedTotal
+    commentsTotal = instance.commentsTotal
+    commentsReceivedTotal = instance.commentsReceivedTotal
+    favoritesTotal = instance.favoritesTotal
+    publicationsTotal = instance.publicationsTotal
+    subscribersTotal = instance.subscribersTotal
+    subscriptionsTotal = instance.subscriptionsTotal
+    lastVisit = instance.lastVisit
+    wasEdited = instance.wasEdited
+    isBanned = instance.isBanned
+    balance = instance.balance
+    preferences = instance.preferences
+//    surveys = instance.surveys
+//    favorites = instance.favorites
+    answers = instance.answers
+    subscribedAt = instance.subscribedAt
+    subscribedToMe = instance.subscribedToMe
+    notifyOnPublication = instance.notifyOnPublication
+  }
 //  func loadSurveys(data: Data) {
 //    let decoder = JSONDecoder()
 //    do {
@@ -717,9 +761,10 @@ class Userprofile: Decodable {
     }
   }
   
-  func downloadImageAsync() async throws {
+//  @discardableResult
+  func downloadImageAsync() async throws {//}-> UIImage {
     do {
-      guard image.isNil, !isDownloading else { return }
+      guard image.isNil, !isDownloading else { return }//UIImage() }
       
       guard let url =  imageURL else { throw AppError.invalidURL }
       //#if DEBUG

@@ -41,7 +41,7 @@ extension HotModel: HotControllerInput {
 #if DEBUG
         print(json)
 #endif
-        Surveys.shared.load(json)
+        try Surveys.shared.load(json)
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
@@ -103,7 +103,7 @@ extension HotModel: HotControllerInput {
         print(json)
 #endif
         await MainActor.run {
-          Surveys.shared.load(json)
+          try? Surveys.shared.load(json)
           //                    modelOutput?.onRequestCompleted()
         }
       } catch {

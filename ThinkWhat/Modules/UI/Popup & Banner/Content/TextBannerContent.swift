@@ -23,6 +23,9 @@ class TextBannerContent: UIView {
     instance.clipsToBounds = true
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     instance.tintColor = imageTintColor
+    instance.publisher(for: \.bounds)
+      .sink { [unowned self] in instance.cornerRadius = $0.width*self.cornerRadiusScaleFactor }
+      .store(in: &subscriptions)
     
     if let icon = icon {
       instance.image = nil
@@ -70,7 +73,7 @@ class TextBannerContent: UIView {
   private let textAlignment: NSTextAlignment
   private var icon: Icon?
   private var attributedText: NSAttributedString?
-  
+  private let cornerRadiusScaleFactor: CGFloat
   
   
   // MARK: - Deinitialization
@@ -95,7 +98,8 @@ class TextBannerContent: UIView {
        tintColor: UIColor,
        fontName: String = Fonts.Regular,
        textStyle: UIFont.TextStyle = .headline,
-       textAlignment: NSTextAlignment = .center) {
+       textAlignment: NSTextAlignment = .center,
+       cornerRadius: CGFloat = 0) {
     self.fontName = fontName
     self.image = image
     self.icon = icon
@@ -105,6 +109,7 @@ class TextBannerContent: UIView {
     self.textStyle = textStyle
     self.imageTintColor = tintColor
     self.textAlignment = textAlignment
+    self.cornerRadiusScaleFactor = cornerRadius
     
     super.init(frame: .zero)
     

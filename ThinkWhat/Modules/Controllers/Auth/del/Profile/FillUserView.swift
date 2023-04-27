@@ -445,8 +445,9 @@ extension FillUserView {
         }
         let touch = UITapGestureRecognizer(target:self, action:#selector(FillUserView.hideKeyboard))
         self.addGestureRecognizer(touch)
-        guard let countryCode = UserDefaults.App.countryByIP else { return }
-        if countryCode == "RU" {
+        
+      ///Forbidden in Russia
+      if AppData.shared.countryByIP == "RU" {
             facebookLogo.removeFromSuperview()
             instagramLogo.removeFromSuperview()
         }

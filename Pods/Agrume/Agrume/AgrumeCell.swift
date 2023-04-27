@@ -4,6 +4,7 @@
 
 import SwiftyGif
 import UIKit
+import VisionKit
 
 protocol AgrumeCellDelegate: AnyObject {
 
@@ -60,12 +61,18 @@ final class AgrumeCell: UICollectionViewCell {
   // if set to true, it means we are updating image on the same cell, so we want to reserve the zoom level & position
   var updatingImageOnSameCell = false
   
+  // enables Live Text analysis & interaction
+  var enableLiveText = false
+  
   var image: UIImage? {
     didSet {
       if image?.imageData != nil, let image = image {
         imageView.setGifImage(image)
       } else {
         imageView.image = image
+        if #available(iOS 16, *), enableLiveText, let image = image {
+          analyzeImage(image)
+        }
       }
       if !updatingImageOnSameCell {
         updateScrollViewAndImageViewForCurrentMetrics()
@@ -175,7 +182,9 @@ extension AgrumeCell: UIGestureRecognizerDelegate {
     contentView.isUserInteractionEnabled = false
     
     CATransaction.begin()
-    CATransaction.setCompletionBlock { [unowned self] in
+    CATransaction.setCompletionBlock { [weak self] in
+      // captures self weakly to avoid extending the lifetime of the cell
+      guard let self else { return }
       self.contentView.isUserInteractionEnabled = true
     }
     scrollView.zoom(to: destination, animated: true)
@@ -248,7 +257,7 @@ extension AgrumeCell: UIGestureRecognizerDelegate {
 
   @objc
   private func dismissPan(_ gesture: UIPanGestureRecognizer) {
-    guard let panPhysics = panPhysics else { return }
+    guard let panPhysics else { return }
 
     let translation = gesture.translation(in: gesture.view)
     let locationInView = gesture.location(in: gesture.view)
@@ -302,7 +311,7 @@ extension AgrumeCell: UIGestureRecognizerDelegate {
   }
 
   private func dismissWithFlick(_ velocity: CGPoint) {
-    guard let panPhysics = panPhysics else { return }
+    guard let panPhysics else { return }
 
     flickedToDismiss = true
 
@@ -479,5 +488,29 @@ extension AgrumeCell: UIScrollViewDelegate {
     if notZoomed && (abs(velocity.x) > highVelocity || abs(velocity.y) > highVelocity) {
       dismiss()
     }
+  }
+  
+  @available(iOS 16, *)
+  private func analyzeImage(_ image: UIImage) {
+    #if !targetEnvironment(macCatalyst)
+    guard ImageAnalyzer.isSupported else {
+      return
+    }
+    let interaction = ImageAnalysisInteraction()
+    imageView.addInteraction(interaction)
+    
+    let analyzer = ImageAnalyzer()
+    let configuration = ImageAnalyzer.Configuration([.text, .machineReadableCode])
+    
+    Task { @MainActor in
+      do {
+        let analysis = try await analyzer.analyze(image, configuration: configuration)
+        interaction.analysis = analysis
+        interaction.preferredInteractionTypes = .automatic
+      } catch {
+        print(error.localizedDescription)
+      }
+    }
+    #endif
   }
 }

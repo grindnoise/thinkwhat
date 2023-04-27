@@ -19,17 +19,21 @@ final class VKWorker {
         vkDelegateReference = VKDelegate()
     }
     
-    class func authorize(completion: @escaping(Result<Token,Error>)->()) {
-        guard VK.sessions.default.accessToken == nil else { completion(.success(VK.sessions.default.accessToken!)); return }
+    class func authorize(completion: @escaping(Result<String,Error>)->()) {
+      guard let accessToken = VK.sessions.default.accessToken?.get() else {
         VK.sessions.default.logIn(
             onSuccess: { info in
-                guard let token = VK.sessions.default.accessToken else { completion(.failure("Failed to recive VK access token")); return }
+              guard let token = VK.sessions.default.accessToken?.get() else { completion(.failure("Failed to recive VK access token")); return }
                 completion(.success(token))
             },
             onError: { error in
                 completion(.failure(error))
             }
         )
+        return
+      }
+      
+      completion(.success(accessToken))
     }
     
     @MainActor

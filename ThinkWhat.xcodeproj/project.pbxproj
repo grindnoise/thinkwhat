@@ -209,10 +209,15 @@
 		AB4A0CA529CD95D600E6D57A /* NewPollCommentsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4A0CA429CD95D600E6D57A /* NewPollCommentsCell.swift */; };
 		AB4AAA6129E3FE920044E971 /* PollPostedPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4AAA6029E3FE920044E971 /* PollPostedPopupContent.swift */; };
 		AB4BD892244DE52100D9A3F0 /* TopIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4BD891244DE52100D9A3F0 /* TopIcon.swift */; };
+		AB4C5B2729F96F4B001684EE /* TermsContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4C5B2329F96F4B001684EE /* TermsContract.swift */; };
+		AB4C5B2829F96F4B001684EE /* TermsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4C5B2429F96F4B001684EE /* TermsViewController.swift */; };
+		AB4C5B2929F96F4B001684EE /* TermsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4C5B2529F96F4B001684EE /* TermsView.swift */; };
+		AB4C5B2A29F96F4B001684EE /* TermsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4C5B2629F96F4B001684EE /* TermsModel.swift */; };
 		AB4EE75528CE49AF0016EEC8 /* UsernameInputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4EE75428CE49AF0016EEC8 /* UsernameInputTextField.swift */; };
 		AB4EE75828CE4AC40016EEC8 /* FlexibleTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4EE75728CE4AC40016EEC8 /* FlexibleTextField.swift */; };
 		AB51075628F02E6E00CA0BFC /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51075528F02E6E00CA0BFC /* Enums.swift */; };
 		AB51075828F1CDD000CA0BFC /* AppSettingsLanguageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51075728F1CDD000CA0BFC /* AppSettingsLanguageCell.swift */; };
+		AB511C1129F14D1000AF7830 /* AnyOptional.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB511C1029F14D1000AF7830 /* AnyOptional.swift */; };
 		AB51605C24EFEC79006A07B7 /* CategoryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51605B24EFEC79006A07B7 /* CategoryCollectionViewController.swift */; };
 		AB51605F24EFF610006A07B7 /* CategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB51605D24EFF610006A07B7 /* CategoryCollectionViewCell.swift */; };
 		AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */; };
@@ -323,6 +328,10 @@
 		AB7C6FB42865AE3000000429 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7C6FB32865AE3000000429 /* Error.swift */; };
 		AB7C95AD29B2281600F367B3 /* HotCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7C95AC29B2281600F367B3 /* HotCard.swift */; };
 		AB7C95AF29B2322200F367B3 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7C95AE29B2322200F367B3 /* Card.swift */; };
+		AB7CB3C329FAC47A0098A62F /* ProfileCreationContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7CB3BF29FAC47A0098A62F /* ProfileCreationContract.swift */; };
+		AB7CB3C429FAC47A0098A62F /* ProfileCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7CB3C029FAC47A0098A62F /* ProfileCreationViewController.swift */; };
+		AB7CB3C529FAC47A0098A62F /* ProfileCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7CB3C129FAC47A0098A62F /* ProfileCreationView.swift */; };
+		AB7CB3C629FAC47A0098A62F /* ProfileCreationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7CB3C229FAC47A0098A62F /* ProfileCreationModel.swift */; };
 		AB7D14E629C475C80036FA7A /* NewPollCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7D14E529C475C80036FA7A /* NewPollCollectionView.swift */; };
 		AB7D14E929C47B4D0036FA7A /* NewPollTopicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7D14E829C47B4D0036FA7A /* NewPollTopicCell.swift */; };
 		AB7D14EB29C47DE40036FA7A /* TagCapsule.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7D14EA29C47DE40036FA7A /* TagCapsule.swift */; };
@@ -484,7 +493,6 @@
 		ABC18339284E52A3005D1C31 /* ImageSelectionHeaderContent.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABC18338284E52A3005D1C31 /* ImageSelectionHeaderContent.xib */; };
 		ABC3E7C722E9B33700DEA9FD /* Mail.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C622E9B33700DEA9FD /* Mail.swift */; };
 		ABC3E7C922EB0B5600DEA9FD /* WarningSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC3E7C822EB0B5600DEA9FD /* WarningSign.swift */; };
-		ABC5823529D8AE49000D4770 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09B8BE406BA85CE59BB01EDA /* Pods_ThinkWhat.framework */; };
 		ABC5823A29D8C0D2000D4770 /* CostCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC5823929D8C0D2000D4770 /* CostCell.swift */; };
 		ABC8270629AA4F5900E33074 /* AccountManagementCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC8270529AA4F5900E33074 /* AccountManagementCollectionView.swift */; };
 		ABC8270829AA4FE800E33074 /* AccountManagementCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC8270729AA4FE800E33074 /* AccountManagementCell.swift */; };
@@ -582,7 +590,7 @@
 		ABFB4222287320DE0066CFA0 /* YoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */; };
 		ABFB42242873443A0066CFA0 /* WebViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB42232873443A0066CFA0 /* WebViewCell.swift */; };
 		ABFD793E25F8CD99009A2824 /* RoundIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFD793D25F8CD99009A2824 /* RoundIcon.swift */; };
-		EBF405C556FC541BF4736050 /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE3CFCD02802992F2CE99B57 /* Pods_ThinkWhat_ThinkWhatTests.framework */; };
+		F3A9E01C5D598FE05DC70541 /* Pods_ThinkWhat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 037F7D34DCC3F8F2C2612CD4 /* Pods_ThinkWhat.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -603,11 +611,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		09B8BE406BA85CE59BB01EDA /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		037F7D34DCC3F8F2C2612CD4 /* Pods_ThinkWhat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		138C4133FA4A5E202A15A359 /* Pods-ThinkWhat.local.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.local.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.local.xcconfig"; sourceTree = "<group>"; };
-		247736518D0309740A98CC0B /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.local.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.local.xcconfig"; sourceTree = "<group>"; };
 		40E571ED81B87E95C9940155 /* Pods-ThinkWhat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.release.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.release.xcconfig"; sourceTree = "<group>"; };
-		46E5EAC6A184DBAC0FA63C02 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig"; sourceTree = "<group>"; };
 		4BCD7E8AF2367DEE4F6E567D /* Pods-ThinkWhat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.debug.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.debug.xcconfig"; sourceTree = "<group>"; };
 		581B3A347B798706999BB86C /* Pods-ThinkWhat.alpha.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat.alpha.xcconfig"; path = "Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat.alpha.xcconfig"; sourceTree = "<group>"; };
 		AB00FFD22583A4A50071C7DE /* TextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewController.swift; sourceTree = "<group>"; };
@@ -821,10 +827,15 @@
 		AB4AAA6029E3FE920044E971 /* PollPostedPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollPostedPopupContent.swift; sourceTree = "<group>"; };
 		AB4B85DC27785ACE00884E65 /* libswiftCore.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftCore.tbd; path = usr/lib/swift/libswiftCore.tbd; sourceTree = SDKROOT; };
 		AB4BD891244DE52100D9A3F0 /* TopIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopIcon.swift; sourceTree = "<group>"; };
+		AB4C5B2329F96F4B001684EE /* TermsContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsContract.swift; sourceTree = "<group>"; };
+		AB4C5B2429F96F4B001684EE /* TermsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsViewController.swift; sourceTree = "<group>"; };
+		AB4C5B2529F96F4B001684EE /* TermsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsView.swift; sourceTree = "<group>"; };
+		AB4C5B2629F96F4B001684EE /* TermsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsModel.swift; sourceTree = "<group>"; };
 		AB4EE75428CE49AF0016EEC8 /* UsernameInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameInputTextField.swift; sourceTree = "<group>"; };
 		AB4EE75728CE4AC40016EEC8 /* FlexibleTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlexibleTextField.swift; sourceTree = "<group>"; };
 		AB51075528F02E6E00CA0BFC /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		AB51075728F1CDD000CA0BFC /* AppSettingsLanguageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsLanguageCell.swift; sourceTree = "<group>"; };
+		AB511C1029F14D1000AF7830 /* AnyOptional.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyOptional.swift; sourceTree = "<group>"; };
 		AB51605B24EFEC79006A07B7 /* CategoryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewController.swift; sourceTree = "<group>"; };
 		AB51605D24EFF610006A07B7 /* CategoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		AB51605E24EFF610006A07B7 /* CategoryCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CategoryCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -935,6 +946,10 @@
 		AB7C6FB32865AE3000000429 /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		AB7C95AC29B2281600F367B3 /* HotCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotCard.swift; sourceTree = "<group>"; };
 		AB7C95AE29B2322200F367B3 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
+		AB7CB3BF29FAC47A0098A62F /* ProfileCreationContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCreationContract.swift; sourceTree = "<group>"; };
+		AB7CB3C029FAC47A0098A62F /* ProfileCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCreationViewController.swift; sourceTree = "<group>"; };
+		AB7CB3C129FAC47A0098A62F /* ProfileCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCreationView.swift; sourceTree = "<group>"; };
+		AB7CB3C229FAC47A0098A62F /* ProfileCreationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCreationModel.swift; sourceTree = "<group>"; };
 		AB7D14E529C475C80036FA7A /* NewPollCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollCollectionView.swift; sourceTree = "<group>"; };
 		AB7D14E829C47B4D0036FA7A /* NewPollTopicCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollTopicCell.swift; sourceTree = "<group>"; };
 		AB7D14EA29C47DE40036FA7A /* TagCapsule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagCapsule.swift; sourceTree = "<group>"; };
@@ -1197,9 +1212,6 @@
 		ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeCell.swift; sourceTree = "<group>"; };
 		ABFB42232873443A0066CFA0 /* WebViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewCell.swift; sourceTree = "<group>"; };
 		ABFD793D25F8CD99009A2824 /* RoundIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundIcon.swift; sourceTree = "<group>"; };
-		B5AA6A15044DFD46E780395C /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.release.xcconfig"; sourceTree = "<group>"; };
-		CE3CFCD02802992F2CE99B57 /* Pods_ThinkWhat_ThinkWhatTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ThinkWhat_ThinkWhatTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DB8B7F6D4E778B22036AA083 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig"; path = "Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1207,7 +1219,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ABC5823529D8AE49000D4770 /* Pods_ThinkWhat.framework in Frameworks */,
+				F3A9E01C5D598FE05DC70541 /* Pods_ThinkWhat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1215,7 +1227,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EBF405C556FC541BF4736050 /* Pods_ThinkWhat_ThinkWhatTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1234,8 +1245,7 @@
 			children = (
 				AB4B85DC27785ACE00884E65 /* libswiftCore.tbd */,
 				AB2BB282277856FB004606E3 /* libswift_Concurrency.tbd */,
-				09B8BE406BA85CE59BB01EDA /* Pods_ThinkWhat.framework */,
-				CE3CFCD02802992F2CE99B57 /* Pods_ThinkWhat_ThinkWhatTests.framework */,
+				037F7D34DCC3F8F2C2612CD4 /* Pods_ThinkWhat.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1342,6 +1352,7 @@
 				AB4054F72878375F000F7768 /* ThinkWhatProtocols.swift */,
 				AB5787F629228AD2009C1DBF /* TintColorable.swift */,
 				AB156F6529AF88BE00F5397E /* Queue.swift */,
+				AB511C1029F14D1000AF7830 /* AnyOptional.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -2000,6 +2011,17 @@
 			path = "Poll publication congratulations";
 			sourceTree = "<group>";
 		};
+		AB4C5B2229F96F35001684EE /* Terms */ = {
+			isa = PBXGroup;
+			children = (
+				AB4C5B2329F96F4B001684EE /* TermsContract.swift */,
+				AB4C5B2429F96F4B001684EE /* TermsViewController.swift */,
+				AB4C5B2529F96F4B001684EE /* TermsView.swift */,
+				AB4C5B2629F96F4B001684EE /* TermsModel.swift */,
+			);
+			path = Terms;
+			sourceTree = "<group>";
+		};
 		AB4EE75628CE4AA30016EEC8 /* Text fields */ = {
 			isa = PBXGroup;
 			children = (
@@ -2096,9 +2118,9 @@
 				AB10031027BFAC7F00338EE4 /* Profile */,
 				AB0AB63627B4FFF2006FD33F /* Agreement */,
 				AB98307127B687A6002C5132 /* Log in */,
+				ABB9E880279EA6090018BB2E /* Welcome */,
 				AB98308027B935A6002C5132 /* Recover account */,
 				AB8DA31E27A1487500F92C18 /* Sign Up */,
-				ABB9E880279EA6090018BB2E /* Welcome */,
 			);
 			path = del;
 			sourceTree = "<group>";
@@ -2361,6 +2383,17 @@
 				ABB1BE9029E5B34A006E757D /* EmptyHotCard.swift */,
 			);
 			path = Card;
+			sourceTree = "<group>";
+		};
+		AB7CB3BE29FAC4440098A62F /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				AB7CB3BF29FAC47A0098A62F /* ProfileCreationContract.swift */,
+				AB7CB3C029FAC47A0098A62F /* ProfileCreationViewController.swift */,
+				AB7CB3C129FAC47A0098A62F /* ProfileCreationView.swift */,
+				AB7CB3C229FAC47A0098A62F /* ProfileCreationModel.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		AB7CE6FA23A36123006FDBD8 /* Existing */ = {
@@ -2899,6 +2932,8 @@
 		ABB9E86C279E9E6B0018BB2E /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				AB7CB3BE29FAC4440098A62F /* Profile */,
+				AB4C5B2229F96F35001684EE /* Terms */,
 				AB5DBB4929E9672A00855B49 /* Sign in */,
 				AB5DBB4029E9392400855B49 /* Start screen */,
 				AB5DBB3F29E9372E00855B49 /* del */,
@@ -3230,10 +3265,6 @@
 				138C4133FA4A5E202A15A359 /* Pods-ThinkWhat.local.xcconfig */,
 				581B3A347B798706999BB86C /* Pods-ThinkWhat.alpha.xcconfig */,
 				40E571ED81B87E95C9940155 /* Pods-ThinkWhat.release.xcconfig */,
-				46E5EAC6A184DBAC0FA63C02 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */,
-				247736518D0309740A98CC0B /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */,
-				DB8B7F6D4E778B22036AA083 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */,
-				B5AA6A15044DFD46E780395C /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -3249,7 +3280,7 @@
 				AB3C67D7223FBB6400B57580 /* Sources */,
 				AB3C67D8223FBB6400B57580 /* Frameworks */,
 				AB3C67D9223FBB6400B57580 /* Resources */,
-				56CABC7E34548779640529DB /* [CP] Embed Pods Frameworks */,
+				F70B04CFC045CD1EF07C8305 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -3264,11 +3295,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB3C6809223FBB6600B57580 /* Build configuration list for PBXNativeTarget "ThinkWhatTests" */;
 			buildPhases = (
-				924EB80A8E3CA9FD0EACBF05 /* [CP] Check Pods Manifest.lock */,
 				AB3C67EE223FBB6600B57580 /* Sources */,
 				AB3C67EF223FBB6600B57580 /* Frameworks */,
 				AB3C67F0223FBB6600B57580 /* Resources */,
-				112BCD2D64DBE23A715918D9 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -3466,40 +3495,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		112BCD2D64DBE23A715918D9 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat-ThinkWhatTests/Pods-ThinkWhat-ThinkWhatTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		56CABC7E34548779640529DB /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		76B7CEE72667A0FBD457CDC7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3522,26 +3517,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		924EB80A8E3CA9FD0EACBF05 /* [CP] Check Pods Manifest.lock */ = {
+		F70B04CFC045CD1EF07C8305 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ThinkWhat-ThinkWhatTests-checkManifestLockResult.txt",
+				"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -3648,6 +3638,7 @@
 				AB2C03D12440A611001BFD75 /* LostConnectionView.swift in Sources */,
 				AB39899B28637E4F004C958E /* CostCollectionView.swift in Sources */,
 				AB82C368259C826100888C74 /* TrashIcon.swift in Sources */,
+				AB4C5B2929F96F4B001684EE /* TermsView.swift in Sources */,
 				ABBCF4142431F1F300BFEAB9 /* VerticallyCenteredTextView.swift in Sources */,
 				AB4EE75528CE49AF0016EEC8 /* UsernameInputTextField.swift in Sources */,
 				AB93FD75247BBC3D009546DD /* ArrayEncoding.swift in Sources */,
@@ -3673,6 +3664,7 @@
 				AB70BFDE28631F41001F0B2B /* DisabledPasteTextField.swift in Sources */,
 				AB90FAF828D490440096B147 /* PopupContent.swift in Sources */,
 				AB9998BE28058FA5009D0E4F /* Double.swift in Sources */,
+				AB511C1129F14D1000AF7830 /* AnyOptional.swift in Sources */,
 				AB00FFD52587A6320071C7DE /* BlurTransition.swift in Sources */,
 				AB7D14E929C47B4D0036FA7A /* NewPollTopicCell.swift in Sources */,
 				ABCA4E0022E5F53F00250AA9 /* VKManager.swift in Sources */,
@@ -3880,6 +3872,7 @@
 				AB8994F326C2BE6900F03375 /* InsufficientBalance.swift in Sources */,
 				AB234F4B28D7685500204EC8 /* SurveysModel.swift in Sources */,
 				AB4BD892244DE52100D9A3F0 /* TopIcon.swift in Sources */,
+				AB4C5B2829F96F4B001684EE /* TermsViewController.swift in Sources */,
 				ABDA046629ADFF020096175F /* SearchInsetTextField.swift in Sources */,
 				AB2AA1B52359EA8A0086D16C /* Survey.swift in Sources */,
 				AB217963275797F700D19567 /* InterestCollectionCell.swift in Sources */,
@@ -3910,6 +3903,7 @@
 				ABCE775928488C8E001E3413 /* ImageSelectionPopup.swift in Sources */,
 				AB3FDD3D23100D7800056C20 /* TemporaryUserCredentials.swift in Sources */,
 				ABB46F352344ACB700AF212B /* NavigationControllerPreloaded.swift in Sources */,
+				AB7CB3C529FAC47A0098A62F /* ProfileCreationView.swift in Sources */,
 				AB91195526C3AB1D007ED54A /* VotesFormula.swift in Sources */,
 				ABE884A42987B46800ACEFC7 /* UserCompatibility.swift in Sources */,
 				AB879049286D9FBB00C069BA /* NavbarContentView.swift in Sources */,
@@ -3919,6 +3913,7 @@
 				ABEDC4E32450168D00FA9128 /* User.swift in Sources */,
 				AB10030D27BF762400338EE4 /* String.swift in Sources */,
 				AB5787F729228AD2009C1DBF /* TintColorable.swift in Sources */,
+				AB4C5B2A29F96F4B001684EE /* TermsModel.swift in Sources */,
 				AB5EB5FD2361DDEA000D4D96 /* CategoryTableViewCell.swift in Sources */,
 				AB3A47D4283F59D200106407 /* PollCreationModel.swift in Sources */,
 				AB3C6828223FD24B00B57580 /* BorderedView.swift in Sources */,
@@ -3940,6 +3935,7 @@
 				AB156F6929AF891500F5397E /* QueueArray.swift in Sources */,
 				AB3A47CB283F599C00106407 /* PollCreationController.swift in Sources */,
 				AB98308C27B9385B002C5132 /* RecoverModel.swift in Sources */,
+				AB7CB3C429FAC47A0098A62F /* ProfileCreationViewController.swift in Sources */,
 				AB74A7F52833F2EB00B93522 /* SettingsSwitch.swift in Sources */,
 				ABB0F6D728F6D6B80068FDDF /* FeedbackModel.swift in Sources */,
 				AB6C9032240D3902009BE941 /* NewSurveyIcons.swift in Sources */,
@@ -3960,6 +3956,7 @@
 				AB18499D2755FEE400BEE23D /* UserViewController.swift in Sources */,
 				AB869F2526C3C69B008353B3 /* Warning.swift in Sources */,
 				AB041451244EFD0300336857 /* CategoriesViewController.swift in Sources */,
+				AB4C5B2729F96F4B001684EE /* TermsContract.swift in Sources */,
 				ABF4D15129D5D28300BCBFD8 /* NewPollCost.swift in Sources */,
 				ABB0F6D928F80E140068FDDF /* CALayer.swift in Sources */,
 				AB72962B27DB5A6D00D45B54 /* ListContract.swift in Sources */,
@@ -3996,6 +3993,7 @@
 				ABF20FBA24CAE8610092B223 /* UserSubscriptionCell.swift in Sources */,
 				ABDEB65D29C9AFD40099C8A4 /* NewPollChoicesCollectionView.swift in Sources */,
 				AB9A901228900C7C00E8197C /* SeparatorCell.swift in Sources */,
+				AB7CB3C329FAC47A0098A62F /* ProfileCreationContract.swift in Sources */,
 				ABBA29AB28A54F80000EBEE7 /* Fade.swift in Sources */,
 				AB5B6250291A6176007F413E /* AppLogoKit.swift in Sources */,
 				AB98308327B935DA002C5132 /* RecoverAccontViewController.swift in Sources */,
@@ -4003,6 +4001,7 @@
 				ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */,
 				AB7478BF2428951F00317EB6 /* CircularIndicatorImageView.swift in Sources */,
 				ABB7D049295A02CF00DF00B4 /* Publisher.swift in Sources */,
+				AB7CB3C629FAC47A0098A62F /* ProfileCreationModel.swift in Sources */,
 				ABDE82C128B38F18004E07BD /* CommentsController.swift in Sources */,
 				ABA16E9229D2E22D002D63B6 /* UIImage.swift in Sources */,
 				ABC8270629AA4F5900E33074 /* AccountManagementCollectionView.swift in Sources */,
@@ -4134,7 +4133,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -4202,7 +4201,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -4236,7 +4235,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4267,7 +4266,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4289,7 +4288,6 @@
 		};
 		AB3C680A223FBB6600B57580 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 46E5EAC6A184DBAC0FA63C02 /* Pods-ThinkWhat-ThinkWhatTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -4312,7 +4310,6 @@
 		};
 		AB3C680B223FBB6600B57580 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B5AA6A15044DFD46E780395C /* Pods-ThinkWhat-ThinkWhatTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -4414,7 +4411,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -4453,7 +4450,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4476,7 +4473,6 @@
 		};
 		AB864447286C40AF00C7A6F8 /* Alpha */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DB8B7F6D4E778B22036AA083 /* Pods-ThinkWhat-ThinkWhatTests.alpha.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -4557,7 +4553,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -4597,7 +4593,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -4621,7 +4617,6 @@
 		};
 		ABD5FD09286C4D2800BCC382 /* Local */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 247736518D0309740A98CC0B /* Pods-ThinkWhat-ThinkWhatTests.local.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";

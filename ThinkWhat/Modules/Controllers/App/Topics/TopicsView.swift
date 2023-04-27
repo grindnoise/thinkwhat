@@ -332,8 +332,25 @@ class TopicsView: UIView {
     instance.layer.shadowOffset = .zero
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
+      .throttle(for: .seconds(0.3), scheduler: DispatchQueue.main, latest: false)
       .filter { $0 != .zero }
-      .sink { instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath }
+      .sink {
+        let path = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath
+        instance.layer.add(Animations.get(property: .ShadowPath,
+                                          fromValue: instance.layer.shadowPath as Any,
+                                          toValue: path,
+                                          duration: 0.2,
+                                          delay: 0,
+                                          repeatCount: 0,
+                                          autoreverses: false,
+                                          timingFunction: .linear,
+                                          delegate: nil,
+                                          isRemovedOnCompletion: false,
+                                          completionBlocks: nil),
+                           forKey: nil)
+        
+//        instance.layer.shadowPath = path//UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath
+      }
       .store(in: &subscriptions)
     background.place(inside: instance)
     
@@ -631,7 +648,7 @@ private extension TopicsView {
       self.filterView.alpha = on ? 1 : 0
       self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
       constraint1.constant = on ? 16 : 0
-      constraint2.constant = on ? 16 : 8
+      constraint2.constant = on ? 16 : 0
       heightConstraint.constant = on ? self.filterViewHeight : 0
       self.layoutIfNeeded()
     }

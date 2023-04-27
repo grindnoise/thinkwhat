@@ -47,8 +47,6 @@ class MainController: UITabBarController {//}, StorageProtocol {
   private lazy var loadingIcon: Icon = {
     let instance = Icon(category: Icon.Category.Logo)
     instance.iconColor = Colors.Logo.Flame.rawValue
-    instance.isRounded = false
-    instance.clipsToBounds = false
     instance.scaleMultiplicator = 1.2
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     
@@ -585,11 +583,18 @@ private extension MainController {
           do {
             guard let appData = json["app_data"] as? JSON,
                   let surveys = json["surveys"] as? JSON,
-                  let userData = json["user_data"] as? JSON
+//                  let current = json["current_user"] as? JSON
+                  let userData = json["user_data"] as? JSON,
+                  let userprofile = userData["userprofile"] as? JSON
             else { throw AppError.server }
 
             do {
               try AppData.loadData(appData)
+              if Userprofiles.shared.current.isNil {
+                let data = try userprofile.rawData()
+                Userprofiles.shared.current = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self,
+                                                                                                              from: data)
+              }
             } catch {
               self.shouldTerminate = true
               switch error {
@@ -607,7 +612,7 @@ private extension MainController {
             guard !self.shouldTerminate else { return }
 
             try Userprofiles.updateUserData(userData)
-            Surveys.shared.load(surveys)
+            try? Surveys.shared.load(surveys)
 
 
             //                        hideLogo()
@@ -638,7 +643,8 @@ private extension MainController {
       navigationController.modalPresentationCapturesStatusBarAppearance = true
       navigationController.tabBarItem.image = image
       navigationController.tabBarItem.selectedImage = selectedImage
-      navigationController.navigationBar.prefersLargeTitles = true
+//      navigationController.navigationBar.prefersLargeTitles = false
+//      navigationController.navigationItem.largeTitleDisplayMode = .never
       navigationController.setNavigationBarHidden(true, animated: false)
       //            navigationController.delegate = appDelegate.transitionCoordinator
       rootViewController.navigationItem.title = title.localized
@@ -677,6 +683,8 @@ private extension MainController {
   
   @MainActor
   func setupUI() {
+    navigationController?.navigationBar.prefersLargeTitles = false
+    navigationController?.navigationItem.largeTitleDisplayMode = .never
 //    tabBarController?.view.backgroundColor = .white
     view.isUserInteractionEnabled = false
     tabBar.backgroundColor = .systemBackground
@@ -692,8 +700,12 @@ private extension MainController {
     navigationItem.setHidesBackButton(true, animated: false)
     UITabBar.appearance().barTintColor = .systemBackground
     
+    ///Fix visibility while loading
+    tabBar.alpha = 0
     setTabBarVisible(visible: false, animated: false)
-    loadingStack.placeInCenter(of: view, widthMultiplier: 0.6, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+    loadingStack.placeInCenter(of: passthroughView,
+                               widthMultiplier: 0.6)//,
+//                               yOffset: -NavigationController.Constants.NavBarHeightSmallState)
     animateLoaderColor(from: Colors.Logo.Flame, to: Colors.Logo.Flame.next())
     
             appDelegate.window?.addSubview(passthroughView)
@@ -727,6 +739,8 @@ private extension MainController {
     view.addSubview(text)
     loadingIcon.alpha = 0
     loadingText.alpha = 0
+    ///Fix visibility while loading
+    tabBar.alpha = 1
     setTabBarVisible(visible: true, animated: true)
     tabBarHeight = tabBar.bounds.height
     

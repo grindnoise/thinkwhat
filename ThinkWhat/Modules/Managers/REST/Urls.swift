@@ -15,6 +15,7 @@ struct API_URLS {
   }
   
   struct Profiles {
+    static let base:                URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/")}()
     static let subscribe:           URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/subscribe/")}()
     static let unsubscribe:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/unsubscribe/")}()
     static let removeSubscribers:   URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/remove_subscribers/")}()
@@ -33,6 +34,7 @@ struct API_URLS {
   
   struct Surveys {
     static let surveyById:          URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_id/")}()
+    static let listByIds:           URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/list_by_ids/")}()
     static let subscriptions:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/subscriptions/")}()
     static let new:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/new/")}()
     static let top:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/top/")}()
@@ -67,6 +69,12 @@ struct API_URLS {
     
   }
   
+  
+  struct Auth {
+    static let current:             URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/current/")}()
+    static let signUp:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/sign_up/")}()
+  }
+  
   struct System {
     static let termsOfUse:          URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("terms_of_use/")}()
     static let licenses:            URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("licenses_ios/")}()
@@ -78,7 +86,6 @@ struct API_URLS {
   static let CLIENT_SECRET            = localhost ? "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH" : "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
   
   
-  static let SIGNUP                   = "api/sign_up/"
   static let CURRENT_TIME             = "api/current_time/"
   static let TOKEN                    = "auth/token/"
   static let TOKEN_CONVERT            = "auth/convert-token/"
@@ -93,10 +100,9 @@ struct API_URLS {
   static let EMAIL_EXISTS             = "api/profiles/email_exists"
   static let GET_CONFIRMATION_CODE    = "api/profiles/send_confirmation_code/"
   static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified/"
-  static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_update/"
-  static let PROFILES                 = "api/profiles/"
-  static let CURRENT_USER             = "api/profiles/current/"
-  static let CURRENT_USER_OR_NULL     = "api/profiles/current_or_null/"
+//  static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_update/"
+//  static let PROFILES                 = "api/profiles/"
+//  static let CURRENT_USER             = "api/profiles/current/"
   static let USER_PROFILE_STATS       = "api/profiles/get_profile_stats/"
   static let USER_PROFILE_TOP_PUBS    = "api/profiles/get_top_active_publications/"
   

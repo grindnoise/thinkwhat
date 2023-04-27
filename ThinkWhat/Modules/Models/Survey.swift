@@ -82,7 +82,7 @@ class Survey: Decodable {
       case .ByOwner:
         return API_URLS.Surveys.byUserprofile
       case .Compatibility:
-        return API_URLS.Surveys.ids
+        return API_URLS.Surveys.listByIds
       }
     }
   }
@@ -653,7 +653,7 @@ class Surveys {
     let _ = try? decoder.decode([Comment].self, from: comments)
   }
   
-  func load(_ json: JSON) {
+  func load(_ json: JSON) throws {
     let decoder = JSONDecoder.withDateTimeDecodingStrategyFormatters()
     do {
       for (key, value) in json {
@@ -665,8 +665,9 @@ class Surveys {
       }
     } catch {
 #if DEBUG
-      fatalError("Survey init() threw error: \(error)")
+      error.printLocalized(class: type(of: self), functionName: #function)
 #endif
+      throw error
     }
   }
   

@@ -201,8 +201,8 @@ extension UserDefaults {
     @UserDefault(key: "min_api_version", defaultValue: 0.3)
     static var minAPIVersion: Double?
     
-    @UserDefault(key: "country_by_ip", defaultValue: nil)
-    static var countryByIP: String?
+//    @UserDefault(key: "country_by_ip", defaultValue: nil)
+//    static var countryByIP: String?
     
     static var youtubePlay: SideAppPreference? {
       set { _youtubePlay = newValue?.rawValue }
@@ -226,7 +226,7 @@ extension UserDefaults {
       UserDefaults.App.hasSeenPollVoteIntroduction        = nil
       UserDefaults.App.hasSeenAppIntroduction             = nil
       UserDefaults.App.minAPIVersion                      = nil
-      UserDefaults.App.countryByIP                        = nil
+//      UserDefaults.App.countryByIP                        = nil
       UserDefaults.App.youtubePlay                        = nil
       UserDefaults.App.tiktokPlay                         = nil
       UserDefaults.App.hasSeenPollCreationIntroduction    = false
@@ -244,7 +244,7 @@ extension UserDefaults {
     KeychainService.saveRefreshToken(token: "")
     KeychainService.saveTokenExpireDateTime(token: "")
 #if DEBUG
-    print("cleaned")
+    print("UserDefaults.cleaned()")
 #endif
   }
 }
@@ -286,13 +286,4 @@ extension UserDefault where Value: ExpressibleByNilLiteral {
   init(key: String, _ container: UserDefaults = .standard) {
     self.init(key: key, defaultValue: nil, container: container)
   }
-}
-
-/// Allows to match for optionals with generics that are defined as non-optional.
-public protocol AnyOptional {
-  /// Returns `true` if `nil`, otherwise `false`.
-  var isNil: Bool { get }
-}
-extension Optional: AnyOptional {
-  public var isNil: Bool { self == nil }
 }

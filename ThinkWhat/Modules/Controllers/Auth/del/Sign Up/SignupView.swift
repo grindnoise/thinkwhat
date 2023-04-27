@@ -291,8 +291,8 @@ extension SignupView {
         self.addGestureRecognizer(touch)
 //        usernameTF.isShowingSpinner = true
         
-        guard let countryCode = UserDefaults.App.countryByIP else { return }
-        if countryCode == "RU" {
+      ///Forbidden in Russia
+      if AppData.shared.countryByIP == "RU" {
             facebook.removeFromSuperview()
         }
     }
@@ -573,7 +573,8 @@ extension SignupView: UITextFieldDelegate {
     }
     
     private func authorize(provider: AuthProvider) {
-        @Sendable @MainActor func onExit() {
+      @MainActor
+      func onExit() {
             var destinationSize: CGSize!
             var destinationOrigin: CGPoint!
             var destinationLogo: UIView!

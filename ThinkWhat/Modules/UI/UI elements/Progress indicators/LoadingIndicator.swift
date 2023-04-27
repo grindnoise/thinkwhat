@@ -36,12 +36,12 @@ class LoadingIndicator: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///`UI`
-  private lazy var logo: Icon = {
+ public private(set) lazy var logo: Icon = {
     let instance = Icon(frame: frame,
                         category: .Logo,
                         scaleMultiplicator: 1,
                         iconColor: color)
-    instance.alpha = 0
+//    instance.alpha = 0
     
     return instance
   }()
@@ -126,7 +126,8 @@ class LoadingIndicator: UIView {
        color: UIColor,
        duration: TimeInterval = 1,
        shouldSendCompletion: Bool = true,
-       isInfinite: Bool = false
+       isInfinite: Bool = false,
+       alpha: CGFloat = 0
   ) {
     
     self.mode = mode
@@ -138,6 +139,7 @@ class LoadingIndicator: UIView {
     super.init(frame: .zero)
     
     setupUI()
+    logo.alpha = alpha
   }
   
   required init?(coder: NSCoder) {
@@ -153,7 +155,7 @@ class LoadingIndicator: UIView {
     
     guard animated else {
       logo.alpha = 1
-      delay(seconds: 0.1) { [weak self] in
+      delay(seconds: 0.01) { [weak self] in
         guard let self = self else { return }
         
         self.layer.removeAllAnimations()
@@ -161,15 +163,15 @@ class LoadingIndicator: UIView {
         case .Logo:
           self.logo.layer.removeAllAnimations()
           self.logo.layer.removeAllAnimations()
-          UIView.animate(withDuration: 0, animations:  {
-            self.logo.transform = .identity
-            self.logo.alpha = 1
-          }) { _ in
-            UIView.animate(withDuration: 0.75, delay: 0, options: [.autoreverse, .repeat]) {
+//          UIView.animate(withDuration: 0, animations:  {
+//            self.logo.transform = .identity
+//            self.logo.alpha = 1
+//          }) { _ in
+          UIView.animate(withDuration: 0.75, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut]) {
               self.logo.transform = .init(scaleX: 0.9, y: 0.9)
-              self.logo.alpha = 0.75
+              self.logo.alpha = 0.85
             }
-          }
+//          }
         case.Topics:
           self.outerIcon.layer.removeAllAnimations()
           self.innerIcon.layer.removeAllAnimations()
@@ -183,7 +185,7 @@ class LoadingIndicator: UIView {
             }
           }
         }
-        self.mode == .Topics ? self.animateTopics() : self.animate()
+        self.mode == .Topics ? self.animateTopics() : ()//self.animate()
       }
       
       return
@@ -276,7 +278,26 @@ class LoadingIndicator: UIView {
 //  }
   
   @MainActor
-  public func stop(reset: Bool = false) {
+  public func stop(reset: Bool = false, completion: Closure? = nil) {
+    guard mode == .Topics else {
+      UIView.animate(withDuration: 0.3, animations: { [weak self] in
+        guard let self = self else { return }
+        
+        self.logo.transform = .init(scaleX: 0.5, y: 0.5)
+        self.logo.alpha = 0
+//        self.logo.transform = .identity
+//        self.logo.alpha = 1
+      }) { [weak self] _ in
+        guard let self = self else { return }
+        
+        completion?()
+        self.didDisappearPublisher.send(true)
+        self.didDisappearPublisher.send(completion: .finished)
+      }
+      
+      return
+    }
+    
     shouldStopAnimating = true
     
     animationsStopped

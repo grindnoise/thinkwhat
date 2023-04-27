@@ -157,7 +157,7 @@ extension PollModel: PollControllerInput {
             resultDetails.points = points
           } else if i.0 == "hot" && !i.1.isEmpty {
             await MainActor.run {
-              Surveys.shared.load(i.1)
+              try? Surveys.shared.load(i.1)
             }
           } else if i.0 == "result_total" {
             do {

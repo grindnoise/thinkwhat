@@ -141,7 +141,7 @@ class UnderlinedSignTextField: UnderlinedTextField {
         checkSign.addEquallyTo(to: rightView!)
         warningSign = Icon()
         warningSign.iconColor = color
-        warningSign.category = .Warning
+        warningSign.category = .Caution
         warningSign.backgroundColor = .clear
         warningSign.alpha = 0
         warningSign.addEquallyTo(to: rightView!)

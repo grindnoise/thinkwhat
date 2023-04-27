@@ -19,31 +19,6 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>FBAEMKit.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>FBSDKCoreKit.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>FBSDKCoreKit_Basics.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>FBSDKLoginKit.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>FBSDKShareKit.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>FlagKit.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -74,32 +49,7 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Nimble.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Pods-ThinkWhat-ThinkWhatTests.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>Pods-ThinkWhat.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>Quick.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>ReCaptcha-ReCaptcha.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>ReCaptcha.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -119,17 +69,7 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Swinject.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>TTRangeSlider.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>UIView-Shimmer.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

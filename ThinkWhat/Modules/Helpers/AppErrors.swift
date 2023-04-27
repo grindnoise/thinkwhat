@@ -122,15 +122,18 @@ extension APIError: LocalizedError {
       var errorDescription = ""
       var comment = "Server error"
       
-      if let json = value as? JSON,
-         let status = json["status"].string,
-         status == "error",
-         let error = json["error"].string {
-       
-        errorDescription += error.localized
-        if error == "insufficient_balance", let shortage = json["shortage"].int {
-          errorDescription += "insufficient_balance_shortage".localized + String(describing: abs(shortage)) + "insufficient_balance_shortage_points".localized + ". "  + "insufficient_balance_shortage_hint".localized
-        }
+      if let json = value as? JSON {
+        if let error = json["error"].string,
+           error == "invalid_grant" {
+          errorDescription = "log_in_error".localized
+        } else if let status = json["status"].string,
+                  status == "error",
+                  let error = json["error"].string {
+          
+          errorDescription += error.localized
+          if error == "insufficient_balance", let shortage = json["shortage"].int {
+            errorDescription += "insufficient_balance_shortage".localized + String(describing: abs(shortage)) + "insufficient_balance_shortage_points".localized + ". "  + "insufficient_balance_shortage_hint".localized
+          }}
       } else if let string = value as? String {
         errorDescription = string
       }

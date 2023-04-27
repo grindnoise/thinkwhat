@@ -39,7 +39,7 @@ struct Notifications {
         static let InstagramURL                     = Notification.Name("NotificationUserprofilesInstagramURL")
         static let TikTokURL                        = Notification.Name("NotificationUserprofilesTikTokURL")
         static let NoSocialURL                      = Notification.Name("NotificationUserprofilesNoSocialURL")
-        static let CurrentUserImageUpdated          = Notification.Name("NotificationUserprofilesCurrentUserImageUpdated")
+//        static let CurrentUserImageUpdated          = Notification.Name("NotificationUserprofilesCurrentUserImageUpdated")
         static let Balance                          = Notification.Name("NotificationUserprofilesBalance")
         static let Preferences                      = Notification.Name("NotificationUserprofilesPreferences")
         static let PublicationsTotal                = Notification.Name("NotificationUserprofilesPublicationsTotal")

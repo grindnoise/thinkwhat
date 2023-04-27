@@ -52,6 +52,39 @@ private lazy var agrume = Agrume(image: UIImage(named: "…")!)
 
 You can also pass in a `URL` and Agrume will take care of the download for you.
 
+### SwiftUI
+
+Currently the SwiftUI implementation doesn't surface configurations, so can only be used as a single image basic viewer - PRs welcome to extend its functionality.
+
+```swift
+import Agrume
+
+struct ExampleView: View {
+    
+  let images: [UIImage]
+
+  @State var showAgrume = false
+
+  var body: some View {
+    VStack {
+      // Hide the presenting button (or other view) whenever Agrume is shown
+      if !showAgrume {
+        Button("Launch Agrume from SwiftUI") {
+          withAnimation {
+            showAgrume = true
+          }
+        }
+      }
+
+      if showAgrume {
+        // You can pass a single or multiple images
+        AgrumeView(images: images, isPresenting: $showAgrume)
+      }
+    }
+  }
+}
+```
+
 ### Background Configuration
 
 Agrume has different background configurations. You can have it blur the view it's covering or supply a background color:
@@ -204,6 +237,14 @@ agrume.onLongPress = helper.makeSaveToLibraryLongPressGesture
 ### Custom Overlay View
 
 You can customise the look and functionality of the image views. To do so, you need create a class that inherits from `AgrumeOverlayView: UIView`. As this is nothing more than a regular `UIView` you can do anything you want with it like add a custom toolbar or buttons to it. The example app shows a detailed example of how this can be achieved.
+
+### Live Text Support
+
+Agrume supports Live Text introduced since iOS 16. This allows user to interact with texts and QR codes in the image. It is available for iOS 16 or newer, on devices with A12 Bionic Chip (iPhone XS) or newer.
+
+```swift
+let agrume = Agrume(image: UIImage(named: "…")!, enableLiveText: true)
+```
 
 ### Lifecycle
 

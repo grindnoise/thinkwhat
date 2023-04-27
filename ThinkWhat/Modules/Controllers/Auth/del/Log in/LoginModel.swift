@@ -19,9 +19,10 @@ extension LoginModel: LoginControllerInput {
         Task {
             do {
                 try await API.shared.auth.loginAsync(username: username, password: password)
-                let userData = try await API.shared.getUserDataAsync()
+              let userData = try await API.shared.profiles.current()
 #if DEBUG
-                print(JSON(userData))
+                print("LoginModel.performLogin()",
+                      JSON(userData))
 #endif
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,

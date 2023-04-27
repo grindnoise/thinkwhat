@@ -7,10 +7,10 @@
 //
 
 import UIKit
-import ReCaptcha
+//import ReCaptcha
 import SwiftyJSON
 import Alamofire
-import FBSDKLoginKit
+//import FBSDKLoginKit
 import SwiftyVK
 
 class SignupViewController: UIViewController {
@@ -30,9 +30,9 @@ class SignupViewController: UIViewController {
         self.controllerInput = model
         self.controllerInput?
             .modelOutput = self
-        recaptcha?.configureWebView { [weak self] webview in
-            webview.frame = self?.view.bounds ?? CGRect.zero
-        }
+//        recaptcha?.configureWebView { [weak self] webview in
+//            webview.frame = self?.view.bounds ?? CGRect.zero
+//        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -40,21 +40,21 @@ class SignupViewController: UIViewController {
         controllerOutput?.onDidDisappear()
     }
     
-    func validate(completion: @escaping(Result<Bool,Error>)->()) {
-        recaptcha?.validate(on: view) { [weak self] (result: ReCaptchaResult) in
-            switch result {
-            case .token:
-                completion(.success(true))
-            case .error(let error):
-                completion(.failure(error.localizedDescription))
-            }
-        }
-    }
+//    func validate(completion: @escaping(Result<Bool,Error>)->()) {
+//        recaptcha?.validate(on: view) { [weak self] (result: ReCaptchaResult) in
+//            switch result {
+//            case .token:
+//                completion(.success(true))
+//            case .error(let error):
+//                completion(.failure(error.localizedDescription))
+//            }
+//        }
+//    }
 
     // MARK: - Properties
     var controllerOutput: SignupControllerOutput?
     var controllerInput: SignupControllerInput?
-    let recaptcha = try? ReCaptcha()
+//    let recaptcha = try? ReCaptcha()
 //    private var reCAPTCHAViewModel: ReCAPTCHAViewModel?
 }
 
@@ -87,12 +87,12 @@ extension SignupViewController: SignupViewInput {
     }
     
     func onCaptchaValidation(completion: @escaping(Result<Bool,Error>)->()) {
-        validate{ completion($0) }
+//        validate{ completion($0) }
     }
     
     func onSignup(username: String, email: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-        recaptcha?.stop()
-        API.shared.auth.signup(email: email, password: password, username: username) { completion($0) }
+//        recaptcha?.stop()
+        API.shared.auth.signUp(email: email, password: password, username: username) { completion($0) }
     }
     
     func checkCredentials(username: String, email: String, completion: @escaping (Result<Bool, Error>) -> ()) {
@@ -112,8 +112,8 @@ extension SignupViewController: SignupViewInput {
                 switch provider {
                 case .VK:
                     VKWorker.logout()
-                case .Facebook:
-                    FBWorker.logout()
+//                case .Facebook:
+//                    FBWorker.logout()
                 case .Google:
                     GoogleWorker.logout()
                 default:
@@ -130,13 +130,13 @@ extension SignupViewController: SignupViewInput {
                     VKWorker.wakeUp()
                     guard let providerToken = try await VKWorker.authorizeAsync().get() else { throw "VK token not available" }
                     return providerToken
-                case .Facebook:
-                    FBWorker.wakeUp()
-                    guard let providerToken = try await FBWorker.authorizeAsync(viewController: self).tokenString as? String else { throw "Facebook token not available" }
-                    return providerToken
+//                case .Facebook:
+//                    FBWorker.wakeUp()
+//                    guard let providerToken = try await FBWorker.authorizeAsync(viewController: self).tokenString as? String else { throw "Facebook token not available" }
+//                    return providerToken
                 case .Google:
-                    guard let providerToken = try await GoogleWorker.authorizeAsync(viewController: self) as? String else { throw "Facebook token not available" }
-                    return providerToken
+//                    guard let providerToken = try await GoogleWorker.authorizeAsync(viewController: self) as? String else { throw "Facebook token not available" }
+                    return ""//providerToken
                 default:
 #if DEBUG
                     fatalError("Not implemented")
@@ -187,33 +187,33 @@ extension SignupViewController: SignupViewInput {
                                                               domain: domain,
                                                               birthDate: birthDate)
                         }
-                    case .Facebook:
-                        guard let id = json["id"].string,
-                              let email = json["email"].string,
-                              let firstName = json["first_name"].string,
-                              let lastName = json["last_name"].string else {
-                                  throw "VK json serialization failure"
-                              }
-                        if let pictureURL = json["picture"]["data"]["url"].string, let url = URL(string: pictureURL) {
-                            do {
-                                providerImage = try await API.shared.system.downloadImageAsync(from: url)
-                                return FBWorker.prepareDjangoData(id: id,
-                                                                  firstName: firstName,
-                                                                  lastName: lastName,
-                                                                  email: email,
-                                                                  image: providerImage)
-                            } catch {
-                                return FBWorker.prepareDjangoData(id: id,
-                                                                  firstName: firstName,
-                                                                  lastName: lastName,
-                                                                  email: email)
-                            }
-                        } else {
-                            return FBWorker.prepareDjangoData(id: id,
-                                                              firstName: firstName,
-                                                              lastName: lastName,
-                                                              email: email)
-                        }
+//                    case .Facebook:
+//                        guard let id = json["id"].string,
+//                              let email = json["email"].string,
+//                              let firstName = json["first_name"].string,
+//                              let lastName = json["last_name"].string else {
+//                                  throw "VK json serialization failure"
+//                              }
+//                        if let pictureURL = json["picture"]["data"]["url"].string, let url = URL(string: pictureURL) {
+//                            do {
+//                                providerImage = try await API.shared.system.downloadImageAsync(from: url)
+//                                return FBWorker.prepareDjangoData(id: id,
+//                                                                  firstName: firstName,
+//                                                                  lastName: lastName,
+//                                                                  email: email,
+//                                                                  image: providerImage)
+//                            } catch {
+//                                return FBWorker.prepareDjangoData(id: id,
+//                                                                  firstName: firstName,
+//                                                                  lastName: lastName,
+//                                                                  email: email)
+//                            }
+//                        } else {
+//                            return FBWorker.prepareDjangoData(id: id,
+//                                                              firstName: firstName,
+//                                                              lastName: lastName,
+//                                                              email: email)
+//                        }
                     default:
                         throw "Not implemented"
                     }
@@ -224,11 +224,11 @@ extension SignupViewController: SignupViewInput {
                     case .VK:
                         let json = try await VKWorker.accountInfoAsync()
                         return try await prepareData(json: json)
-                    case .Facebook:
-                        let json = try await FBWorker.accountInfoAsync()
-                        return try await prepareData(json: json)
+//                    case .Facebook:
+//                        let json = try await FBWorker.accountInfoAsync()
+//                        return try await prepareData(json: json)
                     case .Google:
-                        var dict = try await GoogleWorker.accountInfoAsync(viewController: self)
+                        var dict = try await GoogleWorker.accountInfoAsync()
                         if let url = dict[DjangoVariables.UserProfile.image] as? URL {
                             do {
                                 providerImage = try await API.shared.system.downloadImageAsync(from: url)
@@ -259,20 +259,20 @@ extension SignupViewController: SignupViewInput {
                 try await API.shared.auth.loginViaProviderAsync(provider: provider, token: providerToken)
                 
                 ///3. Get profile from API
-                let userData = await API.shared.getUserDataOrNilAsync()
+              let userData = try await API.shared.profiles.current()
                 do {
                     ///4. If Profile was edited by user - no need to get data from provider
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategy = .formatted(.dateTimeFormatter)
-                    Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: userData!)
+                    Userprofiles.shared.current = try decoder.decode(Userprofile.self, from: userData)
                     guard let url = UserDefaults.Profile.imageURL else { return }
                     Userprofiles.shared.current?.image = try await API.shared.system.downloadImageAsync(from: url)
                 } catch {
                     ///5. Profile wasn't edited - we need to update it with provider data
                     do {
-                        let json = try JSON(data: userData!, options: .mutableContainers)
+                        let json = try JSON(data: userData, options: .mutableContainers)
                         guard let id = json["id"].int else { throw "User ID not found" }
-                        UserDefaults.Profile.id = id
+//                        UserDefaults.Profile.id = id
                         ///5.1. Get user's profile from provider
                         let providerData = try await getProviderData()
                         ///5.2. Feed data to our API

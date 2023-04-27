@@ -158,8 +158,8 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
     //        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label)
     tabBarController?.setTabBarVisible(visible: true, animated: true)
     titleStack.alpha = 1
-    self.navigationController?.navigationBar.alpha = 1
-    
+    navigationController?.navigationBar.alpha = 1
+    navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationItem.largeTitleDisplayMode = .never
   }

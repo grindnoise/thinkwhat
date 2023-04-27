@@ -60,7 +60,10 @@ class ListView: UIView {
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleLabel.font)).isActive = true
+//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleLabel.font)).isActive = true
+//    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleLabel.font))
+//    constraint.identifier = "heightAnchor"
+//    constraint.isActive = true
     
     let opaque = UIView.opaque()
     opaque.backgroundColor = viewInput!.tintColor
@@ -327,9 +330,31 @@ class ListView: UIView {
     instance.layer.shadowOffset = .zero
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
+      .throttle(for: .seconds(0.3), scheduler: DispatchQueue.main, latest: false)
       .filter { $0 != .zero }
-      .sink { instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath }
+      .sink {
+        let path = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath
+        instance.layer.add(Animations.get(property: .ShadowPath,
+                                          fromValue: instance.layer.shadowPath as Any,
+                                          toValue: path,
+                                          duration: 0.2,
+                                          delay: 0,
+                                          repeatCount: 0,
+                                          autoreverses: false,
+                                          timingFunction: .linear,
+                                          delegate: nil,
+                                          isRemovedOnCompletion: false,
+                                          completionBlocks: nil),
+                           forKey: nil)
+        
+//        instance.layer.shadowPath = path//UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath
+      }
       .store(in: &subscriptions)
+//    instance.publisher(for: \.bounds)
+//      .receive(on: DispatchQueue.main)
+//      .filter { $0 != .zero }
+//      .sink { instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath }
+//      .store(in: &subscriptions)
     background.addEquallyTo(to: instance)
     
     return instance
@@ -622,9 +647,9 @@ private extension ListView {
       guard let self = self else { return }
       
       self.filterView.alpha = on ? 1 : 0
-      self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
+      self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
       constraint1.constant = on ? 16 : 0
-      constraint2.constant = on ? 16 : 8
+      constraint2.constant = on ? 16 : 0
       heightConstraint.constant = on ? self.filterViewHeight : 0
       self.layoutIfNeeded()
     }
@@ -738,18 +763,18 @@ extension ListView: ListControllerOutput {
 //    }
 //}
 
-extension ListView: BannerObservable {
-  func onBannerWillAppear(_ sender: Any) {}
-  
-  func onBannerWillDisappear(_ sender: Any) {}
-  
-  func onBannerDidAppear(_ sender: Any) {}
-  
-  func onBannerDidDisappear(_ sender: Any) {
-    if let banner = sender as? Banner {
-      banner.removeFromSuperview()
-    } else if let popup = sender as? Popup {
-      popup.removeFromSuperview()
-    }
-  }
-}
+//extension ListView: BannerObservable {
+//  func onBannerWillAppear(_ sender: Any) {}
+//
+//  func onBannerWillDisappear(_ sender: Any) {}
+//
+//  func onBannerDidAppear(_ sender: Any) {}
+//
+//  func onBannerDidDisappear(_ sender: Any) {
+//    if let banner = sender as? Banner {
+//      banner.removeFromSuperview()
+//    } else if let popup = sender as? Popup {
+//      popup.removeFromSuperview()
+//    }
+//  }
+//}

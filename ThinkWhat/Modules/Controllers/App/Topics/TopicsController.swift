@@ -198,6 +198,7 @@ class TopicsController: UIViewController, TintColorable {
     //        barButton.alpha = 1
     tabBarController?.setTabBarVisible(visible: true, animated: true)
     navigationController?.navigationBar.alpha = 1
+    navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.navigationBar.prefersLargeTitles = false//true
     navigationItem.largeTitleDisplayMode = .never//.always
     

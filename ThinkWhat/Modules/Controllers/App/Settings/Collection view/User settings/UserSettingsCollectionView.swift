@@ -109,12 +109,15 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
     }
     
     let credentialsCellRegistration = UICollectionView.CellRegistration<UserSettingsCredentialsCell, AnyHashable> { [unowned self] cell, indexPath, item in
+      guard let userprofile = Userprofiles.shared.current else { return }
+      
+      cell.userprofile = userprofile
+      cell.color = self.color
       
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
-      cell.color = self.color
       
       //Name
       cell.namePublisher.sink { [weak self] in
@@ -164,12 +167,6 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
         
         self.previewPublisher.send(image)
       }.store(in: &self.subscriptions)
-      
-      guard let userprofile = Userprofiles.shared.current,
-            cell.userprofile.isNil
-      else { return }
-      
-      cell.userprofile = userprofile
 //      cell.setInsets(UIEdgeInsets(top: self.padding*2,
 //                                  left: self.padding,
 //                                  bottom: self.padding,

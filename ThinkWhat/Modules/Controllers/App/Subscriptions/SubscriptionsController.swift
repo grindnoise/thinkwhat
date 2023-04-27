@@ -135,6 +135,7 @@ class SubscriptionsController: UIViewController, TintColorable {
     
     clearNavigationBar(clear: true)
     setNavigationBarTintColor(tintColor)
+    navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationItem.largeTitleDisplayMode = .never
     controllerOutput?.onWillAppear()

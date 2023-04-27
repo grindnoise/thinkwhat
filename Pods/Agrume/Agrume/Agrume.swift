@@ -17,6 +17,7 @@ public final class Agrume: UIViewController {
   private var images: [AgrumeImage]!
   private let startIndex: Int
   private let dismissal: Dismissal
+  private let enableLiveText: Bool
   
   private var overlayView: AgrumeOverlayView?
   private weak var dataSource: AgrumeDataSource?
@@ -63,9 +64,21 @@ public final class Agrume: UIViewController {
   ///   - background: The background configuration
   ///   - dismissal: The dismiss configuration
   ///   - overlayView: View to overlay the image (does not display with 'button' dismissals)
-  public convenience init(image: UIImage, background: Background = .colored(.black),
-                          dismissal: Dismissal = .withPan(.standard), overlayView: AgrumeOverlayView? = nil) {
-    self.init(images: [image], background: background, dismissal: dismissal, overlayView: overlayView)
+  ///   - enableLiveText: Enables Live Text interaction, iOS 16 only
+  public convenience init(
+    image: UIImage,
+    background: Background = .colored(.black),
+    dismissal: Dismissal = .withPan(.standard),
+    overlayView: AgrumeOverlayView? = nil,
+    enableLiveText: Bool = false
+  ) {
+    self.init(
+      images: [image],
+      background: background,
+      dismissal: dismissal,
+      overlayView: overlayView,
+      enableLiveText: enableLiveText
+    )
   }
 
   /// Initialize with a single image url
@@ -75,9 +88,21 @@ public final class Agrume: UIViewController {
   ///   - background: The background configuration
   ///   - dismissal: The dismiss configuration
   ///   - overlayView: View to overlay the image (does not display with 'button' dismissals)
-  public convenience init(url: URL, background: Background = .colored(.black), dismissal: Dismissal = .withPan(.standard),
-                          overlayView: AgrumeOverlayView? = nil) {
-    self.init(urls: [url], background: background, dismissal: dismissal, overlayView: overlayView)
+  ///   - enableLiveText: Enables Live Text interaction, iOS 16 only
+  public convenience init(
+    url: URL,
+    background: Background = .colored(.black),
+    dismissal: Dismissal = .withPan(.standard),
+    overlayView: AgrumeOverlayView? = nil,
+    enableLiveText: Bool = false
+  ) {
+    self.init(
+      urls: [url],
+      background: background,
+      dismissal: dismissal,
+      overlayView: overlayView,
+      enableLiveText: enableLiveText
+    )
   }
 
   /// Initialize with a data source
@@ -88,10 +113,24 @@ public final class Agrume: UIViewController {
   ///   - background: The background configuration
   ///   - dismissal: The dismiss configuration
   ///   - overlayView: View to overlay the image (does not display with 'button' dismissals)
-  public convenience init(dataSource: AgrumeDataSource, startIndex: Int = 0, background: Background = .colored(.black),
-                          dismissal: Dismissal = .withPan(.standard), overlayView: AgrumeOverlayView? = nil) {
-    self.init(images: nil, dataSource: dataSource, startIndex: startIndex, background: background, dismissal: dismissal,
-              overlayView: overlayView)
+  ///   - enableLiveText: Enables Live Text interaction, iOS 16 only
+  public convenience init(
+    dataSource: AgrumeDataSource,
+    startIndex: Int = 0,
+    background: Background = .colored(.black),
+    dismissal: Dismissal = .withPan(.standard),
+    overlayView: AgrumeOverlayView? = nil,
+    enableLiveText: Bool = false
+  ) {
+    self.init(
+      images: nil,
+      dataSource: dataSource,
+      startIndex: startIndex,
+      background: background,
+      dismissal: dismissal,
+      overlayView: overlayView,
+      enableLiveText: enableLiveText
+    )
   }
 
   /// Initialize with an array of images
@@ -102,9 +141,24 @@ public final class Agrume: UIViewController {
   ///   - background: The background configuration
   ///   - dismissal: The dismiss configuration
   ///   - overlayView: View to overlay the image (does not display with 'button' dismissals)
-  public convenience init(images: [UIImage], startIndex: Int = 0, background: Background = .colored(.black),
-                          dismissal: Dismissal = .withPan(.standard), overlayView: AgrumeOverlayView? = nil) {
-    self.init(images: images, urls: nil, startIndex: startIndex, background: background, dismissal: dismissal, overlayView: overlayView)
+  ///   - enableLiveText: Enables Live Text interaction, iOS 16 only
+  public convenience init(
+    images: [UIImage],
+    startIndex: Int = 0,
+    background: Background = .colored(.black),
+    dismissal: Dismissal = .withPan(.standard),
+    overlayView: AgrumeOverlayView? = nil,
+    enableLiveText: Bool = false
+  ) {
+    self.init(
+      images: images,
+      urls: nil,
+      startIndex: startIndex,
+      background: background,
+      dismissal: dismissal,
+      overlayView: overlayView,
+      enableLiveText: enableLiveText
+    )
   }
 
   /// Initialize with an array of image urls
@@ -115,13 +169,36 @@ public final class Agrume: UIViewController {
   ///   - background: The background configuration
   ///   - dismissal: The dismiss configuration
   ///   - overlayView: View to overlay the image (does not display with 'button' dismissals)
-  public convenience init(urls: [URL], startIndex: Int = 0, background: Background = .colored(.black),
-                          dismissal: Dismissal = .withPan(.standard), overlayView: AgrumeOverlayView? = nil) {
-    self.init(images: nil, urls: urls, startIndex: startIndex, background: background, dismissal: dismissal, overlayView: overlayView)
+  ///   - enableLiveText: Enables Live Text interaction, iOS 16 only
+  public convenience init(
+    urls: [URL],
+    startIndex: Int = 0,
+    background: Background = .colored(.black),
+    dismissal: Dismissal = .withPan(.standard),
+    overlayView: AgrumeOverlayView? = nil,
+    enableLiveText: Bool = false
+  ) {
+    self.init(
+      images: nil,
+      urls: urls,
+      startIndex: startIndex,
+      background: background,
+      dismissal: dismissal,
+      overlayView: overlayView,
+      enableLiveText: enableLiveText
+    )
   }
 
-  private init(images: [UIImage]? = nil, urls: [URL]? = nil, dataSource: AgrumeDataSource? = nil, startIndex: Int,
-               background: Background, dismissal: Dismissal, overlayView: AgrumeOverlayView? = nil) {
+  private init(
+    images: [UIImage]? = nil,
+    urls: [URL]? = nil,
+    dataSource: AgrumeDataSource? = nil,
+    startIndex: Int,
+    background: Background,
+    dismissal: Dismissal,
+    overlayView: AgrumeOverlayView? = nil,
+    enableLiveText: Bool = false
+  ) {
     switch (images, urls) {
     case (let images?, nil):
       self.images = images.map { AgrumeImage(image: $0) }
@@ -135,6 +212,7 @@ public final class Agrume: UIViewController {
     self.currentIndex = startIndex
     self.background = background
     self.dismissal = dismissal
+    self.enableLiveText = enableLiveText
     super.init(nibName: nil, bundle: nil)
     
     self.overlayView = overlayView
@@ -209,9 +287,9 @@ public final class Agrume: UIViewController {
       let indicatorStyle: UIActivityIndicatorView.Style
       switch background {
       case let .blurred(style):
-        indicatorStyle = style == .dark ? .whiteLarge : .gray
+        indicatorStyle = style == .dark ? .large : .medium
       case let .colored(color):
-        indicatorStyle = color.isLight ? .gray : .whiteLarge
+        indicatorStyle = color.isLight ? .medium : .large
       }
       let spinner = UIActivityIndicatorView(style: indicatorStyle)
       spinner.center = view.center
@@ -248,7 +326,7 @@ public final class Agrume: UIViewController {
     let replacement = with(images[index]) {
       $0.url = nil
       $0.image = image
-      if let newTitle = newTitle {
+      if let newTitle {
         $0.title = newTitle
       }
     }
@@ -268,7 +346,7 @@ public final class Agrume: UIViewController {
     let replacement = with(images[index]) {
       $0.image = nil
       $0.url = url
-      if let newTitle = newTitle {
+      if let newTitle {
         $0.title = newTitle
       }
     }
@@ -302,14 +380,14 @@ public final class Agrume: UIViewController {
       return
     }
     fetchImage(forIndex: currentIndex) { [weak self] image in
-      guard let self = self else {
+      guard let self else {
         return
       }
       self.onLongPress?(image, self)
     }
   }
 
-  private func addSubviews() {
+  public func addSubviews() {
     view.autoresizingMask = [.flexibleHeight, .flexibleWidth]
 
     if case .blurred = background {
@@ -348,7 +426,7 @@ public final class Agrume: UIViewController {
     }
   }
   
-  private func addOverlayView() {
+  public func addOverlayView() {
     switch (dismissal, overlayView) {
     case let (.withButton(button), _), let (.withPanAndButton(_, button), _):
       let overlayView = AgrumeCloseButtonOverlayView(closeButton: button)
@@ -468,6 +546,7 @@ extension Agrume: UICollectionViewDataSource {
   public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell: AgrumeCell = collectionView.dequeue(indexPath: indexPath)
 
+    cell.enableLiveText = enableLiveText
     cell.tapBehavior = tapBehavior
     switch dismissal {
     case .withPan(let physics), .withPanAndButton(let physics, _):

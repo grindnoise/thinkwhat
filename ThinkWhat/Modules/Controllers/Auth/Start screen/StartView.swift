@@ -11,26 +11,21 @@ import Combine
 
 class StartView: UIView {
   
-  // MARK: - Private properties
-  private var observers: [NSKeyValueObservation] = []
-  private var subscriptions = Set<AnyCancellable>()
-  private var tasks: [Task<Void, Never>?] = []
-  ///**UI**
-  private let padding: CGFloat = 8
-  public private(set) lazy var logoIcon: Icon = {
-    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
-    instance.alpha = 0
-    
-    return instance
-  }()
-  private lazy var logoText: Icon = {
+  // MARK: - Public properties
+  public private(set) lazy var logoText: Icon = {
     let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
     instance.alpha = 0
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
     
     return instance
   }()
-  private lazy var label: UILabel = {
+  public private(set) lazy var logoIcon: Icon = {
+    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
+    instance.alpha = 0
+    
+    return instance
+  }()
+  public private(set) lazy var label: UILabel = {
     let instance = UILabel()
     instance.numberOfLines = 0
     instance.backgroundColor = .clear
@@ -41,28 +36,7 @@ class StartView: UIView {
     
     return instance
   }()
-  private lazy var stack: UIStackView = {
-    let top = UIView.opaque()
-    logoIcon.placeInCenter(of: top,
-                           topInset: 0,
-                           bottomInset: 0)
-    let bottom = UIView.opaque()
-    logoText.placeInCenter(of: bottom,
-                           topInset: 0,
-                           bottomInset: 0)
-    let instance = UIStackView(arrangedSubviews: [
-      top,
-      UIView.verticalSpacer(padding*2),
-      label,
-      UIView.verticalSpacer(padding),
-      bottom
-    ])
-    instance.axis = .vertical
-    instance.spacing = padding*2
-    
-    return instance
-  }()
-  public lazy var button: UIButton = {
+  public private(set) lazy var button: UIButton = {
     let instance = UIButton()
     instance.addTarget(self,
                        action: #selector(self.handleTap(sender:)),
@@ -93,6 +67,36 @@ class StartView: UIView {
                                                      ]),
                                   for: .normal)
     }
+    
+    return instance
+  }()
+  
+  
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  ///**UI**
+  private let padding: CGFloat = 8
+  private lazy var stack: UIStackView = {
+    let top = UIView.opaque()
+    logoIcon.placeInCenter(of: top,
+                           topInset: 0,
+                           bottomInset: 0)
+    let bottom = UIView.opaque()
+    logoText.placeInCenter(of: bottom,
+                           topInset: 0,
+                           bottomInset: 0)
+    let instance = UIStackView(arrangedSubviews: [
+      top,
+      UIView.verticalSpacer(padding*2),
+      label,
+      UIView.verticalSpacer(padding),
+      bottom
+    ])
+    instance.axis = .vertical
+    instance.spacing = padding*2
     
     return instance
   }()

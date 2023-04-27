@@ -249,7 +249,10 @@ extension HotView: HotControllerOutput {
   }
   
   func didAppear() {
-    guard let card = current as? EmptyHotCard else { return }
+    guard let card = current as? EmptyHotCard else {
+      didLoad()
+      return
+    }
     
     card.animate()
   }

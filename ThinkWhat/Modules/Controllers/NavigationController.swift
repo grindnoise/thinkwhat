@@ -17,6 +17,8 @@ class NavigationController: UINavigationController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+//      navigationBar.prefersLargeTitles = false
+//      navigationItem.largeTitleDisplayMode = .never
 //        navigationBar.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
         navigationBar.largeTitleTextAttributes = [
             .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.label

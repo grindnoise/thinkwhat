@@ -54,6 +54,51 @@ extension UIView {
     return instance
   }
   
+  func setSpinning(on: Bool,
+                   color: UIColor,
+                   animated: Bool,
+                   completion: Closure? = nil) {
+    switch on {
+    case true:
+      let spinner = UIActivityIndicatorView()
+      spinner.accessibilityIdentifier = "spinner"
+      spinner.color = color
+      spinner.startAnimating()
+      spinner.alpha = animated ? 0 : 1
+      spinner.transform = animated ? .init(scaleX: 0.5, y: 0.5) : .identity
+      spinner.placeInCenter(of: self)
+      
+      guard animated else {
+        completion?()
+        
+        return
+      }
+      
+      UIView.animate(withDuration: 0.3) {
+        spinner.alpha = 1
+        spinner.transform = .identity
+      } completion: { _ in
+        completion?()
+      }
+    case false:
+      guard let spinner = getSubview(type: UIActivityIndicatorView.self, identifier: "spinner") else { return }
+      
+      guard animated else {
+        spinner.removeFromSuperview()
+        completion?()
+        
+        return
+      }
+      
+      UIView.animate(withDuration: 0.3) {
+        spinner.alpha = 0
+        spinner.transform = .init(scaleX: 0.5, y: 0.5)
+      } completion: { _ in
+        spinner.removeFromSuperview()
+        completion?()
+      }
+    }
+  }
   //    var statusBarWindow: UIWindow {
   //        guard let window = window,
   //              let windowScene = window.windowScene,

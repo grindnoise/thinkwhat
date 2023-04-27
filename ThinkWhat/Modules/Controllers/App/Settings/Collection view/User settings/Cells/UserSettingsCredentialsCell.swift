@@ -14,7 +14,48 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
   // MARK: - Public properties
   public weak var userprofile: Userprofile! {
     didSet {
-      guard let userprofile = userprofile else { return }
+      guard !userprofile.isNil, userprofile.isCurrent else { return }
+      //      userprofile == Userprofiles.shared.current
+      
+//      userprofile.imagePublisher
+//        .receive(on: DispatchQueue.main)
+//        .sink(receiveCompletion: { [weak self] _ in
+//          guard let self = self else { return }
+//
+//          let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+//                                                                text: AppError.server.localizedDescription,
+//                                                                tintColor: .systemRed,
+//                                                                fontName: Fonts.Regular,
+//                                                                textStyle: .subheadline,
+//                                                                textAlignment: .natural),
+//                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                                 isModal: false,
+//                                 useContentViewHeight: true,
+//                                 shouldDismissAfter: 2)
+//          banner.didDisappearPublisher
+//            .sink { _ in banner.removeFromSuperview() }
+//            .store(in: &self.subscriptions)
+//        }, receiveValue: { [weak self] image in
+//          guard let self = self else { return }
+//
+//          self.avatar.imageUploadFinished(image)
+//
+//          let banner = NewBanner(contentView: TextBannerContent(image: image,
+//                                                                text: "image_uploaded",
+//                                                                tintColor: self.color,
+//                                                                fontName: Fonts.Regular,
+//                                                                textStyle: .headline,
+//                                                                textAlignment: .natural,
+//                                                                cornerRadius: 0.05),
+//                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                                 isModal: false,
+//                                 useContentViewHeight: true,
+//                                 shouldDismissAfter: 2)
+//          banner.didDisappearPublisher
+//            .sink { _ in banner.removeFromSuperview() }
+//            .store(in: &self.subscriptions)
+//        })
+//        .store(in: &subscriptions)
       
       setupUI()
       avatar.userprofile = userprofile
@@ -44,26 +85,15 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private lazy var insets = { UIEdgeInsets(top: self.padding*2,
-                                          left: self.padding,
-                                          bottom: self.padding,
-                                          right: self.padding) }()
+                                           left: self.padding,
+                                           bottom: self.padding,
+                                           right: self.padding) }()
   private var currentConstraints = [NSLayoutConstraint]()
-  private lazy var titleLabel: UILabel = {
-    let instance = UILabel()
-    instance.numberOfLines = 1
-    instance.textAlignment = .center
-    instance.numberOfLines = 1
-    instance.textColor = .white
-    instance.text = "userprofile".localized.uppercased()
-    instance.font = UIFont(name: Fonts.Bold, size: 20)
-    instance.adjustsFontSizeToFitWidth = true
-    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font) + padding).isActive = true
-    instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.height / 2.25 }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
+  private lazy var tagCapsule: TagCapsule = { TagCapsule(text: "userprofile".localized.uppercased(),
+                                                         padding: 4,
+                                                         color: color,
+                                                         font: UIFont(name: Fonts.Bold, size: 20)!,
+                                                         iconCategory: userprofile.gender == .Male ? .ManFace : .GirlFace) }()
   private lazy var username: UILabel = {
     let instance = UILabel()
     instance.isUserInteractionEnabled = true
@@ -114,13 +144,13 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
       }
       config.imageColorTransformer = UIConfigurationColorTransformer { _ in return .white }
       config.buttonSize = .large
-      config.baseForegroundColor = .label
+      //      config.baseForegroundColor = .white
       
       instance.configuration = config
     } else {
       let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
         NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.label,
+        NSAttributedString.Key.foregroundColor: UIColor.white,
       ])
       instance.setAttributedTitle(attrString, for: .normal)
       instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -152,7 +182,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     if #available(iOS 15, *) {
       let attrString = AttributedString("TEST", attributes: AttributeContainer([
         NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.label
+        NSAttributedString.Key.foregroundColor: UIColor.white
       ]))
       var config = UIButton.Configuration.filled()
       //            config.cornerStyle = .medium
@@ -183,13 +213,13 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
       //            }
       config.buttonSize = .large
       //            config.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      config.baseForegroundColor = .label
+      //      config.baseForegroundColor = .white
       
       instance.configuration = config
     } else {
       let attrString = NSMutableAttributedString(string: "Мужчина", attributes: [
         NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.label,
+        NSAttributedString.Key.foregroundColor: UIColor.white,
       ])
       instance.setAttributedTitle(attrString, for: .normal)
       instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -219,11 +249,10 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     return instance
   }()
   private lazy var avatar: Avatar = {
-    let instance = Avatar(isShadowed: true)
-    instance.mode = .Editing
+    let instance = Avatar(userprofile: userprofile, isShadowed: true, mode: .Editing)
+    //    instance.mode = .Editing
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-    instance.clipsToBounds = false
-    instance.buttonBgDarkColor = .secondarySystemBackground
+    instance.isUserInteractionEnabled = true
     
     //Catch image tap
     instance.previewPublisher.sink { [weak self] in
@@ -258,33 +287,33 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     nested.axis = .horizontal
     nested.clipsToBounds = false
     nested.spacing = padding
-//    nested.distribution = .fillEqually
+    //    nested.distribution = .fillEqually
     
     let opaque = UIView.opaque()
-//    opaque.translatesAutoresizingMaskIntoConstraints = false
+    opaque.isUserInteractionEnabled = true
     opaque.heightAnchor.constraint(equalToConstant: 200).isActive = true
-    avatar.placeInCenter(of: opaque, topInset: 4, bottomInset: 4)
-    
+    avatar.place(inside: opaque)
+    //    avatar.placeInCenter(of: opaque, topInset: 4, bottomInset: 4)
     
     let instance = UIStackView(arrangedSubviews: [
-      titleLabel,
+      tagCapsule,
       opaque,
       username,
       nested
     ])
     instance.axis = .vertical
     instance.alignment = .center
-//    instance.clipsToBounds = false
-    instance.spacing = padding
+    //    instance.clipsToBounds = false
+    instance.spacing = padding*2
     
-//    userView.translatesAutoresizingMaskIntoConstraints = false
-//    username.translatesAutoresizingMaskIntoConstraints = false
+    //    userView.translatesAutoresizingMaskIntoConstraints = false
+    //    username.translatesAutoresizingMaskIntoConstraints = false
     
-//    NSLayoutConstraint.activate([
-//      userView.widthAnchor.constraint(equalTo: instance.widthAnchor),
-//      userView.heightAnchor.constraint(equalToConstant: 200),
-//      username.widthAnchor.constraint(equalTo: instance.widthAnchor),
-//    ])
+    //    NSLayoutConstraint.activate([
+    //      userView.widthAnchor.constraint(equalTo: instance.widthAnchor),
+    //      userView.heightAnchor.constraint(equalToConstant: 200),
+    //      username.widthAnchor.constraint(equalTo: instance.widthAnchor),
+    //    ])
     
     return instance
   }()
@@ -348,7 +377,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     super.init(frame: frame)
     
     setTasks()
-//    setupUI()
+    //    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -358,38 +387,38 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
   
   
   // MARK: - Overriden methods
-//  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//    super.traitCollectionDidChange(previousTraitCollection)
-//
-//    //        datePicker.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-//
-//    if #available(iOS 15, *) {
-//      if !genderButton.configuration.isNil, !ageButton.configuration.isNil {
-//        genderButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//        ageButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//      }
-//    } else {
-//      genderButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//      ageButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-//    }
-//
-//    //Set dynamic font size
-//    guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-//
-//    guard let constraint_1 = username.getConstraint(identifier: "height"),
-//          //              let constraint_2 = gender.getConstraint(identifier: "height"),
-//          !username.text.isNil
-//    else { return }
-//
-//    username.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
-//    //        gender.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
-//    //        age.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
-//
-//    setNeedsLayout()
-//    constraint_1.constant = username.text!.height(withConstrainedWidth: username.bounds.width, font: username.font)
-//    //        constraint_2.constant = "test".height(withConstrainedWidth: gender.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
-//    layoutIfNeeded()
-//  }
+  //  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+  //    super.traitCollectionDidChange(previousTraitCollection)
+  //
+  //    //        datePicker.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+  //
+  //    if #available(iOS 15, *) {
+  //      if !genderButton.configuration.isNil, !ageButton.configuration.isNil {
+  //        genderButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+  //        ageButton.configuration!.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+  //      }
+  //    } else {
+  //      genderButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+  //      ageButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+  //    }
+  //
+  //    //Set dynamic font size
+  //    guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+  //
+  //    guard let constraint_1 = username.getConstraint(identifier: "height"),
+  //          //              let constraint_2 = gender.getConstraint(identifier: "height"),
+  //          !username.text.isNil
+  //    else { return }
+  //
+  //    username.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
+  //    //        gender.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
+  //    //        age.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)
+  //
+  //    setNeedsLayout()
+  //    constraint_1.constant = username.text!.height(withConstrainedWidth: username.bounds.width, font: username.font)
+  //    //        constraint_2.constant = "test".height(withConstrainedWidth: gender.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
+  //    layoutIfNeeded()
+  //  }
   
   override func updateConstraints() {
     super.updateConstraints()
@@ -414,7 +443,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
   // MARK: - Public methods
   public func setInsets(_ insets: UIEdgeInsets) {
     self.insets = insets
-
+    
     setupUI()
   }
   
@@ -431,26 +460,26 @@ private extension UserSettingsCredentialsCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
-//    stack.removeConstraints(currentConstraints)
-//    stack.removeFromSuperview()
+    //    stack.removeConstraints(currentConstraints)
+    //    stack.removeFromSuperview()
     currentConstraints = stack.place(inside: self,
-                        insets: insets == .zero ? .uniform(size: padding) : insets,
-                        bottomPriority: .defaultLow)
+                                     insets: insets == .zero ? .uniform(size: padding) : insets,
+                                     bottomPriority: .defaultLow)
   }
   
   @MainActor
   func updateUI() {
-//    stack.removeFromSuperview()
-//
-//    guard let insets = insets else {
-//      stack.place(inside: self,
-//                          insets: .uniform(size: padding),
-//                          bottomPriority: .defaultLow)
-//      return
-//    }
-//    stack.place(inside: self,
-//                        insets: insets,
-//                        bottomPriority: .defaultLow)
+    //    stack.removeFromSuperview()
+    //
+    //    guard let insets = insets else {
+    //      stack.place(inside: self,
+    //                          insets: .uniform(size: padding),
+    //                          bottomPriority: .defaultLow)
+    //      return
+    //    }
+    //    stack.place(inside: self,
+    //                        insets: insets,
+    //                        bottomPriority: .defaultLow)
   }
   
   func setTasks() {
@@ -541,32 +570,32 @@ private extension UserSettingsCredentialsCell {
       //                      self.avatar.isUploading
       //                else { return }
       
-      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.CurrentUserImageUpdated) {
-        guard let self = self,
-              let instance = Userprofiles.shared.current,
-              let image = instance.image
-        else { return }
-        
-        await MainActor.run {
-          self.avatar.imageUploadFinished(image)
-          
-          let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "photo")!,
-                                                                text: "image_uploaded",
-                                                                tintColor: .systemOrange,
-                                                                fontName: Fonts.Semibold,
-                                                                textStyle: .headline,
-                                                                textAlignment: .natural),
-                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                 isModal: false,
-                                 useContentViewHeight: true,
-                                 shouldDismissAfter: 2)
-          banner.didDisappearPublisher
-            .sink { _ in banner.removeFromSuperview() }
-            .store(in: &self.subscriptions)
-          
-          //                    showBanner(bannerDelegate: self, text: "".localized, content: UIImageView(image: UIImage(systemName: "photo", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemGreen, shadowed: true)
-        }
-      }
+      //      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.CurrentUserImageUpdated) {
+      //        guard let self = self,
+      //              let instance = Userprofiles.shared.current,
+      //              let image = instance.image
+      //        else { return }
+      //
+      //        await MainActor.run {
+      //          self.avatar.imageUploadFinished(image)
+      //
+      //          let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "photo")!,
+      //                                                                text: "image_uploaded",
+      //                                                                tintColor: .systemOrange,
+      //                                                                fontName: Fonts.Semibold,
+      //                                                                textStyle: .headline,
+      //                                                                textAlignment: .natural),
+      //                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+      //                                 isModal: false,
+      //                                 useContentViewHeight: true,
+      //                                 shouldDismissAfter: 2)
+      //          banner.didDisappearPublisher
+      //            .sink { _ in banner.removeFromSuperview() }
+      //            .store(in: &self.subscriptions)
+      //
+      //          //                    showBanner(bannerDelegate: self, text: "".localized, content: UIImageView(image: UIImage(systemName: "photo", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemGreen, shadowed: true)
+      //        }
+      //      }
     })
     
     //Image upload failure
@@ -623,7 +652,7 @@ private extension UserSettingsCredentialsCell {
   
   @MainActor
   func setupLabels(animated: Bool = false) {
-    titleLabel.backgroundColor = color
+//    titleLabel.backgroundColor = color
     
     guard let userprofile = Userprofiles.shared.current else { return }
     
@@ -693,12 +722,12 @@ private extension UserSettingsCredentialsCell {
     let ageAttributedString = NSAttributedString(string: ageString,
                                                  attributes: [
                                                   .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
-                                                  .foregroundColor: UIColor.label,
+                                                  .foregroundColor: UIColor.white,
                                                  ])
     let genderAttributedString = NSAttributedString(string: userprofile.gender.rawValue.localized.capitalized,
                                                     attributes: [
                                                       .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
-                                                      .foregroundColor: UIColor.label,
+                                                      .foregroundColor: UIColor.white,
                                                     ])
     
     if #available(iOS 15, *) {
@@ -752,6 +781,7 @@ private extension UserSettingsCredentialsCell {
   
   func setColors() {
     avatar.color = color
+    tagCapsule.color = color
     
     if #available(iOS 15, *) {
       genderButton.configuration?.baseBackgroundColor = color

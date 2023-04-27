@@ -11,7 +11,7 @@ import UIKit
 import MapKit
 import Alamofire
 import SwiftyJSON
-import Swinject
+//import Swinject
 import CoreData
 import UserNotifications
 

@@ -9,29 +9,33 @@
 import UIKit
 
 protocol SignInViewInput: AnyObject {
-  
   var controllerOutput: SignInControllerOutput? { get set }
   var controllerInput: SignInControllerInput? { get set }
   
-  func providerlogin(_: AuthProvider)
-  func mailLogin(username: String, password: String)
-  func signup()
+  func mailSignIn(username: String, password: String)
+  func providerSignIn(provider: AuthProvider)
+  func openAgreement()
+//  func openProfile()
+  func signUp()
 }
 
 protocol SignInControllerInput: AnyObject {
-  
   var modelOutput: SignInModelOutput? { get set }
   
-  func mailLogin(username: String, password: String)
-  func providerlogin(_: AuthProvider)
+  func mailSignIn(username: String, password: String)
+  func providerSignIn(provider: AuthProvider, accessToken: String)
 }
 
 protocol SignInModelOutput: AnyObject {
-  func loginCallback(_: Result<Bool, Error>)
+  func mailSignInCallback(_: Result<Bool, Error>)
+  func providerSignInCallback(result: Result<Bool, Error>)
 }
 
 protocol SignInControllerOutput: AnyObject {
   var viewInput: SignInViewInput? { get set }
   
-  
+  func mailSignInCallback(result: Result<Bool, Error>)
+  func providerSignInCallback(result: Result<Bool, Error>)
+  func startAuthorizationUI(provider: AuthProvider)
+//  func stopAuthorizationUI(completion: @escaping Closure)
 }

@@ -112,7 +112,7 @@ class PollController: UIViewController {
     
     return instance
   }()
-  
+
   
   
   // MARK: - Destructor
@@ -566,10 +566,10 @@ private extension PollController {
       return
     }
     
-    navigationController?.setNavigationBarHidden(true, animated: false)
+    navigationController?.setNavigationBarHidden(false, animated: false)
     loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-    controllerInput?.load(item, incrementViewCounter: true)
     loadingIndicator.start()
+    controllerInput?.load(item, incrementViewCounter: true)
   }
   
   func setBarButtonItems() {
@@ -809,7 +809,11 @@ extension PollController: PollModelOutput {
     switch result {
     case .success(_):
 //      navigationController?.setNavigationBarHidden(false, animated: true)
-      loadingIndicator.stop()
+      delay(seconds: 0.5) { [weak self] in
+        guard let self = self else { return }
+        
+        self.loadingIndicator.stop()
+      }
     case .failure:
       let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
                                                             text: AppError.server.localizedDescription,

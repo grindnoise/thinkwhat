@@ -247,19 +247,15 @@ class Avatar: UIView {
     }
   }
   public var choiceColor: UIColor?
-  @MainActor public private(set) var isUploading = false {
-    didSet {
-#if DEBUG
-      print(isUploading)
-#endif
-    }
-  }
+  @MainActor public private(set) var isUploading = false
   //Publishers
   public let galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public let previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
   public let tapPublisher = PassthroughSubject<Userprofile, Never>()
   public let selectionPublisher = CurrentValueSubject<[Userprofile: Bool]?, Never>(nil)
+  
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -286,8 +282,10 @@ class Avatar: UIView {
   }()
   private lazy var button: UIButton = {
     let instance = UIButton()
-    instance.alpha = 0
+    instance.alpha = mode == .Default ? 0 : 1
+    instance.menu = prepareMenu()
     instance.showsMenuAsPrimaryAction = true
+    instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
     instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
@@ -435,10 +433,42 @@ class Avatar: UIView {
     }
   }
   
-  public func imageUploadFinished(_ image: UIImage) {
+  public func imageUploadFinished(_ result: Result<UIImage, Error>) {
     isUploading = false
-    Animations.changeImageCrossDissolve(imageView: imageView, image: image)
     
+    switch result {
+    case .success(let image):
+      Animations.changeImageCrossDissolve(imageView: imageView, image: image)
+      let banner = NewBanner(contentView: TextBannerContent(image: image,
+                                                            text: "image_uploaded",
+                                                            tintColor: self.color,
+                                                            fontName: Fonts.Regular,
+                                                            textStyle: .headline,
+                                                            textAlignment: .natural,
+                                                            cornerRadius: 0.05),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 2)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
+    case .failure(let error):
+      let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+                                                            text: error.localizedDescription,
+                                                            tintColor: .systemRed,
+                                                            fontName: Fonts.Regular,
+                                                            textStyle: .subheadline,
+                                                            textAlignment: .natural),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 2)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
+    }
+
     guard let fade = imageView.getSubview(type: UIView.self, identifier: "fade"),
           let spinner = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "spinner")
     else { return }
@@ -572,19 +602,20 @@ private extension Avatar {
     
     userprofile.imagePublisher
       .receive(on: DispatchQueue.main)
-      .sink(receiveCompletion: { error in
-#if DEBUG
-        print(error)
-#endif
+      .sink(receiveCompletion: { [weak self] in
+        guard let self = self else { return }
+
+        guard self.isUploading else { return }
+        
+        if case .failure(let error) = $0 {
+          self.imageUploadFinished(.failure(error))
+        }
       }, receiveValue: { [weak self] in
         guard let self = self else { return }
         
-        self.image = $0
-//        self.imageView.image = $0
+        guard self.isUploading else { self.image = $0; return }
         
-//        guard !self.ciFilterName.isEmpty else { return }
-//
-//        self.setFilter(filterName: self.ciFilterName, for: $0)
+        self.imageUploadFinished(.success($0))
       })
       .store(in: &subscriptions)
     
@@ -629,7 +660,7 @@ private extension Avatar {
   }
   
   func prepareMenu() -> UIMenu {
-    var actions: [UIAction]!
+    var actions = [UIAction]()
     
     switch mode {
     case .Editing:
