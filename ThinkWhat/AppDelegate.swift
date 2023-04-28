@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     API.shared.system.getCountryByIP()
     window = UIWindow()
-    window?.rootViewController = AppData.accessToken.isNil || AppData.accessToken!.isEmpty ? UINavigationController(rootViewController: StartViewController()) : MainController()
+    window?.rootViewController = UINavigationController(rootViewController: StartViewController())//AppData.accessToken.isNil || AppData.accessToken!.isEmpty ? UINavigationController(rootViewController: StartViewController()) : MainController()
     window?.makeKeyAndVisible()
     //        vkDelegateReference = VKDelegate()
     //        GIDSignIn.sharedInstance.restorePreviousSignIn()

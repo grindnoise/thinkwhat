@@ -28,7 +28,8 @@ protocol TermsModelOutput: AnyObject {
 }
 
 protocol TermsControllerOutput: AnyObject {
-  var viewInput: TermsViewInput? { get set }
+  var viewInput: (TermsViewInput & UIViewController)? { get set }
   
   func getTermsConditionsURL(_: URL)
+  func animateTransitionToApp(_: @escaping Closure)
 }

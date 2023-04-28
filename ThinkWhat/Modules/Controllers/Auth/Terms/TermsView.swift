@@ -13,6 +13,13 @@ import WebKit
 class TermsView: UIView {
   
   // MARK: - Public properties
+  weak var viewInput: (TermsViewInput & UIViewController)? {
+    didSet {
+      guard !viewInput.isNil else { return }
+      
+      setupUI()
+    }
+  }
   ///**UI**
   public private(set) lazy var webView: WKWebView = {
     let instance = WKWebView()
@@ -84,17 +91,6 @@ class TermsView: UIView {
   
   
   
-  // MARK: - Public properties
-  weak var viewInput: TermsViewInput? {
-    didSet {
-      guard !viewInput.isNil else { return }
-      
-      setupUI()
-    }
-  }
-  
-  
-  
   // MARK: - Destructor
   deinit {
     observers.forEach { $0.invalidate() }
@@ -119,6 +115,225 @@ class TermsView: UIView {
 }
 
 extension TermsView: TermsControllerOutput {
+  func animateTransitionToApp(_ completion: @escaping Closure) {
+    guard let viewInput = viewInput,
+          let titleView = viewInput.navigationItem.titleView as? UIStackView,
+          let titleIcon = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoIcon" }).first as? Icon,
+          let titleText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoText" }).first as? Icon,
+          let window = appDelegate.window
+    else { completion(); return }
+    
+    viewInput.navigationItem.setHidesBackButton(true, animated: true)
+    
+    let opaque = PassthroughView()
+    opaque.frame = UIScreen.main.bounds
+    opaque.place(inside: window)
+
+    let loadingIcon: Icon = {
+      let instance = Icon()
+      instance.accessibilityIdentifier = "loadingIcon"
+      instance.category = Icon.Category.Logo
+      instance.iconColor = Colors.main
+      instance.scaleMultiplicator = 1.2
+      instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+      instance.alpha = 0
+      
+      return instance
+    }()
+    let loadingText: Icon = {
+      let instance = Icon()
+      instance.accessibilityIdentifier = "loadingText"
+      instance.category = Icon.Category.LogoText
+      instance.iconColor = Colors.main
+      instance.scaleMultiplicator = 1.1
+      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
+      instance.alpha = 0
+      
+      return instance
+    }()
+    let loadingStack: UIStackView = {
+      let opaque = UIView()
+      opaque.backgroundColor = .clear
+      
+      let instance = UIStackView(arrangedSubviews: [
+        opaque,
+        loadingText
+      ])
+      instance.axis = .vertical
+      instance.distribution = .equalCentering
+      instance.spacing = 0
+      instance.clipsToBounds = false
+      
+      loadingIcon.translatesAutoresizingMaskIntoConstraints = false
+      opaque.translatesAutoresizingMaskIntoConstraints = false
+      opaque.addSubview(loadingIcon)
+      
+      NSLayoutConstraint.activate([
+        loadingIcon.topAnchor.constraint(equalTo: opaque.topAnchor),
+        loadingIcon.bottomAnchor.constraint(equalTo: opaque.bottomAnchor),
+        loadingIcon.centerXAnchor.constraint(equalTo: opaque.centerXAnchor),
+        opaque.heightAnchor.constraint(equalTo: loadingText.heightAnchor, multiplier: 2)
+      ])
+      
+      return instance
+    }()
+    loadingStack.placeInCenter(of: opaque,
+                               widthMultiplier: 0.6)
+        opaque.setNeedsLayout()
+        opaque.layoutIfNeeded()
+    
+    ///Fake icons to animate
+    let fakeLogoIcon: Icon = {
+      let instance = Icon(frame: CGRect(origin: titleIcon.superview!.convert(titleIcon.frame.origin,
+                                                                            to: opaque),
+                                        size: titleIcon.bounds.size))
+      instance.category = Icon.Category.Logo
+      instance.iconColor = Colors.main
+      instance.scaleMultiplicator = 1.2
+      instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+      
+      return instance
+    }()
+    let fakeLogoText: Icon = {
+      let instance = Icon(frame: CGRect(origin: titleText.superview!.convert(titleText.frame.origin,
+                                                                            to: opaque),
+                                        size: titleText.bounds.size))
+      
+      instance.category = Icon.Category.LogoText
+      instance.iconColor = Colors.main
+      instance.scaleMultiplicator = 1.1
+      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
+      
+      return instance
+    }()
+    let fakeAcceptButton: UIButton = {
+      let instance = UIButton(frame: CGRect(origin: acceptButton.superview!.convert(acceptButton.frame.origin,
+                                                                                 to: opaque),
+                                             size: acceptButton.bounds.size))
+      if #available(iOS 15, *) {
+        var config = UIButton.Configuration.filled()
+        config.cornerStyle = .small
+        config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+        config.baseBackgroundColor = Colors.main
+        config.contentInsets.top = padding
+        config.contentInsets.bottom = padding
+        config.contentInsets.leading = 20
+        config.contentInsets.trailing = 20
+        config.attributedTitle = AttributedString("acceptButton".localized.uppercased(),
+                                                  attributes: AttributeContainer([
+                                                    .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                    .foregroundColor: UIColor.white as Any
+                                                  ]))
+        instance.configuration = config
+      } else {
+        instance.cornerRadius = acceptButton.cornerRadius
+        instance.setAttributedTitle(NSAttributedString(string: "acceptButton".localized.uppercased(),
+                                                       attributes: [
+                                                        .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                        .foregroundColor: UIColor.white as Any
+                                                       ]),
+                                    for: .normal)
+        instance.backgroundColor = Colors.main
+      }
+      
+      
+      return instance
+    }()
+    
+//    fakeLogoIcon.frame = CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
+//                                                                to: opaque),
+//                            size: logoIcon.bounds.size)
+//    fakeLogoText.frame = CGRect(origin: logoText.superview!.convert(logoText.frame.origin,
+//                                                                to: opaque),
+//                            size: logoText.bounds.size)
+//
+    opaque.addSubviews([fakeLogoIcon, fakeLogoText, fakeAcceptButton])
+//    opaque.setNeedsLayout()
+//    opaque.layoutIfNeeded()
+    acceptButton.alpha = 0
+    titleIcon.alpha = 0
+    titleText.alpha = 0
+    
+//    print("opaque.frame", opaque.frame)
+//    print("loadingStack.frame", loadingStack.frame)
+    
+//    fakeLogoIcon.icon.add(Animations.get(property: .FillColor,
+//                                        fromValue: Colors.main.cgColor as Any,
+//                                         toValue: Colors.Logo.Flame.next().rawValue.cgColor as Any,
+//                                        duration: 0.3,
+//                                        delay: 0,
+//                                        repeatCount: 0,
+//                                        autoreverses: false,
+//                                        timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                        delegate: nil,
+//                                        isRemovedOnCompletion: false),
+//                         forKey: nil)
+//    fakeLogoText.icon.add(Animations.get(property: .FillColor,
+//                                        fromValue: Colors.main.cgColor as Any,
+//                                         toValue: Colors.Logo.Flame.next().rawValue.cgColor as Any,
+//                                        duration: 0.3,
+//                                        delay: 0,
+//                                        repeatCount: 0,
+//                                        autoreverses: false,
+//                                        timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                        delegate: self,
+//                                        isRemovedOnCompletion: false,
+//                                        completionBlocks: []),
+//                         forKey: nil)
+    fakeLogoIcon.icon.add(Animations.get(property: .Path,
+                                     fromValue: (fakeLogoIcon.icon as! CAShapeLayer).path as Any,
+                                     toValue: (loadingIcon.icon as! CAShapeLayer).path as Any,
+                                     duration: 0.3,
+                                     delay: 0,
+                                     repeatCount: 0,
+                                     autoreverses: false,
+                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                     delegate: self,
+                                     isRemovedOnCompletion: false,
+                                     completionBlocks: []),
+                      forKey: nil)
+    fakeLogoText.icon.add(Animations.get(property: .Path,
+                                     fromValue: (fakeLogoText.icon as! CAShapeLayer).path as Any,
+                                     toValue: (loadingText.icon as! CAShapeLayer).path as Any,
+                                     duration: 0.3,
+                                     delay: 0,
+                                     repeatCount: 0,
+                                     autoreverses: false,
+                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                     delegate: self,
+                                     isRemovedOnCompletion: false,
+                                     completionBlocks: []),
+                      forKey: nil)
+
+    
+    
+    UIView.animate(withDuration: 0.6,
+                   delay: 0,
+                   usingSpringWithDamping: 0.7,
+                   initialSpringVelocity: 0.3,
+                   options: [.curveEaseInOut],
+                   animations: { [weak self] in
+      guard let self = self else { return }
+      
+      self.webView.alpha = 0
+      self.webView.transform = .init(scaleX: 0.5, y: 0.5)
+      fakeAcceptButton.frame.origin.y = opaque.bounds.height
+      fakeLogoIcon.frame = CGRect(origin: loadingStack.convert(loadingIcon.frame.origin,
+                                                                      to: opaque),
+                                  size: loadingIcon.bounds.size)
+      fakeLogoText.frame = CGRect(origin: loadingStack.convert(loadingText.frame.origin,
+                                                                      to: opaque),
+                                  size: loadingText.bounds.size)
+      
+    }) { _ in
+      loadingIcon.alpha = 1
+      loadingText.alpha = 1
+      fakeLogoText.removeFromSuperview()
+      fakeLogoIcon.removeFromSuperview()
+      completion()
+    }
+  }
+  
   func getTermsConditionsURL(_ url: URL) {
     webView.load(URLRequest(url: url))
   }
@@ -136,9 +351,9 @@ private extension TermsView {
                               bottomInset: 0)
     
     let stack = UIStackView(arrangedSubviews: [
-    webView,
-    opaque,
-    UIView.verticalSpacer(padding*2)
+      webView,
+      opaque,
+      UIView.verticalSpacer(padding*2)
     ])
     stack.axis = .vertical
     stack.spacing = padding
@@ -171,6 +386,9 @@ private extension TermsView {
                              isModal: false,
                              useContentViewHeight: true,
                              shouldDismissAfter: 2)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &subscriptions)
     } else {
       switch hasReadAgreement {
       case true:
@@ -227,3 +445,4 @@ extension TermsView: UIScrollViewDelegate {
     }
   }
 }
+extension TermsView: CAAnimationDelegate {}

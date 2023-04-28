@@ -382,7 +382,7 @@ extension SignInView: SignInControllerOutput {
     spinner.alpha = 0
     let label: UILabel = {
       let instance = UILabel()
-      instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+      instance.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .body)
       instance.text = "provider_authorization_progress".localized
       instance.textAlignment = .center
       instance.textColor = .label

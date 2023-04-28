@@ -97,17 +97,19 @@ class TermsViewController: UIViewController {
 
 extension TermsViewController: TermsViewInput {
   func onAccept() {
-    guard let userprofile = Userprofiles.shared.current,
-          let wasEdited = userprofile.wasEdited
-    else { return }
-    
-    navigationController?.navigationBar.backItem?.title = ""
-    guard wasEdited else {
-      navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
-      return
+//    guard let userprofile = Userprofiles.shared.current,
+//          let wasEdited = userprofile.wasEdited
+//    else { return }
+//    
+//    navigationController?.navigationBar.backItem?.title = ""
+//    guard wasEdited else {
+//      navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
+//      return
+//    }
+    //TODO: - переход к анимации загрузки
+    controllerOutput?.animateTransitionToApp {
+      appDelegate.window?.rootViewController = MainController()
     }
-    // TODO: - переход к анимации загрузки
-    appDelegate.window?.rootViewController = MainController()
   }
 }
 

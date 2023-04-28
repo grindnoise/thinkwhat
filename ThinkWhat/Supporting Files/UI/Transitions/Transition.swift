@@ -804,7 +804,8 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           
           return instance
         }()
-        var acceptButtonCoordinate = toView.acceptButton.convert(CGPoint(x: loginButtonCoordinate.x, y: containerView.bounds.height),
+        let acceptButtonCoordinate = toView.acceptButton.convert(CGPoint(x: loginButtonCoordinate.x,
+                                                                         y: containerView.bounds.height),
                                                                  to: containerView)
 //        acceptButtonCoordinate.y = containerView.bounds.height
 //        acceptButtonCoordinate.x = containerView.bounds.height
@@ -815,7 +816,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         
         
         UIView.animate(withDuration: 0.3,
-                       delay: 0.3,
+                       delay: 0.6,
                        options: .curveEaseOut,
                        animations: {
           acceptButton.frame.origin = toView.acceptButton.superview!.convert(toView.acceptButton.frame.origin,
@@ -833,7 +834,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           
           UIView.animate(
             withDuration: 0.6,
-            delay: 0.05*Double(index),
+            delay: 0,
             usingSpringWithDamping: 0.8,
             initialSpringVelocity: 0.3,
             options: [.curveEaseInOut],
