@@ -197,10 +197,19 @@ extension SignInModel: SignInControllerInput {
       do {
         try await API.shared.auth.loginAsync(username: username, password: password)
         
-        let userData = try await API.shared.profiles.current()
-        Userprofiles.shared.current = try JSONDecoder.withDateTimeDecodingStrategyFormatters()
-          .decode(Userprofile.self, from: userData)
+        ///Get profile from API
+        let json = try JSON(data: try await API.shared.profiles.current(),
+                            options: .mutableContainers)
         
+        guard let appData = json["app_data"] as? JSON,
+              let current = json["current_user"] as? JSON
+        else { throw AppError.server }
+        
+        ///Load necessary data before creating user
+        try AppData.loadData(appData)
+        
+        Userprofiles.shared.current = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self,
+                                                                                          from: current.rawData())
         await MainActor.run {
           modelOutput?.mailSignInCallback(.success(true))
         }

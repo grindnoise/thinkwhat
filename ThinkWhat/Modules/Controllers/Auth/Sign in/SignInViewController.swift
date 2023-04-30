@@ -57,11 +57,16 @@ class SignInViewController: UIViewController {
     
     setupUI()
   }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    navigationItem.setHidesBackButton(true, animated: false)
+  }
 }
 
 extension SignInViewController: SignInViewInput {
   func openAgreement() {
-//    appDelegate.window?.rootViewController = MainController()
     navigationController?.delegate = appDelegate.transitionCoordinator
     navigationController?.navigationBar.backItem?.title = ""
     navigationController?.pushViewController(TermsViewController(), animated: true)
@@ -108,7 +113,12 @@ extension SignInViewController: SignInViewInput {
   }
   
   func signUp() {
-    
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.delegate = nil//appDelegate.transitionCoordinator
+    navigationController?.pushViewController(NewAccountViewController(), animated: true)
+    navigationController?.delegate = nil
   }
   
   func mailSignIn(username: String, password: String) {

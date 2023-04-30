@@ -2013,7 +2013,12 @@ private extension API {
   }
   
   @discardableResult
-  func requestAsync(url: URL, httpMethod: HTTPMethod,  parameters: Parameters? = nil, encoding: ParameterEncoding = JSONEncoding.default, headers: HTTPHeaders? = nil, accessControl: Bool = true) async throws -> Data {
+  func requestAsync(url: URL,
+                    httpMethod: HTTPMethod,
+                    parameters: Parameters? = nil,
+                    encoding: ParameterEncoding = JSONEncoding.default,
+                    headers: HTTPHeaders? = nil,
+                    accessControl: Bool = true) async throws -> Data {
     
     func request() async throws -> Data {
       try await withUnsafeThrowingContinuation { (continuation: UnsafeContinuation<Data,Error>) in

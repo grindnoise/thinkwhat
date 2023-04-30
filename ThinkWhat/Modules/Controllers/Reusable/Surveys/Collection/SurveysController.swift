@@ -671,7 +671,7 @@ private extension SurveysController {
                                menu: nil)
     }
     
-    navigationItem.setRightBarButton(button, animated: true)
+    navigationItem.setRightBarButton(button, animated: false)
   }
   
   @objc

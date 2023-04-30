@@ -432,7 +432,7 @@ private extension TopicsController {
         return action
       }(),
                                     menu: nil)
-      navigationItem.setRightBarButton(rightButton, animated: true)
+      navigationItem.setRightBarButton(rightButton, animated: false)
       navigationItem.setLeftBarButton(nil, animated: true)
       
     case .GlobalSearch:
@@ -449,7 +449,7 @@ private extension TopicsController {
         return action
       }(),
                                     menu: nil)
-      navigationItem.setRightBarButton(rightButton, animated: true)
+      navigationItem.setRightBarButton(rightButton, animated: false)
 //      navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
 //                                                      image: UIImage(systemName: "chevron.left",
 //                                                                     withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
@@ -478,7 +478,7 @@ private extension TopicsController {
         return action
       }(),
                                     menu: nil)
-      navigationItem.setRightBarButton(rightButton, animated: true)
+      navigationItem.setRightBarButton(rightButton, animated: false)
       navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
                                                       image: UIImage(systemName: "chevron.left",
                                                                      withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
@@ -525,7 +525,7 @@ private extension TopicsController {
         return action
       }(),
                                     menu: nil)
-      navigationItem.setRightBarButton(rightButton, animated: true)
+      navigationItem.setRightBarButton(rightButton, animated: false)
     }
   }
   

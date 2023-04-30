@@ -464,6 +464,10 @@ extension SignInView: SignInControllerOutput {
                                                           ]),
                                        for: .normal)
       }
+      
+      guard case .success(_) = result else { return }
+      
+      self.viewInput?.openAgreement()
     }
   }
 }
@@ -529,11 +533,11 @@ private extension SignInView {
   
   @objc
   func buttonTapped(_ sender: UIButton) {
-    guard let username = loginTextField.text,
-          let password = passwordTextField.text
-    else { return }
-    
     if sender === loginButton {
+      guard let username = loginTextField.text,
+            let password = passwordTextField.text
+      else { return }
+      
       if username.isEmpty {
         loginTextField.showSign(state: .UsernameNotFilled)
       }
@@ -559,6 +563,8 @@ private extension SignInView {
         viewInput?.mailSignIn(username: username, password: password)
         isUserInteractionEnabled = false
       }
+    } else if sender === signupButton {
+      viewInput?.signUp()
     }
   }
   

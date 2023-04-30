@@ -111,6 +111,7 @@
 "getStartedButton" = "Начать!";
 
 //Signup VC
+"new_account" = "Новый аккаунт";
 "providerLabel" = "или";
 "haveAccountLabel" = "Уже зарегистрированы?";
 "loginButton" = "Войти";
