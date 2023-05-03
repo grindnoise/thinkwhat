@@ -41,13 +41,15 @@ class UserSettingsInfoCell: UICollectionViewListCell {
   ///**UI**
   public private(set) var isAnimationEnabled = false
   ///**Logic**
+  public var mode: UserSettingsCollectionView.Mode = .Default
   public var userprofile: Userprofile! {
     didSet {
       setupUI()
     }
   }
   private lazy var collectionView: UserSettingsInfoCollectionView = {
-    let instance = UserSettingsInfoCollectionView(userprofile: userprofile)
+    let instance = UserSettingsInfoCollectionView(userprofile: userprofile,
+                                                  mode: mode)
     instance.clipsToBounds = true
     instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .secondarySystemBackground : .tertiarySystemBackground
     instance.publisher(for: \.bounds)

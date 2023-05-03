@@ -9,18 +9,15 @@
 import UIKit
 
 protocol ProfileCreationViewInput: AnyObject {
-  
   var controllerOutput: ProfileCreationControllerOutput? { get set }
   var controllerInput: ProfileCreationControllerInput? { get set }
   
-  
+  func openApp()
 }
 
 protocol ProfileCreationControllerInput: AnyObject {
   
   var modelOutput: ProfileCreationModelOutput? { get set }
-  
-  
 }
 
 protocol ProfileCreationModelOutput: AnyObject {
@@ -28,7 +25,5 @@ protocol ProfileCreationModelOutput: AnyObject {
 }
 
 protocol ProfileCreationControllerOutput: AnyObject {
-  var viewInput: ProfileCreationViewInput? { get set }
-  
-  
+  var viewInput: (UIViewController & ProfileCreationViewInput)? { get set }
 }

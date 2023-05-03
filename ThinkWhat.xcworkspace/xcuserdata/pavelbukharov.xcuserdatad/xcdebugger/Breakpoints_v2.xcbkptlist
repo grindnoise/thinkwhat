@@ -2919,22 +2919,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "BA5B6FD7-B534-45EC-9D54-C8A0EB493736"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/User settings/UserSettingsCollectionView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "182"
-            endingLineNumber = "182"
-            landmarkName = "setupUI()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "AFB6219A-A757-43E6-B667-3D1E105FFF06"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -2942,8 +2926,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/User settings/UserSettingsCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "232"
-            endingLineNumber = "232"
+            startingLineNumber = "243"
+            endingLineNumber = "243"
             landmarkName = "setupUI()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3006,8 +2990,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/User settings/UserSettingsInfoCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "253"
-            endingLineNumber = "253"
+            startingLineNumber = "256"
+            endingLineNumber = "256"
             landmarkName = "setupUI()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3466,6 +3450,54 @@
                   startingLineNumber = "454"
                   endingLineNumber = "454"
                   offsetFromSymbolStart = "112">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5C573BD2-ECBF-4268-974B-0B2D634D0FFF"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/Auth/Sign up/NewAccountView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "584"
+            endingLineNumber = "584"
+            landmarkName = "buttonTapped(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "5C573BD2-ECBF-4268-974B-0B2D634D0FFF - 7e26b9527e45ca74"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;Swift.Dictionary&lt;Swift.String, Any&gt;, Swift.Error&gt;) -&gt; () in closure #2 () -&gt; () in closure #1 (Swift.Result&lt;Swift.Dictionary&lt;Swift.String, Any&gt;, Swift.Error&gt;) -&gt; () in closure #1 (Swift.Result&lt;Swift.Bool, Swift.Error&gt;) -&gt; () in ThinkWhat__local_.NewAccountView.buttonTapped(__C.UIButton) -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/Auth/Sign%20up/NewAccountView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "585"
+                  endingLineNumber = "585"
+                  offsetFromSymbolStart = "156">
+               </Location>
+               <Location
+                  uuid = "5C573BD2-ECBF-4268-974B-0B2D634D0FFF - 7ec5e266dff9f571"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;Swift.Dictionary&lt;Swift.String, Any&gt;, Swift.Error&gt;) -&gt; () in closure #2 () -&gt; () in closure #1 (Swift.Result&lt;Swift.Dictionary&lt;Swift.String, Any&gt;, Swift.Error&gt;) -&gt; () in closure #1 (Swift.Result&lt;Swift.Bool, Swift.Error&gt;) -&gt; () in ThinkWhat__alpha_.NewAccountView.buttonTapped(__C.UIButton) -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Controllers/Auth/Sign%20up/NewAccountView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "585"
+                  endingLineNumber = "585"
+                  offsetFromSymbolStart = "156">
                </Location>
             </Locations>
          </BreakpointContent>

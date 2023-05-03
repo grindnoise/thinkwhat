@@ -115,7 +115,7 @@
 "providerLabel" = "или";
 "haveAccountLabel" = "Уже зарегистрированы?";
 "loginButton" = "Войти";
-"signupButton" = "Создать аккаунт";
+"signupButton" = "Регистрация";
 "usernameTF" = "Логин";
 "mailTF" = "Электронная почта";
 "passwordTF" = "Пароль";
@@ -124,7 +124,13 @@
 "username_is_short" = "Недостаточно символов";
 "email_is_busy" = "Электронная почта уже используется";
 "email_is_empty" = "Некорректный формат почты";
+"email_verification_code_sent" = "Электронное письмо с кодом подтверждения было отправлено на адрес:";
+"email_not_delivered" = "Не пришел код?";
+"repeat_after" = "Повторить через ";
+"resend_mail" = "Отправить заново";
+"verification_code" = "Код подтверждения";
 "password_is_short" = "Слишком короткий пароль";
+"invalid_verification_code" = "Неверный код";
 "birthdate_is_empty" = "Выберите дату рождения";
 "success" = "Ура!";
 "provider_authorization_progress" = "Авторизация";

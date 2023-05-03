@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftyJSON
 import Combine
 
 class NewAccountViewController: UIViewController {
@@ -64,11 +65,56 @@ class NewAccountViewController: UIViewController {
     setupUI()
     setTasks()
   }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    
+    delay(seconds: 1) {
+      self.emailConfirmed()
+    }
+  }
 }
 
 extension NewAccountViewController: NewAccountViewInput {
+  func emailConfirmed() {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.delegate = appDelegate.transitionCoordinator
+    navigationController?.pushViewController(TermsViewController(), animated: true)
+    navigationController?.delegate = nil
+  }
+  
+  func sendVerificationCode(_ completion: @escaping (Result<[String : Any], Error>) -> ()) {
+    Task {
+      do {
+        let data = try await API.shared.auth.getEmailConfirmationCode()
+        await MainActor.run {
+          completion(.success(JSON(data).dictionaryObject!))
+        }
+      } catch {
+        completion(.failure(error))
+      }
+    }
+  }
+//  func sendVerificationCode() {
+//    Task {
+//      let data = try await API.shared.auth.getEmailConfirmationCode()
+//      print(JSON(data))
+//    }
+//  }
+  
   func signup(username: String, email: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-    API.shared.auth.signUp(email: email, password: password, username: username) { completion($0) }
+    API.shared.auth.signUp(email: email,
+                           password: password,
+                           username: username) { //completion($0) }
+      if case .failure(let error) = $0 {
+        completion(.failure(error))
+      } else {
+//        API.shared.auth.loginViaMail(username: username, password: password) { completion($0) }
+        API.shared.auth.getTokenByPassword(username: username, password: password) { completion($0) }
+      }
+    }
   }
   
 //  func checkCredentials(username: String, email: String, completion: @escaping (Result<Bool, Error>) -> ()) {
@@ -95,7 +141,7 @@ private extension NewAccountViewController {
       .sink { [weak self] name in
         guard let self = self else { return }
         
-        API.shared.isUsernameEmailAvailable(email: "", username: name) {
+        API.shared.isUsernameEmailAvailable(email: "", username: name.lowercased()) {
           self.controllerOutput?.nameCheckerCallback(result: $0)
         }
       }

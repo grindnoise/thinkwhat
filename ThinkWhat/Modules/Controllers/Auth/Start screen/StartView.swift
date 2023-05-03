@@ -141,6 +141,25 @@ class StartView: UIView {
 
 extension StartView: StartControllerOutput {
   func didAppear() {
+//                  let email = "pbuxaroff@gmail.com"
+//    let banner = NewPopup(padding: self.padding*2,
+//                          contentPadding: .uniform(size: self.padding*2))
+//    let content = EmailVerificationPopupContent(code: 1234,
+//                                                retryTimeout: 5,
+//                                                email: email,
+//                                                color: Colors.main)
+//    content.retryPublisher
+//      .sink {  }
+//      .store(in: &banner.subscriptions)
+//    content.verifiedPublisher
+//      .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
+//      .sink { banner.dismiss() }
+//      .store(in: &banner.subscriptions)
+//    banner.setContent(content)
+//    banner.didDisappearPublisher
+//      .sink { _ in banner.removeFromSuperview() }
+//      .store(in: &self.subscriptions)
+    
     logoIcon.transform = .init(scaleX: 0.75, y: 0.75)
     logoText.transform = .init(scaleX: 0.75, y: 0.75)
     label.transform = .init(scaleX: 0.75, y: 0.75)

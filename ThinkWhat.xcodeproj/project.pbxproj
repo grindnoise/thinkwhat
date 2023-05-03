@@ -266,6 +266,7 @@
 		AB60B5BD285CD6150023C99B /* CommentsSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB60B5BC285CD6150023C99B /* CommentsSelection.swift */; };
 		AB60B5BF285CD81F0023C99B /* CommentsSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB60B5BE285CD81F0023C99B /* CommentsSelection.xib */; };
 		AB61BA2F2782DDA200F89C4C /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB61BA2E2782DDA200F89C4C /* Media.swift */; };
+		AB63B3522A0128B4003BF237 /* EmailVerificationPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB63B3512A0128B4003BF237 /* EmailVerificationPopupContent.swift */; };
 		AB63D7D6283FC03A00173116 /* TopicSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB63D7D5283FC03A00173116 /* TopicSelection.swift */; };
 		AB63D7D8283FC04F00173116 /* TopicSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB63D7D7283FC04F00173116 /* TopicSelection.xib */; };
 		AB649E2628A1597800978520 /* CommentSupplementaryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB649E2528A1597800978520 /* CommentSupplementaryCell.swift */; };
@@ -888,6 +889,7 @@
 		AB60B5BC285CD6150023C99B /* CommentsSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsSelection.swift; sourceTree = "<group>"; };
 		AB60B5BE285CD81F0023C99B /* CommentsSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CommentsSelection.xib; sourceTree = "<group>"; };
 		AB61BA2E2782DDA200F89C4C /* Media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
+		AB63B3512A0128B4003BF237 /* EmailVerificationPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailVerificationPopupContent.swift; sourceTree = "<group>"; };
 		AB63D7D5283FC03A00173116 /* TopicSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelection.swift; sourceTree = "<group>"; };
 		AB63D7D7283FC04F00173116 /* TopicSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TopicSelection.xib; sourceTree = "<group>"; };
 		AB649E2528A1597800978520 /* CommentSupplementaryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentSupplementaryCell.swift; sourceTree = "<group>"; };
@@ -2185,6 +2187,14 @@
 			path = Banners;
 			sourceTree = "<group>";
 		};
+		AB63B3502A01285F003BF237 /* Email verification */ = {
+			isa = PBXGroup;
+			children = (
+				AB63B3512A0128B4003BF237 /* EmailVerificationPopupContent.swift */,
+			);
+			path = "Email verification";
+			sourceTree = "<group>";
+		};
 		AB63D7D4283FBFB100173116 /* Popup content */ = {
 			isa = PBXGroup;
 			children = (
@@ -2845,6 +2855,7 @@
 		ABADF5A327F73C7400A26474 /* Content */ = {
 			isa = PBXGroup;
 			children = (
+				AB63B3502A01285F003BF237 /* Email verification */,
 				AB4AAA5F29E3FE500044E971 /* Poll publication congratulations */,
 				ABF4D14B29D493B200BCBFD8 /* Survey limit */,
 				ABF9952329C77700007D7578 /* TopicSelection */,
@@ -3705,6 +3716,7 @@
 				ABA7829728589C5E00964FDE /* AddChoiceCell.swift in Sources */,
 				ABDEB65F29C9B1540099C8A4 /* NewPollChoice.swift in Sources */,
 				AB93FD78247EA245009546DD /* EmptyCard.swift in Sources */,
+				AB63B3522A0128B4003BF237 /* EmailVerificationPopupContent.swift in Sources */,
 				AB72960D27DA2F0F00D45B54 /* HotContract.swift in Sources */,
 				AB3C6849223FD3EE00B57580 /* UpdateButton.swift in Sources */,
 				AB3C6816223FCE3D00B57580 /* LaunchViewController.swift in Sources */,

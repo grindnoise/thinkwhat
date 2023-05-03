@@ -124,6 +124,12 @@
 "username_is_short" = "Username is too short";
 "email_is_busy" = "Email is already used";
 "email_is_empty" = "Email is incorrect";
+"email_verification_code_sent" = "An email with a verification code has been sent to:";
+"email_not_delivered" = "Haven't received code?";
+"repeat_after" = "Repeat after ";
+"resend_mail" = "Resend";
+"verification_code" = "Verification code";
+"invalid_verification_code" = "Invalid code";
 "password_is_short" = "Password is too short";
 "birthdate_is_empty" = "Select date of birth";
 "success" = "Success!";

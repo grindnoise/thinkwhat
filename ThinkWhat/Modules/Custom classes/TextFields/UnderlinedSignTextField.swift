@@ -131,25 +131,25 @@ class UnderlinedSignTextField: UnderlinedTextField {
         rightView = UIView()
         rightView?.frame = rightViewRect(forBounds: frame)
         
-        guard checkSign.isNil || warningSign.isNil || lowerTextView.isNil else  { return }
-        
-        checkSign = Icon()
-        checkSign.iconColor = color
-        checkSign.category = .Success
-        checkSign.alpha = 0
-        checkSign.backgroundColor = .clear
-        checkSign.addEquallyTo(to: rightView!)
-        warningSign = Icon()
-        warningSign.iconColor = color
-        warningSign.category = .Caution
-        warningSign.backgroundColor = .clear
-        warningSign.alpha = 0
-        warningSign.addEquallyTo(to: rightView!)
-        lowerTextView = UITextView()
-        lowerTextView.alpha = 0
-        lowerTextView.isEditable = false
-        lowerTextView.isSelectable = false
-        lowerTextView.textColor = color
+      guard checkSign.isNil || warningSign.isNil || lowerTextView.isNil else  { return }
+      
+      checkSign = Icon()
+      checkSign.iconColor = .systemGreen
+      checkSign.category = .Success
+      checkSign.alpha = 0
+      checkSign.backgroundColor = .clear
+      checkSign.addEquallyTo(to: rightView!)
+      warningSign = Icon()
+      warningSign.iconColor = Colors.main
+      warningSign.category = .Caution
+      warningSign.backgroundColor = .clear
+      warningSign.alpha = 0
+      warningSign.addEquallyTo(to: rightView!)
+      lowerTextView = UITextView()
+      lowerTextView.alpha = 0
+      lowerTextView.isEditable = false
+      lowerTextView.isSelectable = false
+      lowerTextView.textColor = color
         lowerTextView.isScrollEnabled = false
         lowerTextView.textContainerInset = UIEdgeInsets(top: 0,
                                                         left: -5,

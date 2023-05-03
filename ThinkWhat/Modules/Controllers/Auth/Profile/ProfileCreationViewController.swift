@@ -30,10 +30,15 @@ class ProfileCreationViewController: UIViewController {
       .modelOutput = self
     
     self.view = view as UIView
+    navigationItem.setHidesBackButton(true, animated: false)
   }
 }
 
 extension ProfileCreationViewController: ProfileCreationViewInput {
+  func openApp() {
+    appDelegate.window?.rootViewController = MainController()
+  }
+  
   
 }
 

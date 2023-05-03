@@ -22,7 +22,7 @@ class TermsViewController: UIViewController {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
-  private lazy var logoStack: UIStackView = {
+  public private(set) lazy var logoStack: UIStackView = {
     let logoIcon: Icon = {
       let instance = Icon(category: Icon.Category.Logo)
       instance.accessibilityIdentifier = "logoIcon"
@@ -31,7 +31,7 @@ class TermsViewController: UIViewController {
       instance.clipsToBounds = false
       instance.scaleMultiplicator = 1.2
       instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-      instance.heightAnchor.constraint(equalToConstant: NavigationController.Constants.NavBarHeightSmallState - 4).isActive = true
+      instance.heightAnchor.constraint(equalToConstant: NavigationController.Constants.NavBarHeightSmallState * 0.65).isActive = true
       
       return instance
     }()
@@ -51,7 +51,7 @@ class TermsViewController: UIViewController {
       logoIcon,
       logoText
     ])
-    instance.alpha = 0
+//    instance.alpha = 0
     instance.axis = .horizontal
     instance.spacing = 0
     instance.clipsToBounds = false
@@ -97,19 +97,22 @@ class TermsViewController: UIViewController {
 
 extension TermsViewController: TermsViewInput {
   func onAccept() {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
 //    guard let userprofile = Userprofiles.shared.current,
 //          let wasEdited = userprofile.wasEdited
 //    else { return }
-//    
+//
 //    navigationController?.navigationBar.backItem?.title = ""
 //    guard wasEdited else {
-//      navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
+      navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
 //      return
 //    }
-    //TODO: - переход к анимации загрузки
-    controllerOutput?.animateTransitionToApp {
-      appDelegate.window?.rootViewController = MainController()
-    }
+//
+//    controllerOutput?.animateTransitionToApp {
+//      appDelegate.window?.rootViewController = MainController()
+//    }
   }
 }
 
@@ -125,6 +128,9 @@ private extension TermsViewController {
     navigationController?.setNavigationBarHidden(false, animated: false)
 //    setNavigationBarTintColor(Colors.main)
     fillNavigationBar()
-    navigationItem.titleView = logoStack
+//    navigationItem.titleView = logoStack
+    guard let navBar = navigationController?.navigationBar else { return }
+    
+    logoStack.placeInCenter(of: navBar)
   }
 }

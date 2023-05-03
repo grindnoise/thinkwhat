@@ -89,11 +89,11 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
                                            bottom: self.padding,
                                            right: self.padding) }()
   private var currentConstraints = [NSLayoutConstraint]()
-  private lazy var tagCapsule: TagCapsule = { TagCapsule(text: "userprofile".localized.uppercased(),
-                                                         padding: 4,
-                                                         color: color,
-                                                         font: UIFont(name: Fonts.Bold, size: 20)!,
-                                                         iconCategory: userprofile.gender == .Male ? .ManFace : .GirlFace) }()
+//  private lazy var tagCapsule: TagCapsule = { TagCapsule(text: "userprofile".localized.uppercased(),
+//                                                         padding: 4,
+//                                                         color: color,
+//                                                         font: UIFont(name: Fonts.Bold, size: 20)!,
+//                                                         iconCategory: userprofile.gender == .Male ? .ManFace : .GirlFace) }()
   private lazy var username: UILabel = {
     let instance = UILabel()
     instance.isUserInteractionEnabled = true
@@ -296,7 +296,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     //    avatar.placeInCenter(of: opaque, topInset: 4, bottomInset: 4)
     
     let instance = UIStackView(arrangedSubviews: [
-      tagCapsule,
+//      tagCapsule,
       opaque,
       username,
       nested
@@ -781,7 +781,7 @@ private extension UserSettingsCredentialsCell {
   
   func setColors() {
     avatar.color = color
-    tagCapsule.color = color
+//    tagCapsule.color = color
     
     if #available(iOS 15, *) {
       genderButton.configuration?.baseBackgroundColor = color

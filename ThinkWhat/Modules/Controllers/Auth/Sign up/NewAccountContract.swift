@@ -15,6 +15,8 @@ protocol NewAccountViewInput: AnyObject {
   var controllerInput: NewAccountControllerInput? { get set }
   
   func signup(username: String, email: String, password: String, completion: @escaping(Result<Bool,Error>)->())
+  func sendVerificationCode(_: @escaping(Result<[String: Any], Error>)->())
+  func emailConfirmed()
 //  func checkCredentials(username: String, email: String, completion: @escaping(Result<Bool,Error>)->())
 }
 

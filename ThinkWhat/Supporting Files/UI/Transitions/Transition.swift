@@ -44,7 +44,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
       let containerView = transitionContext.containerView
       containerView.backgroundColor = .clear
       context = transitionContext
-      toVC.view.alpha = 0
+//      toVC.view.alpha = 0
       containerView.addSubview(toVC.view)
       
       //        toVC.view.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
@@ -503,7 +503,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           }
       } else if let fromView = fromVC.view as? SignInView,
                 let toView = toVC.view as? TermsView,
-                let titleView = toVC.navigationItem.titleView as? UIStackView,
+                let titleView = toVC.navigationController?.navigationBar.subviews.filter({ $0 is UIStackView }).first as? UIStackView,
                 let logoIcon = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoIcon" }).first as? Icon,
                 let logoText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoText" }).first as? Icon,
                 let logosStack = fromView.logos.getSubview(type: UIStackView.self, identifier: "stack")  {
@@ -846,6 +846,11 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
               guard index == views.count - 1 else { return }
               
               self.context?.completeTransition(true)
+              fromView.forgotButton.alpha = 1
+              fromView.signupButton.alpha = 1
+              fromView.logoIcon.alpha = 1
+              fromView.loginContainer.alpha = 1
+              fromView.passwordContainer.alpha = 1
             }
         }
         
@@ -869,7 +874,733 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
             logoIcon.alpha = 1
             opaque.removeFromSuperview()
           }
-      } else { self.context?.completeTransition(true) }
+      } else if let fromView = fromVC.view as? SignInView,
+                let toView = toVC.view as? NewAccountView,
+                let logosStack = fromView.logos.getSubview(type: UIStackView.self, identifier: "stack")  {
+        
+        toView.setNeedsLayout()
+        toView.layoutIfNeeded()
+        toView.alpha = 1
+        toView.loginButton.alpha = 0
+        fromView.alpha = 1
+        
+        let padding: CGFloat = 8
+        let fakeLogoIcon: Icon = {
+          let instance = Icon()
+          instance.frame = CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
+                                                                               to: containerView),
+                                  size: fromView.logoIcon.bounds.size)
+          fromView.logoIcon.alpha = 0
+          instance.iconColor = Colors.main
+          instance.scaleMultiplicator = 1
+          instance.category = .Logo
+          
+          return instance
+        }()
+        let fakeLogoText: Icon = {
+          let instance = Icon()
+          instance.frame = CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
+                                                                               to: containerView),
+                                  size: fromView.logoText.bounds.size)
+          fromView.logoIcon.alpha = 0
+          instance.iconColor = Colors.main
+          instance.scaleMultiplicator = 1
+          instance.category = .LogoText
+          
+          return instance
+        }()
+        let fakeLogoIconDestination = toView.logoIcon.superview!.convert(toView.logoIcon.frame.origin,
+                                                                   to: containerView)
+        let fakeLogoTextDestination = toView.logoText.superview!.convert(toView.logoText.frame.origin,
+                                                                   to: containerView)
+        
+        fromView.logoIcon.alpha = 0
+        fromView.logoText.alpha = 0
+        toView.logoIcon.alpha = 0
+        toView.logoText.alpha = 0
+        containerView.addSubview(fakeLogoIcon)
+        containerView.addSubview(fakeLogoText)
+        
+//        let fakeButton: UIButton = {
+//          let instance = UIButton()
+//          if #available(iOS 15, *) {
+//            var config = UIButton.Configuration.filled()
+//            config.cornerStyle = .small
+//            config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+//            config.baseBackgroundColor = Colors.main
+//            config.contentInsets.top = padding
+//            config.contentInsets.bottom = padding
+//            config.contentInsets.leading = 20
+//            config.contentInsets.trailing = 20
+//            config.attributedTitle = AttributedString("loginButton".localized.uppercased(),
+//                                                      attributes: AttributeContainer([
+//                                                        .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+//                                                        .foregroundColor: UIColor.white as Any
+//                                                      ]))
+//            instance.configuration = config
+//          } else {
+//            instance.backgroundColor = Colors.main
+//            instance.cornerRadius = fromView.loginButton.cornerRadius
+//            instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
+//                                                           attributes: [
+//                                                            .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+//                                                            .foregroundColor: UIColor.white as Any
+//                                                           ]),
+//                                        for: .normal)
+//          }
+//
+//          return instance
+//        }()
+        let fakeButtonLabel: UILabel = {
+          let instance = UILabel()
+          instance.font = UIFont(name: Fonts.Bold, size: 20)
+          instance.textColor = .white
+          instance.text = "loginButton".localized.uppercased()
+//          fakeButtonLabel.attributedText = NSAttributedString(string: "loginButton".localized.uppercased(),
+//                                                    attributes: [
+//                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+//                                                      .foregroundColor: UIColor.white as Any
+//                                                    ])
+          return instance
+        }()
+        let fakeButton: UIView = {
+          let instance = UIView()
+          instance.backgroundColor = Colors.main
+          instance.cornerRadius = 6//fromView.loginButton.cornerRadius
+          //            instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
+          //                                                           attributes: [
+          //                                                            .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+          //                                                            .foregroundColor: UIColor.white as Any
+          //                                                           ]),
+          //                                        for: .normal)
+//          let label = UILabel()
+//          label.attributedText = NSAttributedString(string: "loginButton".localized.uppercased(),
+//                                                    attributes: [
+//                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+//                                                      .foregroundColor: UIColor.white as Any
+//                                                    ])
+          fakeButtonLabel.placeInCenter(of: instance)
+
+          return instance
+        }()
+        let fakeButtonCoordinate = toView.loginButton.superview!.convert(toView.loginButton.frame.origin,
+                                                                         to: containerView)
+        fakeButton.frame = CGRect(origin: fromView.loginButton.superview!.convert(fromView.loginButton.frame.origin,
+                                                                                  to: containerView),
+                                  size: fromView.loginButton.bounds.size)
+        containerView.addSubview(fakeButton)
+        UIView.transition(with: fakeButtonLabel,
+                          duration: 0.2,
+                          options: .transitionCrossDissolve,
+                          animations: {
+          fakeButton.frame.size = toView.loginButton.frame.size
+          fakeButtonLabel.text = "signupButton".localized.uppercased()
+//          fakeButtonLabel.attributedText = NSAttributedString(string: "signupButton".localized.uppercased(),
+//                                                              attributes: [
+//                                                                .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+//                                                                .foregroundColor: UIColor.white as Any
+//                                                              ])
+        })
+        
+        
+        
+        let signupButton: UIButton = {
+          let instance = UIButton()
+          instance.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
+                                                         attributes: [
+                                                          .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
+                                                          .foregroundColor: Colors.main as Any
+                                                         ]),
+                                      for: .normal)
+          
+          return instance
+        }()
+        var signupButtonDestination = fromView.signupButton.superview!.convert(fromView.signupButton.frame.origin,
+                                                                               to: containerView)
+        signupButtonDestination.x = -(containerView.bounds.width + signupButton.frame.width)
+        signupButton.frame = CGRect(origin: fromView.signupButton.superview!.convert(fromView.signupButton.frame.origin,
+                                                                                     to: containerView),
+                                    size: fromView.signupButton.bounds.size)
+        
+        fromView.signupButton.alpha = 0
+        containerView.addSubview(signupButton)
+
+        
+        
+        let forgotButton: UIButton = {
+          let instance = UIButton()
+          instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
+                                                         attributes: [
+                                                          .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
+                                                          .foregroundColor: Colors.main as Any
+                                                         ]),
+                                      for: .normal)
+          
+          return instance
+        }()
+        var forgotButtonDestination = fromView.forgotButton.superview!.convert(fromView.forgotButton.frame.origin,
+                                                                               to: containerView)
+        forgotButtonDestination.x = containerView.bounds.width
+        forgotButton.frame = CGRect(origin: fromView.forgotButton.superview!.convert(fromView.forgotButton.frame.origin,
+                                                                                     to: containerView),
+                                    size: fromView.forgotButton.bounds.size)
+        //        forgotButton.frame.origin.x = containerView.bounds.width
+        containerView.addSubview(forgotButton)
+        fromView.forgotButton.alpha = 0
+        
+        
+        
+        let mailContainer: UIStackView = {
+          let loginTextField: UnderlinedSignTextField = {
+            let instance = UnderlinedSignTextField()
+            instance.backgroundColor = .clear
+            instance.tintColor = Colors.main
+            instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+            instance.clipsToBounds = false
+            instance.attributedPlaceholder = NSAttributedString(string: "mailTF".localized,
+                                                                attributes: [
+                                                                  .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                                ])
+            return instance
+          }()
+          
+          let instance = UIStackView(arrangedSubviews: [
+            UIView.horizontalSpacer(padding),
+            loginTextField,
+            UIView.horizontalSpacer(padding)
+          ])
+          instance.axis = .horizontal
+          instance.spacing = 0
+          instance.backgroundColor = (toView.traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground)
+          
+          return instance
+        }()
+        let mailDestination = toView.mailContainer.superview!.convert(toView.mailContainer.frame.origin,
+                                                                      to: containerView)
+        mailContainer.frame = CGRect(origin: fromView.loginContainer.superview!.convert(fromView.loginContainer.frame.origin,
+                                                                                        to: containerView),
+                                     size: fromView.loginContainer.bounds.size)
+        mailContainer.cornerRadius = fromView.passwordContainer.bounds.width * 0.025
+        containerView.addSubview(mailContainer)
+        toView.mailContainer.alpha = 0
+        
+        
+        
+        
+        let loginContainer: UIStackView = {
+          let loginTextField: UnderlinedSignTextField = {
+            let instance = UnderlinedSignTextField()
+            instance.backgroundColor = .clear
+            instance.tintColor = Colors.main
+            instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+            instance.clipsToBounds = false
+            instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
+                                                                attributes: [
+                                                                  .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                                ])
+            return instance
+          }()
+          
+          let instance = UIStackView(arrangedSubviews: [
+            UIView.horizontalSpacer(padding),
+            loginTextField,
+            UIView.horizontalSpacer(padding)
+          ])
+          instance.axis = .horizontal
+          instance.spacing = 0
+          instance.backgroundColor = (toView.traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground)
+          
+          return instance
+        }()
+        let loginDestination = toView.loginContainer.superview!.convert(toView.loginContainer.frame.origin,
+                                                                        to: containerView)
+        loginContainer.frame = CGRect(origin: fromView.loginContainer.superview!.convert(fromView.loginContainer.frame.origin,
+                                                                                         to: containerView),
+                                      size: fromView.loginContainer.bounds.size)
+        loginContainer.cornerRadius = loginContainer.bounds.width * 0.025
+        containerView.addSubview(loginContainer)
+        fromView.loginContainer.alpha = 0
+        toView.loginContainer.alpha = 0
+        
+        
+        
+        let passwordContainer: UIStackView = {
+          let loginTextField: UnderlinedSignTextField = {
+            let instance = UnderlinedSignTextField()
+            instance.backgroundColor = .clear
+            instance.tintColor = Colors.main
+            instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+            instance.clipsToBounds = false
+            instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
+                                                                attributes: [
+                                                                  .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                                ])
+            return instance
+          }()
+          
+          let instance = UIStackView(arrangedSubviews: [
+            UIView.horizontalSpacer(padding),
+            loginTextField,
+            UIView.horizontalSpacer(padding)
+          ])
+          instance.axis = .horizontal
+          instance.spacing = 0
+          instance.backgroundColor = (toView.traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground)
+          
+          return instance
+        }()
+        let passwordDestination = toView.passwordContainer.superview!.convert(toView.passwordContainer.frame.origin,
+                                                                              to: containerView)
+        passwordContainer.frame = CGRect(origin: fromView.passwordContainer.superview!.convert(fromView.passwordContainer.frame.origin,
+                                                                                               to: containerView),
+                                         size: fromView.passwordContainer.bounds.size)
+        passwordContainer.cornerRadius = passwordContainer.bounds.width * 0.025
+        containerView.addSubview(passwordContainer)
+        fromView.passwordContainer.alpha = 0
+        toView.passwordContainer.alpha = 0
+        
+        
+        let orLabel: UILabel = {
+          let instance = UILabel()
+          instance.numberOfLines = 0
+          instance.textAlignment = .center
+          instance.text = "providerLabel".localized
+          instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+          
+          return instance
+        }()
+        var orLabelDestination = fromView.label.superview!.convert(fromView.label.frame.origin,
+                                                                   to: containerView)
+        orLabelDestination.x = containerView.bounds.height
+        orLabel.frame = CGRect(origin: fromView.label.superview!.convert(fromView.label.frame.origin,
+                                                                         to: containerView),
+                               size: fromView.label.bounds.size)
+        containerView.addSubview(orLabel)
+        fromView.label.alpha = 0
+        
+        
+        var logosDestination = fromView.logos.superview!.convert(fromView.logos.frame.origin,
+                                                                 to: containerView)
+        logosDestination.x = containerView.bounds.height
+        let logos: UIView = {
+          let stack = UIStackView(arrangedSubviews: logosStack.arrangedSubviews.map {
+            let instance = $0.copyView()!
+            instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+            
+            return instance
+          })
+          stack.axis = .horizontal
+          let instance = UIView.opaque()
+          stack.placeInCenter(of: instance,
+                              topInset: 0,
+                              bottomInset: 0)
+          
+          return instance
+        }()
+        logos.frame = CGRect(origin: fromView.logos.superview!.convert(fromView.logos.frame.origin,
+                                                                       to: containerView),
+                             size: fromView.logos.bounds.size)
+        containerView.addSubview(logos)
+        fromView.logos.alpha = 0
+        
+        
+        
+        
+        ///Animate coordinates and alpha
+        let views: [[UIView: [UIView: CGPoint]]] = [
+          [fakeLogoIcon: [toView.logoIcon: fakeLogoIconDestination]],
+          [fakeLogoText: [toView.logoText: fakeLogoTextDestination]],
+          [loginContainer: [toView.loginContainer: loginDestination]],
+          [mailContainer: [toView.mailContainer: mailDestination]],
+          [passwordContainer: [toView.passwordContainer: passwordDestination]],
+          [fakeButton: [toView.loginButton: fakeButtonCoordinate]],
+          [orLabel: [UIView(): orLabelDestination]],
+          [logos: [UIView(): logosDestination]],
+          [signupButton: [UIView(): signupButtonDestination]],
+          [forgotButton: [UIView(): forgotButtonDestination]],
+        ]
+          
+//          UIView.animate(withDuration: 0.3,
+//                         delay: 0.6,
+//                         options: .curveEaseOut,
+//                         animations: {
+//            acceptButton.frame.origin = toView.acceptButton.superview!.convert(toView.acceptButton.frame.origin,
+//                                                                    to: containerView)
+//            toView.webView.alpha = 1
+//          }) { _ in
+//            toView.acceptButton.alpha = 1
+//            acceptButton.removeFromSuperview()
+//          }
+          
+          views.enumerated().forEach { index, dict in
+            guard let view = dict.keys.first,
+                  let nested = dict.values.first,
+                  let destinationView = nested.keys.first,
+                  let destinationCoordinate = nested.values.first
+            else { return }
+
+            UIView.animate(
+              withDuration: 0.6,
+              delay: 0,//.01 * Double(index),
+              usingSpringWithDamping: 0.8,
+              initialSpringVelocity: 0.2,
+              options: [.curveEaseInOut],
+              animations: {
+                view.frame.origin = destinationCoordinate
+              }) {  _ in
+                destinationView.alpha = 1
+                view.removeFromSuperview()
+
+                guard index == views.count - 1 else { return }
+
+                fromView.stack.arrangedSubviews.forEach { v in v.alpha = 1; v.subviews.forEach { $0.alpha = 1 } }
+                self.context?.completeTransition(true)
+                
+//                fromView.forgotButton.alpha = 1
+//                fromView.signupButton.alpha = 1
+//                fromView.logoIcon.alpha = 1
+//                fromView.loginContainer.alpha = 1
+//                fromView.passwordContainer.alpha = 1
+              }
+          }
+          
+//          UIView.animate(
+//            withDuration: 0.6,
+//            delay: 0,
+//            usingSpringWithDamping: 0.7,
+//            initialSpringVelocity: 0.3,
+//            options: [.curveEaseInOut],
+//            animations: {
+//              logo.frame = CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
+//                                                                      to: containerView),
+//                                  size: logoIcon.bounds.size)
+//              fakeLogoText.frame = CGRect(origin: logoText.superview!.convert(logoText.frame.origin,
+//                                                                              to: containerView),
+//                                          size: logoText.bounds.size)
+//            }) { _ in
+//              logoText.alpha = 1
+//              logoIcon.alpha = 1
+        //              opaque.removeFromSuperview()
+        //            }
+      } else if let fromView = fromVC.view as? NewAccountView,
+                let toView = toVC.view as? TermsView,
+                let titleView = toVC.navigationController?.navigationBar.subviews.filter({ $0 is UIStackView }).first as? UIStackView,
+                let logoIcon = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoIcon" }).first as? Icon,
+                let logoText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoText" }).first as? Icon {
+        
+        let opaque = UIView.opaque()
+        opaque.place(inside: appDelegate.window!)
+        toView.setNeedsLayout()
+        toView.layoutIfNeeded()
+        toVC.navigationController?.navigationBar.setNeedsLayout()
+        toVC.navigationController?.navigationBar.layoutIfNeeded()
+//        toView.alpha = 1
+        toView.acceptButton.alpha = 0
+        toView.webView.alpha = 0
+        
+        let padding: CGFloat = 8
+        let logo: Icon = {
+          let instance = Icon()
+          instance.frame = CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
+                                                                               to: containerView),
+                                  size: fromView.logoIcon.bounds.size)
+          fromView.logoIcon.alpha = 0
+          logoIcon.alpha = 0
+          instance.iconColor = Colors.main
+          instance.scaleMultiplicator = 1
+          instance.category = .Logo
+          
+          return instance
+        }()
+        let fakeLogoText: Icon = {
+             let instance = Icon()
+             instance.frame = CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
+                                                                                  to: containerView),
+                                     size: fromView.logoText.bounds.size)
+             fromView.logoIcon.alpha = 0
+             logoText.alpha = 0
+             instance.iconColor = Colors.main
+             instance.scaleMultiplicator = 1
+             instance.category = .LogoText
+             
+             return instance
+           }()
+           
+           opaque.addSubview(logo)
+           opaque.addSubview(fakeLogoText)
+           
+           logo.icon.add(Animations.get(property: .Path,
+                                        fromValue: (logo.icon as! CAShapeLayer).path as Any,
+                                        toValue: (logoIcon.icon as! CAShapeLayer).path as Any,
+                                        duration: 0.3,
+                                        delay: 0,
+                                        repeatCount: 0,
+                                        autoreverses: false,
+                                        timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                        delegate: nil,
+                                        isRemovedOnCompletion: false),
+                         forKey: nil)
+           fakeLogoText.icon.add(Animations.get(property: .Path,
+                                                fromValue: (fakeLogoText.icon as! CAShapeLayer).path as Any,
+                                                toValue: (logoText.icon as! CAShapeLayer).path as Any,
+                                                duration: 0.3,
+                                                delay: 0,
+                                                repeatCount: 0,
+                                                autoreverses: false,
+                                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                                delegate: nil,
+                                                isRemovedOnCompletion: false),
+                                 forKey: nil)
+           
+           
+           
+           let loginButton: UIButton = {
+             let instance = UIButton()
+             if #available(iOS 15, *) {
+               var config = UIButton.Configuration.filled()
+               config.cornerStyle = .small
+               config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+               config.baseBackgroundColor = Colors.main
+               config.contentInsets.top = padding
+               config.contentInsets.bottom = padding
+               config.contentInsets.leading = 20
+               config.contentInsets.trailing = 20
+               config.attributedTitle = AttributedString("loginButton".localized.uppercased(),
+                                                         attributes: AttributeContainer([
+                                                           .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                           .foregroundColor: UIColor.white as Any
+                                                         ]))
+               instance.configuration = config
+             } else {
+               instance.backgroundColor = Colors.main
+               instance.cornerRadius = fromView.loginButton.cornerRadius
+               instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
+                                                              attributes: [
+                                                               .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                               .foregroundColor: UIColor.white as Any
+                                                              ]),
+                                           for: .normal)
+             }
+             
+             return instance
+           }()
+           var loginButtonCoordinate = fromView.loginButton.superview!.convert(fromView.loginButton.frame.origin,
+                                                                    to: containerView)
+           //        buttonCoordinate.y = containerView.bounds.height
+           loginButton.frame = CGRect(origin: loginButtonCoordinate,
+                                       size: fromView.loginButton.bounds.size)
+           containerView.addSubview(loginButton)
+           loginButtonCoordinate.x = containerView.bounds.height
+           
+           let loginContainer: UIStackView = {
+             let loginTextField: UnderlinedSignTextField = {
+               let instance = UnderlinedSignTextField()
+               instance.backgroundColor = .clear
+               instance.tintColor = Colors.main
+               instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+               instance.clipsToBounds = false
+               instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
+                                                                   attributes: [
+                                                                     .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                                   ])
+               return instance
+             }()
+             
+             let instance = UIStackView(arrangedSubviews: [
+               UIView.horizontalSpacer(padding),
+               loginTextField,
+               UIView.horizontalSpacer(padding)
+             ])
+             instance.axis = .horizontal
+             instance.spacing = 0
+             instance.backgroundColor = (toView.traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground)
+             
+             return instance
+           }()
+           var loginDestination = fromView.loginContainer.superview!.convert(fromView.loginContainer.frame.origin,
+                                                                             to: containerView)
+           loginContainer.frame = CGRect(origin: loginDestination,
+                                         size: fromView.loginContainer.bounds.size)
+           loginContainer.cornerRadius = loginContainer.bounds.width * 0.025
+           containerView.addSubview(loginContainer)
+           fromView.loginContainer.alpha = 0
+           loginDestination.x = -(containerView.bounds.width + loginContainer.frame.width)
+           
+          
+          let mailContainer: UIStackView = {
+            let loginTextField: UnderlinedSignTextField = {
+              let instance = UnderlinedSignTextField()
+              instance.backgroundColor = .clear
+              instance.tintColor = Colors.main
+              instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+              instance.clipsToBounds = false
+              instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
+                                                                  attributes: [
+                                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                                  ])
+              return instance
+            }()
+            
+            let instance = UIStackView(arrangedSubviews: [
+              UIView.horizontalSpacer(padding),
+              loginTextField,
+              UIView.horizontalSpacer(padding)
+            ])
+            instance.axis = .horizontal
+            instance.spacing = 0
+            instance.backgroundColor = (toView.traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground)
+            
+            return instance
+          }()
+          var mailDestination = fromView.mailContainer.superview!.convert(fromView.mailContainer.frame.origin,
+                                                                            to: containerView)
+          mailContainer.frame = CGRect(origin: mailDestination,
+                                        size: fromView.mailContainer.bounds.size)
+          mailContainer.cornerRadius = mailContainer.bounds.width * 0.025
+          containerView.addSubview(mailContainer)
+          fromView.mailContainer.alpha = 0
+          mailDestination.x = containerView.bounds.width
+          
+          
+           let passwordContainer: UIStackView = {
+             let loginTextField: UnderlinedSignTextField = {
+               let instance = UnderlinedSignTextField()
+               instance.backgroundColor = .clear
+               instance.tintColor = Colors.main
+               instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+               instance.clipsToBounds = false
+               instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
+                                                                   attributes: [
+                                                                     .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                                   ])
+               return instance
+             }()
+             
+             let instance = UIStackView(arrangedSubviews: [
+               UIView.horizontalSpacer(padding),
+               loginTextField,
+               UIView.horizontalSpacer(padding)
+             ])
+             instance.axis = .horizontal
+             instance.spacing = 0
+             instance.backgroundColor = (toView.traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground)
+             
+             return instance
+           }()
+           var passwordDestination = fromView.passwordContainer.superview!.convert(fromView.passwordContainer.frame.origin,
+                                                                                   to: containerView)
+           passwordContainer.frame = CGRect(origin: passwordDestination,
+                                            size: fromView.passwordContainer.bounds.size)
+           passwordContainer.cornerRadius = passwordContainer.bounds.width * 0.025
+           containerView.addSubview(passwordContainer)
+           fromView.passwordContainer.alpha = 0
+           passwordDestination.x = -(containerView.bounds.width + loginContainer.frame.width)
+           
+           ///Animate coordinates
+           let views: [[UIView: CGPoint]] = [
+             [loginContainer: loginDestination],
+             [mailContainer: mailDestination],
+             [passwordContainer: passwordDestination],
+             [loginButton: loginButtonCoordinate],
+           ]
+           
+           let acceptButton: UIButton = {
+             let instance = UIButton()
+             if #available(iOS 15, *) {
+               var config = UIButton.Configuration.filled()
+               config.cornerStyle = .small
+               config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+               config.baseBackgroundColor = UIColor.systemGray
+               config.contentInsets.top = padding
+               config.contentInsets.bottom = padding
+               config.contentInsets.leading = 20
+               config.contentInsets.trailing = 20
+               config.attributedTitle = AttributedString("acceptButton".localized.uppercased(),
+                                                         attributes: AttributeContainer([
+                                                           .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                           .foregroundColor: UIColor.white as Any
+                                                         ]))
+               instance.configuration = config
+             } else {
+               instance.cornerRadius = toView.acceptButton.cornerRadius
+               instance.setAttributedTitle(NSAttributedString(string: "acceptButton".localized.uppercased(),
+                                                              attributes: [
+                                                               .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                               .foregroundColor: UIColor.white as Any
+                                                              ]),
+                                           for: .normal)
+             }
+             
+             return instance
+           }()
+           let acceptButtonCoordinate = toView.acceptButton.convert(CGPoint(x: loginButtonCoordinate.x,
+                                                                            y: containerView.bounds.height),
+                                                                    to: containerView)
+           acceptButton.frame = CGRect(origin: acceptButtonCoordinate,
+                                       size: toView.acceptButton.bounds.size)
+           containerView.addSubview(acceptButton)
+           acceptButton.center.x = containerView.bounds.midX
+           
+           
+           UIView.animate(withDuration: 0.3,
+                          delay: 0.6,
+                          options: .curveEaseOut,
+                          animations: {
+             acceptButton.frame.origin = toView.acceptButton.superview!.convert(toView.acceptButton.frame.origin,
+                                                                     to: containerView)
+             toView.webView.alpha = 1
+           }) { _ in
+             toView.acceptButton.alpha = 1
+             acceptButton.removeFromSuperview()
+           }
+           
+           views.enumerated().forEach { index, dict in
+             guard let coordinate = dict.values.first,
+                   let view = dict.keys.first
+             else { return }
+             
+             UIView.animate(
+               withDuration: 0.3,
+               delay: 0.05*Double(index),
+//               usingSpringWithDamping: 0.8,
+//               initialSpringVelocity: 0.3,
+               options: [.curveEaseInOut],
+               animations: {
+                 view.frame.origin = coordinate
+               }) {  _ in
+                 view.removeFromSuperview()
+                 
+                 guard index == views.count - 1 else { return }
+                 
+                 self.context?.completeTransition(true)
+                 fromView.loginButton.alpha = 1
+                 fromView.logoIcon.alpha = 1
+                 fromView.loginContainer.alpha = 1
+                 fromView.passwordContainer.alpha = 1
+                 fromView.mailContainer.alpha = 1
+               }
+           }
+           
+           titleView.convert(logoIcon.frame.origin, to: containerView)
+           UIView.animate(
+             withDuration: 0.6,
+             delay: 0,
+             usingSpringWithDamping: 0.7,
+             initialSpringVelocity: 0.3,
+             options: [.curveEaseInOut],
+             animations: {
+               logo.frame = CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
+                                                                       to: containerView),
+                                   size: logoIcon.bounds.size)
+               fakeLogoText.frame = CGRect(origin: logoText.superview!.convert(logoText.frame.origin,
+                                                                               to: containerView),
+                                           size: logoText.bounds.size)
+             }) { _ in
+               logoText.alpha = 1
+               logoIcon.alpha = 1
+               opaque.removeFromSuperview()
+             }
+        } else { self.context?.completeTransition(true) }
     }
   }
 }

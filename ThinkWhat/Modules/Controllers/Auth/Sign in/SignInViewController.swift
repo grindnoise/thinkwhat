@@ -67,8 +67,10 @@ class SignInViewController: UIViewController {
 
 extension SignInViewController: SignInViewInput {
   func openAgreement() {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
     navigationController?.delegate = appDelegate.transitionCoordinator
-    navigationController?.navigationBar.backItem?.title = ""
     navigationController?.pushViewController(TermsViewController(), animated: true)
     navigationController?.delegate = nil
   }
@@ -116,7 +118,7 @@ extension SignInViewController: SignInViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.delegate = nil//appDelegate.transitionCoordinator
+    navigationController?.delegate = appDelegate.transitionCoordinator
     navigationController?.pushViewController(NewAccountViewController(), animated: true)
     navigationController?.delegate = nil
   }

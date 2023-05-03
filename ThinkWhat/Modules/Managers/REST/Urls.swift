@@ -73,6 +73,9 @@ struct API_URLS {
   struct Auth {
     static let current:             URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/current/")}()
     static let signUp:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/sign_up/")}()
+    static let getCodeViaMail:      URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/send_confirmation_code/")}()
+    static let token:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("auth/token/")}()
+    static let getTokenByPassword:  URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_token/")}()
   }
   
   struct System {
@@ -87,7 +90,7 @@ struct API_URLS {
   
   
   static let CURRENT_TIME             = "api/current_time/"
-  static let TOKEN                    = "auth/token/"
+//  static let TOKEN                    = "auth/token/"
   static let TOKEN_CONVERT            = "auth/convert-token/"
   static let TOKEN_REVOKE             = "auth/revoke-token/"
   static let RESET_PASSWORD           = "api/password_reset/"
@@ -98,7 +101,7 @@ struct API_URLS {
   static let USERS                    = "api/users/"
   static let USERNAME_EXISTS          = "api/profiles/username_exists"
   static let EMAIL_EXISTS             = "api/profiles/email_exists"
-  static let GET_CONFIRMATION_CODE    = "api/profiles/send_confirmation_code/"
+//  static let GET_CONFIRMATION_CODE    = "api/profiles/send_confirmation_code/"
   static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified/"
 //  static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_update/"
 //  static let PROFILES                 = "api/profiles/"

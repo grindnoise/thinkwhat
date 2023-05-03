@@ -46,6 +46,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
   private var tasks: [Task<Void, Never>?] = []
   private var source: UICollectionViewDiffableDataSource<Section, Int>!
   ///**Logic**
+  public var mode: UserSettingsCollectionView.Mode = .Default
   private var userprofile: Userprofile
 //  private let mode: EditingMode
   ///**UI**
@@ -69,7 +70,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
   
   
   // MARK: - Initialization
-  init(userprofile: Userprofile) {
+  init(userprofile: Userprofile,
+       mode: UserSettingsCollectionView.Mode = .Default) {
+    self.mode = mode
     self.userprofile = userprofile
     
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
@@ -106,16 +109,16 @@ class UserSettingsInfoCollectionView: UICollectionView {
     }
     
     let aboutCellRegistration = UICollectionView.CellRegistration<UserInfoCell, AnyHashable> { [unowned self] cell, indexPath, item in
-//      guard let userprofile = Userprofiles.shared.current else { return }
+      //      guard let userprofile = Userprofiles.shared.current else { return }
       
-//      cell.padding = self.padding
+      //      cell.padding = self.padding
       cell.insets = self.cellPadding
       cell.userprofile = self.userprofile
-//      cell.publisher(for: \.bounds)
-//        .receive(on: DispatchQueue.main)
-//        .sink { _ in
-//          self.source.refresh() }
-//        .store(in: &self.subscriptions)
+      //      cell.publisher(for: \.bounds)
+      //        .receive(on: DispatchQueue.main)
+      //        .sink { _ in
+      //          self.source.refresh() }
+      //        .store(in: &self.subscriptions)
       cell.$boundsPublisher
         .eraseToAnyPublisher()
         .filter { !$0.isNil }
@@ -147,7 +150,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
     
     let cityCellRegistration = UICollectionView.CellRegistration<UserSettingsCityCell, AnyHashable> { [unowned self] cell, _, item in
       
-//      self.userprofile.isCurrent ? { cell.padding = self.padding }() : { cell.insets = .init(top: self.padding, left: self.padding*2, bottom: .zero, right: self.padding*2) }()
+      //      self.userprofile.isCurrent ? { cell.padding = self.padding }() : { cell.insets = .init(top: self.padding, left: self.padding*2, bottom: .zero, right: self.padding*2) }()
       cell.insets = self.cellPadding
       cell.userprofile = self.userprofile
       cell.color = self.color
@@ -181,7 +184,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
       cell.insets = self.cellPadding
       cell.userprofile = self.userprofile
       cell.color = self.color
-//      cell.padding = .zero
+      //      cell.padding = .zero
       cell.topicPublisher
         .sink { [unowned self] in self.topicPublisher.send($0) }
         .store(in: &self.subscriptions)
@@ -193,11 +196,11 @@ class UserSettingsInfoCollectionView: UICollectionView {
     }
     
     let socialCellRegistration = UICollectionView.CellRegistration<UserSettingsSocialHeaderCell, AnyHashable> { [unowned self] cell, indexPath, item in
-//      cell.keyboardWillAppear
-//        .sink { [unowned self] _ in
-//          //                    self.scrollToItem(at: indexPath, at: .top, animated: true)
-//        }
-//        .store(in: &self.subscriptions)
+      //      cell.keyboardWillAppear
+      //        .sink { [unowned self] _ in
+      //          //                    self.scrollToItem(at: indexPath, at: .top, animated: true)
+      //        }
+      //        .store(in: &self.subscriptions)
       cell.padding = .zero
       //Facebook
       cell.facebookPublisher
@@ -269,7 +272,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
     if userprofile.isCurrent {
       snapshot.appendItems([2], toSection: .SocialMedia)
     }
-    snapshot.appendItems([3], toSection: .Interests)
+    if mode != .Creation {
+      snapshot.appendItems([3], toSection: .Interests)
+    }
     source.apply(snapshot, animatingDifferences: false)
   }
 }

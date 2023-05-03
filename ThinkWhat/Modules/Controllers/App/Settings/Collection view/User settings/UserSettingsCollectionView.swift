@@ -12,7 +12,7 @@ import Combine
 class UserSettingsCollectionView: UICollectionView {
   
   enum Section: Int, CaseIterable { case Credentials, Info, Stats, Management }
-  
+  enum Mode { case Default, Creation }
   
   
   // MARK: - Public properties
@@ -54,6 +54,7 @@ class UserSettingsCollectionView: UICollectionView {
   private var source: UICollectionViewDiffableDataSource<Section, Int>!
   ///**Logic**
   private let userprofile: Userprofile
+  private let mode: Mode
   ///**UI**
   private let padding: CGFloat = 8
   
@@ -72,8 +73,12 @@ class UserSettingsCollectionView: UICollectionView {
   
   
   // MARK: - Initialization
-  init(userprofile: Userprofile) {
+  init(mode: Mode = .Default,
+       userprofile: Userprofile,
+       color: UIColor = Colors.main) {
+    self.mode = mode
     self.userprofile = userprofile
+    self.color = color
     
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     
@@ -104,7 +109,12 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
       configuration.showsSeparators = false
       
       let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: environment)
-      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? self.padding : 0, trailing: 0)
+//      switch self.mode {
+//      case .Creation:
+//
+//      case .Default:
+        sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? (self.mode == .Default ? self.padding : 80) : 0, trailing: 0)
+//      }
       return sectionLayout
     }
     
@@ -175,6 +185,7 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
     
     let infoCellRegistration = UICollectionView.CellRegistration<UserSettingsInfoCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.insets = .uniform(size: 8)
+      cell.mode = self.mode
       cell.userprofile = self.userprofile
       cell.publisher(for: \.bounds)
         .receive(on: DispatchQueue.main)
@@ -319,8 +330,10 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
     snapshot.appendSections([.Credentials, .Info, .Stats, .Management])
     snapshot.appendItems([0], toSection: .Credentials)
     snapshot.appendItems([1], toSection: .Info)
-    snapshot.appendItems([2], toSection: .Stats)
-    snapshot.appendItems([3], toSection: .Management)
+    if mode == .Default {
+      snapshot.appendItems([2], toSection: .Stats)
+      snapshot.appendItems([3], toSection: .Management)
+    }
     
     source.apply(snapshot, animatingDifferences: false)
   }

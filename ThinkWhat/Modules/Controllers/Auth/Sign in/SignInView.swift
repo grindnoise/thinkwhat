@@ -77,7 +77,8 @@ class SignInView: UIView {
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
     //    fgLayer.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(0.2).cgColor
-    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: 0.2, of: Colors.Logo.Flame.rawValue).cgColor
+    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
+                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.Logo.Flame.rawValue).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
@@ -133,7 +134,8 @@ class SignInView: UIView {
     let fgLayer = CAShapeLayer()
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
-    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: 0.2, of: Colors.Logo.Flame.rawValue).cgColor
+    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
+                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.Logo.Flame.rawValue).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)

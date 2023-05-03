@@ -117,7 +117,7 @@ class TermsView: UIView {
 extension TermsView: TermsControllerOutput {
   func animateTransitionToApp(_ completion: @escaping Closure) {
     guard let viewInput = viewInput,
-          let titleView = viewInput.navigationItem.titleView as? UIStackView,
+          let titleView = viewInput.navigationController?.navigationBar.subviews.filter({ $0 is UIStackView }).first as? UIStackView,
           let titleIcon = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoIcon" }).first as? Icon,
           let titleText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoText" }).first as? Icon,
           let window = appDelegate.window
