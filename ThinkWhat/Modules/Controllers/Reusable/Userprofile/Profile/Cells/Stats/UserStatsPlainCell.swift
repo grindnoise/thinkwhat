@@ -184,7 +184,7 @@ private extension UserStatsPlainCell {
         components = Calendar.current.dateComponents([.year], from: userprofile.dateJoined, to: Date())
       } else if let months = fullComponents.month, months > 0 {
         components = Calendar.current.dateComponents([.month], from: userprofile.dateJoined, to: Date())
-      } else if let days = fullComponents.day, days > 0 {
+      } else if let days = fullComponents.day, days >= 0 {
         components = Calendar.current.dateComponents([.day], from: userprofile.dateJoined, to: Date())
       }
 

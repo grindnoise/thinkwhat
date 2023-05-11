@@ -90,7 +90,7 @@ class TextBannerContent: UIView {
   
   
   // MARK: - Initialization
-  init(image: UIImage,
+  init(image: UIImage = UIImage(),
        icon: Icon? = nil,
        text: String,
        attributedText: NSAttributedString? = nil,

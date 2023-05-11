@@ -539,7 +539,7 @@ extension Survey: Hashable {
 }
 
 extension Survey: CustomStringConvertible {
-  public var description: String { "ID: \(id) Title: \(title) Author: \(owner.name)" }
+  public var description: String { "ID: \(id) Title: \(title) Author: \(owner.firstNameSingleWord + (owner.lastNameSingleWord.isEmpty ? "" : " \(owner.lastNameSingleWord)"))" }
 }
 
 class Surveys {

@@ -271,6 +271,7 @@
 		AB63D7D8283FC04F00173116 /* TopicSelection.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB63D7D7283FC04F00173116 /* TopicSelection.xib */; };
 		AB649E2628A1597800978520 /* CommentSupplementaryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB649E2528A1597800978520 /* CommentSupplementaryCell.swift */; };
 		AB649E2828A15A9C00978520 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB649E2728A15A9C00978520 /* Comment.swift */; };
+		AB6525542A03CEE4008B9E6A /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB6525532A03CEE4008B9E6A /* LinkedList.swift */; };
 		AB66B4DD282D06AC00244A38 /* ListSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66B4DC282D06AC00244A38 /* ListSwitch.swift */; };
 		AB66B4DF282D06B600244A38 /* ListSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB66B4DE282D06B600244A38 /* ListSwitch.xib */; };
 		AB66D5A9260A197F006CF145 /* CategoryIconsStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */; };
@@ -894,6 +895,7 @@
 		AB63D7D7283FC04F00173116 /* TopicSelection.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TopicSelection.xib; sourceTree = "<group>"; };
 		AB649E2528A1597800978520 /* CommentSupplementaryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentSupplementaryCell.swift; sourceTree = "<group>"; };
 		AB649E2728A15A9C00978520 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
+		AB6525532A03CEE4008B9E6A /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
 		AB66B4DC282D06AC00244A38 /* ListSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListSwitch.swift; sourceTree = "<group>"; };
 		AB66B4DE282D06B600244A38 /* ListSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListSwitch.xib; sourceTree = "<group>"; };
 		AB66D5A8260A197F006CF145 /* CategoryIconsStyleKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryIconsStyleKit.swift; sourceTree = "<group>"; };
@@ -1331,6 +1333,7 @@
 				AB5CCBD52888228C00B970A7 /* EventEmitter.swift */,
 				AB2E08B829802D41004F264A /* TimeLogger.swift */,
 				ABD4FCAC29965E8F00F7E8EB /* Stack.swift */,
+				AB6525532A03CEE4008B9E6A /* LinkedList.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -3960,6 +3963,7 @@
 				AB39F40F2847457200DEE0ED /* InsetTextField.swift in Sources */,
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				ABE56C1D298AC4FB004C761D /* TopicCompatibilityCell.swift in Sources */,
+				AB6525542A03CEE4008B9E6A /* LinkedList.swift in Sources */,
 				AB4727A9268C6444002A9563 /* UI.swift in Sources */,
 				AB6016FE29A6299000BF4365 /* JSONDecoder.swift in Sources */,
 				AB3A47D1283F59D200106407 /* PollCreationContract.swift in Sources */,

@@ -30,6 +30,10 @@ class UserInfoCell: UICollectionViewListCell {
   public var color: UIColor = Colors.System.Red.rawValue {
     didSet {
       textView.tintColor = color
+      
+      guard let toolBar = textView.inputAccessoryView as? UIToolbar else { return }
+      
+      toolBar.tintColor = color
     }
   }
   ///**Publishers**
@@ -123,6 +127,18 @@ class UserInfoCell: UICollectionViewListCell {
     }
     instance.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
     instance.isUserInteractionEnabled = userprofile.isCurrent ? true : false
+    let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 44))
+    toolBar.isTranslucent = true
+    toolBar.accessibilityIdentifier = "toolBar"
+    toolBar.backgroundColor = .tertiarySystemBackground
+    toolBar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
+    toolBar.superview?.backgroundColor = .tertiarySystemBackground
+    let doneButton = UIBarButtonItem(title: "ok".localized, style: .done, target: nil, action: #selector(self.hideKeyboard))
+    let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+    toolBar.items = [space, doneButton]
+    toolBar.barStyle = .default
+    toolBar.tintColor = color
+    instance.inputAccessoryView = toolBar
     
     observers.append(instance.observe(\.contentSize, options: .new) { [weak self] view, value in
       guard let self = self,
@@ -249,6 +265,11 @@ private extension UserInfoCell {
     ]
   }
   
+  @objc
+  func hideKeyboard() {
+    endEditing(true)
+  }
+
 //  private func setupTextView(_ textView: UITextView) {
 //    switch mode {
 //    case .ReadOnly:

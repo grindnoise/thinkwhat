@@ -622,6 +622,24 @@ class API {
       }
     }
     
+    public func signupAsync(email: String,
+                            password: String,
+                            username: String) async throws {
+      guard let url = API_URLS.Auth.signUp else { throw APIError.invalidURL.localizedDescription }
+      
+      let parameters = ["client_id": API_URLS.CLIENT_ID,
+                        "grant_type": "password",
+                        "email": "\(email)",
+                        "password": "\(password)",
+                        "username": "\(username)"]
+      
+      do {
+        try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding(), accessControl: false)
+      } catch {
+        throw error
+      }
+    }
+    
     public func signUp(email: String,
                        password: String,
                        username: String,
@@ -645,7 +663,7 @@ class API {
             //TODO: Определиться с инициализацией JSON
             let json = try JSON(data: data, options: .mutableContainers)
             guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: json.rawString()))); return }
-            self.loginViaMail(username: username, password: password) { completion($0) }
+//            self.loginViaMail(username: username, password: password) { completion($0) }
           }  catch let error {
             completion(.failure(error))
           }

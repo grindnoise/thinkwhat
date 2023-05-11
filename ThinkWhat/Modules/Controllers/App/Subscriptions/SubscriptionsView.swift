@@ -70,7 +70,7 @@ class SubscriptionsView: UIView {
       viewInput?.setUserprofileFilter(userprofile)
       surveysCollectionView.userprofile = userprofile
       onUserSelected(userprofile: userprofile)
-      usernameLabel.text = userprofile.name
+      usernameLabel.text = userprofile.firstNameSingleWord + (userprofile.lastNameSingleWord.isEmpty ? "" : " \(userprofile.lastNameSingleWord)")
       mode = .User
     }
   }

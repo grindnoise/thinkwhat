@@ -21,8 +21,8 @@ extension UserDefaults {
     @UserDefault(key: "last_тame", defaultValue: nil)
     static var lastName: String?
     
-    //        @UserDefault(key: "username", defaultValue: nil)
-    //        static var username: String?
+            @UserDefault(key: "username", defaultValue: nil)
+            static var username: String?
     
     @UserDefault(key: "pseudonym", defaultValue: nil)
     static var pseudonym: String?
@@ -103,7 +103,7 @@ extension UserDefaults {
       UserDefaults.Profile.lastName       = nil
 //      UserDefaults.Profile.city           = ""
       UserDefaults.Profile.cityId         = nil
-      //            UserDefaults.Profile.username       = nil
+                  UserDefaults.Profile.username       = nil
       UserDefaults.Profile.email          = nil
       UserDefaults.Profile.birthDate      = nil
       UserDefaults.Profile.dateJoined      = nil
@@ -156,7 +156,7 @@ extension UserDefaults {
 //      UserDefaults.Profile.city           = profile.cityTitle
       UserDefaults.Profile.cityId         = profile.cityId
       UserDefaults.Profile.birthDate      = profile.birthDate
-      //            UserDefaults.Profile.username       = profile.username
+                  UserDefaults.Profile.username       = profile.username
       UserDefaults.Profile.gender         = profile.gender
       UserDefaults.Profile.wasEdited      = profile.wasEdited
       UserDefaults.Profile.isBanned       = profile.isBanned

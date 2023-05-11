@@ -544,7 +544,7 @@ extension UserprofilesCollectionView: UICollectionViewDelegate {
         actions = [profile, subscription]
         
         
-        return UIMenu(title: cell.userprofile.name, image: nil, identifier: nil, options: .init(), children: actions)
+        return UIMenu(title: cell.userprofile.firstNameSingleWord + (cell.userprofile.lastNameSingleWord.isEmpty ? "" : " \(cell.userprofile.lastNameSingleWord)"), image: nil, identifier: nil, options: .init(), children: actions)
       }
   }
 }

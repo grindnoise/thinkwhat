@@ -396,6 +396,19 @@ class Avatar: UIView {
   //        mode = on ? .Selection : .Default
   //    }
   
+  public func setUserprofileDefaultImage() {
+    imageView.tintColor = .systemGray
+    imageView.contentMode = .center
+    imageView.publisher(for: \.bounds)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.imageView.image = UIImage(systemName: "person.fill",
+                                       withConfiguration: UIImage.SymbolConfiguration(pointSize: $0.height * 0.65))
+      }
+      .store(in: &subscriptions)
+  }
+  
   public func setSelected(_ isSelected: Bool) {
     guard mode == .Selection else { return }
     

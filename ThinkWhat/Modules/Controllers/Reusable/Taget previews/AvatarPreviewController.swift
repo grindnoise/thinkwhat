@@ -37,7 +37,7 @@ class AvatarPreviewController: UIViewController {
         let instance = UILabel()
         instance.backgroundColor = .clear
         instance.numberOfLines = 2
-        instance.text = userprofile.name
+        instance.text = userprofile.firstNameSingleWord + (userprofile.lastNameSingleWord.isEmpty ? "" : " \(userprofile.lastNameSingleWord)")
         instance.font = UIFont.scaledFont(fontName: Fonts.Semibold,
                                           forTextStyle: .title2)
         instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 200 - padding*2,

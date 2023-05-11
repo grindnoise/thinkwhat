@@ -393,7 +393,7 @@ private extension UserCredentialsCell {
                                                                                            forTextStyle: .title2)!)).isActive = true
     }
     
-    username.text = userprofile.name
+    username.text = userprofile.firstNameSingleWord + (userprofile.lastNameSingleWord.isEmpty ? "" : " \(userprofile.lastNameSingleWord)")
     avatar.userprofile = userprofile
     info.text = "\(userprofile.gender.rawValue.localized.lowercased()), \(userprofile.age)"//, \(userprofile.cityTitle)"
     subscriptionButton.backgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)

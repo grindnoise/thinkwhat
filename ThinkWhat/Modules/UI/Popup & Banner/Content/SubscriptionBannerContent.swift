@@ -19,17 +19,19 @@ class UserBannerContentView: UIView {
     case DontNotifyOnPublication = "user_publication_notification_off"
     
     func localizedDescription(userprofile: Userprofile) -> String {
+      let name = userprofile.firstNameSingleWord + (userprofile.lastNameSingleWord.isEmpty ? "" : " \(userprofile.lastNameSingleWord)")
+      
       switch self {
       case .Username:
-        return userprofile.name
+        return name
       case .Subscribe:
-        return self.rawValue.localized + " " + userprofile.name + " ✅"
+        return self.rawValue.localized + " " + name + " ✅"
       case .Unsubscribe:
-        return self.rawValue.localized + " " + userprofile.name + " ⛔️"
+        return self.rawValue.localized + " " + name + " ⛔️"
       case .NotifyOnPublication:
-        return "user_publication_notification_begin".localized + userprofile.name + self.rawValue.localized + " 🔔"
+        return "user_publication_notification_begin".localized + name + self.rawValue.localized + " 🔔"
       case .DontNotifyOnPublication:
-        return "user_publication_notification_begin".localized + userprofile.name + self.rawValue.localized + " 🔕"
+        return "user_publication_notification_begin".localized + name + self.rawValue.localized + " 🔕"
       }
     }
   }

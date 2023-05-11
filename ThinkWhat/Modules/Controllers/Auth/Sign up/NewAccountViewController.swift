@@ -66,17 +66,21 @@ class NewAccountViewController: UIViewController {
     setTasks()
   }
   
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-    
-    delay(seconds: 1) {
-      self.emailConfirmed()
-    }
-  }
+//  override func viewDidAppear(_ animated: Bool) {
+//    super.viewDidAppear(animated)
+//
+//    delay(seconds: 1) {
+//      self.emailConfirmed()
+//    }
+//  }
 }
 
 extension NewAccountViewController: NewAccountViewInput {
   func emailConfirmed() {
+    
+    try? self.controllerInput?.updateUserprofile(parameters: ["is_email_verified": true], image: nil)
+    AppData.isEmailVerified = true
+    
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
@@ -104,15 +108,35 @@ extension NewAccountViewController: NewAccountViewInput {
 //    }
 //  }
   
-  func signup(username: String, email: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-    API.shared.auth.signUp(email: email,
-                           password: password,
-                           username: username) { //completion($0) }
-      if case .failure(let error) = $0 {
-        completion(.failure(error))
-      } else {
-//        API.shared.auth.loginViaMail(username: username, password: password) { completion($0) }
-        API.shared.auth.getTokenByPassword(username: username, password: password) { completion($0) }
+  func signup(username: String, email: String, password: String) {
+    Task {
+      do {
+        try await API.shared.auth.signupAsync(email: email,
+                                              password: password,
+                                              username: username)
+        
+        ///Login
+        try await API.shared.auth.loginAsync(username: username, password: password)
+        
+        ///Get profile from API
+        let json = try JSON(data: try await API.shared.profiles.current(),
+                            options: .mutableContainers)
+        
+        guard let appData = json["app_data"] as? JSON,
+              let current = json["current_user"] as? JSON
+        else { throw AppError.server }
+        
+        ///Load necessary data before creating user
+        try AppData.loadData(appData)
+        
+        Userprofiles.shared.current = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self, from: current.rawData())
+        await MainActor.run {
+          self.controllerOutput?.signupCallback(result: .success(true))
+        }
+      } catch {
+        await MainActor.run {
+          self.controllerOutput?.signupCallback(result: .failure(error))
+        }
       }
     }
   }

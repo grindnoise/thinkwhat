@@ -24,6 +24,8 @@ protocol SignInControllerInput: AnyObject {
   
   func mailSignIn(username: String, password: String)
   func providerSignIn(provider: AuthProvider, accessToken: String)
+  func sendVerificationCode(_: @escaping(Result<[String: Any], Error>)->())
+  func updateUserprofile(parameters: [String: Any], image: UIImage?) throws
 }
 
 protocol SignInModelOutput: AnyObject {

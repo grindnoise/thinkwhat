@@ -12,10 +12,76 @@ import Combine
 class UserSettingsCredentialsCell: UICollectionViewListCell {
   
   // MARK: - Public properties
+  public var mode: UserSettingsCollectionView.Mode = .Default
   public weak var userprofile: Userprofile! {
     didSet {
       guard !userprofile.isNil, userprofile.isCurrent else { return }
-      //      userprofile == Userprofiles.shared.current
+      
+      if mode == .Creation {
+        if userprofile.imageURL == nil {
+          avatar.setUserprofileDefaultImage()
+        }
+        if userprofile.fullName.isEmpty {
+          username.text = userprofile.username
+        }
+      }
+      
+      userprofile.$gender
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] in
+          guard let self = self,
+                $0 != .Unassigned
+          else { return }
+
+          self.setupButtons()
+          self.setColors()
+        }
+        .store(in: &subscriptions)
+      
+      userprofile.$birthDate
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] in
+          guard let self = self,
+                $0 != nil
+          else { return }
+
+          
+          var ageString = ""
+          let estimatedBirthday = Calendar.current.date(byAdding: .year, value: self.userprofile.age == 0 ? -18 : -self.userprofile.age, to: Date())!
+          let fullComponents = Date.dateComponents(from: estimatedBirthday, to: Date())
+          var components: DateComponents!
+          
+          var years = 0
+          if let _years = fullComponents.year, _years > 0 {
+            years = _years
+            components = Calendar.current.dateComponents([.year], from: estimatedBirthday, to: Date())
+            ageString = (DateComponentsFormatter.localizedString(from: components, unitsStyle: .full) ?? "").uppercased()
+          }
+          
+          let ageAttributedString = NSAttributedString(string: ageString,
+                                                       attributes: [
+                                                        .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
+                                                        .foregroundColor: UIColor.white,
+                                                       ])
+          
+          if #available(iOS 15, *) {
+            self.ageButton.configuration?.baseBackgroundColor = self.color
+            self.ageButton.configuration?.title = ageString
+          } else {
+            self.ageButton.setAttributedTitle(ageAttributedString, for: .normal)
+            self.ageButton.backgroundColor = self.color
+            
+//            guard let ageConstraint = ageButton.getConstraint(identifier: "width") else { return }
+//
+//            self.setNeedsLayout()
+//            ageConstraint.constant = ("age".localized + ": " + String(describing: self.userprofile.age))
+//              .width(withConstrainedHeight: self.ageButton.bounds.height,
+//                     font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+//                                             forTextStyle: .subheadline)!) + self.ageButton.imageEdgeInsets.left + self.ageButton.imageEdgeInsets.right + (self.ageButton.imageView?.bounds.width ?? 0) + self.ageButton.titleEdgeInsets.left*4
+//            self.layoutIfNeeded()
+          }
+        }
+        .store(in: &subscriptions)
       
 //      userprofile.imagePublisher
 //        .receive(on: DispatchQueue.main)
@@ -129,7 +195,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     
     if #available(iOS 15, *) {
       var config = UIButton.Configuration.filled()
-      config.image = UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+      config.image = UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
       config.imagePlacement = .trailing
       config.imagePadding = 6
       config.contentInsets.leading = 8
@@ -154,7 +220,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
       ])
       instance.setAttributedTitle(attrString, for: .normal)
       instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      instance.setImage(UIImage(systemName: "chevron.down.square.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+      instance.setImage(UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
       instance.imageView?.tintColor = color//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
       instance.imageView?.contentMode = .scaleAspectFit
       instance.imageEdgeInsets.left = 10
@@ -187,12 +253,13 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
       var config = UIButton.Configuration.filled()
       //            config.cornerStyle = .medium
       config.attributedTitle = attrString
-      config.image = UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+      config.image = UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
       config.imagePlacement = .trailing
       config.imagePadding = 6
       config.contentInsets.leading = 8
       config.contentInsets.trailing = 4
       config.contentInsets.top = 2
+      config.baseBackgroundColor = (mode == .Creation && userprofile.age == 18) ? .systemGray2 : color
       config.contentInsets.bottom = 2
       config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
         var outcoming = incoming
@@ -224,10 +291,11 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
       instance.setAttributedTitle(attrString, for: .normal)
       instance.autoresizingMask = [.flexibleWidth, .flexibleHeight]
       instance.titleEdgeInsets.left = 2
+      instance.backgroundColor = (mode == .Creation && userprofile.age == 18) ? .systemGray2 : color
       //            instance.titleEdgeInsets.right = 8
       instance.titleEdgeInsets.top = 2
       instance.titleEdgeInsets.bottom = 2
-      instance.setImage(UIImage(systemName: "calendar", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+      instance.setImage(UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
       instance.imageView?.tintColor = color//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
       instance.imageView?.contentMode = .scaleAspectFit
       instance.imageEdgeInsets.left = 10
@@ -520,29 +588,29 @@ private extension UserSettingsCredentialsCell {
       }
     })
     
-    //Birth date change
-    tasks.append( Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.BirthDateChanged) {
-        guard let self = self,
-              let instance = notification.object as? Userprofile,
-              instance.isCurrent
-        else { return }
-        
-        self.setupButtons(animated: true)
-      }
-    })
+//    //Birth date change
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.BirthDateChanged) {
+//        guard let self = self,
+//              let instance = notification.object as? Userprofile,
+//              instance.isCurrent
+//        else { return }
+//
+//        self.setupButtons(animated: true)
+//      }
+//    })
     
-    //Gender change
-    tasks.append( Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.GenderChanged) {
-        guard let self = self,
-              let instance = notification.object as? Userprofile,
-              instance.isCurrent
-        else { return }
-        
-        self.setupButtons(animated: true)
-      }
-    })
+//    //Gender change
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.GenderChanged) {
+//        guard let self = self,
+//              let instance = notification.object as? Userprofile,
+//              instance.isCurrent
+//        else { return }
+//
+//        self.setupButtons(animated: true)
+//      }
+//    })
     
     //Image upload began
     tasks.append( Task {@MainActor [weak self] in
@@ -693,7 +761,8 @@ private extension UserSettingsCredentialsCell {
     
     //        gender.text = userprofile.gender.rawValue.localized.lowercased() + ","
     
-    guard let constraint_1 = username.getConstraint(identifier: "height")
+    guard let constraint_1 = username.getConstraint(identifier: "height"),
+          !username.text.isNil
             //              let constraint_2 = gender.getConstraint(identifier: "width"),
             //              let constraint_3 = age.getConstraint(identifier: "width")
     else { return }
@@ -707,36 +776,42 @@ private extension UserSettingsCredentialsCell {
   
   @MainActor
   func setupButtons(animated: Bool = false) {
-    guard let userprofile = Userprofiles.shared.current else { return }
+    guard let userprofile = userprofile else { return }
     
     var ageString = ""
-    let estimatedBirthday = Calendar.current.date(byAdding: .year, value: -userprofile.age, to: Date())!
+    let estimatedBirthday = Calendar.current.date(byAdding: .year, value: userprofile.age == 0 ? -18 : -userprofile.age, to: Date())!
     let fullComponents = Date.dateComponents(from: estimatedBirthday, to: Date())
     var components: DateComponents!
     
-    if let years = fullComponents.year, years > 0 {
+    if let _years = fullComponents.year, _years > 0 {
       components = Calendar.current.dateComponents([.year], from: estimatedBirthday, to: Date())
       ageString = (DateComponentsFormatter.localizedString(from: components, unitsStyle: .full) ?? "").uppercased()
     }
     
-    let ageAttributedString = NSAttributedString(string: ageString,
+    let ageAttributedString = NSAttributedString(string: ageString,//(mode == .Creation && ageString == "18") ? "age".localized.uppercased() : ageString,
                                                  attributes: [
                                                   .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
                                                   .foregroundColor: UIColor.white,
                                                  ])
-    let genderAttributedString = NSAttributedString(string: userprofile.gender.rawValue.localized.capitalized,
+    
+    let genderAttributedString = NSAttributedString(string: userprofile.gender == .Unassigned ? "age".localized.uppercased() : userprofile.gender.rawValue.localized.capitalized,
                                                     attributes: [
                                                       .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .subheadline) as Any,
                                                       .foregroundColor: UIColor.white,
                                                     ])
     
     if #available(iOS 15, *) {
-      genderButton.configuration?.image = UIImage(systemName: userprofile.gender == .Male ? "mustache.fill" : "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
-      genderButton.configuration?.title = userprofile.gender.rawValue.localized.uppercased()
-      ageButton.configuration?.title = ageString
-      
+      if userprofile.gender != .Unassigned {
+        genderButton.configuration?.image = UIImage(systemName: userprofile.gender == .Male ? "mustache.fill" : "mouth.fill",
+                                                    withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+      }
+      ageButton.configuration?.title = ageString//(mode == .Creation && years == 18) ? "age".localized.uppercased() : ageString
+      genderButton.configuration?.title = userprofile.gender == .Unassigned ? "gender".localized.uppercased() : userprofile.gender.rawValue.localized.uppercased()
     } else {
-      genderButton.setImage(UIImage(systemName: userprofile.gender == .Male ? "mustache.fill" : "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+      if userprofile.gender != .Unassigned {
+        genderButton.setImage(UIImage(systemName: userprofile.gender == .Male ? "mustache.fill" : "mouth.fill",
+                                      withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+      }
       genderButton.setAttributedTitle(genderAttributedString, for: .normal)
       ageButton.setAttributedTitle(ageAttributedString, for: .normal)
       
@@ -784,8 +859,9 @@ private extension UserSettingsCredentialsCell {
 //    tagCapsule.color = color
     
     if #available(iOS 15, *) {
-      genderButton.configuration?.baseBackgroundColor = color
-      ageButton.configuration?.baseBackgroundColor = color
+      genderButton.configuration?.baseBackgroundColor = (mode == .Creation && userprofile.gender == .Unassigned) ? .systemGray2 : color
+//      ageButton.configuration?.baseBackgroundColor = (mode == .Creation && userprofile.age == 18) ? .systemGray2 : color
+      
       //          UIConfigurationColorTransformer { [weak self] _ in
       //                guard let self = self else { return .systemGray }
       //
@@ -797,8 +873,8 @@ private extension UserSettingsCredentialsCell {
       //          return self.color
       //            }
     } else {
-      genderButton.backgroundColor = color
-      ageButton.backgroundColor = color
+      genderButton.backgroundColor = (mode == .Creation && userprofile.gender == .Unassigned) ? .systemGray2 : color
+//      ageButton.backgroundColor = (mode == .Creation && userprofile.age == 18) ? .systemGray2 : color
       //            genderButton.imageView?.tintColor = color
       //            ageButton.imageView?.tintColor = color
     }

@@ -113,7 +113,11 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
 //      case .Creation:
 //
 //      case .Default:
-        sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: section == Section.allCases.count-1 ? (self.mode == .Default ? self.padding : 80) : 0, trailing: 0)
+      let inset = self.mode == .Creation ? self.padding : 0
+        sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: inset,
+                                                              leading: inset,
+                                                              bottom: section == Section.allCases.count-1 ? (self.mode == .Default ? self.padding : 80) : inset,
+                                                              trailing: inset)
 //      }
       return sectionLayout
     }
@@ -121,6 +125,7 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
     let credentialsCellRegistration = UICollectionView.CellRegistration<UserSettingsCredentialsCell, AnyHashable> { [unowned self] cell, indexPath, item in
       guard let userprofile = Userprofiles.shared.current else { return }
       
+      cell.mode = self.mode
       cell.userprofile = userprofile
       cell.color = self.color
       
@@ -183,7 +188,7 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
 //                                  right: self.padding))
     }
     
-    let infoCellRegistration = UICollectionView.CellRegistration<UserSettingsInfoCell, AnyHashable> { [unowned self] cell, _, _ in
+    let infoCellRegistration = UICollectionView.CellRegistration<UserSettingsInfoCell, AnyHashable> { [unowned self] cell, indexPath, _ in
       cell.insets = .uniform(size: 8)
       cell.mode = self.mode
       cell.userprofile = self.userprofile
@@ -230,6 +235,11 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
         .eraseToAnyPublisher()
         .filter { !$0.isNil }
         .sink { [unowned self] in
+          guard self.mode != .Creation else {
+            scrollToItem(at: indexPath, at: .top, animated: true)
+            
+            return
+          }
           let point = cell.convert($0!, to: self)
           UIView.animate(withDuration: 0.2) { [unowned self] in
             self.contentOffset.y = point.y

@@ -38,9 +38,7 @@ class ProfileCreationView: UIView {
     instance.$userprofileDescription
       .filter { !$0.isNil }
       .sink { [unowned self] in
-        print($0)
-        fatalError()
-        //self.viewInput?.updateDescription($0!)
+        self.viewInput?.updateDescription($0!)
       }
       .store(in: &self.subscriptions)
     
@@ -58,9 +56,7 @@ class ProfileCreationView: UIView {
       .sink { [unowned self] in
         guard let dict = $0 else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.updateUsername(dict)
+        self.viewInput?.updateUsername(dict)
       }
       .store(in: &subscriptions)
     
@@ -68,9 +64,7 @@ class ProfileCreationView: UIView {
       .sink { [unowned self] in
         guard let date = $0 else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.updateBirthDate(date)
+        self.viewInput?.updateBirthDate(date)
       }
       .store(in: &subscriptions)
     
@@ -78,9 +72,7 @@ class ProfileCreationView: UIView {
       .sink { [unowned self] in
         guard let gender = $0 else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.updateGender(gender)
+        self.viewInput?.updateGender(gender)
       }
       .store(in: &subscriptions)
     
@@ -88,9 +80,7 @@ class ProfileCreationView: UIView {
       .sink { [unowned self] in
         guard !$0.isNil else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.openCamera()
+        self.viewInput?.openCamera()
       }
       .store(in: &subscriptions)
     
@@ -98,9 +88,7 @@ class ProfileCreationView: UIView {
       .sink { [unowned self] in
         guard !$0.isNil else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.openGallery()
+        self.viewInput?.openGallery()
       }
       .store(in: &subscriptions)
     
@@ -122,17 +110,14 @@ class ProfileCreationView: UIView {
               let userprofile = Userprofiles.shared.current
         else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.fetchCity(userprofile: userprofile, string: string)
+        self.viewInput?.fetchCity(userprofile: userprofile, string: string)
       }
       .store(in: &self.subscriptions)
     
     instance.citySelectionPublisher
       .sink { [unowned self] in
-        print($0)
-        fatalError()
-        //self.viewInput?.updateCity($0)
+
+        self.viewInput?.updateCity($0)
       }
       .store(in: &self.subscriptions)
     
@@ -140,9 +125,7 @@ class ProfileCreationView: UIView {
       .sink { [unowned self] in
         guard let url = $0 else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.updateFacebook(url)
+        self.viewInput?.updateFacebook(url)
       }
       .store(in: &self.subscriptions)
     
@@ -150,9 +133,7 @@ class ProfileCreationView: UIView {
       .sink { [unowned self] in
         guard let url = $0 else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.updateInstagram(url)
+        self.viewInput?.updateInstagram(url)
       }
       .store(in: &self.subscriptions)
     
@@ -160,9 +141,7 @@ class ProfileCreationView: UIView {
       .sink { [unowned self] in
         guard let url = $0 else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.updateTiktok(url)
+        self.viewInput?.updateTiktok(url)
       }
       .store(in: &self.subscriptions)
     
@@ -170,59 +149,9 @@ class ProfileCreationView: UIView {
       .sink { [unowned self] in
         guard let url = $0 else { return }
         
-        print($0)
-        fatalError()
-        //self.viewInput?.openURL(url)
+        self.viewInput?.openURL(url)
       }
       .store(in: &self.subscriptions)
-    
-    instance.topicPublisher
-      .sink { [unowned self] in
-        print($0)
-        fatalError()
-        //self.viewInput?.onTopicSelected($0)
-      }
-      .store(in: &subscriptions)
-    
-    instance.publicationsPublisher
-      .sink { [unowned self] in
-        guard !$0.isNil else { return }
-        
-        print($0)
-        fatalError()
-        //self.viewInput?.onPublicationsSelected()
-      }
-      .store(in: &subscriptions)
-    
-    instance.subscribersPublisher
-      .sink { [unowned self] in
-        guard !$0.isNil else { return }
-        
-        print($0)
-        fatalError()
-        //self.viewInput?.onSubscribersSelected()
-      }
-      .store(in: &subscriptions)
-    
-    instance.subscriptionsPublisher
-      .sink { [unowned self] in
-        guard !$0.isNil else { return }
-        
-        print($0)
-        fatalError()
-        //self.viewInput?.onSubscriptionsSelected()
-      }
-      .store(in: &subscriptions)
-    
-    instance.watchingPublisher
-      .sink { [unowned self] in
-        guard !$0.isNil else { return }
-        
-        print($0)
-        fatalError()
-        //self.viewInput?.onWatchingSelected()
-      }
-      .store(in: &subscriptions)
     
     return instance
   }()
@@ -377,7 +306,9 @@ private extension ProfileCreationView {
     userSettingsView.place(inside: self)
     layer.addSublayer(gradient)
     
-    delay(seconds: 1) { [unowned self] in
+    delay(seconds: 0.25) { [weak self] in
+      guard let self = self else { return }
+      
       self.present()
     }
     
@@ -385,9 +316,13 @@ private extension ProfileCreationView {
     actionButton.translatesAutoresizingMaskIntoConstraints = false
     actionButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
     actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-    let constraint = actionButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)//, constant: -tabBarHeight)
+    let constraint = actionButton.bottomAnchor.constraint(equalTo: bottomAnchor)//, constant: -tabBarHeight)
     constraint.identifier = "top"
+    constraint.constant = 100
     constraint.isActive = true
+    
+    let touch = UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard))
+    addGestureRecognizer(touch)
   }
   
   @objc
@@ -566,10 +501,15 @@ private extension ProfileCreationView {
           
           self.actionButton.transform = .identity
           self.actionButton.alpha = 1
-          constraint.constant = -(self.actionButton.bounds.height + tabBarHeight)
+          constraint.constant = -self.actionButton.bounds.height/2
           self.layoutIfNeeded()
         }) { _ in }
     }
+  }
+  
+  @objc
+  func hideKeyboard() {
+    endEditing(true)
   }
 }
 

@@ -347,6 +347,110 @@ class NewAccountView: UIView {
 }
 
 extension NewAccountView: NewAccountControllerOutput {
+  func signupCallback(result: Result<Bool, Error>) {
+    isUserInteractionEnabled = true
+    viewInput?.sendVerificationCode { [weak self] in
+      guard let self = self else { return }
+      
+      switch $0 {
+      case .success(let dict):
+        guard let code = dict["confirmation_code"] as? Int,
+              let expiresString = dict["expires_in"] as? String,
+              let expiresDate = expiresString.dateTime,
+              let email = self.mailTextField.text,
+              let components = email.components(separatedBy: "@") as? [String],
+              let username = components.first,
+              let firstLetter = username.first,
+              let lastLetter = username.last
+        else { return }
+        
+        //              let email = "pbuxaroff@gmail.com"
+        let banner = NewPopup(padding: self.padding*2,
+                              contentPadding: .uniform(size: self.padding*2))
+        let content = EmailVerificationPopupContent(code: code,
+                                                    retryTimeout: 60,
+                                                    email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
+                                                    color: Colors.main)
+        content.verifiedPublisher
+          .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
+          .sink { [weak self] in
+            guard let self = self else { return }
+            
+            self.viewInput?.emailConfirmed()
+            AppData.isEmailVerified = true
+            banner.dismiss()
+          }
+          .store(in: &banner.subscriptions)
+        content.retryPublisher
+          .sink { [unowned self] in self.viewInput?.sendVerificationCode { [unowned self] in
+            
+            switch $0 {
+            case .success(let dict):
+              guard let code = dict["confirmation_code"] as? Int else { return }
+              
+              content.onEmailSent(code)
+            case.failure(let error):
+#if DEBUG
+              error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+              let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+                                                                    text: AppError.server.localizedDescription,
+                                                                    tintColor: .systemRed,
+                                                                    fontName: Fonts.Regular,
+                                                                    textStyle: .subheadline,
+                                                                    textAlignment: .natural),
+                                     contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                     isModal: false,
+                                     useContentViewHeight: true,
+                                     shouldDismissAfter: 2)
+              banner.didDisappearPublisher
+                .sink { _ in banner.removeFromSuperview() }
+                .store(in: &self.subscriptions)
+            }
+          }}
+          .store(in: &banner.subscriptions)
+        banner.setContent(content)
+        banner.didDisappearPublisher
+          .sink { [unowned self] _ in banner.removeFromSuperview() }
+          .store(in: &self.subscriptions)
+
+      case .failure(let error):
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+                                                              text: AppError.server.localizedDescription,
+                                                              tintColor: .systemRed,
+                                                              fontName: Fonts.Regular,
+                                                              textStyle: .subheadline,
+                                                              textAlignment: .natural),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 2)
+        banner.didDisappearPublisher
+          .sink { _ in banner.removeFromSuperview() }
+          .store(in: &self.subscriptions)
+      }
+      self.loginButton.setSpinning(on: false, color: .white, animated: true) {
+        if #available(iOS 15, *) {
+          self.loginButton.configuration?.attributedTitle = AttributedString("signupButton".localized.uppercased(),
+                                                                             attributes: AttributeContainer([
+                                                                              .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                                              .foregroundColor: UIColor.white as Any
+                                                                             ]))
+        } else {
+          self.loginButton.setAttributedTitle(NSAttributedString(string: "signupButton".localized.uppercased(),
+                                                                 attributes: [
+                                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                                  .foregroundColor: UIColor.white as Any
+                                                                 ]),
+                                              for: .normal)
+        }
+      }
+    }
+  }
+  
   func nameCheckerCallback(result: Result<Bool, Error>) {
     switch result {
     case .success(let exists):
@@ -402,6 +506,7 @@ private extension NewAccountView {
     passwordTextField.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: passwordTextField.font!) + padding*2).isActive = true
     stack.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor).isActive = true
     stack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor).isActive = true
+
   }
   
   @objc
@@ -550,107 +655,7 @@ private extension NewAccountView {
         
         viewInput?.signup(username: username,
                           email: mail,
-                          password: password) { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.isUserInteractionEnabled = true
-          self.viewInput?.sendVerificationCode {
-            switch $0 {
-            case .success(let dict):
-              guard let code = dict["confirmation_code"] as? Int,
-                    let expiresString = dict["expires_in"] as? String,
-                    let expiresDate = expiresString.dateTime,
-                    let email = self.mailTextField.text,
-                    let components = email.components(separatedBy: "@") as? [String],
-                    let username = components.first,
-                    let firstLetter = username.first,
-                    let lastLetter = username.last
-              else { return }
-              
-              //              let email = "pbuxaroff@gmail.com"
-              let banner = NewPopup(padding: self.padding*2,
-                                    contentPadding: .uniform(size: self.padding*2))
-              let content = EmailVerificationPopupContent(code: code,
-                                                          retryTimeout: 60,
-                                                          email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
-                                                          color: Colors.main)
-              content.verifiedPublisher
-                .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
-                .sink { banner.dismiss() }
-                .store(in: &banner.subscriptions)
-              content.retryPublisher
-                .sink { [unowned self] in self.viewInput?.sendVerificationCode { [unowned self] in
-                  
-                  switch $0 {
-                  case .success(let dict):
-                    guard let code = dict["confirmation_code"] as? Int else { return }
-                    
-                    content.onEmailSent(code)
-                  case.failure(let error):
-#if DEBUG
-                    error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-                    let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                                          text: AppError.server.localizedDescription,
-                                                                          tintColor: .systemRed,
-                                                                          fontName: Fonts.Regular,
-                                                                          textStyle: .subheadline,
-                                                                          textAlignment: .natural),
-                                           contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                           isModal: false,
-                                           useContentViewHeight: true,
-                                           shouldDismissAfter: 2)
-                    banner.didDisappearPublisher
-                      .sink { _ in banner.removeFromSuperview() }
-                      .store(in: &self.subscriptions)
-                  }
-                }}
-                .store(in: &banner.subscriptions)
-              banner.setContent(content)
-              banner.didDisappearPublisher
-                .sink { [unowned self] _ in
-                  banner.removeFromSuperview()
-                  
-                  self.viewInput?.emailConfirmed()
-                }
-                .store(in: &self.subscriptions)
-
-            case .failure(let error):
-#if DEBUG
-              error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-              let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                                    text: AppError.server.localizedDescription,
-                                                                    tintColor: .systemRed,
-                                                                    fontName: Fonts.Regular,
-                                                                    textStyle: .subheadline,
-                                                                    textAlignment: .natural),
-                                     contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                     isModal: false,
-                                     useContentViewHeight: true,
-                                     shouldDismissAfter: 2)
-              banner.didDisappearPublisher
-                .sink { _ in banner.removeFromSuperview() }
-                .store(in: &self.subscriptions)
-            }
-            self.loginButton.setSpinning(on: false, color: .white, animated: true) {
-              if #available(iOS 15, *) {
-                self.loginButton.configuration?.attributedTitle = AttributedString("signupButton".localized.uppercased(),
-                                                                                   attributes: AttributeContainer([
-                                                                                    .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                                                    .foregroundColor: UIColor.white as Any
-                                                                                   ]))
-              } else {
-                self.loginButton.setAttributedTitle(NSAttributedString(string: "signupButton".localized.uppercased(),
-                                                                       attributes: [
-                                                                        .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                                        .foregroundColor: UIColor.white as Any
-                                                                       ]),
-                                                    for: .normal)
-              }
-            }
-          }
-        }
+                          password: password)
         isUserInteractionEnabled = false
       }
     }

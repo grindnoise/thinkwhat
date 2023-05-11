@@ -198,7 +198,7 @@ class Userprofile: Decodable {
   }
   
   var id:                 Int
-  //    var username:           String
+  var username:           String
   var firstName:          String {
     didSet {
       guard oldValue != firstName else { return }
@@ -211,13 +211,12 @@ class Userprofile: Decodable {
       NotificationCenter.default.post(name: Notifications.Userprofiles.LastNameChanged, object: self)
     }
   }
-  var name: String {
-    return "\(firstName) \(lastName)"
-  }
+  var fullName: String { firstName + (lastName.isEmpty ? "" : " \(lastName)") }
+  var shortName: String { firstNameSingleWord + (lastNameSingleWord.isEmpty ? "" : " \(lastNameSingleWord)") }
   var email: String
   var description: String = ""
   var dateJoined: Date
-  var birthDate: Date? {
+  @Published var birthDate: Date? {
     didSet {
       guard let birthDate = birthDate,
             oldValue != birthDate,
@@ -230,7 +229,7 @@ class Userprofile: Decodable {
   var age: Int {
     return birthDate?.age ?? 18
   }
-  var gender: Gender {
+  @Published var gender: Gender {
     didSet {
       guard oldValue != gender,
             isCurrent
@@ -508,6 +507,7 @@ class Userprofile: Decodable {
   
   init?() {
     guard let _id = UserDefaults.Profile.id,
+          let _username = UserDefaults.Profile.username,
           let _firstName = UserDefaults.Profile.firstName,
           let _lastName = UserDefaults.Profile.lastName,
           let _email = UserDefaults.Profile.email,
@@ -517,6 +517,7 @@ class Userprofile: Decodable {
       return nil
     }
     
+    username    = _username
     lastVisit   = Date()
     id          = _id
     firstName   = _firstName
@@ -544,6 +545,7 @@ class Userprofile: Decodable {
   required init(from decoder: Decoder) throws {
     do {
       let container       = try decoder.container(keyedBy: CodingKeys.self)
+      username            = try container.decode(String.self, forKey: .username)
       id                  = try container.decode(Int.self, forKey: .id)
       balance             = try container.decodeIfPresent(Int.self, forKey: .balance) ?? 0
       description         = try container.decode(String.self, forKey: .description)

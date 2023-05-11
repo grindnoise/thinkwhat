@@ -397,6 +397,7 @@
 "account_delete_description" = "Deleting an account is an irreversible action. Continue?";
 "account_location_empty" = "Please select your location";
 "claim" = "Claim";
+"account_fill_in" = "Fill in your information and select a profile picture";
 
 //Userprofile
 "userprofile" = "Profile";
