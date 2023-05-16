@@ -372,19 +372,6 @@ extension UISearchBar {
   }
 }
 
-extension UIView {
-  func copyView<T: UIView>() -> T? {
-    return NSKeyedUnarchiver.unarchiveObject(with: NSKeyedArchiver.archivedData(withRootObject: self)) as? T
-  }
-  
-  func makeScreenshot() -> UIImage {
-    let renderer = UIGraphicsImageRenderer(bounds: self.bounds)
-    return renderer.image { (context) in
-      self.layer.render(in: context.cgContext)
-    }
-  }
-}
-
 public extension CABasicAnimation {
   convenience init(path: String, fromValue: Any?, toValue: Any?, duration: CFTimeInterval) {
     self.init(keyPath: path)

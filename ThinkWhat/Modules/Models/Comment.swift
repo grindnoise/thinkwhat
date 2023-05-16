@@ -212,7 +212,7 @@ class Comment: Decodable {
       id              = try container.decode(Int.self, forKey: .id)
       body            = try container.decode(String.self, forKey: .body)
       anonUsername    = try container.decode(String.self, forKey: .anonUsername)
-      let _userprofile = try container.decodeIfPresent(Userprofile.self, forKey: .userprofile)
+      let _userprofile = try? container.decodeIfPresent(Userprofile.self, forKey: .userprofile)
       if !_userprofile.isNil {
         userprofile = Userprofiles.shared.all.filter({ $0.id == _userprofile!.id }).first ?? _userprofile
       }

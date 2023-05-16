@@ -67,7 +67,34 @@ class SignInViewController: UIViewController {
 }
 
 extension SignInViewController: SignInViewInput {
-  func openAgreement() {
+  func resetPassword() {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+//    navigationController?.delegate = appDelegate.transitionCoordinator
+    navigationController?.pushViewController(PasswordResetViewController(), animated: true)
+    navigationController?.delegate = nil
+  }
+  
+  func nextScene() {
+    guard !UserDefaults.App.hasReadTermsOfUse else {
+      guard let userprofile = Userprofiles.shared.current,
+            let wasEdited = userprofile.wasEdited
+      else { return }
+
+      guard wasEdited else {
+        navigationController?.delegate = appDelegate.transitionCoordinator
+        navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
+        navigationController?.delegate = nil
+        return
+      }
+      controllerOutput?.animateTransitionToApp {
+        appDelegate.window?.rootViewController = MainController()
+      }
+      
+      return
+    }
+    
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
@@ -154,7 +181,7 @@ extension SignInViewController: SignInModelOutput {
   
   func mailSignInCallback(_ result: Result<Bool, Error>) {
     switch result {
-    case .success(let success):
+    case .success(_):
       if !AppData.isEmailVerified {
         guard AppData.emailVerificationCode.isNil else {
           ///App already has the code
@@ -177,7 +204,10 @@ extension SignInViewController: SignInModelOutput {
           
           content.verifiedPublisher
             .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
-            .sink {
+            .sink {[weak self] in
+              guard let self = self else { return }
+              
+              try? self.controllerInput?.updateUserprofile(parameters: ["is_email_verified": true], image: nil)
               AppData.isEmailVerified = true
               banner.dismiss()
             }

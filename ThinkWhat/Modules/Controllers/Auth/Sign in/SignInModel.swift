@@ -164,6 +164,7 @@ extension SignInModel: SignInControllerInput {
         var userprofile = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self,
                                                                                           from: current.rawData())
         Userprofiles.shared.current = userprofile
+        ///Detext if profile was edited by user
         guard let wasEdited = userprofile.wasEdited else { fatalError() }
         
         ///If profile wasn't prieviously edited by user, then update it with provider's data
@@ -171,6 +172,7 @@ extension SignInModel: SignInControllerInput {
           let providerData = try await getProviderData()
           userprofile = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self,
                                                                                         from:  try await API.shared.profiles.updateUserprofileAsync(data: providerData) { _ in })
+          Userprofiles.shared.current = userprofile
         }
         
 //        UserDefaults.Profile.id = userprofile.id
@@ -228,7 +230,7 @@ extension SignInModel: SignInControllerInput {
   func sendVerificationCode(_ completion: @escaping (Result<[String : Any], Error>) -> ()) {
     Task {
       do {
-        let data = try await API.shared.auth.getEmailConfirmationCode()
+        let data = try await API.shared.auth.sendEmailVerificationCode()
         await MainActor.run {
           completion(.success(JSON(data).dictionaryObject!))
         }

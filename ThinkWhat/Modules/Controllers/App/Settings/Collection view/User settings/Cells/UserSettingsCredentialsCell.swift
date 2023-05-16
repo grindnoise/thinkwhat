@@ -17,14 +17,33 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     didSet {
       guard !userprofile.isNil, userprofile.isCurrent else { return }
       
-      if mode == .Creation {
+//      if mode == .Creation {
         if userprofile.imageURL == nil {
           avatar.setUserprofileDefaultImage()
         }
-        if userprofile.fullName.isEmpty {
-          username.text = userprofile.username
+      setupLabels()
+//        if userprofile.fullName.isEmpty {
+//          username.text = userprofile.username
+//        }
+//      }
+      
+      userprofile.$firstName
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+
+          self.setupLabels(animated: true)
         }
-      }
+        .store(in: &subscriptions)
+      
+      userprofile.$lastName
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+
+          self.setupLabels(animated: true)
+        }
+        .store(in: &subscriptions)
       
       userprofile.$gender
         .receive(on: DispatchQueue.main)
@@ -724,29 +743,39 @@ private extension UserSettingsCredentialsCell {
     
     guard let userprofile = Userprofiles.shared.current else { return }
     
-    if !userprofile.firstNameSingleWord.isEmpty {
-      if animated {
-        UIView.transition(with: username, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
-          guard let self = self else { return }
-          
-          self.username.text = userprofile.firstNameSingleWord
-        } completion: { _ in }
-      } else {
-        username.text = userprofile.firstNameSingleWord
+    if animated {
+      UIView.transition(with: username, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+        guard let self = self else { return }
+        
+        self.username.text = userprofile.fullName.isEmpty ? userprofile.username : userprofile.fullName
       }
+      
+      return
     }
-    
-    if !userprofile.lastNameSingleWord.isEmpty {
-      if animated {
-        UIView.transition(with: username, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
-          guard let self = self else { return }
-          
-          self.username.text! += self.username.text!.isEmpty ? self.userprofile.lastNameSingleWord : " " + userprofile.lastNameSingleWord
-        } completion: { _ in }
-      } else {
-        username.text! += username.text!.isEmpty ? userprofile.lastNameSingleWord : " " + userprofile.lastNameSingleWord
-      }
-    }
+    username.text = userprofile.fullName.isEmpty ? userprofile.username : userprofile.fullName
+//    if !userprofile.firstNameSingleWord.isEmpty {
+//      if animated {
+//        UIView.transition(with: username, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.username.text = userprofile.firstNameSingleWord
+//        } completion: { _ in }
+//      } else {
+//        username.text = userprofile.firstNameSingleWord
+//      }
+//    }
+//
+//    if !userprofile.lastNameSingleWord.isEmpty {
+//      if animated {
+//        UIView.transition(with: username, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.username.text! += self.username.text!.isEmpty ? self.userprofile.lastNameSingleWord : " " + userprofile.lastNameSingleWord
+//        } completion: { _ in }
+//      } else {
+//        username.text! += username.text!.isEmpty ? userprofile.lastNameSingleWord : " " + userprofile.lastNameSingleWord
+//      }
+//    }
     
     //        if animated {
     //            UIView.transition(with: age, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in

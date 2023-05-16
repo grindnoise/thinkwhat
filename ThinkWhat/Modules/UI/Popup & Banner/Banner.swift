@@ -82,7 +82,7 @@ class NewBanner: UIView {
   }()
   private lazy var body: UIView = {
     let instance = UIView()
-    instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .tertiarySystemBackground
+    instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .secondarySystemBackground : .tertiarySystemBackground
     instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:))))
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)

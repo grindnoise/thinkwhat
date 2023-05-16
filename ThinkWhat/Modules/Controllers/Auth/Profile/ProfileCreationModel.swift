@@ -8,6 +8,8 @@
 
 import Foundation
 import UIKit
+import SwiftyJSON
+import L10n_swift
 
 class ProfileCreationModel {
   
@@ -36,12 +38,40 @@ extension ProfileCreationModel: ProfileCreationControllerInput {
   }
   
   func fetchCity(userprofile: Userprofile, string: String) {
-    
+    Task { await GeoNamesWorker.search(userprofile: userprofile, string: string) }
   }
   
-  func saveCity(_: City, completion: @escaping (Bool) -> ()) {
-    
+  func saveCity(_ city: City, completion: @escaping (Bool) -> ()) {
+    Task {
+      do {
+        let data = try await GeoNamesWorker.getByGeonameId(city.geonameId)
+        
+        guard let dict = JSON(data).dictionaryObject else { return }
+        
+        try await API.shared.system.saveCity(dict)
+        completion(true)
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
   }
   
-  
+  func setLocales() {
+    Task {
+      do {
+        var parameters: [String: Any] = [
+          "locales": [[L10n.shared.language: true]],
+          "default_locale": L10n.shared.language
+        ]
+        
+        try await API.shared.system.updateAppSettings(parameters)
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
 }

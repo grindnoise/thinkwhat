@@ -114,8 +114,10 @@
 "new_account" = "Новый аккаунт";
 "providerLabel" = "или";
 "haveAccountLabel" = "Уже зарегистрированы?";
+"dont_have_account_yet" = "Нет аккаунта?";
+"registration" = "Регистрация";
 "loginButton" = "Войти";
-"signupButton" = "Регистрация";
+"signupButton" = "Зарегистрироваться";
 "usernameTF" = "Логин";
 "mailTF" = "Электронная почта";
 "passwordTF" = "Пароль";
@@ -127,7 +129,7 @@
 "email_verification_code_sent" = "Электронное письмо с кодом подтверждения было отправлено на адрес:";
 "email_not_delivered" = "Не пришел код?";
 "repeat_after" = "Повторить через ";
-"resend_mail" = "Отправить заново";
+"resend_mail" = "Отправить новый код";
 "verification_code" = "Код подтверждения";
 "password_is_short" = "Слишком короткий пароль";
 "invalid_verification_code" = "Неверный код";
@@ -164,6 +166,7 @@
 "birthDateTF" = "Дата рождения";
 "cityTF" = "Город";
 "city_placeholder" = "Введите город";
+"fill_necessary_fields" = "Пожалуйста, заполните нобходимые поля: ";
 
 //Hot VC
 "hot" = "Горячие";
@@ -206,7 +209,7 @@
 "poll_complete_at" = "Опрос выполнен на";
 "voted" = "Проголосовали";
 "most_popular_choice" = "Выбранный вариант в тренде";
-"got_points" = "Вы получили ";
+"got_points" = "Спасибо! Вы получили ";
 "points" = " балл(ов)";
 "support_poll" = "Поддержать опрос";
 "next" = "Следующий";
@@ -228,6 +231,14 @@
 "poll" = "Опрос";
 "new_single" = "Новый";
 "poll_rating_difference" = "В чем разница?";
+
+//Reset password
+//
+"password_reset_link_title" = "Забыли\nпароль?";
+"password_reset_link_description" = "Пожалуйста, введите свой адрес электронной почты, чтобы запросить сброс пароля";
+"password_reset_link_sent_description" = "Мы отправили инструкции по восстановлению пароля на вашу электронную почту";
+"password_reset_link_sent_title" = "Проверьте почту";
+"send_password_reset_link" = "Отправить";
 
 //PollCreationView
 "new_poll" = "Новый опрос";

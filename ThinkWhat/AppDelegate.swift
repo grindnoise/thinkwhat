@@ -43,7 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        edu()
     API.shared.system.getCountryByIP()
     window = UIWindow()
-    window?.rootViewController = UINavigationController(rootViewController: StartViewController())//AppData.accessToken.isNil || AppData.accessToken!.isEmpty ? UINavigationController(rootViewController: StartViewController()) : MainController()
+    window?.rootViewController = AppData.accessToken.isNil || AppData.accessToken!.isEmpty ? UINavigationController(rootViewController: StartViewController()) : MainController()
     window?.makeKeyAndVisible()
     //        vkDelegateReference = VKDelegate()
     //        GIDSignIn.sharedInstance.restorePreviousSignIn()
@@ -702,6 +702,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       return 0
     }
     
-    print(maxUncrossedLines([5,4,2,9], [5,1,2,9]))
+//    print(maxUncrossedLines([5,4,2,9], [5,1,2,9]))
+    func climbStairs(_ n: Int) -> Int {
+            var step_1 = 0
+            var step_2 = 1
+            var total: Int? = nil
+
+            for i in 1...n {
+              total = step_2 + step_1
+              step_1 = step_2
+              step_2 = total!
+            }
+
+            return total!
+        }
+    
+    climbStairs(4)
   }
 }

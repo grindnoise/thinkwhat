@@ -30,7 +30,43 @@ class ProfileCreationViewController: UIViewController, UINavigationControllerDel
   // MARK: - Public properties
   var controllerOutput: ProfileCreationControllerOutput?
   var controllerInput: ProfileCreationControllerInput?
-  
+  ///**UI**
+  public private(set) lazy var logoStack: UIStackView = {
+    let logoIcon: Icon = {
+      let instance = Icon(category: Icon.Category.Logo)
+      instance.accessibilityIdentifier = "logoIcon"
+      instance.iconColor = Colors.main
+      instance.isRounded = false
+      instance.clipsToBounds = false
+      instance.scaleMultiplicator = 1.2
+      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+      instance.heightAnchor.constraint(equalToConstant: NavigationController.Constants.NavBarHeightSmallState * 0.65).isActive = true
+      
+      return instance
+    }()
+    let logoText: Icon = {
+      let instance = Icon(category: Icon.Category.LogoText)
+      instance.accessibilityIdentifier = "logoText"
+      instance.iconColor = Colors.main
+      instance.isRounded = false
+      instance.clipsToBounds = false
+      instance.scaleMultiplicator = 1.1
+      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.8).isActive = true
+      
+      return instance
+    }()
+    
+    let instance = UIStackView(arrangedSubviews: [
+      logoIcon,
+      logoText
+    ])
+//    instance.alpha = 0
+    instance.axis = .horizontal
+    instance.spacing = 0
+    instance.clipsToBounds = false
+    
+    return instance
+  }()
   
   
   // MARK: - Destructor
@@ -61,25 +97,46 @@ class ProfileCreationViewController: UIViewController, UINavigationControllerDel
       .modelOutput = self
     
     self.view = view as UIView
-    navigationItem.setHidesBackButton(true, animated: false)
+
+    setupUI()
   }
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
-    let banner = NewBanner(contentView: TextBannerContent(icon: Icon(category: .Logo, iconColor: Colors.main),
-                                                          text: "account_fill_in".localized,
-                                                          tintColor: Colors.main,
-                                                          fontName: Fonts.Regular,
-                                                          textStyle: .headline,
-                                                          textAlignment: .natural),
-                           contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                           isModal: false,
-                           useContentViewHeight: true,
-                           shouldDismissAfter: 5)
-    banner.didDisappearPublisher
-      .sink { _ in banner.removeFromSuperview() }
-      .store(in: &self.subscriptions)
+    delay(seconds: 0.5) { [weak self] in
+      guard let self = self else { return }
+      
+      let banner = NewBanner(contentView: TextBannerContent(icon: Icon(category: .Logo, iconColor: Colors.main),
+                                                            text: "account_fill_in".localized,
+                                                            tintColor: Colors.main,
+                                                            fontName: Fonts.Regular,
+                                                            textStyle: .headline,
+                                                            textAlignment: .natural),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 5)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
+    }
+  }
+}
+
+private extension ProfileCreationViewController {
+  @MainActor
+  func setupUI() {
+    navigationItem.setHidesBackButton(true, animated: false)
+    navigationController?.setNavigationBarHidden(false, animated: false)
+    controllerInput?.setLocales()
+    
+    guard let navBar = navigationController?.navigationBar,
+          navBar.subviews.filter({ $0 is UIStackView }).isEmpty
+    else { return }
+    
+    logoStack.placeInCenter(of: navBar)
+    
   }
 }
 
@@ -154,7 +211,7 @@ extension ProfileCreationViewController: ProfileCreationViewInput {
   }
   
   func updateCity(_ instance: City) {
-    controllerInput?.saveCity(instance) { _ in  }//Userprofiles.shared.current?.city = instance }//[weak self] _ in
+    controllerInput?.saveCity(instance) { _ in  Userprofiles.shared.current?.city = instance }//[weak self] _ in
 //      Userprofiles.shared.current?.city = instance
       //            guard let self = self else { return }
       //

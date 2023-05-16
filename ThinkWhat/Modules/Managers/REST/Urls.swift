@@ -71,11 +71,13 @@ struct API_URLS {
   
   
   struct Auth {
-    static let current:             URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/current/")}()
-    static let signUp:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/sign_up/")}()
-    static let getCodeViaMail:      URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/send_confirmation_code/")}()
-    static let token:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("auth/token/")}()
-    static let getTokenByPassword:  URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_token/")}()
+    static let emailExists          = URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/email_exists")
+    static let usernameExists       = URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/username_exists")
+    static let current              = URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/current/")
+    static let signUp               = URL(string: API_URLS.BASE)?.appendingPathComponent("api/sign_up/")
+    static let getCodeViaMail       = URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/send_confirmation_code/")
+    static let token                = URL(string: API_URLS.BASE)?.appendingPathComponent("auth/token/")
+    static let getTokenByPassword   = URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_token/")
   }
   
   struct System {
@@ -99,8 +101,8 @@ struct API_URLS {
   static let APP_LAUNCH               = "api/app_launch/load/"
   //Profiles
   static let USERS                    = "api/users/"
-  static let USERNAME_EXISTS          = "api/profiles/username_exists"
-  static let EMAIL_EXISTS             = "api/profiles/email_exists"
+//  static let USERNAME_EXISTS          = "api/profiles/username_exists"
+//  static let EMAIL_EXISTS             = "api/profiles/email_exists"
 //  static let GET_CONFIRMATION_CODE    = "api/profiles/send_confirmation_code/"
   static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified/"
 //  static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_update/"

@@ -14,9 +14,10 @@ protocol SignInViewInput: AnyObject {
   
   func mailSignIn(username: String, password: String)
   func providerSignIn(provider: AuthProvider)
-  func openAgreement()
+  func nextScene()
 //  func openProfile()
   func signUp()
+  func resetPassword()
 }
 
 protocol SignInControllerInput: AnyObject {
@@ -34,10 +35,11 @@ protocol SignInModelOutput: AnyObject {
 }
 
 protocol SignInControllerOutput: AnyObject {
-  var viewInput: SignInViewInput? { get set }
+  var viewInput: (UIViewController & SignInViewInput)? { get set }
   
   func mailSignInCallback(result: Result<Bool, Error>)
   func providerSignInCallback(result: Result<Bool, Error>)
   func startAuthorizationUI(provider: AuthProvider)
+  func animateTransitionToApp(_ completion: @escaping Closure) 
 //  func stopAuthorizationUI(completion: @escaping Closure)
 }

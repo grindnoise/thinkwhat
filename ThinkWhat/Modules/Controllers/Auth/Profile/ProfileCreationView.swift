@@ -24,9 +24,42 @@ class ProfileCreationView: UIView {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
-  private lazy var userSettingsView: UserSettingsCollectionView = {
+  public private(set) lazy var userSettingsView: UserSettingsCollectionView = {
     let instance = UserSettingsCollectionView(mode: .Creation,
                                               userprofile: Userprofiles.shared.current!)
+    
+    Userprofiles.shared.current!.$gender
+      .filter { $0 != .Unassigned }
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        guard !Userprofiles.shared.current!.city.isNil else { return }
+        
+        if #available(iOS 15, *) {
+          self.actionButton.configuration?.baseBackgroundColor = Colors.main
+        } else {
+          self.actionButton.backgroundColor = Colors.main
+        }
+      }
+      .store(in: &subscriptions)
+    
+    Userprofiles.shared.current!.$city
+      .filter { !$0.isNil }
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        guard Userprofiles.shared.current!.gender != .Unassigned else { return }
+        
+        if #available(iOS 15, *) {
+          self.actionButton.configuration?.baseBackgroundColor = Colors.main
+        } else {
+          self.actionButton.backgroundColor = Colors.main
+        }
+      }
+      .store(in: &subscriptions)
+    
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     
     instance.publisher(for: \.bounds, options: .new)
@@ -195,7 +228,7 @@ class ProfileCreationView: UIView {
       //      //            instance.imageEdgeInsets.right = 8
       instance.setAttributedTitle(attrString, for: .normal)
       //      instance.semanticContentAttribute = .forceRightToLeft
-      instance.backgroundColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+      instance.backgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
       instance.translatesAutoresizingMaskIntoConstraints = false
       
       let constraint = instance.widthAnchor.constraint(equalToConstant: "getStartedButton".localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!))
@@ -327,7 +360,40 @@ private extension ProfileCreationView {
   
   @objc
   func handleTap() {
-    guard let viewInput = viewInput,
+    func checkNecessaryData() -> Bool {
+      guard let userprofile = Userprofiles.shared.current else { return false }
+      
+      var errors = [String]()
+      if userprofile.gender == .Unassigned {
+        errors.append("gender".localized.lowercased())
+      }
+      if userprofile.city.isNil {
+        errors.append("cityTF".localized.lowercased())
+      }
+      
+      guard errors.isEmpty else {
+        let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+                                                              text: String(errors.reduce("fill_necessary_fields".localized, { $0 + "\n  - \($1), " }).dropLast(2)),
+                                                              tintColor: .systemRed,
+                                                              fontName: Fonts.Regular,
+                                                              textStyle: .subheadline,
+                                                              textAlignment: .natural),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 2)
+        banner.didDisappearPublisher
+          .sink { _ in banner.removeFromSuperview() }
+          .store(in: &self.subscriptions)
+        
+        return false
+      }
+      
+      return true
+    }
+    
+    guard checkNecessaryData(),
+          let viewInput = viewInput,
           let titleView = viewInput.navigationController?.navigationBar.subviews.filter({ $0 is UIStackView }).first as? UIStackView,
           let titleIcon = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoIcon" }).first as? Icon,
           let titleText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoText" }).first as? Icon,
@@ -418,6 +484,7 @@ private extension ProfileCreationView {
     }()
     
     opaque.addSubviews([fakeLogoIcon, fakeLogoText])
+    titleView.alpha = 0
     titleIcon.alpha = 0
     titleText.alpha = 0
     

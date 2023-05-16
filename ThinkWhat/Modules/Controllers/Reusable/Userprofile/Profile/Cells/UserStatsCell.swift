@@ -24,7 +24,7 @@ class UserStatsCell: UICollectionViewListCell {
     }
   }
   ///`Publishers`
-  public let publicationsPublisher = PassthroughSubject<Userprofile, Never>()
+  public var publicationsPublisher = PassthroughSubject<Userprofile, Never>()
   public let commentsPublisher = PassthroughSubject<Userprofile, Never>()
   public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
   ///`Logic`
@@ -190,13 +190,14 @@ class UserStatsCell: UICollectionViewListCell {
     
   }
   
-  //    override func prepareForReuse() {
-  //        super.prepareForReuse()
-  //
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    
+    publicationsPublisher = PassthroughSubject<Userprofile, Never>()
   //        urlPublisher = CurrentValueSubject<URL?, Never>(nil)
   //        subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
   //        imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
-  //    }
+      }
 }
 
 private extension UserStatsCell {

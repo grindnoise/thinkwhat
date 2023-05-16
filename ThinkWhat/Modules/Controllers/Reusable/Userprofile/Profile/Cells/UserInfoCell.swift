@@ -133,7 +133,7 @@ class UserInfoCell: UICollectionViewListCell {
     toolBar.backgroundColor = .tertiarySystemBackground
     toolBar.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
     toolBar.superview?.backgroundColor = .tertiarySystemBackground
-    let doneButton = UIBarButtonItem(title: "ok".localized, style: .done, target: nil, action: #selector(self.hideKeyboard))
+    let doneButton = UIBarButtonItem(title: "save_setting".localized, style: .done, target: nil, action: #selector(self.hideKeyboard))
     let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
     toolBar.items = [space, doneButton]
     toolBar.barStyle = .default

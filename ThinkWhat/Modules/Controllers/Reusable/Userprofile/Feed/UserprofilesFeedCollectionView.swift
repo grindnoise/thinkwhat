@@ -247,6 +247,9 @@ private extension UserprofilesFeedCollectionView {
         guard let self = self,
               self.mode == .Subscriptions
         else { return }
+#if DEBUG
+        print("subscriptionsPublisher")
+#endif
         
         var snap = self.source.snapshot()
         let existingSet = Set(snap.itemIdentifiers)

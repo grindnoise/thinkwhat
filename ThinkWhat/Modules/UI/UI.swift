@@ -211,6 +211,7 @@ enum Colors {
   enum Logo: RawRepresentable, CaseIterable {
     typealias RawValue = UIColor
     
+    case Main
     case Flame            //= UIColor(hexString: "#e4572e")
     case CoolGray   //= UIColor(hexString: "#AFC2D5")
     case Marigold         //= UIColor(hexString: "#F3A712")
@@ -219,6 +220,7 @@ enum Colors {
     
     init?(rawValue: RawValue) {
       switch rawValue.toHexString().lowercased() {
+      case "#009800".lowercased(): self = .Main
       case "#e4572e".lowercased(): self = .Flame
       case "#8B8BAE".lowercased(): self = .CoolGray
       case "#F3A712".lowercased(): self = .Marigold
@@ -230,6 +232,7 @@ enum Colors {
     
     var rawValue: RawValue {
       switch self {
+      case .Main:                 return UIColor(hexString: "#009800")
       case .Flame:                return UIColor(hexString: "#e4572e")
       case .CoolGray:             return UIColor(hexString: "#8B8BAE")
       case .Marigold:             return UIColor(hexString: "#F3A712")
@@ -240,6 +243,7 @@ enum Colors {
     
     public func next() -> Logo {
       switch self {
+      case .Main: return .Flame
       case .Flame: return .CoolGray
       case .CoolGray: return .Marigold
       case .Marigold: return .GreenMunshell
@@ -398,7 +402,7 @@ enum Colors {
     return color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.05 : 0.6)
   }
   
-  static var main: UIColor { Colors.Logo.Flame.rawValue }
+  static var main: UIColor { UIColor(hexString: "#009800") }//Colors.Logo.Flame.rawValue }
 }
 
 //extension Color: RawRepresentable {

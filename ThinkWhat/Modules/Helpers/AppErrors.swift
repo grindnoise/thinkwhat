@@ -133,7 +133,13 @@ extension APIError: LocalizedError {
           errorDescription += error.localized
           if error == "insufficient_balance", let shortage = json["shortage"].int {
             errorDescription += "insufficient_balance_shortage".localized + String(describing: abs(shortage)) + "insufficient_balance_shortage_points".localized + ". "  + "insufficient_balance_shortage_hint".localized
-          }}
+          }
+        } else if let array = json["email"].array,
+                  let first = array.first,
+                  let error = first.string,
+                  error.contains("We couldn't find an account associated with that email. Please try a different e-mail address.")  {
+          errorDescription = "email_not_found".localized
+        }
       } else if let string = value as? String {
         errorDescription = string
       }

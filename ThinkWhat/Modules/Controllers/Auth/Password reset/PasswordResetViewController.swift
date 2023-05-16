@@ -1,27 +1,15 @@
 //
-//  TermsViewController.swift
+//  PasswordResetViewController.swift
 //  ThinkWhat
 //
-//  Created by Pavel Bukharov on 26.04.2023.
+//  Created by Pavel Bukharov on 15.05.2023.
 //  Copyright © 2023 Pavel Bukharov. All rights reserved.
 //
 
 import UIKit
-import Combine
 
-class TermsViewController: UIViewController {
+class PasswordResetViewController: UIViewController {
   
-  // MARK: - Public properties
-  var controllerOutput: TermsControllerOutput?
-  var controllerInput: TermsControllerInput?
-  
-  
-  
-  // MARK: - Private properties
-  private var observers: [NSKeyValueObservation] = []
-  private var subscriptions = Set<AnyCancellable>()
-  private var tasks: [Task<Void, Never>?] = []
-  ///**UI**
   public private(set) lazy var logoStack: UIStackView = {
     let logoIcon: Icon = {
       let instance = Icon(category: Icon.Category.Logo)
@@ -59,27 +47,24 @@ class TermsViewController: UIViewController {
     return instance
   }()
   
+  // MARK: - Public properties
+  var controllerOutput: PasswordResetControllerOutput?
+  var controllerInput: PasswordResetControllerInput?
   
   
   // MARK: - Destructor
   deinit {
-    observers.forEach { $0.invalidate() }
-    tasks.forEach { $0?.cancel() }
-    subscriptions.forEach { $0.cancel() }
-    NotificationCenter.default.removeObserver(self)
 #if DEBUG
     print("\(String(describing: type(of: self))).\(#function)")
 #endif
   }
   
-  
-  
   // MARK: - Overridden Methods
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    let view = TermsView()
-    let model = TermsModel()
+    let view = PasswordResetView()
+    let model = PasswordResetModel()
     
     self.controllerOutput = view
     self.controllerOutput?
@@ -89,48 +74,32 @@ class TermsViewController: UIViewController {
       .modelOutput = self
     
     self.view = view as UIView
-    
     setupUI()
-    controllerInput?.getTermsConditionsURL()
   }
 }
 
-extension TermsViewController: TermsViewInput {
-  func onAccept() {
-    UserDefaults.App.hasReadTermsOfUse = true
-    let backItem = UIBarButtonItem()
-    backItem.title = ""
-    navigationItem.backBarButtonItem = backItem
-    
-    guard let userprofile = Userprofiles.shared.current,
-          let wasEdited = userprofile.wasEdited
-    else { return }
-
-    guard wasEdited else {
-      navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
-      return
-    }
-    controllerOutput?.animateTransitionToApp {
-      appDelegate.window?.rootViewController = MainController()
-    }
+extension PasswordResetViewController: PasswordResetViewInput {
+  func sendResetLink(_ mail: String) {
+    controllerInput?.sendResetLink(mail)
   }
 }
 
-extension TermsViewController: TermsModelOutput {
-  func onTermsConditionsURLReceived(_ url: URL) {
-      controllerOutput?.getTermsConditionsURL(url)
+extension PasswordResetViewController: PasswordResetModelOutput {
+  func callback(_ result: Result<Bool, Error>) {
+    controllerOutput?.callback(result)
   }
 }
 
-private extension TermsViewController {
+private extension PasswordResetViewController {
   @MainActor
   func setupUI() {
     navigationController?.setNavigationBarHidden(false, animated: false)
-//    setNavigationBarTintColor(Colors.main)
     fillNavigationBar()
-//    navigationItem.titleView = logoStack
-    guard let navBar = navigationController?.navigationBar else { return }
     
-    logoStack.placeInCenter(of: navBar)
+    navigationItem.titleView = logoStack
+    
+//    guard let navBar = navigationController?.navigationBar else { return }
+//
+//    logoStack.placeInCenter(of: navBar)
   }
 }

@@ -14,13 +14,13 @@ class SignInView: UIView {
   // MARK: - Public properties
   ///**UI**
   public private(set) lazy var logoIcon: Icon = {
-    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
+    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.main)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     
     return instance
   }()
   public private(set) lazy var logoText: Icon = {
-    let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
+    let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.main)
     instance.alpha = 0
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
     
@@ -35,30 +35,51 @@ class SignInView: UIView {
     logoText.placeInCenter(of: spacer,
                            topInset: 0,
                            bottomInset: 0)
+  
     let buttonView = UIView.opaque()
     loginButton.placeInCenter(of: buttonView,
                               topInset: 0,
                               bottomInset: 0)
-    let buttonsStack = UIStackView(arrangedSubviews: [
-      signupButton,
-      forgotButton
-    ])
-    buttonsStack.axis = .vertical
-    buttonsStack.spacing = 0
+    let opaque = UIView.opaque()
+    signupStack.placeXCentered(inside: opaque, topInset: 0, bottomInset: 0)
+    
+//    let buttonsStack = UIStackView(arrangedSubviews: [
+//      opaque,
+//      forgotButton
+//    ])
+//    buttonsStack.axis = .vertical
+//    buttonsStack.spacing = 0
     
     let instance = UIStackView(arrangedSubviews: [
       top,
       spacer,
+      UIView.verticalSpacer(0),
       loginContainer,
       passwordContainer,
       //      UIView.verticalSpacer(padding),
       buttonView,
-      label,
+      UIView.verticalSpacer(0),
+      separator,
       logos,
-      buttonsStack
+      opaque
+//      buttonsStack
     ])
     instance.axis = .vertical
     instance.spacing = padding*2
+    instance.publisher(for: \.bounds)
+      .filter { !$0.width.isZero }
+      .sink { [weak self] in
+        guard let self = self,
+              let limiter = self.separator.arrangedSubviews.filter({ $0.accessibilityIdentifier == "HorizontalLimiter"}).first,
+              let constraint = limiter.getConstraint(identifier: "widthAnchor")
+        else { return }
+
+        self.separator.setNeedsLayout()
+        constraint.constant = max(0, $0.width/2 - self.padding - "providerLabel".localized.uppercased().width(withConstrainedHeight: 100,
+                                                                                                  font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote)!)/2)
+        self.separator.layoutIfNeeded()
+      }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -76,9 +97,8 @@ class SignInView: UIView {
     let fgLayer = CAShapeLayer()
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
-    //    fgLayer.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(0.2).cgColor
     fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.Logo.Flame.rawValue).cgColor
+                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
@@ -110,7 +130,7 @@ class SignInView: UIView {
     let fgLayer = CAShapeLayer()
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
-    fgLayer.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(0.1).cgColor
+    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
@@ -135,7 +155,7 @@ class SignInView: UIView {
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
     fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.Logo.Flame.rawValue).cgColor
+                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
@@ -204,12 +224,35 @@ class SignInView: UIView {
     
     return instance
   }()
+  public private(set) lazy var separator: UIStackView = {
+    let limiter = HorizontalLimiter(alignment: .Middle, lineColor: .tertiaryLabel, lineWidth: 1)
+    limiter.accessibilityIdentifier = "HorizontalLimiter"
+    var constraint = limiter.widthAnchor.constraint(equalToConstant: 50)
+    constraint.identifier = "widthAnchor"
+    constraint.isActive = true
+    
+    let instance = UIStackView(arrangedSubviews: [
+      limiter,
+      label,
+      HorizontalLimiter(alignment: .Middle, lineColor: .tertiaryLabel, lineWidth: 1)
+    ])
+    instance.spacing = padding
+    instance.axis = .horizontal
+    instance.accessibilityIdentifier = "separator"
+//      instance.distribution = .fillEqually
+    
+    return instance
+  }()
   public private(set) lazy var label: UILabel = {
     let instance = UILabel()
     instance.numberOfLines = 0
+    instance.textColor = .secondaryLabel
     instance.textAlignment = .center
-    instance.text = "providerLabel".localized
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+    instance.text = "providerLabel".localized.uppercased()
+    instance.accessibilityIdentifier = "label"
+    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .footnote)
+//    label.translatesAutoresizingMaskIntoConstraints = false
+    instance.widthAnchor.constraint(equalToConstant: "providerLabel".localized.uppercased().width(withConstrainedHeight: 100, font: instance.font)).isActive = true
     
     return instance
   }()
@@ -231,15 +274,26 @@ class SignInView: UIView {
     
     return instance
   }()
+  public private(set) lazy var appleLogo: AppleLogo = {
+    let instance = AppleLogo()
+    instance.isUserInteractionEnabled = true
+    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+    instance.isOpaque = false
+    
+    return instance
+  }()
   public private(set) lazy var logos: UIView = {
     let instance = UIView.opaque()
     let stack = UIStackView(arrangedSubviews: [
+      appleLogo,
       google,
     ])
     stack.accessibilityIdentifier =  "stack"
     if AppData.shared.countryByIP == "RU" {
       stack.addArrangedSubview(vk)
     }
+    stack.spacing = padding
     stack.axis = .horizontal
     stack.placeInCenter(of: instance,
                         topInset: 0,
@@ -252,12 +306,35 @@ class SignInView: UIView {
     instance.addTarget(self,
                        action: #selector(self.buttonTapped(_:)),
                        for: .touchUpInside)
-    instance.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
+    instance.setAttributedTitle(NSAttributedString(string: "registration".localized,
                                                    attributes: [
                                                     .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
                                                     .foregroundColor: Colors.main as Any
                                                    ]),
                                 for: .normal)
+    
+    return instance
+  }()
+  public private(set) lazy var signupStack: UIStackView = {
+    let text: UILabel = {
+      let instance = UILabel()
+      instance.numberOfLines = 0
+      instance.textColor = .secondaryLabel
+      instance.textAlignment = .center
+      instance.text = "dont_have_account_yet".localized
+      instance.accessibilityIdentifier = "label"
+      instance.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline)
+//        instance.widthAnchor.constraint(equalToConstant: "providerLabel".localized.uppercased().width(withConstrainedHeight: 100, font: instance.font)).isActive = true
+      
+      return instance
+    }()
+    
+    let instance = UIStackView(arrangedSubviews: [
+      text,
+      signupButton
+    ])
+    instance.axis = .horizontal
+    instance.spacing = padding
     
     return instance
   }()
@@ -288,7 +365,7 @@ class SignInView: UIView {
   
   
   // MARK: - Public properties
-  weak var viewInput: SignInViewInput? {
+  weak var viewInput: (UIViewController & SignInViewInput)? {
     didSet {
       guard !viewInput.isNil else { return }
       
@@ -328,7 +405,7 @@ extension SignInView: SignInControllerOutput {
             case .success(_) = result
       else  { return }
       
-      self.viewInput?.openAgreement()
+      self.viewInput?.nextScene()
     }
 //    switch result {
 //    case .success(_):
@@ -357,10 +434,14 @@ extension SignInView: SignInControllerOutput {
    */
   func startAuthorizationUI(provider: AuthProvider) {
     isUserInteractionEnabled = false
-    // TODO: Add animation
-    let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
-    blurEffectView.effect = nil
-    blurEffectView.addEquallyTo(to: self)
+//    let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
+//    blurEffectView.effect = nil
+//    blurEffectView.addEquallyTo(to: self)
+    let bgView = UIView()
+    bgView.backgroundColor = .systemBackground
+    bgView.accessibilityIdentifier = "bgView"
+    bgView.alpha = 0
+    bgView.addEquallyTo(to: self)
     
     let fakeLogo = {
       let instance = Icon()
@@ -422,13 +503,13 @@ extension SignInView: SignInControllerOutput {
       
       return instance
     }()
-    stack.placeInCenter(of: blurEffectView.contentView)//,
+    stack.placeInCenter(of: bgView)//blurEffectView.contentView)//,
 //                        yOffset: -NavigationController.Constants.NavBarHeightSmallState)
     spinner.translatesAutoresizingMaskIntoConstraints = false
     spinner.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
-    blurEffectView.setNeedsLayout()
-    blurEffectView.layoutIfNeeded()
-    let coordinate = stack.convert(spinner.logo.frame.origin, to: blurEffectView)
+    bgView.setNeedsLayout()
+    bgView.layoutIfNeeded()
+    let coordinate = stack.convert(spinner.logo.frame.origin, to: bgView)
     
     UIView.animate(withDuration: 0.6,
                    delay: 0,
@@ -436,7 +517,7 @@ extension SignInView: SignInControllerOutput {
                    initialSpringVelocity: 0.3,
                    options: [.curveEaseInOut],
                    animations: {
-      blurEffectView.effect = UIBlurEffect(style: .prominent)
+      bgView.alpha = 1//UIBlurEffect(style: .prominent)
       fakeLogo.frame.origin = coordinate
       fakeLogo.frame.size = spinner.bounds.size
     }) { _ in
@@ -469,7 +550,153 @@ extension SignInView: SignInControllerOutput {
       
       guard case .success(_) = result else { return }
       
-      self.viewInput?.openAgreement()
+      self.viewInput?.nextScene()
+    }
+  }
+  
+  func animateTransitionToApp(_ completion: @escaping Closure) {
+    guard let viewInput = viewInput,
+          let window = appDelegate.window
+    else { completion(); return }
+    
+    viewInput.navigationItem.setHidesBackButton(true, animated: true)
+    
+    let opaque = PassthroughView()
+    opaque.frame = UIScreen.main.bounds
+    opaque.place(inside: window)
+
+    let loadingIcon: Icon = {
+      let instance = Icon()
+      instance.accessibilityIdentifier = "loadingIcon"
+      instance.category = Icon.Category.Logo
+      instance.iconColor = Colors.main
+      instance.scaleMultiplicator = 1.2
+      instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+      instance.alpha = 0
+      
+      return instance
+    }()
+    let loadingText: Icon = {
+      let instance = Icon()
+      instance.accessibilityIdentifier = "loadingText"
+      instance.category = Icon.Category.LogoText
+      instance.iconColor = Colors.main
+      instance.scaleMultiplicator = 1.1
+      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
+      instance.alpha = 0
+      
+      return instance
+    }()
+    let loadingStack: UIStackView = {
+      let opaque = UIView()
+      opaque.backgroundColor = .clear
+      
+      let instance = UIStackView(arrangedSubviews: [
+        opaque,
+        loadingText
+      ])
+      instance.axis = .vertical
+      instance.distribution = .equalCentering
+      instance.spacing = 0
+      instance.clipsToBounds = false
+      
+      loadingIcon.translatesAutoresizingMaskIntoConstraints = false
+      opaque.translatesAutoresizingMaskIntoConstraints = false
+      opaque.addSubview(loadingIcon)
+      
+      NSLayoutConstraint.activate([
+        loadingIcon.topAnchor.constraint(equalTo: opaque.topAnchor),
+        loadingIcon.bottomAnchor.constraint(equalTo: opaque.bottomAnchor),
+        loadingIcon.centerXAnchor.constraint(equalTo: opaque.centerXAnchor),
+        opaque.heightAnchor.constraint(equalTo: loadingText.heightAnchor, multiplier: 2)
+      ])
+      
+      return instance
+    }()
+    loadingStack.placeInCenter(of: opaque,
+                               widthMultiplier: 0.6)
+        opaque.setNeedsLayout()
+        opaque.layoutIfNeeded()
+    
+    ///Fake icons to animate
+    let fakeLogoIcon: Icon = {
+      let instance = Icon(frame: CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
+                                                                            to: opaque),
+                                        size: logoIcon.bounds.size))
+      instance.iconColor = Colors.main
+      instance.scaleMultiplicator = 1
+      instance.category = .Logo
+      
+      return instance
+    }()
+    let fakeLogoText: Icon = {
+      let instance = Icon(frame: CGRect(origin: logoText.superview!.convert(logoText.frame.origin,
+                                                                            to: opaque),
+                                        size: logoText.bounds.size))
+      
+      instance.iconColor = Colors.main
+      instance.scaleMultiplicator = 1
+      instance.category = .LogoText
+      
+      return instance
+    }()
+
+    opaque.addSubviews([fakeLogoIcon, fakeLogoText])
+    logoIcon.alpha = 0
+    logoText.alpha = 0
+
+    fakeLogoIcon.icon.add(Animations.get(property: .Path,
+                                     fromValue: (fakeLogoIcon.icon as! CAShapeLayer).path as Any,
+                                     toValue: (loadingIcon.icon as! CAShapeLayer).path as Any,
+                                     duration: 0.3,
+                                     delay: 0,
+                                     repeatCount: 0,
+                                     autoreverses: false,
+                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                     delegate: self,
+                                     isRemovedOnCompletion: false,
+                                     completionBlocks: []),
+                      forKey: nil)
+    fakeLogoText.icon.add(Animations.get(property: .Path,
+                                     fromValue: (fakeLogoText.icon as! CAShapeLayer).path as Any,
+                                     toValue: (loadingText.icon as! CAShapeLayer).path as Any,
+                                     duration: 0.3,
+                                     delay: 0,
+                                     repeatCount: 0,
+                                     autoreverses: false,
+                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                     delegate: self,
+                                     isRemovedOnCompletion: false,
+                                     completionBlocks: []),
+                      forKey: nil)
+
+
+
+    UIView.animate(withDuration: 0.6,
+                   delay: 0,
+                   usingSpringWithDamping: 0.7,
+                   initialSpringVelocity: 0.3,
+                   options: [.curveEaseInOut],
+                   animations: { [weak self] in
+      guard let self = self else { return }
+
+      self.subviews.forEach {
+        $0.alpha = 0
+        $0.transform = .init(scaleX: 0.75, y: 0.75)
+      }
+      fakeLogoIcon.frame = CGRect(origin: loadingStack.convert(loadingIcon.frame.origin,
+                                                                      to: opaque),
+                                  size: loadingIcon.bounds.size)
+      fakeLogoText.frame = CGRect(origin: loadingStack.convert(loadingText.frame.origin,
+                                                                      to: opaque),
+                                  size: loadingText.bounds.size)
+
+    }) { _ in
+      loadingIcon.alpha = 1
+      loadingText.alpha = 1
+      fakeLogoText.removeFromSuperview()
+      fakeLogoIcon.removeFromSuperview()
+      completion()
     }
   }
 }
@@ -489,12 +716,17 @@ private extension SignInView {
     passwordTextField.translatesAutoresizingMaskIntoConstraints = false
     logoIcon.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
     loginTextField.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6).isActive = true
-    passwordTextField.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6).isActive = true
+//    passwordTextField.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6).isActive = true
     loginTextField.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: loginTextField.font!) + padding*2).isActive = true
     passwordTextField.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: passwordTextField.font!) + padding*2).isActive = true
     stack.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor).isActive = true
     stack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor).isActive = true
     google.heightAnchor.constraint(equalTo: loginButton.heightAnchor).isActive = true
+    
+    addSubview(forgotButton)
+    forgotButton.translatesAutoresizingMaskIntoConstraints = false
+    forgotButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
+    forgotButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
   }
   
   @objc
@@ -530,6 +762,8 @@ private extension SignInView {
 //      startAuthorizationUI(provider: .Google)
 //      isUserInteractionEnabled = false
       viewInput?.providerSignIn(provider: .VK)
+    } else if sender === appleLogo {
+      viewInput?.providerSignIn(provider: .Apple)
     }
   }
   
@@ -567,6 +801,8 @@ private extension SignInView {
       }
     } else if sender === signupButton {
       viewInput?.signUp()
+    } else if sender == forgotButton {
+      viewInput?.resetPassword()
     }
   }
   
@@ -579,10 +815,10 @@ private extension SignInView {
                   completion: @escaping Closure) {
     isUserInteractionEnabled = true
     
-    guard let blurEffectView = getSubview(type: UIVisualEffectView.self),
+    guard let bgView = getSubview(type: UIView.self, identifier: "bgView"),//let blurEffectView = getSubview(type: UIVisualEffectView.self),
           let fakeLogo = getSubview(type: Icon.self, identifier: "fakeLogo"),
-          let spinner = blurEffectView.contentView.getSubview(type: LoadingIndicator.self),
-          let label = blurEffectView.contentView.getSubview(type: UILabel.self)
+          let spinner = bgView.getSubview(type: LoadingIndicator.self),
+          let label = bgView.getSubview(type: UILabel.self)
     else { return }
     
     fakeLogo.alpha = spinner.logo.alpha
@@ -599,7 +835,7 @@ private extension SignInView {
                      animations: { [weak self] in
         guard let self = self else { return }
         
-        blurEffectView.effect = nil
+        bgView.alpha = 0
         label.alpha = 0
         label.transform = .init(scaleX: 0.75, y: 0.75)
         fakeLogo.alpha = 1
@@ -610,7 +846,7 @@ private extension SignInView {
         guard let self = self else { return }
         
         self.logoIcon.alpha = 1
-        blurEffectView.removeFromSuperview()
+        bgView.removeFromSuperview()
         fakeLogo.removeFromSuperview()
         spinner.removeFromSuperview()
         label.removeFromSuperview()
@@ -620,7 +856,7 @@ private extension SignInView {
     case true:
       let loadingIcon: Icon = {
         let instance = Icon(category: Icon.Category.Logo)
-        instance.iconColor = Colors.Logo.Flame.rawValue
+        instance.iconColor = Colors.main
         instance.scaleMultiplicator = 1.2
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         
@@ -628,7 +864,7 @@ private extension SignInView {
       }()
       let loadingText: Icon = {
         let instance = Icon(category: Icon.Category.LogoText)
-        instance.iconColor = Colors.Logo.Flame.rawValue
+        instance.iconColor = Colors.main
         instance.isRounded = false
         instance.clipsToBounds = false
         instance.scaleMultiplicator = 1.1
@@ -665,10 +901,10 @@ private extension SignInView {
         return instance
       }()
       
-      loadingStack.placeInCenter(of: blurEffectView.contentView,
+      loadingStack.placeInCenter(of: bgView,//blurEffectView.contentView,
                                  widthMultiplier: 0.6)//,
-      blurEffectView.setNeedsLayout()
-      blurEffectView.layoutIfNeeded()
+      bgView.setNeedsLayout()
+      bgView.layoutIfNeeded()
       loadingText.transform = .init(scaleX: 0.5, y: 0.5)
       
       loadingText.icon.add(Animations.get(property: .FillColor,
@@ -721,7 +957,7 @@ private extension SignInView {
         label.transform = .init(scaleX: 0.75, y: 0.75)
         fakeLogo.alpha = 1
         fakeLogo.transform = .identity
-        fakeLogo.frame.origin = loadingStack.convert(loadingIcon.frame.origin, to: blurEffectView.contentView)
+        fakeLogo.frame.origin = loadingStack.convert(loadingIcon.frame.origin, to: bgView)
         fakeLogo.frame.size = loadingIcon.frame.size
         self.stack.alpha = 0
       }) { [weak self] _ in

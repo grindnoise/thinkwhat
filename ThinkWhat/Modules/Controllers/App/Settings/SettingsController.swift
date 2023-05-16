@@ -387,7 +387,7 @@ extension SettingsController: SettingsViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(SurveysController(.Own), animated: true)
+    navigationController?.pushViewController(SurveysController(.Own, color: tintColor), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let main = tabBarController as? MainController else { return }
@@ -466,7 +466,7 @@ extension SettingsController: SettingsViewInput {
   }
   
   func updateCity(_ instance: City) {
-    controllerInput?.saveCity(instance) { _ in  }//Userprofiles.shared.current?.city = instance }//[weak self] _ in
+    controllerInput?.saveCity(instance) { _ in  Userprofiles.shared.current?.city = instance }//[weak self] _ in
 //      Userprofiles.shared.current?.city = instance
       //            guard let self = self else { return }
       //

@@ -92,7 +92,7 @@ extension GetStartedViewController: WelcomeViewInput {
 //            nav.transitionStyle = .Auth
 //            nav.duration = 0.5
 //        }
-        navigationController.pushViewController(SignupViewController(), animated: true)
+//        navigationController.pushViewController(SignupViewController(), animated: true)
     }
 }
 

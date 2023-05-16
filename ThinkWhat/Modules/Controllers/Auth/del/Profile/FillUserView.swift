@@ -543,7 +543,7 @@ extension FillUserView {
                 }
                 guard !logo.isNil, !social.isNil else { return }
                 hyperlinkTF.text = links.filter({ $0.key == social }).values.first ?? ""
-                hyperlinkTF.customRightView = senderView.copyView()!
+                hyperlinkTF.customRightView = try! senderView.copyObject() as! UIView
                 logo.isOpaque = false
                 senderView.alpha = 0
                 scrollContentView.addSubview(logo)

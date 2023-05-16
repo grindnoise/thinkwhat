@@ -60,10 +60,6 @@ class ListView: UIView {
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
-//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleLabel.font)).isActive = true
-//    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleLabel.font))
-//    constraint.identifier = "heightAnchor"
-//    constraint.isActive = true
     
     let opaque = UIView.opaque()
     opaque.backgroundColor = viewInput!.tintColor
@@ -72,31 +68,16 @@ class ListView: UIView {
       .filter { $0 != .zero && opaque.cornerRadius == .zero }
       .sink { opaque.cornerRadius = $0.height/2.25 }
       .store(in: &subscriptions)
-    titleLabel.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
-    
-    let opaque_2 = UIView.opaque()
-    opaque_2.backgroundColor = viewInput!.tintColor
-    opaque_2.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero && opaque.cornerRadius == .zero }
-      .sink { opaque_2.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    periodButton.place(inside: opaque_2, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
-    
-    let stack = UIStackView(arrangedSubviews: [
-      opaque,
-      opaque_2
-    ])
-    stack.axis = .horizontal
-    stack.spacing = 4
-    
-    instance.addSubview(stack)
-    stack.translatesAutoresizingMaskIntoConstraints = false
+    periodButton.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
+
+    opaque.backgroundColor = Colors.main
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    instance.addSubview(opaque)
     
     NSLayoutConstraint.activate([
-      stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-      stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-      stack.heightAnchor.constraint(equalTo: instance.heightAnchor),
+      opaque.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+      opaque.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+      opaque.heightAnchor.constraint(equalTo: instance.heightAnchor),
     ])
     
     return instance
@@ -128,7 +109,7 @@ class ListView: UIView {
     instance.imageView?.tintColor = .white
     instance.imageEdgeInsets.left = 4
     instance.semanticContentAttribute = .forceRightToLeft
-    instance.setImage(UIImage(systemName: ("calendar")), for: .normal)
+    instance.setImage(UIImage(systemName: ("chevron.down")), for: .normal)
     
     return instance
   }()
@@ -498,7 +479,7 @@ private extension ListView {
   
   @MainActor
   func setTitle(category: Survey.SurveyCategory, animated: Bool = true) {
-    guard let constraint = titleLabel.getConstraint(identifier: "width") else { return }
+//    guard let constraint = titleLabel.getConstraint(identifier: "width") else { return }
     
     var text = ""
     
@@ -510,63 +491,15 @@ private extension ListView {
     default: print("")
     }
     
-    //        let attrString = NSMutableAttributedString(string: text,
-    //                                                   attributes: [
-    //                                                    .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3) as Any
-    //                                                   ])
-    //        attrString.append(NSAttributedString(string: " " + "per".localized.lowercased() + " ",
-    //                                             attributes: [
-    //                                                .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any
-    //                                             ]))
-    //
-    //        text += " " + "per".localized.lowercased() + " " //+ "publications".localized.lowercased() + " "
-    let constant = text.width(withConstrainedHeight: 100, font: titleLabel.font)
-    setNeedsLayout()
-    
-    guard animated else {
-      //            titleLabel.attributedText = attrString
-      titleLabel.text = text
-      constraint.constant = constant
-      layoutIfNeeded()
-      
-      return
-    }
-    
-    UIView.transition(with: titleLabel,
-                      duration: 0.15,
-                      options: .transitionCrossDissolve) { [weak self] in
-      guard let self = self else { return }
-      
-      constraint.constant = constant
-      self.titleLabel.text = text//titleLabel.attributedText = attrString
-      self.layoutIfNeeded()
-    }
-    
-    let buttonText = "per_\(period.rawValue.lowercased())".localized.lowercased()
-    
-    if #available(iOS 15, *) {
-      if !periodButton.configuration.isNil {
-        periodButton.configuration?.title = buttonText
-      }
-    } else {
-      let attrString = NSMutableAttributedString(string: buttonText,
-                                                 attributes: [
-                                                  NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3) as Any,
-                                                  NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel,
-                                                 ])
-      periodButton.setAttributedTitle(attrString, for: .normal)
-      //            periodButton.setTitle("per_\(period.rawValue.lowercased())".localized.lowercased(), for: .normal)
-      guard let constraint = periodButton.getConstraint(identifier: "width") else { return }
-      
-      setNeedsLayout()
-      UIView.animate(withDuration: 0.15, delay: 0) { [weak self] in
-        guard let self = self else { return }
-        
-        constraint.constant = buttonText.width(withConstrainedHeight: 100,
-                                               font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
-        self.layoutIfNeeded()
-      }
-    }
+    let buttonText = text + ": " + "per_\(period.rawValue.lowercased())".localized.uppercased()
+    let attrString = NSMutableAttributedString(string: buttonText,
+                                               attributes: [
+                                                .font: UIFont(name: Fonts.Bold, size: 18) as Any,
+                                                .foregroundColor: UIColor.white,
+                                               ])
+//    UIView.setAnimationsEnabled(false)
+    periodButton.setAttributedTitle(attrString, for: .normal)
+//    UIView.setAnimationsEnabled(true)
   }
   
   @MainActor
@@ -749,6 +682,10 @@ extension ListView: ListControllerOutput {
   
   func onDataSourceChanged() {
     guard let category = viewInput?.category else { return }
+    
+    if category == .New, period == .AllTime {
+      period = .PerMonth
+    }
     
     setTitle(category: category, animated: true)
     toggleDateFilter(on: true)

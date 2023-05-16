@@ -33,6 +33,7 @@ protocol ProfileCreationControllerInput: AnyObject {
   func updateUserprofile(parameters: [String: Any], image: UIImage?)
   func fetchCity(userprofile: Userprofile, string: String)
   func saveCity(_: City, completion: @escaping (Bool) -> ())
+  func setLocales()
 }
 
 protocol ProfileCreationModelOutput: AnyObject {

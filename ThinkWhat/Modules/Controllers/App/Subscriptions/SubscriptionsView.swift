@@ -105,8 +105,18 @@ class SubscriptionsView: UIView {
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleLabel.font)).isActive = true
-    
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100,
+                                                                 font: UIFont(name: Fonts.Bold, size: 18)!)).isActive = true
+
+//    let opaque = UIView.opaque()
+//    opaque.backgroundColor = viewInput!.tintColor
+//    opaque.publisher(for: \.bounds)
+//      .receive(on: DispatchQueue.main)
+//      .filter { $0 != .zero && opaque.cornerRadius == .zero }
+//      .sink { opaque.cornerRadius = $0.height/2.25 }
+//      .store(in: &subscriptions)
+//    titleLabel.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
+//
     let opaque = UIView.opaque()
     opaque.backgroundColor = viewInput!.tintColor
     opaque.publisher(for: \.bounds)
@@ -114,48 +124,48 @@ class SubscriptionsView: UIView {
       .filter { $0 != .zero && opaque.cornerRadius == .zero }
       .sink { opaque.cornerRadius = $0.height/2.25 }
       .store(in: &subscriptions)
-    titleLabel.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
-    
-    let opaque_2 = UIView.opaque()
-    opaque_2.backgroundColor = viewInput!.tintColor
-    opaque_2.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero && opaque.cornerRadius == .zero }
-      .sink { opaque_2.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    periodButton.place(inside: opaque_2, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
-    
-    let stack = UIStackView(arrangedSubviews: [
-      opaque,
-      opaque_2
-    ])
-    stack.axis = .horizontal
-    stack.spacing = 4
-    
-    instance.addSubview(stack)
-    stack.translatesAutoresizingMaskIntoConstraints = false
+    periodButton.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
+//
+//    let stack = UIStackView(arrangedSubviews: [
+//      opaque,
+//      opaque_2
+//    ])
+//    stack.axis = .horizontal
+//    stack.spacing = 4
+//
+//    instance.addSubview(stack)
+//    stack.translatesAutoresizingMaskIntoConstraints = false
+//
+//    NSLayoutConstraint.activate([
+//      stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+//      stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+//      stack.heightAnchor.constraint(equalTo: instance.heightAnchor),
+//    ])
+    opaque.backgroundColor = Colors.main
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    instance.addSubview(opaque)
     
     NSLayoutConstraint.activate([
-      stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-      stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-      stack.heightAnchor.constraint(equalTo: instance.heightAnchor),
+      opaque.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+      opaque.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+      opaque.heightAnchor.constraint(equalTo: instance.heightAnchor),
     ])
-    
+
     return instance
   }()
-  private lazy var titleLabel: UILabel = {
-    let instance = UILabel()
-    instance.numberOfLines = 1
-    instance.textAlignment = .center
-    instance.numberOfLines = 1
-    instance.textColor = .white
-    instance.text = "publications".localized.uppercased()
-    instance.font = UIFont(name: Fonts.Bold, size: 18)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
-    instance.adjustsFontSizeToFitWidth = true
-    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
-    
-    return instance
-  }()
+//  private lazy var titleLabel: UILabel = {
+//    let instance = UILabel()
+//    instance.numberOfLines = 1
+//    instance.textAlignment = .center
+//    instance.numberOfLines = 1
+//    instance.textColor = .white
+//    instance.text = "publications".localized.uppercased()
+//    instance.font = UIFont(name: Fonts.Bold, size: 18)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
+//    instance.adjustsFontSizeToFitWidth = true
+//    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
+//
+//    return instance
+//  }()
   private lazy var periodButton: UIButton = {
     let instance = UIButton()
     instance.titleLabel?.numberOfLines = 1
@@ -164,7 +174,7 @@ class SubscriptionsView: UIView {
     instance.imageView?.tintColor = .white
     instance.imageEdgeInsets.left = 4
     instance.semanticContentAttribute = .forceRightToLeft
-    instance.setImage(UIImage(systemName: ("calendar")), for: .normal)
+    instance.setImage(UIImage(systemName: ("chevron.down")), for: .normal)
     
     return instance
   }()
@@ -729,9 +739,10 @@ class SubscriptionsView: UIView {
       periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     } else {
 //      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      let attrString_1 = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
-        NSAttributedString.Key.foregroundColor: Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
+      let attrString_1 = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(),
+                                                   attributes: [
+                                                    .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+                                                    .foregroundColor: Colors.main
       ])
       profileButton.setAttributedTitle(attrString_1, for: .normal)
     }
@@ -1087,7 +1098,7 @@ private extension SubscriptionsView {
     
     periodButton.menu = prepareMenu()
     
-    let buttonText = "per_\(period.rawValue.lowercased())".localized.uppercased()
+    let buttonText = "publications".localized.uppercased() + ": " + "per_\(period.rawValue.lowercased())".localized.uppercased()
     
 //    if #available(iOS 15, *) {
 //      if !periodButton.configuration.isNil {

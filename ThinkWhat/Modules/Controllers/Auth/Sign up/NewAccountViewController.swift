@@ -21,7 +21,7 @@ class NewAccountViewController: UIViewController {
                                                                      padding: 4,
                                                                      color: Colors.main,
                                                                      font: UIFont(name: Fonts.Bold, size: 20)!,
-                                                                     iconCategory: .Rocket) }()
+                                                                     iconCategory: .Logo) }()
   
   
   
@@ -92,9 +92,9 @@ extension NewAccountViewController: NewAccountViewInput {
   func sendVerificationCode(_ completion: @escaping (Result<[String : Any], Error>) -> ()) {
     Task {
       do {
-        let data = try await API.shared.auth.getEmailConfirmationCode()
+        let dict = try await API.shared.auth.sendEmailVerificationCode()
         await MainActor.run {
-          completion(.success(JSON(data).dictionaryObject!))
+          completion(.success(dict))
         }
       } catch {
         completion(.failure(error))
@@ -165,8 +165,19 @@ private extension NewAccountViewController {
       .sink { [weak self] name in
         guard let self = self else { return }
         
-        API.shared.isUsernameEmailAvailable(email: "", username: name.lowercased()) {
-          self.controllerOutput?.nameCheckerCallback(result: $0)
+        
+        Task {
+          do {
+            let response = try await API.shared.auth.checkUsernameAvailibilty(name)
+            
+            await MainActor.run {
+              self.controllerOutput?.nameCheckerCallback(result: .success(response))
+            }
+          } catch {
+            await MainActor.run {
+              self.controllerOutput?.nameCheckerCallback(result: .failure(error))
+            }
+          }
         }
       }
       .store(in: &subscriptions)
@@ -176,8 +187,18 @@ private extension NewAccountViewController {
       .sink { [weak self] mail in
         guard let self = self else { return }
         
-        API.shared.isUsernameEmailAvailable(email: mail, username: "") {
-          self.controllerOutput?.mailCheckerCallback(result: $0)
+        Task {
+          do {
+            let response = try await API.shared.auth.checkEmailAvailibilty(mail)
+            
+            await MainActor.run {
+              self.controllerOutput?.mailCheckerCallback(result: .success(response))
+            }
+          } catch {
+            await MainActor.run {
+              self.controllerOutput?.mailCheckerCallback(result: .failure(error))
+            }
+          }
         }
       }
       .store(in: &subscriptions)

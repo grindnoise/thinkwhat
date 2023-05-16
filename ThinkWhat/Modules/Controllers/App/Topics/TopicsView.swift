@@ -43,7 +43,6 @@ class TopicsView: UIView {
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleLabel.font)).isActive = true
     
     let opaque = UIView.opaque()
     opaque.backgroundColor = viewInput!.tintColor
@@ -52,31 +51,16 @@ class TopicsView: UIView {
       .filter { $0 != .zero && opaque.cornerRadius == .zero }
       .sink { opaque.cornerRadius = $0.height/2.25 }
       .store(in: &subscriptions)
-    titleLabel.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
-    
-    let opaque_2 = UIView.opaque()
-    opaque_2.backgroundColor = viewInput!.tintColor
-    opaque_2.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero && opaque.cornerRadius == .zero }
-      .sink { opaque_2.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    periodButton.place(inside: opaque_2, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
-    
-    let stack = UIStackView(arrangedSubviews: [
-      opaque,
-      opaque_2
-    ])
-    stack.axis = .horizontal
-    stack.spacing = 4
-    
-    instance.addSubview(stack)
-    stack.translatesAutoresizingMaskIntoConstraints = false
+    periodButton.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
+
+    opaque.backgroundColor = Colors.main
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    instance.addSubview(opaque)
     
     NSLayoutConstraint.activate([
-      stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-      stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-      stack.heightAnchor.constraint(equalTo: instance.heightAnchor),
+      opaque.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
+      opaque.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
+      opaque.heightAnchor.constraint(equalTo: instance.heightAnchor),
     ])
     
     return instance
@@ -102,7 +86,7 @@ class TopicsView: UIView {
     instance.imageView?.tintColor = .white
     instance.imageEdgeInsets.left = 4
     instance.semanticContentAttribute = .forceRightToLeft
-    instance.setImage(UIImage(systemName: ("calendar")), for: .normal)
+    instance.setImage(UIImage(systemName: ("chevron.down")), for: .normal)
     
     return instance
   }()
@@ -372,12 +356,9 @@ class TopicsView: UIView {
   private lazy var filterViewHeight: CGFloat = .zero
   private var color = UIColor.clear {
     didSet {
-      guard let opaque_1 = titleLabel.superview,
-            let opaque_2 = periodButton.superview
-      else { return }
+      guard let opaque = periodButton.superview else { return }
       
-      opaque_1.backgroundColor = color
-      opaque_2.backgroundColor = color
+      opaque.backgroundColor = color
     }
   }
   ///**Logic**
@@ -719,7 +700,7 @@ private extension TopicsView {
   @MainActor
   func updatePeriodButton() {
     periodButton.menu = prepareMenu()
-    let buttonText = "per_\(period.rawValue.lowercased())".localized.uppercased()
+    let buttonText = "publications".localized.uppercased() + ": " +  "per_\(period.rawValue.lowercased())".localized.uppercased()
     let attrString = NSMutableAttributedString(string: buttonText,
                                                attributes: [
                                                 .font: UIFont(name: Fonts.Bold, size: 18) as Any,

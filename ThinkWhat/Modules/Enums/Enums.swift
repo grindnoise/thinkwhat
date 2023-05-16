@@ -13,38 +13,38 @@ enum EditingMode { case ReadOnly, Write }
 
 //Open side app or embedded html
 enum SideAppPreference: String {
-    case Embedded = "embedded"
-    case App = "app"
+  case Embedded = "embedded"
+  case App = "app"
 }
 
 enum ImageType: String {
-    case Profile = "profile"
-    case Survey  = "survey"
+  case Profile = "profile"
+  case Survey  = "survey"
 }
 
 enum Language: String {
-    case English = "English"
-    case Russian = "Русский"
+  case English = "English"
+  case Russian = "Русский"
 }
 
 enum FileFormat: String, CaseIterable {
-    case PNG        = "png"
-    case JPEG       = "jpg"
-    case TIFF       = "tiff"
-    case GIF        = "gif"
-    case Unknown    = "thinkwhat"
-    
-    static func fromString(_ string: String) -> Self {
-        for value in Self.allCases {
-            guard string.lowercased() == value.rawValue else { continue }
-            return value
-        }
-        return .Unknown
+  case PNG        = "png"
+  case JPEG       = "jpg"
+  case TIFF       = "tiff"
+  case GIF        = "gif"
+  case Unknown    = "thinkwhat"
+  
+  static func fromString(_ string: String) -> Self {
+    for value in Self.allCases {
+      guard string.lowercased() == value.rawValue else { continue }
+      return value
     }
+    return .Unknown
+  }
 }
 
 enum State {
-    case enabled, disabled
+  case enabled, disabled
 }
 
 //enum TokenState {
@@ -59,98 +59,99 @@ enum State {
 //}
 
 enum ApiReachabilityState {
-    case Reachable, None
+  case Reachable, None
 }
 
 enum SessionType: String {
-    case authorized     = "authorized"
-    case unauthorized   = "unauthorized"
+  case authorized     = "authorized"
+  case unauthorized   = "unauthorized"
 }
 
 enum Gender: String, CaseIterable {
-    case Male           = "Male"
-    case Female         = "Female"
-    case Unassigned     = "all_genders"
+  case Male           = "Male"
+  case Female         = "Female"
+  case Unassigned     = "all_genders"
 }
 
 enum InternetConnection {
-    case Available
-    case None
+  case Available
+  case None
 }
 
 enum AuthProvider: String {
-    case VK         = "vk-oauth2"
-    case Facebook   = "Facebook"
-    case Google     = "google-oauth2"
-    case Phone      = "Phone"
-    case Mail       = "Mail"
-    case Username   = "Username"
+  case VK         = "vk-oauth2"
+  case Facebook   = "Facebook"
+  case Apple   = "apple-id"
+  case Google     = "google-oauth2"
+  case Phone      = "Phone"
+  case Mail       = "Mail"
+  case Username   = "Username"
 }
 
 enum SocialMedia: String {
-    case VK, Facebook, TikTok, Instagram, Twitter
+  case VK, Facebook, TikTok, Instagram, Twitter
 }
 
 enum ThirdPartyApp: String {
-    case TikTok     = "TikTok"
-    case Youtube    = "Youtube"
-    case Null       = ""
-    
-    func logo() -> UIView {
-      var instance = UIView()
-      switch self {
-      case .Youtube:
-        instance = YoutubeLogo()
-      case .TikTok:
-        instance = TikTokLogo()
-      default:
-        return UIView()
-      }
-      instance.isOpaque = false
-      
-      return instance
+  case TikTok     = "TikTok"
+  case Youtube    = "Youtube"
+  case Null       = ""
+  
+  func logo() -> UIView {
+    var instance = UIView()
+    switch self {
+    case .Youtube:
+      instance = YoutubeLogo()
+    case .TikTok:
+      instance = TikTokLogo()
+    default:
+      return UIView()
     }
+    instance.isOpaque = false
+    
+    return instance
+  }
 }
 
 enum ClientSettingsMode {
-    case Reminder, Language
+  case Reminder, Language
 }
 
 //Tab bar items
 enum Tab {
-    case Hot, Subscriptions, Feed, Topics, Settings
+  case Hot, Subscriptions, Feed, Topics, Settings
 }
 
 enum AppSettings: Hashable {
-    case notifications(Notifications)
-    case languages(Languages)
-    
-    enum Notifications: String {
-//            case Allow = "allow_push_notifications"
-        case Completed = "NOTIFICATIONS_OWN_COMPLETED"
-        case Subscriptions = "NOTIFICATIONS_WATCHLIST_COMPLETED"
-        case Watchlist = "NOTIFICATIONS_NEW_SUBSCRIPTIONS"
+  case notifications(Notifications)
+  case languages(Languages)
+  
+  enum Notifications: String {
+    //            case Allow = "allow_push_notifications"
+    case Completed = "NOTIFICATIONS_OWN_COMPLETED"
+    case Subscriptions = "NOTIFICATIONS_WATCHLIST_COMPLETED"
+    case Watchlist = "NOTIFICATIONS_NEW_SUBSCRIPTIONS"
+  }
+  
+  enum Languages: String {
+    case App = "default_locale"
+    case Content = "locales"
+  }
+  
+  public var identifier: String {
+    switch self {
+    case .notifications(.Completed):
+      return Notifications.Completed.rawValue
+    case .notifications(.Subscriptions):
+      return Notifications.Subscriptions.rawValue
+    case .notifications(.Watchlist):
+      return Notifications.Watchlist.rawValue
+    case .languages(.App):
+      return Languages.App.rawValue
+    case .languages(.Content):
+      return Languages.Content.rawValue
     }
-    
-    enum Languages: String {
-        case App = "default_locale"
-        case Content = "locales"
-    }
-
-    public var identifier: String {
-        switch self {
-        case .notifications(.Completed):
-            return Notifications.Completed.rawValue
-        case .notifications(.Subscriptions):
-            return Notifications.Subscriptions.rawValue
-        case .notifications(.Watchlist):
-            return Notifications.Watchlist.rawValue
-        case .languages(.App):
-            return Languages.App.rawValue
-        case .languages(.Content):
-            return Languages.Content.rawValue
-        }
-    }
+  }
 }
 
 //struct AppSettings: Hashable {
@@ -161,36 +162,36 @@ enum AppSettings: Hashable {
 //    }
 //}
 enum ButtonState: String {
-    case Send = "sendButton"
-    case Sending = "sending"
-    case Close = "continueButton"
-    case Back = "back"
+  case Send = "sendButton"
+  case Sending = "sending"
+  case Close = "continueButton"
+  case Back = "back"
 }
 
 enum UserprofilesViewMode: String {
-    case Subscribers, Subscriptions, Voters
+  case Subscribers, Subscriptions, Voters
 }
 
 enum Period: String {
-//    case PerDay     = "per_day"
-//    case PerWeek    = "per_week"
-//    case PerMonth   = "per_month"
-//    case AllTime    = "all_time"
-    case PerDay     = "day"
-    case PerWeek    = "week"
-    case PerMonth   = "month"
-    case AllTime    = "all_time"
-    
-    func date() -> Date? {
-        switch self {
-        case .PerDay:
-            return Calendar.current.date(byAdding: .day, value: -1, to: Date())
-        case .PerWeek:
-            return Calendar.current.date(byAdding: .day, value: -7, to: Date())
-        case .PerMonth:
-            return Calendar.current.date(byAdding: .month, value: -1, to: Date())
-        case .AllTime:
-            return Calendar.current.date(byAdding: .year, value: -999, to: Date())
-        }
+  //    case PerDay     = "per_day"
+  //    case PerWeek    = "per_week"
+  //    case PerMonth   = "per_month"
+  //    case AllTime    = "all_time"
+  case PerDay     = "day"
+  case PerWeek    = "week"
+  case PerMonth   = "month"
+  case AllTime    = "all_time"
+  
+  func date() -> Date? {
+    switch self {
+    case .PerDay:
+      return Calendar.current.date(byAdding: .day, value: -1, to: Date())
+    case .PerWeek:
+      return Calendar.current.date(byAdding: .day, value: -7, to: Date())
+    case .PerMonth:
+      return Calendar.current.date(byAdding: .month, value: -1, to: Date())
+    case .AllTime:
+      return Calendar.current.date(byAdding: .year, value: -999, to: Date())
     }
+  }
 }

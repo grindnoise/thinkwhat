@@ -111,6 +111,7 @@ class SurveysController: UIViewController, TintColorable {
       instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
       instance.backgroundColor = tintColor
     case .Own:
+      topicTitle.insets.left = 8
       topicTitle.text = "my_publications".localized.uppercased()
       instance = UIStackView(arrangedSubviews: [ topicTitle ])
       instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true

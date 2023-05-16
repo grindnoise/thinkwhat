@@ -9,6 +9,31 @@
 import UIKit
 
 extension UIView {
+  
+//  func copyView<T: UIView>() -> T? {
+//    //    do {
+//    //      return try NSKeyedUnarchiver.unarchivedObject(ofClass: T.self, from: try! NSKeyedArchiver.archivedData(withRootObject: self, requiringSecureCoding: false))
+//    //    } catch {
+//    //      return nil
+//    //    }
+//    //    return NSKeyedUnarchiver.unarchiveObject(ofClass: <T>, from: NSKeyedArchiver.archivedData(withRootObject: self)) as? T
+//    do {
+//      return try NSKeyedUnarchiver.unarchivedObject(ofClass: T.self,
+//                                                    from: try! NSKeyedArchiver.archivedData(withRootObject: self,
+//                                                                                            requiringSecureCoding: false))
+//    } catch {
+//      return nil
+//    }
+//    //    return NSKeyedUnarchiver.unarchiveObject(with: NSKeyedArchiver.archivedData(withRootObject: self)) as? T
+//  }
+  
+  func makeScreenshot() -> UIImage {
+    let renderer = UIGraphicsImageRenderer(bounds: self.bounds)
+    return renderer.image { (context) in
+      self.layer.render(in: context.cgContext)
+    }
+  }
+  
   var parentController: UIViewController? {
     if let nextResponder = self.next as? UIViewController {
       return nextResponder

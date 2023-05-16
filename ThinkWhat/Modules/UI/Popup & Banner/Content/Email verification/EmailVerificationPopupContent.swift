@@ -297,7 +297,7 @@ class EmailVerificationPopupContent: UIView {
     
     setupUI()
     
-    textField_1.becomeFirstResponder()
+//    textField_1.becomeFirstResponder()
   }
   
   required init?(coder: NSCoder) {

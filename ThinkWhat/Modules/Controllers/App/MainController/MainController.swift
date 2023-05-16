@@ -46,7 +46,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
   private var logoCenterY: CGFloat = .zero
   private lazy var loadingIcon: Icon = {
     let instance = Icon(category: Icon.Category.Logo)
-    instance.iconColor = Colors.Logo.Flame.rawValue
+    instance.iconColor = Colors.main//.Logo.Flame.rawValue
     instance.scaleMultiplicator = 1.2
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     
@@ -54,7 +54,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
   }()
   private lazy var loadingText: Icon = {
     let instance = Icon(category: Icon.Category.LogoText)
-    instance.iconColor = Colors.Logo.Flame.rawValue
+    instance.iconColor = Colors.main//.Logo.Flame.rawValue
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1.1
@@ -92,7 +92,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
   //    private var apiUnavailableView: APIUnavailableView?
   private lazy var logoIcon: Icon = {
     let instance = Icon(category: Icon.Category.Logo)
-    instance.iconColor = Colors.Logo.Flame.rawValue
+    instance.iconColor = Colors.main//.Logo.Flame.rawValue
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1.2
@@ -102,7 +102,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
   }()
   private lazy var logoText: Icon = {
     let instance = Icon(category: Icon.Category.LogoText)
-    instance.iconColor = Colors.Logo.Flame.rawValue
+    instance.iconColor = Colors.main//.Logo.Flame.rawValue
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1.1
@@ -457,10 +457,31 @@ private extension MainController {
 
     ///Subscription push notifications
     userprofile.notificationPublisher
+      .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
       .receive(on: DispatchQueue.main)
       .sink {
-        let banner = NewBanner(contentView: UserBannerContentView(mode: $0 ? .NotifyOnPublication : .DontNotifyOnPublication,
-                                                                  userprofile: userprofile),
+        guard let user = $0.keys.first,
+              let notify = $0.values.first
+        else { return }
+        
+        let banner = NewBanner(contentView: UserBannerContentView(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication,
+                                                                  userprofile: user),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 1)
+        banner.didDisappearPublisher
+          .sink { _ in banner.removeFromSuperview() }
+          .store(in: &self.subscriptions)
+      }
+      .store(in: &subscriptions)
+    
+    Userprofiles.shared.newSubscriptionPublisher
+      .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in
+        let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
+                                                                  userprofile: $0),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
@@ -471,21 +492,12 @@ private extension MainController {
       }
       .store(in: &subscriptions)
 
-    userprofile.subscriptionsPublisher
-      .filter { !$0.isEmpty }
-      .first()
+    Userprofiles.shared.removeSubscriptionPublisher
+      .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
       .receive(on: DispatchQueue.main)
-      .sink(receiveCompletion: {
-        if case .failure(let error) = $0 {
-#if DEBUG
-          print(error)
-#endif
-        }
-      }, receiveValue: { [unowned self] in
-        guard let new = $0.first else { return }
-
-        let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
-                                                                    userprofile: new),
+      .sink { [unowned self] in
+        let banner = NewBanner(contentView: UserBannerContentView(mode: .Unsubscribe,
+                                                                  userprofile: $0),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
@@ -493,33 +505,57 @@ private extension MainController {
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
-      })
+      }
       .store(in: &subscriptions)
+//    userprofile.subscriptionsPublisher
+//      .filter { !$0.isEmpty }
+//      .first()
+//      .receive(on: DispatchQueue.main)
+//      .sink(receiveCompletion: {
+//        if case .failure(let error) = $0 {
+//#if DEBUG
+//          print(error)
+//#endif
+//        }
+//      }, receiveValue: { [unowned self] in
+//        guard let new = $0.first else { return }
+//
+//        let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
+//                                                                    userprofile: new),
+//                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                               isModal: false,
+//                               useContentViewHeight: true,
+//                               shouldDismissAfter: 1)
+//        banner.didDisappearPublisher
+//          .sink { _ in banner.removeFromSuperview() }
+//          .store(in: &self.subscriptions)
+//      })
+//      .store(in: &subscriptions)
 
-    userprofile.subscriptionsRemovePublisher
-      .filter { !$0.isEmpty }
-      .first()
-      .receive(on: DispatchQueue.main)
-      .sink(receiveCompletion: {
-        if case .failure(let error) = $0 {
-#if DEBUG
-          print(error)
-#endif
-        }
-      }, receiveValue: { [unowned self] in
-        guard let new = $0.first else { return }
-
-        let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
-                                                                    userprofile: new),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 1)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
-          .store(in: &self.subscriptions)
-      })
-      .store(in: &subscriptions)
+//    userprofile.subscriptionsRemovePublisher
+//      .filter { !$0.isEmpty }
+//      .first()
+//      .receive(on: DispatchQueue.main)
+//      .sink(receiveCompletion: {
+//        if case .failure(let error) = $0 {
+//#if DEBUG
+//          print(error)
+//#endif
+//        }
+//      }, receiveValue: { [unowned self] in
+//        guard let new = $0.first else { return }
+//
+//        let banner = NewBanner(contentView: UserBannerContentView(mode: .Unsubscribe,
+//                                                                    userprofile: new),
+//                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                               isModal: false,
+//                               useContentViewHeight: true,
+//                               shouldDismissAfter: 1)
+//        banner.didDisappearPublisher
+//          .sink { _ in banner.removeFromSuperview() }
+//          .store(in: &self.subscriptions)
+//      })
+//      .store(in: &subscriptions)
 
     
     ///Notify when survey is marked favorite
@@ -660,24 +696,24 @@ private extension MainController {
                                  title: "hot",
                                  image: UIImage(systemName: "flame"),
                                  selectedImage: UIImage(systemName: "flame.fill"),
-                                 color: Colors.Logo.Flame.rawValue),
+                                 color: Colors.main),//Logo.Flame.rawValue),
       createNavigationController(for: SubscriptionsController(),
                                  title: "subscriptions",
                                  image: UIImage(systemName: "bell"),
                                  selectedImage: UIImage(systemName: "bell.fill"),
-                                 color: Colors.Logo.CoolGray.rawValue),
+                                 color: Colors.main),//Colors.Logo.CoolGray.rawValue),
       createNavigationController(for: ListController(), title: "list",
                                  image: UIImage(systemName: "square.stack.3d.up"),
                                  selectedImage: UIImage(systemName: "square.stack.3d.up.fill"),
-                                 color: Colors.Logo.GreenMunshell.rawValue),
+                                 color: Colors.main),//Colors.Logo.GreenMunshell.rawValue),
       createNavigationController(for: TopicsController(), title: "topics",
                                  image: UIImage(systemName: "chart.bar.doc.horizontal"),
                                  selectedImage: UIImage(systemName: "chart.bar.doc.horizontal.fill"),
-                                 color: Colors.Logo.Marigold.rawValue),
+                                 color: Colors.main),//Colors.Logo.Marigold.rawValue),
       createNavigationController(for: SettingsController(), title: "settings",
                                  image: UIImage(systemName: "gearshape"),
                                  selectedImage: UIImage(systemName: "gearshape.fill"),
-                                 color: Colors.Logo.AirBlue.rawValue),
+                                 color: Colors.main),//Colors.Logo.AirBlue.rawValue),
     ]
   }
   
@@ -688,7 +724,7 @@ private extension MainController {
 //    tabBarController?.view.backgroundColor = .white
     view.isUserInteractionEnabled = false
     tabBar.backgroundColor = .systemBackground
-    tabBar.tintColor = Colors.Logo.Flame.rawValue
+    tabBar.tintColor = Colors.main//.Logo.Flame.rawValue
     tabBar.shadowImage = UIImage()
     tabBar.backgroundImage = UIImage()
     tabBar.clipsToBounds = true
@@ -706,7 +742,7 @@ private extension MainController {
     loadingStack.placeInCenter(of: passthroughView,
                                widthMultiplier: 0.6)//,
 //                               yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-    animateLoaderColor(from: Colors.Logo.Flame, to: Colors.Logo.Flame.next())
+    animateLoaderColor(from: Colors.Logo.Main, to: Colors.Logo.Main.next())
     
             appDelegate.window?.addSubview(passthroughView)
   }
@@ -906,22 +942,25 @@ extension MainController: UITabBarControllerDelegate {
       switch controller.self {
       case is HotController:
         currentTab = .Hot
-        setColors(Colors.Logo.Flame.rawValue)
+        setColors(Colors.main)//.Logo.Flame.rawValue)
         setLogoCentered(animated: true)
         toggleLogo(on: true)
       case is SubscriptionsController:
-        setColors(Colors.Logo.CoolGray.rawValue)
+        setColors(Colors.main)
+//        setColors(Colors.Logo.CoolGray.rawValue)
         let controller = controller as! SubscriptionsController
         controller.isUserSelected ? { setLogoCentered(animated: true) }() : { setLogoLeading(constant: 10, animated: true) }() 
         toggleLogo(on: true)
       case is ListController:
         currentTab = .Feed
-        setColors(Colors.Logo.GreenMunshell.rawValue)
+        setColors(Colors.main)
+//setColors(Colors.Logo.GreenMunshell.rawValue)
         setLogoLeading(constant: 10, animated: true)
         toggleLogo(on: true)
       case is TopicsController:
         currentTab = .Topics
-        setColors(Colors.Logo.Marigold.rawValue)
+        setColors(Colors.main)
+//setColors(Colors.Logo.Marigold.rawValue)
         setLogoCentered(animated: true)
         guard let instance = controller as? TopicsController,
               instance.mode != .Default
@@ -931,7 +970,8 @@ extension MainController: UITabBarControllerDelegate {
         toggleLogo(on: false)
       case is SettingsController:
         currentTab = .Settings
-        setColors(Colors.Logo.AirBlue.rawValue)
+        setColors(Colors.main)
+//setColors(Colors.Logo.AirBlue.rawValue)
         setLogoCentered(animated: true)
         //                setLogoLeading(constant: 10, animated: true)
         toggleLogo(on: true)

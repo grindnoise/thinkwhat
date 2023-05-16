@@ -179,6 +179,7 @@ class Avatar: UIView {
   public lazy var imageView: UIImageView = {
     let instance = UIImageView()
     instance.contentMode = .scaleAspectFill
+    instance.tintColor = .systemGray
     instance.alpha = 0
     instance.accessibilityIdentifier = "imageView"
     instance.layer.masksToBounds = true
@@ -652,7 +653,11 @@ private extension Avatar {
     
     guard let image = userprofile.image else {
       shimmer.startShimmering()
-      userprofile.downloadImage()
+      if !userprofile.imageURL.isNil {
+        userprofile.downloadImage()
+        return
+      }
+      setUserprofileDefaultImage()
       
       return
     }

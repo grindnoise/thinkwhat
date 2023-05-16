@@ -269,13 +269,14 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
       cell.color = self.color
       cell.insets = UIEdgeInsets(top: padding*2, left: padding, bottom: padding*2, right: padding)
       cell.mode = .Settings
-//      cell.publicationsPublisher
-//        .sink { [weak self] in
-//          guard let self = self else { return }
-//          
-//          self.publicationsPublisher.send($0)
-//        }
-//        .store(in: &subscriptions)
+      cell.publicationsPublisher
+//        .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+          
+          self.publicationsPublisher.send(true)
+        }
+        .store(in: &subscriptions)
 //      
 //      cell.commentsPublisher
 //        .sink { [weak self] in

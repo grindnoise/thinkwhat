@@ -206,6 +206,33 @@ private extension HotController {
         self.isOnScreen = true
       }
     })
+    
+//    guard let userprofile = Userprofiles.shared.current else { return }
+//
+//    userprofile.subscriptionsPublisher
+//      .filter { !$0.isEmpty }
+//      .first()
+//      .receive(on: DispatchQueue.main)
+//      .sink(receiveCompletion: {
+//        if case .failure(let error) = $0 {
+//#if DEBUG
+//          print(error)
+//#endif
+//        }
+//      }, receiveValue: { [unowned self] in
+//        guard let new = $0.first else { return }
+//
+//        let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
+//                                                                    userprofile: new),
+//                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                               isModal: false,
+//                               useContentViewHeight: true,
+//                               shouldDismissAfter: 1)
+//        banner.didDisappearPublisher
+//          .sink { _ in banner.removeFromSuperview() }
+//          .store(in: &self.subscriptions)
+//      })
+//      .store(in: &subscriptions)
   }
   
   func setData() {

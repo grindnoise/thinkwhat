@@ -58,11 +58,12 @@ extension RecoverAccontViewController: RecoverModelOutput {
 //            ImageSigns.envelope.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemGreen
 //            banner.present(content: PlainBannerContent(text: "success".localized, imageContent: ImageSigns.envelope, color: .systemGreen), isModal: false, dismissAfter: 1.5)
         case .failure(let error):
-            var errorDescription = ""
-            if error.localizedDescription.contains("find an account associated with that email") {
-                errorDescription = "email_not_found"
-            }
-            showBanner(bannerDelegate: self, text: "errorDescription".localized, content: PlainBannerContent(text: "errorDescription".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, dismissAfter: 1.5)
+          print(error.localizedDescription)
+//            var errorDescription = ""
+//            if error.localizedDescription.contains("find an account associated with that email") {
+//                errorDescription = "email_not_found"
+//            }
+//            showBanner(bannerDelegate: self, text: "errorDescription".localized, content: PlainBannerContent(text: "errorDescription".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, dismissAfter: 1.5)
             
 //            let banner = Banner(frame: UIScreen.main.bounds, callbackDelegate: nil, bannerDelegate: self)
 //            banner.present(content: PlainBannerContent(text: "errorDescription".localized, imageContent: ImageSigns.envelope, color: .systemRed), isModal: false, dismissAfter: 1.5)

@@ -13,14 +13,14 @@ class StartView: UIView {
   
   // MARK: - Public properties
   public private(set) lazy var logoText: Icon = {
-    let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
+    let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.main)
     instance.alpha = 0
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
     
     return instance
   }()
   public private(set) lazy var logoIcon: Icon = {
-    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
+    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.main)
     instance.alpha = 0
     
     return instance
@@ -45,7 +45,7 @@ class StartView: UIView {
       var config = UIButton.Configuration.filled()
       config.cornerStyle = .small
       config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
-      config.baseBackgroundColor = Colors.Logo.Flame.rawValue
+      config.baseBackgroundColor = Colors.main
       config.contentInsets.top = padding
       config.contentInsets.bottom = padding
       config.contentInsets.leading = 20

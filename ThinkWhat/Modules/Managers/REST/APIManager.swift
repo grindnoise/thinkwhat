@@ -83,7 +83,7 @@ class API {
                              instagramURL: String? = nil,
                              locale: String? = nil) -> [String: Any] {
     
-    var parameters = [String: Any]()
+    var parameters: Parameters = ["is_edited": true]
     if !firstName.isNil || !lastName.isNil || !email.isNil {
       var dict: [String: Any] = [:]
       if let firstName = firstName, !firstName.isEmpty {
@@ -344,31 +344,16 @@ class API {
 //    }
 //  }
   
-  func isUsernameEmailAvailable(email: String, username: String, completion: @escaping(Result<Bool, Error>)->()) {
-    self.request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(email.isEmpty ? API_URLS.USERNAME_EXISTS : API_URLS.EMAIL_EXISTS),
-                 httpMethod: .get,
-                 parameters: email.isEmpty ? ["username": username] : ["email": email],
-                 encoding: URLEncoding.default,
-                 accessControl: false) { result in
-      switch result {
-      case .success(let json):
-        completion(.success(json["exists"].boolValue))
-      case .failure(let error):
-        completion(.failure(error))
-      }
-    }
-  }
-  
-  func getEmailVerification(completion: @escaping (Result<Bool, Error>) -> ()) {
-    request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.GET_EMAIL_VERIFIED), httpMethod: .get) { result in
-      switch result {
-      case .success(let json):
-        completion(.success(json[DjangoVariables.UserProfile.isEmailVerified].boolValue))
-      case .failure(let error):
-        completion(.failure(error))
-      }
-    }
-  }
+//  func getEmailVerification(completion: @escaping (Result<Bool, Error>) -> ()) {
+//    request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.GET_EMAIL_VERIFIED), httpMethod: .get) { result in
+//      switch result {
+//      case .success(let json):
+//        completion(.success(json[DjangoVariables.UserProfile.isEmailVerified].boolValue))
+//      case .failure(let error):
+//        completion(.failure(error))
+//      }
+//    }
+//  }
   
   func initialLoad(completion: @escaping(Result<JSON,Error>)->()) {
     guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.APP_LAUNCH) else { completion(.failure(APIError.invalidURL)); return }
@@ -451,6 +436,115 @@ class API {
       return parent.headers()
     }
     
+    ///**Async**
+    ///Email auhorization. Stores access token if finished successful
+    public func loginAsync(username: String,
+                           password: String) async throws  {
+      guard let url = API_URLS.Auth.token else { fatalError(APIError.invalidURL.localizedDescription) }
+      
+      let parameters = [
+        "client_id": API_URLS.CLIENT_ID,
+        "client_secret": API_URLS.CLIENT_SECRET,
+        "grant_type": "password", "username": "\(username)",
+        "password": "\(password)"
+      ]
+
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: URLEncoding(),
+                                                 accessControl: false)
+        let json = try JSON(data: data, options: .mutableContainers)
+        let _ = saveTokenInKeychain(json: json)
+      } catch let error {
+        throw error
+      }
+    }
+    
+    public func loginViaProviderAsync(provider: AuthProvider,
+                                      token: String) async throws  {
+      guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { throw APIError.invalidURL }
+      let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
+      do {
+        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding(), accessControl: false)
+        let json = try JSON(data: data, options: .mutableContainers)
+        let _ = saveTokenInKeychain(json: json)
+      } catch let error {
+        throw error
+      }
+    }
+    
+    public func signupAsync(email: String,
+                            password: String,
+                            username: String) async throws {
+      guard let url = API_URLS.Auth.signUp else { throw APIError.invalidURL.localizedDescription }
+      
+      let parameters = ["client_id": API_URLS.CLIENT_ID,
+                        "grant_type": "password",
+                        "email": "\(email)",
+                        "password": "\(password)",
+                        "username": "\(username)"]
+      
+      do {
+        try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding(), accessControl: false)
+      } catch {
+        throw error
+      }
+    }
+    
+    public func sendEmailVerificationCode() async throws -> Parameters {
+      guard let url = API_URLS.Auth.getCodeViaMail else { fatalError(APIError.invalidURL.localizedDescription) }
+      
+      let data = try await parent.requestAsync(url: url,
+                                           httpMethod: .get,
+                                           parameters: nil,
+                                           encoding: URLEncoding.default,
+                                           headers: parent.headers(),
+                                           accessControl: false)
+      guard let dict = JSON(data).dictionaryObject else { throw AppError.server }
+      
+      return dict
+      
+//      self.request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.GET_CONFIRMATION_CODE), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
+    }
+    
+    public func checkEmailAvailibilty(_ email: String) async throws -> Bool {
+      guard let url = API_URLS.Auth.emailExists else { fatalError(APIError.invalidURL.localizedDescription) }
+      
+      let data = try await parent.requestAsync(url: url,
+                                           httpMethod: .get,
+                                           parameters: ["email": email],
+                                           encoding: URLEncoding.default,
+                                           accessControl: false)
+      
+      do {
+        let json = try JSON(data: data, options: .mutableContainers)
+        return json["exists"].boolValue
+      } catch {
+        throw AppError.server
+      }
+    }
+    
+    public func checkUsernameAvailibilty(_ username: String) async throws -> Bool {
+      guard let url = API_URLS.Auth.usernameExists else { fatalError(APIError.invalidURL.localizedDescription) }
+      
+      let data =  try await parent.requestAsync(url: url,
+                                                httpMethod: .get,
+                                                parameters: ["username": username],
+                                                encoding: URLEncoding.default,
+                                                accessControl: false)
+      
+      do {
+        let json = try JSON(data: data, options: .mutableContainers)
+        return json["exists"].boolValue
+      } catch {
+        throw AppError.server
+      }
+    }
+    
+    
+    ///**Callbacks**
     public func loginViaMail(username: String, password: String, completion: @escaping (Result<Bool, Error>) -> ()) {
       guard let url = API_URLS.Auth.token else { return completion(.failure(APIError.invalidURL)) }
 
@@ -516,73 +610,6 @@ class API {
       }
     }
     
-    ///Email/username auhorization. Store access token if finished successful
-    public func loginAsync(username: String, password: String) async throws  {
-      guard let url = API_URLS.Auth.token else { fatalError(APIError.invalidURL.localizedDescription) }
-      
-      let parameters = [
-        "client_id": API_URLS.CLIENT_ID,
-        "client_secret": API_URLS.CLIENT_SECRET,
-        "grant_type": "password", "username": "\(username)",
-        "password": "\(password)"
-      ]
-
-      do {
-        let data = try await parent.requestAsync(url: url,
-                                                 httpMethod: .post,
-                                                 parameters: parameters,
-                                                 encoding: URLEncoding(),
-                                                 accessControl: false)
-        let json = try JSON(data: data, options: .mutableContainers)
-        let _ = saveTokenInKeychain(json: json)
-      } catch let error {
-        throw error
-      }
-    }
-    
-    ///Third-party auhorization. Store access token if finished successful
-    public func loginViaProvider(provider: AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-      guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { completion(.failure(APIError.invalidURL)); return }
-      let parameters = ["client_id": API_URLS.CLIENT_ID,
-                        "client_secret": API_URLS.CLIENT_SECRET,
-                        "grant_type": "convert_token",
-                        "backend": "\(provider.rawValue.lowercased())",
-                        "token": "\(token)"]
-      self.parent.sessionManager.request(url,
-                                         method: .post,
-                                         parameters: parameters,
-                                         encoding: URLEncoding(),
-                                         headers: nil).response { response in
-        switch response.result {
-        case .success(let value):
-          guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
-          guard let data = value else { completion(.failure(APIError.badData)); return }
-          do {
-            //TODO: Определиться с инициализацией JSON
-            let json = try JSON(data: data, options: .mutableContainers)
-            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: json.rawString()))); return }
-            completion(saveTokenInKeychain(json: json))
-          } catch let error {
-            completion(.failure(error))
-          }
-        case let .failure(error):
-          completion(.failure(error))
-        }
-      }
-    }
-    
-    public func loginViaProviderAsync(provider: AuthProvider, token: String) async throws  {
-      guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { throw APIError.invalidURL }
-      let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
-      do {
-        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding(), accessControl: false)
-        let json = try JSON(data: data, options: .mutableContainers)
-        let _ = saveTokenInKeychain(json: json)
-      } catch let error {
-        throw error
-      }
-    }
-    
     public func logout(completion: @escaping (Result<Bool, Error>) -> ()) {
       guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_REVOKE) else { completion(.failure(APIError.invalidURL)); return }
       guard let token = KeychainService.loadAccessToken() as String?, !token.isEmpty else {
@@ -622,21 +649,35 @@ class API {
       }
     }
     
-    public func signupAsync(email: String,
-                            password: String,
-                            username: String) async throws {
-      guard let url = API_URLS.Auth.signUp else { throw APIError.invalidURL.localizedDescription }
-      
+    ///**OAuth**
+    ///Social media auhorization. Store access token if finished successful
+    public func loginViaProvider(provider: AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
+      guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { completion(.failure(APIError.invalidURL)); return }
       let parameters = ["client_id": API_URLS.CLIENT_ID,
-                        "grant_type": "password",
-                        "email": "\(email)",
-                        "password": "\(password)",
-                        "username": "\(username)"]
-      
-      do {
-        try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding(), accessControl: false)
-      } catch {
-        throw error
+                        "client_secret": API_URLS.CLIENT_SECRET,
+                        "grant_type": "convert_token",
+                        "backend": "\(provider.rawValue.lowercased())",
+                        "token": "\(token)"]
+      self.parent.sessionManager.request(url,
+                                         method: .post,
+                                         parameters: parameters,
+                                         encoding: URLEncoding(),
+                                         headers: nil).response { response in
+        switch response.result {
+        case .success(let value):
+          guard let statusCode = response.response?.statusCode else { completion(.failure(APIError.httpStatusCodeMissing)); return }
+          guard let data = value else { completion(.failure(APIError.badData)); return }
+          do {
+            //TODO: Определиться с инициализацией JSON
+            let json = try JSON(data: data, options: .mutableContainers)
+            guard 200...299 ~= statusCode else { completion(.failure(APIError.backend(code: statusCode, value: json.rawString()))); return }
+            completion(saveTokenInKeychain(json: json))
+          } catch let error {
+            completion(.failure(error))
+          }
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
     }
     
@@ -671,20 +712,6 @@ class API {
           completion(.failure(error))
         }
       }
-    }
-    
-    public func getEmailConfirmationCode() async throws -> Data {
-      guard let url = API_URLS.Auth.getCodeViaMail else { fatalError(APIError.invalidURL.localizedDescription) }
-      
-      return try await parent.requestAsync(url: url,
-                                           httpMethod: .get,
-                                           parameters: nil,
-                                           encoding: URLEncoding.default,
-                                           headers: parent.headers(),
-                                           accessControl: false)
-      
-      
-//      self.request(url: URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.GET_CONFIRMATION_CODE), httpMethod: .get, parameters: nil, encoding: URLEncoding.default) { completion($0) }
     }
   }
   
@@ -858,7 +885,8 @@ class API {
                                                  httpMethod: .post,
                                                  parameters: parameters,
                                                  encoding: URLEncoding.default,
-                                                 headers: nil)
+                                                 headers: nil,
+                                                 accessControl: false)
         guard try JSON(data: data, options: .mutableContainers)["status"] == "OK" else { throw APIError.badData }
       } catch {
 #if DEBUG

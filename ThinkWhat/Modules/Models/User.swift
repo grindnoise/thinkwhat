@@ -34,15 +34,19 @@ class Userprofiles {
   }
   var current: Userprofile? {
     didSet {
-      guard shouldImportUserDefaults, !current.isNil else { return }
+      guard let current = current, shouldImportUserDefaults else { return }
       
-      UserDefaults.Profile.importData(from: current!)
+      UserDefaults.Profile.importData(from: current)
+      if current.imageURL.isNil {
+        current.image = UIImage(systemName: "person.fill")
+      }
     }
   }
   ///**Publishers**
   public let unsubscribedPublisher = PassthroughSubject<Userprofile, Never>()
   public let instancesPublisher = PassthroughSubject<[Userprofile], Never>()
   public let newSubscriptionPublisher = PassthroughSubject<Userprofile, Never>()
+  public let removeSubscriptionPublisher = PassthroughSubject<Userprofile, Never>()
   
   class func updateUserData(_ json: JSON) throws {
     guard let current = Userprofiles.shared.current,
@@ -199,13 +203,13 @@ class Userprofile: Decodable {
   
   var id:                 Int
   var username:           String
-  var firstName:          String {
+  @Published var firstName: String {
     didSet {
       guard oldValue != firstName else { return }
       NotificationCenter.default.post(name: Notifications.Userprofiles.FirstNameChanged, object: self)
     }
   }
-  var lastName:           String {
+  @Published var lastName: String {
     didSet {
       guard oldValue != lastName else { return }
       NotificationCenter.default.post(name: Notifications.Userprofiles.LastNameChanged, object: self)
@@ -273,7 +277,7 @@ class Userprofile: Decodable {
     }
   }
   var vkURL: URL?
-  var city: City? {
+  @Published var city: City? {
 //    willSet {
 //      print(newValue)
 //    }
@@ -457,9 +461,11 @@ class Userprofile: Decodable {
       subscriptionFlagPublisher.send(subscribedAt)
       subscribedAt ? { current.subscriptionsPublisher.send([self]) }() : { current.subscriptionsRemovePublisher.send([self]) }()
       
-      guard subscribedAt else { return }
-      
-      Userprofiles.shared.newSubscriptionPublisher.send(self)
+      if subscribedAt {
+        Userprofiles.shared.newSubscriptionPublisher.send(self)
+      } else {
+        Userprofiles.shared.removeSubscriptionPublisher.send(self)
+      }
     }
   }
   var subscribedToMe: Bool {
@@ -473,11 +479,11 @@ class Userprofile: Decodable {
     didSet {
       guard oldValue != notifyOnPublication else { return }
       
-      notificationPublisher.send(notifyOnPublication)
+      notificationPublisher.send([self: notifyOnPublication])
       
       guard let current = Userprofiles.shared.current else { return }
       
-      current.notificationPublisher.send(notifyOnPublication)
+      current.notificationPublisher.send([self: notifyOnPublication])
     }
   }
   var isCurrent: Bool { Userprofiles.shared.current == self }
@@ -498,7 +504,7 @@ class Userprofile: Decodable {
   public let votesReceivedTotalPublisher = PassthroughSubject<Int, Never>()
   public let commentsTotalPublisher = PassthroughSubject<Int, Never>()
   public let commentsReceivedTotalPublisher = PassthroughSubject<Int, Never>()
-  public let notificationPublisher = PassthroughSubject<Bool, Never>()
+  public let notificationPublisher = PassthroughSubject<[Userprofile:  Bool], Never>()
   
   
   
@@ -577,7 +583,7 @@ class Userprofile: Decodable {
       notifyOnPublication = try container.decode(Bool.self, forKey: .notifyOnPublication)
       gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
       ///City decoding
-      if !isCurrent, let decodedCity = try? container.decodeIfPresent(City.self, forKey: .city) {
+      if /*!isCurrent, */let decodedCity = try? container.decodeIfPresent(City.self, forKey: .city) {
         let cityInstance = Cities.shared.all.filter({ $0 == decodedCity }).first ?? decodedCity
         city = cityInstance
         cityTitle = cityInstance.localizedName.isEmpty ? cityInstance.name : cityInstance.localizedName

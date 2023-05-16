@@ -71,13 +71,13 @@ class NewAccountView: UIView {
   public var nameChecker = PassthroughSubject<String, Never>()
   ///**UI**
   public private(set) lazy var logoIcon: Icon = {
-    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
+    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.main)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     
     return instance
   }()
   public private(set) lazy var logoText: Icon = {
-    let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.Logo.Flame.rawValue)
+    let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.main)
     //    instance.alpha = 0
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
     
@@ -100,7 +100,8 @@ class NewAccountView: UIView {
     let instance = UIStackView(arrangedSubviews: [
       top,
       spacer,
-      UIView.verticalSpacer(padding),
+      UIView.verticalSpacer(0),
+//      UIView.verticalSpacer(padding),
       loginContainer,
       mailContainer,
       passwordContainer,
@@ -131,9 +132,8 @@ class NewAccountView: UIView {
     let fgLayer = CAShapeLayer()
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
-    //    fgLayer.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(0.2).cgColor
     fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.Logo.Flame.rawValue).cgColor
+                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
@@ -166,7 +166,7 @@ class NewAccountView: UIView {
     let fgLayer = CAShapeLayer()
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
-    fgLayer.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(0.1).cgColor
+    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
@@ -192,7 +192,7 @@ class NewAccountView: UIView {
     fgLayer.opacity = 0
     //    fgLayer.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(0.2).cgColor
     fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.Logo.Flame.rawValue).cgColor
+                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
@@ -226,7 +226,7 @@ class NewAccountView: UIView {
     let fgLayer = CAShapeLayer()
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
-    fgLayer.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(0.1).cgColor
+    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.attributedPlaceholder = NSAttributedString(string: "mailTF".localized,
@@ -251,7 +251,7 @@ class NewAccountView: UIView {
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
     fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.Logo.Flame.rawValue).cgColor
+                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
