@@ -192,11 +192,7 @@ class SettingsView: UIView {
       .store(in: &subscriptions)
     
     instance.subscribersPublisher
-      .sink { [unowned self] in
-        guard !$0.isNil else { return }
-        
-        self.viewInput?.onSubscribersSelected()
-      }
+      .sink { [unowned self] _ in self.viewInput?.onSubscribersSelected() }
       .store(in: &subscriptions)
     
     instance.subscriptionsPublisher
@@ -406,7 +402,20 @@ private extension SettingsView {
 
 extension SettingsView: SettingsControllerOutput {
   func onError(_ error: Error) {
-    showBanner(bannerDelegate: self, text: AppError.server.localizedDescription, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1), shadowed: false)
+    
+    let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                          text: AppError.server.localizedDescription,
+                                                          tintColor: .systemOrange,
+                                                          fontName: Fonts.Semibold,
+                                                          textStyle: .headline,
+                                                          textAlignment: .natural),
+                           contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                           isModal: false,
+                           useContentViewHeight: true,
+                           shouldDismissAfter: 2)
+    banner.didDisappearPublisher
+      .sink { _ in banner.removeFromSuperview() }
+      .store(in: &self.subscriptions)
   }
   
   func onAppSettings() {
@@ -434,22 +443,6 @@ extension SettingsView: SettingsControllerOutput {
   }
   
   
-}
-
-extension SettingsView: BannerObservable {
-  func onBannerWillAppear(_ sender: Any) {}
-  
-  func onBannerWillDisappear(_ sender: Any) {}
-  
-  func onBannerDidAppear(_ sender: Any) {}
-  
-  func onBannerDidDisappear(_ sender: Any) {
-    if let banner = sender as? Banner {
-      banner.removeFromSuperview()
-    } else if let popup = sender as? Popup {
-      popup.removeFromSuperview()
-    }
-  }
 }
 
 extension SettingsView: CAAnimationDelegate {

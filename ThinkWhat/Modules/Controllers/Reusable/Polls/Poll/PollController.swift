@@ -566,7 +566,7 @@ private extension PollController {
       return
     }
     
-    navigationController?.setNavigationBarHidden(false, animated: false)
+    navigationController?.setNavigationBarHidden(true, animated: false)
     loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
     loadingIndicator.start()
     controllerInput?.load(item, incrementViewCounter: true)
@@ -852,7 +852,7 @@ extension PollController: PollModelOutput {
                                                                 icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemGreen),
                                                                 text: "most_popular_choice".localized + "🚀\n" + "got_points".localized + "\(String(describing: details.points)) " + "\("points".localized) 🥳",
                                                                 tintColor: .systemGreen,
-                                                                fontName: Fonts.Semibold,
+                                                                fontName: Fonts.Regular,
                                                                 textStyle: .headline,
                                                                 textAlignment: .center),
                                  contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),

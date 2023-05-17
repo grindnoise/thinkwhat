@@ -457,7 +457,7 @@ class SurveyCell: UICollectionViewCell {
                               withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
                                                                              scale: .large)),
                       for: .normal)
-    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
+    instance.tintColor = .systemOrange.withAlphaComponent(0.75) //traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor,
                                     multiplier: 1/1).isActive = true
     instance.addTarget(self,
@@ -511,7 +511,7 @@ class SurveyCell: UICollectionViewCell {
     commentsImage.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     
     comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray4
-    watchButton.tintColor = item.isFavorite ? .systemGray : .systemGray4
+    watchButton.tintColor = item.isFavorite ? .label : .systemGray4
   }
   
   override func prepareForReuse() {
@@ -588,7 +588,7 @@ private extension SurveyCell {
         guard let self = self else { return }
         
         UIView.animate(withDuration: duration) {
-          self.watchButton.tintColor = flag ? .systemGray : .systemGray4
+          self.watchButton.tintColor = flag ? .label : .systemGray4
         }
         
         //                guard flag else { return }
@@ -780,7 +780,7 @@ private extension SurveyCell {
       viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
       
       comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray4
-      watchButton.tintColor = item.isFavorite ? .systemGray : .systemGray4
+      watchButton.tintColor = item.isFavorite ? .label : .systemGray4
     }
     
     //#if DEBUG

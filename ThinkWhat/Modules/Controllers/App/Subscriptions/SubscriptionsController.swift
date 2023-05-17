@@ -714,3 +714,9 @@ extension SubscriptionsController: BannerObservable {
     }
   }
 }
+
+extension SubscriptionsController: ScreenVisible {
+  func setActive(_ flag: Bool) {
+    isOnScreen = flag
+  }
+}

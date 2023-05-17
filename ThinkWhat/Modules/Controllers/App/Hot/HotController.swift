@@ -311,8 +311,9 @@ extension HotController: DataObservable {
   }
 }
 
-// MARK: - Observers
-private extension HotController {
-
+extension HotController: ScreenVisible {
+  func setActive(_ flag: Bool) {
+    isOnScreen = flag
+  }
 }
 

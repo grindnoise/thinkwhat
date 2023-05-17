@@ -12,7 +12,7 @@ import Combine
 class UserSettingsInfoCollectionView: UICollectionView {
   
   enum Section: Int, CaseIterable {
-    case About, City, SocialMedia, Interests
+    case About, City, Email, SocialMedia, Interests
   }
   
   
@@ -180,6 +180,36 @@ class UserSettingsInfoCollectionView: UICollectionView {
         .store(in: &self.subscriptions)
     }
     
+    let emailCellRegistration = UICollectionView.CellRegistration<UserSettingsEmailCell, AnyHashable> { [unowned self] cell, _, item in
+      cell.insets = self.cellPadding
+      cell.userprofile = self.userprofile
+      cell.color = self.color
+//      ///Fetch
+//      cell.cityFetchPublisher
+//        .filter { !$0.isNil }
+//        .sink { [unowned self] in self.cityFetchPublisher.send($0!) }
+//        .store(in: &self.subscriptions)
+//      ///Selection
+//      cell.citySelectionPublisher
+//        .sink { [unowned self] in self.citySelectionPublisher.send($0) }
+//        .store(in: &self.subscriptions)
+//      cell.$scrollPublisher
+//        .eraseToAnyPublisher()
+//        .filter { !$0.isNil }
+//        .sink { [unowned self] in self.scrollPublisher = cell.convert($0!, to: self) }
+//        .store(in: &self.subscriptions)
+      
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink { cell.color = $0! }
+        .store(in: &self.subscriptions)
+    }
+    
     let interestsCellRegistration = UICollectionView.CellRegistration<UserInterestsCell, AnyHashable> { [unowned self] cell, _, _ in
       cell.insets = self.cellPadding
       cell.userprofile = self.userprofile
@@ -260,20 +290,32 @@ class UserSettingsInfoCollectionView: UICollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: aboutCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
+      } else if section == .Email {
+        return collectionView.dequeueConfiguredReusableCell(using: emailCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
       }
       
       return UICollectionViewCell()
     }
     
     var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-    snapshot.appendSections([.About, .City, .SocialMedia, .Interests])
+    snapshot.appendSections([.About])
+    snapshot.appendSections([.City])
+    if userprofile.isCurrent, mode != .Creation {
+      snapshot.appendSections([.Email])
+    }
+    snapshot.appendSections([.SocialMedia])
+    snapshot.appendSections([.Interests])
+    
     snapshot.appendItems([0], toSection: .About)
     snapshot.appendItems([1], toSection: .City)
-    if userprofile.isCurrent {
-      snapshot.appendItems([2], toSection: .SocialMedia)
+    if userprofile.isCurrent, mode != .Creation {
+      snapshot.appendItems([2], toSection: .Email)
+      snapshot.appendItems([3], toSection: .SocialMedia)
     }
     if mode != .Creation {
-      snapshot.appendItems([3], toSection: .Interests)
+      snapshot.appendItems([4], toSection: .Interests)
     }
     source.apply(snapshot, animatingDifferences: false)
   }

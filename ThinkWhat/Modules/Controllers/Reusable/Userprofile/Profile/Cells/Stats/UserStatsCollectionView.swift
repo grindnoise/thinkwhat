@@ -13,13 +13,13 @@ class UserStatsCollectionView: UICollectionView {
   
   enum Section: Int, CaseIterable {
     case DateJoined,
-         Subscribers,
+         Balance,
          Publications,
          VotesReceived,
          Completed,
-         CommentsReceived,
          CommentsPosted,
-         Balance
+         Subscriptions,
+         Subscribers
   }
   
   typealias Source = UICollectionViewDiffableDataSource<Section, Int>
@@ -246,6 +246,30 @@ private extension UserStatsCollectionView {
         .store(in: &self.subscriptions)
     }
     
+    let subscriptionsCellRegistration = UICollectionView.CellRegistration<UserStatsPlainCell, AnyHashable> { [unowned self] cell, indexPath, item in
+      guard let userprofile = self.userprofile else { return }
+      
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      cell.mode = .Subscriptions
+      cell.userprofile = userprofile
+
+      cell.buttonPublisher
+        .sink { [weak self] _ in
+          guard let self = self else { return }
+
+          self.subscribersPublisher.send(self.userprofile)
+        }
+        .store(in: &self.subscriptions)
+      
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink { cell.color = $0! }
+        .store(in: &self.subscriptions)
+    }
+    
     let subscribersCellRegistration = UICollectionView.CellRegistration<UserStatsPlainCell, AnyHashable> { [unowned self] cell, indexPath, item in
       guard let userprofile = self.userprofile else { return }
       
@@ -286,10 +310,10 @@ private extension UserStatsCollectionView {
         return collectionView.dequeueConfiguredReusableCell(using: votesReceivedCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
-      } else if section == .CommentsReceived {
-        return collectionView.dequeueConfiguredReusableCell(using: commentsReceivedCellRegistration,
-                                                            for: indexPath,
-                                                            item: identifier)
+//      } else if section == .CommentsReceived {
+//        return collectionView.dequeueConfiguredReusableCell(using: commentsReceivedCellRegistration,
+//                                                            for: indexPath,
+//                                                            item: identifier)
       } else if section == .CommentsPosted {
         return collectionView.dequeueConfiguredReusableCell(using: commentsCellRegistration,
                                                             for: indexPath,
@@ -308,6 +332,10 @@ private extension UserStatsCollectionView {
                                                             item: identifier)
       } else if section == .Balance {
         return collectionView.dequeueConfiguredReusableCell(using: balanceCellRegistration,
+                                                            for: indexPath,
+                                                            item: identifier)
+      } else if section == .Subscriptions {
+        return collectionView.dequeueConfiguredReusableCell(using: subscriptionsCellRegistration,
                                                             for: indexPath,
                                                             item: identifier)
       }
@@ -329,41 +357,41 @@ private extension UserStatsCollectionView {
     case .Userprofile:
       snapshot.appendSections([
         .DateJoined,
-        .Subscribers,
         .Publications,
-        .VotesReceived,
-        .CommentsReceived,
         .Completed,
-        .CommentsPosted
+        .VotesReceived,
+        .CommentsPosted,
+        .Subscriptions,
+        .Subscribers,
       ])
+      ///Pass Section raw value
       snapshot.appendItems([0], toSection: .DateJoined)
-      snapshot.appendItems([1], toSection: .Subscribers)
       snapshot.appendItems([2], toSection: .Publications)
+      snapshot.appendItems([4], toSection: .Completed)
       snapshot.appendItems([3], toSection: .VotesReceived)
-      snapshot.appendItems([4], toSection: .CommentsReceived)
-      snapshot.appendItems([5], toSection: .Completed)
-      snapshot.appendItems([6], toSection: .CommentsPosted)
+      snapshot.appendItems([5], toSection: .CommentsPosted)
+      snapshot.appendItems([6], toSection: .Subscriptions)
+      snapshot.appendItems([7], toSection: .Subscribers)
     case .Settings:
       snapshot.appendSections([
         .Balance,
         .DateJoined,
-        .Subscribers,
         .Publications,
-        .VotesReceived,
-        .CommentsReceived,
         .Completed,
-        .CommentsPosted
+        .VotesReceived,
+        .CommentsPosted,
+        .Subscriptions,
+        .Subscribers,
       ])
-      snapshot.appendItems([7], toSection: .Balance)
+      snapshot.appendItems([1], toSection: .Balance)
       snapshot.appendItems([0], toSection: .DateJoined)
-      snapshot.appendItems([1], toSection: .Subscribers)
       snapshot.appendItems([2], toSection: .Publications)
+      snapshot.appendItems([4], toSection: .Completed)
       snapshot.appendItems([3], toSection: .VotesReceived)
-      snapshot.appendItems([4], toSection: .CommentsReceived)
-      snapshot.appendItems([5], toSection: .Completed)
-      snapshot.appendItems([6], toSection: .CommentsPosted)
+      snapshot.appendItems([5], toSection: .CommentsPosted)
+      snapshot.appendItems([6], toSection: .Subscriptions)
+      snapshot.appendItems([7], toSection: .Subscribers)
     }
-    
     
     source.apply(snapshot, animatingDifferences: false)
   }

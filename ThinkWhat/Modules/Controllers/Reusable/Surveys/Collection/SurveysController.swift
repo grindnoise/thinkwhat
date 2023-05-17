@@ -32,7 +32,9 @@ class SurveysController: UIViewController, TintColorable {
       controllerOutput?.setMode(mode)
     }
   }
-  //UI
+  ///**Logic**
+  public private(set) var isOnScreen: Bool = true
+  ///**UI**
   public var tintColor: UIColor = .clear
   
   
@@ -735,5 +737,11 @@ extension SurveysController: UITextFieldDelegate {
     }
     textField.resignFirstResponder()
     return true
+  }
+}
+
+extension SurveysController: ScreenVisible {
+  func setActive(_ flag: Bool) {
+    isOnScreen = flag
   }
 }

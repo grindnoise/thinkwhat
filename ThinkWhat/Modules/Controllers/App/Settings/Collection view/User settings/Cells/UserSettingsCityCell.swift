@@ -78,9 +78,6 @@ class UserSettingsCityCell: UICollectionViewListCell {
     }
   }
   ///`Publishers`
-  public let publicationsPublisher = PassthroughSubject<Userprofile, Never>()
-  public let commentsPublisher = PassthroughSubject<Userprofile, Never>()
-  public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
   public let citySelectionPublisher = PassthroughSubject<City, Never>()
   public var cityFetchPublisher = CurrentValueSubject<String?, Never>(nil)
   @Published public private(set) var scrollPublisher: CGPoint?

@@ -48,7 +48,7 @@ class TopicsController: UIViewController, TintColorable {
     }
   }
   ///**UI**
-  public private(set) var isOnScreen = false
+  public var isOnScreen = false
   
   
   
@@ -798,7 +798,11 @@ extension TopicsController: UITextFieldDelegate {
   @objc
   func textFieldDidChange(_ textField: UITextField) {
     guard !isSearching, let text = textField.text, text.count > 3 else {
-      onSearchCompleted([])
+      delay(seconds: 0.5) {[weak self] in
+        guard let self = self else { return }
+        
+        self.onSearchCompleted([])
+      }
       
       return
     }
@@ -836,4 +840,15 @@ extension TopicsController: UITextFieldDelegate {
   //        textField.color = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
   //        textField.addTarget(self, action: #selector(TopicsController.textFieldDidChange(_:)), for: .editingChanged)
   //    }
+}
+
+extension TopicsController: ScreenVisible {
+  func setActive(_ flag: Bool) {
+    guard flag else {
+      isOnScreen = false
+      
+      return
+    }
+    isOnScreen = mode == .Topic ? true : false
+  }
 }

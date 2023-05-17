@@ -25,8 +25,8 @@ class UserStatsCell: UICollectionViewListCell {
   }
   ///`Publishers`
   public var publicationsPublisher = PassthroughSubject<Userprofile, Never>()
-  public let commentsPublisher = PassthroughSubject<Userprofile, Never>()
-  public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
+  public var commentsPublisher = PassthroughSubject<Userprofile, Never>()
+  public var subscribersPublisher = PassthroughSubject<Userprofile, Never>()
   ///`Logic`
   public var mode: Mode = .Userprofile {
     didSet {
@@ -194,6 +194,7 @@ class UserStatsCell: UICollectionViewListCell {
     super.prepareForReuse()
     
     publicationsPublisher = PassthroughSubject<Userprofile, Never>()
+    subscribersPublisher = PassthroughSubject<Userprofile, Never>()
   //        urlPublisher = CurrentValueSubject<URL?, Never>(nil)
   //        subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
   //        imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)

@@ -448,6 +448,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
     UserDefaults.clear()
     Surveys.clear()
     Userprofiles.clear()
+    AppData.isEmailVerified = false
   }
 }
 
@@ -562,11 +563,14 @@ private extension MainController {
     SurveyReferences.shared.markedFavoritePublisher
       .receive(on: DispatchQueue.main)
       .sink { _ in
-        let banner = Banner(fadeBackground: false)
-        banner.present(content: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
-                                                  text: "watch_survey_notification",
-                                                  tintColor: .label),
-                       dismissAfter: 0.75)
+        
+        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
+                                                              text: "watch_survey_notification",
+                                                              tintColor: .label),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 2)
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
@@ -908,6 +912,14 @@ extension MainController: UITabBarControllerDelegate {
   }
   
   func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+    func setActiveScreen(_ controller: UIViewController) {
+      tabBarController.viewControllers?.forEach {
+        guard var contr = $0 as? (ScreenVisible & UIViewController) else { return }
+        
+        contr.setActive(contr === controller ? true : false)
+      }
+    }
+    
     func setColors(_ color: UIColor) {
       tabBar.tintColor = color
       let logoColorAnim = Animations.get(property: .FillColor,

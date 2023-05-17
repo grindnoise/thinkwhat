@@ -50,7 +50,7 @@ class Userprofiles {
   
   class func updateUserData(_ json: JSON) throws {
     guard let current = Userprofiles.shared.current,
-//          let subscribersTotal = json["subscribers_count"].int,
+          let data = try? json["userprofile"].rawData(),
 //          let subscriptionsTotal = json["subscribed_at_count"].int,
 //          let publicationsTotal = json["own_surveys_count"].int,
 //          let favoritesTotal = json["favorite_surveys_count"].int,
@@ -66,6 +66,8 @@ class Userprofiles {
 //          let description = json["description"].string
     else { return }
     
+    let instance = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self, from: data)
+    Userprofiles.shared.current?.update(from: instance)
 //    current.description = description
 //    current.subscribersTotal = subscribersTotal
 //    current.subscriptionsTotal = subscriptionsTotal
@@ -346,55 +348,13 @@ class Userprofile: Decodable {
       NotificationCenter.default.post(name: Notifications.Userprofiles.CompleteTotal, object: self)
     }
   }
-  var votesReceivedTotal: Int = 0 {
-    didSet {
-      guard oldValue != votesReceivedTotal else { return }
-      
-      votesReceivedTotalPublisher.send(votesReceivedTotal)
-    }
-  }
-  var commentsTotal: Int = 0 {
-    didSet {
-      guard oldValue != commentsTotal else { return }
-      
-      commentsTotalPublisher.send(commentsTotal)
-    }
-  }
-  var commentsReceivedTotal: Int = 0 {
-    didSet {
-      guard oldValue != commentsReceivedTotal else { return }
-      
-      commentsReceivedTotalPublisher.send(commentsReceivedTotal)
-    }
-  }
-  var favoritesTotal: Int = 0 {
-    didSet {
-      guard oldValue != favoritesTotal else { return }
-      
-      NotificationCenter.default.post(name: Notifications.Userprofiles.FavoritesTotal, object: self)
-    }
-  }
-  var publicationsTotal: Int = 0 {
-    didSet {
-      guard oldValue != publicationsTotal else { return }
-      
-      NotificationCenter.default.post(name: Notifications.Userprofiles.PublicationsTotal, object: self)
-    }
-  }
-  var subscribersTotal: Int = 0 {
-    didSet {
-      guard oldValue != subscribersTotal else { return }
-      
-      NotificationCenter.default.post(name: Notifications.Userprofiles.SubscribersTotal, object: self)
-    }
-  }
-  var subscriptionsTotal: Int = 0 {
-    didSet {
-      guard oldValue != subscriptionsTotal else { return }
-      
-      NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionsTotal, object: self)
-    }
-  }
+  @Published var votesReceivedTotal: Int = 0
+  @Published var commentsTotal: Int = 0
+  @Published var commentsReceivedTotal: Int = 0
+  @Published var favoritesTotal: Int = 0 
+  @Published var publicationsTotal: Int = 0
+  @Published var subscribersTotal: Int = 0 
+  @Published var subscriptionsTotal: Int = 0
   var lastVisit: Date
   var wasEdited: Bool?
   var isBanned: Bool {
@@ -501,9 +461,9 @@ class Userprofile: Decodable {
   public let subscribersRemovePublisher = PassthroughSubject<[Userprofile], Never>()
   public let subscriptionsPublisher = PassthroughSubject<[Userprofile], Error>()
   public let subscriptionsRemovePublisher = PassthroughSubject<[Userprofile], Error>()
-  public let votesReceivedTotalPublisher = PassthroughSubject<Int, Never>()
-  public let commentsTotalPublisher = PassthroughSubject<Int, Never>()
-  public let commentsReceivedTotalPublisher = PassthroughSubject<Int, Never>()
+//  public let votesReceivedTotalPublisher = PassthroughSubject<Int, Never>()
+//  public let commentsTotalPublisher = PassthroughSubject<Int, Never>()
+//  public let commentsReceivedTotalPublisher = PassthroughSubject<Int, Never>()
   public let notificationPublisher = PassthroughSubject<[Userprofile:  Bool], Never>()
   
   

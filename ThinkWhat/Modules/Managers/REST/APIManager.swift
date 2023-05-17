@@ -1031,6 +1031,9 @@ class API {
                                               encoding: JSONEncoding.default,
                                               headers: parent.headers())
           userprofiles.forEach { $0.subscribedAt = true }
+        if let current = Userprofiles.shared.current {
+          current.subscriptionsTotal += userprofiles.count
+        }
       } catch let error {
         NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
 #if DEBUG
@@ -1074,6 +1077,10 @@ class API {
         userprofiles.forEach {
           $0.subscribedAt = false
           Userprofiles.shared.unsubscribedPublisher.send($0)
+        }
+        
+        if let current = Userprofiles.shared.current {
+          current.subscriptionsTotal -= userprofiles.count
         }
       } catch let error {
         NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
@@ -1348,33 +1355,6 @@ class API {
         throw error
       }
     }
-    
-    //        public func loadSurveyReferences(_ category: Survey.SurveyCategory, _ topic: Topic? = nil, _ userprofile: Userprofile? = nil) async throws {
-    //            guard let url = category.url else { throw APIError.invalidURL }
-    //            var parameters: Parameters!
-    //            if category == .Topic, !topic.isNil {
-    //                parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
-    //                parameters["category_id"] = topic?.id
-    //            } else if category == .Userprofile, let userprofile = userprofile {
-    //                parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
-    //                parameters["userprofile_id"] = userprofile.id
-    //            } else {
-    //                parameters  = ["exclude_ids": category.dataItems().map { $0.id }]
-    //            }
-    //
-    //            do {
-    //                let data = try await parent.requestAsync(url: url, httpMethod: .get, parameters: parameters, encoding: CustomGetEncoding(), headers: parent.headers())
-    //                try await MainActor.run {
-    //                    Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
-    //                }
-    //            } catch let error {
-    //    #if DEBUG
-    //                print(error)
-    //    #endif
-    //                throw error
-    //            }
-    //        }
-    
     /**
      Returns a new constraint designated by `multiplier`. Original constraint is deactivated
      - parameter instances: surveys to update.
@@ -1897,6 +1877,10 @@ class API {
             try await MainActor.run {
               let instance = try decoder.decode(Survey.self, from: json["survey"].rawData())
               Surveys.shared.append([instance])
+              
+              if let userprofile = Userprofiles.shared.current {
+                userprofile.publicationsTotal += 1
+              }
             }
           } catch {
             guard let errorText = json["error"].string else {

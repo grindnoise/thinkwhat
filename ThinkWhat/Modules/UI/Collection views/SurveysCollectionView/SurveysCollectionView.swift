@@ -322,7 +322,11 @@ class SurveysCollectionView: UICollectionView {
   @MainActor
   @objc
   public func endSearchRefreshing() {
-    loadingIndicator.stop(reset: true)
+    delay(seconds: 2) { [weak self] in
+      guard let self = self else { return }
+      
+      self.loadingIndicator.stop(reset: true)
+    }
 //    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
 //      guard let self = self else { return }
 //
@@ -411,7 +415,7 @@ private extension SurveysCollectionView {
       return sectionLayout
     }
     
-    contentInset.bottom = (category == .ByOwner || category == .Topic) ? 80 : 0
+    contentInset.bottom = (category == .ByOwner || category == .Topic || category == .Own) ? 80 : 0
     
     let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { [unowned self] cell, indexPath, item in
       cell.item = item

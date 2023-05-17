@@ -197,6 +197,40 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
 private extension SettingsController {
   @MainActor
   func setupUI() {
+    if let userprofile = Userprofiles.shared.current {
+      if userprofile.email.isEmpty {
+        if !AppData.isEmailVerified {
+          let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.circle.fill")!,
+                                                                text: "email_is_empty_reminder",
+                                                                tintColor: .systemOrange,
+                                                                fontName: Fonts.Regular,
+                                                                textStyle: .headline,
+                                                                textAlignment: .natural),
+                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                 isModal: false,
+                                 useContentViewHeight: true,
+                                 shouldDismissAfter: 2)
+          banner.didDisappearPublisher
+            .sink { _ in banner.removeFromSuperview() }
+            .store(in: &subscriptions)
+        }
+      } else if !AppData.isEmailVerified {
+        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.circle.fill")!,
+                                                              text: "email_confirm_reminder",
+                                                              tintColor: .systemOrange,
+                                                              fontName: Fonts.Regular,
+                                                              textStyle: .headline,
+                                                              textAlignment: .natural),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 2)
+        banner.didDisappearPublisher
+          .sink { _ in banner.removeFromSuperview() }
+          .store(in: &subscriptions)
+      }
+    }
+    
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationItem.title = ""
     
@@ -356,7 +390,10 @@ extension SettingsController: SettingsViewInput {
     backItem.title = ""
     
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(UserprofilesController(mode: .Subscriptions, userprofile: userprofile), animated: true)
+    navigationController?.pushViewController(UserprofilesController(mode: .Subscriptions,
+                                                                    userprofile: userprofile,
+                                                                    color: tintColor),
+                                             animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let main = tabBarController as? MainController else { return }
@@ -374,7 +411,10 @@ extension SettingsController: SettingsViewInput {
     backItem.title = ""
     
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile), animated: true)
+    navigationController?.pushViewController(UserprofilesController(mode: .Subscribers,
+                                                                    userprofile: userprofile,
+                                                                    color: tintColor),
+                                             animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let main = tabBarController as? MainController else { return }

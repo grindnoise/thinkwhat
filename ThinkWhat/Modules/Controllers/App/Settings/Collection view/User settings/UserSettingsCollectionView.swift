@@ -33,7 +33,7 @@ class UserSettingsCollectionView: UICollectionView {
   public let twitterPublisher = CurrentValueSubject<String?, Never>(nil)
   public let openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
   public let publicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
-  public var subscribersPublisher = CurrentValueSubject<Bool?, Never>(nil)
+  public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
   public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public private(set) var accountManagementPublisher = PassthroughSubject<AccountManagementCell.Mode, Never>()
@@ -286,13 +286,13 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
 //        }
 //        .store(in: &subscriptions)
 //      
-//      cell.subscribersPublisher
-//        .sink { [weak self] in
-//          guard let self = self else { return }
-//          
-//          self.subscribersPublisher.send($0)
-//        }
-//        .store(in: &subscriptions)
+      cell.subscribersPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.subscribersPublisher.send($0)
+        }
+        .store(in: &subscriptions)
       
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear

@@ -408,12 +408,12 @@ private extension PollTitleCell {
       headerStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
       headerStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
       headerStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-      titleLabel.topAnchor.constraint(equalTo: headerStack.bottomAnchor, constant: padding*2),
+      titleLabel.topAnchor.constraint(equalTo: headerStack.bottomAnchor, constant: padding*4),
       titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding*2),
       titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding*2)
+    let constraint = titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding*4)
     constraint.priority = .defaultLow
     constraint.isActive = true
     

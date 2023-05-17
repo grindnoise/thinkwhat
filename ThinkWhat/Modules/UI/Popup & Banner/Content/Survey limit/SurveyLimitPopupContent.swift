@@ -40,8 +40,8 @@ class SurveyLimitPopupContent: UIView {
     let middle = UIView.opaque()
     textField.placeXCentered(inside: middle,
                              widthMultiplier: 0.6,
-                             topInset: padding,
-                             bottomInset: padding)
+                             topInset: 0,
+                             bottomInset: 0)
     let middle2 = UIView.opaque()
     descriptionLabel.place(inside: middle2, insets: .init(top: padding*4, left: padding, bottom: padding, right: padding))
     let bottom = UIView.opaque()
@@ -61,8 +61,8 @@ class SurveyLimitPopupContent: UIView {
     
     let instance = UIStackView(arrangedSubviews: [
       top,
+//      textField,
       middle,
-//      middle2,
       bottom
     ])
     instance.axis = .vertical
@@ -128,7 +128,7 @@ class SurveyLimitPopupContent: UIView {
     instance.text = limit.formattedWithSeparator
     instance.tintColor = color
     instance.keyboardType = .numberPad
-    instance.font = UIFont.scaledFont(fontName: Fonts.Extrabold, forTextStyle: .title1)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Extrabold, forTextStyle: .largeTitle)
     instance.backgroundColor = .systemGray.withAlphaComponent(0.1)
     instance.publisher(for: \.bounds)
       .sink { instance.cornerRadius = $0.height * 0.05}
@@ -146,17 +146,17 @@ class SurveyLimitPopupContent: UIView {
       config.cornerStyle = .small
       config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
       config.baseBackgroundColor = color
-      config.attributedTitle = AttributedString("ready".localized,
+      config.attributedTitle = AttributedString("ready".localized.uppercased(),
                                                 attributes: AttributeContainer([
-                                                  .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
                                                   .foregroundColor: UIColor.white as Any
                                                 ]))
       instance.configuration = config
     } else {
       instance.contentEdgeInsets = .uniform(size: 0)
-      instance.setAttributedTitle(NSAttributedString(string: "ready".localized,
+      instance.setAttributedTitle(NSAttributedString(string: "ready".localized.uppercased(),
                                                      attributes: [
-                                                      .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,
                                                       .foregroundColor: color as Any
                                                      ]),
                                   for: .normal)

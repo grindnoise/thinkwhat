@@ -421,3 +421,9 @@ extension ListController: DataObservable {
     navigationController?.setNavigationBarHidden(false, animated: true)
   }
 }
+
+extension ListController: ScreenVisible {
+  func setActive(_ flag: Bool) {
+    isOnScreen = flag
+  }
+}

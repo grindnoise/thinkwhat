@@ -20,6 +20,7 @@ class UserStatsPlainCell: UICollectionViewListCell {
     case CommentsReceived = "userprofile_comments_received"
     case CommentsPosted = "userprofile_comments_posted"
     case Subscribers = "userprofile_subscribers"
+    case Subscriptions = "userprofile_subscriptions"
   }
   
   // MARK: - Public properties
@@ -29,6 +30,7 @@ class UserStatsPlainCell: UICollectionViewListCell {
       guard !userprofile.isNil else { return }
       
       setupUI()
+      setTasks()
     }
   }
   //Publishers
@@ -244,6 +246,15 @@ private extension UserStatsPlainCell {
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = userprofile.subscribersTotal.isZero ? false : true
       disclosureIndicator.alpha = userprofile.subscribersTotal.isZero ? 0 : 1
+    case .Subscriptions:
+      let attributedTitle = NSAttributedString(string: String(describing: userprofile.subscriptionsTotal.roundedWithAbbreviations),
+                                               attributes: [
+                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .foregroundColor: userprofile.subscriptionsTotal.isZero ? UIColor.label : color
+                                               ])
+      rightButton.setAttributedTitle(attributedTitle, for: .normal)
+      rightButton.isUserInteractionEnabled = userprofile.subscriptionsTotal.isZero ? false : true
+      disclosureIndicator.alpha = userprofile.subscriptionsTotal.isZero ? 0 : 1
     }
   }
   
@@ -252,6 +263,45 @@ private extension UserStatsPlainCell {
     if sender == rightButton {
       buttonPublisher.send(true)
     }
+  }
+  
+  func setTasks() {
+    guard let userprofile = userprofile else { return }
+    print(mode)
+    userprofile.$subscriptionsTotal
+      .filter { [unowned self] _ in self.mode == .Subscriptions }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] _ in self.updateUI() }
+      .store(in: &subscriptions)
+    
+    userprofile.$subscribersTotal
+      .filter { [unowned self] _ in self.mode == .Subscribers }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] _ in self.updateUI() }
+      .store(in: &subscriptions)
+    
+    userprofile.$publicationsTotal
+      .filter { [unowned self] _ in self.mode == .Publications }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] _ in self.updateUI() }
+      .store(in: &subscriptions)
+    
+    userprofile.$votesReceivedTotal
+      .filter { [unowned self] _ in self.mode == .Votes }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] _ in self.updateUI() }
+      .store(in: &subscriptions)
+    
+    userprofile.$commentsReceivedTotal
+      .filter { [unowned self] _ in self.mode == .CommentsReceived }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] _ in self.updateUI() }
+      .store(in: &subscriptions)
+    
+//    userprofile.$favoritesTotal
+//      .receive(on: DispatchQueue.main)
+//      .sink { [unowned self] _ in self.updateUI() }
+//      .store(in: &subscriptions)
   }
 }
 
