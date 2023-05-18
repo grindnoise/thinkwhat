@@ -3139,6 +3139,36 @@
                   endingLineNumber = "745"
                   offsetFromSymbolStart = "256">
                </Location>
+               <Location
+                  uuid = "80AF275F-1179-4C53-8B09-C4E5F1895CD2 - 1d8dc9095f77e4f6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for ThinkWhat__alpha_.Userprofile.downloadImageAsync() async throws -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Models/User.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "745"
+                  endingLineNumber = "745"
+                  offsetFromSymbolStart = "836">
+               </Location>
+               <Location
+                  uuid = "80AF275F-1179-4C53-8B09-C4E5F1895CD2 - 2941a62515f162f3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for ThinkWhat__alpha_.Userprofile.downloadImageAsync() async throws -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/Models/User.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "745"
+                  endingLineNumber = "745"
+                  offsetFromSymbolStart = "256">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -3835,6 +3865,38 @@
             endingLineNumber = "319"
             landmarkName = "beginSearchRefreshing()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "C6C0DB6A-BAF4-4378-9635-C13E7E61CB00 - 9c9c5bee3d90bbc7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.SurveysCollectionView.beginSearchRefreshing() -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/UI/Collection%20views/SurveysCollectionView/SurveysCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "319"
+                  endingLineNumber = "319"
+                  offsetFromSymbolStart = "28">
+               </Location>
+               <Location
+                  uuid = "C6C0DB6A-BAF4-4378-9635-C13E7E61CB00 - b3388b2d7c3fc169"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__alpha_.SurveysCollectionView.beginSearchRefreshing() -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/UI/Collection%20views/SurveysCollectionView/SurveysCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "319"
+                  endingLineNumber = "319"
+                  offsetFromSymbolStart = "28">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -3882,6 +3944,21 @@
                   endingLineNumber = "328"
                   offsetFromSymbolStart = "136">
                </Location>
+               <Location
+                  uuid = "672CABA4-CD62-4D81-965D-37C53C50785F - 513a087b6381f67c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in ThinkWhat__alpha_.SurveysCollectionView.endSearchRefreshing() -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/UI/Collection%20views/SurveysCollectionView/SurveysCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "328"
+                  endingLineNumber = "328"
+                  offsetFromSymbolStart = "136">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -3899,6 +3976,38 @@
             endingLineNumber = "429"
             landmarkName = "animate()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "75D59491-4B8A-4D6B-BCE7-23577D5724C0 - 6f0fbc047080087c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 () -&gt; () in ThinkWhat__local_.LoadingIndicator.animate() -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/UI/UI%20elements/Progress%20indicators/LoadingIndicator.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "429"
+                  endingLineNumber = "429"
+                  offsetFromSymbolStart = "60">
+               </Location>
+               <Location
+                  uuid = "75D59491-4B8A-4D6B-BCE7-23577D5724C0 - 5f8edb7c3a94ff72"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 () -&gt; () in ThinkWhat__alpha_.LoadingIndicator.animate() -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/UI/UI%20elements/Progress%20indicators/LoadingIndicator.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "429"
+                  endingLineNumber = "429"
+                  offsetFromSymbolStart = "60">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -3915,6 +4024,38 @@
             endingLineNumber = "315"
             landmarkName = "stop(reset:completion:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "077A58DB-FDD7-4BC8-A23C-0D993B64487A - cab39ed2ad65f6c8"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in closure #3 (Swift.Bool) -&gt; () in ThinkWhat__local_.LoadingIndicator.stop(reset: Swift.Bool, completion: Swift.Optional&lt;() -&gt; ()&gt;) -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/UI/UI%20elements/Progress%20indicators/LoadingIndicator.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "315"
+                  endingLineNumber = "315"
+                  offsetFromSymbolStart = "140">
+               </Location>
+               <Location
+                  uuid = "077A58DB-FDD7-4BC8-A23C-0D993B64487A - 4a98d4bdf94520c2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in closure #3 (Swift.Bool) -&gt; () in ThinkWhat__alpha_.LoadingIndicator.stop(reset: Swift.Bool, completion: Swift.Optional&lt;() -&gt; ()&gt;) -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/ThinkWhat/ThinkWhat/Modules/UI/UI%20elements/Progress%20indicators/LoadingIndicator.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "315"
+                  endingLineNumber = "315"
+                  offsetFromSymbolStart = "140">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
