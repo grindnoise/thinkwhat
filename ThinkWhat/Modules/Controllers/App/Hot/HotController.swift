@@ -318,6 +318,8 @@ extension HotController: DataObservable {
       navigationController?.pushViewController(PollController(surveyReference: SurveyReferences.shared.all.first!), animated: true)
       tabBarController?.setTabBarVisible(visible: false, animated: true)
       
+      print("test")
+      
       guard let main = tabBarController as? MainController else { return }
       
       main.toggleLogo(on: false)

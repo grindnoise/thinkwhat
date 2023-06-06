@@ -1,0 +1,20 @@
+PODS:
+  - SwiftyVK (3.4.2)
+  - YoutubePlayer-in-WKWebView (0.3.8)
+
+DEPENDENCIES:
+  - SwiftyVK
+  - YoutubePlayer-in-WKWebView
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - SwiftyVK
+    - YoutubePlayer-in-WKWebView
+
+SPEC CHECKSUMS:
+  SwiftyVK: 5005dac6e85f7b0fd44e21ed2f021a397dff4cab
+  YoutubePlayer-in-WKWebView: 4fca3b4f6f09940077bfbae7bddb771f2b43aacd
+
+PODFILE CHECKSUM: effc1cbaf0f4c6e72f80e729e60014e92210f787
+
+COCOAPODS: 1.12.1
