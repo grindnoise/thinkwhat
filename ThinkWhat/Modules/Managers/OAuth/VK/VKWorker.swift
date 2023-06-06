@@ -98,7 +98,10 @@ final class VKWorker {
     class func accountInfo(completion: @escaping(Result<JSON,Error>)->()) {
         guard let id = VK.sessions.default.accessToken?.info["user_id"] else { fatalError() }
         guard let email = VK.sessions.default.accessToken?.info["email"] else { fatalError() }
-        VK.API.Custom.method(name: "users.get", parameters: [Parameter.userIDs.rawValue: id, Parameter.fields.rawValue: "\(Parameter.firstName.rawValue), \(Parameter.lastName.rawValue), \(Parameter.sex.rawValue), \(Parameter.bdate.rawValue), \(Parameter.photo_400.rawValue), \(Parameter.domain.rawValue)"])
+        VK.API.Custom.method(name: "users.get",
+                             parameters: [
+                              Parameter.userIDs.rawValue: id,
+                              Parameter.fields.rawValue: "\(Parameter.firstName.rawValue), \(Parameter.lastName.rawValue), \(Parameter.sex.rawValue), \(Parameter.bdate.rawValue), \(Parameter.photo_400.rawValue), \(Parameter.domain.rawValue)"])
             .onSuccess {
                 var json = JSON($0)
                 json.appendIfArray(json: JSON(["user_id": id, "email": email]))

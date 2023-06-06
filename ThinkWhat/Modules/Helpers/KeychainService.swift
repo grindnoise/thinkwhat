@@ -15,6 +15,7 @@ let accessGroup = "SecurityService"
 
 let passwordKey                 = "KeyForPassword"
 let access_token                = "access_token"
+let apns_token                  = "apns_token"
 let refresh_token               = "refresh_token"
 let expires_in                  = "expires_in"
 //let instagram_access_token      = "instagram_access_token"
@@ -23,6 +24,7 @@ let vk_access_token             = "vk_access_token"
 let google_access_token         = "google_access_token"
 
 let secrets = [
+//    apns_token,
     passwordKey,
     access_token,
     refresh_token,
@@ -47,6 +49,10 @@ public class KeychainService: NSObject {
     public class func saveAccessToken(token: NSString) {
         self.save(service: access_token as NSString, string: token)
     }
+  
+  public class func saveApnsToken(token: Data) {
+      self.save(service: apns_token as NSString, data: token)
+  }
     
 //    public class func saveInstagramAccessToken(token: NSString) {
 //        self.save(service: instagram_access_token as NSString, string: token)
@@ -82,8 +88,11 @@ public class KeychainService: NSObject {
     public class func loadAccessToken() -> NSString? {
         return load(service: access_token as NSString)
     }
-    
-//    public class func loadInstagramAccessToken() -> NSString? {
+  
+  public class func loadApnsToken() -> Data? {
+    return load(service: apns_token as NSString)
+  }
+  //    public class func loadInstagramAccessToken() -> NSString? {
 //        return self.load(service: instagram_access_token as NSString)
 //    }
     
@@ -118,7 +127,49 @@ public class KeychainService: NSObject {
     /**
      * Internal methods for querying the keychain.
      */
-    
+  
+  private class func save(service: NSString, data: Data) {
+      // Create query
+      let query = [
+          kSecValueData: data,
+          kSecClass: kSecClassGenericPassword,
+          kSecAttrService: service,
+          kSecAttrAccount: account,
+          kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+      ] as [CFString : Any] as CFDictionary
+
+      let deleteStatus = SecItemDelete(query as CFDictionary)
+
+//#if DEBUG
+//      print("delete", deleteStatus)
+//#endif
+
+      let status = SecItemAdd(query, nil)
+      if status != errSecSuccess {
+#if DEBUG
+          print("Error: \(status)")
+#endif
+      }
+
+      if status == errSecDuplicateItem {
+          // Item already exist, thus update it.
+          let query = [
+              kSecAttrService: service,
+              kSecAttrAccount: account,
+              kSecClass: kSecClassGenericPassword,
+              kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+          ] as [CFString : Any] as CFDictionary
+
+          let attributesToUpdate = [kSecValueData: data] as CFDictionary
+
+          // Update existing item
+          let code = SecItemUpdate(query, attributesToUpdate)
+#if DEBUG
+          print("update", code)
+#endif
+      }
+  }
+  
     private class func save(service: NSString, string: NSString) {
 //        let dataFromString: NSData = string.data(using: String.Encoding.utf8.rawValue, allowLossyConversion: false)! as NSData
 //
@@ -149,7 +200,7 @@ public class KeychainService: NSObject {
             kSecAttrService: service,
             kSecAttrAccount: account,
             kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-        ] as CFDictionary
+        ] as [CFString : Any] as CFDictionary
 
         let deleteStatus = SecItemDelete(query as CFDictionary)
 
@@ -229,6 +280,25 @@ public class KeychainService: NSObject {
 
         return string
     }
+  
+  private class func load(service: NSString) -> Data? {
+      let query = [
+          kSecAttrService: service,
+          kSecAttrAccount: account,
+          kSecClass: kSecClassGenericPassword,
+          kSecReturnData: true,
+          kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+          kSecMatchLimitValue: 1
+
+      ] as [CFString : Any] as CFDictionary
+
+      var result: AnyObject?
+      SecItemCopyMatching(query, &result)
+    
+      guard let data = result as? Data else { return nil }
+
+      return data
+  }
     
     private class func delete(service: String, account: String) {
 //

@@ -9,6 +9,7 @@
 import UIKit
 import Combine
 import SwiftyJSON
+import AuthenticationServices
 
 class SignInViewController: UIViewController {
   
@@ -89,7 +90,7 @@ extension SignInViewController: SignInViewInput {
         return
       }
       controllerOutput?.animateTransitionToApp {
-        appDelegate.window?.rootViewController = MainController()
+        appDelegate.window?.rootViewController = MainController(surveyId: nil)
       }
       
       return
@@ -134,6 +135,15 @@ extension SignInViewController: SignInViewInput {
           self.controllerOutput?.providerSignInCallback(result: .failure(error))
         }
       }
+    case .Apple:
+      let appleIDProvider = ASAuthorizationAppleIDProvider()
+      let request = appleIDProvider.createRequest()
+      request.requestedScopes = [.fullName, .email,]
+      
+      let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+      authorizationController.delegate = self
+      authorizationController.presentationContextProvider = self
+      authorizationController.performRequests()
     default:
 #if DEBUG
         fatalError("Not implemented")
@@ -374,5 +384,57 @@ private extension SignInViewController {
   func setupUI() {
     navigationController?.setNavigationBarHidden(true, animated: false)
 //    navigationItem.setHidesBackButton(true, animated: false)
+  }
+}
+
+extension SignInViewController: ASAuthorizationControllerPresentationContextProviding, ASAuthorizationControllerDelegate {
+  func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+    return self.view.window!
+  }
+  
+  func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+#if DEBUG
+    error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+    controllerOutput?.providerSignInCallback(result: .failure(AppError.server))
+  }
+  
+  func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+      switch authorization.credential {
+      case let appleIDCredential as ASAuthorizationAppleIDCredential:
+          
+          // Create an account in your system.
+        guard let authorizationCode = appleIDCredential.authorizationCode,
+              let code = String(data: authorizationCode, encoding: .utf8) else {
+          controllerOutput?.providerSignInCallback(result: .failure(AppError.server))
+          return
+        }
+        print("authorizationCode", code)
+        controllerOutput?.startAuthorizationUI(provider: .Apple)
+        controllerInput?.providerSignIn(provider: .Apple, accessToken: code)
+//        let userIdentifier = appleIDCredential.user
+//        let fullName = appleIDCredential.fullName
+//        let email = appleIDCredential.email
+//
+//        // For the purpose of this demo app, store the `userIdentifier` in the keychain.
+//        //          self.saveUserInKeychain(userIdentifier)
+//        //
+//        //          // For the purpose of this demo app, show the Apple ID credential information in the `ResultViewController`.
+//        //          self.showResultViewController(userIdentifier: userIdentifier, fullName: fullName, email: email)
+//
+//      case let passwordCredential as ASPasswordCredential:
+//
+//          // Sign in using an existing iCloud Keychain credential.
+//          let username = passwordCredential.user
+//          let password = passwordCredential.password
+//
+////          // For the purpose of this demo app, show the password credential as an alert.
+////          DispatchQueue.main.async {
+////              self.showPasswordCredentialAlert(username: username, password: password)
+////          }
+          
+      default:
+          break
+      }
   }
 }

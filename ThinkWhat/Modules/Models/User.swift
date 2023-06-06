@@ -40,6 +40,13 @@ class Userprofiles {
       if current.imageURL.isNil {
         current.image = UIImage(systemName: "person.fill")
       }
+      
+      // Register device
+      if let token = PushNotifications.loadToken() {
+        Task {
+          await API.shared.system.registerDevice(token: token)
+        }
+      }
     }
   }
   ///**Publishers**
@@ -590,12 +597,12 @@ class Userprofile: Decodable {
       Userprofiles.shared.current?.instagramURL = instagramURL
       Userprofiles.shared.current?.tiktokURL = tiktokURL
     } catch {
-#if DEBUG
-      error.printLocalized(class: type(of: self), functionName: #function)
-      fatalError()
-#else
+//#if DEBUG
+//      error.printLocalized(class: type(of: self), functionName: #function)
+//      fatalError()
+//#else
       throw error
-#endif
+//#endif
     }
   }
   

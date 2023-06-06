@@ -490,3 +490,6 @@
 "insufficient_balance_shortage_hint" = "To earn points, take an active part in the publications of community members";
 "new_poll_posted" = "Poll has been published!";
 "minimum_votes" = "Minimum number of votes: ";
+
+// Push notifications
+"pn_new_post" = "%@ posted a new post";

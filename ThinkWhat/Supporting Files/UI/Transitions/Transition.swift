@@ -6,6 +6,7 @@
 //  Copyright © 2023 Pavel Bukharov. All rights reserved.
 //
 
+import AuthenticationServices
 import UIKit
 
 class Transition: NSObject, UIViewControllerAnimatedTransitioning {
@@ -349,7 +350,14 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
 //        signupButton.frame.origin.x = -(containerView.bounds.width + signupButton.frame.width)
 //        containerView.addSubview(signupButton)
 //        toView.signupButton.alpha = 0
-        
+        let apple = ASAuthorizationAppleIDButton()
+        let appleDestination = toView.apple.superview!.convert(toView.apple.frame.origin,
+                                                                             to: containerView)
+        apple.frame.origin = appleDestination
+        apple.frame.origin.y = containerView.bounds.height
+        apple.frame.size = toView.apple.frame.size
+        containerView.addSubview(apple)
+        toView.apple.alpha = 0
         
         let signupStack = try! toView.signupStack.copyObject() as! UIStackView
         signupStack.arrangedSubviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = true }
@@ -384,10 +392,11 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         let views: [ [UIView: [UIView: CGPoint]]] = [
           [toView.loginContainer: [loginContainer: loginDestination]],
           [toView.passwordContainer: [passwordContainer: passwordDestination]],
+          [toView.apple: [apple: appleDestination]],
           [toView.separator: [separator: separatorDestination]],
-//          [toView.label: [orLabel: orLabelDestination]],
-//          [toView.signupButton: [signupButton: signupButtonDestination]],
-                    [toView.signupStack: [signupStack: signupStackDestination]],
+          //          [toView.label: [orLabel: orLabelDestination]],
+          //          [toView.signupButton: [signupButton: signupButtonDestination]],
+          [toView.signupStack: [signupStack: signupStackDestination]],
           [toView.forgotButton: [forgotButton: forgotButtonDestination]],
         ]
         
@@ -635,6 +644,14 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         containerView.addSubview(loginButton)
         loginButtonCoordinate.y = containerView.bounds.height
         
+        let apple = ASAuthorizationAppleIDButton()
+        var appleDestination = fromView.apple.superview!.convert(fromView.apple.frame.origin,
+                                                                             to: containerView)
+        apple.frame.origin = appleDestination
+        appleDestination.x = -(containerView.bounds.width + apple.frame.width)
+        apple.frame.size = fromView.apple.frame.size
+        containerView.addSubview(apple)
+        fromView.apple.alpha = 0
 //        //TODO
 //        let signupStack = try! fromView.signupStack.copyObject() as! UIStackView
 //        signupStack.arrangedSubviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = true }
@@ -788,7 +805,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         //        orLabel.frame.origin.y = containerView.bounds.height
         containerView.addSubview(orLabel)
         fromView.label.alpha = 0
-        orLabelDestination.x = containerView.bounds.height
+        orLabelDestination.x = containerView.bounds.width
         
         var logosDestination = fromView.logos.superview!.convert(fromView.logos.frame.origin,
                                                                  to: containerView)
@@ -811,12 +828,13 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                              size: fromView.logos.bounds.size)
         containerView.addSubview(logos)
         fromView.label.alpha = 0
-        logosDestination.x = containerView.bounds.height
+        logosDestination.x = containerView.bounds.width
         
         ///Animate coordinates
         let views: [[UIView: CGPoint]] = [
           [loginContainer: loginDestination],
           [passwordContainer: passwordDestination],
+          [apple: appleDestination],
           [loginButton: loginButtonCoordinate],
           [orLabel: orLabelDestination],
           [logos: logosDestination],
@@ -1027,6 +1045,15 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           
           return instance
         }()
+        let apple = ASAuthorizationAppleIDButton()
+        var appleDestination = fromView.apple.superview!.convert(fromView.apple.frame.origin,
+                                                                             to: containerView)
+        apple.frame.origin = appleDestination
+        appleDestination.x = -(containerView.bounds.width + apple.frame.width)
+        apple.frame.size = fromView.apple.frame.size
+        containerView.addSubview(apple)
+        fromView.apple.alpha = 0
+
         var loginButtonCoordinate = fromView.loginButton.superview!.convert(fromView.loginButton.frame.origin,
                                                                  to: containerView)
         //        buttonCoordinate.y = containerView.bounds.height
@@ -1192,6 +1219,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           [loginContainer: loginDestination],
           [passwordContainer: passwordDestination],
           [loginButton: loginButtonCoordinate],
+          [apple: appleDestination],
           [orLabel: orLabelDestination],
           [logos: logosDestination],
           [signupButton: signupButtonDestination],

@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import AuthenticationServices
 
 class SignInView: UIView {
   
@@ -43,6 +44,10 @@ class SignInView: UIView {
     let opaque = UIView.opaque()
     signupStack.placeXCentered(inside: opaque, topInset: 0, bottomInset: 0)
     
+    let opaque2 = UIView.opaque()
+    apple.placeXCentered(inside: opaque2, topInset: 0, bottomInset: 0)
+    
+    
 //    let buttonsStack = UIStackView(arrangedSubviews: [
 //      opaque,
 //      forgotButton
@@ -58,10 +63,12 @@ class SignInView: UIView {
       passwordContainer,
       //      UIView.verticalSpacer(padding),
       buttonView,
-      UIView.verticalSpacer(0),
+//      UIView.verticalSpacer(padding*2),
+      opaque,
+      opaque2,
       separator,
       logos,
-      opaque
+//      opaque
 //      buttonsStack
     ])
     instance.axis = .vertical
@@ -274,19 +281,25 @@ class SignInView: UIView {
     
     return instance
   }()
-  public private(set) lazy var appleLogo: AppleLogo = {
-    let instance = AppleLogo()
-    instance.isUserInteractionEnabled = true
-    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
-    instance.isOpaque = false
+//  public private(set) lazy var appleLogo: AppleLogo = {
+//    let instance = AppleLogo()
+//    instance.isUserInteractionEnabled = true
+//    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
+//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+//    instance.isOpaque = false
+//
+//    return instance
+//  }()
+  public private(set) lazy var apple: ASAuthorizationAppleIDButton = {
+    let instance = ASAuthorizationAppleIDButton()
+    instance.addTarget(self, action: #selector(self.buttonTapped(_:)), for: .touchUpInside)
     
     return instance
   }()
   public private(set) lazy var logos: UIView = {
     let instance = UIView.opaque()
     let stack = UIStackView(arrangedSubviews: [
-      appleLogo,
+//      appleLogo,
       google,
     ])
     stack.accessibilityIdentifier =  "stack"
@@ -727,6 +740,9 @@ private extension SignInView {
     forgotButton.translatesAutoresizingMaskIntoConstraints = false
     forgotButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
     forgotButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+    
+    apple.translatesAutoresizingMaskIntoConstraints = false
+    apple.heightAnchor.constraint(equalTo: loginButton.heightAnchor).isActive = true
   }
   
   @objc
@@ -762,7 +778,7 @@ private extension SignInView {
 //      startAuthorizationUI(provider: .Google)
 //      isUserInteractionEnabled = false
       viewInput?.providerSignIn(provider: .VK)
-    } else if sender === appleLogo {
+    } else if sender === apple {//appleLogo {
       viewInput?.providerSignIn(provider: .Apple)
     }
   }
@@ -803,6 +819,8 @@ private extension SignInView {
       viewInput?.signUp()
     } else if sender == forgotButton {
       viewInput?.resetPassword()
+    } else if sender == apple {
+      viewInput?.providerSignIn(provider: .Apple)
     }
   }
   

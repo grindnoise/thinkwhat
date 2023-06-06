@@ -61,9 +61,9 @@ class City: Decodable {
         Cities.shared.all.append(self)
       }
     } catch {
-#if DEBUG
-      error.printLocalized(class: type(of: self), functionName: #function)
-#endif
+//#if DEBUG
+//      error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
       throw error
     }
   }

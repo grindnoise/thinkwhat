@@ -9,6 +9,7 @@
 import Foundation
 import SwiftyJSON
 import Combine
+import UIKit
 
 class Topics {
   static let shared = Topics()

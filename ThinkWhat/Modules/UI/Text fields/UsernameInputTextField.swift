@@ -201,7 +201,16 @@ final class UsernameInputTextField: UITextField {
     @objc
     private func handleSend() {
         guard firstnameTextView.text.count >= 2 else {
-            showBanner(bannerDelegate: self, text: "minimum_characters_needed".localized + "\(2)", content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1), shadowed: false)
+          let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
+                                                                text: "minimum_characters_needed".localized + "\(2)",
+                                                                tintColor: .systemOrange),
+                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                 isModal: false,
+                                 useContentViewHeight: true,
+                                 shouldDismissAfter: 2)
+          banner.didDisappearPublisher
+            .sink { _ in banner.removeFromSuperview() }
+            .store(in: &self.subscriptions)
             return
         }
         

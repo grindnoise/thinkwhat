@@ -42,7 +42,10 @@ class MainController: UITabBarController {//}, StorageProtocol {
   private let profileUpdater = PassthroughSubject<Date, Never>()
   private var shouldTerminate = false
   //    private var loadingIndicator: LoadingIndicator?
-  //UI
+  /// **Logic**
+  private var surveyId: String?  // Used when app was opened from push notification in closed state
+  private var commentId: String? //
+  /// **UI**
   private var logoCenterY: CGFloat = .zero
   private lazy var loadingIcon: Icon = {
     let instance = Icon(category: Icon.Category.Logo)
@@ -165,6 +168,22 @@ class MainController: UITabBarController {//}, StorageProtocol {
   }
   
   // MARK: - Initialization
+  /// Init from push notification with survey id arrives when app is closed
+  /// - Parameter surveyId: id of the survey extracted from push notification
+  /// - Parameter commentId: id of the survey extracted from push notification
+  init(surveyId: String? = nil,
+       commentId: String? = nil) {
+    self.surveyId = surveyId
+    self.commentId = commentId
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  
+  
   
   // MARK: - Public methods
   func setLogoInitialFrame(size: CGSize, y: CGFloat) {
@@ -444,11 +463,18 @@ class MainController: UITabBarController {//}, StorageProtocol {
     loadingText.icon.removeAllAnimations()
     passthroughView.removeFromSuperview()
     API.shared.cancelAllRequests()
-    appDelegate.window?.rootViewController = UINavigationController(rootViewController: StartViewController())
     UserDefaults.clear()
     Surveys.clear()
-    Userprofiles.clear()
     AppData.isEmailVerified = false
+    if let token = PushNotifications.loadToken() {
+      Task {
+        PushNotifications.unregisterDevice(token: token) {
+          KeychainService.deleteData()
+        }
+      }
+    }
+    Userprofiles.clear()
+    appDelegate.window?.rootViewController = UINavigationController(rootViewController: StartViewController())
   }
 }
 
@@ -695,8 +721,41 @@ private extension MainController {
       return navigationController
     }
     
+//    viewControllers = [UIViewController]()
+//      // Init from push notification with survey id arrives when app is closed
+//      if !surveyId.isNil {
+//        viewControllers?.append(createNavigationController(for: HotController(surveyId: surveyId),
+//                                   title: "hot",
+//                                   image: UIImage(systemName: "flame"),
+//                                   selectedImage: UIImage(systemName: "flame.fill"),
+//                                   color: Colors.main))//Logo.Flame.rawValue),
+//      } else {
+//        viewControllers?.append(createNavigationController(for: HotController(surveyId: commentId),
+//                                   title: "hot",
+//                                   image: UIImage(systemName: "flame"),
+//                                   selectedImage: UIImage(systemName: "flame.fill"),
+//                                   color: Colors.main))//Logo.Flame.rawValue),
+//      }
+//    viewControllers?.append(createNavigationController(for: SubscriptionsController(),
+//                                 title: "subscriptions",
+//                                 image: UIImage(systemName: "bell"),
+//                                 selectedImage: UIImage(systemName: "bell.fill"),
+//                                 color: Colors.main))//Colors.Logo.CoolGray.rawValue),
+//    viewControllers?.append(createNavigationController(for: ListController(), title: "list",
+//                                 image: UIImage(systemName: "square.stack.3d.up"),
+//                                 selectedImage: UIImage(systemName: "square.stack.3d.up.fill"),
+//                                 color: Colors.main))//Colors.Logo.GreenMunshell.rawValue),
+//    viewControllers?.append(createNavigationController(for: TopicsController(), title: "topics",
+//                                 image: UIImage(systemName: "chart.bar.doc.horizontal"),
+//                                 selectedImage: UIImage(systemName: "chart.bar.doc.horizontal.fill"),
+//                                 color: Colors.main))//Colors.Logo.Marigold.rawValue),
+//    viewControllers?.append(createNavigationController(for: SettingsController(), title: "settings",
+//                                 image: UIImage(systemName: "gearshape"),
+//                                 selectedImage: UIImage(systemName: "gearshape.fill"),
+//                                 color: Colors.main))//Colors.Logo.AirBlue.rawValue),
+    
     viewControllers = [
-      createNavigationController(for: HotController(),
+      createNavigationController(for: surveyId.isNil ? HotController(commentId: commentId) : HotController(surveyId: surveyId),
                                  title: "hot",
                                  image: UIImage(systemName: "flame"),
                                  selectedImage: UIImage(systemName: "flame.fill"),

@@ -9,6 +9,7 @@
 import Foundation
 import SwiftyJSON
 import Combine
+import UIKit
 
 class Survey: Decodable {
   // MARK: - Enums

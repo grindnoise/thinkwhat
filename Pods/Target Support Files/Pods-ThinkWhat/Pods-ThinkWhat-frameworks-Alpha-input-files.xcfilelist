@@ -1,14 +1,4 @@
 ${PODS_ROOT}/Target Support Files/Pods-ThinkWhat/Pods-ThinkWhat-frameworks.sh
-${BUILT_PRODUCTS_DIR}/Agrume/Agrume.framework
-${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework
-${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework
-${BUILT_PRODUCTS_DIR}/FlagKit/FlagKit.framework
-${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework
-${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework
-${BUILT_PRODUCTS_DIR}/GoogleSignIn/GoogleSignIn.framework
-${BUILT_PRODUCTS_DIR}/L10n-swift/L10n_swift.framework
-${BUILT_PRODUCTS_DIR}/SwiftyGif/SwiftyGif.framework
-${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework
 ${BUILT_PRODUCTS_DIR}/SwiftyVK/SwiftyVK.framework
 ${BUILT_PRODUCTS_DIR}/TTRangeSlider/TTRangeSlider.framework
 ${BUILT_PRODUCTS_DIR}/YoutubePlayer-in-WKWebView/YoutubePlayer_in_WKWebView.framework

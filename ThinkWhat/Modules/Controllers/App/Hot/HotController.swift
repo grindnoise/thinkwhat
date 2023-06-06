@@ -27,9 +27,11 @@ class HotController: UIViewController, TintColorable {
   public private(set) var isOnScreen = true
   public private(set) var tabBarHeight: CGFloat = .zero
   public private(set) var navBarHeight: CGFloat = .zero
-  ///**Logic**
-  public private(set) var queue = QueueArray<Survey>()
-  public var currentSurvey: Survey? { controllerOutput?.currentSurvey }
+  /// **Logic**
+  private var surveyId: String?  // Used when app was opened from push notification in closed state
+  private var commentId: String? //
+  public private(set) var queue = QueueArray<Survey>() // Store elements in queue
+  public var currentSurvey: Survey? { controllerOutput?.currentSurvey } // Survey on screen
   
   
   
@@ -43,6 +45,27 @@ class HotController: UIViewController, TintColorable {
   private var isNetworking = false
   private var timer: Timer?
   private var initialColor: UIColor = .clear
+  
+  
+  
+  // MARK: - Initialization
+  /// Init from push notification with survey id arrives when app is closed
+  /// - Parameter surveyId: key extracted from push notification
+  init(surveyId: String? = nil) {
+    self.surveyId = surveyId
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  /// Init from push notification with survey id arrives when app is closed
+  /// - Parameter commentId: key extracted from push notification
+  init(commentId: String? = nil) {
+    self.commentId = commentId
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   
   
@@ -289,6 +312,17 @@ extension HotController: HotModelOutput {
 
 extension HotController: DataObservable {
   func onDataLoaded() {
+    // If app was opened from notification with survey id
+    if !surveyId.isNil {
+      navigationController?.navigationBar.backItem?.title = ""
+      navigationController?.pushViewController(PollController(surveyReference: SurveyReferences.shared.all.first!), animated: true)
+      tabBarController?.setTabBarVisible(visible: false, animated: true)
+      
+      guard let main = tabBarController as? MainController else { return }
+      
+      main.toggleLogo(on: false)
+    }
+    
     isDataReady = true
     navigationController?.setNavigationBarHidden(false, animated: true)
     
@@ -316,4 +350,3 @@ extension HotController: ScreenVisible {
     isOnScreen = flag
   }
 }
-

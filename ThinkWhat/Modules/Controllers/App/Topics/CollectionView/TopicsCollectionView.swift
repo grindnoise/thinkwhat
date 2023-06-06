@@ -9,6 +9,39 @@
 import UIKit
 import Combine
 
+enum TopicListItem: Hashable {
+    case header(TopicHeaderItem)
+    case topic(TopicItem)
+}
+
+struct TopicHeaderItem: Hashable {
+    let title: String
+    let description: String
+    let topic: Topic
+    let topics: [TopicItem]
+    
+    init(topic: Topic) {
+        self.topic = topic
+        self.title = topic.title
+        self.description = topic.description
+        self.topics = topic.children.map {
+            return TopicItem(topic: $0)
+        }
+    }
+}
+
+struct TopicItem: Hashable {
+    let title: String
+    let description: String
+    let topic: Topic
+    
+    init(topic: Topic) {
+        self.topic = topic
+        self.title = topic.title
+        self.description = topic.description
+    }
+}
+
 class TopicsCollectionView: UICollectionView {
   enum Mode { case Default, Selection }
   // MARK: - Public properties

@@ -9,13 +9,40 @@
 import Foundation
 
 struct API_URLS {
+  static let BASE                     = localhost ? "http://127.0.0.1:8000/" : "https://damp-oasis-64585.herokuapp.com/"////
+  static let CLIENT_ID                = localhost ? "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS" : "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
+  static let CLIENT_SECRET            = localhost ? "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH" : "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
+  static let CURRENT_TIME             = "api/current_time/"
+  static let TOKEN_REVOKE             = "auth/revoke-token/"
+  static let RESET_PASSWORD           = "api/password_reset/"
+  static let APP_LAUNCH               = "api/app_launch/load/"
+  //Profiles
+  static let USERS                    = "api/users/"
+  static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified/"
+  static let USER_PROFILE_STATS       = "api/profiles/get_profile_stats/"
+  static let USER_PROFILE_TOP_PUBS    = "api/profiles/get_top_active_publications/"
+  static let SURVEYS                  = "api/surveys/"
+  static let SURVEYS_MEDIA            = "api/media/"
+  static let SURVEYS_TOP              = "api/surveys/top/"
+  static let SURVEYS_NEW              = "api/surveys/new/"
+  static let SURVEYS_OWN              = "api/surveys/own/"
+  static let SURVEYS_HOT              = "api/surveys/hot/"
+  //    static let SURVEYS_HOT_EXCEPT       = "api/surveys/hot_except/"
+  static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
+  static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
+  static let SURVEYS_REJECT           = "api/surveys/reject/"
+  static let VOTE                     = "api/vote/"
+  static let CATEGORIES               = "api/categories/"
+  static let BALANCE                  = "api/current_balance_price/"
+  static let CREATE_CITY              = "api/cities/create_city/"
   
   struct Geocoding {
     static let countryByIP = "http://ip-api.com/json/?fields=status,message,country,countryCode,region,regionName"
   }
   
   struct Profiles {
-    static let base:                URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/")}()
+    static let baseString = "api/profiles/"
+    static let base:                URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent(baseString)}()
     static let subscribe:           URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/subscribe/")}()
     static let unsubscribe:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/unsubscribe/")}()
     static let removeSubscribers:   URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/remove_subscribers/")}()
@@ -26,6 +53,9 @@ struct API_URLS {
     static let feedback:            URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/feedback/")}()
     static let compatibility:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_compatibility/")}()
     static let switchNotifications: URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/switch_subscription_notifications/")}()
+    static let registerDevice:      URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent(baseString + "register_device/")}()
+    static let unregisterDevice:    URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent(baseString + "unregister_device/")}()
+//    static let setDeviceState:      URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent(baseString + "set_device_state/")}()
   }
   
   struct Topics {
@@ -78,6 +108,8 @@ struct API_URLS {
     static let getCodeViaMail       = URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/send_confirmation_code/")
     static let token                = URL(string: API_URLS.BASE)?.appendingPathComponent("auth/token/")
     static let getTokenByPassword   = URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/get_token/")
+    static let convertToken         = URL(string: API_URLS.BASE)?.appendingPathComponent("auth/convert-token/")
+    static let appleSignIn          = URL(string: API_URLS.BASE)?.appendingPathComponent("auth/apple/")
   }
   
   struct System {
@@ -85,54 +117,4 @@ struct API_URLS {
     static let licenses:            URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("licenses_ios/")}()
     //        static let updateStats:     URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/get_updates/")}()
   }
-  
-  static let BASE                     = localhost ? "http://127.0.0.1:8000/" : "https://damp-oasis-64585.herokuapp.com/"////
-  static let CLIENT_ID                = localhost ? "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS" : "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
-  static let CLIENT_SECRET            = localhost ? "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH" : "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
-  
-  
-  static let CURRENT_TIME             = "api/current_time/"
-//  static let TOKEN                    = "auth/token/"
-  static let TOKEN_CONVERT            = "auth/convert-token/"
-  static let TOKEN_REVOKE             = "auth/revoke-token/"
-  static let RESET_PASSWORD           = "api/password_reset/"
-  
-  
-  static let APP_LAUNCH               = "api/app_launch/load/"
-  //Profiles
-  static let USERS                    = "api/users/"
-//  static let USERNAME_EXISTS          = "api/profiles/username_exists"
-//  static let EMAIL_EXISTS             = "api/profiles/email_exists"
-//  static let GET_CONFIRMATION_CODE    = "api/profiles/send_confirmation_code/"
-  static let GET_EMAIL_VERIFIED       = "api/profiles/get_email_verified/"
-//  static let PROFILE_NEEDS_UPDATE     = "api/profiles/needs_update/"
-//  static let PROFILES                 = "api/profiles/"
-//  static let CURRENT_USER             = "api/profiles/current/"
-  static let USER_PROFILE_STATS       = "api/profiles/get_profile_stats/"
-  static let USER_PROFILE_TOP_PUBS    = "api/profiles/get_top_active_publications/"
-  
-  
-  //Surveys
-  static let SURVEYS                  = "api/surveys/"
-  static let SURVEYS_MEDIA            = "api/media/"
-  static let SURVEYS_TOP              = "api/surveys/top/"
-  static let SURVEYS_NEW              = "api/surveys/new/"
-  
-  static let SURVEYS_OWN              = "api/surveys/own/"
-  static let SURVEYS_HOT              = "api/surveys/hot/"
-  //    static let SURVEYS_HOT_EXCEPT       = "api/surveys/hot_except/"
-  static let SURVEYS_FAVORITE         = "api/surveys/favorite/"
-  static let SURVEYS_TOTAL_COUNT      = "api/surveys/total_count/"
-  static let SURVEYS_REJECT           = "api/surveys/reject/"
-  
-  static let VOTE                     = "api/vote/"
-  
-  
-  static let CATEGORIES               = "api/categories/"
-  static let BALANCE                  = "api/current_balance_price/"
-  
-  static let CREATE_CITY              = "api/cities/create_city/"
-  
-  //    static let SMS_VALIDATION_URL   = "http://burber.pythonanywhere.com/passcode/generate/"
-  
 }

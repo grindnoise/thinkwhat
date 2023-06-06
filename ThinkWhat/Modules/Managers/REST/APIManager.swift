@@ -11,6 +11,7 @@ import Alamofire
 import SwiftyJSON
 import simd
 import CoreAudio
+import UIKit
 
 class API {
   static let shared   = API()
@@ -150,7 +151,7 @@ class API {
     guard let accessToken = KeychainService.loadAccessToken() else { return nil }
     
     let headers: HTTPHeaders = [
-      "Authorization": "Bearer " + (KeychainService.loadAccessToken()! as String) as String,
+      "Authorization": "Bearer " + (accessToken as String) as String,
       "Content-Type": "application/json"
     ]
     return headers
@@ -464,10 +465,25 @@ class API {
     
     public func loginViaProviderAsync(provider: AuthProvider,
                                       token: String) async throws  {
-      guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { throw APIError.invalidURL }
+      
+      var url: URL!
+      if provider == .Apple {
+        guard let _url = API_URLS.Auth.appleSignIn else { throw APIError.invalidURL }
+        
+        url = _url
+      } else {
+        guard let _url = API_URLS.Auth.convertToken else { throw APIError.invalidURL }
+        
+        url = _url
+      }
       let parameters = ["client_id": API_URLS.CLIENT_ID, "client_secret": API_URLS.CLIENT_SECRET, "grant_type": "convert_token", "backend": "\(provider.rawValue.lowercased())", "token": "\(token)"]
+      print(parameters)
       do {
-        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: URLEncoding(), accessControl: false)
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: URLEncoding(),
+                                                 accessControl: false)
         let json = try JSON(data: data, options: .mutableContainers)
         let _ = saveTokenInKeychain(json: json)
       } catch let error {
@@ -652,7 +668,8 @@ class API {
     ///**OAuth**
     ///Social media auhorization. Store access token if finished successful
     public func loginViaProvider(provider: AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-      guard let url = URL(string: API_URLS.BASE)?.appendingPathComponent(API_URLS.TOKEN_CONVERT) else { completion(.failure(APIError.invalidURL)); return }
+      guard let url = API_URLS.Auth.convertToken else { completion(.failure(APIError.invalidURL)); return }
+      
       let parameters = ["client_id": API_URLS.CLIENT_ID,
                         "client_secret": API_URLS.CLIENT_SECRET,
                         "grant_type": "convert_token",
@@ -893,6 +910,58 @@ class API {
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif
         throw error
+      }
+    }
+    
+    /// Deletes push notification token from database
+    /// - Parameter token: `PushNotificationToken` to be removed
+    public func unregisterDevice(token: PushNotificationToken) async {
+      guard let url = API_URLS.Profiles.unregisterDevice,
+            let headers = headers
+      else { return }
+      
+      let parameters: Parameters = [
+        "device_type": "apns",
+        "device_token": token.token,
+      ]
+      
+      do {
+        try await parent.requestAsync(url: url,
+                                      httpMethod: .post,
+                                      parameters: parameters,
+                                      encoding: JSONEncoding.default,
+                                      headers: headers)
+        
+      } catch let error {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+    
+    /// Appends push notification token to database
+    /// - Parameter token: `PushNotificationToken` to be removed
+    public func registerDevice(token: PushNotificationToken) async {
+      guard let url = API_URLS.Profiles.registerDevice,
+            let headers = headers
+      else { return }
+      
+      let parameters: Parameters = [
+        "device_type": "apns",
+        "device_token": token.token,
+      ]
+      
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: headers)
+        
+      } catch let error {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
       }
     }
   }

@@ -215,7 +215,7 @@ class NewAccountView: UIView {
     let instance = UnderlinedSignTextField()
     instance.delegate = self
     instance.keyboardType = .emailAddress
-    instance.backgroundColor = .clear
+    instance.backgroundColor = .clear 
     instance.tintColor = Colors.main
     instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
     instance.clipsToBounds = false

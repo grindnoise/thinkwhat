@@ -691,11 +691,11 @@ extension Banner: CallbackObservable {
   }
 }
 
-func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, content: UIView, color: UIColor = .systemRed, textColor: UIColor = .label, isModal: Bool = false, dismissAfter: TimeInterval = 1, backgroundColor: UIColor = . clear, identifier: String = "", fadeBackground: Bool = false, shadowed: Bool = true) {
-  let banner = Banner(callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate, backgroundColor: backgroundColor, fadeBackground: fadeBackground, shadowed: shadowed)
-  banner.accessibilityIdentifier = identifier
-  banner.present(content: PlainBannerContent(text: text, imageContent: content, color: color, textColor: textColor), isModal: isModal, dismissAfter: dismissAfter)
-}
+//func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, text: String, content: UIView, color: UIColor = .systemRed, textColor: UIColor = .label, isModal: Bool = false, dismissAfter: TimeInterval = 1, backgroundColor: UIColor = . clear, identifier: String = "", fadeBackground: Bool = false, shadowed: Bool = true) {
+//  let banner = Banner(callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate, backgroundColor: backgroundColor, fadeBackground: fadeBackground, shadowed: shadowed)
+//  banner.accessibilityIdentifier = identifier
+//  banner.present(content: PlainBannerContent(text: text, imageContent: content, color: color, textColor: textColor), isModal: isModal, dismissAfter: dismissAfter)
+//}
 //
 //func showPopup(callbackDelegate: CallbackObservable? = nil, bannerDelegate: BannerObservable, subview: UIView, color: UIColor = .systemRed, isModal: Bool = true, shouldDismissAfter: TimeInterval = 1, accessibilityIdentifier: String = "", callbackPassthrough: Bool = false) {
 //    let banner = Popup(frame: UIScreen.main.bounds, callbackDelegate: callbackDelegate, bannerDelegate: bannerDelegate)
@@ -711,31 +711,31 @@ func showBanner(callbackDelegate: CallbackObservable? = nil, bannerDelegate: Ban
 //    banner.present(content: subview)
 //}
 
-func showTip(delegate: BannerObservable, identifier: String, force: Bool = false, timeout: TimeInterval = 2) {
-  guard  force || UserDefaults.App.hasSeenAppIntroduction.isNil else { return }
-  guard identifier == "choices_tip" ||
-          identifier == "description_tip" ||
-          identifier == "url_tip" ||
-          identifier == "images_tip" ||
-          identifier == "limits_tip" ||
-          identifier == "question_tip" ||
-          identifier == "hot_tip" else { return }
-  var color = K_COLOR_TABBAR
-  var imageView = UIImageView(image: UIImage(systemName: "info.circle.fill"))
-  if identifier == "hot_tip" {
-    color = .systemRed
-    imageView = ImageSigns.flameFilled
-  } else if identifier == "question_tip" {
-    imageView = UIImageView(image: UIImage(systemName: "questionmark.circle.fill"))
-  } else if identifier == "limits_tip" {
-    imageView = ImageSigns.speedometer
-  } else if identifier == "url_tip" {
-    imageView = UIImageView(image: UIImage(systemName: "link.circle.fill"))
-  }
-  
-  showBanner(bannerDelegate: delegate,
-             text: identifier.localized,
-             content: imageView,
-             color: color,
-             dismissAfter: timeout)
-}
+//func showTip(delegate: BannerObservable, identifier: String, force: Bool = false, timeout: TimeInterval = 2) {
+//  guard  force || UserDefaults.App.hasSeenAppIntroduction.isNil else { return }
+//  guard identifier == "choices_tip" ||
+//          identifier == "description_tip" ||
+//          identifier == "url_tip" ||
+//          identifier == "images_tip" ||
+//          identifier == "limits_tip" ||
+//          identifier == "question_tip" ||
+//          identifier == "hot_tip" else { return }
+//  var color = K_COLOR_TABBAR
+//  var imageView = UIImageView(image: UIImage(systemName: "info.circle.fill"))
+//  if identifier == "hot_tip" {
+//    color = .systemRed
+//    imageView = ImageSigns.flameFilled
+//  } else if identifier == "question_tip" {
+//    imageView = UIImageView(image: UIImage(systemName: "questionmark.circle.fill"))
+//  } else if identifier == "limits_tip" {
+//    imageView = ImageSigns.speedometer
+//  } else if identifier == "url_tip" {
+//    imageView = UIImageView(image: UIImage(systemName: "link.circle.fill"))
+//  }
+//
+//  showBanner(bannerDelegate: delegate,
+//             text: identifier.localized,
+//             content: imageView,
+//             color: color,
+//             dismissAfter: timeout)
+//}

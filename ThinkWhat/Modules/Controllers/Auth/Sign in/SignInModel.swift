@@ -34,7 +34,7 @@ extension SignInModel: SignInControllerInput {
         GoogleWorker.logout()
       default:
 #if DEBUG
-        fatalError("Not implemented")
+        print("Not implemented")
 #endif
       }
     }
@@ -164,6 +164,15 @@ extension SignInModel: SignInControllerInput {
         var userprofile = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self,
                                                                                           from: current.rawData())
         Userprofiles.shared.current = userprofile
+        
+        // If provider is Apple - no need to request user's data
+        if provider == .Apple {
+          await MainActor.run {
+            modelOutput?.providerSignInCallback(result: .success(true))
+          }
+          return
+        }
+        
         ///Detext if profile was edited by user
         guard let wasEdited = userprofile.wasEdited else { fatalError() }
         

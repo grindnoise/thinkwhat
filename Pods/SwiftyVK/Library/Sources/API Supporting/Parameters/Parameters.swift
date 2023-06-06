@@ -39,6 +39,7 @@ public enum Parameter: String, Hashable {
     case count
     case city
     case country
+    case photo_400 = "photo_400_orig"
     case hometown
     case universityCountry = "university_country"
     case university
@@ -142,7 +143,6 @@ public enum Parameter: String, Hashable {
     case server
     case hash
     case photo
-    case photo_400 = "photo_400_orig"
     case photoId = "photo_id"
     case startTime = "start_time"
     case endTime = "end_time"

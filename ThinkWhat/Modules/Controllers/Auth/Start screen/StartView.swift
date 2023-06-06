@@ -276,6 +276,6 @@ extension StartView: Localizable {
                                                    ]),
                                 for: .normal)
     }
-    label.text = #keyPath(WelcomeView.welcomeLabel).localized
+    label.text = "welcomeLabel".localized
   }
 }

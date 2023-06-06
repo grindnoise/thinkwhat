@@ -515,8 +515,8 @@ extension UIDevice {
         || FileManager.default.fileExists(atPath: "/bin/bash")
         || FileManager.default.fileExists(atPath: "/usr/sbin/sshd")
         || FileManager.default.fileExists(atPath: "/etc/apt")
-        || FileManager.default.fileExists(atPath: "/private/var/lib/apt/")
-        || UIApplication.shared.canOpenURL(URL(string:"cydia://package/com.example.package")!) {
+        || FileManager.default.fileExists(atPath: "/private/var/lib/apt/") {
+//        || UIApplication.shared.canOpenURL(URL(string:"cydia://package/com.example.package")!) {
       return true
     }
     // Check 2 : Reading and writing in system directories (sandbox violation)

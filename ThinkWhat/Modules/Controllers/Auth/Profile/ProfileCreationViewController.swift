@@ -146,7 +146,7 @@ extension ProfileCreationViewController: ProfileCreationViewInput {
   }
   
   func openApp() {
-    appDelegate.window?.rootViewController = MainController()
+    appDelegate.window?.rootViewController = MainController(surveyId: nil)
   }
   
   func updateDescription(_ string: String) {

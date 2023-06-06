@@ -312,8 +312,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
     snapshot.appendItems([1], toSection: .City)
     if userprofile.isCurrent, mode != .Creation {
       snapshot.appendItems([2], toSection: .Email)
-      snapshot.appendItems([3], toSection: .SocialMedia)
+//      snapshot.appendItems([3], toSection: .SocialMedia)
     }
+    snapshot.appendItems([3], toSection: .SocialMedia)
     if mode != .Creation {
       snapshot.appendItems([4], toSection: .Interests)
     }

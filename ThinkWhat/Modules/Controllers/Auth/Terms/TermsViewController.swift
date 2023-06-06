@@ -106,13 +106,13 @@ extension TermsViewController: TermsViewInput {
           let wasEdited = userprofile.wasEdited
     else { return }
 
-    guard wasEdited else {
+//    guard wasEdited else {
       navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
-      return
-    }
-    controllerOutput?.animateTransitionToApp {
-      appDelegate.window?.rootViewController = MainController()
-    }
+//      return
+//    }
+//    controllerOutput?.animateTransitionToApp {
+//      appDelegate.window?.rootViewController = MainController()
+//    }
   }
 }
 

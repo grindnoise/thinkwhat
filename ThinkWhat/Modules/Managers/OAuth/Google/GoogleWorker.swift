@@ -11,7 +11,7 @@ import GoogleSignIn
 
 class GoogleWorker {
 //  static let signInConfig = GIDConfiguration.init(clientID: Bundle.main.object(forInfoDictionaryKey: "GoogleAppID") as! String)
-  
+
   class func wakeUp() {
     GIDSignIn.sharedInstance.restorePreviousSignIn()
   }
@@ -43,7 +43,7 @@ class GoogleWorker {
       //          continuation.resume(returning: authentication.accessToken)
       //          return
       //      }
-      
+
       //      GIDSignIn.sharedInstance.signIn(
       //          withPresenting: viewController) { signInResult, error in
       //            guard let result = signInResult else {
@@ -53,8 +53,8 @@ class GoogleWorker {
       //            // If sign in succeeded, display the app's main content View.
       //          }
       //        )
-      
-      
+
+
       GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { result, error in
         if let error = error {
           continuation.resume(throwing: error)
@@ -69,12 +69,12 @@ class GoogleWorker {
       }
     }
   }
-  
+
   class func signIn(viewController: UIViewController, completion: @escaping(Result<String, Error>) -> ())  {
     if let token = GIDSignIn.sharedInstance.currentUser?.accessToken {
       return completion(.success(token.tokenString))
     }
-    
+
     GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { result, error in
       if let error = error {
         return completion(.failure(error))
@@ -101,7 +101,7 @@ class GoogleWorker {
       return
     }
   }
-  
+
   static func prepareDjangoData(id: String, firstName: String, lastName: String, email: String, image: UIImage? = nil) -> [String: Any] {
     var parameters = [String: Any]()
     parameters["owner.\(DjangoVariables.User.firstName)"] = firstName
@@ -113,7 +113,7 @@ class GoogleWorker {
     }
     return parameters
   }
-  
+
   //    static func _prepareDjangoData(_ data: [String : Any]) -> [String : Any] {
   //        var userProfile = [String: Any]()
   //        for (key, value) in data {
@@ -127,7 +127,7 @@ class GoogleWorker {
   //        }
   //        return userProfile
   //    }
-  
+
   //    public class func performLogin(viewController: UIViewController, completionHandler: @escaping(Bool) -> Void) {
   //
   //        shared.logIn(permissions: ["public_profile", "email"],
@@ -140,11 +140,11 @@ class GoogleWorker {
   //                                }
   //        }
   //    }
-  
+
   public class func logout() {//(completionHandler: @escaping(Bool) -> Void) {
     GIDSignIn.sharedInstance.signOut()
   }
-  
+
   //    public class func getUserData(completionHandler: @escaping(JSON?) -> Void) {
   //        if AccessToken.current != nil {
   //            GraphRequest(graphPath: "me", parameters: ["fields" : "name, first_name, last_name, email, picture.type(large)"]).start() {
@@ -164,7 +164,7 @@ class GoogleWorker {
   //            }
   //        }
   //    }
-  
+
   //    private func initializeServerAPI() -> APIManagerProtocol {
   //        return appDelegate.container.resolve(APIManagerProtocol.self)!
   //    }
