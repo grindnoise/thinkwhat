@@ -184,13 +184,13 @@ class SurveyReference: Decodable {// NSObject,
 //      NotificationCenter.default.post(name: Notifications.Surveys.Ban, object: self)
     }
   }
+  // Flag is needed to unhighlight item in list
   var isVisited: Bool {
     didSet {
       guard oldValue != isVisited else { return }
       
       survey?.isVisited = isVisited
       isVisitedPublisher.send(isVisited)
-
     }
   }
   var isClaimed: Bool = false {

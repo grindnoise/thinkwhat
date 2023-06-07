@@ -42,10 +42,10 @@ class Userprofiles {
       }
       
       // Register device
-      if let token = PushNotifications.loadToken() {
-        Task {
-          await API.shared.system.registerDevice(token: token)
-        }
+      guard current != oldValue, let token = PushNotifications.loadToken() else { return }
+      
+      Task.detached() {
+        await API.shared.system.registerDevice(token: token)
       }
     }
   }

@@ -30,7 +30,7 @@ extension NotificationCenter: UNUserNotificationCenterDelegate {
        let navigationController = mainController.selectedViewController as? UINavigationController {
       print(surveyId)
       navigationController.navigationBar.backItem?.title = ""
-      navigationController.pushViewController(PollController(surveyReference: SurveyReferences.shared.all.first!), animated: true)
+      navigationController.pushViewController(PollController(surveyId: surveyId), animated: true)
       mainController.setTabBarVisible(visible: false, animated: true)
       mainController.toggleLogo(on: false)
     }

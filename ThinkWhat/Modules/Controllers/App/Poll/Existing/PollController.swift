@@ -17,33 +17,7 @@ class PollController: UIViewController {
   // MARK: - Public properties
   var controllerOutput: PollControllerOutput?
   var controllerInput: PollControllerInput?
-  public private(set) var item: SurveyReference {
-    didSet {
-      //            func update() {
-      //                //Update survey stats every n seconds
-      //                Timer
-      //                    .publish(every: 5, on: .current, in: .common)
-      //                    .autoconnect()
-      //                    .sink { [weak self] seconds in
-      //                        guard let self = self else { return }
-      //
-      //                        self.controllerInput?.updateResultsStats(self.surveyReference)
-      //                    }
-      //                    .store(in: &subscriptions)
-      //            }
-      //
-      //            guard surveyReference.isComplete else {
-      //                surveyReference.isCompletePublisher
-      //                    .filter { $0 }
-      //                    .sink { _ in update() }
-      //                    .store(in: &subscriptions)
-      //
-      //                return
-      //            }
-      //
-      //            update()
-    }
-  }
+  public private(set) var item: SurveyReference!
   public private(set) var mode: Mode
   
   
@@ -53,6 +27,7 @@ class PollController: UIViewController {
   private var tasks: [Task<Void, Never>?] = []
   private var subscriptions = Set<AnyCancellable>()
   ///**Logic**
+  private var surveyId: String?
   private var userHasVoted = false
   private var isOnScreen = false
   private var surveyStateUpdater: AnyCancellable?
@@ -96,7 +71,7 @@ class PollController: UIViewController {
     return instance
   }()
   private lazy var loadingIndicator: LoadingIndicator = {
-    let instance = LoadingIndicator(color: item.topic.tagColor,
+    let instance = LoadingIndicator(color: item.isNil ? Colors.main : item.topic.tagColor,
                                     duration: 0.5)
     instance.didDisappearPublisher
       .sink { [weak self] _ in
@@ -129,9 +104,8 @@ class PollController: UIViewController {
   
   
   // MARK: - Initialization
-  init(surveyReference: SurveyReference,
-       mode: Mode = .Vote,
-       showNext: Bool = false) {
+  // Init from lists/hot view
+  init(surveyReference: SurveyReference, mode: Mode = .Vote) {
     self.item = surveyReference
     self.mode = mode
     
@@ -164,6 +138,14 @@ class PollController: UIViewController {
       .store(in: &subscriptions)
   }
   
+  // Init from push notification
+  init(surveyId: String) {
+    self.surveyId = surveyId
+    self.mode = .Vote
+    
+    super.init(nibName: nil, bundle: nil)
+  }
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -185,10 +167,15 @@ class PollController: UIViewController {
       .modelOutput = self
     self.view = view as UIView
     
-    setTasks()
-//    setupUI()
+    // Check if init is from push notification
+    guard !item.isNil, surveyId.isNil else {
+      loadData(surveyID: surveyId!)
+      return
+    }
+    
     guard item.isBanned else {
       loadData()
+      setTasks()
       return
     }
     
@@ -221,6 +208,7 @@ class PollController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
+    guard !item.isNil else { return }
     setupUI()
   }
   
@@ -556,20 +544,31 @@ private extension PollController {
       }
   }
   
-  func loadData() {
+  /// Loads survey by reference or id if it's a push notification
+  /// - Parameter surveyID: survey id extracted from push notification
+  func loadData(surveyID: String = "") {
     
-    guard item.survey.isNil else {
-      controllerOutput?.item = item.survey
-      
-      guard mode != .Preview else { return }
-      controllerInput?.addView()
-      return
+    
+    switch surveyID.isEmpty {
+    case false:
+      navigationController?.setNavigationBarHidden(true, animated: false)
+      loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+      loadingIndicator.start()
+      controllerInput?.load(surveyID)
+    case true:
+      guard item.survey.isNil else {
+        controllerOutput?.item = item.survey
+        
+        // Increment view counter
+        guard mode != .Preview else { return }
+        controllerInput?.incrementViewCounter()
+        return
+      }
+      navigationController?.setNavigationBarHidden(true, animated: false)
+      loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+      loadingIndicator.start()
+      controllerInput?.load(item, incrementViewCounter: true)
     }
-    
-    navigationController?.setNavigationBarHidden(true, animated: false)
-    loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-    loadingIndicator.start()
-    controllerInput?.load(item, incrementViewCounter: true)
   }
   
   func setBarButtonItems() {
@@ -807,12 +806,21 @@ extension PollController: PollModelOutput {
   @MainActor
   func onLoadCallback(_ result: Result<Survey, Error>) {
     switch result {
-    case .success(_):
+    case .success(let instance):
+      if item.isNil {
+        item = instance.reference
+        setTasks()
+        setupUI()
+      }
 //      navigationController?.setNavigationBarHidden(false, animated: true)
       delay(seconds: 0.5) { [weak self] in
         guard let self = self else { return }
         
-        self.loadingIndicator.stop()
+        self.loadingIndicator.stop() { [weak self] in
+          guard let self = self else { return }
+          
+          self.loadingIndicator.removeFromSuperview()
+        }
       }
     case .failure:
       let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,

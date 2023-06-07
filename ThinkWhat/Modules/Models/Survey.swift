@@ -266,6 +266,7 @@ class Survey: Decodable {
       reference.isRejectedPublisher.send(isRejected)
     }
   }
+  // Flag is needed to unhighlight item in list
   var isVisited: Bool {
     didSet {
       reference.isVisited = isVisited

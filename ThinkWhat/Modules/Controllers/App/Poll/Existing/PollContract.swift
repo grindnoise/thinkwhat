@@ -13,7 +13,7 @@ protocol PollViewInput: AnyObject {
   
   var controllerOutput: PollControllerOutput? { get set }
   var controllerInput: PollControllerInput? { get set }
-  var item: SurveyReference { get }
+  var item: SurveyReference! { get }
   var mode: PollController.Mode { get }
   
   func openUserprofile()
@@ -41,10 +41,11 @@ protocol PollControllerInput: AnyObject {
   
   func claim(_: [SurveyReference :Claim])
   func load(_: SurveyReference, incrementViewCounter: Bool)
+  func load(_: String)
   func toggleFavorite(_: Bool)
   func vote(_: Answer)
   func post(_: Survey)
-  func addView()
+  func incrementViewCounter()
   func updateResultsStats(_: Survey)
   func postComment(body: String, replyTo: Comment?, username: String?)
   func updateCommentsStats(_: [Comment])
@@ -55,7 +56,7 @@ protocol PollControllerInput: AnyObject {
 }
 
 protocol PollModelOutput: AnyObject {
-  var item: SurveyReference { get }
+  var item: SurveyReference! { get }
   
   func postCallback(_: Result<Bool, Error>)
   func onLoadCallback(_: Result<Survey, Error>)

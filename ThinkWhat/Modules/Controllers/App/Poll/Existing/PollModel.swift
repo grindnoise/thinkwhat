@@ -114,7 +114,7 @@ extension PollModel: PollControllerInput {
     }
   }
   
-  func addView() {
+  func incrementViewCounter() {
     guard let survey = item else { return }
     
     Task {
@@ -224,6 +224,17 @@ extension PollModel: PollControllerInput {
     Task {
       do {
         let instance = try await API.shared.surveys.getSurvey(byReference: reference, incrementCounter: incrementViewCounter)
+        await MainActor.run { modelOutput?.onLoadCallback(.success(instance)) }
+      } catch {
+        await MainActor.run { modelOutput?.onLoadCallback(.failure(error)) }
+      }
+    }
+  }
+  
+  func load(_ referenceId: String) {
+    Task {
+      do {
+        let instance = try await API.shared.surveys.getSurvey(byReferenceId: referenceId)
         await MainActor.run { modelOutput?.onLoadCallback(.success(instance)) }
       } catch {
         await MainActor.run { modelOutput?.onLoadCallback(.failure(error)) }

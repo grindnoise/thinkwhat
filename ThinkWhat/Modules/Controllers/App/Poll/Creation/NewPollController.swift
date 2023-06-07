@@ -214,10 +214,7 @@ extension NewPollController: NewPollViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(PollController(surveyReference: instance.reference,
-                                                            mode: .Preview,
-                                                            showNext: false),
-                                             animated: true)
+    navigationController?.pushViewController(PollController(surveyReference: instance.reference, mode: .Preview), animated: true)
   }
   
   func setColor(_ color: UIColor) {

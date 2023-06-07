@@ -31,6 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow()
     
     // Check if app was opened by push notification
+    // surveyId or surveyId+commentId are passed to MainController to open specific controller
     var surveyId: String?
     var commentId: String?
     if let remoteNotification = launchOptions?[.remoteNotification] as?  [AnyHashable : Any],
@@ -80,8 +81,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
   
   func applicationWillResignActive(_ application: UIApplication) {
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+    // Reset badge
+    UserDefaults.extensions.badge = 0
   }
   
   func applicationDidEnterBackground(_ application: UIApplication) {
@@ -103,8 +104,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+      print(deviceToken.reduce("") { $0 + String(format: "%02x", $1) })
       PushNotifications.saveToken(token: deviceToken)
 //      PushNotifications.registerCustomActions()
+  }
+  
+  func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+    print(error.localizedDescription)
   }
   
   // MARK: - Core Data stack

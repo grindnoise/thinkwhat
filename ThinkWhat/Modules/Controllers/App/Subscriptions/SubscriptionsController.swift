@@ -620,7 +620,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(PollController(surveyReference: instance, showNext: false), animated: true)
+    navigationController?.pushViewController(PollController(surveyReference: instance), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let controller = tabBarController as? MainController else { return }

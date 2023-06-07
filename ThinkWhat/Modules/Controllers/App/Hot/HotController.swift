@@ -312,19 +312,6 @@ extension HotController: HotModelOutput {
 
 extension HotController: DataObservable {
   func onDataLoaded() {
-    // If app was opened from notification with survey id
-    if !surveyId.isNil {
-      navigationController?.navigationBar.backItem?.title = ""
-      navigationController?.pushViewController(PollController(surveyReference: SurveyReferences.shared.all.first!), animated: true)
-      tabBarController?.setTabBarVisible(visible: false, animated: true)
-      
-      print("testing2")
-      
-      guard let main = tabBarController as? MainController else { return }
-      
-      main.toggleLogo(on: false)
-    }
-    
     isDataReady = true
     navigationController?.setNavigationBarHidden(false, animated: true)
     
@@ -344,6 +331,17 @@ extension HotController: DataObservable {
     setData()
     setTasks()
     controllerOutput?.setSurvey(queue.dequeue())
+    
+    // If app was opened from notification with survey id
+    if let surveyId = surveyId {
+      navigationController?.navigationBar.backItem?.title = ""
+      navigationController?.pushViewController(PollController(surveyId: surveyId), animated: true)
+      tabBarController?.setTabBarVisible(visible: false, animated: true)
+      
+      guard let main = tabBarController as? MainController else { return }
+      
+      main.toggleLogo(on: false)
+    }
   }
 }
 

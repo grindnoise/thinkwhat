@@ -952,11 +952,11 @@ class API {
       ]
       
       do {
-        let data = try await parent.requestAsync(url: url,
-                                                 httpMethod: .post,
-                                                 parameters: parameters,
-                                                 encoding: JSONEncoding.default,
-                                                 headers: headers)
+        try await parent.requestAsync(url: url,
+                                      httpMethod: .post,
+                                      parameters: parameters,
+                                      encoding: JSONEncoding.default,
+                                      headers: headers)
         
       } catch let error {
 #if DEBUG
@@ -1286,6 +1286,43 @@ class API {
         instance!.isVisited = true
         
         return instance!
+      } catch let error {
+        throw error
+      }
+    }
+    
+    @discardableResult
+    /// Loads `Survey` by string id
+    /// - Parameter referenceId: survey id
+    /// - Returns: `Survey`
+    func getSurvey(byReferenceId referenceId: String) async throws -> Survey {
+      guard let url = API_URLS.Surveys.surveyById,
+            !headers.isNil
+      else { throw APIError.invalidURL }
+      
+      var parameters: Parameters = [
+        "survey_id": referenceId,
+        "add_view_count": true
+      ]
+      
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: parent.headers())
+        
+        let json = try JSON(data: data, options: .mutableContainers)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                   DateFormatter.dateTimeFormatter,
+                                                   DateFormatter.dateFormatter ]
+        let instance = try decoder.decode(Survey.self, from: json.rawData())
+        instance.isVisited = true
+        Surveys.shared.append([instance])
+        SurveyReferences.shared.append([instance.reference])
+        
+        return instance
       } catch let error {
         throw error
       }
