@@ -23,6 +23,8 @@ class TermsView: UIView {
   ///**UI**
   public private(set) lazy var webView: WKWebView = {
     let instance = WKWebView()
+    instance.isOpaque = false
+    instance.backgroundColor = .clear
     instance.scrollView.isScrollEnabled = false
     instance.scrollView.delegate = self
     instance.navigationDelegate = self

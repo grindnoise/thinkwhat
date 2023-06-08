@@ -447,13 +447,27 @@ class MainController: UITabBarController {//}, StorageProtocol {
   
   @MainActor
   public func deleteAccount() {
-//    UserDefaults.clear()
-//    subscriptions.forEach { $0 .cancel() }
-//    loadingIcon.icon.removeAllAnimations()
-//    loadingText.icon.removeAllAnimations()
-//    passthroughView.removeFromSuperview()
-//    API.shared.cancelAllRequests()
-//    appDelegate.window?.rootViewController = GetStartedViewController()
+    Task { [weak self] in
+      guard let self = self else { return }
+      
+      try await API.shared.profiles.deleteAccount()
+      self.subscriptions.forEach { $0 .cancel() }
+      self.loadingIcon.icon.removeAllAnimations()
+      self.loadingText.icon.removeAllAnimations()
+      self.passthroughView.removeFromSuperview()
+      UserDefaults.clear()
+      Surveys.clear()
+      AppData.isEmailVerified = false
+      if let token = PushNotifications.loadToken() {
+        Task {
+          PushNotifications.unregisterDevice(token: token) {
+            KeychainService.deleteData()
+          }
+        }
+      }
+      Userprofiles.clear()
+      appDelegate.window?.rootViewController = UINavigationController(rootViewController: StartViewController())
+    }
   }
   
   @MainActor
@@ -468,10 +482,11 @@ class MainController: UITabBarController {//}, StorageProtocol {
     AppData.isEmailVerified = false
     if let token = PushNotifications.loadToken() {
       Task {
-        PushNotifications.unregisterDevice(token: token) {
-          KeychainService.deleteData()
-        }
+        defer { KeychainService.deleteData() }
+        PushNotifications.unregisterDevice(token: token)
       }
+    } else {
+      KeychainService.deleteData()
     }
     Userprofiles.clear()
     appDelegate.window?.rootViewController = UINavigationController(rootViewController: StartViewController())

@@ -83,6 +83,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func applicationWillResignActive(_ application: UIApplication) {
     // Reset badge
     UserDefaults.extensions.badge = 0
+    application.applicationIconBadgeNumber = 0
   }
   
   func applicationDidEnterBackground(_ application: UIApplication) {
@@ -101,15 +102,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     self.saveContext()
   }
   
-  func application(
-    _ application: UIApplication,
+  func application(_ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
       print(deviceToken.reduce("") { $0 + String(format: "%02x", $1) })
       PushNotifications.saveToken(token: deviceToken)
 //      PushNotifications.registerCustomActions()
   }
   
-  func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+  func application(_ application: UIApplication,
+                   didFailToRegisterForRemoteNotificationsWithError error: Error) {
     print(error.localizedDescription)
   }
   

@@ -306,7 +306,7 @@ extension SettingsController: SettingsViewInput {
     case .Logout:
       controller.logout()
     case .Delete:
-      fatalError()
+      controller.deleteAccount()
     }
   }
   

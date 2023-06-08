@@ -43,7 +43,6 @@ class HotController: UIViewController, TintColorable {
   ///**UI**
   private var isViewLayedOut = false
   private var isNetworking = false
-  private var timer: Timer?
   private var initialColor: UIColor = .clear
   
   
@@ -104,7 +103,7 @@ class HotController: UIViewController, TintColorable {
     
     guard isDataReady else { return }
     
-    tabBarController?.setTabBarVisible(visible: true, animated: true)
+    tabBarController?.setTabBarVisible(visible: true, animated: surveyId.isNil ? true : false)
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -175,7 +174,8 @@ private extension HotController {
       .sink { [unowned self] in self.queue.remove($0.survey!) }
       .store(in: &subscriptions)
     
-    Timer.publish(every: 5, on: .main, in: .common)
+    // Update survey stats - views, is_banned, rating, etc.
+    Timer.publish(every: 10, on: .main, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in
         guard self.isOnScreen,
@@ -188,6 +188,7 @@ private extension HotController {
       .sink { [unowned self] _ in self.controllerInput?.updateData() }
       .store(in: &subscriptions)
     
+    // Request new chunk of surveys if stack is empty
     Timer.publish(every: 5, on: .main, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in
@@ -313,7 +314,7 @@ extension HotController: HotModelOutput {
 extension HotController: DataObservable {
   func onDataLoaded() {
     isDataReady = true
-    navigationController?.setNavigationBarHidden(false, animated: true)
+    navigationController?.setNavigationBarHidden(false, animated: surveyId.isNil ? true : false)
     
     if tabBarHeight.isZero,
        let height = tabBarController?.tabBar.bounds.height,
@@ -341,6 +342,7 @@ extension HotController: DataObservable {
       guard let main = tabBarController as? MainController else { return }
       
       main.toggleLogo(on: false)
+      self.surveyId = nil
     }
   }
 }

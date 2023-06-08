@@ -25,14 +25,34 @@ extension NotificationCenter: UNUserNotificationCenterDelegate {
     _ center: UNUserNotificationCenter,
     didReceive response: UNNotificationResponse
   ) async {
-    if let surveyId = response.notification.request.content.userInfo["survey_id"] as? String,
-       let mainController = appDelegate.window?.rootViewController as? MainController,
-       let navigationController = mainController.selectedViewController as? UINavigationController {
-      print(surveyId)
+    switch response.notification.request.content.categoryIdentifier {
+    case "NewPublication":
+      guard let surveyId = response.notification.request.content.userInfo["survey_id"] as? String,
+            let mainController = appDelegate.window?.rootViewController as? MainController,
+            let navigationController = mainController.selectedViewController as? UINavigationController
+      else { return }
+      
       navigationController.navigationBar.backItem?.title = ""
       navigationController.pushViewController(PollController(surveyId: surveyId), animated: true)
       mainController.setTabBarVisible(visible: false, animated: true)
       mainController.toggleLogo(on: false)
+    case "OwnPublicationFinished", "WatchlistPublicationFinished":
+      guard let surveyId = response.notification.request.content.userInfo["survey_id"] as? String,
+            let mainController = appDelegate.window?.rootViewController as? MainController,
+            let navigationController = mainController.selectedViewController as? UINavigationController
+      else { return }
+      
+      navigationController.navigationBar.backItem?.title = ""
+      // Check if we already have one loaded
+      if let found = SurveyReferences.shared.all.filter({ String($0.id) == surveyId }).first {
+        navigationController.pushViewController(PollController(surveyReference: found, mode: .Read), animated: true)
+      } else {
+        navigationController.pushViewController(PollController(surveyId: surveyId, mode: .Read), animated: true)
+      }
+      mainController.setTabBarVisible(visible: false, animated: true)
+      mainController.toggleLogo(on: false)
+    default:
+      return
     }
     
 //    let identity = response.notification.request.content.categoryIdentifier

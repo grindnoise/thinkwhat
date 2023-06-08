@@ -139,9 +139,9 @@ class PollController: UIViewController {
   }
   
   // Init from push notification
-  init(surveyId: String) {
+  init(surveyId: String, mode: Mode = .Vote) {
     self.surveyId = surveyId
-    self.mode = .Vote
+    self.mode = mode
     
     super.init(nibName: nil, bundle: nil)
   }

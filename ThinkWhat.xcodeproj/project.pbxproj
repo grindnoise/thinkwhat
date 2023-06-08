@@ -308,6 +308,9 @@
 		AB883B332804391D00DBE4EF /* VoteMessage.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB883B322804391D00DBE4EF /* VoteMessage.xib */; };
 		AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB889815240FA60C0087E5AD /* CopyPasteIcon.swift */; };
 		AB889818240FA65B0087E5AD /* CopyPasteTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB889817240FA65B0087E5AD /* CopyPasteTextField.swift */; };
+		AB8BE16D2A31D5A200B0FB63 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8BE16C2A31D5A200B0FB63 /* NotificationService.swift */; };
+		AB8BE1712A31D5A200B0FB63 /* Push service extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AB8BE1782A31D61400B0FB63 /* BadgeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */; };
 		AB8DA31727A0325D00F92C18 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB8DA31927A0325D00F92C18 /* Localizable.strings */; };
 		AB8DA32C27A1591300F92C18 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA32B27A1591300F92C18 /* Auth.swift */; };
 		AB8DA32E27A15BAD00F92C18 /* Basic.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8DA32D27A15BAD00F92C18 /* Basic.swift */; };
@@ -508,6 +511,13 @@
 			remoteGlobalIDString = AB3C67DA223FBB6400B57580;
 			remoteInfo = ThinkWhat;
 		};
+		AB8BE16F2A31D5A200B0FB63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AB3C67D3223FBB6400B57580 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AB8BE1692A31D5A200B0FB63;
+			remoteInfo = "Push service extension";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -517,6 +527,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				AB8BE1712A31D5A200B0FB63 /* Push service extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -758,6 +769,7 @@
 		AB68111D29828CA900C14C32 /* CGSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSize.swift; sourceTree = "<group>"; };
 		AB68F4F02A1361190082246F /* HorizontalLimiter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalLimiter.swift; sourceTree = "<group>"; };
 		AB68F4F22A1390490082246F /* NSObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSObject.swift; sourceTree = "<group>"; };
+		AB6AC63D2A31CC670028B2B4 /* ThinkWhatRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhatRelease.entitlements; sourceTree = "<group>"; };
 		AB6AFFCE289D514B00D260F4 /* Combine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Combine.swift; sourceTree = "<group>"; };
 		AB6B071E247688600095721B /* delUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = delUserViewController.swift; sourceTree = "<group>"; };
 		AB6C9031240D3902009BE941 /* NewSurveyIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSurveyIcons.swift; sourceTree = "<group>"; };
@@ -834,6 +846,13 @@
 		AB883B322804391D00DBE4EF /* VoteMessage.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VoteMessage.xib; sourceTree = "<group>"; };
 		AB889815240FA60C0087E5AD /* CopyPasteIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyPasteIcon.swift; sourceTree = "<group>"; };
 		AB889817240FA65B0087E5AD /* CopyPasteTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyPasteTextField.swift; sourceTree = "<group>"; };
+		AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Push service extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB8BE16C2A31D5A200B0FB63 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		AB8BE16E2A31D5A200B0FB63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB8BE1772A31D5C600B0FB63 /* Push service extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Push service extension.entitlements"; sourceTree = "<group>"; };
+		AB8BE1792A31DC7400B0FB63 /* Push service extensionDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Push service extensionDebug.entitlements"; sourceTree = "<group>"; };
+		AB8BE17A2A31DC8500B0FB63 /* Push service extensionLocal.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Push service extensionLocal.entitlements"; sourceTree = "<group>"; };
+		AB8BE17B2A31DCC000B0FB63 /* Push service extensionAlpha.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Push service extensionAlpha.entitlements"; sourceTree = "<group>"; };
 		AB8DA31527A01CC500F92C18 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
 		AB8DA31627A01CC500F92C18 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		AB8DA31827A0325D00F92C18 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1052,6 +1071,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AB8BE1672A31D5A200B0FB63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1162,6 +1188,7 @@
 		AB10030B27BF760400338EE4 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */,
 				AB10030E27BF772600338EE4 /* Bundle.swift */,
 				ABB0F6D828F80E140068FDDF /* CALayer.swift */,
 				AB6AFFCE289D514B00D260F4 /* Combine.swift */,
@@ -1453,6 +1480,7 @@
 				AB3C67DD223FBB6400B57580 /* ThinkWhat */,
 				AB3C67F5223FBB6600B57580 /* ThinkWhatTests */,
 				AB3C6800223FBB6600B57580 /* ThinkWhatUITests */,
+				AB8BE16B2A31D5A200B0FB63 /* Push service extension */,
 				AB3C67DC223FBB6400B57580 /* Products */,
 				69AB746D40F296BDC8D5D954 /* Frameworks */,
 				E9FBECDA3D06FB129E6BE92E /* Pods */,
@@ -1465,6 +1493,7 @@
 				AB3C67DB223FBB6400B57580 /* ThinkWhat.app */,
 				AB3C67F2223FBB6600B57580 /* ThinkWhatTests.xctest */,
 				AB3C67FD223FBB6600B57580 /* ThinkWhatUITests.xctest */,
+				AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1472,6 +1501,7 @@
 		AB3C67DD223FBB6400B57580 /* ThinkWhat */ = {
 			isa = PBXGroup;
 			children = (
+				AB6AC63D2A31CC670028B2B4 /* ThinkWhatRelease.entitlements */,
 				ABF1F19D22C24DEE008913C3 /* ThinkWhat.entitlements */,
 				AB05FDD12A20FB8900A5986C /* ThinkWhatAlpha.entitlements */,
 				ABDB8ECB2A248C4D0005D6D0 /* ThinkWhatDebug.entitlements */,
@@ -2103,6 +2133,19 @@
 			path = CopyPasteTextField;
 			sourceTree = "<group>";
 		};
+		AB8BE16B2A31D5A200B0FB63 /* Push service extension */ = {
+			isa = PBXGroup;
+			children = (
+				AB8BE17B2A31DCC000B0FB63 /* Push service extensionAlpha.entitlements */,
+				AB8BE17A2A31DC8500B0FB63 /* Push service extensionLocal.entitlements */,
+				AB8BE1792A31DC7400B0FB63 /* Push service extensionDebug.entitlements */,
+				AB8BE1772A31D5C600B0FB63 /* Push service extension.entitlements */,
+				AB8BE16C2A31D5A200B0FB63 /* NotificationService.swift */,
+				AB8BE16E2A31D5A200B0FB63 /* Info.plist */,
+			);
+			path = "Push service extension";
+			sourceTree = "<group>";
+		};
 		AB8DA32A27A1578A00F92C18 /* old */ = {
 			isa = PBXGroup;
 			children = (
@@ -2418,7 +2461,6 @@
 				AB10030827BEB82900338EE4 /* Protocols */,
 				ABEC4D962A20A7CE003CB425 /* Services */,
 				AB913F8928097D8A00609D51 /* UI */,
-				AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -2748,6 +2790,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				AB8BE1702A31D5A200B0FB63 /* PBXTargetDependency */,
 			);
 			name = ThinkWhat;
 			packageProductDependencies = (
@@ -2798,6 +2841,23 @@
 			productReference = AB3C67FD223FBB6600B57580 /* ThinkWhatUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		AB8BE1692A31D5A200B0FB63 /* Push service extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AB8BE1722A31D5A300B0FB63 /* Build configuration list for PBXNativeTarget "Push service extension" */;
+			buildPhases = (
+				AB8BE1662A31D5A200B0FB63 /* Sources */,
+				AB8BE1672A31D5A200B0FB63 /* Frameworks */,
+				AB8BE1682A31D5A200B0FB63 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Push service extension";
+			productName = "Push service extension";
+			productReference = AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2824,6 +2884,9 @@
 					AB3C67FC223FBB6600B57580 = {
 						CreatedOnToolsVersion = 10.1;
 						TestTargetID = AB3C67DA223FBB6400B57580;
+					};
+					AB8BE1692A31D5A200B0FB63 = {
+						CreatedOnToolsVersion = 14.3;
 					};
 				};
 			};
@@ -2852,6 +2915,7 @@
 				AB3C67DA223FBB6400B57580 /* ThinkWhat */,
 				AB3C67F1223FBB6600B57580 /* ThinkWhatTests */,
 				AB3C67FC223FBB6600B57580 /* ThinkWhatUITests */,
+				AB8BE1692A31D5A200B0FB63 /* Push service extension */,
 			);
 		};
 /* End PBXProject section */
@@ -2925,6 +2989,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AB3C67FB223FBB6600B57580 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AB8BE1682A31D5A200B0FB63 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3421,6 +3492,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AB8BE1662A31D5A200B0FB63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AB8BE16D2A31D5A200B0FB63 /* NotificationService.swift in Sources */,
+				AB8BE1782A31D61400B0FB63 /* BadgeExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -3433,6 +3513,11 @@
 			isa = PBXTargetDependency;
 			target = AB3C67DA223FBB6400B57580 /* ThinkWhat */;
 			targetProxy = AB3C67FE223FBB6600B57580 /* PBXContainerItemProxy */;
+		};
+		AB8BE1702A31D5A200B0FB63 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AB8BE1692A31D5A200B0FB63 /* Push service extension */;
+			targetProxy = AB8BE16F2A31D5A200B0FB63 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -3611,11 +3696,12 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatDebug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3644,14 +3730,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhat.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3837,7 +3924,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatAlpha.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -3876,6 +3963,7 @@
 					"$(SRCROOT)/**",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3938,6 +4026,128 @@
 				TEST_TARGET_NAME = ThinkWhat;
 			};
 			name = Alpha;
+		};
+		AB8BE1732A31D5A300B0FB63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "Push service extension/Push service extensionDebug.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Push service extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Push service extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Pavel Bukharov. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "bukharovpavel.thinkwhat.dev.Push-service-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AB8BE1742A31D5A300B0FB63 /* Local */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "Push service extension/Push service extensionLocal.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Push service extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Push service extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Pavel Bukharov. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "bukharovpavel.thinkwhat.local.Push-service-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Local;
+		};
+		AB8BE1752A31D5A300B0FB63 /* Alpha */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "Push service extension/Push service extensionAlpha.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Push service extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Push service extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Pavel Bukharov. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "bukharovpavel.thinkwhat.alpha.Push-service-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Alpha;
+		};
+		AB8BE1762A31D5A300B0FB63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "Push service extension/Push service extension.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YR8888VBGA;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Push service extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Push service extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Pavel Bukharov. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "bukharovpavel.thinkwhat.Push-service-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
 		};
 		ABD5FD07286C4D2800BCC382 /* Local */ = {
 			isa = XCBuildConfiguration;
@@ -4020,11 +4230,12 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhat.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "$(SRCROOT)/ThinkWhat/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4132,6 +4343,17 @@
 				ABD5FD0A286C4D2800BCC382 /* Local */,
 				AB864448286C40AF00C7A6F8 /* Alpha */,
 				AB3C680E223FBB6600B57580 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AB8BE1722A31D5A300B0FB63 /* Build configuration list for PBXNativeTarget "Push service extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB8BE1732A31D5A300B0FB63 /* Debug */,
+				AB8BE1742A31D5A300B0FB63 /* Local */,
+				AB8BE1752A31D5A300B0FB63 /* Alpha */,
+				AB8BE1762A31D5A300B0FB63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

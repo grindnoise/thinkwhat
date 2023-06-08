@@ -90,7 +90,7 @@ public class KeychainService: NSObject {
   }
   
   public class func removeApnsToken() {
-    delete(service: access_token, account: account)
+    delete(service: apns_token, account: account)
   }
   
   public class func loadApnsToken() -> Data? {
@@ -142,11 +142,11 @@ public class KeychainService: NSObject {
       kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
     ] as [CFString : Any] as CFDictionary
     
-    let deleteStatus = SecItemDelete(query as CFDictionary)
     
-    //#if DEBUG
-    //      print("delete", deleteStatus)
-    //#endif
+    
+    #if DEBUG
+          print("deleteStatus", SecItemDelete(query as CFDictionary))
+    #endif
     
     let status = SecItemAdd(query, nil)
     if status != errSecSuccess {

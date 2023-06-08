@@ -548,7 +548,7 @@ private extension SurveysCollectionView {
     ///**Updaters**
     ///Load data if zero items
     Timer
-      .publish(every: 3, on: .current, in: .common)
+      .publish(every: 10, on: .current, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in !self.isLoading }
       .sink { [weak self] seconds in
@@ -563,7 +563,7 @@ private extension SurveysCollectionView {
       .store(in: &subscriptions)
     ///Update stats for visible cells
     Timer
-      .publish(every: 3, on: .current, in: .common)
+      .publish(every: 10, on: .current, in: .common)
       .autoconnect()
       .sink { [weak self] seconds in
         guard let self = self,

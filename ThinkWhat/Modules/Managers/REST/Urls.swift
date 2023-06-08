@@ -55,6 +55,7 @@ struct API_URLS {
     static let switchNotifications: URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/switch_subscription_notifications/")}()
     static let registerDevice:      URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent(baseString + "register_device/")}()
     static let unregisterDevice:    URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent(baseString + "unregister_device/")}()
+    static let deleteAccount:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent(baseString + "delete_account/")}()
 //    static let setDeviceState:      URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent(baseString + "set_device_state/")}()
   }
   

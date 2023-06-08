@@ -1238,6 +1238,22 @@ class API {
         userprofile.compatibilityPublisher.send(completion: .failure(error))
       }
     }
+    
+    public func deleteAccount() async throws {
+      guard let url = API_URLS.Profiles.deleteAccount else { throw APIError.invalidURL }
+      
+      do {
+        try await parent.requestAsync(url: url,
+                                      httpMethod: .post,
+                                      parameters: nil,
+                                      encoding: URLEncoding.default,
+                                      headers: parent.headers())
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
   }
   
   final class Polls {
