@@ -291,7 +291,7 @@ class SignInView: UIView {
 //    return instance
 //  }()
   public private(set) lazy var apple: ASAuthorizationAppleIDButton = {
-    let instance = ASAuthorizationAppleIDButton()
+    let instance = ASAuthorizationAppleIDButton(type: .signIn, style: traitCollection.userInterfaceStyle == .dark ? .white : .black)
     instance.addTarget(self, action: #selector(self.buttonTapped(_:)), for: .touchUpInside)
     
     return instance

@@ -181,13 +181,25 @@ extension UserDefaults {
     }
     
     @UserDefault(key: "NOTIFICATIONS_OWN_COMPLETED", defaultValue: false)
-    static var notifyOnOwnCompleted: Bool?
+    static var notifyOnOwnCompleted: Bool? {
+      didSet {
+        print("notifyOnOwnCompleted", notifyOnOwnCompleted)
+      }
+    }
     
     @UserDefault(key: "NOTIFICATIONS_WATCHLIST_COMPLETED", defaultValue: false)
-    static var notifyOnWatchlistCompleted: Bool?
+    static var notifyOnWatchlistCompleted: Bool? {
+      didSet {
+        print("notifyOnWatchlistCompleted", notifyOnWatchlistCompleted)
+      }
+    }
     
     @UserDefault(key: "NOTIFICATIONS_NEW_SUBSCRIPTIONS", defaultValue: false)
-    static var notifyOnNewSubscription: Bool?
+    static var notifyOnNewSubscription: Bool? {
+      didSet {
+        print("notifyOnNewSubscription", notifyOnWatchlistCompleted)
+      }
+    }
     
     @UserDefault(key: "has_seen_app_introduction", defaultValue: false)
     static var hasSeenAppIntroduction: Bool?

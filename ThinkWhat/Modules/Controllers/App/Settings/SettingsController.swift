@@ -321,6 +321,11 @@ extension SettingsController: SettingsViewInput {
     config.entersReaderIfAvailable = false
     vc = SFSafariViewController(url: API_URLS.System.licenses!, configuration: config)
     present(vc, animated: true)
+    
+    guard let main = tabBarController as? MainController else { return }
+    
+    main.toggleLogo(on: false)
+    setSwitchHidden(true)
   }
   
   func showTerms() {
@@ -329,6 +334,11 @@ extension SettingsController: SettingsViewInput {
     config.entersReaderIfAvailable = false
     vc = SFSafariViewController(url: API_URLS.System.termsOfUse!, configuration: config)
     present(vc, animated: true)
+    
+    guard let main = tabBarController as? MainController else { return }
+    
+    main.toggleLogo(on: false)
+    setSwitchHidden(true)
   }
   
   func feedback() {

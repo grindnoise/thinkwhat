@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow()
     
     // Check if app was opened by push notification
-    // surveyId or surveyId+commentId are passed to MainController to open specific controller
+    // surveyId or surveyId/commentId are passed to MainController to open specific controller
     var surveyId: String?
     var commentId: String?
     if let remoteNotification = launchOptions?[.remoteNotification] as?  [AnyHashable : Any],
@@ -65,19 +65,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 #if DEBUG
     print(url)
 #endif
-    //    ///FB
     //    ApplicationDelegate.shared.application(
     //      app,
     //      open: url,
     //      sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
     //      annotation: options[UIApplication.OpenURLOptionsKey.annotation]
     //    )
-    ///VK
-    let app = options[.sourceApplication] as? String
-    VK.handle(url: url, sourceApplication: app)
-    ///Google
+    VK.handle(url: url, sourceApplication: options[.sourceApplication] as? String)
     return GIDSignIn.sharedInstance.handle(url)
-    //        return true
   }
   
   func applicationWillResignActive(_ application: UIApplication) {
@@ -115,7 +110,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
   
   // MARK: - Core Data stack
-  
   lazy var persistentContainer: NSPersistentContainer = {
     /*
      The persistent container for the application. This implementation
@@ -144,7 +138,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }()
   
   // MARK: - Core Data Saving support
-  
   func saveContext () {
     let context = persistentContainer.viewContext
     if context.hasChanges {

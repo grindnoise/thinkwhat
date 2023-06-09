@@ -137,11 +137,11 @@ class AppSettingsCollectionView: UICollectionView {
                 cell.mode = .notifications(.Completed)
                 cell.isOn = UserDefaults.App.notifyOnOwnCompleted ?? false
             case 1:
-                cell.mode = .notifications(.Subscriptions)
-                cell.isOn = UserDefaults.App.notifyOnNewSubscription ?? false
+              cell.mode = .notifications(.Watchlist)
+              cell.isOn = UserDefaults.App.notifyOnWatchlistCompleted ?? false
             case 2:
-                cell.mode = .notifications(.Watchlist)
-                cell.isOn = UserDefaults.App.notifyOnWatchlistCompleted ?? false
+              cell.mode = .notifications(.Subscriptions)
+              cell.isOn = UserDefaults.App.notifyOnNewSubscription ?? false
             default:
 #if DEBUG
       fatalError()

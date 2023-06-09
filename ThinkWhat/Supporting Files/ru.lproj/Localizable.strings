@@ -364,9 +364,9 @@
 "logout" = "Выйти из аккаунта";
 "delete_account" = "Удалить аккаунт";
 "allow_push_notifications" = "Разрешить уведомления";
-"NOTIFICATIONS_OWN_COMPLETED" = "Мои завершенные публикации";
+"NOTIFICATIONS_OWN_COMPLETED" = "Завершение моих публикаций";
 "NOTIFICATIONS_NEW_SUBSCRIPTIONS" = "Новые публикации по подписке";
-"NOTIFICATIONS_WATCHLIST_COMPLETED" = "Завершенные в отслеживаемых";
+"NOTIFICATIONS_WATCHLIST_COMPLETED" = "Завершение отслеживаемых";
 "notifications" = "Уведомления";
 "languages" = "Языки";
 "default_locale" = "Интерфейс";

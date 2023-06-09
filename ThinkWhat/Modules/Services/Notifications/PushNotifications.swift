@@ -29,12 +29,11 @@ enum PushNotifications {
     {
       Task {
         unregisterDevice(token: prevToken)
-        registerDevice(token: newToken)
       }
     }
-//    Task {
-//      registerDevice(token: newToken)
-//    }
+    Task {
+      registerDevice(token: newToken)
+    }
     KeychainService.saveApnsToken(token: token)
   }
   
@@ -55,7 +54,7 @@ enum PushNotifications {
   static func unregisterDevice(token: PushNotificationToken, completion: Closure? = nil) {
     Task {
       await API.shared.system.unregisterDevice(token: token)
-      KeychainService.removeApnsToken()
+//      KeychainService.removeApnsToken()
       completion?()
     }
   }

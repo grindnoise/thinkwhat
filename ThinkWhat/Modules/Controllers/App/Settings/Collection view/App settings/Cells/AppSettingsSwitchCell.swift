@@ -18,7 +18,7 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
         didSet {
             guard !mode.isNil else { return }
             
-            updateUI()
+          setupUI()
         }
     }
     public var isOn: Bool = true {
@@ -111,7 +111,7 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
         super.init(frame: frame)
         
 //        setTasks()
-        setupUI()
+//        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -164,20 +164,19 @@ private extension AppSettingsSwitchCell {
         let constraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
         constraint.priority = .defaultLow
         constraint.isActive = true
+      
+      switch mode {
+      case .notifications(.Completed):
+          titleLabel.text = AppSettings.Notifications.Completed.rawValue.localized
+      case .notifications(.Subscriptions):
+          titleLabel.text = AppSettings.Notifications.Subscriptions.rawValue.localized
+      case .notifications(.Watchlist):
+          titleLabel.text = AppSettings.Notifications.Watchlist.rawValue.localized
+      default:
+          print("")
+      }
     }
-    
-    func updateUI() {
-        switch mode {
-        case .notifications(.Completed):
-            titleLabel.text = AppSettings.Notifications.Completed.rawValue.localized
-        case .notifications(.Subscriptions):
-            titleLabel.text = AppSettings.Notifications.Subscriptions.rawValue.localized
-        case .notifications(.Watchlist):
-            titleLabel.text = AppSettings.Notifications.Watchlist.rawValue.localized
-        default:
-            print("")
-        }
-    }
+   
     
     @objc
     func toggleSwitch(_ sender: UISwitch) {

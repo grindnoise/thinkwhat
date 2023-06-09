@@ -129,8 +129,8 @@ enum AppSettings: Hashable {
   enum Notifications: String {
     //            case Allow = "allow_push_notifications"
     case Completed = "NOTIFICATIONS_OWN_COMPLETED"
-    case Subscriptions = "NOTIFICATIONS_WATCHLIST_COMPLETED"
-    case Watchlist = "NOTIFICATIONS_NEW_SUBSCRIPTIONS"
+    case Subscriptions = "NOTIFICATIONS_NEW_SUBSCRIPTIONS"
+    case Watchlist = "NOTIFICATIONS_WATCHLIST_COMPLETED"
   }
   
   enum Languages: String {

@@ -350,7 +350,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
 //        signupButton.frame.origin.x = -(containerView.bounds.width + signupButton.frame.width)
 //        containerView.addSubview(signupButton)
 //        toView.signupButton.alpha = 0
-        let apple = ASAuthorizationAppleIDButton()
+        let apple = ASAuthorizationAppleIDButton(type: .signIn, style: navigationController.traitCollection.userInterfaceStyle == .dark ? .white : .black)
         let appleDestination = toView.apple.superview!.convert(toView.apple.frame.origin,
                                                                              to: containerView)
         apple.frame.origin = appleDestination
@@ -644,7 +644,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         containerView.addSubview(loginButton)
         loginButtonCoordinate.y = containerView.bounds.height
         
-        let apple = ASAuthorizationAppleIDButton()
+        let apple = ASAuthorizationAppleIDButton(type: .signIn, style: navigationController.traitCollection.userInterfaceStyle == .dark ? .white : .black)
         var appleDestination = fromView.apple.superview!.convert(fromView.apple.frame.origin,
                                                                              to: containerView)
         apple.frame.origin = appleDestination
@@ -652,54 +652,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         apple.frame.size = fromView.apple.frame.size
         containerView.addSubview(apple)
         fromView.apple.alpha = 0
-//        //TODO
-//        let signupStack = try! fromView.signupStack.copyObject() as! UIStackView
-//        signupStack.arrangedSubviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = true }
-//        let signupStackDestination = fromView.signupStack.superview!.convert(fromView.signupStack.frame.origin,
-//                                                                                     to: containerView)
-//        signupStack.translatesAutoresizingMaskIntoConstraints = true
-//        signupStack.frame.origin = fromView.signupStack.superview!.convert(fromView.signupStack.frame.origin,
-//                                                                       to: containerView)
-//        signupStack.frame.origin.y = containerView.bounds.height
-//        containerView.addSubview(signupStack)
-//        fromView.signupStack.alpha = 0
-//        let forgotButton: UIButton = {
-//          let instance = UIButton()
-//          instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
-//                                                         attributes: [
-//                                                          .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
-//                                                          .foregroundColor: Colors.main as Any
-//                                                         ]),
-//                                      for: .normal)
-//
-//          return instance
-//        }()
-//
-//
-//
-//
-//        let signupButton: UIButton = {
-//          let instance = UIButton()
-//          instance.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
-//                                                         attributes: [
-//                                                          .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
-//                                                          .foregroundColor: Colors.main as Any
-//                                                         ]),
-//                                      for: .normal)
-//
-//          return instance
-//        }()
-//        var signupButtonDestination = fromView.signupButton.superview!.convert(fromView.signupButton.frame.origin,
-//                                                                               to: containerView)
-//
-//
-//        signupButton.frame = CGRect(origin: signupButtonDestination,
-//                                    size: fromView.signupButton.bounds.size)
-//        containerView.addSubview(signupButton)
-//        fromView.signupButton.alpha = 0
-//        signupButtonDestination.y = containerView.bounds.height
-        
-        
+
         let forgotButton: UIButton = {
           let instance = UIButton()
           instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
@@ -1045,7 +998,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           
           return instance
         }()
-        let apple = ASAuthorizationAppleIDButton()
+        let apple = ASAuthorizationAppleIDButton(type: .signIn, style: navigationController.traitCollection.userInterfaceStyle == .dark ? .white : .black)
         var appleDestination = fromView.apple.superview!.convert(fromView.apple.frame.origin,
                                                                              to: containerView)
         apple.frame.origin = appleDestination
@@ -1325,37 +1278,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         toView.logoText.alpha = 0
         containerView.addSubview(fakeLogoIcon)
         containerView.addSubview(fakeLogoText)
-        
-//        let fakeButton: UIButton = {
-//          let instance = UIButton()
-//          if #available(iOS 15, *) {
-//            var config = UIButton.Configuration.filled()
-//            config.cornerStyle = .small
-//            config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
-//            config.baseBackgroundColor = Colors.main
-//            config.contentInsets.top = padding
-//            config.contentInsets.bottom = padding
-//            config.contentInsets.leading = 20
-//            config.contentInsets.trailing = 20
-//            config.attributedTitle = AttributedString("loginButton".localized.uppercased(),
-//                                                      attributes: AttributeContainer([
-//                                                        .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-//                                                        .foregroundColor: UIColor.white as Any
-//                                                      ]))
-//            instance.configuration = config
-//          } else {
-//            instance.backgroundColor = Colors.main
-//            instance.cornerRadius = fromView.loginButton.cornerRadius
-//            instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
-//                                                           attributes: [
-//                                                            .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-//                                                            .foregroundColor: UIColor.white as Any
-//                                                           ]),
-//                                        for: .normal)
-//          }
-//
-//          return instance
-//        }()
+       
         let fakeButtonLabel: UILabel = {
           let instance = UILabel()
           instance.font = UIFont(name: Fonts.Bold, size: 20)
@@ -1489,7 +1412,14 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         containerView.addSubview(mailContainer)
         toView.mailContainer.alpha = 0
         
-        
+        let apple = ASAuthorizationAppleIDButton(type: .signIn, style: navigationController.traitCollection.userInterfaceStyle == .dark ? .white : .black)
+        var appleDestination = fromView.apple.superview!.convert(fromView.apple.frame.origin,
+                                                                             to: containerView)
+        apple.frame.origin = appleDestination
+        appleDestination.x = -(containerView.bounds.width + apple.frame.width)
+        apple.frame.size = fromView.apple.frame.size
+        containerView.addSubview(apple)
+        fromView.apple.alpha = 0
         
         
         let loginContainer: UIStackView = {
@@ -1620,6 +1550,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           [passwordContainer: [toView.passwordContainer: passwordDestination]],
           [fakeButton: [toView.loginButton: fakeButtonCoordinate]],
           [orLabel: [UIView(): orLabelDestination]],
+          [apple: [UIView(): appleDestination]],
           [logos: [UIView(): logosDestination]],
           [signupButton: [UIView(): signupButtonDestination]],
           [forgotButton: [UIView(): forgotButtonDestination]],
