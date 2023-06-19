@@ -31,39 +31,50 @@ class TermsView: UIView {
     
     return instance
   }()
-  public private(set) lazy var acceptButton: UIButton = {
+  public private(set) lazy var acceptButton: UIView = {
+    let opaque = UIView.opaque()
+    opaque.layer.masksToBounds = false
+    
     let instance = UIButton()
     instance.addTarget(self,
-                       action: #selector(self.handleTap(_:)),
+                       action: #selector(self.handleTap),
                        for: .touchUpInside)
     if #available(iOS 15, *) {
       var config = UIButton.Configuration.filled()
-      config.cornerStyle = .small
-      config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
-      config.baseBackgroundColor = UIColor.systemGray
-      config.contentInsets.top = padding
-      config.contentInsets.bottom = padding
-      config.contentInsets.leading = 20
-      config.contentInsets.trailing = 20
-      config.attributedTitle = AttributedString("acceptButton".localized.uppercased(),
+      config.cornerStyle = .capsule
+      config.baseBackgroundColor = .systemGray
+      config.attributedTitle = AttributedString("acceptButton".localized,
                                                 attributes: AttributeContainer([
-                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                   .foregroundColor: UIColor.clear as Any
                                                 ]))
       instance.configuration = config
     } else {
+      instance.backgroundColor = .systemGray
       instance.publisher(for: \.bounds)
         .sink { instance.cornerRadius = $0.width * 0.025 }
         .store(in: &subscriptions)
-      instance.setAttributedTitle(NSAttributedString(string: "acceptButton".localized.uppercased(),
+      instance.setAttributedTitle(NSAttributedString(string: "acceptButton".localized,
                                                      attributes: [
-                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                       .foregroundColor: UIColor.clear as Any
                                                      ]),
                                   for: .normal)
     }
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
+    opaque.publisher(for: \.bounds)
+      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
+      .sink { [unowned self] in
+        opaque.layer.shadowOpacity = 1
+        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+      }
+      .store(in: &subscriptions)
+    instance.place(inside: opaque)
     
-    return instance
+    return opaque
   }()
   
   // MARK: - Private properties
@@ -83,9 +94,9 @@ class TermsView: UIView {
     didSet {
       if hasReadAgreement {
         if #available(iOS 15, *) {
-          acceptButton.configuration?.baseBackgroundColor = Colors.main
+          acceptButton.getSubview(type: UIButton.self)!.configuration?.baseBackgroundColor = Colors.main
         } else {
-          acceptButton.backgroundColor = Colors.main
+          acceptButton.getSubview(type: UIButton.self)!.backgroundColor = Colors.main
         }
       }
     }
@@ -214,24 +225,19 @@ extension TermsView: TermsControllerOutput {
                                              size: acceptButton.bounds.size))
       if #available(iOS 15, *) {
         var config = UIButton.Configuration.filled()
-        config.cornerStyle = .small
-        config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+        config.cornerStyle = .capsule
         config.baseBackgroundColor = Colors.main
-        config.contentInsets.top = padding
-        config.contentInsets.bottom = padding
-        config.contentInsets.leading = 20
-        config.contentInsets.trailing = 20
-        config.attributedTitle = AttributedString("acceptButton".localized.uppercased(),
+        config.attributedTitle = AttributedString("acceptButton".localized,
                                                   attributes: AttributeContainer([
-                                                    .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                    .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                     .foregroundColor: UIColor.white as Any
                                                   ]))
         instance.configuration = config
       } else {
         instance.cornerRadius = acceptButton.cornerRadius
-        instance.setAttributedTitle(NSAttributedString(string: "acceptButton".localized.uppercased(),
+        instance.setAttributedTitle(NSAttributedString(string: "acceptButton".localized,
                                                        attributes: [
-                                                        .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                        .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                         .foregroundColor: UIColor.white as Any
                                                        ]),
                                     for: .normal)
@@ -347,10 +353,11 @@ private extension TermsView {
     backgroundColor = .systemBackground
     acceptButton.setSpinning(on: true, color: .white, animated: false)
     
+    
     let opaque = UIView.opaque()
     acceptButton.placeInCenter(of: opaque,
-                              topInset: 0,
-                              bottomInset: 0)
+                              topInset: padding,
+                              bottomInset: padding)
     
     let stack = UIStackView(arrangedSubviews: [
       webView,
@@ -361,18 +368,8 @@ private extension TermsView {
     stack.spacing = padding
     stack.place(inside: self)
     
-//    let views = [webView, acceptButton]
-//    addSubviews(views)
-//    views.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-//
-//    NSLayoutConstraint.activate([
-//      webView.topAnchor.constraint(equalTo: topAnchor),
-//      webView.leadingAnchor.constraint(equalTo: leadingAnchor),
-//      webView.trailingAnchor.constraint(equalTo: trailingAnchor),
-//      acceptButton.topAnchor.constraint(equalTo: webView.bottomAnchor),
-//      acceptButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-//      acceptButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2)
-//    ])
+    acceptButton.translatesAutoresizingMaskIntoConstraints = false
+    acceptButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
   }
   
   @objc
@@ -422,18 +419,18 @@ extension TermsView: WKNavigationDelegate {
       guard let self = self else { return }
       
       if #available(iOS 15, *) {
-      self.acceptButton.configuration?.attributedTitle = AttributedString("acceptButton".localized.uppercased(),
-                                                                      attributes: AttributeContainer([
-                                                                        .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                                        .foregroundColor: UIColor.white as Any
-                                                                      ]))
+        self.acceptButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString("acceptButton".localized,
+                                                                                                             attributes: AttributeContainer([
+                                                                                                              .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                                              .foregroundColor: UIColor.white as Any
+                                                                                                             ]))
       } else {
-        self.acceptButton.setAttributedTitle(NSAttributedString(string: "acceptButton".localized.uppercased(),
-                                                          attributes: [
-                                                            .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                            .foregroundColor: UIColor.white as Any
-                                                          ]),
-                                       for: .normal)
+        self.acceptButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: "acceptButton".localized,
+                                                                                                 attributes: [
+                                                                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                                  .foregroundColor: UIColor.white as Any
+                                                                                                 ]),
+                                                                              for: .normal)
       }
     }
   }

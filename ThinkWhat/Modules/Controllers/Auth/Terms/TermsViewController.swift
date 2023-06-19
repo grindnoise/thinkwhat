@@ -21,40 +21,54 @@ class TermsViewController: UIViewController {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
+  private var willMoveToParent = false
   ///**UI**
   public private(set) lazy var logoStack: UIStackView = {
-    let logoIcon: Icon = {
-      let instance = Icon(category: Icon.Category.Logo)
-      instance.accessibilityIdentifier = "logoIcon"
-      instance.iconColor = Colors.main
-      instance.isRounded = false
-      instance.clipsToBounds = false
-      instance.scaleMultiplicator = 1.2
-      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-      instance.heightAnchor.constraint(equalToConstant: NavigationController.Constants.NavBarHeightSmallState * 0.65).isActive = true
+//    let logoIcon: Icon = {
+//      let instance = Icon(category: Icon.Category.Logo)
+//      instance.accessibilityIdentifier = "logoIcon"
+//      instance.iconColor = Colors.main
+//      instance.isRounded = false
+//      instance.clipsToBounds = false
+//      instance.scaleMultiplicator = 1.2
+//      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//      instance.heightAnchor.constraint(equalToConstant: NavigationController.Constants.NavBarHeightSmallState * 0.65).isActive = true
+//
+//      return instance
+//    }()
+//    let logoText: Icon = {
+//      let instance = Icon(category: Icon.Category.LogoText)
+//      instance.accessibilityIdentifier = "logoText"
+//      instance.iconColor = Colors.main
+//      instance.isRounded = false
+//      instance.clipsToBounds = false
+//      instance.scaleMultiplicator = 1.1
+//      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.8).isActive = true
+//
+//      return instance
+//    }()
+    
+    let logoIcon = Logo()
+    let opaque = UIView.opaque()
+    
+
       
-      return instance
-    }()
-    let logoText: Icon = {
-      let instance = Icon(category: Icon.Category.LogoText)
-      instance.accessibilityIdentifier = "logoText"
-      instance.iconColor = Colors.main
-      instance.isRounded = false
-      instance.clipsToBounds = false
-      instance.scaleMultiplicator = 1.1
-      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.8).isActive = true
-      
-      return instance
-    }()
+//      .placeInCenter(of: opaque,
+//                         topInset: NavigationController.Constants.NavBarHeightSmallState * 0.15,
+//                         bottomInset: NavigationController.Constants.NavBarHeightSmallState * 0.15)
+    
+    logoIcon.translatesAutoresizingMaskIntoConstraints = false
+    logoIcon.heightAnchor.constraint(equalToConstant: NavigationController.Constants.NavBarHeightSmallState * 0.7).isActive = true
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    LogoText().place(inside: opaque, insets: UIEdgeInsets(top: NavigationController.Constants.NavBarHeightSmallState * 0.175, left: 0, bottom: NavigationController.Constants.NavBarHeightSmallState * 0.175, right: 0))
     
     let instance = UIStackView(arrangedSubviews: [
       logoIcon,
-      logoText
+      opaque
     ])
-//    instance.alpha = 0
+
     instance.axis = .horizontal
-    instance.spacing = 0
-    instance.clipsToBounds = false
+    instance.spacing = 8
     
     return instance
   }()
@@ -93,6 +107,33 @@ class TermsViewController: UIViewController {
     setupUI()
     controllerInput?.getTermsConditionsURL()
   }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    guard willMoveToParent,
+          let constraint = logoStack.getConstraint(identifier: "centerYAnchor"),
+          let navigationBar = navigationController?.navigationBar
+    else { return }
+    
+    KeychainService.deleteData()
+    
+    navigationBar.setNeedsLayout()
+    UIView.animate(withDuration: 0.1, animations: {
+      constraint.constant = -100
+      navigationBar.layoutIfNeeded()
+    }) { [weak self] _ in
+      guard let self = self else { return }
+      
+      self.logoStack.removeFromSuperview()
+    }
+  }
+  
+  override func willMove(toParent parent: UIViewController?) {
+    super.willMove(toParent: parent)
+    
+    willMoveToParent = parent.isNil ? true : false
+  }
 }
 
 extension TermsViewController: TermsViewInput {
@@ -129,6 +170,7 @@ private extension TermsViewController {
 //    setNavigationBarTintColor(Colors.main)
     fillNavigationBar()
 //    navigationItem.titleView = logoStack
+    
     guard let navBar = navigationController?.navigationBar else { return }
     
     logoStack.placeInCenter(of: navBar)

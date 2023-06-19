@@ -30,4 +30,19 @@ struct Fonts {
     static let Light            = "OpenSans-Light"
     static let Italic           = "OpenSans-Italic"
     static let Extrabold        = "OpenSans-ExtraBold"
+  
+  struct Rubik {
+    static let Black            = "Rubik-Black"
+    static let BlackItalic      = "Rubik-BlackItalic"
+    static let Bold             = "Rubik-Bold"
+    static let ExtraBold        = "Rubik-ExtraBold"
+    static let Italic           = "Rubik-Italic"
+    static let Light            = "Rubik-Light"
+    static let LightItalic      = "Rubik-LightItalic"
+    static let Medium           = "Rubik-Medium"
+    static let MediumItalic     = "Rubik-MediumItalic"
+    static let Regular          = "Rubik-Regular"
+    static let SemiBold         = "Rubik-SemiBold"
+    static let SemiBoldItalic   = "Rubik-SemiBoldItalic"
+  }
 }

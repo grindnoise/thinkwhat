@@ -117,6 +117,8 @@
 	<string>6LcFd0UeAAAAADYslKFQeYeAL8_aLmSRGP80qAP5</string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>Rubik-Regular.ttf</string>
+		<string>Rubik-SemiBold.ttf</string>
 		<string>OpenSans-Semibold.ttf</string>
 		<string>OpenSans-Light.ttf</string>
 		<string>OpenSans-Italic.ttf</string>

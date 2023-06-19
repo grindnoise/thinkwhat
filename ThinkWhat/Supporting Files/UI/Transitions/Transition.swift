@@ -158,55 +158,49 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         
         toView.setNeedsLayout()
         toView.layoutIfNeeded()
-        toView.alpha = 1
+        toView.alpha = 0
         let padding: CGFloat = 8
-        let logo = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.main)
-        logo.frame = CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
-                                                                         to: containerView),
-                            size: fromView.logoIcon.bounds.size)
+        let logo  = Logo(frame: CGRect(origin: fromView.logo.superview!.convert(fromView.logo.frame.origin,
+                                                                                to: containerView),
+                                       size: fromView.logo.bounds.size))
+        logo.removeConstraints(logo.getAllConstraints())
         containerView.addSubview(logo)
-        fromView.logoIcon.alpha = 0
+        fromView.logo.alpha = 0
         toView.logoIcon.alpha = 0
-        logo.iconColor = Colors.main
-        logo.scaleMultiplicator = 1
-        logo.category = .Logo
-        
-        let logoText = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.main)
-        logoText.frame = CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
-                                                                             to: containerView),
-                                size: fromView.logoText.bounds.size)
+
+        let logoText = LogoText(frame: CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
+                                                                                   to: containerView),
+                                          size: fromView.logoText.bounds.size))
+        logoText.removeConstraints(logoText.getAllConstraints())
         containerView.addSubview(logoText)
         fromView.logoText.alpha = 0
-        logoText.iconColor = Colors.main
-        logoText.scaleMultiplicator = 1
-        logoText.category = .LogoText
-        
+        toView.logoText.alpha = 0
+
         let button: UIButton = {
           let instance = UIButton()
           if #available(iOS 15, *) {
             var config = UIButton.Configuration.filled()
-            config.cornerStyle = .small
-            config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+            config.cornerStyle = .capsule
             config.baseBackgroundColor = Colors.main
-            config.contentInsets.top = padding
-            config.contentInsets.bottom = padding
-            config.contentInsets.leading = 20
-            config.contentInsets.trailing = 20
-            config.attributedTitle = AttributedString("getStartedButton".localized.uppercased(),
+            config.attributedTitle = AttributedString("getStartedButton".localized.capitalized,
                                                       attributes: AttributeContainer([
-                                                        .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                        .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                         .foregroundColor: UIColor.white as Any
                                                       ]))
             instance.configuration = config
           } else {
             instance.cornerRadius = fromView.button.cornerRadius
-            instance.setAttributedTitle(NSAttributedString(string: "getStartedButton".localized.uppercased(),
+            instance.setAttributedTitle(NSAttributedString(string: "getStartedButton".localized.capitalized,
                                                            attributes: [
-                                                            .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                            .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                             .foregroundColor: UIColor.white as Any
                                                            ]),
                                         for: .normal)
           }
+          instance.layer.shadowOpacity = 1
+          instance.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+          instance.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+          instance.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
           
           return instance
         }()
@@ -217,23 +211,6 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         fromView.button.alpha = 0
         toView.loginButton.alpha = 0
         toView.loginButton.transform = .init(scaleX: 0.5, y: 0.5)
-        
-        let label: UILabel = {
-          let instance = UILabel()
-          instance.numberOfLines = 0
-          instance.backgroundColor = .clear
-          instance.textAlignment = .center
-          instance.alpha = 1
-          instance.text = "welcomeLabel".localized
-          instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title3)
-          
-          return instance
-        }()
-        label.frame = CGRect(origin: fromView.label.superview!.convert(fromView.label.frame.origin,
-                                                                       to: containerView),
-                             size: fromView.label.bounds.size)
-        containerView.addSubview(label)
-        fromView.label.alpha = 0
         
         let loginContainer: UIStackView = {
           let loginTextField: UnderlinedSignTextField = {
@@ -265,7 +242,6 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         loginContainer.frame = CGRect(origin: loginDestination,
                                       size: toView.loginContainer.bounds.size)
         loginContainer.frame.origin.y = containerView.bounds.height
-        //          loginContainer.transform = .init(scaleX: 0.75, y: 0.75)
         loginContainer.cornerRadius = loginContainer.bounds.width * 0.025
         containerView.addSubview(loginContainer)
         toView.loginContainer.alpha = 0
@@ -304,23 +280,6 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         containerView.addSubview(passwordContainer)
         toView.passwordContainer.alpha = 0
         
-//        let orLabel: UILabel = {
-//          let instance = UILabel()
-//          instance.numberOfLines = 1
-//          instance.textAlignment = .center
-//          instance.text = "providerLabel".localized
-//          instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
-//
-//          return instance
-//        }()
-//        let orLabelDestination = toView.passwordContainer.superview!.convert(toView.label.frame.origin,
-//                                                                             to: containerView)
-//        orLabel.frame = CGRect(origin: loginDestination,
-//                               size: toView.label.bounds.size)
-//        orLabel.frame.origin.y = containerView.bounds.height
-//        containerView.addSubview(orLabel)
-//        toView.label.alpha = 0
-        
         let separator = try! toView.separator.copyObject() as! UIStackView
         separator.arrangedSubviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = true }
         let separatorDestination = toView.separator.superview!.convert(toView.separator.frame.origin,
@@ -331,31 +290,14 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         separator.frame.origin.y = containerView.bounds.height
         containerView.addSubview(separator)
         toView.separator.alpha = 0
-        
-//        let signupButton: UIButton = {
-//          let instance = UIButton()
-//          instance.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
-//                                                         attributes: [
-//                                                          .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
-//                                                          .foregroundColor: Colors.main as Any
-//                                                         ]),
-//                                      for: .normal)
-//
-//          return instance
-//        }()
-//        let signupButtonDestination = toView.signupButton.superview!.convert(toView.signupButton.frame.origin,
-//                                                                             to: containerView)
-//        signupButton.frame = CGRect(origin: signupButtonDestination,
-//                                    size: toView.signupButton.bounds.size)
-//        signupButton.frame.origin.x = -(containerView.bounds.width + signupButton.frame.width)
-//        containerView.addSubview(signupButton)
-//        toView.signupButton.alpha = 0
+       
         let apple = ASAuthorizationAppleIDButton(type: .signIn, style: navigationController.traitCollection.userInterfaceStyle == .dark ? .white : .black)
         let appleDestination = toView.apple.superview!.convert(toView.apple.frame.origin,
                                                                              to: containerView)
         apple.frame.origin = appleDestination
         apple.frame.origin.y = containerView.bounds.height
         apple.frame.size = toView.apple.frame.size
+        (apple as UIControl).cornerRadius = apple.bounds.height/2
         containerView.addSubview(apple)
         toView.apple.alpha = 0
         
@@ -373,7 +315,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let instance = UIButton()
           instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
                                                          attributes: [
-                                                          .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
+                                                          .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                           .foregroundColor: Colors.main as Any
                                                          ]),
                                       for: .normal)
@@ -406,19 +348,18 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
             $0.alpha = 0
           }
         }
-        
-        UIView.animate(withDuration: 0.25,
+        UIView.animate(withDuration: 0.3,
                        delay: 0,
                        options: .curveEaseIn,
                        animations: {
-          label.frame.origin.x = -label.bounds.width
-          //          logoText.frame.origin.x = containerView.bounds.width
           button.frame.origin.y = containerView.bounds.height
-        }) {
-          _ in
-          label.removeFromSuperview()
-          //          logoText.removeFromSuperview()
+          fromView.spiral.startRotating(duration: 0.05, repeatCount: 1, clockwise: false)
+          fromView.spiral.transform = .init(scaleX: 1.5, y: 1.5)
+          fromView.spiral.alpha = 0
+          toView.alpha = 1
+        }) { _ in
           button.removeFromSuperview()
+          fromView.spiral.stopRotating()
           
           delay(seconds: 0.3) {
             if let stack = toView.logos.getSubview(type: UIStackView.self) {
@@ -461,57 +402,16 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
               options: [.curveEaseInOut],
               animations: {
                 view.frame.origin = coordinate
-                //                                    size: toView.logoIcon.bounds.size)
-                //                loginContainer.transform = .identity
               }) {  _ in
                 destination.alpha = 1
                 view.removeFromSuperview()
-                
-                //                if index == 0 {
-                //                  UIView.animate(
-                //                    withDuration: 0.6,
-                //                    delay: 0,
-                //                    usingSpringWithDamping: 0.7,
-                //                    initialSpringVelocity: 0.3,
-                //                    options: [.curveEaseInOut],
-                //                    animations: {
-                //                      toView.loginButton.alpha = 1
-                //                      toView.loginButton.transform = .identity
-                //                    })
-                //                }
-                
+
                 guard index == views.count - 1 else { return }
                 
                 self.context?.completeTransition(true)
               }
           }
         }
-        
-        //        UIView.animate(withDuration: 0.5,
-        //                       delay: 0,
-        //                       options: .curveEaseInOut,
-        //                       animations: {
-        //          logo.frame = CGRect(origin: toView.logoIcon.superview!.convert(toView.logoIcon.frame.origin,
-        //                                                                         to: containerView),
-        //                              size: toView.logoIcon.bounds.size)
-        //        }) {  _ in
-        //          toVC.view.alpha = 1
-        //          toView.logoIcon.alpha = 1
-        //          logo.removeFromSuperview()
-        //          //            self.context?.completeTransition(true)
-        //        }
-        //
-        logoText.icon.add(Animations.get(property: .Path,
-                                         fromValue: (logoText.icon as! CAShapeLayer).path as Any,
-                                         toValue: (toView.logoText.icon as! CAShapeLayer).path as Any,
-                                         duration: 0.3,
-                                         delay: 0,
-                                         repeatCount: 0,
-                                         autoreverses: false,
-                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                         delegate: nil,
-                                         isRemovedOnCompletion: false),
-                          forKey: nil)
         
         UIView.animate(
           withDuration: 0.6,
@@ -536,8 +436,8 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
       } else if let fromView = fromVC.view as? SignInView,
                 let toView = toVC.view as? TermsView,
                 let titleView = toVC.navigationController?.navigationBar.subviews.filter({ $0 is UIStackView }).first as? UIStackView,
-                let logoIcon = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoIcon" }).first as? Icon,
-                let logoText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoText" }).first as? Icon,
+                let logoIcon = titleView.arrangedSubviews.filter({ $0 is Logo }).first as? Logo,
+                let logoText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "opaque" }).first?.subviews.filter({ $0 is LogoText }).first as? LogoText,
                 let logosStack = fromView.logos.getSubview(type: UIStackView.self, identifier: "stack")  {
         
         let opaque = UIView.opaque()
@@ -551,97 +451,70 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         toView.webView.alpha = 0
         
         let padding: CGFloat = 8
-        let logo: Icon = {
-          let instance = Icon()
-          instance.frame = CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
-                                                                               to: containerView),
-                                  size: fromView.logoIcon.bounds.size)
-          fromView.logoIcon.alpha = 0
-          logoIcon.alpha = 0
-          instance.iconColor = Colors.main
-          instance.scaleMultiplicator = 1
-          instance.category = .Logo
-          
-          return instance
-        }()
-        let fakeLogoText: Icon = {
-          let instance = Icon()
-          instance.frame = CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
-                                                                               to: containerView),
-                                  size: fromView.logoText.bounds.size)
-          fromView.logoIcon.alpha = 0
-          logoText.alpha = 0
-          instance.iconColor = Colors.main
-          instance.scaleMultiplicator = 1
-          instance.category = .LogoText
-          
-          return instance
-        }()
+        let fakeLogoIcon  = Logo(frame: CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
+                                                                                to: containerView),
+                                       size: fromView.logoIcon.bounds.size))
+        fakeLogoIcon.removeConstraints(fakeLogoIcon.getAllConstraints())
+        opaque.addSubview(fakeLogoIcon)
+        fromView.logoIcon.alpha = 0
+        logoIcon.alpha = 0
+
         
-        opaque.addSubview(logo)
+        let fakeLogoText = LogoText(frame: CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
+                                                                                   to: containerView),
+                                          size: fromView.logoText.bounds.size))
+        fakeLogoText.removeConstraints(fakeLogoText.getAllConstraints())
         opaque.addSubview(fakeLogoText)
+        fromView.logoText.alpha = 0
+        logoText.alpha = 0
         
-        logo.icon.add(Animations.get(property: .Path,
-                                     fromValue: (logo.icon as! CAShapeLayer).path as Any,
-                                     toValue: (logoIcon.icon as! CAShapeLayer).path as Any,
-                                     duration: 0.3,
-                                     delay: 0,
-                                     repeatCount: 0,
-                                     autoreverses: false,
-                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                     delegate: nil,
-                                     isRemovedOnCompletion: false),
-                      forKey: nil)
-        fakeLogoText.icon.add(Animations.get(property: .Path,
-                                             fromValue: (fakeLogoText.icon as! CAShapeLayer).path as Any,
-                                             toValue: (logoText.icon as! CAShapeLayer).path as Any,
-                                             duration: 0.3,
-                                             delay: 0,
-                                             repeatCount: 0,
-                                             autoreverses: false,
-                                             timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                             delegate: nil,
-                                             isRemovedOnCompletion: false),
-                              forKey: nil)
-        
-        
-        
-        let loginButton: UIButton = {
+        let fakeLogoIconDestination = logoIcon.superview!.convert(logoIcon.frame.origin,
+                                                                   to: containerView)
+        let fakeLogoTextDestination = logoText.superview!.convert(logoText.frame.origin,
+                                                                   to: containerView)
+
+        let loginButton: UIView = {
+          let opaque = UIView.opaque()
+          opaque.layer.masksToBounds = false
+          
           let instance = UIButton()
           if #available(iOS 15, *) {
             var config = UIButton.Configuration.filled()
-            config.cornerStyle = .small
-            config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+            config.cornerStyle = .capsule
             config.baseBackgroundColor = Colors.main
-            config.contentInsets.top = padding
-            config.contentInsets.bottom = padding
-            config.contentInsets.leading = 20
-            config.contentInsets.trailing = 20
-            config.attributedTitle = AttributedString("loginButton".localized.uppercased(),
+            config.attributedTitle = AttributedString("loginButton".localized,
                                                       attributes: AttributeContainer([
-                                                        .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                        .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                         .foregroundColor: UIColor.white as Any
                                                       ]))
             instance.configuration = config
           } else {
             instance.backgroundColor = Colors.main
             instance.cornerRadius = fromView.loginButton.cornerRadius
-            instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
+            instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized,
                                                            attributes: [
-                                                            .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                            .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                             .foregroundColor: UIColor.white as Any
                                                            ]),
                                         for: .normal)
+            instance.place(inside: opaque)
           }
+          instance.place(inside: opaque)
           
-          return instance
+          return opaque
         }()
         var loginButtonCoordinate = fromView.loginButton.superview!.convert(fromView.loginButton.frame.origin,
                                                                  to: containerView)
-        //        buttonCoordinate.y = containerView.bounds.height
         loginButton.frame = CGRect(origin: loginButtonCoordinate,
                                     size: fromView.loginButton.bounds.size)
         containerView.addSubview(loginButton)
+        
+        // Draw shadow
+        loginButton.layer.shadowOpacity = 1
+        loginButton.layer.shadowPath = UIBezierPath(roundedRect: loginButton.bounds, cornerRadius: loginButton.bounds.height/2).cgPath
+        loginButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        loginButton.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        loginButton.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
         loginButtonCoordinate.y = containerView.bounds.height
         
         let apple = ASAuthorizationAppleIDButton(type: .signIn, style: navigationController.traitCollection.userInterfaceStyle == .dark ? .white : .black)
@@ -657,7 +530,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let instance = UIButton()
           instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
                                                          attributes: [
-                                                          .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
+                                                          .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                           .foregroundColor: Colors.main as Any
                                                          ]),
                                       for: .normal)
@@ -668,7 +541,6 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                                                                                to: containerView)
         forgotButton.frame = CGRect(origin: forgotButtonDestination,
                                     size: fromView.forgotButton.bounds.size)
-        //        forgotButton.frame.origin.x = containerView.bounds.width
         containerView.addSubview(forgotButton)
         fromView.forgotButton.alpha = 0
         
@@ -869,8 +741,10 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
               fromView.forgotButton.alpha = 1
               fromView.signupButton.alpha = 1
               fromView.logoIcon.alpha = 1
+              fromView.logoText.alpha = 1
               fromView.loginContainer.alpha = 1
               fromView.passwordContainer.alpha = 1
+              fromView.label.alpha = 1
             }
         }
         
@@ -883,7 +757,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           initialSpringVelocity: 0.3,
           options: [.curveEaseInOut],
           animations: {
-            logo.frame = CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
+            fakeLogoIcon.frame = CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
                                                                     to: containerView),
                                 size: logoIcon.bounds.size)
             fakeLogoText.frame = CGRect(origin: logoText.superview!.convert(logoText.frame.origin,
@@ -1243,30 +1117,47 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         fromView.alpha = 1
         
         let padding: CGFloat = 8
-        let fakeLogoIcon: Icon = {
-          let instance = Icon()
-          instance.frame = CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
-                                                                               to: containerView),
-                                  size: fromView.logoIcon.bounds.size)
-          fromView.logoIcon.alpha = 0
-          instance.iconColor = Colors.main
-          instance.scaleMultiplicator = 1
-          instance.category = .Logo
-          
-          return instance
-        }()
-        let fakeLogoText: Icon = {
-          let instance = Icon()
-          instance.frame = CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
-                                                                               to: containerView),
-                                  size: fromView.logoText.bounds.size)
-          fromView.logoIcon.alpha = 0
-          instance.iconColor = Colors.main
-          instance.scaleMultiplicator = 1
-          instance.category = .LogoText
-          
-          return instance
-        }()
+//        let fakeLogoIcon: Icon = {
+//          let instance = Icon()
+//          instance.frame = CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
+//                                                                               to: containerView),
+//                                  size: fromView.logoIcon.bounds.size)
+//          fromView.logoIcon.alpha = 0
+//          instance.iconColor = Colors.main
+//          instance.scaleMultiplicator = 1
+//          instance.category = .Logo
+//
+//          return instance
+//        }()
+//        let fakeLogoText: Icon = {
+//          let instance = Icon()
+//          instance.frame = CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
+//                                                                               to: containerView),
+//                                  size: fromView.logoText.bounds.size)
+//          fromView.logoIcon.alpha = 0
+//          instance.iconColor = Colors.main
+//          instance.scaleMultiplicator = 1
+//          instance.category = .LogoText
+//
+//          return instance
+//        }()
+        let fakeLogoIcon  = Logo(frame: CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
+                                                                                to: containerView),
+                                       size: fromView.logoIcon.bounds.size))
+        fakeLogoIcon.removeConstraints(fakeLogoIcon.getAllConstraints())
+        containerView.addSubview(fakeLogoIcon)
+        fromView.logoIcon.alpha = 0
+        toView.logoIcon.alpha = 0
+
+        
+        let fakeLogoText = LogoText(frame: CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
+                                                                                   to: containerView),
+                                          size: fromView.logoText.bounds.size))
+        fakeLogoText.removeConstraints(fakeLogoText.getAllConstraints())
+        containerView.addSubview(fakeLogoText)
+        fromView.logoText.alpha = 0
+        toView.logoText.alpha = 0
+        
         let fakeLogoIconDestination = toView.logoIcon.superview!.convert(toView.logoIcon.frame.origin,
                                                                    to: containerView)
         let fakeLogoTextDestination = toView.logoText.superview!.convert(toView.logoText.frame.origin,
@@ -1281,7 +1172,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
        
         let fakeButtonLabel: UILabel = {
           let instance = UILabel()
-          instance.font = UIFont(name: Fonts.Bold, size: 20)
+          instance.font = UIFont(name: Fonts.Rubik.SemiBold, size: 14)
           instance.textColor = .white
           instance.text = "loginButton".localized.uppercased()
 //          fakeButtonLabel.attributedText = NSAttributedString(string: "loginButton".localized.uppercased(),
@@ -1292,24 +1183,18 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           return instance
         }()
         let fakeButton: UIView = {
+          let opaque = UIView()
+          opaque.backgroundColor = .clear
+          opaque.layer.masksToBounds = false
+          opaque.clipsToBounds = false
+          
           let instance = UIView()
           instance.backgroundColor = Colors.main
-          instance.cornerRadius = 6//fromView.loginButton.cornerRadius
-          //            instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
-          //                                                           attributes: [
-          //                                                            .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-          //                                                            .foregroundColor: UIColor.white as Any
-          //                                                           ]),
-          //                                        for: .normal)
-//          let label = UILabel()
-//          label.attributedText = NSAttributedString(string: "loginButton".localized.uppercased(),
-//                                                    attributes: [
-//                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-//                                                      .foregroundColor: UIColor.white as Any
-//                                                    ])
+          instance.cornerRadius = fromView.loginButton.frame.height/2
           fakeButtonLabel.placeInCenter(of: instance)
+          instance.place(inside: opaque)
 
-          return instance
+          return opaque
         }()
         let fakeButtonCoordinate = toView.loginButton.superview!.convert(toView.loginButton.frame.origin,
                                                                          to: containerView)
@@ -1317,21 +1202,22 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                                                                                   to: containerView),
                                   size: fromView.loginButton.bounds.size)
         containerView.addSubview(fakeButton)
+        
+        // Draw shadow
+        fakeButton.layer.shadowOpacity = 1
+        fakeButton.layer.shadowPath = UIBezierPath(roundedRect: fakeButton.bounds, cornerRadius: fakeButton.bounds.height/2).cgPath
+        fakeButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        fakeButton.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        fakeButton.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+        
+        
         UIView.transition(with: fakeButtonLabel,
-                          duration: 0.2,
+                          duration: 0.3,
                           options: .transitionCrossDissolve,
                           animations: {
-          fakeButton.frame.size = toView.loginButton.frame.size
-          fakeButtonLabel.text = "signupButton".localized.uppercased()
-//          fakeButtonLabel.attributedText = NSAttributedString(string: "signupButton".localized.uppercased(),
-//                                                              attributes: [
-//                                                                .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-//                                                                .foregroundColor: UIColor.white as Any
-//                                                              ])
+          fakeButtonLabel.text = "signupButton".localized
         })
-        
-        
-        
+
         let signupButton: UIButton = {
           let instance = UIButton()
           instance.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
@@ -1368,7 +1254,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         }()
         var forgotButtonDestination = fromView.forgotButton.superview!.convert(fromView.forgotButton.frame.origin,
                                                                                to: containerView)
-        forgotButtonDestination.x = containerView.bounds.width
+        forgotButtonDestination.x = -(containerView.bounds.width + forgotButton.frame.width)
         forgotButton.frame = CGRect(origin: fromView.forgotButton.superview!.convert(fromView.forgotButton.frame.origin,
                                                                                      to: containerView),
                                     size: fromView.forgotButton.bounds.size)
@@ -1416,7 +1302,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         var appleDestination = fromView.apple.superview!.convert(fromView.apple.frame.origin,
                                                                              to: containerView)
         apple.frame.origin = appleDestination
-        appleDestination.x = -(containerView.bounds.width + apple.frame.width)
+        appleDestination.x = containerView.bounds.width//-(containerView.bounds.width + apple.frame.width)
         apple.frame.size = fromView.apple.frame.size
         containerView.addSubview(apple)
         fromView.apple.alpha = 0
@@ -1583,6 +1469,9 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
               options: [.curveEaseInOut],
               animations: {
                 view.frame.origin = destinationCoordinate
+                if view === fakeLogoText {
+                  view.frame.size = toView.logoText.frame.size
+                }
               }) {  _ in
                 destinationView.alpha = 1
                 view.removeFromSuperview()
@@ -1627,8 +1516,8 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
       } else if let fromView = fromVC.view as? NewAccountView,
                 let toView = toVC.view as? TermsView,
                 let titleView = toVC.navigationController?.navigationBar.subviews.filter({ $0 is UIStackView }).first as? UIStackView,
-                let logoIcon = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoIcon" }).first as? Icon,
-                let logoText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoText" }).first as? Icon {
+                let logoIcon = titleView.arrangedSubviews.filter({ $0 is Logo }).first as? Logo,
+                let logoText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "opaque" }).first?.subviews.filter({ $0 is LogoText }).first as? LogoText {
         
         let opaque = UIView.opaque()
         opaque.place(inside: appDelegate.window!)
@@ -1641,84 +1530,47 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         toView.webView.alpha = 0
         
         let padding: CGFloat = 8
-        let logo: Icon = {
-          let instance = Icon()
-          instance.frame = CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
-                                                                               to: containerView),
-                                  size: fromView.logoIcon.bounds.size)
-          fromView.logoIcon.alpha = 0
-          logoIcon.alpha = 0
-          instance.iconColor = Colors.main
-          instance.scaleMultiplicator = 1
-          instance.category = .Logo
-          
-          return instance
-        }()
-        let fakeLogoText: Icon = {
-             let instance = Icon()
-             instance.frame = CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
-                                                                                  to: containerView),
-                                     size: fromView.logoText.bounds.size)
-             fromView.logoIcon.alpha = 0
-             logoText.alpha = 0
-             instance.iconColor = Colors.main
-             instance.scaleMultiplicator = 1
-             instance.category = .LogoText
-             
-             return instance
-           }()
-           
-           opaque.addSubview(logo)
-           opaque.addSubview(fakeLogoText)
-           
-           logo.icon.add(Animations.get(property: .Path,
-                                        fromValue: (logo.icon as! CAShapeLayer).path as Any,
-                                        toValue: (logoIcon.icon as! CAShapeLayer).path as Any,
-                                        duration: 0.3,
-                                        delay: 0,
-                                        repeatCount: 0,
-                                        autoreverses: false,
-                                        timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                        delegate: nil,
-                                        isRemovedOnCompletion: false),
-                         forKey: nil)
-           fakeLogoText.icon.add(Animations.get(property: .Path,
-                                                fromValue: (fakeLogoText.icon as! CAShapeLayer).path as Any,
-                                                toValue: (logoText.icon as! CAShapeLayer).path as Any,
-                                                duration: 0.3,
-                                                delay: 0,
-                                                repeatCount: 0,
-                                                autoreverses: false,
-                                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                                delegate: nil,
-                                                isRemovedOnCompletion: false),
-                                 forKey: nil)
-           
-           
+        let fakeLogoIcon  = Logo(frame: CGRect(origin: fromView.logoIcon.superview!.convert(fromView.logoIcon.frame.origin,
+                                                                                to: containerView),
+                                       size: fromView.logoIcon.bounds.size))
+        fakeLogoIcon.removeConstraints(fakeLogoIcon.getAllConstraints())
+        opaque.addSubview(fakeLogoIcon)
+        fromView.logoIcon.alpha = 0
+        logoIcon.alpha = 0
+
+        
+        let fakeLogoText = LogoText(frame: CGRect(origin: fromView.logoText.superview!.convert(fromView.logoText.frame.origin,
+                                                                                   to: containerView),
+                                          size: fromView.logoText.bounds.size))
+        fakeLogoText.removeConstraints(fakeLogoText.getAllConstraints())
+        opaque.addSubview(fakeLogoText)
+        fromView.logoText.alpha = 0
+        logoText.alpha = 0
+        
+        let fakeLogoIconDestination = logoIcon.superview!.convert(logoIcon.frame.origin,
+                                                                   to: containerView)
+        let fakeLogoTextDestination = logoText.superview!.convert(logoText.frame.origin,
+                                                                   to: containerView)
+        
            
            let loginButton: UIButton = {
              let instance = UIButton()
              if #available(iOS 15, *) {
                var config = UIButton.Configuration.filled()
-               config.cornerStyle = .small
-               config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+               config.cornerStyle = .capsule
                config.baseBackgroundColor = Colors.main
-               config.contentInsets.top = padding
-               config.contentInsets.bottom = padding
-               config.contentInsets.leading = 20
-               config.contentInsets.trailing = 20
-               config.attributedTitle = AttributedString("loginButton".localized.uppercased(),
+               config.attributedTitle = AttributedString("loginButton".localized,
                                                          attributes: AttributeContainer([
-                                                           .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                          .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                            .foregroundColor: UIColor.white as Any
                                                          ]))
                instance.configuration = config
              } else {
                instance.backgroundColor = Colors.main
                instance.cornerRadius = fromView.loginButton.cornerRadius
-               instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
+               instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized,
                                                               attributes: [
-                                                               .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                                .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                                .foregroundColor: UIColor.white as Any
                                                               ]),
                                            for: .normal)
@@ -1846,28 +1698,26 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
              [loginButton: loginButtonCoordinate],
            ]
            
-           let acceptButton: UIButton = {
+           let acceptButton: UIView = {
+             
+             
              let instance = UIButton()
              if #available(iOS 15, *) {
                var config = UIButton.Configuration.filled()
-               config.cornerStyle = .small
-               config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+               config.cornerStyle = .capsule
                config.baseBackgroundColor = UIColor.systemGray
-               config.contentInsets.top = padding
-               config.contentInsets.bottom = padding
-               config.contentInsets.leading = 20
-               config.contentInsets.trailing = 20
-               config.attributedTitle = AttributedString("acceptButton".localized.uppercased(),
+               config.attributedTitle = AttributedString("acceptButton".localized,
                                                          attributes: AttributeContainer([
-                                                           .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                          .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                            .foregroundColor: UIColor.white as Any
                                                          ]))
                instance.configuration = config
              } else {
                instance.cornerRadius = toView.acceptButton.cornerRadius
-               instance.setAttributedTitle(NSAttributedString(string: "acceptButton".localized.uppercased(),
+               instance.backgroundColor = .systemGray
+               instance.setAttributedTitle(NSAttributedString(string: "acceptButton".localized,
                                                               attributes: [
-                                                               .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                               .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                                .foregroundColor: UIColor.white as Any
                                                               ]),
                                            for: .normal)
@@ -1931,11 +1781,9 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
              initialSpringVelocity: 0.3,
              options: [.curveEaseInOut],
              animations: {
-               logo.frame = CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
-                                                                       to: containerView),
+               fakeLogoIcon.frame = CGRect(origin: fakeLogoIconDestination,
                                    size: logoIcon.bounds.size)
-               fakeLogoText.frame = CGRect(origin: logoText.superview!.convert(logoText.frame.origin,
-                                                                               to: containerView),
+               fakeLogoText.frame = CGRect(origin: fakeLogoTextDestination,
                                            size: logoText.bounds.size)
              }) { _ in
                logoText.alpha = 1

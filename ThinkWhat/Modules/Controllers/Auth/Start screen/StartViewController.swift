@@ -16,7 +16,12 @@ class StartViewController: UIViewController {
   var controllerOutput: StartControllerOutput?
   var controllerInput: StartControllerInput?
   
-  
+  // MARK: - Destructor
+  deinit {
+#if DEBUG
+    print("\(String(describing: type(of: self))).\(#function)")
+#endif
+  }
   
   // MARK: - Private properties
   private var currentLaguage: String = ""

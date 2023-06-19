@@ -108,7 +108,8 @@
 
 //Welcome VC
 "welcomeLabel" = "Welcome to";
-"getStartedButton" = "Get started!";
+"getStartedButton" = "Get started";
+"start_tap_to_continue" = "tap to continue";
 
 //Signup VC
 "new_account" = "New account";

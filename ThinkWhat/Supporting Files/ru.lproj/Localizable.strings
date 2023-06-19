@@ -108,7 +108,8 @@
 
 //Welcome VC
 "welcomeLabel" = "Добро пожаловать в";
-"getStartedButton" = "Начать!";
+"getStartedButton" = "Начать";
+"start_tap_to_continue" = "нажмите, чтобы продолжить";
 
 //Signup VC
 "new_account" = "Новый аккаунт";

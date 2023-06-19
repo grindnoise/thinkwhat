@@ -308,6 +308,20 @@
 		AB883B332804391D00DBE4EF /* VoteMessage.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB883B322804391D00DBE4EF /* VoteMessage.xib */; };
 		AB889816240FA60C0087E5AD /* CopyPasteIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB889815240FA60C0087E5AD /* CopyPasteIcon.swift */; };
 		AB889818240FA65B0087E5AD /* CopyPasteTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB889817240FA65B0087E5AD /* CopyPasteTextField.swift */; };
+		AB8A447B2A3E543300FF3488 /* Rubik-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A446D2A3E543200FF3488 /* Rubik-Bold.ttf */; };
+		AB8A447C2A3E543300FF3488 /* Rubik-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A446E2A3E543200FF3488 /* Rubik-Italic.ttf */; };
+		AB8A447D2A3E543300FF3488 /* Rubik-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A446F2A3E543200FF3488 /* Rubik-MediumItalic.ttf */; };
+		AB8A447E2A3E543300FF3488 /* Rubik-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44702A3E543200FF3488 /* Rubik-BoldItalic.ttf */; };
+		AB8A447F2A3E543300FF3488 /* Rubik-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44712A3E543200FF3488 /* Rubik-Black.ttf */; };
+		AB8A44802A3E543300FF3488 /* Rubik-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44722A3E543300FF3488 /* Rubik-BlackItalic.ttf */; };
+		AB8A44812A3E543300FF3488 /* Rubik-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44732A3E543300FF3488 /* Rubik-ExtraBoldItalic.ttf */; };
+		AB8A44822A3E543300FF3488 /* Rubik-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44742A3E543300FF3488 /* Rubik-Light.ttf */; };
+		AB8A44832A3E543300FF3488 /* Rubik-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44752A3E543300FF3488 /* Rubik-Medium.ttf */; };
+		AB8A44842A3E543300FF3488 /* Rubik-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44762A3E543300FF3488 /* Rubik-ExtraBold.ttf */; };
+		AB8A44852A3E543300FF3488 /* Rubik-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44772A3E543300FF3488 /* Rubik-LightItalic.ttf */; };
+		AB8A44862A3E543300FF3488 /* Rubik-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44782A3E543300FF3488 /* Rubik-Regular.ttf */; };
+		AB8A44872A3E543300FF3488 /* Rubik-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44792A3E543300FF3488 /* Rubik-SemiBold.ttf */; };
+		AB8A44882A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A447A2A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf */; };
 		AB8BE16D2A31D5A200B0FB63 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8BE16C2A31D5A200B0FB63 /* NotificationService.swift */; };
 		AB8BE1712A31D5A200B0FB63 /* Push service extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AB8BE1782A31D61400B0FB63 /* BadgeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */; };
@@ -846,6 +860,20 @@
 		AB883B322804391D00DBE4EF /* VoteMessage.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VoteMessage.xib; sourceTree = "<group>"; };
 		AB889815240FA60C0087E5AD /* CopyPasteIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyPasteIcon.swift; sourceTree = "<group>"; };
 		AB889817240FA65B0087E5AD /* CopyPasteTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyPasteTextField.swift; sourceTree = "<group>"; };
+		AB8A446D2A3E543200FF3488 /* Rubik-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-Bold.ttf"; sourceTree = "<group>"; };
+		AB8A446E2A3E543200FF3488 /* Rubik-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-Italic.ttf"; sourceTree = "<group>"; };
+		AB8A446F2A3E543200FF3488 /* Rubik-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-MediumItalic.ttf"; sourceTree = "<group>"; };
+		AB8A44702A3E543200FF3488 /* Rubik-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-BoldItalic.ttf"; sourceTree = "<group>"; };
+		AB8A44712A3E543200FF3488 /* Rubik-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-Black.ttf"; sourceTree = "<group>"; };
+		AB8A44722A3E543300FF3488 /* Rubik-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-BlackItalic.ttf"; sourceTree = "<group>"; };
+		AB8A44732A3E543300FF3488 /* Rubik-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
+		AB8A44742A3E543300FF3488 /* Rubik-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-Light.ttf"; sourceTree = "<group>"; };
+		AB8A44752A3E543300FF3488 /* Rubik-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-Medium.ttf"; sourceTree = "<group>"; };
+		AB8A44762A3E543300FF3488 /* Rubik-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-ExtraBold.ttf"; sourceTree = "<group>"; };
+		AB8A44772A3E543300FF3488 /* Rubik-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-LightItalic.ttf"; sourceTree = "<group>"; };
+		AB8A44782A3E543300FF3488 /* Rubik-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-Regular.ttf"; sourceTree = "<group>"; };
+		AB8A44792A3E543300FF3488 /* Rubik-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-SemiBold.ttf"; sourceTree = "<group>"; };
+		AB8A447A2A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
 		AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Push service extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB8BE16C2A31D5A200B0FB63 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		AB8BE16E2A31D5A200B0FB63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1624,6 +1652,20 @@
 		AB3C6835223FD3EE00B57580 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				AB8A44712A3E543200FF3488 /* Rubik-Black.ttf */,
+				AB8A44722A3E543300FF3488 /* Rubik-BlackItalic.ttf */,
+				AB8A446D2A3E543200FF3488 /* Rubik-Bold.ttf */,
+				AB8A44702A3E543200FF3488 /* Rubik-BoldItalic.ttf */,
+				AB8A44762A3E543300FF3488 /* Rubik-ExtraBold.ttf */,
+				AB8A44732A3E543300FF3488 /* Rubik-ExtraBoldItalic.ttf */,
+				AB8A446E2A3E543200FF3488 /* Rubik-Italic.ttf */,
+				AB8A44742A3E543300FF3488 /* Rubik-Light.ttf */,
+				AB8A44772A3E543300FF3488 /* Rubik-LightItalic.ttf */,
+				AB8A44752A3E543300FF3488 /* Rubik-Medium.ttf */,
+				AB8A446F2A3E543200FF3488 /* Rubik-MediumItalic.ttf */,
+				AB8A44782A3E543300FF3488 /* Rubik-Regular.ttf */,
+				AB8A44792A3E543300FF3488 /* Rubik-SemiBold.ttf */,
+				AB8A447A2A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf */,
 				ABCBDA0D28759EE300888F23 /* Fonts.swift */,
 				AB3C6836223FD3EE00B57580 /* OpenSans-Semibold.ttf */,
 				AB3C6837223FD3EE00B57580 /* OpenSans-Light.ttf */,
@@ -2925,26 +2967,37 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB8A447F2A3E543300FF3488 /* Rubik-Black.ttf in Resources */,
 				AB66B4DF282D06B600244A38 /* ListSwitch.xib in Resources */,
+				AB8A447B2A3E543300FF3488 /* Rubik-Bold.ttf in Resources */,
 				AB883B2D2800708500DBE4EF /* Popup.xib in Resources */,
 				AB51606024EFF610006A07B7 /* CategoryCollectionViewCell.xib in Resources */,
 				AB1F34D5286B273B0086969E /* ImagePasteView.xib in Resources */,
 				AB72961227DA311000D45B54 /* HotView.xib in Resources */,
+				AB8A447C2A3E543300FF3488 /* Rubik-Italic.ttf in Resources */,
 				AB38DD722819538A00FFEB3F /* Confirm.xib in Resources */,
+				AB8A44852A3E543300FF3488 /* Rubik-LightItalic.ttf in Resources */,
+				AB8A44882A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf in Resources */,
 				AB3C684B223FD3EE00B57580 /* OpenSans-Light.ttf in Resources */,
 				AB7599EF245B2F51008B0569 /* SurveyPreview.xib in Resources */,
 				ABD639A627A5B0C50020958F /* recaptcha.html in Resources */,
+				AB8A447D2A3E543300FF3488 /* Rubik-MediumItalic.ttf in Resources */,
 				AB234F5828D774C000204EC8 /* Root.storyboard in Resources */,
 				AB99A95924C8154A00814F96 /* UserLogoHeader.xib in Resources */,
 				AB234F5428D774C000204EC8 /* App.storyboard in Resources */,
 				AB8DA31727A0325D00F92C18 /* Localizable.strings in Resources */,
+				AB8A447E2A3E543300FF3488 /* Rubik-BoldItalic.ttf in Resources */,
+				AB8A44812A3E543300FF3488 /* Rubik-ExtraBoldItalic.ttf in Resources */,
+				AB8A44842A3E543300FF3488 /* Rubik-ExtraBold.ttf in Resources */,
 				AB3C67EC223FBB6600B57580 /* LaunchScreen.storyboard in Resources */,
 				AB72963027DB5A9B00D45B54 /* ListView.xib in Resources */,
+				AB8A44862A3E543300FF3488 /* Rubik-Regular.ttf in Resources */,
 				AB74A7F72833F4B300B93522 /* SettingsSwitch.xib in Resources */,
 				AB3C67E9223FBB6600B57580 /* Assets.xcassets in Resources */,
 				AB1F34D0286B1DC60086969E /* URLPasteView.xib in Resources */,
 				AB72964427DB60C800D45B54 /* SettingsController.xib in Resources */,
 				ABA448F527EE044B00F8E00D /* PollView.xib in Resources */,
+				AB8A44822A3E543300FF3488 /* Rubik-Light.ttf in Resources */,
 				AB234F5628D774C000204EC8 /* Controllers.storyboard in Resources */,
 				AB3C684D223FD3EE00B57580 /* OpenSans-ExtraBold.ttf in Resources */,
 				AB72961727DA3F2300D45B54 /* SubscriptionsController.xib in Resources */,
@@ -2964,6 +3017,8 @@
 				AB0B7FD92944E07A00941FA1 /* ListController.xib in Resources */,
 				AB3C684F223FD3EE00B57580 /* OpenSans-Bold.ttf in Resources */,
 				AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */,
+				AB8A44802A3E543300FF3488 /* Rubik-BlackItalic.ttf in Resources */,
+				AB8A44832A3E543300FF3488 /* Rubik-Medium.ttf in Resources */,
 				AB234F5728D774C000204EC8 /* Auth.storyboard in Resources */,
 				ABBA73F52382BCCC00540ECF /* StatisticsViewController.xib in Resources */,
 				AB5EB5FE2361DDEA000D4D96 /* CategoryTableViewCell.xib in Resources */,
@@ -2976,6 +3031,7 @@
 				AB3C6852223FD3EF00B57580 /* OpenSans-Regular.ttf in Resources */,
 				AB72962127DA418700D45B54 /* SubscriptionsView.xib in Resources */,
 				AB3C6850223FD3EE00B57580 /* OpenSans-SemiboldItalic.ttf in Resources */,
+				AB8A44872A3E543300FF3488 /* Rubik-SemiBold.ttf in Resources */,
 				AB72964E27DB619300D45B54 /* SettingsView.xib in Resources */,
 				AB463FBE27C7E6C8007D7240 /* delAvatar.xib in Resources */,
 			);
@@ -3696,7 +3752,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatDebug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -3712,7 +3768,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = bukharovpavel.thinkwhat.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = bukharovpavel.thinkwhat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INCLUDE_PATHS = "";
@@ -3733,7 +3789,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -3924,7 +3980,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatAlpha.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -4230,7 +4286,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhat.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;

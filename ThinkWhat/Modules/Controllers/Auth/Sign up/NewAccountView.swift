@@ -70,16 +70,23 @@ class NewAccountView: UIView {
   public var mailChecker = PassthroughSubject<String, Never>()
   public var nameChecker = PassthroughSubject<String, Never>()
   ///**UI**
-  public private(set) lazy var logoIcon: Icon = {
-    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.main)
+//  public private(set) lazy var logoIcon: Icon = {
+//    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.main)
+//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+//
+//    return instance
+//  }()
+//  public private(set) lazy var logoText: Icon = {
+//    let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.main)
+//    //    instance.alpha = 0
+//    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
+//
+//    return instance
+//  }()
+  public private(set) lazy var logoText: LogoText = { LogoText() }()
+  public private(set) lazy var logoIcon: Logo = {
+    let instance = Logo()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
-    
-    return instance
-  }()
-  public private(set) lazy var logoText: Icon = {
-    let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.main)
-    //    instance.alpha = 0
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
     
     return instance
   }()
@@ -88,9 +95,9 @@ class NewAccountView: UIView {
     logoIcon.placeInCenter(of: top,
                            topInset: 0,
                            bottomInset: 0)
-    let spacer = UIView.verticalSpacer(padding*5)
+    let spacer = UIView.opaque()
     logoText.placeInCenter(of: spacer,
-                           topInset: 0,
+                           topInset: 20,
                            bottomInset: 0)
     let buttonView = UIView.opaque()
     loginButton.placeInCenter(of: buttonView,
@@ -286,23 +293,21 @@ class NewAccountView: UIView {
     
     return instance
   }()
-  public private(set) lazy var loginButton: UIButton = {
+  public private(set) lazy var loginButton: UIView = {
+    let opaque = UIView.opaque()
+    opaque.layer.masksToBounds = false
+    
     let instance = UIButton()
     instance.addTarget(self,
                        action: #selector(self.buttonTapped(_:)),
                        for: .touchUpInside)
     if #available(iOS 15, *) {
       var config = UIButton.Configuration.filled()
-      config.cornerStyle = .small
-      config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+      config.cornerStyle = .capsule
       config.baseBackgroundColor = Colors.main
-      config.contentInsets.top = padding
-      config.contentInsets.bottom = padding
-      config.contentInsets.leading = 20
-      config.contentInsets.trailing = 20
-      config.attributedTitle = AttributedString("signupButton".localized.uppercased(),
+      config.attributedTitle = AttributedString("signupButton".localized,
                                                 attributes: AttributeContainer([
-                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                   .foregroundColor: UIColor.white as Any
                                                 ]))
       instance.configuration = config
@@ -311,15 +316,26 @@ class NewAccountView: UIView {
       instance.publisher(for: \.bounds)
         .sink { instance.cornerRadius = $0.width * 0.025 }
         .store(in: &subscriptions)
-      instance.setAttributedTitle(NSAttributedString(string: "signupButton".localized.uppercased(),
+      instance.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
                                                      attributes: [
-                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                       .foregroundColor: UIColor.white as Any
                                                      ]),
                                   for: .normal)
     }
+    opaque.publisher(for: \.bounds)
+      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
+      .sink { [unowned self] in
+        opaque.layer.shadowOpacity = 1
+        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+      }
+      .store(in: &subscriptions)
+    instance.place(inside: opaque)
     
-    return instance
+    return opaque
   }()
   
   
@@ -434,13 +450,13 @@ extension NewAccountView: NewAccountControllerOutput {
       }
       self.loginButton.setSpinning(on: false, color: .white, animated: true) {
         if #available(iOS 15, *) {
-          self.loginButton.configuration?.attributedTitle = AttributedString("signupButton".localized.uppercased(),
+          self.loginButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString("signupButton".localized.uppercased(),
                                                                              attributes: AttributeContainer([
                                                                               .font: UIFont(name: Fonts.Bold, size: 20) as Any,
                                                                               .foregroundColor: UIColor.white as Any
                                                                              ]))
         } else {
-          self.loginButton.setAttributedTitle(NSAttributedString(string: "signupButton".localized.uppercased(),
+          self.loginButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: "signupButton".localized.uppercased(),
                                                                  attributes: [
                                                                   .font: UIFont(name: Fonts.Bold, size: 20) as Any,
                                                                   .foregroundColor: UIColor.white as Any
@@ -495,18 +511,23 @@ private extension NewAccountView {
     
     addSubview(stack)
     stack.translatesAutoresizingMaskIntoConstraints = false
+    stack.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.7).isActive = true
+    stack.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor).isActive = true
+    stack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor).isActive = true
+    
     loginTextField.translatesAutoresizingMaskIntoConstraints = false
-    passwordTextField.translatesAutoresizingMaskIntoConstraints = false
-    logoIcon.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
-    loginTextField.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6).isActive = true
-    mailTextField.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6).isActive = true
-    passwordTextField.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.6).isActive = true
     loginTextField.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: loginTextField.font!) + padding*2).isActive = true
     mailTextField.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: mailTextField.font!) + padding*2).isActive = true
     passwordTextField.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: passwordTextField.font!) + padding*2).isActive = true
-    stack.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor).isActive = true
-    stack.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor).isActive = true
 
+    loginButton.translatesAutoresizingMaskIntoConstraints = false
+    loginButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
+    loginButton.widthAnchor.constraint(equalTo: loginButton.heightAnchor, multiplier: 188/52).isActive = true
+    
+    logoIcon.translatesAutoresizingMaskIntoConstraints = false
+    logoIcon.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.31).isActive = true
+    logoText.translatesAutoresizingMaskIntoConstraints = false
+    logoText.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
   }
   
   @objc
@@ -623,13 +644,13 @@ private extension NewAccountView {
       }
       if !username.isEmpty && !mail.isEmpty && !password.isEmpty {
         if #available(iOS 15, *) {
-          loginButton.configuration?.attributedTitle = AttributedString("loginButton".localized.uppercased(),
+          loginButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString("loginButton".localized.uppercased(),
                                                                         attributes: AttributeContainer([
                                                                           .font: UIFont(name: Fonts.Bold, size: 20) as Any,
                                                                           .foregroundColor: UIColor.clear as Any
                                                                         ]))
         } else {
-          loginButton.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
+          loginButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
                                                             attributes: [
                                                               .font: UIFont(name: Fonts.Bold, size: 20) as Any,
                                                               .foregroundColor: UIColor.clear as Any
@@ -637,15 +658,15 @@ private extension NewAccountView {
                                          for: .normal)
         }
         
-        loginButton.setSpinning(on: true, color: .white, animated: true)
+        loginButton.getSubview(type: UIButton.self)!.setSpinning(on: true, color: .white, animated: true)
         if #available(iOS 15, *) {
-          self.loginButton.configuration?.attributedTitle = AttributedString("signupButton".localized.uppercased(),
+          self.loginButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString("signupButton".localized.uppercased(),
                                                                              attributes: AttributeContainer([
                                                                               .font: UIFont(name: Fonts.Bold, size: 20) as Any,
                                                                               .foregroundColor: UIColor.clear as Any
                                                                              ]))
         } else {
-          self.loginButton.setAttributedTitle(NSAttributedString(string: "signupButton".localized.uppercased(),
+          self.loginButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: "signupButton".localized.uppercased(),
                                                                  attributes: [
                                                                   .font: UIFont(name: Fonts.Bold, size: 20) as Any,
                                                                   .foregroundColor: UIColor.clear as Any

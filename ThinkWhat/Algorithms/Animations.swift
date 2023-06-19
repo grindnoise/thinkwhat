@@ -17,6 +17,7 @@ struct Animations {
     case Scale           = "transform.scale"
     case ScaleY          = "transform.scale.Y"
     case Path            = "path"
+    case Rotation        = "transform.rotation.z"
     case BackgroundColor = "backgroundColor"
     case StrokeStart     = "strokeStart"
     case StrokeEnd       = "strokeEnd"

@@ -45,9 +45,8 @@ class LoadingIndicator: UIView {
     
     return instance
   }()
-  private lazy var outerIcon: Icon = {
-    let instance = Icon(frame: frame,
-                        category: .LogoOuter,
+  public private(set) lazy var outerIcon: Icon = {
+    let instance = Icon(category: .LogoOuter,
                         scaleMultiplicator: 1,
                         iconColor: color)
     instance.publisher(for: \.bounds)
@@ -70,7 +69,7 @@ class LoadingIndicator: UIView {
     
     return instance
   }()
-  private lazy var innerIcon: Icon = {
+  public private(set) lazy var innerIcon: Icon = {
     let instance = Icon(frame: frame,
                         category: .LogoInner,
                         scaleMultiplicator: 1,
@@ -361,7 +360,10 @@ private extension LoadingIndicator {
   
     switch mode {
     case .Logo:
-      logo.place(inside: self)
+//      logo.place(inside: self)
+      outerIcon.place(inside: self)
+      innerIcon.placeCentered(inside: outerIcon, withMultiplier: 0.5)
+      innerIcon.layer.zPosition = 10
     case.Topics:
       outerIcon.place(inside: self)
       innerIcon.placeCentered(inside: outerIcon, withMultiplier: 0.5)

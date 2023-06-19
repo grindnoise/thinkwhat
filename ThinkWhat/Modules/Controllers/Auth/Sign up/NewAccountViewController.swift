@@ -17,11 +17,11 @@ class NewAccountViewController: UIViewController {
   var controllerOutput: NewAccountControllerOutput?
   var controllerInput: NewAccountControllerInput?
   ///**UI**
-  public private(set) lazy var tagCapsule: TagCapsule = { TagCapsule(text: "new_account".localized.uppercased(),
-                                                                     padding: 4,
-                                                                     color: Colors.main,
-                                                                     font: UIFont(name: Fonts.Bold, size: 20)!,
-                                                                     iconCategory: .Logo) }()
+//  public private(set) lazy var tagCapsule: TagCapsule = { TagCapsule(text: "new_account".localized.uppercased(),
+//                                                                     padding: 4,
+//                                                                     color: Colors.main,
+//                                                                     font: UIFont(name: Fonts.Bold, size: 20)!,
+//                                                                     iconCategory: .Logo) }()
   
   
   
@@ -156,7 +156,7 @@ private extension NewAccountViewController {
 //    navigationController?.navigationBar.backItem?.title = ""
     navigationController?.setNavigationBarHidden(false, animated: false)
     fillNavigationBar()
-    navigationItem.titleView = tagCapsule
+//    navigationItem.titleView = tagCapsule
   }
   
   func setTasks() {

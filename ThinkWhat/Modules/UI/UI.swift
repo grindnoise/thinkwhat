@@ -402,7 +402,8 @@ enum Colors {
     return color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.05 : 0.6)
   }
   
-  static var main: UIColor { UIColor(hexString: "#009800") }//Colors.Logo.Flame.rawValue }
+  static var main: UIColor { UIColor(hexString: "#21A038") } //Colors.Logo.Flame.rawValue }
+  static var darkTheme: UIColor { UIColor(hexString: "#262626") }
 }
 
 //extension Color: RawRepresentable {
