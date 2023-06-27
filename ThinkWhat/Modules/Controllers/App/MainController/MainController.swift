@@ -47,72 +47,29 @@ class MainController: UITabBarController {//}, StorageProtocol {
   private var commentId: String? //
   /// **UI**
   private var logoCenterY: CGFloat = .zero
-  private lazy var loadingIcon: Icon = {
-    let instance = Icon(category: Icon.Category.Logo)
-    instance.iconColor = Colors.main//.Logo.Flame.rawValue
-    instance.scaleMultiplicator = 1.2
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+  public private(set) lazy var loadingText: LogoText = { LogoText() }()
+  public private(set) lazy var loadingIcon: Logo = {
+    let instance = Logo()
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     
     return instance
   }()
-  private lazy var loadingText: Icon = {
-    let instance = Icon(category: Icon.Category.LogoText)
-    instance.iconColor = Colors.main//.Logo.Flame.rawValue
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.1
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
-    
-    return instance
-  }()
-  private lazy var loadingStack: UIStackView = {
-    let opaque = UIView()
-    opaque.backgroundColor = .clear
+  public private(set) lazy var loadingStack: UIStackView = {
+    let opaque = UIView.opaque()
+    loadingIcon.placeInCenter(of: opaque, topInset: 0, bottomInset: 0)
     
     let instance = UIStackView(arrangedSubviews: [
       opaque,
       loadingText
     ])
     instance.axis = .vertical
-    instance.distribution = .equalCentering
-    instance.spacing = 0
-    instance.clipsToBounds = false
-    view.addSubview(instance)
-    
-    loadingIcon.translatesAutoresizingMaskIntoConstraints = false
-    opaque.translatesAutoresizingMaskIntoConstraints = false
-    opaque.addSubview(loadingIcon)
-    
-    NSLayoutConstraint.activate([
-      loadingIcon.topAnchor.constraint(equalTo: opaque.topAnchor),
-      loadingIcon.bottomAnchor.constraint(equalTo: opaque.bottomAnchor),
-      loadingIcon.centerXAnchor.constraint(equalTo: opaque.centerXAnchor),
-      opaque.heightAnchor.constraint(equalTo: loadingText.heightAnchor, multiplier: 2)
-    ])
-    
+    instance.spacing = 30
+
     return instance
   }()
-  //    private var apiUnavailableView: APIUnavailableView?
-  private lazy var logoIcon: Icon = {
-    let instance = Icon(category: Icon.Category.Logo)
-    instance.iconColor = Colors.main//.Logo.Flame.rawValue
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.2
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    
-    return instance
-  }()
-  private lazy var logoText: Icon = {
-    let instance = Icon(category: Icon.Category.LogoText)
-    instance.iconColor = Colors.main//.Logo.Flame.rawValue
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.1
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.8).isActive = true
-    
-    return instance
-  }()
+  public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: "#1E1E1E".hexColor!.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.7 : 0.03)) }()
+  private lazy var logoIcon: Logo = { Logo() }()
+  private lazy var logoText: LogoText = { LogoText() }()
   private lazy var passthroughView: PassthroughView = {
     let instance = PassthroughView(color: .clear)
     instance.frame = UIScreen.main.bounds
@@ -120,22 +77,31 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     return instance
   }()
-  private lazy var logoStack: UIStackView = {
+  public private(set) lazy var logoStack: UIStackView = {
+    let opaque = UIView.opaque()
+    logoIcon.translatesAutoresizingMaskIntoConstraints = false
+//    logoIcon.heightAnchor.constraint(equalToConstant: NavigationController.Constants.NavBarHeightSmallState * 0.6).isActive = true
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    logoText.place(inside: opaque, insets: UIEdgeInsets(top: NavigationController.Constants.NavBarHeightSmallState * 0.125, left: 0, bottom: NavigationController.Constants.NavBarHeightSmallState * 0.125, right: 0))
+    
     let instance = UIStackView(arrangedSubviews: [
       logoIcon,
-      logoText
+      opaque
     ])
-    instance.alpha = 0
-    instance.axis = .horizontal
-    instance.spacing = 0
-    instance.clipsToBounds = false
-    //        instance.layer.zPosition = 100
     passthroughView.addSubview(instance)
-    //        view.addSubview(instance)
+    instance.axis = .horizontal
+    instance.spacing = 8
+    instance.alpha = 0
     
     return instance
   }()
-  private var isDataLoaded = false
+  private var isDataLoaded = false {
+    didSet {
+      guard isDataLoaded else { return }
+      
+      launch()
+    }
+  }
   //    private lazy var logo: AppLogoWithText = {
   //        let instance = AppLogoWithText(color: Colors.Logo.Flame.main,
   //                                       minusToneColor: Colors.Logo.Flame.minusTone)
@@ -452,8 +418,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
       
       try await API.shared.profiles.deleteAccount()
       self.subscriptions.forEach { $0 .cancel() }
-      self.loadingIcon.icon.removeAllAnimations()
-      self.loadingText.icon.removeAllAnimations()
+//      self.loadingIcon.icon.removeAllAnimations()
+//      self.loadingText.icon.removeAllAnimations()
       self.passthroughView.removeFromSuperview()
       UserDefaults.clear()
       Surveys.clear()
@@ -473,8 +439,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
   @MainActor
   public func logout() {
     subscriptions.forEach { $0 .cancel() }
-    loadingIcon.icon.removeAllAnimations()
-    loadingText.icon.removeAllAnimations()
+//    loadingIcon.icon.removeAllAnimations()
+//    loadingText.icon.removeAllAnimations()
     passthroughView.removeFromSuperview()
     API.shared.cancelAllRequests()
     UserDefaults.clear()
@@ -797,6 +763,8 @@ private extension MainController {
   
   @MainActor
   func setupUI() {
+    spiral.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationController?.navigationItem.largeTitleDisplayMode = .never
 //    tabBarController?.view.backgroundColor = .white
@@ -817,10 +785,26 @@ private extension MainController {
     ///Fix visibility while loading
     tabBar.alpha = 0
     setTabBarVisible(visible: false, animated: false)
-    loadingStack.placeInCenter(of: passthroughView,
-                               widthMultiplier: 0.6)//,
-//                               yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-    animateLoaderColor(from: Colors.Logo.Main, to: Colors.Logo.Main.next())
+    
+    loadingStack.placeInCenter(of: view)
+    
+    view.insertSubview(spiral, belowSubview: loadingStack)
+    spiral.translatesAutoresizingMaskIntoConstraints = false
+    spiral.heightAnchor.constraint(equalTo: spiral.widthAnchor).isActive = true
+    spiral.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1.5).isActive = true
+    spiral.centerXAnchor.constraint(equalTo: loadingIcon.centerXAnchor).isActive = true
+    spiral.centerYAnchor.constraint(equalTo: loadingIcon.centerYAnchor).isActive = true
+    spiral.startRotating(duration: 5)
+    
+    loadingIcon.translatesAutoresizingMaskIntoConstraints = false
+    loadingIcon.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.31).isActive = true
+    loadingText.translatesAutoresizingMaskIntoConstraints = false
+    loadingText.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5).isActive = true
+    
+//    loadingStack.placeInCenter(of: passthroughView,
+//                               widthMultiplier: 0.6)//,
+////                               yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+////    animateLoaderColor(from: Colors.Logo.Main, to: Colors.Logo.Main.next())
     
             appDelegate.window?.addSubview(passthroughView)
   }
@@ -845,139 +829,143 @@ private extension MainController {
   
   @MainActor
   func launch() {
-    let icon = loadingIcon.replicate()
-    let text = loadingText.replicate()
-    icon.frame.origin = loadingStack.convert(loadingIcon.frame.origin, to: view)
-    text.frame.origin = loadingStack.convert(loadingText.frame.origin, to: view)
-    view.addSubview(icon)
-    view.addSubview(text)
+    // Add temp logo
+    let fakeLogoIcon = Logo(frame: CGRect(origin: loadingIcon.superview!.convert(loadingIcon.frame.origin,
+                                                                            to: passthroughView),
+                                   size: loadingIcon.bounds.size))
+    fakeLogoIcon.removeConstraints(fakeLogoIcon.getAllConstraints())
+    passthroughView.addSubview(fakeLogoIcon)
+
+    // Add temp logo text
+    let fakeLogoText = LogoText(frame: CGRect(origin: loadingText.superview!.convert(loadingText.frame.origin,
+                                                                               to: passthroughView),
+                                      size: loadingText.bounds.size))
+    fakeLogoText.removeConstraints(fakeLogoText.getAllConstraints())
+    passthroughView.addSubview(fakeLogoText)
+    
+    // Hide loading icon & text
     loadingIcon.alpha = 0
     loadingText.alpha = 0
-    ///Fix visibility while loading
-    tabBar.alpha = 1
-    setTabBarVisible(visible: true, animated: true)
-    tabBarHeight = tabBar.bounds.height
     
-    let destinationLogoSize = logoIcon.frame.size
-    let destinationLogoOrigin = logoStack.convert(logoIcon.frame.origin, to: view)
-    let destinationLogoPath = (logoIcon.icon as! CAShapeLayer).path
-    let logoPathAnim = Animations.get(property: .Path,
-                                      fromValue: (icon.icon as! CAShapeLayer).path as Any,
-                                      toValue: destinationLogoPath as Any,
-                                      duration: 0.25,
-                                      delay: 0,
-                                      repeatCount: 0,
-                                      autoreverses: false,
-                                      timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                      delegate: nil,
-                                      isRemovedOnCompletion: false)
-    let logoColorAnim = Animations.get(property: .FillColor,
-                                       fromValue: loadingIcon.iconColor.cgColor as Any,
-                                       toValue: logoIcon.iconColor.cgColor as Any,
-                                       duration: 0.5,
-                                       delay: 0,
-                                       repeatCount: 0,
-                                       autoreverses: false,
-                                       timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                       delegate: nil,
-                                       isRemovedOnCompletion: false)
-    icon.icon.add(logoColorAnim, forKey: nil)
-    icon.icon.add(logoPathAnim, forKey: nil)
-
-    let destinationTextSize = logoText.frame.size
-    let destinationTextOrigin = logoStack.convert(logoText.frame.origin, to: view)
-    let destinationTextPath = (logoText.icon as! CAShapeLayer).path
-    let textPathAnim = Animations.get(property: .Path,
-                                      fromValue: (text.icon as! CAShapeLayer).path as Any,
-                                      toValue: destinationTextPath as Any,
-                                      duration: 0.25,
-                                      delay: 0,
-                                      repeatCount: 0,
-                                      autoreverses: false,
-                                      timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                      delegate: nil,
-                                      isRemovedOnCompletion: false)
-    let textColorAnim = Animations.get(property: .FillColor,
-                                       fromValue: loadingText.iconColor.cgColor as Any,
-                                       toValue: logoText.iconColor.cgColor as Any,
-                                       duration: 0.5,
-                                       delay: 0,
-                                       repeatCount: 0,
-                                       autoreverses: false,
-                                       timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                       delegate: nil,
-                                       isRemovedOnCompletion: false)
-    text.icon.add(textColorAnim, forKey: nil)
-    text.icon.add(textPathAnim, forKey: nil)
-
+    // Animate
+//    spiral.startRotating(duration: 1)
+    UIView.animate(withDuration: 0.3,
+                   delay: 0,
+                   options: .curveEaseIn,
+                   animations: { [weak self] in
+      guard let self = self else { return }
+      self.spiral.transform = .init(scaleX: 1.25, y: 1.25)
+      self.spiral.alpha = 0
+    }) { [weak self] _ in
+      guard let self = self else { return }
+      
+      self.spiral.removeFromSuperview()
+      // Reveal tab bar
+      tabBar.alpha = 1
+      setTabBarVisible(visible: true, animated: true)
+      tabBarHeight = tabBar.bounds.height
+      self.view.isUserInteractionEnabled = true
+      self.viewControllers?.forEach {
+        guard let nav = $0 as? UINavigationController,// CustomNavigationController,
+              let target = nav.viewControllers.first as? DataObservable else { return }
+        target.onDataLoaded()
+      }
+      self.loadingStack.removeFromSuperview()
+    }
+    
     UIView.animate(
-      withDuration: 0.5,
-      delay: 0,
-      usingSpringWithDamping: 0.8,
+      withDuration: 0.6,
+      delay: 0.2,
+      usingSpringWithDamping: 0.7,
       initialSpringVelocity: 0.3,
       options: [.curveEaseInOut],
-      animations: {
-        icon.frame.origin = destinationLogoOrigin
-        text.frame.origin = destinationTextOrigin
-        icon.frame.size = destinationLogoSize
-        text.frame.size = destinationTextSize
-      }) { [weak self] _ in
+      animations: { [weak self] in
         guard let self = self else { return }
         
-        icon.removeFromSuperview()
-        text.removeFromSuperview()
+        fakeLogoIcon.frame = CGRect(origin: self.logoIcon.superview!.convert(self.logoIcon.frame.origin,
+                                                                             to: self.passthroughView),
+                                    size: self.logoIcon.bounds.size)
+        fakeLogoText.frame = CGRect(origin: self.logoText.superview!.convert(logoText.frame.origin,
+                                                                        to: self.passthroughView),
+                                    size: self.logoText.bounds.size)
+      }) { _ in
         self.logoStack.alpha = 1
-        self.view.isUserInteractionEnabled = true
-        self.viewControllers?.forEach {
-          guard let nav = $0 as? UINavigationController,// CustomNavigationController,
-                let target = nav.viewControllers.first as? DataObservable else { return }
-          target.onDataLoaded()
-        }
-        self.loadingStack.removeFromSuperview()
+        fakeLogoIcon.removeFromSuperview()
+        fakeLogoText.removeFromSuperview()
       }
+    
+//
+//    let destinationLogoSize = logoIcon.frame.size
+//    let destinationLogoOrigin = logoStack.convert(logoIcon.frame.origin, to: view)
+//
+//    UIView.animate(
+//      withDuration: 0.5,
+//      delay: 0,
+//      usingSpringWithDamping: 0.8,
+//      initialSpringVelocity: 0.3,
+//      options: [.curveEaseInOut],
+//      animations: {
+////        icon.frame.origin = destinationLogoOrigin
+////        text.frame.origin = destinationTextOrigin
+////        icon.frame.size = destinationLogoSize
+////        text.frame.size = destinationTextSize
+//      }) { [weak self] _ in
+//        guard let self = self else { return }
+//
+////        icon.removeFromSuperview()
+////        text.removeFromSuperview()
+//        self.logoStack.alpha = 1
+//        self.view.isUserInteractionEnabled = true
+//        self.viewControllers?.forEach {
+//          guard let nav = $0 as? UINavigationController,// CustomNavigationController,
+//                let target = nav.viewControllers.first as? DataObservable else { return }
+//          target.onDataLoaded()
+//        }
+//        self.loadingStack.removeFromSuperview()
+//      }
   }
   
-  func animateLoaderColor(from: Colors.Logo, to: Colors.Logo) {
-    let anim_1 = Animations.get(property: .FillColor,
-                                fromValue: from.rawValue.cgColor as Any,
-                                toValue: to.rawValue.cgColor as Any,
-                                duration: 1,
-                                delay: 0,
-                                repeatCount: 0,
-                                autoreverses: false,
-                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                delegate: self,
-                                isRemovedOnCompletion: false,
-                                completionBlocks: [
-                                  {[weak self] in
-                                    guard let self = self else { return }
-                                    
-                                    guard self.isDataLoaded else {
-                                      delayAsync(delay: 0.75) {
-                                        self.animateLoaderColor(from: to, to: to.next())
-                                      }
-                                      return
-                                    }
-                                    
-                                    self.launch()
-                                  }])
-    let anim_2 = Animations.get(property: .FillColor,
-                                fromValue: from.rawValue.cgColor as Any,
-                                toValue: to.rawValue.cgColor as Any,
-                                duration: 1,
-                                delay: 0,
-                                repeatCount: 0,
-                                autoreverses: false,
-                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                delegate: nil,
-                                isRemovedOnCompletion: false)
-    loadingIcon.icon.add(anim_1, forKey: nil)
-    loadingText.icon.add(anim_2, forKey: nil)
-//    (loadingIcon.icon as! CAShapeLayer).fillColor = to.rawValue.cgColor
-//    (loadingText.icon as! CAShapeLayer).fillColor = to.rawValue.cgColor
-    loadingIcon.iconColor = to.rawValue
-        loadingText.iconColor = to.rawValue
-  }
+//  func animateLoaderColor(from: Colors.Logo, to: Colors.Logo) {
+//    let anim_1 = Animations.get(property: .FillColor,
+//                                fromValue: from.rawValue.cgColor as Any,
+//                                toValue: to.rawValue.cgColor as Any,
+//                                duration: 1,
+//                                delay: 0,
+//                                repeatCount: 0,
+//                                autoreverses: false,
+//                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                delegate: self,
+//                                isRemovedOnCompletion: false,
+//                                completionBlocks: [
+//                                  {[weak self] in
+//                                    guard let self = self else { return }
+//
+//                                    guard self.isDataLoaded else {
+//                                      delayAsync(delay: 0.75) {
+//                                        self.animateLoaderColor(from: to, to: to.next())
+//                                      }
+//                                      return
+//                                    }
+//
+//                                    self.launch()
+//                                  }])
+//    let anim_2 = Animations.get(property: .FillColor,
+//                                fromValue: from.rawValue.cgColor as Any,
+//                                toValue: to.rawValue.cgColor as Any,
+//                                duration: 1,
+//                                delay: 0,
+//                                repeatCount: 0,
+//                                autoreverses: false,
+//                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                delegate: nil,
+//                                isRemovedOnCompletion: false)
+//    loadingIcon.icon.add(anim_1, forKey: nil)
+//    loadingText.icon.add(anim_2, forKey: nil)
+////    (loadingIcon.icon as! CAShapeLayer).fillColor = to.rawValue.cgColor
+////    (loadingText.icon as! CAShapeLayer).fillColor = to.rawValue.cgColor
+//    loadingIcon.iconColor = to.rawValue
+//        loadingText.iconColor = to.rawValue
+//  }
 }
 
 extension MainController: UITabBarControllerDelegate {
@@ -996,31 +984,31 @@ extension MainController: UITabBarControllerDelegate {
     
     func setColors(_ color: UIColor) {
       tabBar.tintColor = color
-      let logoColorAnim = Animations.get(property: .FillColor,
-                                         fromValue: logoIcon.iconColor.cgColor as Any,
-                                         toValue: color.cgColor as Any,
-                                         duration: tabAnimationDuration,
-                                         delay: 0,
-                                         repeatCount: 0,
-                                         autoreverses: false,
-                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                         delegate: nil,
-                                         isRemovedOnCompletion: false)
-      self.logoIcon.icon.add(logoColorAnim, forKey: nil)
-      self.logoIcon.iconColor = color
-      
-      let textColorAnim = Animations.get(property: .FillColor,
-                                         fromValue: logoText.iconColor.cgColor as Any,
-                                         toValue: color.cgColor as Any,
-                                         duration: tabAnimationDuration,
-                                         delay: 0,
-                                         repeatCount: 0,
-                                         autoreverses: false,
-                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                         delegate: nil,
-                                         isRemovedOnCompletion: false)
-      self.logoText.icon.add(textColorAnim, forKey: nil)
-      self.logoText.iconColor = color
+//      let logoColorAnim = Animations.get(property: .FillColor,
+//                                         fromValue: logoIcon.iconColor.cgColor as Any,
+//                                         toValue: color.cgColor as Any,
+//                                         duration: tabAnimationDuration,
+//                                         delay: 0,
+//                                         repeatCount: 0,
+//                                         autoreverses: false,
+//                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                         delegate: nil,
+//                                         isRemovedOnCompletion: false)
+//      self.logoIcon.icon.add(logoColorAnim, forKey: nil)
+//      self.logoIcon.iconColor = color
+//
+//      let textColorAnim = Animations.get(property: .FillColor,
+//                                         fromValue: logoText.iconColor.cgColor as Any,
+//                                         toValue: color.cgColor as Any,
+//                                         duration: tabAnimationDuration,
+//                                         delay: 0,
+//                                         repeatCount: 0,
+//                                         autoreverses: false,
+//                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                         delegate: nil,
+//                                         isRemovedOnCompletion: false)
+//      self.logoText.icon.add(textColorAnim, forKey: nil)
+//      self.logoText.iconColor = color
     }
     
     if let nav = viewController as? UINavigationController,

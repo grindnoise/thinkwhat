@@ -37,7 +37,7 @@ class ProfileCreationView: UIView {
         guard !Userprofiles.shared.current!.city.isNil else { return }
         
         if #available(iOS 15, *) {
-          self.actionButton.configuration?.baseBackgroundColor = Colors.main
+          self.actionButton.getSubview(type: UIButton.self)!.configuration?.baseBackgroundColor = Colors.main
         } else {
           self.actionButton.backgroundColor = Colors.main
         }
@@ -53,7 +53,7 @@ class ProfileCreationView: UIView {
         guard Userprofiles.shared.current!.gender != .Unassigned else { return }
         
         if #available(iOS 15, *) {
-          self.actionButton.configuration?.baseBackgroundColor = Colors.main
+          self.actionButton.getSubview(type: UIButton.self)!.configuration?.baseBackgroundColor = Colors.main
         } else {
           self.actionButton.backgroundColor = Colors.main
         }
@@ -188,89 +188,50 @@ class ProfileCreationView: UIView {
     
     return instance
   }()
-  private lazy var actionButton: UIButton = {
-    let instance = UIButton()
-    instance.alpha = 0
-    instance.layer.zPosition = 2
-    instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
+  public private(set) lazy var actionButton: UIView = {
+    let opaque = UIView.opaque()
+    opaque.layer.masksToBounds = false
     
+    let instance = UIButton()
+    instance.addTarget(self,
+                       action: #selector(self.handleTap),
+                       for: .touchUpInside)
     if #available(iOS 15, *) {
-      let attrString = AttributedString("getStartedButton".localized.uppercased(), attributes: AttributeContainer([
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.white
-      ]))
       var config = UIButton.Configuration.filled()
-      config.attributedTitle = attrString
-      config.baseBackgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-      //      config.image = UIImage(systemName: viewInput!.mode == .Preview ? "megaphone.fill" : "hand.point.left.fill",
-      //                             withConfiguration: UIImage.SymbolConfiguration(scale: .large))
-      //      config.imagePlacement = .trailing
-      //      config.imagePadding = padding
-      config.contentInsets.top = padding
-      config.contentInsets.bottom = padding
-      config.contentInsets.leading = 20
-      config.contentInsets.trailing = 20
-      config.buttonSize = .large
-      
+      config.cornerStyle = .capsule
+      config.baseBackgroundColor = Colors.main
+      config.attributedTitle = AttributedString("getStartedButton".localized.capitalized,
+                                                attributes: AttributeContainer([
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                  .foregroundColor: UIColor.white as Any
+                                                ]))
       instance.configuration = config
     } else {
-      let attrString = NSMutableAttributedString(string: "getStartedButton".localized.uppercased(), attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.white
-      ])
-      instance.titleEdgeInsets.left = 20
-      instance.titleEdgeInsets.right = 20
-      //      instance.setImage(UIImage(systemName: viewInput!.mode == .Preview ? "megaphone.fill" : "hand.point.left.fill",
-      //                                withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-      //                        for: .normal)
-      //      instance.imageView?.tintColor = .white
-      //      instance.imageEdgeInsets.left = 8
-      //      //            instance.imageEdgeInsets.right = 8
-      instance.setAttributedTitle(attrString, for: .normal)
-      //      instance.semanticContentAttribute = .forceRightToLeft
-      instance.backgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-      instance.translatesAutoresizingMaskIntoConstraints = false
-      
-      let constraint = instance.widthAnchor.constraint(equalToConstant: "getStartedButton".localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!))
-      constraint.identifier = "width"
-      constraint.isActive = true
-      
+      instance.backgroundColor = Colors.main
       instance.publisher(for: \.bounds)
-        .sink { [weak self] rect in
-          guard let self = self else { return }
-          
-          instance.cornerRadius = rect.height/3.25
-          
-          guard let constraint = instance.getConstraint(identifier: "width") else { return }
-          //          self.setNeedsLayout()
-          constraint.constant = "getStartedButton".localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (instance .imageView?.bounds.width ?? 0)
-          //          self.layoutIfNeeded()
-        }
+        .sink { instance.cornerRadius = $0.height/2 }
         .store(in: &subscriptions)
+      instance.setAttributedTitle(NSAttributedString(string: "getStartedButton".localized.capitalized,
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                      .foregroundColor: UIColor.white as Any
+                                                     ]),
+                                  for: .normal)
     }
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
+    opaque.publisher(for: \.bounds)
+      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
+      .sink { [unowned self] in
+        opaque.layer.shadowOpacity = 1
+        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+      }
+      .store(in: &subscriptions)
+    instance.place(inside: opaque)
     
-    //    let shadowView = UIView()
-    //    shadowView.clipsToBounds = false
-    //    shadowView.backgroundColor = .clear
-    //    shadowView.accessibilityIdentifier = "shadow"
-    //    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    //    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.7).cgColor
-    //    shadowView.layer.shadowRadius = 16
-    //    shadowView.layer.shadowOffset = .zero
-    //    shadowView.layer.zPosition = 1
-    //    shadowView.publisher(for: \.bounds)
-    //      .receive(on: DispatchQueue.main)
-    //      .sink { [weak self] in
-    //        guard let self = self else { return }
-    //
-    //        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0,
-    //                                                   cornerRadius: instance.cornerRadius).cgPath
-    //      }
-    //      .store(in: &subscriptions)
-    //    shadowView.place(inside: instance)
-    //    instance.layer.zPosition = 2
-    
-    return instance
+    return opaque
   }()
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
@@ -347,6 +308,7 @@ private extension ProfileCreationView {
     
     addSubview(actionButton)
     actionButton.translatesAutoresizingMaskIntoConstraints = false
+    actionButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
     actionButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
     actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
     let constraint = actionButton.bottomAnchor.constraint(equalTo: bottomAnchor)//, constant: -tabBarHeight)
@@ -395,8 +357,8 @@ private extension ProfileCreationView {
     guard checkNecessaryData(),
           let viewInput = viewInput,
           let titleView = viewInput.navigationController?.navigationBar.subviews.filter({ $0 is UIStackView }).first as? UIStackView,
-          let titleIcon = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoIcon" }).first as? Icon,
-          let titleText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "logoText" }).first as? Icon,
+          let logoIcon = titleView.arrangedSubviews.filter({ $0 is Logo }).first as? Logo,
+          let logoText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "opaque" }).first?.subviews.filter({ $0 is LogoText }).first as? LogoText,
           let window = appDelegate.window,
           let constraint = actionButton.getConstraint(identifier: "top")
     else { return }
@@ -405,113 +367,42 @@ private extension ProfileCreationView {
     opaque.frame = UIScreen.main.bounds
     opaque.place(inside: window)
 
-    let loadingIcon: Icon = {
-      let instance = Icon()
-      instance.accessibilityIdentifier = "loadingIcon"
-      instance.category = Icon.Category.Logo
-      instance.iconColor = Colors.main
-      instance.scaleMultiplicator = 1.2
-      instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-      instance.alpha = 0
-      
-      return instance
-    }()
-    let loadingText: Icon = {
-      let instance = Icon()
-      instance.accessibilityIdentifier = "loadingText"
-      instance.category = Icon.Category.LogoText
-      instance.iconColor = Colors.main
-      instance.scaleMultiplicator = 1.1
-      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
-      instance.alpha = 0
-      
-      return instance
-    }()
+    let tempLogo = Logo()
+    let tempLogoText = LogoText()
     let loadingStack: UIStackView = {
-      let opaque = UIView()
-      opaque.backgroundColor = .clear
-      
+      let opaque = UIView.opaque()
+      tempLogo.placeInCenter(of: opaque, topInset: 0, bottomInset: 0)
       let instance = UIStackView(arrangedSubviews: [
         opaque,
-        loadingText
+        tempLogoText,
       ])
       instance.axis = .vertical
-      instance.distribution = .equalCentering
-      instance.spacing = 0
-      instance.clipsToBounds = false
-      
-      loadingIcon.translatesAutoresizingMaskIntoConstraints = false
-      opaque.translatesAutoresizingMaskIntoConstraints = false
-      opaque.addSubview(loadingIcon)
-      
-      NSLayoutConstraint.activate([
-        loadingIcon.topAnchor.constraint(equalTo: opaque.topAnchor),
-        loadingIcon.bottomAnchor.constraint(equalTo: opaque.bottomAnchor),
-        loadingIcon.centerXAnchor.constraint(equalTo: opaque.centerXAnchor),
-        opaque.heightAnchor.constraint(equalTo: loadingText.heightAnchor, multiplier: 2)
-      ])
+      instance.spacing = 30
+      tempLogo.alpha = 0
+      tempLogoText.alpha = 0
       
       return instance
     }()
-    loadingStack.placeInCenter(of: opaque,
-                               widthMultiplier: 0.6)
-        opaque.setNeedsLayout()
-        opaque.layoutIfNeeded()
+    
+    loadingStack.placeInCenter(of: opaque)
+    
+    tempLogo.translatesAutoresizingMaskIntoConstraints = false
+    tempLogo.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.31).isActive = true
+    tempLogoText.translatesAutoresizingMaskIntoConstraints = false
+    tempLogoText.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
+    opaque.setNeedsLayout()
+    opaque.layoutIfNeeded()
     
     ///Fake icons to animate
-    let fakeLogoIcon: Icon = {
-      let instance = Icon(frame: CGRect(origin: titleIcon.superview!.convert(titleIcon.frame.origin,
-                                                                            to: opaque),
-                                        size: titleIcon.bounds.size))
-      instance.category = Icon.Category.Logo
-      instance.iconColor = Colors.main
-      instance.scaleMultiplicator = 1.2
-      instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-      
-      return instance
-    }()
-    let fakeLogoText: Icon = {
-      let instance = Icon(frame: CGRect(origin: titleText.superview!.convert(titleText.frame.origin,
-                                                                            to: opaque),
-                                        size: titleText.bounds.size))
-      
-      instance.category = Icon.Category.LogoText
-      instance.iconColor = Colors.main
-      instance.scaleMultiplicator = 1.1
-      instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
-      
-      return instance
-    }()
-    
-    opaque.addSubviews([fakeLogoIcon, fakeLogoText])
-    titleView.alpha = 0
-    titleIcon.alpha = 0
-    titleText.alpha = 0
-    
-    fakeLogoIcon.icon.add(Animations.get(property: .Path,
-                                     fromValue: (fakeLogoIcon.icon as! CAShapeLayer).path as Any,
-                                     toValue: (loadingIcon.icon as! CAShapeLayer).path as Any,
-                                     duration: 0.3,
-                                     delay: 0,
-                                     repeatCount: 0,
-                                     autoreverses: false,
-                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                     delegate: self,
-                                     isRemovedOnCompletion: false,
-                                     completionBlocks: []),
-                      forKey: nil)
-    fakeLogoText.icon.add(Animations.get(property: .Path,
-                                     fromValue: (fakeLogoText.icon as! CAShapeLayer).path as Any,
-                                     toValue: (loadingText.icon as! CAShapeLayer).path as Any,
-                                     duration: 0.3,
-                                     delay: 0,
-                                     repeatCount: 0,
-                                     autoreverses: false,
-                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                     delegate: self,
-                                     isRemovedOnCompletion: false,
-                                     completionBlocks: []),
-                      forKey: nil)
+    let fakeLogo = Logo(frame: CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin, to: self),
+                                                                    size: logoIcon.bounds.size))
+    let fakeLogoText = LogoText(frame: CGRect(origin: logoText.superview!.convert(logoText.frame.origin, to: self),
+                                                                    size: logoText.bounds.size))
+    fakeLogo.removeConstraints(fakeLogo.getAllConstraints())
+    fakeLogoText.removeConstraints(fakeLogoText.getAllConstraints())
+    opaque.addSubviews([fakeLogo, fakeLogoText])
+    logoIcon.alpha = 0
+    logoText.alpha = 0
 
     UIView.animate(withDuration: 0.2) { [weak self] in
       guard let self = self else { return }
@@ -521,10 +412,10 @@ private extension ProfileCreationView {
     }
     
     setNeedsLayout()
-    UIView.animate(withDuration: 0.4,
+    UIView.animate(withDuration: 0.6,
                    delay: 0,
-//                   usingSpringWithDamping: 0.7,
-//                   initialSpringVelocity: 0.3,
+                   usingSpringWithDamping: 0.8,
+                   initialSpringVelocity: 0.3,
                    options: [.curveEaseInOut],
                    animations: { [weak self] in
       guard let self = self else { return }
@@ -532,19 +423,19 @@ private extension ProfileCreationView {
       constraint.constant = 100
       self.layoutIfNeeded()
       
-      fakeLogoIcon.frame = CGRect(origin: loadingStack.convert(loadingIcon.frame.origin,
+      fakeLogo.frame = CGRect(origin: loadingStack.convert(tempLogo.frame.origin,
                                                                       to: opaque),
-                                  size: loadingIcon.bounds.size)
-      fakeLogoText.frame = CGRect(origin: loadingStack.convert(loadingText.frame.origin,
+                                  size: tempLogo.bounds.size)
+      fakeLogoText.frame = CGRect(origin: loadingStack.convert(tempLogoText.frame.origin,
                                                                       to: opaque),
-                                  size: loadingText.bounds.size)
+                                  size: tempLogoText.bounds.size)
       
     }) { _ in
-      loadingIcon.alpha = 1
-      loadingText.alpha = 1
+      tempLogo.alpha = 1
+      tempLogoText.alpha = 1
       fakeLogoText.removeFromSuperview()
-      fakeLogoIcon.removeFromSuperview()
-      viewInput.openApp()
+      fakeLogo.removeFromSuperview()
+//      viewInput.openApp()
     }
   }
   

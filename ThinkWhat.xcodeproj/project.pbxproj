@@ -322,6 +322,7 @@
 		AB8A44862A3E543300FF3488 /* Rubik-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44782A3E543300FF3488 /* Rubik-Regular.ttf */; };
 		AB8A44872A3E543300FF3488 /* Rubik-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44792A3E543300FF3488 /* Rubik-SemiBold.ttf */; };
 		AB8A44882A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A447A2A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf */; };
+		AB8A9BCA2A4AD5B00020A7CA /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8A9BC92A4AD5B00020A7CA /* Spinner.swift */; };
 		AB8BE16D2A31D5A200B0FB63 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8BE16C2A31D5A200B0FB63 /* NotificationService.swift */; };
 		AB8BE1712A31D5A200B0FB63 /* Push service extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AB8BE1782A31D61400B0FB63 /* BadgeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */; };
@@ -874,6 +875,7 @@
 		AB8A44782A3E543300FF3488 /* Rubik-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-Regular.ttf"; sourceTree = "<group>"; };
 		AB8A44792A3E543300FF3488 /* Rubik-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-SemiBold.ttf"; sourceTree = "<group>"; };
 		AB8A447A2A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		AB8A9BC92A4AD5B00020A7CA /* Spinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
 		AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Push service extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB8BE16C2A31D5A200B0FB63 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		AB8BE16E2A31D5A200B0FB63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -2266,6 +2268,7 @@
 				ABEF04982971A7C4001D9A2E /* Line.swift */,
 				AB7D14EA29C47DE40036FA7A /* TagCapsule.swift */,
 				AB68F4F02A1361190082246F /* HorizontalLimiter.swift */,
+				AB8A9BC92A4AD5B00020A7CA /* Spinner.swift */,
 			);
 			path = "UI elements";
 			sourceTree = "<group>";
@@ -3333,6 +3336,7 @@
 				ABE56C1F298AC623004C761D /* TopicCompatibilityHeaderCell.swift in Sources */,
 				ABBA73FE2387C5A200540ECF /* FlameIcon.swift in Sources */,
 				AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */,
+				AB8A9BCA2A4AD5B00020A7CA /* Spinner.swift in Sources */,
 				AB3F8D1B294C4BE600C3980D /* TextCell.swift in Sources */,
 				AB40550128785AAB000F7768 /* CommentCell.swift in Sources */,
 				AB2AA1B32359E9D30086D16C /* SurveysTableViewController.swift in Sources */,
@@ -3752,7 +3756,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatDebug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -3789,7 +3793,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -3980,7 +3984,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatAlpha.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -4286,7 +4290,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhat.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;

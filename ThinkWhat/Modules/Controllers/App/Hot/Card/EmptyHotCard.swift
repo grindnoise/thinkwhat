@@ -96,64 +96,65 @@ class EmptyHotCard: UIView, Card {
     
     return instance
   }()
-  private lazy var loadingIndicator: LoadingIndicator = {
-    let instance = LoadingIndicator(mode: .Topics,
-                                    color: Colors.Logo.Flame.rawValue,
-                                    duration: 0.75,
-                                    isInfinite: true)
-    instance.colorPublisher
-      .filter { !$0.isNil }
-      .sink { [weak self] in
-        guard let self = self,
-              let color = $0
-        else { return }
+  private lazy var spinner: SpiralSpinner = { SpiralSpinner() }()
+//  private lazy var loadingIndicator: LoadingIndicator = {
+//    let instance = LoadingIndicator(mode: .Topics,
+//                                    color: Colors.Logo.Flame.rawValue,
+//                                    duration: 0.75,
+//                                    isInfinite: true)
+//    instance.colorPublisher
+//      .filter { !$0.isNil }
+//      .sink { [weak self] in
+//        guard let self = self,
+//              let color = $0
+//        else { return }
+////
+//        if self.traitCollection.userInterfaceStyle != .dark {
+//          self.gradient.add(Animations.get(property: .Colors,
+//                                           fromValue: self.gradient.colors as Any,
+//                                           toValue: [UIColor.white.blended(withFraction: 0.05,
+//                                                                           of: color).cgColor,
+//                                                     UIColor.white.blended(withFraction: 0.1,
+//                                                                           of: color).cgColor] as Any,
+//                                           duration: 0.5,
+//                                           timingFunction: .easeInEaseOut,
+//                                           delegate: self,
+//                                           isRemovedOnCompletion: true,
+//                                           completionBlocks: [
+//                                            {[weak self] in
+//                                              guard let self = self else { return }
 //
-        if self.traitCollection.userInterfaceStyle != .dark {
-          self.gradient.add(Animations.get(property: .Colors,
-                                           fromValue: self.gradient.colors as Any,
-                                           toValue: [UIColor.white.blended(withFraction: 0.05,
-                                                                           of: color).cgColor,
-                                                     UIColor.white.blended(withFraction: 0.1,
-                                                                           of: color).cgColor] as Any,
-                                           duration: 0.5,
-                                           timingFunction: .easeInEaseOut,
-                                           delegate: self,
-                                           isRemovedOnCompletion: true,
-                                           completionBlocks: [
-                                            {[weak self] in
-                                              guard let self = self else { return }
-
-                                              self.gradient.colors = [UIColor.white.blended(withFraction: 0.05,
-                                                                                            of: color).cgColor,
-                                                                      UIColor.white.blended(withFraction: 0.1,
-                                                                                            of: color).cgColor]
-                                            }]),
-                            forKey: nil)
-          self.gradient.colors = [UIColor.white.blended(withFraction: 0.05,
-                                                        of: color).cgColor,
-                                  UIColor.white.blended(withFraction: 0.1,
-                                                        of: color).cgColor]
-        }
-
-        UIView.animate(withDuration: 0.5) {
-          if #available(iOS 15, *) {
-            if let bg = self.button.configuration?.background.customView {
-              bg.backgroundColor = color
-            }
-          } else {
-            self.button.backgroundColor = color
-          }
-//          self.label.textColor = color
-        }
-//        UIView.transition(with: self.label, duration: 0.1, options: .transitionCrossDissolve) {
-//          self.label.textColor = color
+//                                              self.gradient.colors = [UIColor.white.blended(withFraction: 0.05,
+//                                                                                            of: color).cgColor,
+//                                                                      UIColor.white.blended(withFraction: 0.1,
+//                                                                                            of: color).cgColor]
+//                                            }]),
+//                            forKey: nil)
+//          self.gradient.colors = [UIColor.white.blended(withFraction: 0.05,
+//                                                        of: color).cgColor,
+//                                  UIColor.white.blended(withFraction: 0.1,
+//                                                        of: color).cgColor]
 //        }
-
-      }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
+//
+//        UIView.animate(withDuration: 0.5) {
+//          if #available(iOS 15, *) {
+//            if let bg = self.button.configuration?.background.customView {
+//              bg.backgroundColor = color
+//            }
+//          } else {
+//            self.button.backgroundColor = color
+//          }
+////          self.label.textColor = color
+//        }
+////        UIView.transition(with: self.label, duration: 0.1, options: .transitionCrossDissolve) {
+////          self.label.textColor = color
+////        }
+//
+//      }
+//      .store(in: &subscriptions)
+//
+//    return instance
+//  }()
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.blended(withFraction: 0.05,
@@ -201,9 +202,12 @@ class EmptyHotCard: UIView, Card {
   }()
   private lazy var stack: UIStackView = {
     let top = UIView.opaque()
-    loadingIndicator.placeInCenter(of: top,
+    spinner.placeInCenter(of: top,
                         topInset: 0,
                         bottomInset: 0)
+//    loadingIndicator.placeInCenter(of: top,
+//                        topInset: 0,
+//                        bottomInset: 0)
     let instance = UIStackView(arrangedSubviews: [
       top,
       label
@@ -249,11 +253,11 @@ class EmptyHotCard: UIView, Card {
   
   // MARK: - Public
   public func animate() {
-    loadingIndicator.start(animated: false)
+//    loadingIndicator.start(animated: false)
   }
-  
+
   public func removeAllAnimations() {
-    loadingIndicator.removeAllAnimations()
+//    loadingIndicator.removeAllAnimations()
   }
 }
 
@@ -285,10 +289,13 @@ private extension EmptyHotCard {
       .store(in: &subscriptions)
     
     stack.placeInCenter(of: body)
-    loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
-    loadingIndicator.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
+    spinner.translatesAutoresizingMaskIntoConstraints = false
+    spinner.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
     
-    loadingIndicator.start()
+//    loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+//    loadingIndicator.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
+//
+//    loadingIndicator.start()
     
 //    addSubview(label)
 //    label.translatesAutoresizingMaskIntoConstraints = false
@@ -322,4 +329,3 @@ extension EmptyHotCard: CAAnimationDelegate {
     }
   }
 }
-

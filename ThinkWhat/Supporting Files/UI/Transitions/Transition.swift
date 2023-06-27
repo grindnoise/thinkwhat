@@ -468,10 +468,10 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         fromView.logoText.alpha = 0
         logoText.alpha = 0
         
-        let fakeLogoIconDestination = logoIcon.superview!.convert(logoIcon.frame.origin,
-                                                                   to: containerView)
-        let fakeLogoTextDestination = logoText.superview!.convert(logoText.frame.origin,
-                                                                   to: containerView)
+//        let fakeLogoIconDestination = logoIcon.superview!.convert(logoIcon.frame.origin,
+//                                                                   to: containerView)
+//        let fakeLogoTextDestination = logoText.superview!.convert(logoText.frame.origin,
+//                                                                   to: containerView)
 
         let loginButton: UIView = {
           let opaque = UIView.opaque()
@@ -667,56 +667,54 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           [forgotButton: forgotButtonDestination],
         ]
         
-        let acceptButton: UIButton = {
-          let instance = UIButton()
-          if #available(iOS 15, *) {
-            var config = UIButton.Configuration.filled()
-            config.cornerStyle = .small
-            config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
-            config.baseBackgroundColor = UIColor.systemGray
-            config.contentInsets.top = padding
-            config.contentInsets.bottom = padding
-            config.contentInsets.leading = 20
-            config.contentInsets.trailing = 20
-            config.attributedTitle = AttributedString("acceptButton".localized.uppercased(),
-                                                      attributes: AttributeContainer([
-                                                        .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                        .foregroundColor: UIColor.white as Any
-                                                      ]))
-            instance.configuration = config
-          } else {
-            instance.cornerRadius = toView.acceptButton.cornerRadius
-            instance.setAttributedTitle(NSAttributedString(string: "acceptButton".localized.uppercased(),
-                                                           attributes: [
-                                                            .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                            .foregroundColor: UIColor.white as Any
-                                                           ]),
-                                        for: .normal)
-          }
-          
+        let fakeButtonLabel: UILabel = {
+          let instance = UILabel()
+          instance.font = UIFont(name: Fonts.Rubik.SemiBold, size: 14)
+          instance.textColor = .white
+          instance.text = "acceptButton".localized
+
           return instance
         }()
-        let acceptButtonCoordinate = toView.acceptButton.convert(CGPoint(x: loginButtonCoordinate.x,
-                                                                         y: containerView.bounds.height),
-                                                                 to: containerView)
-//        acceptButtonCoordinate.y = containerView.bounds.height
-//        acceptButtonCoordinate.x = containerView.bounds.height
-        acceptButton.frame = CGRect(origin: acceptButtonCoordinate,
-                                    size: toView.acceptButton.bounds.size)
-        containerView.addSubview(acceptButton)
-        acceptButton.center.x = containerView.bounds.midX
+        let fakeButton: UIView = {
+          let opaque = UIView()
+          opaque.backgroundColor = .clear
+          opaque.layer.masksToBounds = false
+          opaque.clipsToBounds = false
+          
+          let instance = UIView()
+          instance.backgroundColor = Colors.main
+          instance.cornerRadius = fromView.loginButton.frame.height/2
+          fakeButtonLabel.placeInCenter(of: instance)
+          instance.place(inside: opaque)
+
+          return opaque
+        }()
+
+        fakeButton.frame = CGRect(origin: fromView.loginButton.superview!.convert(fromView.loginButton.frame.origin,
+                                                                                  to: containerView),
+                                  size: fromView.loginButton.bounds.size)
+        containerView.addSubview(fakeButton)
+        
+        // Draw shadow
+        fakeButton.layer.shadowOpacity = 1
+        fakeButton.layer.shadowPath = UIBezierPath(roundedRect: fakeButton.bounds, cornerRadius: fakeButton.bounds.height/2).cgPath
+        fakeButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        fakeButton.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        fakeButton.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+        
+        fakeButton.frame.origin.y = containerView.bounds.height
         
         
         UIView.animate(withDuration: 0.3,
                        delay: 0.6,
                        options: .curveEaseOut,
                        animations: {
-          acceptButton.frame.origin = toView.acceptButton.superview!.convert(toView.acceptButton.frame.origin,
+          fakeButton.frame.origin = toView.acceptButton.superview!.convert(toView.acceptButton.frame.origin,
                                                                   to: containerView)
           toView.webView.alpha = 1
         }) { _ in
           toView.acceptButton.alpha = 1
-          acceptButton.removeFromSuperview()
+          fakeButton.removeFromSuperview()
         }
         
         views.enumerated().forEach { index, dict in
@@ -1174,7 +1172,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let instance = UILabel()
           instance.font = UIFont(name: Fonts.Rubik.SemiBold, size: 14)
           instance.textColor = .white
-          instance.text = "loginButton".localized.uppercased()
+          instance.text = "loginButton".localized
 //          fakeButtonLabel.attributedText = NSAttributedString(string: "loginButton".localized.uppercased(),
 //                                                    attributes: [
 //                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,

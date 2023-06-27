@@ -70,23 +70,24 @@ class PollController: UIViewController {
     
     return instance
   }()
-  private lazy var loadingIndicator: LoadingIndicator = {
-    let instance = LoadingIndicator(color: item.isNil ? Colors.main : item.topic.tagColor,
-                                    duration: 0.5)
-    instance.didDisappearPublisher
-      .sink { [weak self] _ in
-        guard let self = self,
-              let survey = self.item.survey
-        else { return }
-        
-        self.navigationController?.setNavigationBarHidden(false, animated: true)
-        self.controllerOutput?.presentView(survey)
-        instance.removeFromSuperview()
-      }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
+  private var spinner: SpiralSpinner!// = { SpiralSpinner() }()
+//  private lazy var loadingIndicator: LoadingIndicator = {
+//    let instance = LoadingIndicator(color: item.isNil ? Colors.main : item.topic.tagColor,
+//                                    duration: 0.5)
+//    instance.didDisappearPublisher
+//      .sink { [weak self] _ in
+//        guard let self = self,
+//              let survey = self.item.survey
+//        else { return }
+//
+//        self.navigationController?.setNavigationBarHidden(false, animated: true)
+//        self.controllerOutput?.presentView(survey)
+//        instance.removeFromSuperview()
+//      }
+//      .store(in: &subscriptions)
+//
+//    return instance
+//  }()
 
   
   
@@ -547,13 +548,14 @@ private extension PollController {
   /// Loads survey by reference or id if it's a push notification
   /// - Parameter surveyID: survey id extracted from push notification
   func loadData(surveyID: String = "") {
-    
+    spinner = SpiralSpinner(color: !item.isNil ? item.topic.tagColor : Colors.main)
     
     switch surveyID.isEmpty {
     case false:
       navigationController?.setNavigationBarHidden(true, animated: false)
-      loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-      loadingIndicator.start()
+      spinner.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+//      loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+//      loadingIndicator.start()
       controllerInput?.load(surveyID)
     case true:
       guard item.survey.isNil else {
@@ -561,14 +563,17 @@ private extension PollController {
         
         // Increment view counter
         guard mode != .Preview else { return }
+        
         controllerInput?.incrementViewCounter()
         return
       }
       navigationController?.setNavigationBarHidden(true, animated: false)
-      loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-      loadingIndicator.start()
+      spinner.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+//      loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+//      loadingIndicator.start()
       controllerInput?.load(item, incrementViewCounter: true)
     }
+    spinner.start(duration: 1)
   }
   
   func setBarButtonItems() {
@@ -816,10 +821,20 @@ extension PollController: PollModelOutput {
       delay(seconds: 0.5) { [weak self] in
         guard let self = self else { return }
         
-        self.loadingIndicator.stop() { [weak self] in
+        UIView.animate(withDuration: 0.4, animations: { [weak self] in
           guard let self = self else { return }
           
-          self.loadingIndicator.removeFromSuperview()
+          self.spinner.alpha = 0
+          self.spinner.transform =  CGAffineTransform(scaleX: 0.25, y: 0.25)
+        }) { [weak self] _ in
+          guard let self = self,
+                let survey = self.item.survey
+          else { return }
+          
+          self.navigationController?.setNavigationBarHidden(false, animated: true)
+          self.controllerOutput?.presentView(survey)
+          self.spinner.stop()
+          self.spinner.removeFromSuperview()
         }
       }
     case .failure:

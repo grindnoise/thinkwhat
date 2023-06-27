@@ -17,7 +17,7 @@ class LoaderCell: UICollectionReusableView {
       guard color != oldValue else { return }
       
       setupUI()
-      loadingIndicator.color = color
+//      loadingIndicator.color = color
 //      loadingIndicator.setIconColor(color)
     }
   }
@@ -25,20 +25,45 @@ class LoaderCell: UICollectionReusableView {
     didSet {
       guard oldValue != isLoading else { return }
       
+//      if isLoading {
+//        spinner.start(duration: 1)
+////        loadingIndicator.start()
+//      } else {
+//        spinner.stop()
+////        loadingIndicator.stop()
+////        loadingIndicator.reset()
+//      }
       if isLoading {
-        loadingIndicator.start()
-      } else {
-        loadingIndicator.stop()
-//        loadingIndicator.reset()
+        addSubview(spinner)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        //    spinner.backgroundColor = .red
+        
+        NSLayoutConstraint.activate([
+          spinner.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+          spinner.centerXAnchor.constraint(equalTo: centerXAnchor),
+          spinner.heightAnchor.constraint(equalToConstant: 40)
+        ])
+        let constraint = spinner.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8)
+        constraint.priority = .defaultLow
+        constraint.isActive = true
+        
+        spinner.start(duration: 1)
       }
       
-//      loadingIndicator.transform = isLoading ? CGAffineTransform(scaleX: 0.5, y: 0.5) : .identity
-//      loadingIndicator.alpha = isLoading ? 0 : 1
-//      UIView.animate(withDuration: 0.2, animations: { [weak self] in
-//        guard let self = self else { return }
-//
-//        self.loadingIndicator.alpha = self.isLoading ? 1 : 0
-//        self.loadingIndicator.transform = self.isLoading ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
+      spinner.transform = isLoading ? CGAffineTransform(scaleX: 0.5, y: 0.5) : .identity
+      spinner.alpha = isLoading ? 0 : 1
+      UIView.animate(withDuration: 0.2, animations: { [weak self] in
+        guard let self = self else { return }
+        
+        self.spinner.alpha = self.isLoading ? 1 : 0
+        self.spinner.transform = self.isLoading ? .identity : CGAffineTransform(scaleX: 0.25, y: 0.25)
+      }) { [weak self] _ in
+        guard let self = self,
+              !self.isLoading
+        else { return }
+        
+        self.spinner.removeFromSuperview()
+      }
 //      }) { [weak self] _ in
 //        guard let self = self else { return }
 //
@@ -58,10 +83,10 @@ class LoaderCell: UICollectionReusableView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  private var colorAnimation: CAAnimation?
-  private var scaleAnimation: CAAnimation?
-  
-  private lazy var loadingIndicator: LoadingIndicator = { LoadingIndicator(color: color, shouldSendCompletion: false) }()
+//  private var colorAnimation: CAAnimation?
+//  private var scaleAnimation: CAAnimation?
+  private lazy var spinner: SpiralSpinner = { SpiralSpinner() }()
+//  private lazy var loadingIndicator: LoadingIndicator = { LoadingIndicator(color: color, shouldSendCompletion: false) }()
 //  private lazy var loadingIndicator: Icon = {
 //    let instance = Icon(category: Icon.Category.Logo)
 //    instance.iconColor = color
@@ -101,9 +126,10 @@ class LoaderCell: UICollectionReusableView {
  
   
   public func cancelAllAnimations() {
-    loadingIndicator.layer.removeAllAnimations()
-    colorAnimation = nil
-    scaleAnimation = nil
+    spinner.stop()
+//    loadingIndicator.layer.removeAllAnimations()
+//    colorAnimation = nil
+//    scaleAnimation = nil
   }
 }
 
@@ -112,19 +138,31 @@ private extension LoaderCell {
   func setupUI() {
     backgroundColor = .clear
     
+//    addSubview(spinner)
+//    spinner.translatesAutoresizingMaskIntoConstraints = false
+////    spinner.backgroundColor = .red
+//
+//    NSLayoutConstraint.activate([
+//      spinner.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+//      spinner.centerXAnchor.constraint(equalTo: centerXAnchor),
+//      spinner.heightAnchor.constraint(equalToConstant: 40)
+//    ])
+//    let constraint = spinner.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8)
+//    constraint.priority = .defaultLow
+//    constraint.isActive = true
     //      loadingIndicator.placeInCenter(of: self)
     
-    addSubview(loadingIndicator)
-    loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
-    
-    NSLayoutConstraint.activate([
-      loadingIndicator.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-      loadingIndicator.centerXAnchor.constraint(equalTo: centerXAnchor, constant: -8),
-      loadingIndicator.heightAnchor.constraint(equalToConstant: 40)
-    ])
-    let constraint = loadingIndicator.bottomAnchor.constraint(equalTo: bottomAnchor)
-    constraint.priority = .defaultLow
-    constraint.isActive = true
+//    addSubview(loadingIndicator)
+//    loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+//
+//    NSLayoutConstraint.activate([
+//      loadingIndicator.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+//      loadingIndicator.centerXAnchor.constraint(equalTo: centerXAnchor, constant: -8),
+//      loadingIndicator.heightAnchor.constraint(equalToConstant: 40)
+//    ])
+//    let constraint = loadingIndicator.bottomAnchor.constraint(equalTo: bottomAnchor)
+//    constraint.priority = .defaultLow
+//    constraint.isActive = true
     
     //      let constraint = heightAnchor.constraint(equalToConstant: 30)
     //      constraint.isActive = true

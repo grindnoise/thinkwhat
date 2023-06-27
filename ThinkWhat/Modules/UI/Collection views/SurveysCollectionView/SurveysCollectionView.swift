@@ -98,7 +98,7 @@ class SurveysCollectionView: UICollectionView {
       guard oldValue != color else { return }
       
       colorPublisher.send(color)
-      loadingIndicator.color = color
+//      loadingIndicator.color = color
 //      guard let superIndicator = viewByClassName(className: "_UIScrollViewScrollIndicator"),
 //            let indicator = superIndicator.subviews.first
 //      else { return }
@@ -198,19 +198,20 @@ class SurveysCollectionView: UICollectionView {
   private var loadingInProgress = false
   ///**UI**
   private let padding: CGFloat = 8
-  private lazy var loadingIndicator: LoadingIndicator = {
-    let instance = LoadingIndicator(color: color,
-                                    duration: 0.5,
-                                    shouldSendCompletion: false)
-//    instance.didDisappearPublisher
-//      .sink { _ in
-//        instance.reset()
-//      }
-//      .store(in: &subscriptions)
-    instance.placeInCenter(of: self, widthMultiplier: 0.25)
-    
-    return instance
-  }()
+  private lazy var spinner: SpiralSpinner = { SpiralSpinner() }()
+//  private lazy var loadingIndicator: LoadingIndicator = {
+//    let instance = LoadingIndicator(color: color,
+//                                    duration: 0.5,
+//                                    shouldSendCompletion: false)
+////    instance.didDisappearPublisher
+////      .sink { _ in
+////        instance.reset()
+////      }
+////      .store(in: &subscriptions)
+//    instance.placeInCenter(of: self, widthMultiplier: 0.25)
+//    
+//    return instance
+//  }()
   private let colorPublisher = PassthroughSubject<UIColor, Never>()
 //  private lazy var searchSpinner: UIActivityIndicatorView = {
 //    let instance = UIActivityIndicatorView(style: .large)
@@ -316,7 +317,8 @@ class SurveysCollectionView: UICollectionView {
   
   @MainActor @objc
   public func beginSearchRefreshing() {
-    loadingIndicator.start()
+//    loadingIndicator.start()
+    spinner.start(duration: 1)
   }
   
   @MainActor
@@ -325,7 +327,8 @@ class SurveysCollectionView: UICollectionView {
     delay(seconds: 2) { [weak self] in
       guard let self = self else { return }
       
-      self.loadingIndicator.stop(reset: true)
+//      self.loadingIndicator.stop(reset: true)
+      spinner.stop()
     }
 //    let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
 //      guard let self = self else { return }

@@ -254,13 +254,13 @@ extension HotView: HotControllerOutput {
       return
     }
     
-    card.animate()
+//    card.animate()
   }
   
   func didDisappear() {
     guard let card = current as? EmptyHotCard else { return }
     
-    card.removeAllAnimations()
+//    card.removeAllAnimations()
   }
   
   func didLoad() {
