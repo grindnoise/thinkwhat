@@ -55,44 +55,54 @@ class HotCard: UIView, Card {
     
     return instance
   }()
-  public lazy var voteButton: UIButton = {
+  public private(set) lazy var voteButton: UIView = {
+    let opaque = UIView.opaque()
+    opaque.layer.masksToBounds = false
+    
     let instance = UIButton()
     instance.addTarget(self,
                        action: #selector(self.handleTap(sender:)),
                        for: .touchUpInside)
     if #available(iOS 15, *) {
       var config = UIButton.Configuration.filled()
-      config.cornerStyle = .small
-      config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
+      config.cornerStyle = .capsule
       config.baseBackgroundColor = item.topic.tagColor
-      config.contentInsets.top = padding
-      config.contentInsets.bottom = padding
-      config.contentInsets.leading = 20
-      config.contentInsets.trailing = 20
-      config.attributedTitle = AttributedString("hot_participate".localized.uppercased(),
+      config.attributedTitle = AttributedString("hot_participate".localized.capitalized,
                                                 attributes: AttributeContainer([
-                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                   .foregroundColor: UIColor.white as Any
                                                 ]))
       instance.configuration = config
     } else {
-      instance.publisher(for: \.bounds)
-        .sink { instance.cornerRadius = $0.width * 0.025 }
-        .store(in: &subscriptions)
       instance.backgroundColor = item.topic.tagColor
-//      instance.contentEdgeInsets = .uniform(size: 0)
-      instance.setAttributedTitle(NSAttributedString(string: "hot_participate".localized.uppercased(),
+      instance.publisher(for: \.bounds)
+        .sink { instance.cornerRadius = $0.height/2 }
+        .store(in: &subscriptions)
+      instance.setAttributedTitle(NSAttributedString(string: "hot_participate".localized.capitalized,
                                                      attributes: [
-                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                       .foregroundColor: UIColor.white as Any
                                                      ]),
                                   for: .normal)
     }
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
+    opaque.publisher(for: \.bounds)
+      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
+      .sink { [unowned self] in
+        opaque.layer.shadowOpacity = 1
+        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+      }
+      .store(in: &subscriptions)
+    instance.place(inside: opaque)
     
-    return instance
+    return opaque
   }()
   public lazy var nextButton: UIButton = {
     let instance = UIButton()
+    instance.layer.masksToBounds = false
     instance.setImage(UIImage(systemName: "arrowshape.right.fill",
                               withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
     //    instance.imageView?.contentMode = .scaleAspectFill
@@ -102,6 +112,11 @@ class HotCard: UIView, Card {
     instance.addTarget(self,
                        action: #selector(self.handleTap(sender:)),
                        for: .touchUpInside)
+    instance.imageView?.layer.shadowOpacity = 1
+    instance.imageView?.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
+    instance.imageView?.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 4 : 2
+    instance.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    instance.imageView?.layer.masksToBounds = false
     return instance
   }()
   public lazy var claimButton: UIButton = {
@@ -115,6 +130,12 @@ class HotCard: UIView, Card {
     instance.addTarget(self,
                        action: #selector(self.handleTap(sender:)),
                        for: .touchUpInside)
+    instance.imageView?.layer.shadowOpacity = 1
+    instance.imageView?.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
+    instance.imageView?.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 4 : 2
+    instance.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    instance.imageView?.layer.masksToBounds = false
+    
     return instance
   }()
   
@@ -449,6 +470,15 @@ class HotCard: UIView, Card {
     body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .white : .tertiarySystemBackground
     //    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? UIColor.white.blended(withFraction: 0.055, of: item.topic.tagColor) : .tertiarySystemBackground
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    voteButton.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 8 : 4
+    voteButton.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+    voteButton.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    claimButton.imageView?.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
+    claimButton.imageView?.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 4 : 2
+    claimButton.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    nextButton.imageView?.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
+    nextButton.imageView?.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 4 : 2
+    nextButton.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
   }
 }
 
@@ -466,6 +496,7 @@ private extension HotCard {
     layoutIfNeeded()
     
     addSubview(stack)
+    voteButton.translatesAutoresizingMaskIntoConstraints = false
     stack.translatesAutoresizingMaskIntoConstraints = false
 //    stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2).isActive = true
     stack.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
@@ -480,6 +511,7 @@ private extension HotCard {
         }
       .store(in: &subscriptions)
 //    stack.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height/4).isActive = true
+    voteButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
   }
   
   @MainActor
@@ -507,7 +539,7 @@ private extension HotCard {
 //  }
   
   @objc
-  func handleTap(sender: UIButton) {
+  func handleTap(sender: UIView) {
 //    setBanned {}
 //    collectionView.mode = .Default
     if sender == voteButton {

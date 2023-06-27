@@ -11,11 +11,11 @@ import Combine
 
 class EmptyHotCard: UIView, Card {
   enum Action { case Next, Claim, Vote }
-
+  
   public lazy var body: UIView = {
     let instance = UIView()
-    instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .systemBackground : .tertiarySystemBackground
-    instance.layer.addSublayer(gradient)
+//    instance.backgroundColor = .traitCollection.userInterfaceStyle != .dark ? .white : Colors.darkTheme
+//    instance.layer.addSublayer(gradient)
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
       .filter { $0 != .zero }
@@ -24,55 +24,54 @@ class EmptyHotCard: UIView, Card {
         instance.cornerRadius = $0.width*0.05
       }
       .store(in: &subscriptions)
-
+    
     return instance
   }()
-  public lazy var button: UIButton = {
+  public private(set) lazy var button: UIView = {
+    let opaque = UIView.opaque()
+    opaque.layer.masksToBounds = false
+    
     let instance = UIButton()
+    instance.layer.zPosition = 100
     instance.addTarget(self,
                        action: #selector(self.handleTap(sender:)),
                        for: .touchUpInside)
     if #available(iOS 15, *) {
       var config = UIButton.Configuration.filled()
-      config.cornerStyle = .small
-      config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
-      config.baseBackgroundColor = .clear
-      let red = UIView.opaque()
-      red.backgroundColor = Colors.Logo.Flame.rawValue
-      config.background.customView = red
-      config.image = UIImage(systemName: "megaphone.fill",
-                             withConfiguration: UIImage.SymbolConfiguration(scale: .large))
-      config.imagePlacement = .trailing
-      config.imagePadding = padding
-      config.contentInsets.top = padding
-      config.contentInsets.bottom = padding
-      config.contentInsets.leading = 20
-      config.contentInsets.trailing = 20
-      config.attributedTitle = AttributedString("create_post".localized.uppercased(),
+      config.cornerStyle = .capsule
+      config.baseBackgroundColor = Colors.main
+      config.attributedTitle = AttributedString("create_post".localized,
                                                 attributes: AttributeContainer([
-                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                   .foregroundColor: UIColor.white as Any
                                                 ]))
       instance.configuration = config
     } else {
-      instance.setImage(UIImage(systemName: "megaphone.fill",
-                                withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-                        for: .normal)
-      instance.imageView?.tintColor = .white
-      instance.imageEdgeInsets.left = 8
+      instance.backgroundColor = Colors.main
       instance.publisher(for: \.bounds)
-        .sink { instance.cornerRadius = $0.width * 0.025 }
+        .sink { instance.cornerRadius = $0.height/2 }
         .store(in: &subscriptions)
-//      instance.backgroundColor = Colors.Logo.Flame.rawValue
-      instance.setAttributedTitle(NSAttributedString(string: "create_post".localized.uppercased(),
+      instance.setAttributedTitle(NSAttributedString(string: "create_post".localized,
                                                      attributes: [
-                                                      .font: UIFont(name: Fonts.Bold, size: 20) as Any,
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                       .foregroundColor: UIColor.white as Any
                                                      ]),
                                   for: .normal)
     }
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
+    opaque.publisher(for: \.bounds)
+      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
+      .sink { [unowned self] in
+        opaque.layer.shadowOpacity = 1
+        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+      }
+      .store(in: &subscriptions)
+    instance.place(inside: opaque)
     
-    return instance
+    return opaque
   }()
   public var subscriptions = Set<AnyCancellable>()
   public var tapPublisher = PassthroughSubject<Void, Never>()
@@ -82,7 +81,16 @@ class EmptyHotCard: UIView, Card {
   private var observers: [NSKeyValueObservation] = []
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
+  private var shouldTerminate = false
   private let padding: CGFloat = 8
+  private let maxItems = 12
+  private var items = [Icon]() {
+    didSet {
+      guard !shouldTerminate && items.count < maxItems else { return }
+      
+      generateItems(maxItems - items.count)
+    }
+  }
   private lazy var shadowView: UIView = {
     let instance = UIView()
     instance.clipsToBounds = false
@@ -96,65 +104,6 @@ class EmptyHotCard: UIView, Card {
     
     return instance
   }()
-  private lazy var spinner: SpiralSpinner = { SpiralSpinner() }()
-//  private lazy var loadingIndicator: LoadingIndicator = {
-//    let instance = LoadingIndicator(mode: .Topics,
-//                                    color: Colors.Logo.Flame.rawValue,
-//                                    duration: 0.75,
-//                                    isInfinite: true)
-//    instance.colorPublisher
-//      .filter { !$0.isNil }
-//      .sink { [weak self] in
-//        guard let self = self,
-//              let color = $0
-//        else { return }
-////
-//        if self.traitCollection.userInterfaceStyle != .dark {
-//          self.gradient.add(Animations.get(property: .Colors,
-//                                           fromValue: self.gradient.colors as Any,
-//                                           toValue: [UIColor.white.blended(withFraction: 0.05,
-//                                                                           of: color).cgColor,
-//                                                     UIColor.white.blended(withFraction: 0.1,
-//                                                                           of: color).cgColor] as Any,
-//                                           duration: 0.5,
-//                                           timingFunction: .easeInEaseOut,
-//                                           delegate: self,
-//                                           isRemovedOnCompletion: true,
-//                                           completionBlocks: [
-//                                            {[weak self] in
-//                                              guard let self = self else { return }
-//
-//                                              self.gradient.colors = [UIColor.white.blended(withFraction: 0.05,
-//                                                                                            of: color).cgColor,
-//                                                                      UIColor.white.blended(withFraction: 0.1,
-//                                                                                            of: color).cgColor]
-//                                            }]),
-//                            forKey: nil)
-//          self.gradient.colors = [UIColor.white.blended(withFraction: 0.05,
-//                                                        of: color).cgColor,
-//                                  UIColor.white.blended(withFraction: 0.1,
-//                                                        of: color).cgColor]
-//        }
-//
-//        UIView.animate(withDuration: 0.5) {
-//          if #available(iOS 15, *) {
-//            if let bg = self.button.configuration?.background.customView {
-//              bg.backgroundColor = color
-//            }
-//          } else {
-//            self.button.backgroundColor = color
-//          }
-////          self.label.textColor = color
-//        }
-////        UIView.transition(with: self.label, duration: 0.1, options: .transitionCrossDissolve) {
-////          self.label.textColor = color
-////        }
-//
-//      }
-//      .store(in: &subscriptions)
-//
-//    return instance
-//  }()
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.blended(withFraction: 0.05,
@@ -166,65 +115,72 @@ class EmptyHotCard: UIView, Card {
     
     return instance
   }()
+  private lazy var logoIcon: Logo = { Logo() }()
   private lazy var label: UILabel = {
     let instance = UILabel()
     instance.numberOfLines = 0
     instance.backgroundColor = .clear
     instance.textAlignment = .center
     instance.text = "waiting_for_new_posts".localized
-    instance.textColor = .secondaryLabel//Colors.Logo.Flame.rawValue
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .title3)
+    instance.textColor = .label//Colors.Logo.Flame.rawValue
+    instance.font = UIFont(name: Fonts.Rubik.Regular, size: 14)
     
-    Timer
-      .publish(every: 1, on: .main, in: .common)
-      .autoconnect()
-      .sink { [weak self] _ in
-        guard let self = self else { return }
-        
-        guard self.dots.count < 3 else {
-          self.dots = ""
-          UIView.setAnimationsEnabled(false)
-          self.label.text! = "waiting_for_new_posts".localized
-          UIView.setAnimationsEnabled(true)
-          
-          return
-        }
-        
-        self.dots += "."
-        UIView.setAnimationsEnabled(false)
-        self.label.text! = "waiting_for_new_posts".localized + self.dots
-        UIView.setAnimationsEnabled(true)
-      }
-      .store(in: &subscriptions)
-
+//    Timer
+//      .publish(every: 1, on: .main, in: .common)
+//      .autoconnect()
+//      .sink { [weak self] _ in
+//        guard let self = self else { return }
+//
+//        guard self.dots.count < 3 else {
+//          self.dots = ""
+//          UIView.setAnimationsEnabled(false)
+//          self.label.text! = "waiting_for_new_posts".localized
+//          UIView.setAnimationsEnabled(true)
+//
+//          return
+//        }
+//
+//        self.dots += "."
+//        UIView.setAnimationsEnabled(false)
+//        self.label.text! = "waiting_for_new_posts".localized + self.dots
+//        UIView.setAnimationsEnabled(true)
+//      }
+//      .store(in: &subscriptions)
+    
     
     return instance
   }()
   private lazy var stack: UIStackView = {
     let top = UIView.opaque()
-    spinner.placeInCenter(of: top,
-                        topInset: 0,
-                        bottomInset: 0)
-//    loadingIndicator.placeInCenter(of: top,
-//                        topInset: 0,
-//                        bottomInset: 0)
+    logoIcon.placeInCenter(of: top,
+                          topInset: 0,
+                          bottomInset: 0)
     let instance = UIStackView(arrangedSubviews: [
       top,
       label
     ])
     instance.axis = .vertical
-    instance.spacing = 50
+    instance.spacing = 20
     
     return instance
   }()
-  private var dots = ""
-//  private lazy var icon: Icon = {
-//    let instance = Icon(category: .Logo, iconColor: Colors.Logo.Flame.rawValue)
-//    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
-//    instance.scaleMultiplicator = 1
-//
-//    return instance
-//  }()
+  //  private var dots = ""
+  public private(set) lazy var spiral: Icon = {
+    let instance = Icon(frame: .zero,
+                        category: .Spiral,
+                        scaleMultiplicator: 1,
+                        iconColor: "#1E1E1E".hexColor!.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.55 : 0.03))
+    instance.backgroundColor = .clear//traitCollection.userInterfaceStyle != .dark ? .white : Colors.darkTheme
+    
+    return instance
+  }()
+  //  private lazy var icon: Icon = {
+  //    let instance = Icon(category: .Logo, iconColor: Colors.Logo.Flame.rawValue)
+  //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+  //    instance.scaleMultiplicator = 1
+  //
+  //    return instance
+  //  }()
   
   
   
@@ -253,11 +209,31 @@ class EmptyHotCard: UIView, Card {
   
   // MARK: - Public
   public func animate() {
-//    loadingIndicator.start(animated: false)
+    spiral.startRotating(duration: 15)
+    UIView.animate(withDuration: 1.25, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut]) { [weak self]  in
+      guard let self = self else { return }
+      
+      self.logoIcon.transform = .init(scaleX: 0.9, y: 0.9)
+      self.logoIcon.alpha = 0.95
+    }
+    
+    generateItems(maxItems)
   }
-
+  
   public func removeAllAnimations() {
-//    loadingIndicator.removeAllAnimations()
+    shouldTerminate = true
+    items.forEach { $0.removeFromSuperview() }
+  }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+
+    spiral.setIconColor("#1E1E1E".hexColor!.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.55 : 0.03))
+    spiral.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .white : Colors.darkTheme
+    button.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 8 : 4
+    button.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+    button.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
 }
 
@@ -267,7 +243,16 @@ private extension EmptyHotCard {
     backgroundColor = .clear
     clipsToBounds = false
     
-    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .white : .tertiarySystemBackground
+    stack.placeInCenter(of: body)
+    
+    body.insertSubview(spiral, belowSubview: stack)
+    body.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    spiral.translatesAutoresizingMaskIntoConstraints = false
+    spiral.backgroundColor = .clear
+    spiral.heightAnchor.constraint(equalTo: spiral.widthAnchor).isActive = true
+    spiral.widthAnchor.constraint(equalTo: body.heightAnchor, multiplier: 1.5).isActive = true
+    spiral.centerXAnchor.constraint(equalTo: logoIcon.centerXAnchor).isActive = true
+    spiral.centerYAnchor.constraint(equalTo: logoIcon.centerYAnchor).isActive = true
     
     shadowView.place(inside: self)
     
@@ -277,6 +262,7 @@ private extension EmptyHotCard {
     addSubview(button)
     button.translatesAutoresizingMaskIntoConstraints = false
     button.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+    button.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
     
     let constraint = button.bottomAnchor.constraint(equalTo: bottomAnchor)
     constraint.isActive = true
@@ -288,26 +274,59 @@ private extension EmptyHotCard {
       }
       .store(in: &subscriptions)
     
-    stack.placeInCenter(of: body)
-    spinner.translatesAutoresizingMaskIntoConstraints = false
-    spinner.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
+    logoIcon.translatesAutoresizingMaskIntoConstraints = false
+    logoIcon.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.31).isActive = true
     
-//    loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
-//    loadingIndicator.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
-//
-//    loadingIndicator.start()
-    
-//    addSubview(label)
-//    label.translatesAutoresizingMaskIntoConstraints = false
-//
-//    NSLayoutConstraint.activate([
-//      label.topAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: padding),
-//      label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
-//      label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
-//      label.bottomAnchor.constraint(equalTo: button.topAnchor, constant: -padding),
-//    ])
+    animate()
   }
 
+  func generateItems(_ count: Int) {
+    func getRandomCategory() -> Icon.Category {
+      let all = Set(Topics.shared.all.filter({ !$0.isOther }).map { $0.iconCategory })
+      let current = Set(items.map { $0.category })
+      var diff = all.subtracting(current)
+      
+      return Array(diff)[Int.random(in: 0...diff.count - 1)]
+//      Topics.shared.all.filter({ !$0.isOther})[Int.random(in: 0...Topics.shared.all.count - 1)]
+    }
+    
+    delay(seconds: Double.random(in: 0.2...2)) {[weak self] in
+      guard let self = self else { return }
+      
+      let category = getRandomCategory()
+      let random = Icon(frame: CGRect(origin: self.randomPoint(), size: .uniform(size: CGFloat.random(in: 20...40))))
+      random.iconColor = Topics.shared.all.filter({ $0.iconCategory == category }).first?.tagColor ?? Colors.main
+      random.scaleMultiplicator = 1
+      random.category = category
+      random.transform = .init(scaleX: 0.5, y: 0.5)
+      random.alpha = 0
+      random.startRotating(duration: Double.random(in: 5...30),
+                           repeatCount: .infinity,
+                           clockwise: Int.random(in: 1...3) % 2 == 0 ? true : false)
+      
+      if Int.random(in: 1...3) % 2 == 0 {
+        self.body.insertSubview(random, belowSubview: self.stack)
+      } else {
+        self.body.insertSubview(random, belowSubview: self.spiral)
+      }
+      self.items.append(random)
+      
+      Timer.scheduledTimer(withTimeInterval: TimeInterval.random(in: 4...12), repeats: false, block: { _ in
+        UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
+          random.alpha = 0
+          random.transform = .init(scaleX: 0.5, y: 0.5)
+        } completion: { _ in
+          random.removeFromSuperview()
+          self.items.remove(object: random)
+        }
+      })
+      
+      UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
+        random.alpha = CGFloat.random(in: 0.2...0.7)
+        random.transform = .identity
+      }
+    }
+  }
   
   @objc
   func handleTap(sender: UIButton) {

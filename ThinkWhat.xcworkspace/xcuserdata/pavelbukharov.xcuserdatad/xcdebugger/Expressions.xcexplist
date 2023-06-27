@@ -1888,6 +1888,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in EmptyHotCard.generateItems(_:):EmptyHotCard.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "random.frame">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "static UserProfile.== infix(_:_:):UserProfile.swift">
          <PersistentStrings>
             <PersistentString
@@ -2751,6 +2759,14 @@
          <PersistentStrings>
             <PersistentString
                value = "openedConstraint.isActive">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "EmptyHotCard.items.didset:EmptyHotCard.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "shouldTerminate">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -10815,6 +10831,14 @@
             </PersistentString>
             <PersistentString
                value = "superview">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Icon.bounds.didset:Icon.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "icon">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

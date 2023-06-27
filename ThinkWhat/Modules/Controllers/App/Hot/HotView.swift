@@ -193,6 +193,10 @@ class HotView: UIView {
           instance.alpha = 0
           self.layoutIfNeeded()
         }) { [unowned self] _ in
+          guard let card = instance as? EmptyHotCard else { return }
+          
+          card.removeAllAnimations()
+          
           self.outgoing = nil
           instance.removeFromSuperview()
         }
@@ -254,13 +258,13 @@ extension HotView: HotControllerOutput {
       return
     }
     
-//    card.animate()
+    card.animate()
   }
   
   func didDisappear() {
     guard let card = current as? EmptyHotCard else { return }
     
-//    card.removeAllAnimations()
+    card.removeAllAnimations()
   }
   
   func didLoad() {

@@ -60,7 +60,7 @@ class TermsViewController: UIViewController {
     logoIcon.translatesAutoresizingMaskIntoConstraints = false
     logoIcon.heightAnchor.constraint(equalToConstant: NavigationController.Constants.NavBarHeightSmallState * 0.6).isActive = true
     opaque.translatesAutoresizingMaskIntoConstraints = false
-    LogoText().place(inside: opaque, insets: UIEdgeInsets(top: NavigationController.Constants.NavBarHeightSmallState * 0.125, left: 0, bottom: NavigationController.Constants.NavBarHeightSmallState * 0.125, right: 0))
+    LogoText().place(inside: opaque, insets: UIEdgeInsets(top: NavigationController.Constants.NavBarHeightSmallState * 0.175, left: 0, bottom: NavigationController.Constants.NavBarHeightSmallState * 0.175, right: 0))
     
     let instance = UIStackView(arrangedSubviews: [
       logoIcon,

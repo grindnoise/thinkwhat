@@ -754,4 +754,8 @@ extension UIView {
     self.layer.removeAllAnimations()
   }
   
+  func randomPoint() -> CGPoint {
+    CGPoint(x: Int.random(in: 0...Int(bounds.width)),
+            y: Int.random(in: 0...Int(bounds.height)))
+  }
 }

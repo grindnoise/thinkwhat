@@ -176,9 +176,9 @@
 //Hot VC
 "hot" = "Горячие";
 "searching" = "Поиск";
-"waiting_for_new_posts" = "Ждём новых публикаций";
+"waiting_for_new_posts" = "Ожидание публикаций";
 "hot_participate" = "Участвовать";
-"create_post" = "Cоздать свою";
+"create_post" = "Cоздать публикацию";
 
 //Subscriptions VC
 "subscriptions" = "Подписки";

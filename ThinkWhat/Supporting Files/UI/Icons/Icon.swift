@@ -262,6 +262,21 @@ class Icon: UIView {
 //                    icon = newLayer
                     (icon as! CAShapeLayer).path = path.getScaledPath(size: bounds.size, scaleMultiplicator: scaleMultiplicator)
                 }
+//              //            setupLayerFrames()
+//              cornerRadius = isRounded ? bounds.width / 2 : 0
+//              layer.masksToBounds = isRounded ? true : false
+//              if icon is CAShapeLayer {
+//                  if let path = (icon as! CAShapeLayer).path {
+//  //                    let newLayer = CAShapeLayer()
+//  //                    let path = getScaledPath(originalPath: path)
+//  //                    newLayer.path = path
+//  //                    icon = newLayer
+//                      (icon as! CAShapeLayer).path = path.getScaledPath(size: bounds.size, scaleMultiplicator: scaleMultiplicator)
+//                  }
+//                (icon as! CAShapeLayer).frame = bounds
+//                (icon as! CAShapeLayer).fillColor = iconColor.cgColor
+//
+//              layer.addSublayer(icon)
             } else {
                 icon = getLayer()
             }

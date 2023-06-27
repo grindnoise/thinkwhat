@@ -80,17 +80,21 @@ class MainController: UITabBarController {//}, StorageProtocol {
   public private(set) lazy var logoStack: UIStackView = {
     let opaque = UIView.opaque()
     logoIcon.translatesAutoresizingMaskIntoConstraints = false
-//    logoIcon.heightAnchor.constraint(equalToConstant: NavigationController.Constants.NavBarHeightSmallState * 0.6).isActive = true
     opaque.translatesAutoresizingMaskIntoConstraints = false
-    logoText.place(inside: opaque, insets: UIEdgeInsets(top: NavigationController.Constants.NavBarHeightSmallState * 0.125, left: 0, bottom: NavigationController.Constants.NavBarHeightSmallState * 0.125, right: 0))
+    logoText.place(inside: opaque, insets: UIEdgeInsets(top: NavigationController.Constants.NavBarHeightSmallState * 0.175, left: 0, bottom: NavigationController.Constants.NavBarHeightSmallState * 0.175, right: 0))
+    
+    let opaque2 = UIView.opaque()
+    logoIcon.translatesAutoresizingMaskIntoConstraints = false
+    opaque2.translatesAutoresizingMaskIntoConstraints = false
+    logoIcon.place(inside: opaque2, insets: .uniform(size: NavigationController.Constants.NavBarHeightSmallState * 0.1))
     
     let instance = UIStackView(arrangedSubviews: [
-      logoIcon,
+      opaque2,
       opaque
     ])
     passthroughView.addSubview(instance)
     instance.axis = .horizontal
-    instance.spacing = 8
+    instance.spacing = 0
     instance.alpha = 0
     
     return instance
