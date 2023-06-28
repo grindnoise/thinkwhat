@@ -95,8 +95,16 @@ class StartView: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
+  private var shouldTerminate = false
   private let padding: CGFloat = 8
-  
+  private let maxItems = 16
+  private var items = [Icon]() {
+    didSet {
+      guard !shouldTerminate && items.count < maxItems else { return }
+      
+      generateItems(maxItems - items.count)
+    }
+  }
   
   
   // MARK: - Public properties
@@ -146,6 +154,7 @@ class StartView: UIView {
     button.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 8 : 4
     button.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
     button.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    logoText.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
   }
 }
 
@@ -203,6 +212,10 @@ extension StartView: StartControllerOutput {
       self.logo.alpha = 1
     }
   }
+  
+  func didDisappear() {
+    shouldTerminate = true
+  }
 }
 
 private extension StartView {
@@ -237,6 +250,22 @@ private extension StartView {
     logo.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.31).isActive = true
     logoText.translatesAutoresizingMaskIntoConstraints = false
     logoText.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
+    
+    stack.layer.masksToBounds = false
+    logoText.layer.masksToBounds = false
+    logoText.layer.shadowPath = UIBezierPath(roundedRect: logoText.bounds, cornerRadius: logoText.bounds.height/2).cgPath
+    logoText.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
+    logoText.layer.shadowOffset = .zero
+    logoText.layer.shadowRadius = logoText.bounds.height/2
+    logoText.layer.shadowOpacity = 1
+    
+    logo.layer.masksToBounds = false
+    logo.layer.shadowColor = Colors.main.cgColor
+    logo.layer.shadowOffset = .zero
+    logo.layer.shadowRadius = padding
+    logo.layer.shadowOpacity = 0.5
+    
+    generateItems(maxItems)
   }
   
   @objc
@@ -244,7 +273,80 @@ private extension StartView {
     viewInput?.nextScene()
   }
   
-  
+  func generateItems(_ count: Int) {
+    func getRandomCategory() -> Icon.Category {
+      let all = [
+        11002, // Anon
+        10015, // Plus
+        10062, // Comments
+        25,    // Style
+        40,    // Misc
+        10027, // Hot
+        10033, // !
+        10034, // ?
+        10043, // Rocket
+        10047, // Eye
+        10064, // Binoculars
+        10066, // Oval
+        10068, // Megaphone
+        10081, // Spiral
+        10074, // Triangle
+        10078, // Thunder
+      ].map { Icon.Category(rawValue: $0)! }
+      
+      let current = Set(items.map { $0.category })
+      let diff = Set(all).subtracting(current)
+      
+      guard diff.count > 1 else { return diff.first! }
+      
+      return Array(diff)[Int.random(in: 0..<diff.count-1)]
+    }
+    
+    delay(seconds: Double.random(in: 0.2...2)) {[weak self] in
+      guard let self = self,
+            self.items.count < self.maxItems
+      else { return }
+      
+      let category = getRandomCategory()
+      let random = Icon(frame: CGRect(origin: self.randomPoint(), size: .uniform(size: CGFloat.random(in: 20...40))))
+      let color = UIColor.random()
+      random.iconColor = color
+      random.scaleMultiplicator = 1
+      random.category = category
+      random.transform = .init(scaleX: 0.5, y: 0.5)
+      random.alpha = 0
+      random.startRotating(duration: Double.random(in: 5...30),
+                           repeatCount: .infinity,
+                           clockwise: Int.random(in: 1...3) % 2 == 0 ? true : false)
+      random.setAnchorPoint(CGPoint(x: Int.random(in: -5...5), y: Int.random(in: -5...5)))
+      random.layer.masksToBounds = false
+      random.icon.shadowOffset = .zero
+      random.icon.shadowOpacity = Float.random(in: 0.3...0.8)
+      random.icon.shadowColor = color.cgColor
+      random.icon.shadowRadius = random.bounds.width * 0.3
+      
+      self.insertSubview(random, belowSubview: self.stack)
+      self.items.append(random)
+      let duration = TimeInterval.random(in: 4...12)
+      UIView.animate(withDuration: duration) {
+        random.transform = CGAffineTransform(rotationAngle: Int.random(in: 0...9) % 2 == 0 ? .pi : -.pi)//Float.random(in: 0...360).degreesToRadians)
+      }
+      Timer.scheduledTimer(withTimeInterval: duration*0.9, repeats: false, block: { _ in
+        UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
+          random.alpha = 0
+          random.transform = .init(scaleX: 0.5, y: 0.5)
+        } completion: { _ in
+          random.removeFromSuperview()
+          self.items.remove(object: random)
+        }
+      })
+      
+      UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
+        random.alpha = CGFloat.random(in: 0.2...0.6)
+        random.transform = .identity
+      }
+    }
+  }
 }
 
 extension StartView: Localizable {

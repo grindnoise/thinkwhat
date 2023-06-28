@@ -69,67 +69,115 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         fakeCard.setNeedsLayout()
         fakeCard.layoutIfNeeded()
         
-        let fakeAction = try! card.voteButton.copyObject() as! UIButton
-        fakeAction.layer.zPosition = 100
-        let fakeActionOrigin = card.voteButton.superview!.convert(card.voteButton.frame.origin,
-                                                                  to: containerView)
-        fakeAction.placeTopLeading(inside: appDelegate.window!,
-                                   leadingInset: fakeActionOrigin.x,
-                                   topInset: fakeActionOrigin.y,
-                                   width: fakeAction.frame.width,
-                                   height: fakeAction.frame.height)
-        let fakeClaim = try! card.claimButton.copyObject() as! UIButton
+        let fakeClaim: UIButton = {
+          let instance = UIButton()
+          instance.setImage(UIImage(systemName: "exclamationmark.triangle.fill",
+                                    withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+//          instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1).isActive = true
+          instance.tintColor = card.item.topic.tagColor
+          instance.imageView?.layer.shadowOpacity = 1
+          instance.imageView?.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
+          instance.imageView?.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 4 : 2
+          instance.imageView?.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? card.item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+          instance.imageView?.layer.masksToBounds = false
+          
+          return instance
+        }()
         fakeClaim.layer.zPosition = 100
-        let fakeClaimOrigin = card.claimButton.superview!.convert(card.claimButton.frame.origin, to: appDelegate.window!)
-        fakeClaim.placeTopLeading(inside: appDelegate.window!,
-                                  leadingInset: fakeClaimOrigin.x,
-                                  topInset: fakeClaimOrigin.y,
-                                  width: fakeClaim.frame.width,
-                                  height: fakeClaim.frame.height)
+        fakeClaim.frame = CGRect(origin: card.claimButton.superview!.convert(card.claimButton.frame.origin,
+                                                                             to: appDelegate.window!),
+                                  size: card.claimButton.bounds.size)
+        appDelegate.window!.addSubview(fakeClaim)
+        card.claimButton.alpha = 0
+
+        let fakeAction: UIView = {
+          let opaque = UIView.opaque()
+          opaque.layer.masksToBounds = false
+          
+          let instance = UIButton()
+          if #available(iOS 15, *) {
+            var config = UIButton.Configuration.filled()
+            config.cornerStyle = .capsule
+            config.baseBackgroundColor = card.item.topic.tagColor
+            config.attributedTitle = AttributedString("hot_participate".localized,
+                                                      attributes: AttributeContainer([
+                                                        .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                        .foregroundColor: UIColor.white as Any
+                                                      ]))
+            instance.configuration = config
+          } else {
+            instance.backgroundColor = card.item.topic.tagColor
+            instance.cornerRadius = card.voteButton.cornerRadius
+            instance.setAttributedTitle(NSAttributedString(string: "hot_participate".localized,
+                                                           attributes: [
+                                                            .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                            .foregroundColor: UIColor.white as Any
+                                                           ]),
+                                        for: .normal)
+            instance.place(inside: opaque)
+          }
+          instance.place(inside: opaque)
+          
+          return opaque
+        }()
+        fakeAction.frame = CGRect(origin: card.voteButton.superview!.convert(card.voteButton.frame.origin,
+                                                                             to: appDelegate.window!),
+                                  size: card.voteButton.bounds.size)
+        appDelegate.window!.addSubview(fakeAction)
+        card.voteButton.alpha = 0
         
-        let fakeNext = try! card.nextButton.copyObject() as! UIButton
+        // Draw shadow
+        fakeAction.layer.zPosition = 100
+        fakeAction.layer.shadowOpacity = 1
+        fakeAction.layer.shadowPath = UIBezierPath(roundedRect: fakeAction.bounds, cornerRadius: fakeAction.bounds.height/2).cgPath
+        fakeAction.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        fakeAction.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        fakeAction.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+        
+        let fakeNext: UIButton = {
+          let instance = UIButton()
+          instance.setImage(UIImage(systemName: "arrowshape.right.fill",
+                                    withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
+//          instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1).isActive = true
+          instance.tintColor = card.item.topic.tagColor
+          instance.imageView?.layer.shadowOpacity = 1
+          instance.imageView?.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
+          instance.imageView?.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 4 : 2
+          instance.imageView?.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? card.item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+          instance.imageView?.layer.masksToBounds = false
+          
+          return instance
+        }()
         fakeNext.layer.zPosition = 100
-        let fakeNextOrigin = card.nextButton.superview!.convert(card.nextButton.frame.origin, to: appDelegate.window!)
-        fakeNext.placeTopLeading(inside: appDelegate.window!,
-                                 leadingInset: fakeNextOrigin.x,
-                                 topInset: fakeNextOrigin.y,
-                                 width: fakeNext.frame.width,
-                                 height: fakeNext.frame.height)
+        fakeNext.frame = CGRect(origin: card.nextButton.superview!.convert(card.nextButton.frame.origin,
+                                                                             to: appDelegate.window!),
+                                  size: card.nextButton.bounds.size)
+        appDelegate.window!.addSubview(fakeNext)
+        card.nextButton.alpha = 0
         
         delay(seconds: 0.05) { [weak self] in
           guard let self = self else { return }
           appDelegate.window?.addSubview(fakeCard)
           hotView.alpha = 0
           fakeCard.togglePollMode()
-          
+
           UIView.animate(withDuration: self.duration,//self.duration,
                          delay: 0,
-                         options: .curveEaseOut,
+                         options: .curveEaseInOut,
                          animations: {
-            fakeAction.transform = .init(scaleX: 0.75, y: 0.75)
-            //              fakeAction.alpha = 0
-            //              fakeNext.transform = .init(scaleX: 0.75, y: 0.75)
-            //              fakeNext.alpha = 0
-            //              fakeClaim.transform = .init(scaleX: 0.75, y: 0.75)
-            //              fakeClaim.alpha = 0
-            
-            if let fakeNextConstraint = fakeNext.getConstraint(identifier: "leadingAnchor"),
-               let fakeClaimConstraint = fakeClaim.getConstraint(identifier: "leadingAnchor"),
-               let fakeActionConstraint = fakeAction.getConstraint(identifier: "topAnchor")
-            {
-              appDelegate.window!.setNeedsLayout()
-              fakeClaimConstraint.constant -= fakeClaimOrigin.x + fakeClaim.bounds.width
-              fakeNextConstraint.constant += UIScreen.main.bounds.width - fakeNextOrigin.x
-              fakeActionConstraint.constant += UIScreen.main.bounds.height - fakeActionOrigin.y
-              appDelegate.window!.layoutIfNeeded()
-            }
+            fakeAction.frame.origin.y = appDelegate.window!.bounds.height
+            fakeClaim.frame.origin.x = -fakeClaim.bounds.width
+            fakeNext.frame.origin.x = appDelegate.window!.bounds.width
           }) { _ in
             fakeAction.removeFromSuperview()
             fakeClaim.removeFromSuperview()
             fakeCard.removeFromSuperview()
+            card.voteButton.alpha = 1
+            card.claimButton.alpha = 1
+            card.nextButton.alpha = 1
             //              self.context?.completeTransition(true)
           }
-          
+
           UIView.animate(withDuration: self.duration*0.9,//self.duration,
                          delay: 0,
                          options: .curveEaseOut,

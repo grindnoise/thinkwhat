@@ -141,7 +141,7 @@
 		AB3C6853223FD3EF00B57580 /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB3C683F223FD3EE00B57580 /* OpenSans-BoldItalic.ttf */; };
 		AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6841223FD3EE00B57580 /* SocialLogosStyleKit.swift */; };
 		AB3C6855223FD3EF00B57580 /* LogoAnimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6842223FD3EE00B57580 /* LogoAnimView.swift */; };
-		AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */; };
+		AB3C6856223FD3EF00B57580 /* Logo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6843223FD3EE00B57580 /* Logo.swift */; };
 		AB3C685C223FD74E00B57580 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C6858223FD74C00B57580 /* Reachability.swift */; };
 		AB3C685E223FD74E00B57580 /* FileIOController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685A223FD74D00B57580 /* FileIOController.swift */; };
 		AB3C685F223FD74E00B57580 /* ScrollingTabBarUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */; };
@@ -323,6 +323,7 @@
 		AB8A44872A3E543300FF3488 /* Rubik-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A44792A3E543300FF3488 /* Rubik-SemiBold.ttf */; };
 		AB8A44882A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB8A447A2A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf */; };
 		AB8A9BCA2A4AD5B00020A7CA /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8A9BC92A4AD5B00020A7CA /* Spinner.swift */; };
+		AB8A9BCC2A4C76B70020A7CA /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8A9BCB2A4C76B70020A7CA /* UIColor.swift */; };
 		AB8BE16D2A31D5A200B0FB63 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8BE16C2A31D5A200B0FB63 /* NotificationService.swift */; };
 		AB8BE1712A31D5A200B0FB63 /* Push service extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AB8BE1782A31D61400B0FB63 /* BadgeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */; };
@@ -692,7 +693,7 @@
 		AB3C683F223FD3EE00B57580 /* OpenSans-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-BoldItalic.ttf"; sourceTree = "<group>"; };
 		AB3C6841223FD3EE00B57580 /* SocialLogosStyleKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialLogosStyleKit.swift; sourceTree = "<group>"; };
 		AB3C6842223FD3EE00B57580 /* LogoAnimView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogoAnimView.swift; sourceTree = "<group>"; };
-		AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogoStyleKit.swift; sourceTree = "<group>"; };
+		AB3C6843223FD3EE00B57580 /* Logo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logo.swift; sourceTree = "<group>"; };
 		AB3C6858223FD74C00B57580 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		AB3C685A223FD74D00B57580 /* FileIOController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileIOController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		AB3C685B223FD74D00B57580 /* ScrollingTabBarUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollingTabBarUtils.swift; sourceTree = "<group>"; };
@@ -876,6 +877,7 @@
 		AB8A44792A3E543300FF3488 /* Rubik-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-SemiBold.ttf"; sourceTree = "<group>"; };
 		AB8A447A2A3E543300FF3488 /* Rubik-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Rubik-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
 		AB8A9BC92A4AD5B00020A7CA /* Spinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
+		AB8A9BCB2A4C76B70020A7CA /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		AB8BE16A2A31D5A200B0FB63 /* Push service extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Push service extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB8BE16C2A31D5A200B0FB63 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		AB8BE16E2A31D5A200B0FB63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1247,6 +1249,7 @@
 				AB39D40129C362DB00892D58 /* CAGradientLayer.swift */,
 				ABA16E9129D2E22D002D63B6 /* UIImage.swift */,
 				AB68F4F22A1390490082246F /* NSObject.swift */,
+				AB8A9BCB2A4C76B70020A7CA /* UIColor.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1688,7 +1691,7 @@
 			children = (
 				AB3C6841223FD3EE00B57580 /* SocialLogosStyleKit.swift */,
 				AB3C6842223FD3EE00B57580 /* LogoAnimView.swift */,
-				AB3C6843223FD3EE00B57580 /* LogoStyleKit.swift */,
+				AB3C6843223FD3EE00B57580 /* Logo.swift */,
 			);
 			path = Logos;
 			sourceTree = "<group>";
@@ -3310,7 +3313,7 @@
 				AB3C6854223FD3EF00B57580 /* SocialLogosStyleKit.swift in Sources */,
 				ABE912C529CB4BAF00EABDFD /* NewPollImage.swift in Sources */,
 				AB8DAB5423BA2A790089E25F /* PlainIcons.swift in Sources */,
-				AB3C6856223FD3EF00B57580 /* LogoStyleKit.swift in Sources */,
+				AB3C6856223FD3EF00B57580 /* Logo.swift in Sources */,
 				AB3C6848223FD3EE00B57580 /* Buttons.swift in Sources */,
 				AB39D40029C358D000892D58 /* ProgressCapsule.swift in Sources */,
 				AB9958B82A24B83C00127DF6 /* BadgeExtension.swift in Sources */,
@@ -3339,6 +3342,7 @@
 				AB8A9BCA2A4AD5B00020A7CA /* Spinner.swift in Sources */,
 				AB3F8D1B294C4BE600C3980D /* TextCell.swift in Sources */,
 				AB40550128785AAB000F7768 /* CommentCell.swift in Sources */,
+				AB8A9BCC2A4C76B70020A7CA /* UIColor.swift in Sources */,
 				AB2AA1B32359E9D30086D16C /* SurveysTableViewController.swift in Sources */,
 				ABA448F227EE031D00F8E00D /* PollView.swift in Sources */,
 				ABF20FBC24CAEB640092B223 /* UserClaimCell.swift in Sources */,

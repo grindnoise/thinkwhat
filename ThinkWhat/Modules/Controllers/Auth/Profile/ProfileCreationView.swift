@@ -403,6 +403,15 @@ private extension ProfileCreationView {
     opaque.addSubviews([fakeLogo, fakeLogoText])
     logoIcon.alpha = 0
     logoText.alpha = 0
+    
+    let spiral = Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: "#1E1E1E".hexColor!.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.7 : 0.03))
+    opaque.insertSubview(spiral, belowSubview: loadingStack)
+    spiral.translatesAutoresizingMaskIntoConstraints = false
+    spiral.heightAnchor.constraint(equalTo: spiral.widthAnchor).isActive = true
+    spiral.widthAnchor.constraint(equalTo: opaque.heightAnchor, multiplier: 1.5).isActive = true
+    spiral.centerXAnchor.constraint(equalTo: fakeLogo.centerXAnchor).isActive = true
+    spiral.centerYAnchor.constraint(equalTo: fakeLogo.centerYAnchor).isActive = true
+    spiral.alpha = 0
 
     UIView.animate(withDuration: 0.2) { [weak self] in
       guard let self = self else { return }
@@ -422,6 +431,8 @@ private extension ProfileCreationView {
       
       constraint.constant = 100
       self.layoutIfNeeded()
+      opaque.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+      spiral.alpha = 1
       
       fakeLogo.frame = CGRect(origin: loadingStack.convert(tempLogo.frame.origin,
                                                                       to: opaque),
@@ -435,7 +446,7 @@ private extension ProfileCreationView {
       tempLogoText.alpha = 1
       fakeLogoText.removeFromSuperview()
       fakeLogo.removeFromSuperview()
-//      viewInput.openApp()
+      viewInput.openApp()
     }
   }
   

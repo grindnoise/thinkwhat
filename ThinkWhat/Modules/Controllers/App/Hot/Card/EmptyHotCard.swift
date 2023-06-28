@@ -83,7 +83,7 @@ class EmptyHotCard: UIView, Card {
   ///**UI**
   private var shouldTerminate = false
   private let padding: CGFloat = 8
-  private let maxItems = 12
+  private let maxItems = 15
   private var items = [Icon]() {
     didSet {
       guard !shouldTerminate && items.count < maxItems else { return }
@@ -155,6 +155,9 @@ class EmptyHotCard: UIView, Card {
     logoIcon.placeInCenter(of: top,
                           topInset: 0,
                           bottomInset: 0)
+//    let bottom = UIView.opaque()
+//    bottom.accessibilityIdentifier = "bottom"
+//    label.place(inside: bottom)
     let instance = UIStackView(arrangedSubviews: [
       top,
       label
@@ -209,12 +212,20 @@ class EmptyHotCard: UIView, Card {
   
   // MARK: - Public
   public func animate() {
+    shouldTerminate = false
     spiral.startRotating(duration: 15)
-    UIView.animate(withDuration: 1.25, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut]) { [weak self]  in
-      guard let self = self else { return }
-      
-      self.logoIcon.transform = .init(scaleX: 0.9, y: 0.9)
-      self.logoIcon.alpha = 0.95
+    UIView.animate(withDuration: 0.5, animations: { [weak self]  in
+        guard let self = self else { return }
+        
+        self.logoIcon.transform = .identity
+        self.logoIcon.alpha = 1
+    }) { _ in
+      UIView.animate(withDuration: 1.25, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut]) { [weak self]  in
+        guard let self = self else { return }
+        
+        self.logoIcon.transform = .init(scaleX: 0.9, y: 0.9)
+        self.logoIcon.alpha = 0.95
+      }
     }
     
     generateItems(maxItems)
@@ -234,6 +245,7 @@ class EmptyHotCard: UIView, Card {
     button.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
     button.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    label.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
   }
 }
 
@@ -277,6 +289,20 @@ private extension EmptyHotCard {
     logoIcon.translatesAutoresizingMaskIntoConstraints = false
     logoIcon.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.31).isActive = true
     
+    stack.layer.masksToBounds = false
+    label.layer.masksToBounds = false
+    label.layer.shadowPath = UIBezierPath(roundedRect: label.bounds, cornerRadius: label.bounds.height/2).cgPath
+    label.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
+    label.layer.shadowOffset = .zero
+    label.layer.shadowRadius = label.bounds.height/2
+    label.layer.shadowOpacity = 1
+    
+    logoIcon.layer.masksToBounds = false
+    logoIcon.layer.shadowColor = Colors.main.cgColor
+    logoIcon.layer.shadowOffset = .zero
+    logoIcon.layer.shadowRadius = padding
+    logoIcon.layer.shadowOpacity = 0.5
+    
     animate()
   }
 
@@ -295,7 +321,8 @@ private extension EmptyHotCard {
       
       let category = getRandomCategory()
       let random = Icon(frame: CGRect(origin: self.randomPoint(), size: .uniform(size: CGFloat.random(in: 20...40))))
-      random.iconColor = Topics.shared.all.filter({ $0.iconCategory == category }).first?.tagColor ?? Colors.main
+      let color = Topics.shared.all.filter({ $0.iconCategory == category }).first?.tagColor ?? Colors.main
+      random.iconColor = color
       random.scaleMultiplicator = 1
       random.category = category
       random.transform = .init(scaleX: 0.5, y: 0.5)
@@ -303,6 +330,12 @@ private extension EmptyHotCard {
       random.startRotating(duration: Double.random(in: 5...30),
                            repeatCount: .infinity,
                            clockwise: Int.random(in: 1...3) % 2 == 0 ? true : false)
+      random.setAnchorPoint(CGPoint(x: Int.random(in: -5...5), y: Int.random(in: -5...5)))
+      random.layer.masksToBounds = false
+      random.icon.shadowOffset = .zero
+      random.icon.shadowOpacity = Float.random(in: 0.3...0.8)
+      random.icon.shadowColor = color.cgColor
+      random.icon.shadowRadius = random.bounds.width * 0.3
       
       if Int.random(in: 1...3) % 2 == 0 {
         self.body.insertSubview(random, belowSubview: self.stack)
@@ -310,8 +343,11 @@ private extension EmptyHotCard {
         self.body.insertSubview(random, belowSubview: self.spiral)
       }
       self.items.append(random)
-      
-      Timer.scheduledTimer(withTimeInterval: TimeInterval.random(in: 4...12), repeats: false, block: { _ in
+      let duration = TimeInterval.random(in: 4...12)
+      UIView.animate(withDuration: duration) {
+        random.transform = CGAffineTransform(rotationAngle: Int.random(in: 0...9) % 2 == 0 ? .pi : -.pi)//Float.random(in: 0...360).degreesToRadians)
+      }
+      Timer.scheduledTimer(withTimeInterval: duration*0.9, repeats: false, block: { _ in
         UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
           random.alpha = 0
           random.transform = .init(scaleX: 0.5, y: 0.5)
@@ -322,7 +358,7 @@ private extension EmptyHotCard {
       })
       
       UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
-        random.alpha = CGFloat.random(in: 0.2...0.7)
+        random.alpha = CGFloat.random(in: 0.2...0.6)
         random.transform = .identity
       }
     }

@@ -50,6 +50,12 @@ class StartViewController: UIViewController {
     
     controllerOutput?.didAppear()
   }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    
+    controllerOutput?.didDisappear()
+  }
 }
 
 extension StartViewController: StartViewInput {

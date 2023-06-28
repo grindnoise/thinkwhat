@@ -671,6 +671,8 @@ extension SignInView: SignInControllerOutput {
         opaque.setNeedsLayout()
         opaque.layoutIfNeeded()
     
+    
+    
     ///Fake icons to animate
     let fakeLogoIcon: Icon = {
       let instance = Icon(frame: CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
@@ -733,6 +735,7 @@ extension SignInView: SignInControllerOutput {
                    animations: { [weak self] in
       guard let self = self else { return }
 
+//      spiral.alpha = 1
       self.subviews.forEach {
         $0.alpha = 0
         $0.transform = .init(scaleX: 0.75, y: 0.75)

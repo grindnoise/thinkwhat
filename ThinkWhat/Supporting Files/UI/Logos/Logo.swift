@@ -15,20 +15,59 @@ import UIKit
 
 class Logo: UIView {
   
+//  ///**UI**
+//  public private(set) lazy var icon: Icon = {
+//    let instance = Icon(frame: frame,
+//                        category: .Logo,
+//                        scaleMultiplicator: 1,
+//                        iconColor: Colors.main)
+//
+//    return instance
+//  }()
+//  public var color: UIColor
+//  public private(set) lazy var background: Icon = {
+//    let instance = Icon(frame: frame,
+//                        category: .LogoOuter,
+//                        scaleMultiplicator: 1.1,
+//                        iconColor: .white)
+//
+//    return instance
+//  }()
+//
+//
+//
+//  ///**Init**
+//  init(frame: CGRect = .zero,
+//       color: UIColor = Colors.main) {
+//    self.color = color
+//
+//    super.init(frame: frame)
+//
+//    setupUI()
+//  }
   override init(frame: CGRect) {
     super.init(frame: frame)
-    
+
     isOpaque = false
     backgroundColor = .clear
     heightAnchor.constraint(equalTo: widthAnchor, multiplier: 1/1).isActive = true
   }
-  
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
   override func draw(_ rect: CGRect) {
     LogoStyleKit.drawLogo(frame: rect, resizing: .aspectFit)
+  }
+  
+  @MainActor
+  func setupUI() {
+    heightAnchor.constraint(equalTo: widthAnchor, multiplier: 1/1).isActive = true
+//    background.place(inside: self)
+////    icon.icon.masksToBounds = true
+////    icon.icon.insertSublayer(background.icon, at: 0)
+//    icon.place(inside: self)
   }
 }
 

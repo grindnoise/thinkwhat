@@ -48,16 +48,10 @@ class MainController: UITabBarController {//}, StorageProtocol {
   /// **UI**
   private var logoCenterY: CGFloat = .zero
   public private(set) lazy var loadingText: LogoText = { LogoText() }()
-  public private(set) lazy var loadingIcon: Logo = {
-    let instance = Logo()
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
-    
-    return instance
-  }()
+  public private(set) lazy var loadingIcon: Logo = { Logo() }()
   public private(set) lazy var loadingStack: UIStackView = {
     let opaque = UIView.opaque()
     loadingIcon.placeInCenter(of: opaque, topInset: 0, bottomInset: 0)
-    
     let instance = UIStackView(arrangedSubviews: [
       opaque,
       loadingText
@@ -742,25 +736,25 @@ private extension MainController {
     viewControllers = [
       createNavigationController(for: surveyId.isNil ? HotController(commentId: commentId) : HotController(surveyId: surveyId),
                                  title: "hot",
-                                 image: UIImage(systemName: "flame"),
-                                 selectedImage: UIImage(systemName: "flame.fill"),
+                                 image: UIImage(systemName: "flame", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//
+                                 selectedImage: UIImage(systemName: "flame.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),
                                  color: Colors.main),//Logo.Flame.rawValue),
       createNavigationController(for: SubscriptionsController(),
                                  title: "subscriptions",
-                                 image: UIImage(systemName: "bell"),
-                                 selectedImage: UIImage(systemName: "bell.fill"),
+                                 image: UIImage(systemName: "bell", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
+                                 selectedImage: UIImage(systemName: "bell.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
                                  color: Colors.main),//Colors.Logo.CoolGray.rawValue),
       createNavigationController(for: ListController(), title: "list",
-                                 image: UIImage(systemName: "square.stack.3d.up"),
-                                 selectedImage: UIImage(systemName: "square.stack.3d.up.fill"),
+                                 image: UIImage(systemName: "square.stack.3d.up", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
+                                 selectedImage: UIImage(systemName: "square.stack.3d.up.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
                                  color: Colors.main),//Colors.Logo.GreenMunshell.rawValue),
       createNavigationController(for: TopicsController(), title: "topics",
-                                 image: UIImage(systemName: "chart.bar.doc.horizontal"),
-                                 selectedImage: UIImage(systemName: "chart.bar.doc.horizontal.fill"),
+                                 image: UIImage(systemName: "chart.bar.doc.horizontal", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
+                                 selectedImage: UIImage(systemName: "chart.bar.doc.horizontal.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
                                  color: Colors.main),//Colors.Logo.Marigold.rawValue),
       createNavigationController(for: SettingsController(), title: "settings",
-                                 image: UIImage(systemName: "gearshape"),
-                                 selectedImage: UIImage(systemName: "gearshape.fill"),
+                                 image: UIImage(systemName: "gearshape", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
+                                 selectedImage: UIImage(systemName: "gearshape.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
                                  color: Colors.main),//Colors.Logo.AirBlue.rawValue),
     ]
   }
@@ -779,8 +773,19 @@ private extension MainController {
     tabBar.backgroundImage = UIImage()
     tabBar.clipsToBounds = true
     
-    UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Regular, size: 11)], for: .normal)
-    UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: StringAttributes.font(name: StringAttributes.Fonts.Style.Semibold, size: 11)], for: .selected)
+    if #available(iOS 15, *) {
+      let tabBarAppearance = UITabBarAppearance()
+      tabBarAppearance.backgroundColor = .systemBackground
+      tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [.font: UIFont(name: Fonts.Rubik.Regular, size: 11) as Any]
+      tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.font: UIFont(name: Fonts.Rubik.Medium, size: 11) as Any]
+      tabBar.standardAppearance = tabBarAppearance
+      tabBar.scrollEdgeAppearance = tabBarAppearance
+    } else {
+      UITabBarItem.appearance().setTitleTextAttributes([.font: StringAttributes.font(name: Fonts.Rubik.Regular, size: 11)],
+                                                       for: .normal)
+      UITabBarItem.appearance().setTitleTextAttributes([.font: StringAttributes.font(name: Fonts.Rubik.SemiBold, size: 11)],
+                                                       for: .selected)
+    }
     
     delegate = self
     navigationItem.setHidesBackButton(true, animated: false)
@@ -790,27 +795,29 @@ private extension MainController {
     tabBar.alpha = 0
     setTabBarVisible(visible: false, animated: false)
     
-    loadingStack.placeInCenter(of: view)
+    appDelegate.window?.addSubview(passthroughView)
     
-    view.insertSubview(spiral, belowSubview: loadingStack)
+    loadingStack.placeInCenter(of: passthroughView)
+    
+    passthroughView.insertSubview(spiral, belowSubview: loadingStack)
     spiral.translatesAutoresizingMaskIntoConstraints = false
     spiral.heightAnchor.constraint(equalTo: spiral.widthAnchor).isActive = true
-    spiral.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1.5).isActive = true
+    spiral.widthAnchor.constraint(equalTo: passthroughView.heightAnchor, multiplier: 1.5).isActive = true
     spiral.centerXAnchor.constraint(equalTo: loadingIcon.centerXAnchor).isActive = true
     spiral.centerYAnchor.constraint(equalTo: loadingIcon.centerYAnchor).isActive = true
     spiral.startRotating(duration: 5)
     
     loadingIcon.translatesAutoresizingMaskIntoConstraints = false
-    loadingIcon.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.31).isActive = true
+    loadingIcon.widthAnchor.constraint(equalTo: passthroughView.widthAnchor, multiplier: 0.31).isActive = true
     loadingText.translatesAutoresizingMaskIntoConstraints = false
-    loadingText.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5).isActive = true
+    loadingText.widthAnchor.constraint(equalTo: passthroughView.widthAnchor, multiplier: 0.5).isActive = true
     
+//    loadingIcon.backgroundColor = .black
 //    loadingStack.placeInCenter(of: passthroughView,
 //                               widthMultiplier: 0.6)//,
 ////                               yOffset: -NavigationController.Constants.NavBarHeightSmallState)
 ////    animateLoaderColor(from: Colors.Logo.Main, to: Colors.Logo.Main.next())
     
-            appDelegate.window?.addSubview(passthroughView)
   }
   
   func onServerUnavailable() {
@@ -837,6 +844,7 @@ private extension MainController {
     let fakeLogoIcon = Logo(frame: CGRect(origin: loadingIcon.superview!.convert(loadingIcon.frame.origin,
                                                                             to: passthroughView),
                                    size: loadingIcon.bounds.size))
+//    fakeLogoIcon.backgroundColor = .black
     fakeLogoIcon.removeConstraints(fakeLogoIcon.getAllConstraints())
     passthroughView.addSubview(fakeLogoIcon)
 
@@ -847,12 +855,36 @@ private extension MainController {
     fakeLogoText.removeConstraints(fakeLogoText.getAllConstraints())
     passthroughView.addSubview(fakeLogoText)
     
+//    // Logo path animation
+//    let anim1 = Animations.get(property: .Path,
+//                               fromValue: (loadingIcon.icon.icon as! CAShapeLayer).path as Any,
+//                               toValue: (logoIcon.icon.icon as! CAShapeLayer).path?.boundingBox as Any,
+//                               duration: 0.3,
+//                               delay: 0,
+//                               repeatCount: 0,
+//                               autoreverses: false,
+//                               timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                               delegate: nil,
+//                               isRemovedOnCompletion: false)
+//    let anim2 = Animations.get(property: .Path,
+//                               fromValue: (loadingIcon.background.icon as! CAShapeLayer).path as Any,
+//                               toValue: (logoIcon.background.icon as! CAShapeLayer).path as Any,
+//                               duration: 0.3,
+//                               delay: 0,
+//                               repeatCount: 0,
+//                               autoreverses: false,
+//                               timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                               delegate: nil,
+//                               isRemovedOnCompletion: false)
+//    fakeLogoIcon.icon.icon.add(anim1, forKey: nil)
+//    fakeLogoIcon.background.icon.add(anim2, forKey: nil)
+    
     // Hide loading icon & text
     loadingIcon.alpha = 0
     loadingText.alpha = 0
     
     // Animate
-//    spiral.startRotating(duration: 1)
+    //    spiral.startRotating(duration: 1)
     UIView.animate(withDuration: 0.3,
                    delay: 0,
                    options: .curveEaseIn,
@@ -879,10 +911,10 @@ private extension MainController {
     
     UIView.animate(
       withDuration: 0.6,
-      delay: 0.2,
+      delay: 0,
       usingSpringWithDamping: 0.7,
       initialSpringVelocity: 0.3,
-      options: [.curveEaseInOut],
+      options: [.curveEaseOut],
       animations: { [weak self] in
         guard let self = self else { return }
         

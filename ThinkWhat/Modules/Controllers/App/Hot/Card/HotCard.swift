@@ -177,8 +177,8 @@ class HotCard: UIView, Card {
   }()
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
-    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.1, of: item.topic.tagColor).cgColor
+    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.cgColor//.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
     instance.setGradient(colors: [clear, feathered],
                          locations: [0.0, 0.5])
     
@@ -187,7 +187,7 @@ class HotCard: UIView, Card {
   private lazy var fadeGradient: CAGradientLayer = {
     let instance = CAGradientLayer()
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.1, of: item.topic.tagColor).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
     instance.setGradient(colors: [clear, clear, feathered],
                          locations: [0.0, 0.75, 0.9])
     
@@ -458,12 +458,12 @@ class HotCard: UIView, Card {
     super.traitCollectionDidChange(previousTraitCollection)
     
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.1, of: item.topic.tagColor).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
     
     fadeGradient.setGradient(colors: [clear, clear, feathered],
                              locations: [0.0, 0.75, 0.9])
     
-    let clear_2 = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
+    let clear_2 = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.cgColor//.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
     gradient.setGradient(colors: [clear_2, feathered],
                          locations: [0.0, 0.5])
     
@@ -542,7 +542,7 @@ private extension HotCard {
   func handleTap(sender: UIView) {
 //    setBanned {}
 //    collectionView.mode = .Default
-    if sender == voteButton {
+    if sender == voteButton.getSubview(type: UIButton.self) {
       action = .Vote
     } else {
       action = sender == claimButton ? .Claim : .Next

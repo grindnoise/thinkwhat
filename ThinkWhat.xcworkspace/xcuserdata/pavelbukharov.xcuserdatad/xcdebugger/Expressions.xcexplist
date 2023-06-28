@@ -1893,6 +1893,9 @@
             <PersistentString
                value = "random.frame">
             </PersistentString>
+            <PersistentString
+               value = "self!.items">
+            </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
@@ -4683,6 +4686,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "EmptyHotCard.setupUI():EmptyHotCard.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "label.layer.masksToBounds">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in static VKWorker.authorize():VKWorker.swift">
       </ContextState>
       <ContextState
@@ -6414,6 +6425,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "HotCard.handleTap(sender:):HotCard.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "sender == voteButton.getSubview(type: UIButton.self)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in StartView.label.getter:StartView.swift">
          <PersistentStrings>
             <PersistentString
@@ -6487,7 +6506,7 @@
          contextName = "Transition.animateTransition(using:):Transition.swift">
          <PersistentStrings>
             <PersistentString
-               value = "separator.arrangedSubviews[2].frame">
+               value = "fakeClaim.frame">
             </PersistentString>
             <PersistentString
                value = "apple.frame">
@@ -6496,7 +6515,7 @@
                value = "apple.alpha">
             </PersistentString>
             <PersistentString
-               value = "separator.frame">
+               value = "fakeAction.getAllConstraints()">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -8037,6 +8056,14 @@
          <PersistentStrings>
             <PersistentString
                value = "url">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "getRandomCategory #1 () in StartView.generateItems(_:):StartView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "items">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

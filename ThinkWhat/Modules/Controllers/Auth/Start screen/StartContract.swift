@@ -31,4 +31,5 @@ protocol StartControllerOutput: AnyObject {
   var viewInput: StartViewInput? { get set }
   
   func didAppear()
+  func didDisappear()
 }
