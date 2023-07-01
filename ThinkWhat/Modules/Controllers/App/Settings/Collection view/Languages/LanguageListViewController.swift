@@ -73,19 +73,19 @@ extension LanguageListViewController: LanguageListViewInput {
 }
 
 extension LanguageListViewController: LanguageListModelOutput {}
-
-extension LanguageListViewController: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let banner = sender as? Popup {
-            banner.removeFromSuperview()
-        }
-    }
-}
+//
+//extension LanguageListViewController: BannerObservable {
+//    func onBannerWillAppear(_ sender: Any) {}
+//    
+//    func onBannerWillDisappear(_ sender: Any) {}
+//    
+//    func onBannerDidAppear(_ sender: Any) {}
+//    
+//    func onBannerDidDisappear(_ sender: Any) {
+//        if let banner = sender as? Banner {
+//            banner.removeFromSuperview()
+//        } else if let banner = sender as? Popup {
+//            banner.removeFromSuperview()
+//        }
+//    }
+//}

@@ -202,6 +202,8 @@ class Icon: UIView {
       case Thunder = 10078
       case Toast = 10080
       case SpiralFull = 10081
+      
+      case Key = 10082
     }
     
     
@@ -13088,6 +13090,30 @@ class Icon: UIView {
           iconPath.addCurve(to: CGPoint(x: 407.39, y: 190.03), controlPoint1: CGPoint(x: 398.92, y: 192.36), controlPoint2: CGPoint(x: 402.74, y: 191.08))
           iconPath.addCurve(to: CGPoint(x: 542.17, y: 159.73), controlPoint1: CGPoint(x: 433.49, y: 183.81), controlPoint2: CGPoint(x: 513.74, y: 165.81))
           iconPath.addCurve(to: CGPoint(x: 549.22, y: 159.51), controlPoint1: CGPoint(x: 546.59, y: 158.76), controlPoint2: CGPoint(x: 548.77, y: 158.68))
+          iconPath.close()
+          
+        case .Key:
+          iconPath.move(to: CGPoint(x: 99.55, y: 39.23))
+          iconPath.addCurve(to: CGPoint(x: 67.66, y: 71.01), controlPoint1: CGPoint(x: 81.81, y: 39.23), controlPoint2: CGPoint(x: 67.66, y: 53.39))
+          iconPath.addCurve(to: CGPoint(x: 87.56, y: 100.63), controlPoint1: CGPoint(x: 67.66, y: 84.16), controlPoint2: CGPoint(x: 75.4, y: 95.76))
+          iconPath.addLine(to: CGPoint(x: 87.56, y: 148.02))
+          iconPath.addCurve(to: CGPoint(x: 89.1, y: 151.7), controlPoint1: CGPoint(x: 87.56, y: 149.41), controlPoint2: CGPoint(x: 88.03, y: 150.63))
+          iconPath.addLine(to: CGPoint(x: 97.5, y: 159.97))
+          iconPath.addCurve(to: CGPoint(x: 101.9, y: 159.91), controlPoint1: CGPoint(x: 98.56, y: 160.93), controlPoint2: CGPoint(x: 100.63, y: 161.19))
+          iconPath.addLine(to: CGPoint(x: 117.34, y: 144.48))
+          iconPath.addCurve(to: CGPoint(x: 117.33, y: 139.79), controlPoint1: CGPoint(x: 118.68, y: 143.12), controlPoint2: CGPoint(x: 118.63, y: 141.11))
+          iconPath.addLine(to: CGPoint(x: 108.39, y: 130.95))
+          iconPath.addLine(to: CGPoint(x: 120.86, y: 118.49))
+          iconPath.addCurve(to: CGPoint(x: 120.75, y: 113.85), controlPoint1: CGPoint(x: 122.14, y: 117.22), controlPoint2: CGPoint(x: 122.15, y: 115.21))
+          iconPath.addLine(to: CGPoint(x: 108.66, y: 101.63))
+          iconPath.addCurve(to: CGPoint(x: 131.44, y: 71.01), controlPoint1: CGPoint(x: 123.3, y: 95.47), controlPoint2: CGPoint(x: 131.44, y: 84.29))
+          iconPath.addCurve(to: CGPoint(x: 99.55, y: 39.23), controlPoint1: CGPoint(x: 131.44, y: 53.45), controlPoint2: CGPoint(x: 117.24, y: 39.23))
+          iconPath.close()
+          iconPath.move(to: CGPoint(x: 99.55, y: 68.09))
+          iconPath.addCurve(to: CGPoint(x: 91.41, y: 59.89), controlPoint1: CGPoint(x: 95, y: 68.09), controlPoint2: CGPoint(x: 91.41, y: 64.4))
+          iconPath.addCurve(to: CGPoint(x: 99.55, y: 51.75), controlPoint1: CGPoint(x: 91.41, y: 55.34), controlPoint2: CGPoint(x: 95, y: 51.75))
+          iconPath.addCurve(to: CGPoint(x: 107.75, y: 59.89), controlPoint1: CGPoint(x: 104.06, y: 51.75), controlPoint2: CGPoint(x: 107.75, y: 55.36))
+          iconPath.addCurve(to: CGPoint(x: 99.55, y: 68.09), controlPoint1: CGPoint(x: 107.75, y: 64.4), controlPoint2: CGPoint(x: 104.06, y: 68.09))
           iconPath.close()
           
         default:

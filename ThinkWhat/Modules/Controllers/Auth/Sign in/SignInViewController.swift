@@ -64,6 +64,13 @@ class SignInViewController: UIViewController {
     super.viewWillAppear(animated)
     
     navigationItem.setHidesBackButton(true, animated: false)
+    navigationController?.setNavigationBarHidden(false, animated: false)
+  }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
   }
 }
 
@@ -158,7 +165,7 @@ extension SignInViewController: SignInViewInput {
     navigationItem.backBarButtonItem = backItem
     navigationController?.delegate = appDelegate.transitionCoordinator
     navigationController?.pushViewController(NewAccountViewController(), animated: true)
-    navigationController?.delegate = nil
+//    navigationController?.delegate = nil
   }
   
   func mailSignIn(username: String, password: String) {
@@ -383,7 +390,6 @@ private extension SignInViewController {
   @MainActor
   func setupUI() {
     navigationController?.setNavigationBarHidden(true, animated: false)
-//    navigationItem.setHidesBackButton(true, animated: false)
   }
 }
 

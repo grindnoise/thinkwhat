@@ -51,7 +51,7 @@ class EmailVerificationPopupContent: UIView {
     let instance = UILabel()
     instance.numberOfLines = 0
     instance.alpha = 0
-    instance.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote)
     instance.text = "invalid_verification_code".localized.lowercased()
     instance.textColor = .systemRed
     
@@ -60,7 +60,7 @@ class EmailVerificationPopupContent: UIView {
   private lazy var mailNotDeliveredLabel: UILabel = {
     let instance = UILabel()
     instance.textAlignment = .center
-    instance.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote)
     instance.text = "email_not_delivered".localized
     instance.textColor = .secondaryLabel
     
@@ -69,7 +69,7 @@ class EmailVerificationPopupContent: UIView {
   private lazy var retryLabel: UILabel = {
     let instance = UILabel()
     instance.textAlignment = .center
-    instance.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote)
     instance.text = "repeat_after".localized + String(describing: retryTimeout)
     instance.textColor = .secondaryLabel
     
@@ -113,7 +113,7 @@ class EmailVerificationPopupContent: UIView {
     attrString.append(NSMutableAttributedString(string: " \(email)",
                                                 attributes: [
                                                   .paragraphStyle: paragraph,
-                                                  .font: UIFont(name: Fonts.Semibold, size: 14) as Any,
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                   .foregroundColor: UIColor.label
                                                 ]))
     instance.attributedText = attrString
@@ -181,10 +181,11 @@ class EmailVerificationPopupContent: UIView {
     return instance
   }()
   private lazy var tagCapsule: TagCapsule = { TagCapsule(text: "verification_code".localized.uppercased(),
-                                                         padding: 4,
+                                                         padding: 8,
+                                                         textPadding: 8,
                                                          color: color,
-                                                         font: UIFont(name: Fonts.Bold, size: 20)!,
-                                                         iconCategory: .Locked) }()
+                                                         font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
+                                                         iconCategory: .Key) }()
   private lazy var textField_1: UITextField = {
     let instance = UITextField()
     instance.delegate = self
@@ -257,7 +258,7 @@ class EmailVerificationPopupContent: UIView {
                        for: .touchUpInside)
     instance.setAttributedTitle(NSAttributedString(string: "resend_mail".localized,
                                                    attributes: [
-                                                    .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                    .font: UIFont(name: Fonts.Rubik.SemiBold, size: 20) as Any,
                                                     .foregroundColor: color as Any
                                                    ]),
                                 for: .normal)
@@ -390,7 +391,7 @@ private extension EmailVerificationPopupContent {
   }
   
   func attributes() -> [NSAttributedString.Key: Any] {
-    let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    let font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.firstLineHeadIndent = font!.pointSize + padding
     if #available(iOS 15.0, *) {

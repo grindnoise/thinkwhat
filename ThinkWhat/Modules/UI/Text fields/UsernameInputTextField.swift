@@ -249,19 +249,19 @@ final class UsernameInputTextField: UITextField {
     }
 }
 
-// MARK: - BannerObservable
-extension UsernameInputTextField: BannerObservable {
-    func onBannerWillAppear(_ sender: Any) {}
-    
-    func onBannerWillDisappear(_ sender: Any) {}
-    
-    func onBannerDidAppear(_ sender: Any) {}
-    
-    func onBannerDidDisappear(_ sender: Any) {
-        if let banner = sender as? Banner {
-            banner.removeFromSuperview()
-        } else if let popup = sender as? Popup {
-            popup.removeFromSuperview()
-        }
-    }
-}
+//// MARK: - BannerObservable
+//extension UsernameInputTextField: BannerObservable {
+//    func onBannerWillAppear(_ sender: Any) {}
+//    
+//    func onBannerWillDisappear(_ sender: Any) {}
+//    
+//    func onBannerDidAppear(_ sender: Any) {}
+//    
+//    func onBannerDidDisappear(_ sender: Any) {
+//        if let banner = sender as? Banner {
+//            banner.removeFromSuperview()
+//        } else if let popup = sender as? Popup {
+//            popup.removeFromSuperview()
+//        }
+//    }
+//}

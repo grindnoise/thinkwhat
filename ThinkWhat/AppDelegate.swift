@@ -39,6 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       surveyId = _surveyId
     }
     
+//    KeychainService.deleteData()
     var rootController: UIViewController!
     if AppData.accessToken.isNil || AppData.accessToken!.isEmpty {
       rootController = UINavigationController(rootViewController: StartViewController())

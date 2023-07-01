@@ -80,11 +80,20 @@ class TagCapsule: UIView {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat
+  private let textPadding: CGFloat
   private lazy var stack: UIStackView = {
+    let opaque = UIView.opaque()
+    icon.placeInCenter(of: opaque)
+    
+    let opaque2 = UIView.opaque()
+    label.place(inside: opaque2, insets: .uniform(size: textPadding))
+    
     let instance = UIStackView(arrangedSubviews: [
-//      UIView.horizontalSpacer(padding),
+      UIView.horizontalSpacer(padding),
       icon,
-      label,
+//      label,
+//      opaque,
+      opaque2,
       UIView.horizontalSpacer(padding),
     ])
     instance.publisher(for: \.bounds, options: .new)
@@ -92,7 +101,7 @@ class TagCapsule: UIView {
       .sink { instance.cornerRadius = $0.height/2.25 }
       .store(in: &subscriptions)
     instance.backgroundColor = color
-    instance.spacing = padding
+    instance.spacing = 0
     
     return instance
   }()
@@ -138,10 +147,12 @@ class TagCapsule: UIView {
   // MARK: - Initialization
   init(text: String,
        padding: CGFloat = 4,
+       textPadding: CGFloat = 0,
        color: UIColor = Colors.Logo.Flame.rawValue,
        font: UIFont,
        iconCategory: Icon.Category = .Logo) {
     self.text = text
+    self.textPadding = textPadding
     self.padding = padding
     self.color = color
     self.font = font

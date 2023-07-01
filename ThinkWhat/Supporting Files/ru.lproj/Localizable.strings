@@ -124,7 +124,7 @@
 "mail_example_placeholder" = "yourmail@example.domain";
 "passwordTF" = "Пароль";
 "username_is_busy" = "Пользователь существует";
-"username_is_empty" = "Поле пустое";
+"username_is_empty" = "Заполните поле";
 "username_is_short" = "Недостаточно символов";
 "email_confirm_reminder" = "Подтвердите электронную почту на случай утери пароля";
 "email_is_empty_reminder" = "Укажите электронную почту на случай утери пароля";

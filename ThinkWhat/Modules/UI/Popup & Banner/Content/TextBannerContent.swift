@@ -96,7 +96,7 @@ class TextBannerContent: UIView {
        attributedText: NSAttributedString? = nil,
        textColor: UIColor = .label,
        tintColor: UIColor,
-       fontName: String = Fonts.Regular,
+       fontName: String = Fonts.Rubik.Regular,
        textStyle: UIFont.TextStyle = .headline,
        textAlignment: NSTextAlignment = .center,
        cornerRadius: CGFloat = 0) {

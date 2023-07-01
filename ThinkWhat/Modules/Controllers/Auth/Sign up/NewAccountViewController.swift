@@ -73,6 +73,12 @@ class NewAccountViewController: UIViewController {
 //      self.emailConfirmed()
 //    }
 //  }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+  }
 }
 
 extension NewAccountViewController: NewAccountViewInput {
@@ -140,10 +146,6 @@ extension NewAccountViewController: NewAccountViewInput {
       }
     }
   }
-  
-//  func checkCredentials(username: String, email: String, completion: @escaping (Result<Bool, Error>) -> ()) {
-//    API.shared.isUsernameEmailAvailable(email: email, username: username) { completion($0) }
-//  }
 }
 
 extension NewAccountViewController: NewAccountModelOutput {
@@ -155,8 +157,9 @@ private extension NewAccountViewController {
   func setupUI() {
 //    navigationController?.navigationBar.backItem?.title = ""
     navigationController?.setNavigationBarHidden(false, animated: false)
-    fillNavigationBar()
+    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
 //    navigationItem.titleView = tagCapsule
+    
   }
   
   func setTasks() {

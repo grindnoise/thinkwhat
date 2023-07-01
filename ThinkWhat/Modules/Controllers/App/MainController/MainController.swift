@@ -613,7 +613,92 @@ private extension MainController {
     
   }
   
+  // Set user's email confirmed
+  func emailConfirmed() {
+    AppData.isEmailVerified = true
+    Task {
+      do {
+        let data = try await API.shared.profiles.updateUserprofileAsync(data: ["is_email_verified": true], uploadProgress: { progress in
+#if DEBUG
+          print(progress)
+#endif
+        })
+        let instance = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self, from: data)
+        Userprofiles.shared.current?.update(from: instance)
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
+  
+  func sendVerificationCode(_ completion: @escaping (Result<[String : Any], Error>) -> ()) {
+    Task {
+      do {
+        let dict = try await API.shared.auth.sendEmailVerificationCode()
+        await MainActor.run {
+          completion(.success(dict))
+        }
+      } catch {
+        completion(.failure(error))
+      }
+    }
+  }
+  
   func loadData() {
+//    guard AppData.isEmailVerified else {
+//      let banner = NewPopup(padding: 16,
+//                            contentPadding: .uniform(size: 16))
+//      let content = EmailVerificationPopupContent(code: code,
+//                                                  retryTimeout: 60,
+//                                                  email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
+//                                                  color: Colors.main)
+//      content.verifiedPublisher
+//        .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
+//        .sink { [weak self] in
+//          guard let self = self else { return }
+//
+//          AppData.isEmailVerified = true
+//          banner.dismiss()
+//        }
+//        .store(in: &banner.subscriptions)
+//      content.retryPublisher
+//        .sink { [unowned self] in self.viewInput?.sendVerificationCode { [unowned self] in
+//
+//          switch $0 {
+//          case .success(let dict):
+//            guard let code = dict["confirmation_code"] as? Int else { return }
+//
+//            content.onEmailSent(code)
+//          case.failure(let error):
+//#if DEBUG
+//            error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//            let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+//                                                                  text: AppError.server.localizedDescription,
+//                                                                  tintColor: .systemRed,
+//                                                                  fontName: Fonts.Rubik.Regular,
+//                                                                  textStyle: .subheadline,
+//                                                                  textAlignment: .natural),
+//                                   contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                                   isModal: false,
+//                                   useContentViewHeight: true,
+//                                   shouldDismissAfter: 2)
+//            banner.didDisappearPublisher
+//              .sink { _ in banner.removeFromSuperview() }
+//              .store(in: &self.subscriptions)
+//          }
+//        }}
+//        .store(in: &banner.subscriptions)
+//      banner.setContent(content)
+//      banner.didDisappearPublisher
+//        .sink { [unowned self] _ in banner.removeFromSuperview() }
+//        .store(in: &self.subscriptions)
+//
+//      return
+//    }
+    
     Task {
       do {
         let json = try await API.shared.system.appLaunch()
@@ -635,10 +720,9 @@ private extension MainController {
 
             do {
               try AppData.loadData(appData)
+
               if Userprofiles.shared.current.isNil {
-                let data = try userprofile.rawData()
-                Userprofiles.shared.current = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self,
-                                                                                                              from: data)
+                Userprofiles.shared.current = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Userprofile.self, from: try userprofile.rawData())
               }
             } catch {
               self.shouldTerminate = true
@@ -659,8 +743,73 @@ private extension MainController {
             try Userprofiles.updateUserData(userData)
             try? Surveys.shared.load(surveys)
 
+            // If user hasn't verified email
+            guard AppData.isEmailVerified else {
+              if let email = UserDefaults.Profile.email,
+                 let components = email.components(separatedBy: "@") as? [String],
+                 let username = components.first,
+                 let firstLetter = username.first,
+                 let lastLetter = username.last,
+                 let code = AppData.emailVerificationCode {
+                
+                let banner = NewPopup(padding: 16,
+                                      contentPadding: .uniform(size: 16))
+                let content = EmailVerificationPopupContent(code: code,
+                                                            retryTimeout: 5,
+                                                            email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
+                                                            color: Colors.main)
+                content.verifiedPublisher
+                  .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
+                  .sink { [weak self] in
+                    guard let self = self else { return }
 
-            //                        hideLogo()
+                    self.emailConfirmed()
+                    banner.dismiss()
+                  }
+                  .store(in: &banner.subscriptions)
+                content.retryPublisher
+                  .sink { [unowned self] in
+                    
+                    // Resend code via email
+                    self.sendVerificationCode { [unowned self] in
+
+                    switch $0 {
+                    case .success(let dict):
+                      guard let code = dict["confirmation_code"] as? Int else { return }
+
+                      content.onEmailSent(code)
+                    case.failure(let error):
+#if DEBUG
+                      error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                      let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+                                                                            text: AppError.server.localizedDescription,
+                                                                            tintColor: .systemRed,
+                                                                            fontName: Fonts.Rubik.Regular,
+                                                                            textStyle: .subheadline,
+                                                                            textAlignment: .natural),
+                                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                             isModal: false,
+                                             useContentViewHeight: true,
+                                             shouldDismissAfter: 2)
+                      banner.didDisappearPublisher
+                        .sink { _ in banner.removeFromSuperview() }
+                        .store(in: &self.subscriptions)
+                    }
+                  }}
+                  .store(in: &banner.subscriptions)
+                banner.setContent(content)
+                banner.didDisappearPublisher
+                  .sink { [unowned self] _ in
+                    self.isDataLoaded = true
+                    banner.removeFromSuperview()
+                  }
+                  .store(in: &self.subscriptions)
+              }
+              
+              return
+            }
+
             self.isDataLoaded = true
             self.setTasks()
           } catch {

@@ -70,23 +70,15 @@ class NewAccountView: UIView {
   public var mailChecker = PassthroughSubject<String, Never>()
   public var nameChecker = PassthroughSubject<String, Never>()
   ///**UI**
-//  public private(set) lazy var logoIcon: Icon = {
-//    let instance = Icon(category: .Logo, scaleMultiplicator: 1, iconColor: Colors.main)
-//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
-//
-//    return instance
-//  }()
-//  public private(set) lazy var logoText: Icon = {
-//    let instance = Icon(category: .LogoText, scaleMultiplicator: 1, iconColor: Colors.main)
-//    //    instance.alpha = 0
-//    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
-//
-//    return instance
-//  }()
   public private(set) lazy var logoText: LogoText = { LogoText() }()
   public private(set) lazy var logoIcon: Logo = {
     let instance = Logo()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+    instance.layer.masksToBounds = false
+    instance.layer.shadowColor = Colors.main.cgColor
+    instance.layer.shadowOffset = .zero
+    instance.layer.shadowRadius = padding
+    instance.layer.shadowOpacity = 0.5
     
     return instance
   }()
@@ -108,11 +100,11 @@ class NewAccountView: UIView {
       top,
       spacer,
       UIView.verticalSpacer(0),
-//      UIView.verticalSpacer(padding),
+      //      UIView.verticalSpacer(padding),
       loginContainer,
       mailContainer,
       passwordContainer,
-//      UIView.verticalSpacer(padding),
+      //      UIView.verticalSpacer(padding),
       buttonView,
       UIView.verticalSpacer(padding),
       UIView.verticalSpacer(padding),
@@ -122,6 +114,7 @@ class NewAccountView: UIView {
     ])
     instance.axis = .vertical
     instance.spacing = padding*2
+    instance.addGestureRecognizer(getTapRecogizer())
     
     return instance
   }()
@@ -135,27 +128,27 @@ class NewAccountView: UIView {
     instance.spacing = 0
     let bgLayer = CAShapeLayer()
     bgLayer.name = "background"
-    bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
-    let fgLayer = CAShapeLayer()
-    fgLayer.name = "foreground"
-    fgLayer.opacity = 0
-    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
+    bgLayer.backgroundColor = UIColor.secondarySystemFill.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+    //    let fgLayer = CAShapeLayer()
+    //    fgLayer.name = "foreground"
+    //    fgLayer.opacity = 0
+    //    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
+    //                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
-    instance.layer.insertSublayer(fgLayer, at: 1)
+    //    instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
       .sink {
         bgLayer.frame = $0
         bgLayer.cornerRadius = $0.width*0.025
-        fgLayer.frame = $0
-        fgLayer.cornerRadius = $0.width*0.025
+        //        fgLayer.frame = $0
+        //        fgLayer.cornerRadius = $0.width*0.025
       }
       .store(in: &subscriptions)
-    let opaque = UIView.opaque()
-    opaque.addEquallyTo(to: instance)
-    opaque.isUserInteractionEnabled = true
-    opaque.accessibilityIdentifier = "login"
-    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+    //    let opaque = UIView.opaque()
+    //    opaque.addEquallyTo(to: instance)
+    //    opaque.isUserInteractionEnabled = true
+    //    opaque.accessibilityIdentifier = "login"
+    //    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     
     return instance
   }()
@@ -164,21 +157,21 @@ class NewAccountView: UIView {
     instance.delegate = self
     instance.backgroundColor = .clear
     instance.tintColor = Colors.main
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
     instance.addTarget(self, action: #selector(self.editingChanged), for: .editingChanged)
     
     let bgLayer = CAShapeLayer()
     bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
-    let fgLayer = CAShapeLayer()
-    fgLayer.name = "foreground"
-    fgLayer.opacity = 0
-    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
+    //    let fgLayer = CAShapeLayer()
+    //    fgLayer.name = "foreground"
+    //    fgLayer.opacity = 0
+    //    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
-    instance.layer.insertSublayer(fgLayer, at: 1)
+    //    instance.layer.insertSublayer(fgLayer, at: 1)
     instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
                                                         attributes: [
-                                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                          .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any
                                                         ])
     
     return instance
@@ -193,28 +186,23 @@ class NewAccountView: UIView {
     instance.spacing = 0
     let bgLayer = CAShapeLayer()
     bgLayer.name = "background"
-    bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
-    let fgLayer = CAShapeLayer()
-    fgLayer.name = "foreground"
-    fgLayer.opacity = 0
-    //    fgLayer.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(0.2).cgColor
-    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
+    bgLayer.backgroundColor = UIColor.secondarySystemFill.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+    //    let fgLayer = CAShapeLayer()
+    //    fgLayer.name = "foreground"
+    //    fgLayer.opacity = 0
+    //    //    fgLayer.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(0.2).cgColor
+    //    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
+    //                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
-    instance.layer.insertSublayer(fgLayer, at: 1)
+    //    instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
       .sink {
         bgLayer.frame = $0
         bgLayer.cornerRadius = $0.width*0.025
-        fgLayer.frame = $0
-        fgLayer.cornerRadius = $0.width*0.025
+        //        fgLayer.frame = $0
+        //        fgLayer.cornerRadius = $0.width*0.025
       }
       .store(in: &subscriptions)
-    let opaque = UIView.opaque()
-    opaque.addEquallyTo(to: instance)
-    opaque.isUserInteractionEnabled = true
-    opaque.accessibilityIdentifier = "mail"
-    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     
     return instance
   }()
@@ -222,23 +210,23 @@ class NewAccountView: UIView {
     let instance = UnderlinedSignTextField()
     instance.delegate = self
     instance.keyboardType = .emailAddress
-    instance.backgroundColor = .clear 
+    instance.backgroundColor = .clear
     instance.tintColor = Colors.main
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
     instance.addTarget(self, action: #selector(self.editingChanged), for: .editingChanged)
     
     let bgLayer = CAShapeLayer()
     bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
-    let fgLayer = CAShapeLayer()
-    fgLayer.name = "foreground"
-    fgLayer.opacity = 0
-    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
+    //    let fgLayer = CAShapeLayer()
+    //    fgLayer.name = "foreground"
+    //    fgLayer.opacity = 0
+    //    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
-    instance.layer.insertSublayer(fgLayer, at: 1)
+    //    instance.layer.insertSublayer(fgLayer, at: 1)
     instance.attributedPlaceholder = NSAttributedString(string: "mailTF".localized,
                                                         attributes: [
-                                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                          .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any
                                                         ])
     
     return instance
@@ -253,27 +241,22 @@ class NewAccountView: UIView {
     instance.spacing = 0
     let bgLayer = CAShapeLayer()
     bgLayer.name = "background"
-    bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
-    let fgLayer = CAShapeLayer()
-    fgLayer.name = "foreground"
-    fgLayer.opacity = 0
-    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
+    bgLayer.backgroundColor = UIColor.secondarySystemFill.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+    //    let fgLayer = CAShapeLayer()
+    //    fgLayer.name = "foreground"
+    //    fgLayer.opacity = 0
+    //    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
+    //                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
-    instance.layer.insertSublayer(fgLayer, at: 1)
+    //    instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
       .sink {
         bgLayer.frame = $0
         bgLayer.cornerRadius = $0.width*0.025
-        fgLayer.frame = $0
-        fgLayer.cornerRadius = $0.width*0.025
+        //        fgLayer.frame = $0
+        //        fgLayer.cornerRadius = $0.width*0.025
       }
       .store(in: &subscriptions)
-    let opaque = UIView.opaque()
-    opaque.addEquallyTo(to: instance)
-    opaque.isUserInteractionEnabled = true
-    opaque.accessibilityIdentifier = "password"
-    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     
     return instance
   }()
@@ -282,13 +265,13 @@ class NewAccountView: UIView {
     instance.delegate = self
     instance.backgroundColor = .clear
     instance.isSecureTextEntry = true
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
     instance.tintColor = Colors.main
     instance.addTarget(self, action: #selector(self.editingChanged), for: .editingChanged)
     instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
                                                         attributes: [
-                                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                          .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any
                                                         ])
     
     return instance
@@ -360,6 +343,10 @@ class NewAccountView: UIView {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+  }
 }
 
 extension NewAccountView: NewAccountControllerOutput {
@@ -403,6 +390,7 @@ extension NewAccountView: NewAccountControllerOutput {
             switch $0 {
             case .success(let dict):
               guard let code = dict["confirmation_code"] as? Int else { return }
+              AppData.emailVerificationCode
               
               content.onEmailSent(code)
             case.failure(let error):
@@ -412,7 +400,7 @@ extension NewAccountView: NewAccountControllerOutput {
               let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
                                                                     text: AppError.server.localizedDescription,
                                                                     tintColor: .systemRed,
-                                                                    fontName: Fonts.Regular,
+                                                                    fontName: Fonts.Rubik.Regular,
                                                                     textStyle: .subheadline,
                                                                     textAlignment: .natural),
                                      contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
@@ -429,7 +417,7 @@ extension NewAccountView: NewAccountControllerOutput {
         banner.didDisappearPublisher
           .sink { [unowned self] _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
-
+        
       case .failure(let error):
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
@@ -437,7 +425,7 @@ extension NewAccountView: NewAccountControllerOutput {
         let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
                                                               text: AppError.server.localizedDescription,
                                                               tintColor: .systemRed,
-                                                              fontName: Fonts.Regular,
+                                                              fontName: Fonts.Rubik.Regular,
                                                               textStyle: .subheadline,
                                                               textAlignment: .natural),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
@@ -450,18 +438,18 @@ extension NewAccountView: NewAccountControllerOutput {
       }
       self.loginButton.setSpinning(on: false, color: .white, animated: true) {
         if #available(iOS 15, *) {
-          self.loginButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString("signupButton".localized.uppercased(),
-                                                                             attributes: AttributeContainer([
-                                                                              .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                                              .foregroundColor: UIColor.white as Any
-                                                                             ]))
+          self.loginButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString("signupButton".localized,
+                                                                                                              attributes: AttributeContainer([
+                                                                                                                .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                                                .foregroundColor: UIColor.white as Any
+                                                                                                              ]))
         } else {
-          self.loginButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: "signupButton".localized.uppercased(),
-                                                                 attributes: [
-                                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                                  .foregroundColor: UIColor.white as Any
-                                                                 ]),
-                                              for: .normal)
+          self.loginButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
+                                                                                                  attributes: [
+                                                                                                    .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                                    .foregroundColor: UIColor.white as Any
+                                                                                                  ]),
+                                                                               for: .normal)
         }
       }
     }
@@ -490,7 +478,7 @@ extension NewAccountView: NewAccountControllerOutput {
     switch result {
     case .success(let exists):
       if !exists {
-          self.isMailFilled = true
+        self.isMailFilled = true
       } else {
         self.mailTextField.showSign(state: .EmailExists)
         self.isMailFilled = false
@@ -507,8 +495,8 @@ extension NewAccountView: NewAccountControllerOutput {
 private extension NewAccountView {
   @MainActor
   func setupUI() {
-    backgroundColor = .systemBackground
-    
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    addGestureRecognizer(getTapRecogizer())
     addSubview(stack)
     stack.translatesAutoresizingMaskIntoConstraints = false
     stack.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.7).isActive = true
@@ -519,7 +507,7 @@ private extension NewAccountView {
     loginTextField.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: loginTextField.font!) + padding*2).isActive = true
     mailTextField.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: mailTextField.font!) + padding*2).isActive = true
     passwordTextField.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: passwordTextField.font!) + padding*2).isActive = true
-
+    
     loginButton.translatesAutoresizingMaskIntoConstraints = false
     loginButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
     loginButton.widthAnchor.constraint(equalTo: loginButton.heightAnchor, multiplier: 188/52).isActive = true
@@ -531,103 +519,8 @@ private extension NewAccountView {
   }
   
   @objc
-  func handleTap(_ sender: UITapGestureRecognizer) {
-//
-//    if sender.view?.accessibilityIdentifier == "password",
-//       let foreground = passwordContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first {
-//
-//      if passwordTextField.isFirstResponder {
-//        endEditing(true)
-//        Animations.unmaskLayerCircled(unmask: false,
-//                                      layer: layer,
-//                                      location: CGPoint(x: passwordContainer.bounds.midX, y: passwordContainer.bounds.midY),
-//                                      duration: 0.2,
-//                                      opacityDurationMultiplier: 1,
-//                                      delegate: self) { foreground.opacity = 0 }
-//      } else {
-//        Animations.unmaskLayerCircled(layer: foreground,
-//                                      location: sender.location(ofTouch: 0, in: passwordContainer),
-//                                      duration: 0.4,
-//                                      opacityDurationMultiplier: 1,
-//                                      delegate: self) { [unowned self] in self.passwordTextField.becomeFirstResponder() }
-//      }
-//      passwordTextField.becomeFirstResponder()
-//    } else if sender.view?.accessibilityIdentifier == "login",
-//              let foreground = loginContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first {
-//
-//      if loginTextField.isFirstResponder {
-//        endEditing(true)
-//        Animations.unmaskLayerCircled(unmask: false,
-//                                      layer: layer,
-//                                      location: CGPoint(x: loginContainer.bounds.midX, y: loginContainer.bounds.midY),
-//                                      duration: 0.2,
-//                                      opacityDurationMultiplier: 1,
-//                                      delegate: self) { foreground.opacity = 0 }
-//      } else {
-//        loginTextField.becomeFirstResponder()
-//        Animations.unmaskLayerCircled(layer: foreground,
-//                                      location: sender.location(ofTouch: 0, in: loginContainer),
-//                                      duration: 0.4,
-//                                      opacityDurationMultiplier: 1,
-//                                      delegate: self)
-//      }
-//    } else if sender.view?.accessibilityIdentifier == "mail",
-//              let foreground = mailContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first {
-//
-//      if mailTextField.isFirstResponder {
-//        endEditing(true)
-//        Animations.unmaskLayerCircled(unmask: false,
-//                                      layer: layer,
-//                                      location: CGPoint(x: mailContainer.bounds.midX, y: mailContainer.bounds.midY),
-//                                      duration: 0.2,
-//                                      opacityDurationMultiplier: 1,
-//                                      delegate: self) { foreground.opacity = 0 }
-//      } else {
-//        Animations.unmaskLayerCircled(layer: foreground,
-//                                      location: sender.location(ofTouch: 0, in: mailContainer),
-//                                      duration: 0.4,
-//                                      opacityDurationMultiplier: 1,
-//                                      delegate: self) { [unowned self] in self.mailTextField.becomeFirstResponder() }
-//      }
-    if sender.view?.accessibilityIdentifier == "password",
-       let foreground = passwordContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first,
-       !passwordTextField.isFirstResponder {
-      
-      Animations.unmaskLayerCircled(layer: foreground,
-                                    location: sender.location(ofTouch: 0, in: passwordContainer),
-                                    duration: 0.4,
-                                    opacityDurationMultiplier: 1,
-                                    delegate: self) { [unowned self] in self.passwordTextField.becomeFirstResponder() }
-      passwordTextField.becomeFirstResponder()
-    } else if sender.view?.accessibilityIdentifier == "login",
-              let foreground = loginContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first,
-              !loginTextField.isFirstResponder {
-      loginTextField.becomeFirstResponder()
-      
-      Animations.unmaskLayerCircled(layer: foreground,
-                                    location: sender.location(ofTouch: 0, in: passwordContainer),
-                                    duration: 0.4,
-                                    opacityDurationMultiplier: 1,
-                                    delegate: self) { [unowned self] in self.loginTextField.becomeFirstResponder() }
-    } else if sender.view?.accessibilityIdentifier == "mail",
-               let foreground = mailContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first,
-               !mailTextField.isFirstResponder {
-      mailTextField.becomeFirstResponder()
-       
-       Animations.unmaskLayerCircled(layer: foreground,
-                                     location: sender.location(ofTouch: 0, in: mailContainer),
-                                     duration: 0.4,
-                                     opacityDurationMultiplier: 1,
-                                     delegate: self) { [unowned self] in self.mailTextField.becomeFirstResponder() }
-     } else if sender.view?.accessibilityIdentifier == "recognizer" {
-      sender.view?.removeFromSuperview()
-      endEditing(true)
-    }
-  }
-  
-  @objc
-  func buttonTapped(_ sender: UIButton) {
-    if sender === loginButton {
+  func buttonTapped(_ sender: UIView) {
+    if sender === loginButton.getSubview(type: UIButton.self) {
       guard let username = loginTextField.text,
             let mail = mailTextField.text,
             let password = passwordTextField.text
@@ -637,56 +530,102 @@ private extension NewAccountView {
         loginTextField.showSign(state: .UsernameNotFilled)
       }
       if mail.isEmpty {
-        mailTextField.showSign(state: .EmailIsIncorrect)
+        mailTextField.showSign(state: .UsernameNotFilled)
       }
       if password.isEmpty {
         passwordTextField.showSign(state: .UsernameNotFilled)
       }
-      if !username.isEmpty && !mail.isEmpty && !password.isEmpty {
-        if #available(iOS 15, *) {
-          loginButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString("loginButton".localized.uppercased(),
-                                                                        attributes: AttributeContainer([
-                                                                          .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                                          .foregroundColor: UIColor.clear as Any
-                                                                        ]))
-        } else {
-          loginButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
-                                                            attributes: [
-                                                              .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                              .foregroundColor: UIColor.clear as Any
-                                                            ]),
-                                         for: .normal)
-        }
+      
+      guard isCorrect else {
+        let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+                                                              text: "check_fields".localized,
+                                                              tintColor: .systemRed,
+                                                              fontName: Fonts.Rubik.Regular,
+                                                              textStyle: .subheadline,
+                                                              textAlignment: .natural),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 2)
+        banner.didDisappearPublisher
+          .sink { _ in banner.removeFromSuperview() }
+          .store(in: &self.subscriptions)
         
-        loginButton.getSubview(type: UIButton.self)!.setSpinning(on: true, color: .white, animated: true)
-        if #available(iOS 15, *) {
-          self.loginButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString("signupButton".localized.uppercased(),
-                                                                             attributes: AttributeContainer([
-                                                                              .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                                              .foregroundColor: UIColor.clear as Any
-                                                                             ]))
-        } else {
-          self.loginButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: "signupButton".localized.uppercased(),
-                                                                 attributes: [
-                                                                  .font: UIFont(name: Fonts.Bold, size: 20) as Any,
-                                                                  .foregroundColor: UIColor.clear as Any
-                                                                 ]),
-                                              for: .normal)
-        }
-        
-        viewInput?.signup(username: username,
-                          email: mail,
-                          password: password)
-        isUserInteractionEnabled = false
+        return
       }
+      
+      if #available(iOS 15, *) {
+        loginButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString("signupButton".localized,
+                                                                                                       attributes: AttributeContainer([
+                                                                                                        .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                                        .foregroundColor: UIColor.clear as Any
+                                                                                                       ]))
+      } else {
+        loginButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
+                                                                                           attributes: [
+                                                                                            .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                            .foregroundColor: UIColor.clear as Any
+                                                                                           ]),
+                                                                        for: .normal)
+      }
+      
+      loginButton.getSubview(type: UIButton.self)!.setSpinning(on: true, color: .white, animated: true)
+
+      viewInput?.signup(username: username,
+                        email: mail,
+                        password: password)
+      isUserInteractionEnabled = false
     }
   }
   
   @objc
   func editingChanged(_ textField: UnderlinedSignTextField) {
-    guard let text = textField.text else { return }
+    //guard let text = textField.text else { return }
     
-    if textField === passwordTextField {
+    
+  }
+  
+  @objc
+  func dismissKeyboard() {
+    endEditing(true)
+  }
+  
+  func getTapRecogizer() -> UITapGestureRecognizer {
+    let instance = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
+    instance.cancelsTouchesInView = false
+    
+    return instance
+  }
+}
+
+
+extension NewAccountView: UITextFieldDelegate {
+  func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+    guard let textField = textField as? UnderlinedSignTextField,
+          let text = textField.text
+    else { return true }
+    
+    if textField === loginTextField {
+      if !text.isEmpty && text.count < 4 {
+        loginTextField.showSign(state: .UsernameIsShort)
+        isLoginFilled = false
+      } else if text.isEmpty {
+        loginTextField.hideSign()
+      } else {
+        textField.isShowingSpinner = true
+        nameChecker.send(text)
+      }
+    } else if textField === mailTextField {
+      if text.isEmpty {
+        mailTextField.hideSign()
+        isMailFilled = false
+      } else if !text.isValidEmail {
+        mailTextField.showSign(state: .EmailIsIncorrect)
+      } else {
+        textField.isShowingSpinner = true
+        mailChecker.send(text)
+      }
+    } else if textField === passwordTextField {
       if text.isEmpty {
         isPwdFilled = false
         passwordTextField.hideSign()
@@ -696,142 +635,15 @@ private extension NewAccountView {
       } else {
         isPwdFilled = true
       }
-    } else if textField === loginTextField {
-      if !text.isEmpty && text.count < 4 {
-        loginTextField.showSign(state: .UsernameIsShort)
-        isLoginFilled = false
-      } else if textField.text!.count >= 4 {
-        textField.isShowingSpinner = true
-        nameChecker.send(text)
-        //              viewInput?.checkCredentials(username: textField.text!, email: "") { [weak self] result in
-        //                  guard let self = self else { return }
-        //                  switch result {
-        //                  case .success(let exists):
-        //                      if !exists {
-        //                          if self.loginTextField.text!.count >= 4 {
-        //                              self.isLoginFilled = true
-        //                          }
-        //                      } else {
-        //                          self.loginTextField.showSign(state: .UsernameExists)
-        //                          self.isLoginFilled = false
-        //                      }
-        //                  case .failure(let error):
-        //                    let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-        //                                                                          text: error.localizedDescription.localized,
-        //                                                                          tintColor: .systemRed,
-        //                                                                          fontName: Fonts.Regular,
-        //                                                                          textStyle: .subheadline,
-        //                                                                          textAlignment: .natural),
-        //                                           contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-        //                                           isModal: false,
-        //                                           useContentViewHeight: true,
-        //                                           shouldDismissAfter: 2)
-        //                    banner.didDisappearPublisher
-        //                      .sink { _ in banner.removeFromSuperview() }
-        //                      .store(in: &subscriptions)
-        //              #if DEBUG
-        //                    error.printLocalized(class: type(of: self), functionName: #function)
-        //              #endif
-        //                  }
-        //                  self.isPerformingChecks = false
-        //                  textField.isShowingSpinner = false
-        //              }
-      } else if text.isEmpty {
-        loginTextField.hideSign()
-      } else {
-        isLoginFilled = true
-        loginTextField.hideSign()
-      }
-    } else if textField === mailTextField {
-      if text.isEmpty {
-        mailTextField.hideSign()
-        isMailFilled = false
-      } else if text.isValidEmail {
-        textField.isShowingSpinner = true
-        mailChecker.send(text)
-        //            viewInput?.checkCredentials(username: "", email: textField.text!.lowercased()) {  [weak self] result in
-        //                  guard let self = self else { return }
-        //                  switch result {
-        //                  case .success(let exists):
-        //                      if !exists {
-        //                          self.isMailFilled = true
-        //                      } else {
-        //                          self.mailTextField.showSign(state: .EmailExists)
-        //                          self.isMailFilled = false
-        //                      }
-        //                  case .failure(let error):
-        //#if DEBUG
-        //                    error.printLocalized(class: type(of: self), functionName: #function)
-        //#endif
-        ////                        showAlert(type: .Warning, buttons: [["Закрыть": [CustomAlertView.ButtonType.Ok: nil]]], text: error.localizedDescription)
-        //                  }
-        //                  self.isPerformingChecks = false
-        //                  textField.isShowingSpinner = false
-        //              }
-      } else {
-        isMailFilled = false
-        mailTextField.showSign(state: .EmailIsIncorrect)
-      }
     }
-  }
-}
-
-
-extension NewAccountView: UITextFieldDelegate {
-  func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-    guard let textField = textField as? UnderlinedSignTextField else { return true }
     
-//    textField.hideSign()
-    
-    getSubview(type: UIView.self, identifier: "recognizer")?.removeFromSuperview()
-    
-    if textField === loginTextField,
-       //       let background = loginContainer.layer.sublayers?.filter({ $0.name == "background" }).first,
-       let layer = loginContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first {
-      
-      Animations.unmaskLayerCircled(unmask: false,
-                                    layer: layer,
-                                    location: CGPoint(x: loginContainer.bounds.midX, y: loginContainer.bounds.midY),
-                                    duration: 0.2,
-                                    opacityDurationMultiplier: 1,
-                                    delegate: self) { layer.opacity = 0 }
-      //      background.add(Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.2, delegate: nil), forKey: nil)
-      //      background.opacity = 1
-    } else if textField === passwordTextField,
-              //              let background = passwordContainer.layer.sublayers?.filter({ $0.name == "background" }).first,
-              let layer = passwordContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first {
-      
-      Animations.unmaskLayerCircled(unmask: false,
-                                    layer: layer,
-                                    location: CGPoint(x: loginContainer.bounds.midX, y: loginContainer.bounds.midY),
-                                    duration: 0.2,
-                                    opacityDurationMultiplier: 1,
-                                    delegate: self) { layer.opacity = 0 }
-      //      background.add(Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.2, delegate: nil), forKey: nil)
-      //      background.opacity = 1
-    } else if textField === mailTextField,
-              //              let background = passwordContainer.layer.sublayers?.filter({ $0.name == "background" }).first,
-              let layer = mailContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first {
-      
-      Animations.unmaskLayerCircled(unmask: false,
-                                    layer: layer,
-                                    location: CGPoint(x: mailContainer.bounds.midX, y: mailContainer.bounds.midY),
-                                    duration: 0.2,
-                                    opacityDurationMultiplier: 1,
-                                    delegate: self) { layer.opacity = 0 }
-    }
     return true
   }
   
   func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-//    guard let textField = textField as? UnderlinedSignTextField else { return true }
+    guard let textField = textField as? UnderlinedSignTextField else { return true }
     
-//    textField.hideSign()
-    let opaque = UIView.opaque()
-    opaque.accessibilityIdentifier = "recognizer"
-    opaque.isUserInteractionEnabled = true
-    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
-    opaque.place(inside: self)
+    textField.hideSign()
     
     return true
   }
@@ -842,32 +654,6 @@ extension NewAccountView: UITextFieldDelegate {
     
     return true
   }
-  
-//  func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-//    guard let textField = textField as? UnderlinedSignTextField else { return true }
-//
-////    textField.hideSign()
-//    let opaque = UIView.opaque()
-////    opaque.accessibilityIdentifier = "recognizer"
-//    if textField === loginTextField {
-//      opaque.accessibilityIdentifier = "login"
-//    } else if textField === mailTextField {
-//      opaque.accessibilityIdentifier = "mail"
-//    } else {
-//      opaque.accessibilityIdentifier = "recognizer"
-//    }
-//    opaque.isUserInteractionEnabled = true
-//    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
-//    opaque.place(inside: self)
-//
-//    return true
-//  }
-  
-  //  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-  //    endEditing(true)
-  //
-  //    return true
-  //  }
   
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     if textField === loginTextField {

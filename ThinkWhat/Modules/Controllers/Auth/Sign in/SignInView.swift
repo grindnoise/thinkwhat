@@ -18,6 +18,11 @@ class SignInView: UIView {
   public private(set) lazy var logoIcon: Logo = {
     let instance = Logo()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+    instance.layer.masksToBounds = false
+    instance.layer.shadowColor = Colors.main.cgColor
+    instance.layer.shadowOffset = .zero
+    instance.layer.shadowRadius = padding
+    instance.layer.shadowOpacity = 0.5
     
     return instance
   }()
@@ -30,7 +35,6 @@ class SignInView: UIView {
     logoText.placeInCenter(of: spacer,
                            topInset: 20,
                            bottomInset: 0)
-  
     let buttonView = UIView.opaque()
     loginButton.placeInCenter(of: buttonView,
                               topInset: 0,
@@ -39,8 +43,9 @@ class SignInView: UIView {
     signupStack.placeXCentered(inside: opaque, topInset: 0, bottomInset: 0)
     
     let opaque2 = UIView.opaque()
+    appleDark.placeXCentered(inside: opaque2, topInset: 0, bottomInset: 0)
     apple.placeXCentered(inside: opaque2, topInset: 0, bottomInset: 0)
-
+    
     let instance = UIStackView(arrangedSubviews: [
       top,
       spacer,
@@ -53,6 +58,7 @@ class SignInView: UIView {
       separator,
       logos,
     ])
+    instance.addGestureRecognizer(getTapRecogizer())
     instance.axis = .vertical
     instance.spacing = padding*2
     instance.publisher(for: \.bounds)
@@ -82,27 +88,22 @@ class SignInView: UIView {
     instance.spacing = 0
     let bgLayer = CAShapeLayer()
     bgLayer.name = "background"
-    bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
-    let fgLayer = CAShapeLayer()
-    fgLayer.name = "foreground"
-    fgLayer.opacity = 0
-    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
+    bgLayer.backgroundColor = UIColor.secondarySystemFill.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+//    let fgLayer = CAShapeLayer()
+//    fgLayer.name = "foreground"
+//    fgLayer.opacity = 0
+//    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
+//                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
-    instance.layer.insertSublayer(fgLayer, at: 1)
+//    instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
       .sink {
         bgLayer.frame = $0
         bgLayer.cornerRadius = $0.width*0.025
-        fgLayer.frame = $0
-        fgLayer.cornerRadius = $0.width*0.025
+//        fgLayer.frame = $0
+//        fgLayer.cornerRadius = $0.width*0.025
       }
       .store(in: &subscriptions)
-    let opaque = UIView.opaque()
-    opaque.addEquallyTo(to: instance)
-    opaque.isUserInteractionEnabled = true
-    opaque.accessibilityIdentifier = "login"
-    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     
     return instance
   }()
@@ -111,20 +112,23 @@ class SignInView: UIView {
     instance.delegate = self
     instance.backgroundColor = .clear
     instance.tintColor = Colors.main
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
+    instance.textContentType = .name
+    instance.autocorrectionType = .no
+    instance.spellCheckingType = .no
     instance.clipsToBounds = false
     
-    let bgLayer = CAShapeLayer()
-    bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
-    let fgLayer = CAShapeLayer()
-    fgLayer.name = "foreground"
-    fgLayer.opacity = 0
-    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
-    instance.layer.insertSublayer(bgLayer, at: 0)
-    instance.layer.insertSublayer(fgLayer, at: 1)
+//    let bgLayer = CAShapeLayer()
+//    bgLayer.backgroundColor = UIColor.secondarySystemFill.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+//    let fgLayer = CAShapeLayer()
+//    fgLayer.name = "foreground"
+//    fgLayer.opacity = 0
+//    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
+//    instance.layer.insertSublayer(bgLayer, at: 0)
+//    instance.layer.insertSublayer(fgLayer, at: 1)
     instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
                                                         attributes: [
-                                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                          .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any
                                                         ])
     
     return instance
@@ -139,27 +143,22 @@ class SignInView: UIView {
     instance.spacing = 0
     let bgLayer = CAShapeLayer()
     bgLayer.name = "background"
-    bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
-    let fgLayer = CAShapeLayer()
-    fgLayer.name = "foreground"
-    fgLayer.opacity = 0
-    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
+    bgLayer.backgroundColor = UIColor.secondarySystemFill.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+//    let fgLayer = CAShapeLayer()
+//    fgLayer.name = "foreground"
+//    fgLayer.opacity = 0
+//    fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
+//                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
-    instance.layer.insertSublayer(fgLayer, at: 1)
+//    instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
       .sink {
         bgLayer.frame = $0
         bgLayer.cornerRadius = $0.width*0.025
-        fgLayer.frame = $0
-        fgLayer.cornerRadius = $0.width*0.025
+//        fgLayer.frame = $0
+//        fgLayer.cornerRadius = $0.width*0.025
       }
       .store(in: &subscriptions)
-    let opaque = UIView.opaque()
-    opaque.addEquallyTo(to: instance)
-    opaque.isUserInteractionEnabled = true
-    opaque.accessibilityIdentifier = "password"
-    opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     
     return instance
   }()
@@ -168,12 +167,12 @@ class SignInView: UIView {
     instance.delegate = self
     instance.backgroundColor = .clear
     instance.isSecureTextEntry = true
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
     instance.tintColor = Colors.main
     instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
                                                         attributes: [
-                                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                          .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any
                                                         ])
     
     return instance
@@ -282,11 +281,22 @@ class SignInView: UIView {
 //    return instance
 //  }()
   public private(set) lazy var apple: ASAuthorizationAppleIDButton = {
-    let instance = ASAuthorizationAppleIDButton(type: .signIn, style: traitCollection.userInterfaceStyle == .dark ? .white : .black)
+    let instance = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
     instance.addTarget(self, action: #selector(self.buttonTapped(_:)), for: .touchUpInside)
     instance.publisher(for: \.bounds)
       .sink { (instance as UIControl).cornerRadius = $0.height/2 }
       .store(in: &subscriptions)
+    instance.alpha = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    
+    return instance
+  }()
+  public private(set) lazy var appleDark: ASAuthorizationAppleIDButton = {
+    let instance = ASAuthorizationAppleIDButton(type: .signIn, style: .white )
+    instance.addTarget(self, action: #selector(self.buttonTapped(_:)), for: .touchUpInside)
+    instance.publisher(for: \.bounds)
+      .sink { (instance as UIControl).cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
+    instance.alpha = traitCollection.userInterfaceStyle == .dark ? 1 : 0
     
     return instance
   }()
@@ -420,20 +430,27 @@ class SignInView: UIView {
       label.textColor = traitCollection.userInterfaceStyle == .dark ? "#828487".hexColor : "#8C96A3".hexColor
     }
     
-    if let pwdBgLayer = passwordContainer.layer.sublayers?.filter({ $0.name == "background"}).first,
-       let pwdFgLayer = passwordContainer.layer.sublayers?.filter({ $0.name == "foreground"}).first,
-       let loginBgLayer = loginContainer.layer.sublayers?.filter({ $0.name == "background"}).first,
-       let loginFgLayer = loginContainer.layer.sublayers?.filter({ $0.name == "foreground"}).first {
-      
-      let bgColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
-      let fgColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                     of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
-      
-      pwdBgLayer.backgroundColor = bgColor
-      pwdFgLayer.backgroundColor = fgColor
-      loginBgLayer.backgroundColor = bgColor
-      loginFgLayer.backgroundColor = fgColor
+    if traitCollection.userInterfaceStyle == .dark {
+      appleDark.alpha = 1
+      apple.alpha = 0
+    } else {
+      appleDark.alpha = 0
+      apple.alpha = 1
     }
+//    if let pwdBgLayer = passwordContainer.layer.sublayers?.filter({ $0.name == "background"}).first,
+//       let pwdFgLayer = passwordContainer.layer.sublayers?.filter({ $0.name == "foreground"}).first,
+//       let loginBgLayer = loginContainer.layer.sublayers?.filter({ $0.name == "background"}).first,
+//       let loginFgLayer = loginContainer.layer.sublayers?.filter({ $0.name == "foreground"}).first {
+//
+//      let bgColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
+//      let fgColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
+//                                                     of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
+//
+//      pwdBgLayer.backgroundColor = bgColor
+//      pwdFgLayer.backgroundColor = fgColor
+//      loginBgLayer.backgroundColor = bgColor
+//      loginFgLayer.backgroundColor = fgColor
+//    }
   }
 }
 
@@ -762,6 +779,7 @@ private extension SignInView {
   func setupUI() {
     backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
     
+    addGestureRecognizer(getTapRecogizer())
     //    stack.placeCentered(inside: self, withMultiplier: 0.75)
 //        setNeedsLayout()
 //        layoutIfNeeded()
@@ -787,6 +805,8 @@ private extension SignInView {
     forgotButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
     forgotButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
     
+    appleDark.translatesAutoresizingMaskIntoConstraints = false
+    appleDark.heightAnchor.constraint(equalTo: loginButton.heightAnchor).isActive = true
     apple.translatesAutoresizingMaskIntoConstraints = false
     apple.heightAnchor.constraint(equalTo: loginButton.heightAnchor).isActive = true
     
@@ -798,27 +818,27 @@ private extension SignInView {
   
   @objc
   func handleTap(_ sender: UITapGestureRecognizer) {
-    if sender.view?.accessibilityIdentifier == "password",
-       let foreground = passwordContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first,
-       !passwordTextField.isFirstResponder {
-      
-      Animations.unmaskLayerCircled(layer: foreground,
-                                    location: sender.location(ofTouch: 0, in: passwordContainer),
-                                    duration: 0.4,
-                                    opacityDurationMultiplier: 1,
-                                    delegate: self) { [unowned self] in self.passwordTextField.becomeFirstResponder() }
-      passwordTextField.becomeFirstResponder()
-    } else if sender.view?.accessibilityIdentifier == "login",
-              let foreground = loginContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first,
-              !loginTextField.isFirstResponder {
-      loginTextField.becomeFirstResponder()
-      
-      Animations.unmaskLayerCircled(layer: foreground,
-                                    location: sender.location(ofTouch: 0, in: passwordContainer),
-                                    duration: 0.4,
-                                    opacityDurationMultiplier: 1,
-                                    delegate: self) { [unowned self] in self.loginTextField.becomeFirstResponder() }
-    } else if sender.view?.accessibilityIdentifier == "recognizer" {
+//    if sender.view?.accessibilityIdentifier == "password",
+//       let foreground = passwordContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first,
+//       !passwordTextField.isFirstResponder {
+//
+//      Animations.unmaskLayerCircled(layer: foreground,
+//                                    location: sender.location(ofTouch: 0, in: passwordContainer),
+//                                    duration: 0.4,
+//                                    opacityDurationMultiplier: 1,
+//                                    delegate: self) { [unowned self] in self.passwordTextField.becomeFirstResponder() }
+//      passwordTextField.becomeFirstResponder()
+//    } else if sender.view?.accessibilityIdentifier == "login",
+//              let foreground = loginContainer.layer.sublayers?.filter({ $0.name == "foreground" }).first,
+//              !loginTextField.isFirstResponder {
+//      loginTextField.becomeFirstResponder()
+//
+//      Animations.unmaskLayerCircled(layer: foreground,
+//                                    location: sender.location(ofTouch: 0, in: passwordContainer),
+//                                    duration: 0.4,
+//                                    opacityDurationMultiplier: 1,
+//                                    delegate: self) { [unowned self] in self.loginTextField.becomeFirstResponder() } } else
+    if sender.view?.accessibilityIdentifier == "recognizer" {
       sender.view?.removeFromSuperview()
       endEditing(true)
     } else if sender.view === google {
@@ -829,14 +849,20 @@ private extension SignInView {
 //      startAuthorizationUI(provider: .Google)
 //      isUserInteractionEnabled = false
       viewInput?.providerSignIn(provider: .VK)
-    } else if sender === apple {//appleLogo {
+    } else if sender === apple || sender === appleDark {
       viewInput?.providerSignIn(provider: .Apple)
     }
   }
   
   @objc
+  func test() {
+    fatalError()
+  }
+  
+  @objc
   func buttonTapped(_ sender: UIButton) {
-    if sender === loginButton {
+    if sender === loginButton.getSubview(type: UIButton.self) {
+      dismissKeyboard()
       guard let username = loginTextField.text,
             let password = passwordTextField.text
       else { return }
@@ -870,7 +896,7 @@ private extension SignInView {
       viewInput?.signUp()
     } else if sender == forgotButton {
       viewInput?.resetPassword()
-    } else if sender == apple {
+    } else if sender == apple || sender === appleDark {
       viewInput?.providerSignIn(provider: .Apple)
     }
   }
@@ -1058,6 +1084,18 @@ private extension SignInView {
 //      }
     }
   }
+  
+  @objc
+  func dismissKeyboard() {
+    endEditing(true)
+  }
+  
+  func getTapRecogizer() -> UITapGestureRecognizer {
+    let instance = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
+    instance.cancelsTouchesInView = false
+    
+    return instance
+  }
 }
 
 extension SignInView: UITextFieldDelegate {
@@ -1104,7 +1142,13 @@ extension SignInView: UITextFieldDelegate {
     opaque.accessibilityIdentifier = "recognizer"
     opaque.isUserInteractionEnabled = true
     opaque.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:))))
-    opaque.place(inside: self)
+    insertSubview(opaque, belowSubview: stack)
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    opaque.topAnchor.constraint(equalTo: topAnchor).isActive = true
+    opaque.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+    opaque.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+    opaque.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+//    opaque.place(inside: self)
     
     return true
   }

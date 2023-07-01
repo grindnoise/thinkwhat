@@ -404,6 +404,8 @@ enum Colors {
   
   static var main: UIColor { UIColor(hexString: "#21A038") } //Colors.Logo.Flame.rawValue }
   static var darkTheme: UIColor { UIColor(hexString: "#262626") }
+  static var bannerDark: UIColor { UIColor(hexString: "#494949") }
+  static var bannerLight: UIColor { UIColor(hexString: "#F1F0F0") }
 }
 
 //extension Color: RawRepresentable {
