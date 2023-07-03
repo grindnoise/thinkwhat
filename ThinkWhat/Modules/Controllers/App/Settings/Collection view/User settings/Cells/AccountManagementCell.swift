@@ -14,6 +14,7 @@ class AccountManagementCell: UICollectionViewListCell {
   enum Mode: String {
     case Logout = "logout"
     case Delete = "delete_account"
+    case EmailChange = "email_change"
   }
   
   // MARK: - Public properties
@@ -152,7 +153,7 @@ private extension AccountManagementCell {
     if #available(iOS 15, *) {
       let attrString = AttributedString(string,
                                         attributes: AttributeContainer([
-                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                          .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
                                           .foregroundColor: color
                                         ]))
       button.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
@@ -166,7 +167,7 @@ private extension AccountManagementCell {
     } else {
       let attrString = NSMutableAttributedString(string: string,
                                                  attributes: [
-                                                  .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                  .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
                                                   .foregroundColor: color
                                                  ])
 //      button.setImage(image, for: .normal)
@@ -180,7 +181,7 @@ private extension AccountManagementCell {
     let banner = NewPopup(padding: padding*2,
                           contentPadding: .uniform(size: padding*2))
     let content = AccountManagementPopupContent(mode: mode,
-                                               color: mode == .Logout ? color : .systemRed)
+                                                color: color)
     content.actionPublisher
       .sink { [weak self] in
         guard let self = self,

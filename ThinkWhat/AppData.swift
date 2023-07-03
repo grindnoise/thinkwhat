@@ -12,6 +12,7 @@ import SwiftyJSON
 class AppData {
   
   static var isEmailVerified = false
+  static var isSocialAuth = false
   
   static var emailVerificationCode: Int?
   
@@ -40,13 +41,15 @@ class AppData {
           let value = Bundle.main.object(forInfoDictionaryKey: "ApiVersion") as? String,
           let currentAPI = Double(value) as? Double,
           let isEmailVerified = json["is_email_verified"].bool,
-          let emailVerificationString = json["email_verification_code"].rawString()
+          let emailVerificationString = json["email_verification_code"].rawString(),
+          let isSocialAuth = json["is_social_auth"].bool
     else { throw AppError.server }
     
     if let emailVerificationCode = Int(emailVerificationString) {
       AppData.emailVerificationCode = emailVerificationCode
     }
     AppData.isEmailVerified = isEmailVerified
+    AppData.isSocialAuth = isSocialAuth
     shared.isDataLoaded = true
     //Check current API supported version and compare with backend
     if currentAPI.rounded(toPlaces: 1) < supportedAPI.rounded(toPlaces: 1) {

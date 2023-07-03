@@ -52,8 +52,16 @@ class UserInfoCell: UICollectionViewListCell {
   private var isAnimationEnabled = false
   ///**UI**
   private lazy var stack: UIStackView = {
+    let headerStack = UIStackView(arrangedSubviews: [
+      headerImage,
+      headerLabel,
+      UIView.opaque(),
+    ])
+    headerStack.axis = .horizontal
+    headerStack.spacing = padding/2
+    
     let instance = UIStackView(arrangedSubviews: [
-      disclosureLabel,
+      headerStack,
       textView
     ])
     instance.axis = .vertical
@@ -71,11 +79,11 @@ class UserInfoCell: UICollectionViewListCell {
 //
 //    return instance
 //  }()
-  private lazy var disclosureLabel: UILabel = {
+  private lazy var headerLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.text = "userprofile_about".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .footnote)
     
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"
@@ -93,6 +101,16 @@ class UserInfoCell: UICollectionViewListCell {
         self.layoutIfNeeded()
       }
       .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var headerImage: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "person.text.rectangle.fill",
+                                              withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
+    instance.tintColor = .secondaryLabel
+    instance.contentMode = .scaleAspectFit
+//    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
     
     return instance
   }()
@@ -122,7 +140,7 @@ class UserInfoCell: UICollectionViewListCell {
                                                    attributes: attributes())
     } else {
       instance.delegate = self
-      instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+      instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
       instance.text = userprofile.description
     }
     instance.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
@@ -251,7 +269,7 @@ private extension UserInfoCell {
   }
   
   func attributes() -> [NSAttributedString.Key: Any] {
-    let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    let font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     let paragraphStyle = NSMutableParagraphStyle()
     if #available(iOS 15.0, *) {
       paragraphStyle.usesDefaultHyphenation = true
@@ -297,7 +315,7 @@ private extension UserInfoCell {
 extension UserInfoCell: UITextViewDelegate {
   func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
     self.isAnimationEnabled = true
-    scrollPublisher = disclosureLabel.convert(disclosureLabel.frame.origin, to: self)
+    scrollPublisher = headerLabel.convert(headerLabel.frame.origin, to: self)
     
     return true
   }

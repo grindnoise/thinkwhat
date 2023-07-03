@@ -69,6 +69,11 @@ class SettingsView: UIView {
       .sink { [unowned self] in self.viewInput?.updateDescription($0!) }
       .store(in: &self.subscriptions)
     
+    // Email change
+    instance.$email
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.viewInput?.sendVerificationCode($0!) }
+      .store(in: &self.subscriptions)
     //            .sink { style in
     //                instance.backgroundColor = style == .dark ? .secondarySystemBackground : .systemBackground
     //            }
@@ -196,11 +201,7 @@ class SettingsView: UIView {
       .store(in: &subscriptions)
     
     instance.subscriptionsPublisher
-      .sink { [unowned self] in
-        guard !$0.isNil else { return }
-        
-        self.viewInput?.onSubscriptionsSelected()
-      }
+      .sink { [unowned self] _ in self.viewInput?.onSubscriptionsSelected() }
       .store(in: &subscriptions)
     
     instance.watchingPublisher

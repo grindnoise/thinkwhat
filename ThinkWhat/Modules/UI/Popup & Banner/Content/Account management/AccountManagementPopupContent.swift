@@ -30,22 +30,20 @@ class AccountManagementPopupContent: UIView {
   private let color: UIColor
   private lazy var stack: UIStackView = {
     let top = UIView.opaque()
-    label.placeInCenter(of: top,
-                        topInset: padding*2,
-                        bottomInset: padding)
+    tagLabel.placeXCentered(inside: top,
+                            topInset: padding*2,
+                            bottomInset: -padding*2)
     
     let bottom = UIView.opaque()
     let buttonsStack = UIStackView(arrangedSubviews: [
       confirmButton,
       cancelButton
     ])
-    buttonsStack.distribution = .fillEqually
-    buttonsStack.contentMode = .left
-    buttonsStack.axis = .horizontal
-    buttonsStack.spacing = 4
+    buttonsStack.axis = .vertical
+    buttonsStack.spacing = padding*2
     buttonsStack.placeInCenter(of: bottom,
-                        topInset: padding,
-                        bottomInset: padding)
+                        topInset: padding*2,
+                        bottomInset: padding*2)
     
     let instance = UIStackView(arrangedSubviews: [
       top,
@@ -53,44 +51,36 @@ class AccountManagementPopupContent: UIView {
       bottom
     ])
     instance.axis = .vertical
-    instance.spacing = padding
-    bottom.translatesAutoresizingMaskIntoConstraints = false
-    bottom.heightAnchor.constraint(equalTo: top.heightAnchor).isActive = true
+    instance.spacing = padding*2
     
     return instance
   }()
-  private lazy var label: UIStackView = {
-    let label = InsetLabel()
-    label.font = UIFont(name: Fonts.Bold, size: 20)//.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title2)
-    label.text = mode == .Logout ? "account_logout".localized.uppercased() : "account_delete".localized.uppercased()
-    label.textColor = .white
-    label.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+  private lazy var tagLabel: TagCapsule = {
+    var text = ""
+    var image: UIImage!
+    var color = Colors.main
     
-    let icon = UIImageView(image: UIImage(systemName: mode == .Logout ? "rectangle.portrait.and.arrow.forward" : "trash",
-                                          withConfiguration: UIImage.SymbolConfiguration(weight: .bold)))
-    icon.heightAnchor.constraint(equalTo: icon.widthAnchor, multiplier: 1/1).isActive = true
-    icon.tintColor = .white
-    icon.contentMode = .center
+    switch mode {
+    case .Logout:
+      text = "account_logout".localized.uppercased()
+      image = UIImage(systemName: "rectangle.portrait.and.arrow.forward", withConfiguration: UIImage.SymbolConfiguration(weight: .bold))
+    case .Delete:
+      text = "account_delete".localized.uppercased()
+      color = .systemRed
+      image = UIImage(systemName: "envelope.fill", withConfiguration: UIImage.SymbolConfiguration(weight: .bold))
+    case .EmailChange:
+      text = "account_email_change".localized.uppercased()
+      image = UIImage(systemName: "trash", withConfiguration: UIImage.SymbolConfiguration(weight: .bold))
+    }
     
-    let opaque = UIView.opaque()
-    opaque.widthAnchor.constraint(equalToConstant: padding/2).isActive = true
-    
-    let instance = UIStackView(arrangedSubviews: [
-      opaque,
-      icon,
-      label
-    ])
-    instance.translatesAutoresizingMaskIntoConstraints = false
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: label.font)).isActive = true
-    instance.axis = .horizontal
-    instance.spacing = padding/2
-    instance.backgroundColor = color
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    return instance
+    return TagCapsule(text: text,
+                      padding: padding,
+                      textPadding: padding,
+                      color: color,
+                      font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
+                      isShadowed: true,
+                      iconCategory: nil,
+                      image: image)
   }()
   private lazy var textView: UITextView = {
     let instance = UITextView()
@@ -120,29 +110,43 @@ class AccountManagementPopupContent: UIView {
       constraint.constant = height
       self.layoutIfNeeded()
     })
-    instance.attributedText = NSAttributedString(string: mode == .Logout ? "account_logout_description".localized : "account_delete_description".localized,
+    
+    var text = ""
+    
+    switch mode {
+    case .Logout:
+      text = "account_logout_description".localized
+    case .Delete:
+      text = "account_delete_description".localized
+    case .EmailChange:
+      text = "account_email_change_description".localized
+    }
+    
+    instance.attributedText = NSAttributedString(string: text,
                                                  attributes: [
                                                   .paragraphStyle: paragraph,
-                                                  .font: UIFont(name: Fonts.Regular, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Rubik.Regular, size: 20) as Any,
                                                   .foregroundColor: UIColor.label
                                                  ])
-    
+    instance.isUserInteractionEnabled = false
     
     return instance
   }()
-  private lazy var confirmButton: UIButton = {
+  private lazy var confirmButton: UIView = {
+    let opaque = UIView.opaque()
+    opaque.layer.masksToBounds = false
+    
     let instance = UIButton()
     instance.addTarget(self,
                        action: #selector(self.handleTap(sender:)),
                        for: .touchUpInside)
     if #available(iOS 15, *) {
       var config = UIButton.Configuration.filled()
-      config.cornerStyle = .small
-      config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
-      config.baseBackgroundColor = color
+      config.cornerStyle = .capsule
+      config.baseBackgroundColor = mode == .Delete ? .systemRed : color
       config.attributedTitle = AttributedString("confirm".localized,
                                                 attributes: AttributeContainer([
-                                                  .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                   .foregroundColor: UIColor.white as Any
                                                 ]))
       instance.configuration = config
@@ -150,13 +154,25 @@ class AccountManagementPopupContent: UIView {
       instance.contentEdgeInsets = .uniform(size: 0)
       instance.setAttributedTitle(NSAttributedString(string: "confirm".localized,
                                                      attributes: [
-                                                      .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                       .foregroundColor: color as Any
                                                      ]),
                                   for: .normal)
     }
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
+    opaque.publisher(for: \.bounds)
+      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
+      .sink { [unowned self] in
+        opaque.layer.shadowOpacity = 1
+        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? self.color.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+      }
+      .store(in: &subscriptions)
+    instance.place(inside: opaque)
     
-    return instance
+    return opaque
   }()
   private lazy var cancelButton: UIButton = {
     let instance = UIButton()
@@ -168,7 +184,7 @@ class AccountManagementPopupContent: UIView {
       config.contentInsets = .uniform(size: 0)
       config.attributedTitle = AttributedString("cancel".localized,
                                                 attributes: AttributeContainer([
-                                                  .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                   .foregroundColor: UIColor.secondaryLabel as Any
                                                 ]))
       instance.configuration = config
@@ -176,7 +192,7 @@ class AccountManagementPopupContent: UIView {
       instance.contentEdgeInsets = .uniform(size: 0)
       instance.setAttributedTitle(NSAttributedString(string: "cancel".localized,
                                                      attributes: [
-                                                      .font: UIFont(name: Fonts.Semibold, size: 20) as Any,
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
                                                       .foregroundColor: UIColor.secondaryLabel as Any
                                                      ]),
                                   for: .normal)
@@ -229,21 +245,9 @@ class AccountManagementPopupContent: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    let paragraph = NSMutableParagraphStyle()
-    if #available(iOS 15.0, *) {
-        paragraph.usesDefaultHyphenation = true
-    } else {
-      paragraph.hyphenationFactor = 1
-    }
-    paragraph.alignment = .natural
-    paragraph.firstLineHeadIndent = padding * 2
-    
-    textView.attributedText = NSAttributedString(string: mode == .Logout ? "account_logout_description".localized : "account_delete_description".localized,
-                                                 attributes: [
-                                                  .paragraphStyle: paragraph,
-                                                  .font: UIFont(name: Fonts.Regular, size: 20) as Any,
-                                                  .foregroundColor: UIColor.label
-                                                 ])
+    confirmButton.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 8 : 4
+    confirmButton.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+    confirmButton.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? color.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
   }
 }
 
@@ -252,6 +256,9 @@ private extension AccountManagementPopupContent {
   func setupUI() {
     backgroundColor = .clear
     stack.place(inside: self)
+    
+    confirmButton.translatesAutoresizingMaskIntoConstraints = false
+    confirmButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
   }
   
   @MainActor
@@ -261,7 +268,7 @@ private extension AccountManagementPopupContent {
   
   @objc
   func handleTap(sender: UIButton) {
-    if sender == confirmButton {
+    if sender == confirmButton.getSubview(type: UIButton.self) {
       actionPublisher.send([Action.Confirm: mode])
       actionPublisher.send(completion: .finished)
     } else {

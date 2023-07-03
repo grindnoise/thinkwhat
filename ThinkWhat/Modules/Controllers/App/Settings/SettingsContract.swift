@@ -39,6 +39,7 @@ protocol SettingsViewInput: AnyObject {
   func showTerms()
   func feedback()
   func manageAccount(_: AccountManagementCell.Mode)
+  func sendVerificationCode(_: String)
 }
 
 protocol SettingsControllerInput: AnyObject {
@@ -49,6 +50,7 @@ protocol SettingsControllerInput: AnyObject {
   func fetchCity(userprofile: Userprofile, string: String)
   func saveCity(_: City, completion: @escaping (Bool) -> ())
   func updateAppSettings(_: [AppSettings: Any])
+  func sendVerificationCode(to: String, completion: @escaping (Result<[String : Any], Error>) -> ())
   //    func updateUserData()
 }
 

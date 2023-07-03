@@ -1486,6 +1486,17 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #12 in Transition.popSignupToSignin(containerView:context:fromView:toView:):Transition.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "toView.appleDark.alpha">
+            </PersistentString>
+            <PersistentString
+               value = "toView.apple.alpha">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in closure #1 in VotersViewController.collectionView(_:cellForItemAt:):VotersViewController.swift">
          <PersistentStrings>
             <PersistentString
@@ -2120,14 +2131,6 @@
          <PersistentStrings>
             <PersistentString
                value = "title.bounds">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in closure #1 in MainController.loadData():MainController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "UserDefaults.Profile.email!">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -3450,6 +3453,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "NewAccountView.buttonTapped(_:):NewAccountView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "isCorrect">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "PollDescriptionCell.isFoldable.didset:PollDescriptionCell.swift">
          <PersistentStrings>
             <PersistentString
@@ -3529,7 +3540,7 @@
          contextName = "AppDelegate.application(_:didFinishLaunchingWithOptions:):AppDelegate.swift">
          <PersistentStrings>
             <PersistentString
-               value = "AppData.accessToken">
+               value = "launchOptions?[UIApplication.LaunchOptionsKey.remoteNotification]">
             </PersistentString>
             <PersistentString
                value = "AppData.accessToken!">
@@ -3869,6 +3880,17 @@
          <PersistentStrings>
             <PersistentString
                value = "Userprofiles.shared.current">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #3 in Transition.popSignupToSignin(containerView:context:fromView:toView:):Transition.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "&quot;loginButton&quot;.localized">
+            </PersistentString>
+            <PersistentString
+               value = "fakeButtonLabel.text">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -4386,6 +4408,9 @@
       <ContextState
          contextName = "EmailVerificationPopupContent.input.didset:EmailVerificationPopupContent.swift">
          <PersistentStrings>
+            <PersistentString
+               value = "input">
+            </PersistentString>
             <PersistentString
                value = "code">
             </PersistentString>
@@ -8664,14 +8689,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in SignInView.stack.getter:SignInView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "opaque2.subviews">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "ImageSelectionPopup.init(controller:callbackDelegate:item:):ImageSelectionPopup.swift">
          <PersistentStrings>
             <PersistentString
@@ -9026,6 +9043,17 @@
       </ContextState>
       <ContextState
          contextName = "ClaimSelection.btnTapped(_:):ClaimSelection.swift">
+      </ContextState>
+      <ContextState
+         contextName = "Transition.popSignupToSignin(containerView:context:fromView:toView:):Transition.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "toView.appleDark.alpha">
+            </PersistentString>
+            <PersistentString
+               value = "toView.apple.alpha">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "closure #1 in SurveysViewController.loadData():SurveysViewController.swift">

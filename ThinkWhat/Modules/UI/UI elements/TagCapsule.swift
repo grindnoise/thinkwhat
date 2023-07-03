@@ -41,21 +41,34 @@ class TagCapsule: UIView {
       }
     }
   }
-  public var iconCategory: Icon.Category {
+  public var iconCategory: Icon.Category? {
     didSet {
-      guard oldValue != iconCategory else { return }
+      guard let iconCategory = iconCategory,
+            oldValue != iconCategory
+      else { return }
       
-          icon.icon.add(Animations.get(property: .Path,
-                                       fromValue: (self.icon.icon as! CAShapeLayer).path!,
-                                       toValue: (self.icon.getLayer(iconCategory) as! CAShapeLayer).path!,
-                                       duration: 0.3,
-                                       delay: 0,
-                                       repeatCount: 0,
-                                       autoreverses: false,
-                                       timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                       delegate: nil,
-                                       isRemovedOnCompletion: false),
-                        forKey: nil)
+      icon?.icon.add(Animations.get(property: .Path,
+                                   fromValue: (self.icon?.icon as! CAShapeLayer).path!,
+                                   toValue: (self.icon?.getLayer(iconCategory) as! CAShapeLayer).path!,
+                                   duration: 0.3,
+                                   delay: 0,
+                                   repeatCount: 0,
+                                   autoreverses: false,
+                                   timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                   delegate: nil,
+                                   isRemovedOnCompletion: false),
+                    forKey: nil)
+    }
+  }
+  public var image: UIImage? {
+    didSet {
+      // Animate image change
+      guard let image = image,
+            oldValue != image,
+            let imageView = imageView
+      else { return }
+      
+      Animations.changeImageCrossDissolve(imageView: imageView, image: image)
     }
   }
   public var color: UIColor {
@@ -81,16 +94,23 @@ class TagCapsule: UIView {
   ///**UI**
   private let padding: CGFloat
   private let textPadding: CGFloat
+  private let isShadowed: Bool
   private lazy var stack: UIStackView = {
     let opaque = UIView.opaque()
-    icon.placeInCenter(of: opaque)
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor).isActive = true
+    if !iconCategory.isNil, let icon = icon {
+      icon.place(inside: opaque)
+    } else if !image.isNil, let imageView = imageView {
+      imageView.placeInCenter(of: opaque)
+    }
+    
     
     let opaque2 = UIView.opaque()
     label.place(inside: opaque2, insets: .uniform(size: textPadding))
     
     let instance = UIStackView(arrangedSubviews: [
       UIView.horizontalSpacer(padding),
-      icon,
+      opaque,
 //      label,
 //      opaque,
       opaque2,
@@ -101,17 +121,25 @@ class TagCapsule: UIView {
       .sink { instance.cornerRadius = $0.height/2.25 }
       .store(in: &subscriptions)
     instance.backgroundColor = color
-    instance.spacing = 0
+    instance.spacing = 0//padding
     
     return instance
   }()
-  private lazy var icon: Icon = {
-    let instance = Icon(category: iconCategory)
+  private lazy var icon: Icon? = {
+    let instance = Icon(category: iconCategory!)
     instance.iconColor = .white
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1.65
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+    
+    return instance
+  }()
+  private lazy var imageView: UIImageView? = {
+    let instance = UIImageView(image: image)
+    instance.contentMode = .center
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    instance.tintColor = .white
     
     return instance
   }()
@@ -127,12 +155,29 @@ class TagCapsule: UIView {
     
     return instance
   }()
-  
+  private lazy var shadowView: UIView = {
+    let instance = UIView.opaque()
+    instance.layer.masksToBounds = false
+    instance.accessibilityIdentifier = "shadow"
+    instance.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? color.cgColor : UIColor.black.withAlphaComponent(0.35).cgColor
+    instance.layer.shadowOffset = .zero
+    instance.layer.shadowOpacity = 1
+    instance.publisher(for: \.bounds)
+      .sink {
+        instance.layer.shadowRadius = $0.height/8
+        instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
   
   
   // MARK: - Deinitialization
   deinit {
-    icon.icon.removeAllAnimations()
+    if !iconCategory.isNil {
+      icon?.icon.removeAllAnimations()
+    }
     observers.forEach { $0.invalidate() }
     tasks.forEach { $0?.cancel() }
     subscriptions.forEach { $0.cancel() }
@@ -150,11 +195,15 @@ class TagCapsule: UIView {
        textPadding: CGFloat = 0,
        color: UIColor = Colors.Logo.Flame.rawValue,
        font: UIFont,
-       iconCategory: Icon.Category = .Logo) {
+       isShadowed: Bool = false,
+       iconCategory: Icon.Category? = nil,
+       image: UIImage? = nil) {
+    self.image = image
     self.text = text
     self.textPadding = textPadding
     self.padding = padding
     self.color = color
+    self.isShadowed = isShadowed
     self.font = font
     self.iconCategory = iconCategory
     
@@ -171,15 +220,23 @@ class TagCapsule: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    if isShadowed {
+      shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    }
   }
 }
 
 private extension TagCapsule {
   @MainActor
   func setupUI() {
+    layer.masksToBounds = false
     backgroundColor = .clear
+    if isShadowed {
+      shadowView.place(inside: self,
+                       bottomPriority: .required)
+    }
     stack.place(inside: self,
-                bottomPriority: .defaultLow)
+                bottomPriority: .required)
   }
 }
 

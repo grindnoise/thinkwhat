@@ -39,7 +39,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
                                                                                   iconColor: .systemRed),
                                                                   text: error.localizedDescription,
                                                                   tintColor: .clear,
-                                                                  fontName: Fonts.Regular,
+                                                                  fontName: Fonts.Rubik.Regular,
                                                                   textStyle: .headline,
                                                                   textAlignment: .natural),
                                    contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
@@ -151,11 +151,13 @@ class UserSettingsCityCell: UICollectionViewListCell {
 //  }()
   private lazy var stack: UIStackView = {
     let headerStack = UIStackView(arrangedSubviews: [
-      label,
+      headerImage,
+      headerLabel,
       UIView.opaque(),
 //      hintButton
     ])
     headerStack.axis = .horizontal
+      headerStack.spacing = padding/2
 
     let leftSpacer = UIView.opaque()
     leftSpacer.widthAnchor.constraint(equalToConstant: userprofile.isCurrent ? 8 : 0).isActive = true
@@ -186,11 +188,21 @@ class UserSettingsCityCell: UICollectionViewListCell {
 
     return instance
   }()
-  private lazy var label: UILabel = {
+  private lazy var headerImage: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "location.fill",
+                                              withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
+    instance.tintColor = .secondaryLabel
+    instance.contentMode = .scaleAspectFit
+//    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
+    
+    return instance
+  }()
+  private lazy var headerLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.text = "location".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .footnote)
 
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"
@@ -226,16 +238,16 @@ class UserSettingsCityCell: UICollectionViewListCell {
                                    bottom: 8,
                                    right: 0)
     instance.isUserInteractionEnabled = userprofile.isCurrent ? true : false
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.indicator.color = color
     instance.spellCheckingType = .no
     instance.autocorrectionType = .no
     instance.attributedPlaceholder = NSAttributedString(string: "city_placeholder".localized, attributes: [
-      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline) as Any,
+      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .headline) as Any,
       NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
     ])
     instance.forceNoFiltering = true
-    instance.theme.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline)!
+    instance.theme.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .subheadline)!
 //    instance.theme.bgColor = userprofile.isCurrent ? traitCollection.userInterfaceStyle != .dark ? .tertiarySystemBackground : .secondarySystemBackground : .clear
     instance.theme.bgColor = traitCollection.userInterfaceStyle != .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.theme.borderColor = .clear
@@ -346,7 +358,7 @@ private extension UserSettingsCityCell {
                                                           icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: color),
                                                           text: "userprofile_contrib_hint",
                                                           tintColor: .clear,
-                                                          fontName: Fonts.Regular,
+                                                          fontName: Fonts.Rubik.Regular,
                                                           textStyle: .headline,
                                                           textAlignment: .natural),
                            contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
@@ -442,7 +454,7 @@ private extension UserSettingsCityCell {
                                                                               iconColor: .systemRed),
                                                               text: "account_location_empty".localized,
                                                               tintColor: .clear,
-                                                              fontName: Fonts.Regular,
+                                                              fontName: Fonts.Rubik.Regular,
                                                               textStyle: .headline,
                                                               textAlignment: .natural),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
@@ -470,7 +482,7 @@ extension UserSettingsCityCell: UITextFieldDelegate {
       addGestureRecognizer(touch)
     }
     
-    scrollPublisher = label.convert(label.frame.origin, to: self)
+    scrollPublisher = headerLabel.convert(headerLabel.frame.origin, to: self)
     
     return true
   }

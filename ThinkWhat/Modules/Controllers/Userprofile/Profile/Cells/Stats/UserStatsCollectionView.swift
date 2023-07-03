@@ -38,6 +38,7 @@ class UserStatsCollectionView: UICollectionView {
   public let publicationsPublisher = PassthroughSubject<Userprofile, Never>()
   public let commentsPublisher = PassthroughSubject<Userprofile, Never>()
   public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
+  public let subscriptionsPublisher = PassthroughSubject<Userprofile, Never>()
   public let colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
   ///`Logic`
   public var mode: UserStatsCell.Mode = .Userprofile {
@@ -260,7 +261,7 @@ private extension UserStatsCollectionView {
         .sink { [weak self] _ in
           guard let self = self else { return }
 
-          self.subscribersPublisher.send(self.userprofile)
+          self.subscriptionsPublisher.send(self.userprofile)
         }
         .store(in: &self.subscriptions)
       

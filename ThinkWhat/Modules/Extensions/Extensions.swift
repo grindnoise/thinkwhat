@@ -682,49 +682,48 @@ extension CGSize {
 
 extension CGPath {
   func getScaledPath(size: CGSize, scaleMultiplicator _scaleMultiplicator: CGFloat = 0) -> CGPath {
-    
-    let boundingBox = self.boundingBox
-    
-    let boundingBoxAspectRatio = boundingBox.width/boundingBox.height
-    let viewAspectRatio = size.width/size.height
-    
-    var scaleFactor: CGFloat = 1.0
-    if (boundingBoxAspectRatio > viewAspectRatio) {
       
-      // Width is limiting factor
-      scaleFactor = size.width/boundingBox.width
-    } else {
-      // Height is limiting factor
-      scaleFactor = size.height/boundingBox.height
+      let boundingBox = self.boundingBox
+      
+      let boundingBoxAspectRatio = boundingBox.width/boundingBox.height
+      let viewAspectRatio = size.width/size.height
+      
+      var scaleFactor: CGFloat = 1.0
+      if (boundingBoxAspectRatio > viewAspectRatio) {
+        
+        // Width is limiting factor
+        scaleFactor = size.width/boundingBox.width
+      } else {
+        // Height is limiting factor
+        scaleFactor = size.height/boundingBox.height
+      }
+      
+      scaleFactor /= _scaleMultiplicator != 0 ? _scaleMultiplicator : 2.05
+      scaleFactor = scaleFactor == 0 ? 1 : scaleFactor
+      //
+      //        if _scaleMultiplicator != 1 {
+      //            scaleFactor = _scaleMultiplicator
+      //        }
+      // Scaling the path ...
+      var scaleTransform = CGAffineTransform.identity
+      // Scale down the path first
+      scaleTransform = scaleTransform.scaledBy(x: scaleFactor, y: scaleFactor);
+      // Then translate the path to the upper left corner
+      scaleTransform = scaleTransform.translatedBy(x: -boundingBox.minX, y: -boundingBox.minY);
+      
+      // If you want to be fancy you could also center the path in the view
+      // i.e. if you don't want it to stick to the top.
+      // It is done by calculating the heigth and width difference and translating
+      // half the scaled value of that in both x and y (the scaled side will be 0)
+      let scaledSize = boundingBox.size.applying(CGAffineTransform(scaleX: scaleFactor, y: scaleFactor))
+      
+      let centerOffset = CGSize(width: (size.width-scaledSize.width)/(scaleFactor*2.0), height: (size.height-scaledSize.height)/(scaleFactor*2.0))
+      scaleTransform = scaleTransform.translatedBy(x: centerOffset.width, y: centerOffset.height);
+      // End of "center in view" transformation code
+      
+      let scaledPath = self.copy(using: &scaleTransform)
+      return scaledPath!
     }
-    
-    scaleFactor /= _scaleMultiplicator != 0 ? _scaleMultiplicator : 2.05
-    scaleFactor = scaleFactor == 0 ? 1 : scaleFactor
-    //
-    //        if _scaleMultiplicator != 1 {
-    //            scaleFactor = _scaleMultiplicator
-    //        }
-    // Scaling the path ...
-    var scaleTransform = CGAffineTransform.identity
-    // Scale down the path first
-    scaleTransform = scaleTransform.scaledBy(x: scaleFactor, y: scaleFactor);
-    // Then translate the path to the upper left corner
-    scaleTransform = scaleTransform.translatedBy(x: -boundingBox.minX, y: -boundingBox.minY);
-    
-    // If you want to be fancy you could also center the path in the view
-    // i.e. if you don't want it to stick to the top.
-    // It is done by calculating the heigth and width difference and translating
-    // half the scaled value of that in both x and y (the scaled side will be 0)
-    let scaledSize = boundingBox.size.applying(CGAffineTransform(scaleX: scaleFactor, y: scaleFactor))
-    
-    let centerOffset = CGSize(width: (size.width-scaledSize.width)/(scaleFactor*2.0), height: (size.height-scaledSize.height)/(scaleFactor*2.0))
-    scaleTransform = scaleTransform.translatedBy(x: centerOffset.width, y: centerOffset.height);
-    // End of "center in view" transformation code
-    
-    let scaledPath = self.copy(using: &scaleTransform)
-    return scaledPath!
-//    scaledPath?.boundingBox
-  }
 }
 
 extension UIImageView {

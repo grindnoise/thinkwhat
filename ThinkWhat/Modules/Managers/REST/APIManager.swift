@@ -509,12 +509,21 @@ class API {
       }
     }
     
-    public func sendEmailVerificationCode() async throws -> Parameters {
+    
+    /// Sends email verification code
+    /// - Parameter newEmail: force send to address, otherwise sends to current model email
+    /// - Returns: dictionary with code
+    public func sendEmailVerificationCode(newEmail: String = "") async throws -> Parameters {
       guard let url = API_URLS.Auth.getCodeViaMail else { fatalError(APIError.invalidURL.localizedDescription) }
+      
+      var parameters: Parameters?
+      if !newEmail.isEmpty, newEmail.isValidEmail {
+        parameters = ["email": newEmail]
+      }
       
       let data = try await parent.requestAsync(url: url,
                                            httpMethod: .get,
-                                           parameters: nil,
+                                           parameters: parameters,
                                            encoding: URLEncoding.default,
                                            headers: parent.headers(),
                                            accessControl: false)

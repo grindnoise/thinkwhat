@@ -85,23 +85,23 @@ extension SignInViewController: SignInViewInput {
   }
   
   func nextScene() {
-    guard !UserDefaults.App.hasReadTermsOfUse else {
-      guard let userprofile = Userprofiles.shared.current,
-            let wasEdited = userprofile.wasEdited
-      else { return }
-
-      guard wasEdited else {
-        navigationController?.delegate = appDelegate.transitionCoordinator
-        navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
-        navigationController?.delegate = nil
-        return
-      }
-      controllerOutput?.animateTransitionToApp {
-        appDelegate.window?.rootViewController = MainController(surveyId: nil)
-      }
-      
-      return
-    }
+//    guard !UserDefaults.App.hasReadTermsOfUse else {
+//      guard let userprofile = Userprofiles.shared.current,
+//            let wasEdited = userprofile.wasEdited
+//      else { return }
+//
+//      guard wasEdited else {
+//        navigationController?.delegate = appDelegate.transitionCoordinator
+//        navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
+//        navigationController?.delegate = nil
+//        return
+//      }
+//      controllerOutput?.animateTransitionToApp {
+//        appDelegate.window?.rootViewController = MainController(surveyId: nil)
+//      }
+//
+//      return
+//    }
     
     let backItem = UIBarButtonItem()
     backItem.title = ""
@@ -199,7 +199,7 @@ extension SignInViewController: SignInModelOutput {
   func mailSignInCallback(_ result: Result<Bool, Error>) {
     switch result {
     case .success(_):
-      if !AppData.isEmailVerified {
+      if !AppData.isSocialAuth && !AppData.isEmailVerified {
         guard AppData.emailVerificationCode.isNil else {
           ///App already has the code
           guard let userprofile = Userprofiles.shared.current,

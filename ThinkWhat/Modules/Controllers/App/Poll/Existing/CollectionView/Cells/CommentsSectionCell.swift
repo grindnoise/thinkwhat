@@ -177,6 +177,7 @@ class CommentsSectionCell: UICollectionViewCell {
       .store(in: &subscriptions)
     
     instance.commentPublisher
+      .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
       .sink { [weak self] in
         guard let self = self else { return }
         

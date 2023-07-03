@@ -68,7 +68,7 @@ class UserStatsPlainCell: UICollectionViewListCell {
   private lazy var leftLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular,
                                       forTextStyle: .body)
     
     return instance
@@ -164,7 +164,7 @@ private extension UserStatsPlainCell {
     case .Balance:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.balance),
                                                attributes: [
-                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
                                                 .foregroundColor: userprofile.publicationsTotal.isZero ? UIColor.label : color
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
@@ -194,14 +194,14 @@ private extension UserStatsPlainCell {
       
       let attributedTitle = NSAttributedString(string: text,
                                                attributes: [
-                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = false
     case .Publications:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.publicationsTotal),
                                                attributes: [
-                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
                                                 .foregroundColor: userprofile.publicationsTotal.isZero ? UIColor.label : color
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
@@ -210,28 +210,28 @@ private extension UserStatsPlainCell {
     case .Votes:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.votesReceivedTotal.roundedWithAbbreviations),
                                                attributes: [
-                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = false
     case .Completed:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.completeTotal),
                                                attributes: [
-                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = false
     case .CommentsReceived:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.commentsReceivedTotal),
                                                attributes: [
-                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = false
     case .CommentsPosted:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.commentsTotal.roundedWithAbbreviations),
                                                attributes: [
-                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
 //                                                .foregroundColor: userprofile.commentsTotal.isZero ? UIColor.label : color
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
@@ -240,7 +240,7 @@ private extension UserStatsPlainCell {
     case .Subscribers:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.subscribersTotal.roundedWithAbbreviations),
                                                attributes: [
-                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
                                                 .foregroundColor: userprofile.subscribersTotal.isZero ? UIColor.label : color
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
@@ -249,7 +249,7 @@ private extension UserStatsPlainCell {
     case .Subscriptions:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.subscriptionsTotal.roundedWithAbbreviations),
                                                attributes: [
-                                                .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any,
+                                                .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
                                                 .foregroundColor: userprofile.subscriptionsTotal.isZero ? UIColor.label : color
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)

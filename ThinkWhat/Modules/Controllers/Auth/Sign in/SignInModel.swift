@@ -156,7 +156,9 @@ extension SignInModel: SignInControllerInput {
         
         guard let appData = json["app_data"] as? JSON,
               let current = json["current_user"] as? JSON
-        else { throw AppError.server }
+        else {
+          throw AppError.server
+        }
         
         ///Load necessary data before creating user
         try AppData.loadData(appData)
@@ -196,6 +198,8 @@ extension SignInModel: SignInControllerInput {
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif
         providerLogout()
+        KeychainService.deleteData()
+        UserDefaults.clear()
         await MainActor.run {
           modelOutput?.providerSignInCallback(result: .failure(error))
         }

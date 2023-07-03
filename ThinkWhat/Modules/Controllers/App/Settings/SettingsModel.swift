@@ -118,5 +118,18 @@ extension SettingsModel: SettingsControllerInput {
       }
     }
   }
+  
+  func sendVerificationCode(to: String, completion: @escaping (Result<[String : Any], Error>) -> ()) {
+    Task {
+      do {
+        let dict = try await API.shared.auth.sendEmailVerificationCode(newEmail: to)
+        await MainActor.run {
+          completion(.success(dict))
+        }
+      } catch {
+        completion(.failure(error))
+      }
+    }
+  }
 }
 

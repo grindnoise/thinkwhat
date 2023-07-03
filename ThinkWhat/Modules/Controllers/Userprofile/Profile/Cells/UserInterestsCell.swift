@@ -69,27 +69,38 @@ class UserInterestsCell: UICollectionViewListCell {
 //    return instance
 //  }()
   private lazy var stack: UIStackView = {
+    
+    
     let stack = UIStackView(arrangedSubviews: [
-      label,
+      headerImage,
+      headerLabel,
       UIView.opaque(),
-      hintButton
+//      hintButton
     ])
     stack.axis = .horizontal
+    stack.spacing = padding / 2
     
     let instance = UIStackView(arrangedSubviews: [
       stack,
       collectionView
     ])
     instance.axis = .vertical
-    instance.spacing = 16
+    instance.spacing = padding
     
     return instance
   }()
-  private lazy var label: UILabel = {
+  private lazy var headerImage: Icon = {
+    let width = "T".height(withConstrainedWidth: 100, font: headerLabel.font)
+    let instance = Icon(frame: CGRect(origin: .zero, size: .uniform(size: width)), category: .Logo, scaleMultiplicator: 1, iconColor: .secondaryLabel)
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+    
+    return instance
+  }()
+  private lazy var headerLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.text = "userprofile_community_contribution".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .footnote)
     
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"
@@ -218,7 +229,7 @@ private extension UserInterestsCell {
                                                           icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: color),
                                                           text: "userprofile_contrib_hint",
                                                           tintColor: .clear,
-                                                          fontName: Fonts.Regular,
+                                                          fontName: Fonts.Rubik.Regular,
                                                           textStyle: .headline,
                                                           textAlignment: .natural),
                            contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),

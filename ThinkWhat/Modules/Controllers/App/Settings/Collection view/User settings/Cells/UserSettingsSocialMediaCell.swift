@@ -103,7 +103,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
   private lazy var leftLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .label
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular,
                                       forTextStyle: .body)
     
     return instance
@@ -127,9 +127,10 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
 //                                   left: 0,
 //                                   bottom: 8,
 //                                   right: 0)
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.translatesAutoresizingMaskIntoConstraints = false
-    let constraint = instance.heightAnchor.constraint(equalToConstant: 10)
+    // Set static 40 height due to app crash on 01.07.2023
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 40)
     constraint.identifier = "height"
     constraint.isActive  = true
     instance.spellCheckingType = .no
@@ -148,20 +149,22 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
     instance.clipsToBounds = false
     instance.layer.masksToBounds = false
     
-    instance.publisher(for: \.bounds, options: .new)
-      .sink { [weak self] rect in
-        guard let self = self,
-              let constraint = instance.getConstraint(identifier: "height")
-        else { return }
-
-        self.setNeedsLayout()
-        constraint.constant = max(rect.height, 40)
-        self.layoutIfNeeded()
-//        let constraint = instance.heightAnchor.constraint(equalToConstant: max(rect.height, 40))
-//        constraint.identifier = "height"
-//        constraint.isActive = true
-      }
-      .store(in: &subscriptions)
+    // Commented due to app crash 01.07.2023
+//    instance.publisher(for: \.bounds, options: .new)
+//      .filter { $0 != instance.frame }
+//      .sink { [weak self] rect in
+//        guard let self = self,
+//              let constraint = instance.getConstraint(identifier: "height")
+//        else { return }
+//
+//        self.setNeedsLayout()
+//        constraint.constant = max(rect.height, 40)
+//        self.layoutIfNeeded()
+////        let constraint = instance.heightAnchor.constraint(equalToConstant: max(rect.height, 40))
+////        constraint.identifier = "height"
+////        constraint.isActive = true
+//      }
+//      .store(in: &subscriptions)
     
     return instance
   }()
@@ -318,7 +321,7 @@ private extension UserSettingsSocialMediaCell {
     }
     textField.text = url.isNil ? "" : url!.absoluteString
     textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [
-      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body) as Any,
+      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
       NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
     ])
     logo.isOpaque = false

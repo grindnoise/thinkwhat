@@ -20,10 +20,19 @@ class UserSettingsEmailCell: UICollectionViewListCell {
       
       setTasks()
       setupUI()
+      
+      // When user confirms new email
+      userprofile?.$email
+        .receive(on: DispatchQueue.main)
+        .filter { _ in AppData.isEmailVerified }
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.textField.text = $0
+        }
+        .store(in: &subscriptions)
     }
   }
-  ///`Publishers`
-  public let isEmailChangedPublisher = PassthroughSubject<String, Never>()
   ///`UI`
   public var color: UIColor = Colors.System.Red.rawValue {
     didSet {
@@ -51,10 +60,13 @@ class UserSettingsEmailCell: UICollectionViewListCell {
   }()
   private lazy var stack: UIStackView = {
     let headerStack = UIStackView(arrangedSubviews: [
-      label,
-      UIView.opaque(),
+      headerImage,
+      headerLabel,
+      UIView.opaque()
     ])
     headerStack.axis = .horizontal
+      headerStack.spacing = padding/2
+    
     let contentStack: UIStackView = {
       let rightSpacer = UIView.opaque()
       rightSpacer.widthAnchor.constraint(equalToConstant: 8).isActive = true
@@ -88,19 +100,21 @@ class UserSettingsEmailCell: UICollectionViewListCell {
 //                                   left: 0,
 //                                   bottom: 8,
 //                                   right: 0)
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     if let userprofile = userprofile, !userprofile.email.isEmpty {
       instance.text = userprofile.email
     }
     instance.translatesAutoresizingMaskIntoConstraints = false
+    instance.delegate = self
     let constraint = instance.heightAnchor.constraint(equalToConstant: 10)
     constraint.identifier = "height"
     constraint.isActive  = true
     instance.spellCheckingType = .no
     instance.autocorrectionType = .no
+    instance.keyboardType = .asciiCapable
     instance.attributedPlaceholder = NSAttributedString(string: "mail_example_placeholder".localized,
                                                         attributes: [
-                                                          .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
+                                                          .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any
                                                         ])
 //  private lazy var textField: UnderlinedSignTextField = {
 //      let instance = UnderlinedSignTextField()//lowerTextFieldTopConstant: -4)
@@ -108,7 +122,7 @@ class UserSettingsEmailCell: UICollectionViewListCell {
 //      instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //      instance.clearButtonMode = .always
 //      instance.text = ""
-//      instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .headline)
+//      instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .headline)
 //      instance.spellCheckingType = .no
 //      instance.autocorrectionType = .no
     instance.addTarget(self, action: #selector(self.handleIO(_:)), for: .editingChanged)
@@ -149,11 +163,21 @@ class UserSettingsEmailCell: UICollectionViewListCell {
     
     return instance
   }()
-  private lazy var label: UILabel = {
+  private lazy var headerImage: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "envelope.fill",
+                                              withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
+    instance.tintColor = .secondaryLabel
+    instance.contentMode = .scaleAspectFit
+//    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
+    
+    return instance
+  }()
+  private lazy var headerLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.text = "mailTF".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .footnote)
 
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"
@@ -174,6 +198,13 @@ class UserSettingsEmailCell: UICollectionViewListCell {
 
     return instance
   }()
+  
+  
+  
+  // MARK: - Private properties
+  ///**Publishers**
+  public private(set) var emailPublisher = PassthroughSubject<String, Never>()
+  
   
   
   // MARK: - Destructor
@@ -217,16 +248,18 @@ class UserSettingsEmailCell: UICollectionViewListCell {
 //          setupButtons()
       }
   
-  //  override func prepareForReuse() {
-  //    super.prepareForReuse()
-  //
+    override func prepareForReuse() {
+      super.prepareForReuse()
+  
+      emailPublisher = PassthroughSubject<String, Never>()
+      scrollPublisher = headerLabel.convert(headerLabel.frame.origin, to: self)
   //    facebookPublisher = CurrentValueSubject<String?, Never>(nil)
   //    instagramPublisher = CurrentValueSubject<String?, Never>(nil)
   //    tiktokPublisher = CurrentValueSubject<String?, Never>(nil)
   //    googlePublisher = CurrentValueSubject<String?, Never>(nil)
   //    twitterPublisher = CurrentValueSubject<String?, Never>(nil)
   //    openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
-  //  }
+    }
 }
 
 // MARK: - Private
@@ -244,9 +277,10 @@ private extension UserSettingsEmailCell {
   }
   
   @objc
-  func handleIO(_ instance: UnderlinedSearchTextField) {
-    //        guard let text = instance.text, text.count >= 4 else { return }
-    //        fatalError()
+  func handleIO(_ instance: UnderlinedSignTextField) {
+    guard let text = instance.text else { return }
+    
+    instance.text = text.lowercased()
   }
   
   @objc
@@ -256,7 +290,7 @@ private extension UserSettingsEmailCell {
       let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "checkmark.circle.fill")!,
                                                             text: "email_is_confirmed".localizedDescription,
                                                             tintColor: .systemOrange,
-                                                            fontName: Fonts.Regular,
+                                                            fontName: Fonts.Rubik.Regular,
                                                             textStyle: .headline,
                                                             textAlignment: .natural),
                              contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
@@ -276,6 +310,60 @@ private extension UserSettingsEmailCell {
 }
 
 extension UserSettingsEmailCell: UITextFieldDelegate {
-
+  func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+    scrollPublisher = headerLabel.convert(headerLabel.frame.origin, to: self)
+    
+    return true
+  }
+  
+  func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+    guard let textField = textField as? UnderlinedSignTextField,
+          let text = textField.text
+    else { return true }
+    
+    textField.hideSign()
+    if !text.isValidEmail {
+      textField.showSign(state: .EmailIsIncorrect)
+      delay(seconds: 3) {
+        guard !textField.isFirstResponder else { return }
+        
+        textField.hideSign()
+        textField.text = Userprofiles.shared.current?.email
+      }
+    } else {
+      guard Userprofiles.shared.current?.email != text else { return true }
+      // Confirm new email
+      let banner = NewPopup(padding: padding*2,
+                            contentPadding: .uniform(size: padding*2))
+      let content = AccountManagementPopupContent(mode: .EmailChange,
+                                                  color: Colors.main)
+      content.actionPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] in
+          guard let self = self,
+                let action = $0.keys.first
+          else { return }
+          
+          banner.dismiss()
+          
+          guard action == .Confirm else {
+            // Revert change
+            textField.text = Userprofiles.shared.current?.email
+            
+            return
+          }
+          
+          self.emailPublisher.send(text)
+        }
+        .store(in: &banner.subscriptions)
+      
+      banner.setContent(content)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
+    }
+    
+    return true
+  }
 }
 

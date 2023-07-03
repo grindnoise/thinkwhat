@@ -150,76 +150,76 @@ class UnderlinedSignTextField: UnderlinedTextField {
       lowerTextView.isEditable = false
       lowerTextView.isSelectable = false
       lowerTextView.textColor = color
-      lowerTextView.isScrollEnabled = false
-      lowerTextView.textContainerInset = UIEdgeInsets(top: 0,
-                                                      left: -5,
-                                                      bottom: 0,
-                                                      right: 0)
-      superview?.addSubview(lowerTextView)
-      lowerTextView.translatesAutoresizingMaskIntoConstraints = false
-      lowerTextView.heightAnchor.constraint(equalToConstant: 16).isActive = true
-      lowerTextView.topAnchor.constraint(equalTo: bottomAnchor, constant: lowerTextFieldTopConstant).isActive = true
-      lowerTextView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-      lowerTextView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-      lowerTextView.backgroundColor = .clear
-      ///Add custom view
-      guard !customRightView.isNil else { return }
-      customRightView?.addEquallyTo(to: rightView!,
-                                    multiplier: 1.25)
-    }
-  
-  open override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
-    let width = min(bounds.size.width, rightViewSize.width)
-    let height = min(bounds.size.height, rightViewSize.height)
-    let rect = CGRect(x: bounds.width - rightViewSize.width,
-                      y: bounds.size.height / 2 - height / 2,
-                      width: width,
-                      height: height)
-    return rect
-  }
-  
-  public func showSign(state: SignState) {
-    isShowingSign = true
-    switch state {
-    case .Approved:
-      UIView.animate(withDuration: 0.15, animations: {
-        self.warningSign.alpha = 0
-        self.lowerTextView.alpha = 0
-      }) { _ in
-        UIView.animate(withDuration: 0.15) {
-          self.checkSign.alpha = 1
-        }
-      }
-    case .InvalidHyperlink:
-      UIView.animate(withDuration: 0.15) {
-        self.lowerTextView.text = state.rawValue.localized
-        self.lowerTextView.alpha = 1
-      }
-    default:
-      UIView.animate(withDuration: 0.15, animations: {
-        self.checkSign.alpha = 0
-      }) { _ in
-        self.lowerTextView.text = state.localizedString()
-        UIView.animate(withDuration: 0.15) {
-          self.lowerTextView.alpha = 1
-          self.warningSign.alpha = 1
-        }
-      }
+        lowerTextView.isScrollEnabled = false
+        lowerTextView.textContainerInset = UIEdgeInsets(top: 0,
+                                                        left: -5,
+                                                        bottom: 0,
+                                                        right: 0)
+        superview?.addSubview(lowerTextView)
+        lowerTextView.translatesAutoresizingMaskIntoConstraints = false
+        lowerTextView.heightAnchor.constraint(equalToConstant: 16).isActive = true
+        lowerTextView.topAnchor.constraint(equalTo: bottomAnchor, constant: lowerTextFieldTopConstant).isActive = true
+        lowerTextView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        lowerTextView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        lowerTextView.backgroundColor = .clear
+        ///Add custom view
+        guard !customRightView.isNil else { return }
+        customRightView?.addEquallyTo(to: rightView!,
+                                      multiplier: 1.25)
     }
     
-    //        if rightView?.alpha == 0 {
-    //            UIView.animate(withDuration: 0.2) {
-    //                self.rightView!.alpha = 1
-    //            }
-    //        }
-  }
-  
-  public func hideSign() {
-    isShowingSign = false
-    UIView.animate(withDuration: 0.2) {
-      self.checkSign.alpha = 0
-      self.warningSign.alpha = 0
-      self.lowerTextView.alpha = 0
+    open override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
+        let width = min(bounds.size.width, rightViewSize.width)
+        let height = min(bounds.size.height, rightViewSize.height)
+        let rect = CGRect(x: bounds.width - rightViewSize.width,
+                          y: bounds.size.height / 2 - height / 2,
+                          width: width,
+                          height: height)
+        return rect
     }
-  }
+    
+    public func showSign(state: SignState) {
+        isShowingSign = true
+        switch state {
+        case .Approved:
+            UIView.animate(withDuration: 0.15, animations: {
+                self.warningSign.alpha = 0
+                self.lowerTextView.alpha = 0
+            }) { _ in
+                UIView.animate(withDuration: 0.15) {
+                    self.checkSign.alpha = 1
+                }
+            }
+        case .InvalidHyperlink:
+            UIView.animate(withDuration: 0.15) {
+                self.lowerTextView.text = state.rawValue.localized
+                self.lowerTextView.alpha = 1
+            }
+        default:
+            UIView.animate(withDuration: 0.15, animations: {
+                self.checkSign.alpha = 0
+            }) { _ in
+                self.lowerTextView.text = state.localizedString()
+                UIView.animate(withDuration: 0.15) {
+                    self.lowerTextView.alpha = 1
+                    self.warningSign.alpha = 1
+                }
+            }
+        }
+        
+//        if rightView?.alpha == 0 {
+//            UIView.animate(withDuration: 0.2) {
+//                self.rightView!.alpha = 1
+//            }
+//        }
+    }
+    
+    public func hideSign() {
+        isShowingSign = false
+        UIView.animate(withDuration: 0.2) {
+            self.checkSign.alpha = 0
+            self.warningSign.alpha = 0
+            self.lowerTextView.alpha = 0
+        }
+    }
 }

@@ -458,7 +458,7 @@ private extension AnswerCell {
                                    isRemovedOnCompletion: false,
                                    completionBlocks: [{
 //        selection.opacity = 0
-        selection.removeAllAnimations()
+//        selection.removeAllAnimations()
         selection.removeFromSuperlayer() }]),
                     forKey: nil)
       selection.add(Animations.get(property: .Scale,
@@ -470,7 +470,7 @@ private extension AnswerCell {
                                    isRemovedOnCompletion: false,
                                    completionBlocks: [{
 //        selection.setAffineTransform(CGAffineTransform(scaleX: 1, y: 0.1))
-        selection.removeAllAnimations()
+//        selection.removeAllAnimations()
         selection.removeFromSuperlayer() }]),
                     forKey: nil)
     }
@@ -525,51 +525,6 @@ private extension AnswerCell {
         selection.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? self.color.withAlphaComponent(0.4).cgColor : self.color.withAlphaComponent(0.2).cgColor
         selection.frame = self.stackView.frame
       }
-//    selection.add(Animations.get(property: .Colors,
-//                                 fromValue: 1,
-//                                 toValue: 0,
-//                                 duration: 0.2,
-//                                 timingFunction: .easeOut,
-//                                 delegate: self,
-//                                 completionBlocks: [{ selection.removeFromSuperlayer() }]),
-//                  forKey: nil)
-    
-    
-    //    guard let passView = stackView.getSubview(type: PassthroughView.self),
-//          let constraint = passView.getConstraint(identifier: "heightAnchor")
-//    else {
-//      ///
-//      UIView.animate(
-//        withDuration: 0.3,
-//        delay: 0,
-//        usingSpringWithDamping: 0.8,
-//        initialSpringVelocity: 0.3,
-//        options: [.curveEaseInOut]) { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.2) : .clear
-//          self.imageView.tintColor = self.color
-//          self.textView.backgroundColor = .clear
-//          self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
-//        }
-//      return
-//    }
-//
-//    setNeedsLayout()
-//    UIView.animate(
-//      withDuration: 0.3,
-//      delay: 0,
-//      usingSpringWithDamping: 0.8,
-//      initialSpringVelocity: 0.3,
-//      options: [.curveEaseInOut]) { [weak self] in
-//        guard let self = self else { return }
-//
-//        passView.backgroundColor = (self.isChosen || self.isAnswerSelected) ? self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : self.color.withAlphaComponent(0.2) : .clear
-//        self.imageView.tintColor = self.color
-//        self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
-//        constraint.constant = self.stackView.bounds.height
-//        self.layoutIfNeeded()
-//      }
   }
   
   func observeVoters() {

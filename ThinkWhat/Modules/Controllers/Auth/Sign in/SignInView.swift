@@ -117,7 +117,9 @@ class SignInView: UIView {
     instance.autocorrectionType = .no
     instance.spellCheckingType = .no
     instance.clipsToBounds = false
-    
+    instance.addTarget(self, action: #selector(self.textFieldDidChange(_:)), for: .editingChanged)
+    instance.keyboardType = .asciiCapable
+
 //    let bgLayer = CAShapeLayer()
 //    bgLayer.backgroundColor = UIColor.secondarySystemFill.cgColor//(traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
 //    let fgLayer = CAShapeLayer()
@@ -166,6 +168,7 @@ class SignInView: UIView {
     let instance = UnderlinedSignTextField()
     instance.delegate = self
     instance.backgroundColor = .clear
+    instance.keyboardType = .asciiCapable
     instance.isSecureTextEntry = true
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
@@ -1157,6 +1160,13 @@ extension SignInView: UITextFieldDelegate {
     endEditing(true)
     
     return true
+  }
+  
+  @objc
+  func textFieldDidChange(_ textField: UITextField) {
+    guard let text = textField.text else { return }
+    
+    textField.text = text.lowercased()
   }
 }
 

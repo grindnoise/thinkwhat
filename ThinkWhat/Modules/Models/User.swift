@@ -226,7 +226,7 @@ class Userprofile: Decodable {
   }
   var fullName: String { firstName + (lastName.isEmpty ? "" : " \(lastName)") }
   var shortName: String { firstNameSingleWord + (lastNameSingleWord.isEmpty ? "" : " \(lastNameSingleWord)") }
-  var email: String
+  @Published var email: String
   var description: String = ""
   var dateJoined: Date
   @Published var birthDate: Date? {

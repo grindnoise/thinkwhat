@@ -55,6 +55,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
   ///**Publishers**
   private var colorPublisher = CurrentValueSubject<UIColor?, Never>(nil)
   @Published public private(set) var userprofileDescription: String?
+  @Published public private(set) var email: String?
   
   // MARK: - Destructor
   deinit {
@@ -184,20 +185,15 @@ class UserSettingsInfoCollectionView: UICollectionView {
       cell.insets = self.cellPadding
       cell.userprofile = self.userprofile
       cell.color = self.color
-//      ///Fetch
-//      cell.cityFetchPublisher
-//        .filter { !$0.isNil }
-//        .sink { [unowned self] in self.cityFetchPublisher.send($0!) }
-//        .store(in: &self.subscriptions)
-//      ///Selection
-//      cell.citySelectionPublisher
-//        .sink { [unowned self] in self.citySelectionPublisher.send($0) }
-//        .store(in: &self.subscriptions)
-//      cell.$scrollPublisher
-//        .eraseToAnyPublisher()
-//        .filter { !$0.isNil }
-//        .sink { [unowned self] in self.scrollPublisher = cell.convert($0!, to: self) }
-//        .store(in: &self.subscriptions)
+      cell.$scrollPublisher
+        .eraseToAnyPublisher()
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.scrollPublisher = cell.convert($0!, to: self) }
+        .store(in: &self.subscriptions)
+      cell.emailPublisher
+        .eraseToAnyPublisher()
+        .sink { [unowned self] in self.email = $0 }
+        .store(in: &self.self.subscriptions)
       
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
@@ -306,7 +302,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
       snapshot.appendSections([.Email])
     }
     snapshot.appendSections([.SocialMedia])
-    snapshot.appendSections([.Interests])
+    if !userprofile.preferences.isEmpty {
+      snapshot.appendSections([.Interests])
+    }
     
     snapshot.appendItems([0], toSection: .About)
     snapshot.appendItems([1], toSection: .City)
@@ -315,7 +313,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
 //      snapshot.appendItems([3], toSection: .SocialMedia)
     }
     snapshot.appendItems([3], toSection: .SocialMedia)
-    if mode != .Creation {
+    if mode != .Creation && !userprofile.preferences.isEmpty {
       snapshot.appendItems([4], toSection: .Interests)
     }
     source.apply(snapshot, animatingDifferences: false)

@@ -299,6 +299,121 @@ private extension SettingsController {
 
 // MARK: - View Input
 extension SettingsController: SettingsViewInput {
+  func sendVerificationCode(_ email: String) {
+    controllerInput?.sendVerificationCode(to: email) { [weak self] in
+      guard let self = self else { return }
+      
+      switch $0 {
+      case .success(let dict):
+        guard let code = dict["confirmation_code"] as? Int,
+              let components = email.components(separatedBy: "@") as? [String],
+              let username = components.first,
+              let firstLetter = username.first,
+              let lastLetter = username.last
+        else { return }
+        
+        let banner = NewPopup(padding: 16,
+                              contentPadding: .uniform(size: 16))
+        let content = EmailVerificationPopupContent(code: code,
+                                                    retryTimeout: 60,
+                                                    email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
+                                                    color: Colors.main,
+                                                    canCancel: true)
+        content.cancelPublisher
+          .sink { Userprofiles.shared.current?.email = Userprofiles.shared.current!.email; banner.dismiss() }
+          .store(in: &self.subscriptions)
+        content.verifiedPublisher
+          .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
+          .sink { [weak self] in
+            guard let self = self else { return }
+            
+            self.controllerInput?.updateUserprofile(parameters: [
+              "owner": [DjangoVariables.User.email: email],
+              "is_email_verified": true,
+            ],
+                                                    image: nil)
+            AppData.isEmailVerified = true
+            Userprofiles.shared.current?.email = email
+            banner.dismiss()
+            
+            let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "checkmark.circle.fill")!,
+                                                                  text: "account_email_confirmed".localized,
+                                                                  tintColor: Colors.main,
+                                                                  fontName: Fonts.Rubik.Regular,
+                                                                  textStyle: .subheadline,
+                                                                  textAlignment: .natural),
+                                   contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                   isModal: false,
+                                   useContentViewHeight: true,
+                                   shouldDismissAfter: 2)
+            banner.didDisappearPublisher
+              .sink { _ in banner.removeFromSuperview() }
+              .store(in: &self.subscriptions)
+          }
+          .store(in: &banner.subscriptions)
+        content.retryPublisher
+          .sink { [weak self] in
+            guard let self = self else { return }
+            
+            // Resend code via email
+            self.controllerInput?.sendVerificationCode(to: email) { [unowned self] in
+              
+              switch $0 {
+              case .success(let dict):
+                guard let code = dict["confirmation_code"] as? Int else { return }
+                
+                content.onEmailSent(code)
+              case.failure(let error):
+                DispatchQueue.main.async {
+#if DEBUG
+                  error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+                  let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+                                                                        text: AppError.server.localizedDescription,
+                                                                        tintColor: .systemRed,
+                                                                        fontName: Fonts.Rubik.Regular,
+                                                                        textStyle: .subheadline,
+                                                                        textAlignment: .natural),
+                                         contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                         isModal: false,
+                                         useContentViewHeight: true,
+                                         shouldDismissAfter: 2)
+                  banner.didDisappearPublisher
+                    .sink { _ in banner.removeFromSuperview() }
+                    .store(in: &self.subscriptions)
+                }
+              }
+            }
+          }
+          .store(in: &banner.subscriptions)
+        banner.setContent(content)
+        banner.didDisappearPublisher
+          .sink { _ in banner.removeFromSuperview() }
+          .store(in: &self.subscriptions)
+        
+        return
+        
+      case.failure(let error):
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
+                                                              text: AppError.server.localizedDescription,
+                                                              tintColor: .systemRed,
+                                                              fontName: Fonts.Rubik.Regular,
+                                                              textStyle: .subheadline,
+                                                              textAlignment: .natural),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 2)
+        banner.didDisappearPublisher
+          .sink { _ in banner.removeFromSuperview() }
+          .store(in: &self.subscriptions)
+      }
+    }
+  }
+  
   func manageAccount(_ mode: AccountManagementCell.Mode) {
     guard let controller = tabBarController as? MainController else { return }
     
@@ -307,6 +422,8 @@ extension SettingsController: SettingsViewInput {
       controller.logout()
     case .Delete:
       controller.deleteAccount()
+    default:
+      print("")
     }
   }
   

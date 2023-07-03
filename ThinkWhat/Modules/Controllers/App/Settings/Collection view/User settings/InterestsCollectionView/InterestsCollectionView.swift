@@ -22,7 +22,7 @@ class InterestsCollectionView: UICollectionView {
   // MARK: - Public properties
   public weak var userprofile: Userprofile! {
     didSet {
-      guard let userprofile = userprofile else { return }
+      guard !userprofile.isNil else { return }
       
       reload(animated: false)
     }

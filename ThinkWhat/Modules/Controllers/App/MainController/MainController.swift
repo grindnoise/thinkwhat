@@ -444,6 +444,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
     UserDefaults.clear()
     Surveys.clear()
     AppData.isEmailVerified = false
+    AppData.isSocialAuth = true
     if let token = PushNotifications.loadToken() {
       Task {
         defer { KeychainService.deleteData() }
@@ -743,40 +744,41 @@ private extension MainController {
             try Userprofiles.updateUserData(userData)
             try? Surveys.shared.load(surveys)
 
-            // If user hasn't verified email
-            guard AppData.isEmailVerified else {
-              if let email = UserDefaults.Profile.email,
-                 let components = email.components(separatedBy: "@") as? [String],
-                 let username = components.first,
-                 let firstLetter = username.first,
-                 let lastLetter = username.last,
-                 let code = AppData.emailVerificationCode {
-                
-                let banner = NewPopup(padding: 16,
-                                      contentPadding: .uniform(size: 16))
-                let content = EmailVerificationPopupContent(code: code,
-                                                            retryTimeout: 5,
-                                                            email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
-                                                            color: Colors.main)
-                content.verifiedPublisher
-                  .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
-                  .sink { [weak self] in
-                    guard let self = self else { return }
-
-                    self.emailConfirmed()
-                    banner.dismiss()
-                  }
-                  .store(in: &banner.subscriptions)
-                content.retryPublisher
-                  .sink { [unowned self] in
+            // If user hasn't verified email if he/she has resgistered via email
+            if !AppData.isEmailVerified,
+               !AppData.isSocialAuth,
+               let email = UserDefaults.Profile.email,
+               let components = email.components(separatedBy: "@") as? [String],
+               let username = components.first,
+               let firstLetter = username.first,
+               let lastLetter = username.last,
+               let code = AppData.emailVerificationCode {
+              
+              let banner = NewPopup(padding: 16,
+                                    contentPadding: .uniform(size: 16))
+              let content = EmailVerificationPopupContent(code: code,
+                                                          retryTimeout: 60,
+                                                          email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
+                                                          color: Colors.main)
+              content.verifiedPublisher
+                .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
+                .sink { [weak self] in
+                  guard let self = self else { return }
+                  
+                  self.emailConfirmed()
+                  banner.dismiss()
+                }
+                .store(in: &banner.subscriptions)
+              content.retryPublisher
+                .sink { [unowned self] in
+                  
+                  // Resend code via email
+                  self.sendVerificationCode { [unowned self] in
                     
-                    // Resend code via email
-                    self.sendVerificationCode { [unowned self] in
-
                     switch $0 {
                     case .success(let dict):
                       guard let code = dict["confirmation_code"] as? Int else { return }
-
+                      
                       content.onEmailSent(code)
                     case.failure(let error):
 #if DEBUG
@@ -797,15 +799,14 @@ private extension MainController {
                         .store(in: &self.subscriptions)
                     }
                   }}
-                  .store(in: &banner.subscriptions)
-                banner.setContent(content)
-                banner.didDisappearPublisher
-                  .sink { [unowned self] _ in
-                    self.isDataLoaded = true
-                    banner.removeFromSuperview()
-                  }
-                  .store(in: &self.subscriptions)
-              }
+                .store(in: &banner.subscriptions)
+              banner.setContent(content)
+              banner.didDisappearPublisher
+                .sink { [unowned self] _ in
+                  self.isDataLoaded = true
+                  banner.removeFromSuperview()
+                }
+                .store(in: &self.subscriptions)
               
               return
             }

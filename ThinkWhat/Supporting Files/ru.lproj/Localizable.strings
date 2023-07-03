@@ -364,6 +364,7 @@
 "account_management" = "Управление учетной записью";
 "logout" = "Выйти из аккаунта";
 "delete_account" = "Удалить аккаунт";
+"email_change" = "Сменить почту";
 "allow_push_notifications" = "Разрешить уведомления";
 "NOTIFICATIONS_OWN_COMPLETED" = "Завершение моих публикаций";
 "NOTIFICATIONS_NEW_SUBSCRIPTIONS" = "Новые публикации по подписке";
@@ -409,8 +410,11 @@
 "save_setting" = "Сохранить";
 "account_logout" = "Выход из аккаунта";
 "account_delete" = "Удаление аккаунта";
+"account_email_change" = "Смена почты";
+"account_email_confirmed" = "Почта подтверждена";
 "account_logout_description" = "Вы собираетесь выйти из учетной записи. Продолжить?";
 "account_delete_description" = "Удаление аккаунта - необратимое действие. Продолжить?";
+"account_email_change_description" = "Вы собираетесь сменить электронную почту, для этого понадобится подтвердить ее. Продолжить?";
 "account_location_empty" = "Пожалуйста, заполните Ваше местонахождение";
 "claim" = "Жалоба";
 "account_fill_in" = "Заполните информацию о себе и выберите изображение профиля";

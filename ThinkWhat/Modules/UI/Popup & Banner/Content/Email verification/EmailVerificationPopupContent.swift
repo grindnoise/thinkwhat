@@ -18,6 +18,7 @@ class EmailVerificationPopupContent: UIView {
   // MARK: - Public properties
   public let verifiedPublisher = PassthroughSubject<Void, Never>()
   public let retryPublisher = PassthroughSubject<Void, Never>()
+  public let cancelPublisher = PassthroughSubject<Void, Never>()
   
   
   
@@ -47,6 +48,7 @@ class EmailVerificationPopupContent: UIView {
   ///**UI**
   private let padding: CGFloat
   private let color: UIColor
+  private let canCancel: Bool
   private lazy var label: UILabel = {
     let instance = UILabel()
     instance.numberOfLines = 0
@@ -157,6 +159,11 @@ class EmailVerificationPopupContent: UIView {
       mailNotDeliveredLabel,
       retryLabel
     ])
+    if canCancel {
+      let v = UIView.opaque()
+      cancelButton.placeXCentered(inside: v, topInset: padding*2, bottomInset: -padding*2)
+      remains.addArrangedSubview(v)
+    }
     remains.spacing = padding/2
     remains.axis = .vertical
     remains.placeXCentered(inside: bottom, topInset: padding, bottomInset: 0)
@@ -173,6 +180,7 @@ class EmailVerificationPopupContent: UIView {
 //      middle2,
 //      bottom
     ])
+    
     instance.axis = .vertical
 //    instance.spacing = padding*4
 //    bottom.translatesAutoresizingMaskIntoConstraints = false
@@ -265,7 +273,33 @@ class EmailVerificationPopupContent: UIView {
     
     return instance
   }()
-  
+  private lazy var cancelButton: UIButton = {
+    let instance = UIButton()
+    instance.addTarget(self,
+                       action: #selector(self.cancel),
+                       for: .touchUpInside)
+    if #available(iOS 15, *) {
+      var config = UIButton.Configuration.plain()
+      config.contentInsets = .uniform(size: 0)
+      config.attributedTitle = AttributedString("cancel".localized,
+                                                attributes: AttributeContainer([
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                  .foregroundColor: UIColor.secondaryLabel as Any
+                                                ]))
+      instance.configuration = config
+    } else {
+      instance.contentEdgeInsets = .uniform(size: 0)
+      instance.setAttributedTitle(NSAttributedString(string: "cancel".localized,
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                      .foregroundColor: UIColor.secondaryLabel as Any
+                                                     ]),
+                                  for: .normal)
+    }
+    
+    return instance
+  }()
+
   
   
   // MARK: - Deinitialization
@@ -286,8 +320,9 @@ class EmailVerificationPopupContent: UIView {
        retryTimeout: Int,
        email: String,
        color: UIColor,
-       padding: CGFloat = 8) {
-    
+       padding: CGFloat = 8,
+       canCancel: Bool = false) {
+    self.canCancel = canCancel
     self.email = email
     self.code = code
     self.retryTimeout = retryTimeout
@@ -362,6 +397,15 @@ private extension EmailVerificationPopupContent {
   @objc
   func handleTap(sender: UIButton) {
     retryPublisher.send()
+    textField_1.text = ""
+    textField_2.text = ""
+    textField_3.text = ""
+    textField_4.text = ""
+  }
+  
+  @objc
+  func cancel() {
+    cancelPublisher.send()
   }
   
   func countdown() {

@@ -34,10 +34,11 @@ class UserSettingsCollectionView: UICollectionView {
   public let openURLPublisher = CurrentValueSubject<URL?, Never>(nil)
   public let publicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public let subscribersPublisher = PassthroughSubject<Userprofile, Never>()
-  public var subscriptionsPublisher = CurrentValueSubject<Bool?, Never>(nil)
+  public let subscriptionsPublisher = PassthroughSubject<Userprofile, Never>()
   public var watchingPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public private(set) var accountManagementPublisher = PassthroughSubject<AccountManagementCell.Mode, Never>()
   @Published public private(set) var userprofileDescription: String?
+  @Published public private(set) var email: String?
   ///**UI
   public var color: UIColor = Colors.System.Red.rawValue {
     didSet {
@@ -206,6 +207,10 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
         .filter { !$0.isNil }
         .sink { [unowned self] in self.userprofileDescription = $0! }
         .store(in: &self.subscriptions)
+      cell.$email
+        .filter { !$0.isNil }
+        .sink { [unowned self] in self.email = $0! }
+        .store(in: &self.subscriptions)
       
       cell.cityFetchPublisher
         .throttle(for: .seconds(1),
@@ -291,6 +296,14 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
           guard let self = self else { return }
           
           self.subscribersPublisher.send($0)
+        }
+        .store(in: &subscriptions)
+      
+      cell.subscriptionsPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.subscriptionsPublisher.send($0)
         }
         .store(in: &subscriptions)
       

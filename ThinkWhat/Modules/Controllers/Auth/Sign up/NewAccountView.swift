@@ -160,6 +160,7 @@ class NewAccountView: UIView {
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
     instance.addTarget(self, action: #selector(self.editingChanged), for: .editingChanged)
+    instance.keyboardType = .asciiCapable
     
     let bgLayer = CAShapeLayer()
     bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
@@ -215,6 +216,7 @@ class NewAccountView: UIView {
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
     instance.addTarget(self, action: #selector(self.editingChanged), for: .editingChanged)
+    instance.keyboardType = .asciiCapable
     
     let bgLayer = CAShapeLayer()
     bgLayer.backgroundColor = (traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground : UIColor.secondarySystemBackground).cgColor
@@ -269,6 +271,7 @@ class NewAccountView: UIView {
     instance.clipsToBounds = false
     instance.tintColor = Colors.main
     instance.addTarget(self, action: #selector(self.editingChanged), for: .editingChanged)
+    instance.keyboardType = .asciiCapable
     instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
                                                         attributes: [
                                                           .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any
@@ -359,7 +362,7 @@ extension NewAccountView: NewAccountControllerOutput {
       case .success(let dict):
         guard let code = dict["confirmation_code"] as? Int,
               let expiresString = dict["expires_in"] as? String,
-              let expiresDate = expiresString.dateTime,
+//              let expiresDate = expiresString.dateTime,
               let email = self.mailTextField.text,
               let components = email.components(separatedBy: "@") as? [String],
               let username = components.first,
@@ -367,7 +370,6 @@ extension NewAccountView: NewAccountControllerOutput {
               let lastLetter = username.last
         else { return }
         
-        //              let email = "pbuxaroff@gmail.com"
         let banner = NewPopup(padding: self.padding*2,
                               contentPadding: .uniform(size: self.padding*2))
         let content = EmailVerificationPopupContent(code: code,
@@ -390,7 +392,6 @@ extension NewAccountView: NewAccountControllerOutput {
             switch $0 {
             case .success(let dict):
               guard let code = dict["confirmation_code"] as? Int else { return }
-              AppData.emailVerificationCode
               
               content.onEmailSent(code)
             case.failure(let error):
@@ -580,9 +581,9 @@ private extension NewAccountView {
   
   @objc
   func editingChanged(_ textField: UnderlinedSignTextField) {
-    //guard let text = textField.text else { return }
+    guard let text = textField.text else { return }
     
-    
+    textField.text = text.lowercased()
   }
   
   @objc

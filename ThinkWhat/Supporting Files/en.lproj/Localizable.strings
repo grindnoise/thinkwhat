@@ -364,6 +364,7 @@
 "account_management" = "Account management";
 "logout" = "Log out";
 "delete_account" = "Delete account";
+"email_change" = "Change email";
 "allow_push_notifications" = "Allow notifications";
 "NOTIFICATIONS_OWN_COMPLETED" = "My completed posts";
 "NOTIFICATIONS_NEW_SUBSCRIPTIONS" = "New posts by subscription";
@@ -409,8 +410,11 @@
 "save_setting" = "Save";
 "account_logout" = "Logout";
 "account_delete" = "Account deleting";
+"account_email_change" = "Email change";
+"account_email_confirmed" = "Email confirmed";
 "account_logout_description" = "You are about to sign out of your account. Continue?";
 "account_delete_description" = "Deleting an account is an irreversible action. Continue?";
+"account_email_change_description" = "You are going to change email. Thus you will need to confirm new email. Continue?";
 "account_location_empty" = "Please select your location";
 "claim" = "Claim";
 "account_fill_in" = "Fill in your information and select a profile picture";

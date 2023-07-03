@@ -22,6 +22,7 @@ class UserSettingsInfoCell: UICollectionViewListCell {
   }
   ///**Publishers**
   @Published public private(set) var userprofileDescription: String?
+  @Published public private(set) var email: String?
   @Published public private(set) var scrollPublisher: CGPoint?
   @Published public private(set) var boundsPublisher: Bool?
   public private(set) var cityFetchPublisher = PassthroughSubject<String, Never>()
@@ -57,9 +58,13 @@ class UserSettingsInfoCell: UICollectionViewListCell {
       .store(in: &subscriptions)
     
     instance.$userprofileDescription
-      .filter { !$0.isNil }
-      .sink { [unowned self] in userprofileDescription = $0! }
+//      .filter { !$0.isNil }
+      .sink { [unowned self] in self.userprofileDescription = $0 }
       .store(in: &subscriptions)
+    instance.$email
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.email = $0 }
+      .store(in: &self.subscriptions)
     instance.cityFetchPublisher
       .filter { !$0.isNil }
       .sink { [unowned self] in self.cityFetchPublisher.send($0!) }
@@ -158,6 +163,7 @@ class UserSettingsInfoCell: UICollectionViewListCell {
       tiktokPublisher = PassthroughSubject<String, Never>()
       googlePublisher = PassthroughSubject<String, Never>()
       twitterPublisher = PassthroughSubject<String, Never>()
+//      emailPublisher = PassthroughSubject<String, Never>()
 //            urlPublisher = CurrentValueSubject<URL?, Never>(nil)
 //            subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
 //            imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
