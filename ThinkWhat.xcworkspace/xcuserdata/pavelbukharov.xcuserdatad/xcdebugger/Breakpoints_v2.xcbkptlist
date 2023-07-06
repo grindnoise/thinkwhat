@@ -1864,8 +1864,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "986"
-            endingLineNumber = "986"
+            startingLineNumber = "997"
+            endingLineNumber = "997"
             landmarkName = "onUserSelected(userprofile:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2175,22 +2175,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "9E880D6D-09F0-44C6-959A-250D7B8CFA18"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Topics/TopicsView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "625"
-            endingLineNumber = "625"
-            landmarkName = "toggleDateFilter(on:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "FE9CF9C6-3F24-4D2E-AEA6-50A3A9350539"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -2198,8 +2182,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Topics/TopicsView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "376"
-            endingLineNumber = "376"
+            startingLineNumber = "366"
+            endingLineNumber = "366"
             landmarkName = "isDateFilterOnScreen"
             landmarkType = "24">
          </BreakpointContent>
@@ -2214,8 +2198,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Topics/TopicsView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "517"
-            endingLineNumber = "517"
+            startingLineNumber = "493"
+            endingLineNumber = "493"
             landmarkName = "TopicsView"
             landmarkType = "21">
          </BreakpointContent>
@@ -3224,6 +3208,36 @@
                   startingLineNumber = "752"
                   endingLineNumber = "752"
                   offsetFromSymbolStart = "248">
+               </Location>
+               <Location
+                  uuid = "80AF275F-1179-4C53-8B09-C4E5F1895CD2 - 886b9211b70e247f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for ThinkWhat__local_.Userprofile.downloadImageAsync() async throws -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Models/User.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "752"
+                  endingLineNumber = "752"
+                  offsetFromSymbolStart = "836">
+               </Location>
+               <Location
+                  uuid = "80AF275F-1179-4C53-8B09-C4E5F1895CD2 - a3bfbd35c294ae40"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for ThinkWhat__local_.Userprofile.downloadImageAsync() async throws -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Models/User.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "752"
+                  endingLineNumber = "752"
+                  offsetFromSymbolStart = "256">
                </Location>
             </Locations>
          </BreakpointContent>

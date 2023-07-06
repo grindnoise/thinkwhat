@@ -105,76 +105,50 @@ class SubscriptionsView: UIView {
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100,
-                                                                 font: UIFont(name: Fonts.Bold, size: 18)!)).isActive = true
+//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!)).isActive = true
 
-//    let opaque = UIView.opaque()
-//    opaque.backgroundColor = viewInput!.tintColor
-//    opaque.publisher(for: \.bounds)
-//      .receive(on: DispatchQueue.main)
-//      .filter { $0 != .zero && opaque.cornerRadius == .zero }
-//      .sink { opaque.cornerRadius = $0.height/2.25 }
-//      .store(in: &subscriptions)
-//    titleLabel.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
-//
-    let opaque = UIView.opaque()
-    opaque.backgroundColor = viewInput!.tintColor
-    opaque.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero && opaque.cornerRadius == .zero }
-      .sink { opaque.cornerRadius = $0.height/2.25 }
+    let shadowView = UIView.opaque()
+    shadowView.layer.masksToBounds = false
+    shadowView.accessibilityIdentifier = "shadow"
+    shadowView.layer.shadowColor = UIColor.black.withAlphaComponent(0.35).cgColor
+    shadowView.layer.shadowOffset = .zero
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.publisher(for: \.bounds)
+      .sink {
+        shadowView.layer.shadowRadius = $0.height/8
+        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+      }
       .store(in: &subscriptions)
-    periodButton.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
-//
-//    let stack = UIStackView(arrangedSubviews: [
-//      opaque,
-//      opaque_2
-//    ])
-//    stack.axis = .horizontal
-//    stack.spacing = 4
-//
-//    instance.addSubview(stack)
-//    stack.translatesAutoresizingMaskIntoConstraints = false
-//
-//    NSLayoutConstraint.activate([
-//      stack.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-//      stack.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-//      stack.heightAnchor.constraint(equalTo: instance.heightAnchor),
-//    ])
-    opaque.backgroundColor = Colors.main
-    opaque.translatesAutoresizingMaskIntoConstraints = false
-    instance.addSubview(opaque)
+
+    periodButton.placeInCenter(of: instance)
+    
+    shadowView.translatesAutoresizingMaskIntoConstraints = false
+        instance.insertSubview(shadowView, belowSubview: periodButton)
     
     NSLayoutConstraint.activate([
-      opaque.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-      opaque.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-      opaque.heightAnchor.constraint(equalTo: instance.heightAnchor),
+      shadowView.leadingAnchor.constraint(equalTo: periodButton.leadingAnchor),
+      shadowView.topAnchor.constraint(equalTo: periodButton.topAnchor),
+      shadowView.trailingAnchor.constraint(equalTo: periodButton.trailingAnchor),
+      shadowView.bottomAnchor.constraint(equalTo: periodButton.bottomAnchor),
     ])
 
     return instance
   }()
-//  private lazy var titleLabel: UILabel = {
-//    let instance = UILabel()
-//    instance.numberOfLines = 1
-//    instance.textAlignment = .center
-//    instance.numberOfLines = 1
-//    instance.textColor = .white
-//    instance.text = "publications".localized.uppercased()
-//    instance.font = UIFont(name: Fonts.Bold, size: 18)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
-//    instance.adjustsFontSizeToFitWidth = true
-//    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
-//
-//    return instance
-//  }()
   private lazy var periodButton: UIButton = {
     let instance = UIButton()
     instance.titleLabel?.numberOfLines = 1
     instance.showsMenuAsPrimaryAction = true
     instance.menu = prepareMenu()
-    instance.imageView?.tintColor = .white
-    instance.imageEdgeInsets.left = 4
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+//    instance.setTitleColor(traitCollection.userInterfaceStyle == .dark ? .white : viewInput?.tintColor, for: .normal)
+    instance.imageEdgeInsets.left = padding
+    instance.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding*2, bottom: padding, right: padding*2)
     instance.semanticContentAttribute = .forceRightToLeft
-    instance.setImage(UIImage(systemName: ("chevron.down")), for: .normal)
+    instance.setImage(UIImage(systemName: ("slider.horizontal.3"), withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -472,6 +446,7 @@ class SubscriptionsView: UIView {
     instance.tapPublisher
       .sink { [unowned self] in self.viewInput?.openUserprofile($0) }
       .store(in: &subscriptions)
+    instance.isShadowed = traitCollection.userInterfaceStyle != .dark
     
     return instance
   }()
@@ -480,7 +455,7 @@ class SubscriptionsView: UIView {
     //        instance.insets.top = -4
     instance.textAlignment = .left
     instance.numberOfLines = 1
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title2)
     instance.adjustsFontSizeToFitWidth = true
     
     return instance
@@ -495,7 +470,7 @@ class SubscriptionsView: UIView {
       config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [unowned self] incoming in
         var outgoing = incoming
         outgoing.foregroundColor = Colors.System.Purple.rawValue//self.traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
-        outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        outgoing.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote)
         return outgoing
       }
       config.baseBackgroundColor = Colors.System.Purple.rawValue.withAlphaComponent(0.15)//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR.withAlphaComponent(0.15) : .systemBlue.withAlphaComponent(0.15)
@@ -513,7 +488,7 @@ class SubscriptionsView: UIView {
       instance.configuration = config
     } else {
       let attrString = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
         NSAttributedString.Key.foregroundColor: Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
       ])
       instance.setAttributedTitle(attrString, for: .normal)
@@ -537,7 +512,7 @@ class SubscriptionsView: UIView {
       config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
         var outgoing = incoming
         outgoing.foregroundColor = UIColor.systemRed
-        outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+        outgoing.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote)
         return outgoing
       }
       config.baseBackgroundColor = .systemRed.withAlphaComponent(0.15)
@@ -561,7 +536,7 @@ class SubscriptionsView: UIView {
       //                .store(in: &subscriptions)
     } else {
       let attrString = NSMutableAttributedString(string: "unsubscribe".localized.uppercased(), attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
         NSAttributedString.Key.foregroundColor: UIColor.systemRed
       ])
       instance.setAttributedTitle(attrString, for: .normal)
@@ -576,21 +551,52 @@ class SubscriptionsView: UIView {
     return instance
   }()
   private lazy var userStack: UIStackView = {
-    let opaque = UIView()
-    opaque.backgroundColor = .clear
-    
-    let instance = UIStackView(arrangedSubviews: [
+    let nested = UIStackView(arrangedSubviews: [
       usernameLabel,
       profileButton,
       subscriptionButton,
-      opaque
+      UIView.opaque()
     ])
-    instance.alignment = .leading
-    instance.axis = .vertical
-    instance.spacing = 4
-    instance.accessibilityIdentifier = "userStack"
+    nested.alignment = .leading
+    nested.axis = .vertical
+    nested.spacing = 4
+    nested.accessibilityIdentifier = "nested"
+    
+    let opaque = UIView.opaque()
+    opaque.addSubview(avatar)
+    
+    let instance = UIStackView(arrangedSubviews: [
+      opaque,
+      nested,
+    ])
+    instance.axis = .horizontal
+    instance.spacing = padding*2
+    instance.alignment = .center
+    
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    opaque.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.3).isActive = true
+    avatar.translatesAutoresizingMaskIntoConstraints = false
+    avatar.centerXAnchor.constraint(equalTo: opaque.centerXAnchor).isActive = true
+    avatar.centerYAnchor.constraint(equalTo: opaque.centerYAnchor).isActive = true
+    avatar.leadingAnchor.constraint(equalTo: opaque.leadingAnchor).isActive = true
+    avatar.trailingAnchor.constraint(equalTo: opaque.trailingAnchor).isActive = true
     
     return instance
+//    let opaque = UIView()
+//    opaque.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+//
+//    let instance = UIStackView(arrangedSubviews: [
+//      usernameLabel,
+//      profileButton,
+//      subscriptionButton,
+//      opaque
+//    ])
+//    instance.alignment = .leading
+//    instance.axis = .vertical
+//    instance.spacing = 4
+//    instance.accessibilityIdentifier = "userStack"
+//
+//    return instance
   }()
   private lazy var userView: UIView = {
     let instance = UIView()
@@ -603,52 +609,57 @@ class SubscriptionsView: UIView {
     instance.layer.shadowOffset = .zero
     instance.alpha = 1
     instance.place(inside: topView,
-                   insets: UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10))
+                   insets: UIEdgeInsets(top: 0, left: padding, bottom: 0, right: padding))
+    let background = UIView()
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    background.place(inside: instance)
     instance.publisher(for: \.bounds)
-      .sink { rect in
-        instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
+      .sink { [weak self] in
+        instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath
+        background.cornerRadius = $0.width * 0.05
       }
       .store(in: &subscriptions)
     
-    let backgroundView = UIView()
-    backgroundView.accessibilityIdentifier = "background"
-    backgroundView.clipsToBounds = true
-    backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-    backgroundView.publisher(for: \.bounds)
-      .sink { rect in
-        backgroundView.cornerRadius = rect.width * 0.05
-      }
-      .store(in: &subscriptions)
-    
-    backgroundView.place(inside: instance)
-    backgroundView.addSubview(avatar)
-    avatar.translatesAutoresizingMaskIntoConstraints = false
-    
-    let opaque = UIView()
-    opaque.accessibilityIdentifier = "opaque"
-    opaque.clipsToBounds = true
-    backgroundView.addSubview(opaque)
-    opaque.backgroundColor = .clear
-    userStack.translatesAutoresizingMaskIntoConstraints = false
-    opaque.translatesAutoresizingMaskIntoConstraints = false
-    opaque.addSubview(userStack)
-    
-    NSLayoutConstraint.activate([
-      avatar.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 8),
-      avatar.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 8),
-      avatar.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -8),
-      //            opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16),
-      opaque.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 6),
-      opaque.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -6),
-      opaque.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor),
-      userStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor),
-      userStack.trailingAnchor.constraint(equalTo: opaque.trailingAnchor),
-      userStack.centerYAnchor.constraint(equalTo: opaque.centerYAnchor),
-    ])
-    
-    let constraint = opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16)
-    constraint.identifier = "trailing"
-    constraint.isActive = true
+    userStack.place(inside: background, insets: .uniform(size: padding*2))
+//    let backgroundView = UIView()
+//    backgroundView.accessibilityIdentifier = "background"
+//    backgroundView.clipsToBounds = true
+//    backgroundView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+//    backgroundView.publisher(for: \.bounds)
+//      .sink { rect in
+//        backgroundView.cornerRadius = rect.width * 0.05
+//      }
+//      .store(in: &subscriptions)
+//
+//    backgroundView.place(inside: instance)
+//    backgroundView.addSubview(avatar)
+//    avatar.translatesAutoresizingMaskIntoConstraints = false
+//
+//    let opaque = UIView()
+//    opaque.accessibilityIdentifier = "opaque"
+//    opaque.clipsToBounds = true
+//    backgroundView.addSubview(opaque)
+//    opaque.backgroundColor = .clear
+//    userStack.translatesAutoresizingMaskIntoConstraints = false
+//    opaque.translatesAutoresizingMaskIntoConstraints = false
+//    opaque.addSubview(userStack)
+//
+//    NSLayoutConstraint.activate([
+//      avatar.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 8),
+//      avatar.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 8),
+//      avatar.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -8),
+//      //            opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16),
+//      opaque.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 6),
+//      opaque.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -6),
+//      opaque.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor),
+//      userStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor),
+//      userStack.trailingAnchor.constraint(equalTo: opaque.trailingAnchor),
+//      userStack.centerYAnchor.constraint(equalTo: opaque.centerYAnchor),
+//    ])
+//
+//    let constraint = opaque.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 16)
+//    constraint.identifier = "trailing"
+//    constraint.isActive = true
     
     return instance
   }()
@@ -702,11 +713,18 @@ class SubscriptionsView: UIView {
     constraint.identifier = "height"
     constraint.isActive = true
     
-    feedCollectionView.place(inside: instance)
+    feedCollectionView.translatesAutoresizingMaskIntoConstraints = false
+    instance.addSubview(feedCollectionView)
+    
+    feedCollectionView.topAnchor.constraint(equalTo: instance.topAnchor).isActive = true
+    feedCollectionView.leadingAnchor.constraint(equalTo: instance.leadingAnchor).isActive = true
+    feedCollectionView.trailingAnchor.constraint(equalTo: instance.trailingAnchor).isActive = true
+    feedCollectionView.heightAnchor.constraint(equalToConstant: topViewHeight).isActive = true
     
     return instance
   }()
   private lazy var filterViewHeight: CGFloat = .zero
+  private lazy var topViewHeight: CGFloat = 100
   
   @IBOutlet var contentView: UIView!
   
@@ -741,15 +759,20 @@ class SubscriptionsView: UIView {
 //      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
       let attrString_1 = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(),
                                                    attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote) as Any,
+                                                    .font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
                                                     .foregroundColor: Colors.main
       ])
       profileButton.setAttributedTitle(attrString_1, for: .normal)
     }
-    
+    avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
     userView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+    periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+    periodButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+    updatePeriodButton()
+    
+    filterView.getSubview(type: UIView.self, identifier: "shadow")?.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     
     guard let background = userView.getSubview(type: UIView.self, identifier: "background") else { return }
     
@@ -934,28 +957,16 @@ private extension SubscriptionsView {
         }
       }
     }
-    //        userView.setNeedsLayout()
-    //        avatar.updateConstraints()
-    //        userView.layoutIfNeeded()
     
     guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
           let constraint = shadowView.getConstraint(identifier: "top"),
-          let constraint1 = filterView.getConstraint(identifier: "top_1")
+          let constraint1 = filterView.getConstraint(identifier: "top_1"),
+          let topViewConstraint = topView.getConstraint(identifier: "height")
     else { return }
     
     setNeedsLayout()
     avatar.userprofile = userprofile
-//    avatar.alpha = 0
-//    avatar.tapPublisher
-//      .sink { [unowned self] in self.viewInput?.openUserprofile($0) }
-//      .store(in: &subscriptions)
-    //        usernameLabel.text = userprofile.name
-    //        usernameLabel.setConstraints()
-    //        notifyButton.setImage(UIImage(systemName: "bell.and.waves.left.and.right.fill",
-    //                                      withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),
-    //                              for: .normal)
-    //        userView.layoutIfNeeded()
-    
+
     let temp = UIImageView(image: userprofile.image)
     temp.contentMode = .scaleAspectFill
     temp.frame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: topView), size: cell.avatar.bounds.size)
@@ -964,7 +975,7 @@ private extension SubscriptionsView {
     cell.avatar.alpha = 0
     
     let destinationFrame = CGRect(origin: userView.convert(avatar.frame.origin, to: topView),
-                                  size: avatar.bounds.size)
+                                  size: .init(width: cell.avatar.bounds.size.width * 2.23, height: cell.avatar.bounds.size.width * 2.23))
     
     userView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
     userStack.arrangedSubviews.forEach { $0.alpha = 0 }
@@ -985,6 +996,7 @@ private extension SubscriptionsView {
         self.userView.transform = .identity
         constraint.constant = self.filterView.alpha == 1 ? 16 : 8
         constraint1.constant = self.filterView.alpha == 1 ? 16 : 8//8
+        topViewConstraint.constant = topViewHeight * 1.5
         self.layoutIfNeeded()
         animateStackView()
       }) { [weak self] _ in
@@ -1095,34 +1107,20 @@ private extension SubscriptionsView {
   
   @MainActor
   func updatePeriodButton() {
-    
     periodButton.menu = prepareMenu()
-    
     let buttonText = "publications".localized.uppercased() + ": " + "per_\(period.rawValue.lowercased())".localized.uppercased()
-    
-//    if #available(iOS 15, *) {
-//      if !periodButton.configuration.isNil {
-//        periodButton.configuration?.title = buttonText
-//      }
-//    } else {
-      let attrString = NSMutableAttributedString(string: buttonText,
-                                                 attributes: [
-                                                  .font: UIFont(name: Fonts.Bold, size: 18) as Any,
-                                                  .foregroundColor: UIColor.white,
-                                                 ])
-      periodButton.setAttributedTitle(attrString, for: .normal)
-      
-//      guard let constraint = periodButton.getConstraint(identifier: "width") else { return }
-//
-//      setNeedsLayout()
-//      UIView.animate(withDuration: 0.15, delay: 0) { [weak self] in
-//        guard let self = self else { return }
-//
-//        constraint.constant = buttonText.width(withConstrainedHeight: 100,
-//                                               font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
-//        self.layoutIfNeeded()
-//      }
-//    }
+    let attrString = NSMutableAttributedString(string: buttonText,
+                                               attributes: [
+                                                .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : viewInput?.tintColor as Any,
+                                               ])
+    periodButton.setAttributedTitle(attrString, for: .normal)
+    let attrString1 = NSMutableAttributedString(string: buttonText,
+                                                attributes: [
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : viewInput?.tintColor as Any,
+                                                ])
+    periodButton.setAttributedTitle(attrString1, for: .highlighted)
   }
   
   @MainActor
@@ -1142,7 +1140,7 @@ private extension SubscriptionsView {
       //            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
       //            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
       self.filterView.alpha = on ? 1 : 0
-      self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
+      self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
       constraint1.constant = on ? 16 : self.mode == .Default ? 0 : 10
       constraint2.constant = on ? 16 : 0
       //            constraint3.constant = on ? 8 : 4
@@ -1159,7 +1157,7 @@ private extension SubscriptionsView {
       label.accessibilityIdentifier = "emptyLabel"
       label.backgroundColor = .clear
       label.alpha = 0
-      label.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title3)
+      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title3)
       label.text = "publications_not_found".localized// + "\n⚠︎"
       label.textColor = .secondaryLabel
       label.numberOfLines = 0
@@ -1244,7 +1242,7 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
     let destinationFrame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: topView),
                                   size: cell.avatar.imageView.bounds.size)
     
-    userView.setNeedsLayout()
+    setNeedsLayout()
     //        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
     //                                                       delay: 0,
     //                                                       options: .curveEaseInOut,
@@ -1267,7 +1265,10 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
         subview.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         //                self.userStack.spacing = 100
         constraint.constant = self.userView.bounds.width/3
-        self.userView.layoutIfNeeded()
+        if let topViewConstraint = self.topView.getConstraint(identifier: "height") {
+          topViewConstraint.constant = self.topViewHeight
+        }
+        self.layoutIfNeeded()
       }) { _ in
         subview.transform = .identity
         self.userView.transform = .identity

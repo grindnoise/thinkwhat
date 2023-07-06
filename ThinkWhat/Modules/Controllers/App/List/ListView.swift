@@ -21,7 +21,6 @@ class ListView: UIView {
       
       setupUI()
       updatePeriodButton()
-      setTitle(category: viewInput.category, animated: false)
       collectionView.color = viewInput.tintColor
       
       if #available(iOS 15, *) {
@@ -60,45 +59,32 @@ class ListView: UIView {
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
-    
-    let opaque = UIView.opaque()
-    opaque.backgroundColor = viewInput!.tintColor
-    opaque.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero && opaque.cornerRadius == .zero }
-      .sink { opaque.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    periodButton.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
 
-    opaque.backgroundColor = Colors.main
-    opaque.translatesAutoresizingMaskIntoConstraints = false
-    instance.addSubview(opaque)
+    let shadowView = UIView.opaque()
+    shadowView.layer.masksToBounds = false
+    shadowView.accessibilityIdentifier = "shadow"
+    shadowView.layer.shadowColor = UIColor.black.withAlphaComponent(0.35).cgColor
+    shadowView.layer.shadowOffset = .zero
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.publisher(for: \.bounds)
+      .sink {
+        shadowView.layer.shadowRadius = $0.height/8
+        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+      }
+      .store(in: &subscriptions)
+
+    periodButton.placeInCenter(of: instance)
+    
+    shadowView.translatesAutoresizingMaskIntoConstraints = false
+        instance.insertSubview(shadowView, belowSubview: periodButton)
     
     NSLayoutConstraint.activate([
-      opaque.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-      opaque.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-      opaque.heightAnchor.constraint(equalTo: instance.heightAnchor),
+      shadowView.leadingAnchor.constraint(equalTo: periodButton.leadingAnchor),
+      shadowView.topAnchor.constraint(equalTo: periodButton.topAnchor),
+      shadowView.trailingAnchor.constraint(equalTo: periodButton.trailingAnchor),
+      shadowView.bottomAnchor.constraint(equalTo: periodButton.bottomAnchor),
     ])
-    
-    return instance
-  }()
-  private lazy var titleLabel: UILabel = {
-    let instance = UILabel()
-    instance.textAlignment = .center
-    instance.numberOfLines = 1
-    instance.textColor = .white//traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-    instance.font = UIFont(name: Fonts.Bold, size: 18)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
-//    instance.adjustsFontSizeToFitWidth = true
-    
-    
-    //        if let viewInput = viewInput {
-    //            setTitle(category: viewInput.category, animated: false)
-    //        }
-    
-    let constraint = instance.widthAnchor.constraint(equalToConstant: 0)
-    constraint.identifier = "width"
-    constraint.isActive = true
-    
+
     return instance
   }()
   private lazy var periodButton: UIButton = {
@@ -106,10 +92,15 @@ class ListView: UIView {
     instance.titleLabel?.numberOfLines = 1
     instance.showsMenuAsPrimaryAction = true
     instance.menu = prepareMenu()
-    instance.imageView?.tintColor = .white
-    instance.imageEdgeInsets.left = 4
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+    instance.imageEdgeInsets.left = padding
+    instance.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding*2, bottom: padding, right: padding*2)
     instance.semanticContentAttribute = .forceRightToLeft
-    instance.setImage(UIImage(systemName: ("chevron.down")), for: .normal)
+    instance.setImage(UIImage(systemName: ("slider.horizontal.3"), withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -357,14 +348,10 @@ class ListView: UIView {
   ///**Logic**
   private var period: Period = .PerMonth {
     didSet {
-      guard oldValue != period,
-            let category = viewInput?.category
-      else { return }
+      guard oldValue != period else { return }
+      
       updatePeriodButton()
       collectionView.period = period
-      
-      periodButton.menu = prepareMenu()
-      setTitle(category: category, animated: true)
     }
   }
   private var isEmpty = false {
@@ -413,11 +400,16 @@ class ListView: UIView {
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
     background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
-    if #available(iOS 15, *) {
-      periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    } else {
-      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    }
+//    if #available(iOS 15, *) {
+//      periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    } else {
+//      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    }
+    periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+    periodButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+    updatePeriodButton()
+    
+    filterView.getSubview(type: UIView.self, identifier: "shadow")?.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
 }
 
@@ -475,31 +467,6 @@ private extension ListView {
     constraint.identifier = "height"
     constraint.isActive = true
     constraint.priority = .defaultLow
-  }
-  
-  @MainActor
-  func setTitle(category: Survey.SurveyCategory, animated: Bool = true) {
-//    guard let constraint = titleLabel.getConstraint(identifier: "width") else { return }
-    
-    var text = ""
-    
-    switch category {
-    case .New: text =  "new".localized.uppercased()
-    case .Top: text = "top".localized.uppercased()
-    case .Favorite: text = "watching".localized.uppercased()
-    case .Own: text = "own".localized.uppercased()
-    default: print("")
-    }
-    
-    let buttonText = text + ": " + "per_\(period.rawValue.lowercased())".localized.uppercased()
-    let attrString = NSMutableAttributedString(string: buttonText,
-                                               attributes: [
-                                                .font: UIFont(name: Fonts.Bold, size: 18) as Any,
-                                                .foregroundColor: UIColor.white,
-                                               ])
-//    UIView.setAnimationsEnabled(false)
-    periodButton.setAttributedTitle(attrString, for: .normal)
-//    UIView.setAnimationsEnabled(true)
   }
   
   @MainActor
@@ -571,8 +538,8 @@ private extension ListView {
   func toggleDateFilter(on: Bool) {
     print(on)
     guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-          let constraint1 = filterView.getConstraint(identifier: "top_1"),
-          let constraint2 = filterView.getConstraint(identifier: "top")
+          let constraint1 = filterView.getConstraint(identifier: "top_1")//,
+//          let constraint2 = filterView.getConstraint(identifier: "top")
     else { return }
     
     setNeedsLayout()
@@ -582,7 +549,7 @@ private extension ListView {
       self.filterView.alpha = on ? 1 : 0
       self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
       constraint1.constant = on ? 16 : 0
-      constraint2.constant = on ? 16 : 0
+//      constraint2.constant = on ? 16 : 0
       heightConstraint.constant = on ? self.filterViewHeight : 0
       self.layoutIfNeeded()
     }
@@ -593,31 +560,29 @@ private extension ListView {
     
     periodButton.menu = prepareMenu()
     
-    let buttonText = "per_\(period.rawValue.lowercased())".localized.uppercased()
+    var text = ""
     
-//    if #available(iOS 15, *) {
-//      if !periodButton.configuration.isNil {
-//        periodButton.configuration?.title = buttonText
-//      }
-//    } else {
-      let attrString = NSMutableAttributedString(string: buttonText,
-                                                 attributes: [
-                                                  .font: UIFont(name: Fonts.Bold, size: 18) as Any,
-                                                  .foregroundColor: UIColor.white,
-                                                 ])
-      periodButton.setAttributedTitle(attrString, for: .normal)
-      
-//      guard let constraint = periodButton.getConstraint(identifier: "width") else { return }
-//
-//      setNeedsLayout()
-//      UIView.animate(withDuration: 0.15, delay: 0) { [weak self] in
-//        guard let self = self else { return }
-//
-//        constraint.constant = buttonText.width(withConstrainedHeight: 100,
-//                                               font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title3)!)
-//        self.layoutIfNeeded()
-//      }
-//    }
+    switch viewInput?.category {
+    case .New: text =  "new".localized.uppercased()
+    case .Top: text = "top".localized.uppercased()
+    case .Favorite: text = "watching".localized.uppercased()
+    case .Own: text = "own".localized.uppercased()
+    default: print("")
+    }
+    
+    let buttonText = text + ": " + "per_\(period.rawValue.lowercased())".localized.uppercased()
+    let attrString = NSMutableAttributedString(string: buttonText,
+                                               attributes: [
+                                                .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : viewInput?.tintColor as Any,
+                                               ])
+    periodButton.setAttributedTitle(attrString, for: .normal)
+    let attrString1 = NSMutableAttributedString(string: buttonText,
+                                               attributes: [
+                                                .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : viewInput?.tintColor as Any,
+                                               ])
+    periodButton.setAttributedTitle(attrString1, for: .highlighted)
   }
 
   func switchEmptyLabel(isEmpty: Bool) {
@@ -626,7 +591,7 @@ private extension ListView {
       label.accessibilityIdentifier = "emptyLabel"
       label.backgroundColor = .clear
       label.alpha = 0
-      label.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title3)
+      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title3)
       label.text = "publications_not_found".localized// + "\n⚠︎"
       label.textColor = .secondaryLabel
       label.numberOfLines = 0
@@ -687,10 +652,9 @@ extension ListView: ListControllerOutput {
       period = .PerMonth
     }
     
-    setTitle(category: category, animated: true)
+    updatePeriodButton()
     toggleDateFilter(on: true)
     collectionView.category = category
-    periodButton.menu = prepareMenu()
   }
 }
 

@@ -32,21 +32,22 @@ class ListSwitch: UIView {
     
     @IBOutlet var contentView: UIView!
     @IBOutlet weak var shadowView: UIView! {
-        didSet {
-            shadowView.clipsToBounds = false
-            shadowView.backgroundColor = .clear
-            shadowView.accessibilityIdentifier = "shadow"
-            shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-            shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-            shadowView.layer.shadowRadius = 5
-            shadowView.layer.shadowOffset = .zero
-            shadowView.publisher(for: \.bounds, options: .new)
-                .sink { [weak self] rect in
-                    guard let self = self else { return }
-                    
-                    self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width/2).cgPath
-                }
-                .store(in: &subscriptions)
+      didSet {
+        shadowView.clipsToBounds = false
+        shadowView.backgroundColor = .clear
+        shadowView.accessibilityIdentifier = "shadow"
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        shadowView.layer.shadowColor = UIColor.black.withAlphaComponent(0.35).cgColor
+        shadowView.layer.shadowOffset = .zero
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        shadowView.publisher(for: \.bounds)
+          .sink { [weak self] in
+            guard let self = self else { return }
+            
+            self.shadowView.layer.shadowRadius = $0.height/8
+            self.shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+          }
+          .store(in: &subscriptions)
         }
     }
     @IBOutlet weak var stackView: UIStackView!

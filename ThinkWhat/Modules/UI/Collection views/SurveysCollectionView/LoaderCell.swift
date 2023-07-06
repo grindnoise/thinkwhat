@@ -17,6 +17,7 @@ class LoaderCell: UICollectionReusableView {
       guard color != oldValue else { return }
       
       setupUI()
+      spinner.setColor(color)
 //      loadingIndicator.color = color
 //      loadingIndicator.setIconColor(color)
     }

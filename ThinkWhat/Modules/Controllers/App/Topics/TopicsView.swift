@@ -43,53 +43,51 @@ class TopicsView: UIView {
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
-    
-    let opaque = UIView.opaque()
-    opaque.backgroundColor = viewInput!.tintColor
-    opaque.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero && opaque.cornerRadius == .zero }
-      .sink { opaque.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    periodButton.place(inside: opaque, insets: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
 
-    opaque.backgroundColor = Colors.main
-    opaque.translatesAutoresizingMaskIntoConstraints = false
-    instance.addSubview(opaque)
+    let shadowView = UIView.opaque()
+    shadowView.layer.masksToBounds = false
+    shadowView.accessibilityIdentifier = "shadow"
+    shadowView.layer.shadowColor = UIColor.black.withAlphaComponent(0.35).cgColor
+    shadowView.layer.shadowOffset = .zero
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.publisher(for: \.bounds)
+      .sink {
+        shadowView.layer.shadowRadius = $0.height/8
+        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+      }
+      .store(in: &subscriptions)
+
+    periodButton.placeInCenter(of: instance)
+    
+    shadowView.translatesAutoresizingMaskIntoConstraints = false
+        instance.insertSubview(shadowView, belowSubview: periodButton)
     
     NSLayoutConstraint.activate([
-      opaque.centerXAnchor.constraint(equalTo: instance.centerXAnchor),
-      opaque.centerYAnchor.constraint(equalTo: instance.centerYAnchor),
-      opaque.heightAnchor.constraint(equalTo: instance.heightAnchor),
+      shadowView.leadingAnchor.constraint(equalTo: periodButton.leadingAnchor),
+      shadowView.topAnchor.constraint(equalTo: periodButton.topAnchor),
+      shadowView.trailingAnchor.constraint(equalTo: periodButton.trailingAnchor),
+      shadowView.bottomAnchor.constraint(equalTo: periodButton.bottomAnchor),
     ])
-    
-    return instance
-  }()
-  private lazy var titleLabel: UILabel = {
-    let instance = UILabel()
-    instance.numberOfLines = 1
-    instance.textAlignment = .center
-    instance.numberOfLines = 1
-    instance.textColor = .white
-    instance.text = "publications".localized.uppercased()
-    instance.font = UIFont(name: Fonts.Bold, size: 18)//UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title3)
-    instance.adjustsFontSizeToFitWidth = true
-    instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font)).isActive = true
-    
+
     return instance
   }()
   private lazy var periodButton: UIButton = {
     let instance = UIButton()
     instance.titleLabel?.numberOfLines = 1
     instance.showsMenuAsPrimaryAction = true
-    instance.menu = prepareMenu()
-    instance.imageView?.tintColor = .white
-    instance.imageEdgeInsets.left = 4
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+    instance.imageEdgeInsets.left = padding
+    instance.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding*2, bottom: padding, right: padding*2)
     instance.semanticContentAttribute = .forceRightToLeft
-    instance.setImage(UIImage(systemName: ("chevron.down")), for: .normal)
+    instance.setImage(UIImage(systemName: ("slider.horizontal.3"), withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
     
     return instance
   }()
+
   private lazy var surveysCollectionView: SurveysCollectionView = {
     let instance = SurveysCollectionView(category: .Search)
     instance.backgroundColor = .clear
@@ -252,7 +250,6 @@ class TopicsView: UIView {
         else { return }
         
         self.viewInput?.onTopicSelected(topic)
-        self.color = topic.tagColor
         self.viewInput?.setNavigationBarTintColor(topic.tagColor)
         self.touchLocation = point
         self.surveysCollectionView.topic = topic
@@ -271,16 +268,16 @@ class TopicsView: UIView {
                           duration: 0.35,
                           delegate: self)
         if #available(iOS 15, *) {
-          self.periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return self.color }
+          self.periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return self.topic?.tagColor ?? Colors.main }
           self.periodButton.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var outcoming = incoming
             outcoming.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .title3)
-            outcoming.foregroundColor = self.color
+            outcoming.foregroundColor = self.topic?.tagColor
             return outcoming
           }
         } else {
-          self.periodButton.imageView?.tintColor = self.color
-          self.periodButton.tintColor = self.color
+          self.periodButton.imageView?.tintColor = self.topic?.tagColor
+          self.periodButton.tintColor = self.topic?.tagColor
         }
       }.store(in: &subscriptions)
     
@@ -290,7 +287,7 @@ class TopicsView: UIView {
     let instance = UIView()
     instance.accessibilityIdentifier = "bg"
     instance.layer.masksToBounds = true
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
     instance.publisher(for: \.bounds)
       .sink { [unowned self] rect in
         guard self.filterView.alpha != 0 else { return }
@@ -354,13 +351,6 @@ class TopicsView: UIView {
     return label
   }()
   private lazy var filterViewHeight: CGFloat = .zero
-  private var color = UIColor.clear {
-    didSet {
-      guard let opaque = periodButton.superview else { return }
-      
-      opaque.backgroundColor = color
-    }
-  }
   ///**Logic**
   private var touchLocation: CGPoint = .zero
   private var period: Period = .AllTime {
@@ -429,19 +419,17 @@ class TopicsView: UIView {
     collectionView.backgroundColor = .clear
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     
-    if #available(iOS 15, *) {
-      periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    } else {
-      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    }
-    
+//    if #available(iOS 15, *) {
+//      periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    } else {
+//      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    }
+    periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+    periodButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+    updatePeriodButton()
     setBackgroundColor()
-    //        guard let viewInput = viewInput, viewInput.mode == .Topic  else {
-    //            background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-    //            return
-    //        }
-    //
-    //        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+    
+    filterView.getSubview(type: UIView.self, identifier: "shadow")?.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
 }
 
@@ -449,18 +437,9 @@ class TopicsView: UIView {
 private extension TopicsView {
   @MainActor
   func setupUI() {
-//    guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-//
-//    //        let zeroSized = UIView()
-//    //        zeroSized.backgroundColor = .clear
-//    //        zeroSized.heightAnchor.constraint(equalToConstant: 0).isActive = true
-//
-//    addSubview(contentView)
-    //        contentView.addSubview(zeroSized)
     contentView.addSubview(filterView)
     contentView.addSubview(shadowView)
     contentView.translatesAutoresizingMaskIntoConstraints = false
-    //        zeroSized.translatesAutoresizingMaskIntoConstraints = false
     filterView.translatesAutoresizingMaskIntoConstraints = false
     shadowView.translatesAutoresizingMaskIntoConstraints = false
     
@@ -470,10 +449,7 @@ private extension TopicsView {
       contentView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
       contentView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
       filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-      filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-      //            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-      //            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-      //            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
+      filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10)
     ])
     
     let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10)
@@ -509,7 +485,7 @@ private extension TopicsView {
     //        constraint.isActive = true
     filterView.alpha = 0
     filterView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-    
+    toggleDateFilter(on: false, animated: false)
   }
   
 //  func reveal(present: Bool, location: CGPoint = .zero, view revealView: UIView, color: UIColor, fadeView: UIView, duration: TimeInterval, animateOpacity: Bool = true) {
@@ -596,40 +572,41 @@ private extension TopicsView {
 //    }
 //  }
   
-  func setBackgroundColor() {//_ color: UIColor) {
-    
+  func setBackgroundColor() {
     UIView.animate(withDuration: 0.15) { [weak self] in
       guard let self = self else { return }
       
-      guard let viewInput = self.viewInput, viewInput.mode == .Topic  else {
-        let color: UIColor = .secondarySystemBackground//self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        self.background.backgroundColor = color
-        self.surveysCollectionView.backgroundColor = color
-        return
-      }
-      
-      let color: UIColor = .secondarySystemBackground//self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
-      self.background.backgroundColor = color
-      self.surveysCollectionView.backgroundColor = color
-      //            self.background.backgroundColor = color
+      self.background.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+      self.surveysCollectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
     }
   }
   
   @MainActor
-  func toggleDateFilter(on: Bool) {
+  func toggleDateFilter(on: Bool, animated: Bool = true) {
     guard let heightConstraint = filterView.getConstraint(identifier: "height"),
           let constraint1 = filterView.getConstraint(identifier: "top_1"),
           let constraint2 = filterView.getConstraint(identifier: "top")
     else { return }
     
     setNeedsLayout()
+    guard animated else {
+      filterView.alpha = on ? 1 : 0
+      filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
+      constraint1.constant = on ? 16 : 0
+      constraint2.constant = on ? 16 : 0
+      heightConstraint.constant = on ? filterViewHeight : 0
+      layoutIfNeeded()
+      
+      return
+    }
+    
     UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
       guard let self = self else { return }
       
       self.filterView.alpha = on ? 1 : 0
       self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
-      constraint1.constant = on ? 16 : 0
-      constraint2.constant = on ? 16 : 0
+      constraint1.constant = on ? 16 : 8
+      constraint2.constant = on ? 16 : 8
       heightConstraint.constant = on ? self.filterViewHeight : 0
       self.layoutIfNeeded()
     }
@@ -703,10 +680,16 @@ private extension TopicsView {
     let buttonText = "publications".localized.uppercased() + ": " +  "per_\(period.rawValue.lowercased())".localized.uppercased()
     let attrString = NSMutableAttributedString(string: buttonText,
                                                attributes: [
-                                                .font: UIFont(name: Fonts.Bold, size: 18) as Any,
-                                                .foregroundColor: UIColor.white,
+                                                .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : viewInput?.tintColor as Any,
                                                ])
     periodButton.setAttributedTitle(attrString, for: .normal)
+    let attrString1 = NSMutableAttributedString(string: buttonText,
+                                               attributes: [
+                                                .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : viewInput?.tintColor as Any,
+                                               ])
+    periodButton.setAttributedTitle(attrString1, for: .highlighted)
   }
   
   func switchEmptyLabel(isEmpty: Bool) {
@@ -764,18 +747,7 @@ extension TopicsView: TopicsControllerOutput {
   func beginSearchRefreshing() {
     surveysCollectionView.beginSearchRefreshing()
   }
-  
-  //    func onRequestCompleted(_ result: Result<Bool, Error>) {
-  //        surveysCollectionView.endRefreshing()
-  //    }
-  
-  //    func onTopicMode(_ instance: Topic) {
-  //        surveysCollectionView.topic = instance
-  //        surveysCollectionView.alpha = 1
-  //        surveysCollectionView.backgroundColor = background.backgroundColor
-  //        reveal(view: surveysCollectionView, duration: 0.3)
-  //    }
-  
+
   func onDefaultMode(color: UIColor? = nil) {
     UIView.animate(withDuration: 0.2) { [unowned self] in
       if self.isEmpty {
@@ -784,7 +756,6 @@ extension TopicsView: TopicsControllerOutput {
     }
     surveysCollectionView.isOnScreen = false
     surveysCollectionView.alpha = 1
-    //        collectionView.backgroundColor = background.backgroundColor
     Animations.reveal(present: false,
                       location: CGPoint(x: bounds.maxX, y: bounds.minY)/*touchLocation*/,
                       view: surveysCollectionView,

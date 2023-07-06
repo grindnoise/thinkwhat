@@ -10,7 +10,7 @@ import UIKit
 
 public final class SpiralSpinner: UIView {
   
-  private let color: UIColor
+  private var color: UIColor
   
   init(frame: CGRect = .zero, color: UIColor = Colors.main) {
     self.color = color
@@ -31,6 +31,11 @@ public final class SpiralSpinner: UIView {
 #if DEBUG
     print("\(String(describing: type(of: self))).\(#function)")
 #endif
+  }
+  
+  public func setColor(_ color: UIColor) {
+    self.color = color
+    setNeedsDisplay()
   }
   
   public func start(duration: TimeInterval) {
