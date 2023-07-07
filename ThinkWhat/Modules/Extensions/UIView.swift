@@ -80,8 +80,8 @@ extension UIView {
   }
   
   func setSpinning(on: Bool,
-                   color: UIColor,
-                   animated: Bool,
+                   color: UIColor = .systemBackground,
+                   animated: Bool = true,
                    completion: Closure? = nil) {
     switch on {
     case true:

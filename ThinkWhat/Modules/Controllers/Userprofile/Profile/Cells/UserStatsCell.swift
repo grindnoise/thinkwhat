@@ -51,6 +51,14 @@ class UserStatsCell: UICollectionViewListCell {
       updateUI()
     }
   }
+  public var isShadowed: Bool = false {
+    didSet {
+      guard isShadowed else { return }
+      
+      shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+      background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : isShadowed ? .systemBackground : .secondarySystemBackground
+    }
+  }
   
   
   
@@ -182,6 +190,22 @@ class UserStatsCell: UICollectionViewListCell {
     
     return instance
   }()
+  private lazy var shadowView: UIView = {
+    let instance = UIView.opaque()
+    instance.layer.masksToBounds = false
+    instance.accessibilityIdentifier = "shadowView"
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.3).cgColor
+    instance.layer.shadowOffset = .zero
+    instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+    instance.layer.shadowRadius = padding*0.85//*2
+    instance.publisher(for: \.bounds)
+      .sink {
+        instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width * 0.05).cgPath
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
   
   
   // MARK: - Destructor
@@ -212,7 +236,8 @@ class UserStatsCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : isShadowed ? .systemBackground : .secondarySystemBackground
     
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
@@ -237,20 +262,39 @@ private extension UserStatsCell {
   func setupUI() {
     backgroundColor = .clear
     clipsToBounds = true
+//    addSubview(shadowView)
+//    shadowView.place(inside: self,
+//                     insets: UIEdgeInsets(top: padding*3, left: padding, bottom: padding*3, right: padding))
+//    background.place(inside: self,
+//                     insets: UIEdgeInsets(top: padding*3, left: padding, bottom: padding*3, right: padding))
     
-    background.place(inside: self,
-                     insets: UIEdgeInsets(top: padding*2, left: padding, bottom: padding*2, right: padding))
+//    shadowView.translatesAutoresizingMaskIntoConstraints = false
+//    insertSubview(shadowView, belowSubview: background)
+//    shadowView.leadingAnchor.constraint(equalTo: background.leadingAnchor).isActive = true
+//    shadowView.topAnchor.constraint(equalTo: background.topAnchor).isActive = true
+//    shadowView.trailingAnchor.constraint(equalTo: background.trailingAnchor).isActive = true
+//    shadowView.bottomAnchor.constraint(equalTo: background.bottomAnchor).isActive = true
+        shadowView.place(inside: self,
+                         insets: UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding),
+                         bottomPriority: .defaultLow)
+    background.place(inside: shadowView)
+    background.layer.zPosition = 100
   }
   
   @MainActor
   func updateUI() {
     background.removeFromSuperview()
-
+    shadowView.removeFromSuperview()
+    
     guard let insets = insets else {
+      shadowView.place(inside: self,
+                       insets: .uniform(size: padding))
       background.place(inside: self,
                        insets: .uniform(size: padding))
       return
     }
+    shadowView.place(inside: self,
+                     insets: insets)
     background.place(inside: self,
                      insets: insets)
   }

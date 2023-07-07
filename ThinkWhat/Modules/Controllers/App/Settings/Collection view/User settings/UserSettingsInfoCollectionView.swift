@@ -57,6 +57,8 @@ class UserSettingsInfoCollectionView: UICollectionView {
   @Published public private(set) var userprofileDescription: String?
   @Published public private(set) var email: String?
   
+  
+  
   // MARK: - Destructor
   deinit {
     observers.forEach { $0.invalidate() }

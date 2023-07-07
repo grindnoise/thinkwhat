@@ -1864,8 +1864,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "997"
-            endingLineNumber = "997"
+            startingLineNumber = "994"
+            endingLineNumber = "994"
             landmarkName = "onUserSelected(userprofile:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2166,8 +2166,8 @@
             filePath = "ThinkWhat/Modules/UI/Static/Avatar/Avatar.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "556"
-            endingLineNumber = "556"
+            startingLineNumber = "558"
+            endingLineNumber = "558"
             landmarkName = "traitCollectionDidChange(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2934,8 +2934,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/User settings/UserSettingsInfoCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "282"
-            endingLineNumber = "282"
+            startingLineNumber = "284"
+            endingLineNumber = "284"
             landmarkName = "setupUI()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3158,8 +3158,8 @@
             filePath = "ThinkWhat/Modules/UI/Static/Avatar/Avatar.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "755"
-            endingLineNumber = "755"
+            startingLineNumber = "757"
+            endingLineNumber = "757"
             landmarkName = "setFilter(filterName:for:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3231,6 +3231,66 @@
                   continueAfterRunningActions = "No"
                   symbolName = "(4) suspend resume partial function for ThinkWhat__local_.Userprofile.downloadImageAsync() async throws -&gt; ()"
                   moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Models/User.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "752"
+                  endingLineNumber = "752"
+                  offsetFromSymbolStart = "256">
+               </Location>
+               <Location
+                  uuid = "80AF275F-1179-4C53-8B09-C4E5F1895CD2 - b6ca312eebbbbccc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for ThinkWhat.Userprofile.downloadImageAsync() async throws -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Models/User.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "752"
+                  endingLineNumber = "752"
+                  offsetFromSymbolStart = "836">
+               </Location>
+               <Location
+                  uuid = "80AF275F-1179-4C53-8B09-C4E5F1895CD2 - 6ce6f278d8391969"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for ThinkWhat.Userprofile.downloadImageAsync() async throws -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Models/User.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "752"
+                  endingLineNumber = "752"
+                  offsetFromSymbolStart = "256">
+               </Location>
+               <Location
+                  uuid = "80AF275F-1179-4C53-8B09-C4E5F1895CD2 - 5627f92a94617d7d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for ThinkWhat__alpha_.Userprofile.downloadImageAsync() async throws -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Models/User.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "752"
+                  endingLineNumber = "752"
+                  offsetFromSymbolStart = "836">
+               </Location>
+               <Location
+                  uuid = "80AF275F-1179-4C53-8B09-C4E5F1895CD2 - 62eb9606dee7fb78"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for ThinkWhat__alpha_.Userprofile.downloadImageAsync() async throws -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Models/User.swift"
                   startingColumnNumber = "9223372036854775807"
@@ -4491,6 +4551,36 @@
                   endingLineNumber = "963"
                   offsetFromSymbolStart = "1040">
                </Location>
+               <Location
+                  uuid = "A43CADB7-C7B6-4B43-A5A7-766D5D38A400 - e5ea0e9b66f0b434"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat.SignInView.stopLoader(success: Swift.Bool, completion: () -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Controllers/Auth/Sign%20in/SignInView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "963"
+                  endingLineNumber = "963"
+                  offsetFromSymbolStart = "1040">
+               </Location>
+               <Location
+                  uuid = "A43CADB7-C7B6-4B43-A5A7-766D5D38A400 - 3afc8a5a94c9349a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__alpha_.SignInView.stopLoader(success: Swift.Bool, completion: () -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Controllers/Auth/Sign%20in/SignInView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "963"
+                  endingLineNumber = "963"
+                  offsetFromSymbolStart = "1040">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -4547,6 +4637,21 @@
                   continueAfterRunningActions = "No"
                   symbolName = "ThinkWhat.HotCard.setComplete(() -&gt; ()) -&gt; ()"
                   moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Controllers/App/Hot/Card/HotCard.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "307"
+                  endingLineNumber = "307"
+                  offsetFromSymbolStart = "104">
+               </Location>
+               <Location
+                  uuid = "092A8458-B4B2-4BCF-833D-4210B5E24A0C - e2cad01410725b55"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__alpha_.HotCard.setComplete(() -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Controllers/App/Hot/Card/HotCard.swift"
                   startingColumnNumber = "9223372036854775807"
@@ -4715,6 +4820,21 @@
                   endingLineNumber = "419"
                   offsetFromSymbolStart = "56">
                </Location>
+               <Location
+                  uuid = "F55B92E0-0B2F-456B-ACFA-1F6FE74CF2FB - 2ee9bc001cbccf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in ThinkWhat__alpha_.AnswerCell.setSelected(forceDeselect: Swift.Bool, completion: (Swift.Bool) -&gt; ()) -&gt; ()"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/ChoiceCollectionView/AnswerCell.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "419"
+                  endingLineNumber = "419"
+                  offsetFromSymbolStart = "56">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
@@ -4748,6 +4868,53 @@
             endingLineNumber = "87"
             landmarkName = "prepareUserData(firstName:lastName:email:description:gender:birthDate:city:image:vkID:vkURL:facebookID:facebookURL:tiktokURL:instagramURL:locale:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "EBC114E4-6B2F-4790-8961-01D9D3F0210B - c8be4642d7c84982"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static ThinkWhat__local_.API.prepareUserData(firstName: Swift.Optional&lt;Swift.String&gt;, lastName: Swift.Optional&lt;Swift.String&gt;, email: Swift.Optional&lt;Swift.String&gt;, description: Swift.Optional&lt;Swift.String&gt;, gender: Swift.Optional&lt;ThinkWhat__local_.Gender&gt;, birthDate: Swift.Optional&lt;Swift.String&gt;, city: Swift.Optional&lt;ThinkWhat__local_.City&gt;, image: Swift.Optional&lt;__C.UIImage&gt;, vkID: Swift.Optional&lt;Swift.String&gt;, vkURL: Swift.Optional&lt;Swift.String&gt;, facebookID: Swift.Optional&lt;Swift.String&gt;, facebookURL: Swift.Optional&lt;Swift.String&gt;, tiktokURL: Swift.Optional&lt;Swift.String&gt;, instagramURL: Swift.Optional&lt;Swift.String&gt;, locale: Swift.Optional&lt;Swift.String&gt;) -&gt; Swift.Dictionary&lt;Swift.String, Any&gt;"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Managers/REST/APIManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "87"
+                  endingLineNumber = "87"
+                  offsetFromSymbolStart = "572">
+               </Location>
+               <Location
+                  uuid = "EBC114E4-6B2F-4790-8961-01D9D3F0210B - b7e9b7ab44443a5b"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static ThinkWhat.API.prepareUserData(firstName: Swift.Optional&lt;Swift.String&gt;, lastName: Swift.Optional&lt;Swift.String&gt;, email: Swift.Optional&lt;Swift.String&gt;, description: Swift.Optional&lt;Swift.String&gt;, gender: Swift.Optional&lt;ThinkWhat.Gender&gt;, birthDate: Swift.Optional&lt;Swift.String&gt;, city: Swift.Optional&lt;ThinkWhat.City&gt;, image: Swift.Optional&lt;__C.UIImage&gt;, vkID: Swift.Optional&lt;Swift.String&gt;, vkURL: Swift.Optional&lt;Swift.String&gt;, facebookID: Swift.Optional&lt;Swift.String&gt;, facebookURL: Swift.Optional&lt;Swift.String&gt;, tiktokURL: Swift.Optional&lt;Swift.String&gt;, instagramURL: Swift.Optional&lt;Swift.String&gt;, locale: Swift.Optional&lt;Swift.String&gt;) -&gt; Swift.Dictionary&lt;Swift.String, Any&gt;"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Managers/REST/APIManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "87"
+                  endingLineNumber = "87"
+                  offsetFromSymbolStart = "572">
+               </Location>
+               <Location
+                  uuid = "EBC114E4-6B2F-4790-8961-01D9D3F0210B - 42945285613eac77"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static ThinkWhat__alpha_.API.prepareUserData(firstName: Swift.Optional&lt;Swift.String&gt;, lastName: Swift.Optional&lt;Swift.String&gt;, email: Swift.Optional&lt;Swift.String&gt;, description: Swift.Optional&lt;Swift.String&gt;, gender: Swift.Optional&lt;ThinkWhat__alpha_.Gender&gt;, birthDate: Swift.Optional&lt;Swift.String&gt;, city: Swift.Optional&lt;ThinkWhat__alpha_.City&gt;, image: Swift.Optional&lt;__C.UIImage&gt;, vkID: Swift.Optional&lt;Swift.String&gt;, vkURL: Swift.Optional&lt;Swift.String&gt;, facebookID: Swift.Optional&lt;Swift.String&gt;, facebookURL: Swift.Optional&lt;Swift.String&gt;, tiktokURL: Swift.Optional&lt;Swift.String&gt;, instagramURL: Swift.Optional&lt;Swift.String&gt;, locale: Swift.Optional&lt;Swift.String&gt;) -&gt; Swift.Dictionary&lt;Swift.String, Any&gt;"
+                  moduleName = "ThinkWhat (alpha)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Managers/REST/APIManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "87"
+                  endingLineNumber = "87"
+                  offsetFromSymbolStart = "572">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -4760,10 +4927,57 @@
             filePath = "ThinkWhat/Modules/Controllers/Userprofile/Profile/UserprofileCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "307"
-            endingLineNumber = "307"
+            startingLineNumber = "310"
+            endingLineNumber = "310"
             landmarkName = "setupUI()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "3CE509A5-1FE5-4543-A76A-BFB7BCEFA457 - fde37fdaa38e0f03"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #6 (ThinkWhat__local_.Userprofile) -&gt; () in closure #5 (ThinkWhat__local_.UserStatsCell, Foundation.IndexPath, Swift.AnyHashable) -&gt; () in ThinkWhat__local_.UserprofileCollectionView.setupUI() -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Controllers/Userprofile/Profile/UserprofileCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "310"
+                  endingLineNumber = "310"
+                  offsetFromSymbolStart = "200">
+               </Location>
+               <Location
+                  uuid = "3CE509A5-1FE5-4543-A76A-BFB7BCEFA457 - fde37fdaa38e0f03"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #6 (ThinkWhat__local_.Userprofile) -&gt; () in closure #5 (ThinkWhat__local_.UserStatsCell, Foundation.IndexPath, Swift.AnyHashable) -&gt; () in ThinkWhat__local_.UserprofileCollectionView.setupUI() -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Controllers/Userprofile/Profile/UserprofileCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "310"
+                  endingLineNumber = "310"
+                  offsetFromSymbolStart = "160">
+               </Location>
+               <Location
+                  uuid = "3CE509A5-1FE5-4543-A76A-BFB7BCEFA457 - f6ed263a6a396887"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #6 (ThinkWhat.Userprofile) -&gt; () in closure #5 (ThinkWhat.UserStatsCell, Foundation.IndexPath, Swift.AnyHashable) -&gt; () in ThinkWhat.UserprofileCollectionView.setupUI() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/ThinkWhat/Modules/Controllers/Userprofile/Profile/UserprofileCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "310"
+                  endingLineNumber = "310"
+                  offsetFromSymbolStart = "160">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

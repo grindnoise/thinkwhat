@@ -7733,6 +7733,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in UserStatsCell.shadowView.getter:UserStatsCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "padding">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in push #1 (_:) in VotersStack.push(userprofiles:):VotersStack.swift">
          <PersistentStrings>
             <PersistentString
@@ -7848,14 +7856,6 @@
             </PersistentString>
             <PersistentString
                value = "placeholder.bounds.midY">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "animateStackView #1 () in SubscriptionsView.onUserSelected(userprofile:):SubscriptionsView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "filterView.frame.height">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -8461,14 +8461,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "closure #1 in SubscriptionsView.toggleDateFilter(on:):SubscriptionsView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "self!.filterView.bounds">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "UnderlinedSignTextField.color.didset:UnderlinedSignTextField.swift">
          <PersistentStrings>
             <PersistentString
@@ -8749,6 +8741,9 @@
                value = "dataItems">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "UserStatsCell.updateUI():UserStatsCell.swift">
       </ContextState>
       <ContextState
          contextName = "SessionManager.request(_:method:parameters:encoding:headers:):SessionManager.swift">
@@ -9730,6 +9725,14 @@
             </PersistentString>
             <PersistentString
                value = "self.selectionView.alpha">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in UserSettingsInfoCell.shadowView.getter:UserSettingsInfoCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "padding">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -12028,6 +12031,14 @@
       </ContextState>
       <ContextState
          contextName = "closure #2 in closure #2 in performRequest #1 () in APIManager.updateUserProfile(data:completion:):APIManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "UserSettingsInfoCell.setupUI():UserSettingsInfoCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "insets">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "AppData.UserProfile.eraseData():Main.swift">

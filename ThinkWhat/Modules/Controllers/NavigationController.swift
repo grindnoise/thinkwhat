@@ -21,9 +21,11 @@ class NavigationController: UINavigationController {
 //      navigationItem.largeTitleDisplayMode = .never
 //        navigationBar.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .label
         navigationBar.largeTitleTextAttributes = [
+          .font: UIFont(name: Fonts.Rubik.Bold, size: 20),
             .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.label
         ]
         navigationBar.titleTextAttributes = [
+          .font: UIFont(name: Fonts.Rubik.Bold, size: 20),
             .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : UIColor.label
         ]
     }

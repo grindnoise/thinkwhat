@@ -37,7 +37,7 @@ class ListSwitch: UIView {
         shadowView.backgroundColor = .clear
         shadowView.accessibilityIdentifier = "shadow"
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        shadowView.layer.shadowColor = UIColor.black.withAlphaComponent(0.35).cgColor
+        shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
         shadowView.layer.shadowOffset = .zero
         shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
         shadowView.publisher(for: \.bounds)

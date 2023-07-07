@@ -121,8 +121,9 @@ private extension UserprofileCollectionView {
 //    }
     
     let infoCellRegistration = UICollectionView.CellRegistration<UserSettingsInfoCell, AnyHashable> { [unowned self] cell, _, _ in
-      cell.insets = .init(top: self.padding*2, left: self.padding*2, bottom: self.padding, right: self.padding*2)
+      cell.insets = .init(top: self.padding*2, left: self.padding*2, bottom: self.padding*2, right: self.padding*2)
       cell.userprofile = self.userprofile
+      cell.isShadowed = true
       cell.publisher(for: \.bounds)
         .receive(on: DispatchQueue.main)
         .sink { [unowned self] _ in
@@ -162,7 +163,8 @@ private extension UserprofileCollectionView {
     let compatibilityCellRegistration = UICollectionView.CellRegistration<UserCompatibilityCell, AnyHashable> { [unowned self] cell, _, _ in
       guard let userprofile = self.userprofile else { return }
       
-      cell.insets = .init(top: self.padding*2, left: self.padding*2, bottom: self.padding, right: self.padding*2)
+      cell.insets = .init(top: self.padding*2, left: self.padding*2, bottom: self.padding*2, right: self.padding*2)
+      cell.isShadowed = !userprofile.isCurrent
       self.colorPublisher
         .filter { !$0.isNil }
         .sink { cell.color = $0! }
@@ -267,7 +269,8 @@ private extension UserprofileCollectionView {
       guard let userprofile = self.userprofile else { return }
       
       cell.userprofile = userprofile
-      cell.insets = UIEdgeInsets(top: padding*2, left: padding*2, bottom: padding*2, right: padding*2)
+      cell.isShadowed = true
+      cell.insets = UIEdgeInsets(top: self.padding*2, left: self.padding*2, bottom: self.padding*3, right: self.padding*2)
       cell.color = self.color
       self.colorPublisher
         .filter { !$0.isNil }

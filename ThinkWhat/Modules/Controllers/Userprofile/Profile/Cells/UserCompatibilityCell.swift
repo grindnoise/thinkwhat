@@ -31,6 +31,14 @@ class UserCompatibilityCell: UICollectionViewListCell {
       collectionView.color = color
     }
   }
+  public var isShadowed: Bool = false {
+    didSet {
+      guard isShadowed else { return }
+      
+      shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+      collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : isShadowed ? .systemBackground : .secondarySystemBackground
+    }
+  }
   
   
   // MARK: - Private properties
@@ -99,6 +107,22 @@ class UserCompatibilityCell: UICollectionViewListCell {
 
     return instance
   }()
+  private lazy var shadowView: UIView = {
+    let instance = UIView.opaque()
+    instance.layer.masksToBounds = false
+    instance.accessibilityIdentifier = "shadowView"
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.3).cgColor
+    instance.layer.shadowOffset = .zero
+    instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+    instance.layer.shadowRadius = padding*0.85
+    instance.publisher(for: \.bounds)
+      .sink {
+        instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width * 0.05).cgPath
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
   
   
   // MARK: - Destructor
@@ -128,15 +152,19 @@ class UserCompatibilityCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+    collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : isShadowed ? .systemBackground : .secondarySystemBackground
   }
 }
 
 private extension UserCompatibilityCell {
   @MainActor
   func setupUI() {
+    shadowView.place(inside: self,
+                     insets: insets ?? .init(top: padding*3, left: padding, bottom: padding*3, right: padding),
+                     bottomPriority: .defaultLow)
     collectionView.place(inside: self,
-                         insets: insets ?? .uniform(size: padding),
+                         insets: insets ?? .init(top: padding*3, left: padding, bottom: padding*3, right: padding),
                          bottomPriority: .defaultLow)
   }
   

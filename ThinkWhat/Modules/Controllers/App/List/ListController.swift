@@ -352,7 +352,7 @@ private extension ListController {
     NSLayoutConstraint.activate([
       titleStack.heightAnchor.constraint(equalToConstant: 40),
       titleStack.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
-      titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -10)
+      titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -20)
     ])
     
     let constraint = titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor, constant: -100)

@@ -110,7 +110,7 @@ class SubscriptionsView: UIView {
     let shadowView = UIView.opaque()
     shadowView.layer.masksToBounds = false
     shadowView.accessibilityIdentifier = "shadow"
-    shadowView.layer.shadowColor = UIColor.black.withAlphaComponent(0.35).cgColor
+    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
     shadowView.layer.shadowOffset = .zero
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     shadowView.publisher(for: \.bounds)
@@ -142,6 +142,7 @@ class SubscriptionsView: UIView {
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
     instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
 //    instance.setTitleColor(traitCollection.userInterfaceStyle == .dark ? .white : viewInput?.tintColor, for: .normal)
+    instance.adjustsImageWhenHighlighted = false
     instance.imageEdgeInsets.left = padding
     instance.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding*2, bottom: padding, right: padding*2)
     instance.semanticContentAttribute = .forceRightToLeft
@@ -446,7 +447,7 @@ class SubscriptionsView: UIView {
     instance.tapPublisher
       .sink { [unowned self] in self.viewInput?.openUserprofile($0) }
       .store(in: &subscriptions)
-    instance.isShadowed = traitCollection.userInterfaceStyle != .dark
+//    instance.isShadowed = traitCollection.userInterfaceStyle != .dark
     
     return instance
   }()
@@ -460,106 +461,88 @@ class SubscriptionsView: UIView {
     
     return instance
   }()
-  private lazy var profileButton: UIButton = {
-    let instance = UIButton()
-    instance.addTarget(self, action: #selector(self.onProfileButtonTapped), for: .touchUpInside)
-    
-    if #available(iOS 15, *) {
-      var config = UIButton.Configuration.filled()
-      config.title = "open_userprofile".localized.uppercased()
-      config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [unowned self] incoming in
-        var outgoing = incoming
-        outgoing.foregroundColor = Colors.System.Purple.rawValue//self.traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
-        outgoing.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote)
-        return outgoing
+  private lazy var profileButton: UIView = {
+    let shadowView = UIView.opaque()
+    shadowView.layer.masksToBounds = false
+    shadowView.accessibilityIdentifier = "profileButton"
+    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    shadowView.layer.shadowOffset = .zero
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.publisher(for: \.bounds)
+      .sink {
+        shadowView.layer.shadowRadius = $0.height/8
+        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
       }
-      config.baseBackgroundColor = Colors.System.Purple.rawValue.withAlphaComponent(0.15)//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR.withAlphaComponent(0.15) : .systemBlue.withAlphaComponent(0.15)
-      config.cornerStyle = .small
-      config.buttonSize = .mini
-      config.contentInsets.leading = 4
-      config.contentInsets.top = 2
-      config.contentInsets.bottom = 2
-      config.contentInsets.trailing = 4
-      config.imagePlacement = .trailing
-      config.imagePadding = 4.0
-      config.imageColorTransformer = UIConfigurationColorTransformer { _ in return Colors.System.Purple.rawValue }//[unowned self] _ in return self.traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue }
-      config.image = UIImage(systemName: "person.fill",
-                             withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
-      instance.configuration = config
-    } else {
-      let attrString = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(), attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
-        NSAttributedString.Key.foregroundColor: Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
-      ])
-      instance.setAttributedTitle(attrString, for: .normal)
-      instance.semanticContentAttribute = .forceRightToLeft
-      instance.setImage(UIImage(systemName: "person.fill",
-                                withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                        for: .normal)
-      instance.tintColor = Colors.System.Purple.rawValue//traitCollection.userInterfaceStyle != .dark ? K_COLOR_TABBAR : .systemBlue
-      instance.imageEdgeInsets.left = 4.0
-    }
+      .store(in: &subscriptions)
+    let button = UIButton()
+    button.setAttributedTitle(NSAttributedString(string: "open_userprofile".localized.uppercased(),
+                                                 attributes: [
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+                                                 ]),
+                              for: .normal)
+    button.contentEdgeInsets = UIEdgeInsets(top: padding/2, left: padding, bottom: padding/2, right: padding)
+    button.accessibilityIdentifier = "profileButton"
+    button.imageEdgeInsets.left = padding/2
+    button.semanticContentAttribute = .forceRightToLeft
+    button.adjustsImageWhenHighlighted = false
+    button.setImage(UIImage(systemName: ("arrow.right"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+    button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
+    button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+    button.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+    button.publisher(for: \.bounds)
+      .sink { button.cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
+    button.place(inside: shadowView)
     
-    return instance
+    return shadowView
   }()
-  private lazy var subscriptionButton: UIButton = {
-    let instance = UIButton()
-    instance.addTarget(self, action: #selector(self.unsubscribe), for: .touchUpInside)
-    
-    if #available(iOS 15, *) {
-      var config = UIButton.Configuration.filled()
-      config.title = "unsubscribe".localized.uppercased()
-      config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-        var outgoing = incoming
-        outgoing.foregroundColor = UIColor.systemRed
-        outgoing.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote)
-        return outgoing
+  private lazy var subscriptionButton: UIView = {
+    let shadowView = UIView.opaque()
+    shadowView.layer.masksToBounds = false
+    shadowView.accessibilityIdentifier = "subscriptionButton"
+    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    shadowView.layer.shadowOffset = .zero
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.publisher(for: \.bounds)
+      .sink {
+        shadowView.layer.shadowRadius = $0.height/8
+        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
       }
-      config.baseBackgroundColor = .systemRed.withAlphaComponent(0.15)
-      config.cornerStyle = .small
-      config.buttonSize = .mini
-      config.contentInsets.leading = 4
-      config.contentInsets.top = 2
-      config.contentInsets.bottom = 2
-      config.contentInsets.trailing = 4
-      config.imagePlacement = .trailing
-      config.imagePadding = 4.0
-      config.activityIndicatorColorTransformer = UIConfigurationColorTransformer { _ in return .systemRed }
-      config.imageColorTransformer = UIConfigurationColorTransformer { _ in return .systemRed }
-      config.image = UIImage(systemName: "hand.raised.slash.fill",
-                             withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
-      instance.configuration = config
-      //            instance.publisher(for: \.bounds, options: .new)
-      //                .sink { rect in
-      //                    instance.cornerRadius = rect.height/2.25
-      //                }
-      //                .store(in: &subscriptions)
-    } else {
-      let attrString = NSMutableAttributedString(string: "unsubscribe".localized.uppercased(), attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.systemRed
-      ])
-      instance.setAttributedTitle(attrString, for: .normal)
-      instance.semanticContentAttribute = .forceRightToLeft
-      instance.setImage(UIImage(systemName: "hand.raised.slash.fill",
-                                withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                        for: .normal)
-      instance.tintColor = .systemRed
-      instance.imageEdgeInsets.left = 4.0
-    }
+      .store(in: &subscriptions)
+    let button = UIButton()
+    button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+                                                 attributes: [
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                  .foregroundColor: UIColor.systemRed as Any
+                                                 ]),
+                              for: .normal)
+    button.accessibilityIdentifier = "subscriptionButton"
+    button.contentEdgeInsets = UIEdgeInsets(top: padding/2, left: padding, bottom: padding/2, right: padding)
+    button.imageEdgeInsets.left = padding/2
+    button.adjustsImageWhenHighlighted = false
+    button.semanticContentAttribute = .forceRightToLeft
+    button.setImage(UIImage(systemName: ("xmark"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+    button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
+    button.tintColor = .systemRed
+    button.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
+    button.publisher(for: \.bounds)
+      .sink { button.cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
+    button.place(inside: shadowView)
     
-    return instance
+    return shadowView
   }()
   private lazy var userStack: UIStackView = {
     let nested = UIStackView(arrangedSubviews: [
       usernameLabel,
+      UIView.opaque(),
       profileButton,
       subscriptionButton,
-      UIView.opaque()
     ])
     nested.alignment = .leading
     nested.axis = .vertical
-    nested.spacing = 4
+    nested.spacing = padding
     nested.accessibilityIdentifier = "nested"
     
     let opaque = UIView.opaque()
@@ -574,7 +557,8 @@ class SubscriptionsView: UIView {
     instance.alignment = .center
     
     opaque.translatesAutoresizingMaskIntoConstraints = false
-    opaque.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.3).isActive = true
+    opaque.widthAnchor.constraint(equalTo: opaque.heightAnchor).isActive = true
+    opaque.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     avatar.translatesAutoresizingMaskIntoConstraints = false
     avatar.centerXAnchor.constraint(equalTo: opaque.centerXAnchor).isActive = true
     avatar.centerYAnchor.constraint(equalTo: opaque.centerYAnchor).isActive = true
@@ -611,6 +595,7 @@ class SubscriptionsView: UIView {
     instance.place(inside: topView,
                    insets: UIEdgeInsets(top: 0, left: padding, bottom: 0, right: padding))
     let background = UIView()
+    background.accessibilityIdentifier = "background"
     background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
     background.place(inside: instance)
     instance.publisher(for: \.bounds)
@@ -750,21 +735,8 @@ class SubscriptionsView: UIView {
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-    
-    //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-    //        userView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    if #available(iOS 15, *) {
-      periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    } else {
-//      periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-      let attrString_1 = NSMutableAttributedString(string: "open_userprofile".localized.uppercased(),
-                                                   attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
-                                                    .foregroundColor: Colors.main
-      ])
-      profileButton.setAttributedTitle(attrString_1, for: .normal)
-    }
-    avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
+
+//    avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
     userView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
@@ -772,11 +744,21 @@ class SubscriptionsView: UIView {
     periodButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
     updatePeriodButton()
     
+    profileButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    if let profileBtn = profileButton.getSubview(type: UIButton.self)  {
+      profileBtn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
+      profileBtn.setAttributedTitle(NSAttributedString(string: "open_userprofile".localized.uppercased(),
+                                                       attributes: [
+                                                        .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                        .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+                                                       ]),
+                                    for: .normal)
+      profileBtn.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main
+    }
+    subscriptionButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    subscriptionButton.getSubview(type: UIButton.self)?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
     filterView.getSubview(type: UIView.self, identifier: "shadow")?.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    
-    guard let background = userView.getSubview(type: UIView.self, identifier: "background") else { return }
-    
-    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+    userView.getSubview(type: UIView.self, identifier: "background")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
   }
 }
 
@@ -796,17 +778,20 @@ private extension SubscriptionsView {
         if viewInput.isOnScreen {
           self.subscriptionButton.isUserInteractionEnabled = true
           self.viewInput?.setDefaultMode()
-          if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
-            self.subscriptionButton.configuration!.showsActivityIndicator = false
-          } else {
-            guard let imageView = self.subscriptionButton.imageView,
-                  let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+          self.subscriptionButton.setSpinning(on: false) { [weak self] in
+            guard let self = self,
+                  let button = subscriptionButton.getSubview(type: UIButton.self)
             else { return }
             
-            indicator.removeFromSuperview()
-            imageView.tintColor = .systemRed
+            self.feedCollectionView.removeItem(unsubscribed)
+            button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+                                                         attributes: [
+                                                          .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                          .foregroundColor: UIColor.systemRed as Any
+                                                         ]),
+                                      for: .normal)
+            button.imageView?.tintColor = .systemRed
           }
-          delayAsync(delay: 0.45) { [unowned self] in self.feedCollectionView.removeItem(unsubscribed) }
         } else {
           self.feedCollectionView.removeItem(unsubscribed)
           self.feedCollectionView.alpha = 1
@@ -855,16 +840,29 @@ private extension SubscriptionsView {
               self.userprofile == userprofile
         else { return }
         
-        if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
-          self.subscriptionButton.configuration!.showsActivityIndicator = false
-        } else {
-          guard let imageView = self.subscriptionButton.imageView,
-                let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+        self.subscriptionButton.setSpinning(on: false) { [weak self] in
+          guard let self = self,
+                let button = subscriptionButton.getSubview(type: UIButton.self)
           else { return }
           
-          indicator.removeFromSuperview()
-          imageView.tintColor = .systemRed
+          button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+                                                       attributes: [
+                                                        .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                        .foregroundColor: UIColor.systemRed as Any
+                                                       ]),
+                                    for: .normal)
+          button.imageView?.tintColor = .systemRed
         }
+//        if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
+//          self.subscriptionButton.configuration!.showsActivityIndicator = false
+//        } else {
+//          guard let imageView = self.subscriptionButton.imageView,
+//                let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+//          else { return }
+//
+//          indicator.removeFromSuperview()
+//          imageView.tintColor = .systemRed
+//        }
       }
     })
   }
@@ -936,14 +934,12 @@ private extension SubscriptionsView {
   
   @MainActor
   func onUserSelected(userprofile: Userprofile) {
-    func animateStackView() {
-      delayAsync(delay: 0.075) { [weak self] in
+    func animateStackView(_ stack: UIStackView) {
+      delayAsync(delay: 0.005) { [weak self] in
         guard let self = self else { return }
         
         self.isCardOnScreen = true
-        self.userStack.arrangedSubviews.enumerated().forEach { index, item in
-          item.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-          
+        stack.arrangedSubviews.enumerated().forEach { index, item in
           UIView.animate(
             withDuration: 0.3,
             delay: Double(index)*0.045,
@@ -961,30 +957,31 @@ private extension SubscriptionsView {
     guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
           let constraint = shadowView.getConstraint(identifier: "top"),
           let constraint1 = filterView.getConstraint(identifier: "top_1"),
-          let topViewConstraint = topView.getConstraint(identifier: "height")
+          let topViewConstraint = topView.getConstraint(identifier: "height"),
+          let stack = userStack.arrangedSubviews.filter({ $0 is UIStackView }).first as? UIStackView
     else { return }
     
-    setNeedsLayout()
     avatar.userprofile = userprofile
 
     let temp = UIImageView(image: userprofile.image)
     temp.contentMode = .scaleAspectFill
-    temp.frame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: topView), size: cell.avatar.bounds.size)
+    temp.frame = CGRect(origin: cell.avatar.convert(cell.avatar.frame.origin, to: topView), size: cell.avatar.bounds.size)
     temp.cornerRadius = cell.avatar.bounds.height/2
     topView.addSubview(temp)
     cell.avatar.alpha = 0
     
-    let destinationFrame = CGRect(origin: userView.convert(avatar.frame.origin, to: topView),
-                                  size: .init(width: cell.avatar.bounds.size.width * 2.23, height: cell.avatar.bounds.size.width * 2.23))
+    let destinationFrame = CGRect(origin: .init(x: padding*3, y: padding*2),//avatar.superview!.convert(avatar.frame.origin, to: topView),
+                                  size: .init(width: cell.avatar.bounds.size.width * 1.96, height: cell.avatar.bounds.size.width * 1.96))
     
     userView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-    userStack.arrangedSubviews.forEach { $0.alpha = 0 }
-    
+    stack.arrangedSubviews.forEach { $0.alpha = 0; $0.transform = CGAffineTransform(scaleX: 0.75, y: 0.75) }
+    toggleDateFilter(on: true)
+    setNeedsLayout()
     UIView.animate(
-      withDuration: 0.3,
+      withDuration: 0.2,
       delay: 0,
-      usingSpringWithDamping: 0.8,
-      initialSpringVelocity: 0.3,
+//      usingSpringWithDamping: 0.8,
+//      initialSpringVelocity: 0.3,
       options: [.curveEaseInOut],
       animations: { [weak self] in
         guard let self = self else { return }
@@ -998,7 +995,7 @@ private extension SubscriptionsView {
         constraint1.constant = self.filterView.alpha == 1 ? 16 : 8//8
         topViewConstraint.constant = topViewHeight * 1.5
         self.layoutIfNeeded()
-        animateStackView()
+        animateStackView(stack)
       }) { [weak self] _ in
         guard let self = self else { return }
         let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
@@ -1010,35 +1007,26 @@ private extension SubscriptionsView {
   }
   
   @objc
-  func onProfileButtonTapped() {
+  func handleTap(_ button: UIButton) {
     guard let userprofile = userprofile else { return }
-    
-    viewInput?.openUserprofile(userprofile)
-  }
-  
-  @objc
-  func unsubscribe() {
-    guard let userprofile = userprofile else { return }
-    
-    viewInput?.unsubscribe(from: userprofile)
-    subscriptionButton.isUserInteractionEnabled = false
-    
-    if #available(iOS 15, *), !subscriptionButton.configuration.isNil {
-      subscriptionButton.configuration!.showsActivityIndicator = true
-    } else {
-      guard let imageView = subscriptionButton.imageView else { return }
+    if button.accessibilityIdentifier == "profileButton" {
+      viewInput?.openUserprofile(userprofile)
+    } else if button.accessibilityIdentifier == "subscriptionButton" {
       
-      imageView.clipsToBounds = false
-      let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
-                                                            size: CGSize(width: imageView.bounds.height,
-                                                                         height: imageView.bounds.height)))
-      indicator.layoutCentered(in: imageView)
-      indicator.color = .systemRed
-      indicator.startAnimating()
-      indicator.accessibilityIdentifier = "indicator"
-      UIView.animate(withDuration: 0.2) {
-        indicator.alpha = 1
-        imageView.tintColor = .clear
+      viewInput?.unsubscribe(from: userprofile)
+      subscriptionButton.isUserInteractionEnabled = false
+      subscriptionButton.setSpinning(on: true, color: .systemRed) { [weak self] in
+        guard let self = self,
+              let button = self.subscriptionButton.getSubview(type: UIButton.self)
+        else { return }
+        
+        button.imageView?.tintColor = .clear
+        button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                      .foregroundColor: UIColor.clear as Any
+                                                     ]),
+                                  for: .normal)
       }
     }
   }
@@ -1209,17 +1197,17 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
     guard let viewInput = viewInput,
           viewInput.isOnScreen,
           let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
-          let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
-          let constraint = subview.getConstraint(identifier: "trailing"),
+//          let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
+          let constraint = topView.getConstraint(identifier: "height"),
           let userprofile = userprofile
     else {
-      guard let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
-            let constraint = subview.getConstraint(identifier: "trailing")
-      else { return }
+//      guard let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
+//            let constraint = subview.getConstraint(identifier: "trailing")
+//      else { return }
       
       avatar.alpha = 0
       isCardOnScreen = false
-      constraint.constant = 16
+//      constraint.constant = 16
       if let cells = feedCollectionView.visibleCells.filter({ $0.isKind(of: UserprofileCell.self )}) as? [UserprofileCell] {
         cells.forEach { $0.avatar.alpha = 1 }
       }
@@ -1229,10 +1217,11 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
     
 //    mode = .Default
 //    surveysCollectionView.category = .Subscriptions
+    toggleDateFilter(on: true)
     
     let temp = UIImageView(image: userprofile.image)
     temp.contentMode = .scaleAspectFill
-    temp.frame = CGRect(origin: userView.convert(avatar.frame.origin, to: topView),
+    temp.frame = CGRect(origin: avatar.superview!.convert(avatar.frame.origin, to: topView),
                         size: avatar.bounds.size)
     temp.cornerRadius = temp.bounds.height/2
     avatar.alpha = 0
@@ -1243,46 +1232,33 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
                                   size: cell.avatar.imageView.bounds.size)
     
     setNeedsLayout()
-    //        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
-    //                                                       delay: 0,
-    //                                                       options: .curveEaseInOut,
-    //                                                       animations: { [weak self] in
-    //            guard let self = self else { return }
     UIView.animate(
-      withDuration: 0.15,
+      withDuration: 0.2,
       delay: 0,
-      //            usingSpringWithDamping: 0.8,
-      //            initialSpringVelocity: 0.3,
       options: [.curveEaseInOut],
       animations: { [weak self] in
         guard let self = self else { return }
-        
+
         temp.frame = destinationFrame
         temp.cornerRadius = cell.avatar.bounds.height/2
         self.feedCollectionView.alpha = 1
         self.userView.alpha = 0
         self.userView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
-        subview.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        //                self.userStack.spacing = 100
-        constraint.constant = self.userView.bounds.width/3
-        if let topViewConstraint = self.topView.getConstraint(identifier: "height") {
-          topViewConstraint.constant = self.topViewHeight
-        }
+        constraint.constant = topViewHeight
         self.layoutIfNeeded()
-      }) { _ in
-        subview.transform = .identity
-        self.userView.transform = .identity
-        constraint.constant = 16
-        //            self.userStack.spacing = 4
+      }) { [weak self] _ in
+        guard let self = self else { return }
         
+        self.userView.transform = .identity
+
         UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0, animations: {
           cell.avatar.alpha = 1
         }) { [unowned self] _ in
           temp.removeFromSuperview()
           self.isCardOnScreen = false
-          
+
           guard let completion = completion else { return }
-          
+
           completion()
         }
       }

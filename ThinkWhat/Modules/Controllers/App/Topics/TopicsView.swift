@@ -47,7 +47,7 @@ class TopicsView: UIView {
     let shadowView = UIView.opaque()
     shadowView.layer.masksToBounds = false
     shadowView.accessibilityIdentifier = "shadow"
-    shadowView.layer.shadowColor = UIColor.black.withAlphaComponent(0.35).cgColor
+    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
     shadowView.layer.shadowOffset = .zero
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     shadowView.publisher(for: \.bounds)

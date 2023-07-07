@@ -54,7 +54,7 @@ class UserSettingsSocialHeaderCell: UICollectionViewListCell {
   ///`UI`
   private lazy var background: UIView = {
     let instance = UIView()
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.publisher(for: \.bounds, options: .new)
       .sink { rect in
         instance.cornerRadius = rect.width*0.05
@@ -188,7 +188,7 @@ class UserSettingsSocialHeaderCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+//    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }

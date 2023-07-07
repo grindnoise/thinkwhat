@@ -180,31 +180,31 @@ class Avatar: UIView {
     let instance = UIImageView()
     instance.contentMode = .scaleAspectFill
     instance.tintColor = .systemGray
-    instance.alpha = 0
+//    instance.alpha = 0
     instance.accessibilityIdentifier = "imageView"
     instance.layer.masksToBounds = true
     instance.backgroundColor = .clear//.systemGray2
     instance.isUserInteractionEnabled = true
     instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-    instance.publisher(for: \.image)
-      .receive(on: DispatchQueue.main)
-      .filter { !$0.isNil}
-      .sink { [weak self] _ in
-        guard let self = self else { return }
-        
-        DispatchQueue.main.async {
-          //                    instance.alpha = 0
-          UIView.animate(withDuration: 0.25, delay: 0, animations: { [weak self] in
-            guard let self = self else { return }
-            
-            instance.alpha = 1
-          }) { _ in
-            self.shimmer.stopShimmering()
-          }
-        }
-      }
-      .store(in: &subscriptions)
+//    instance.publisher(for: \.image)
+//      .receive(on: DispatchQueue.main)
+//      .filter { !$0.isNil}
+//      .sink { [weak self] _ in
+//        guard let self = self else { return }
+//
+//        DispatchQueue.main.async {
+//          //                    instance.alpha = 0
+//          UIView.animate(withDuration: 0.25, delay: 0, animations: { [weak self] in
+//            guard let self = self else { return }
+//
+//            instance.alpha = 1
+//          }) { _ in
+//            self.shimmer.stopShimmering()
+//          }
+//        }
+//      }
+//      .store(in: &subscriptions)
     
     instance.publisher(for: \.bounds)
       .filter { $0 != .zero}
@@ -269,13 +269,15 @@ class Avatar: UIView {
     instance.backgroundColor = .clear
     instance.accessibilityIdentifier = "shadowView"
     instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.4).cgColor
-    instance.layer.shadowRadius = 4
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
     instance.layer.shadowOffset = .zero
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.publisher(for: \.bounds)
       .filter { $0 != .zero }
-      .sink { instance.layer.shadowPath = UIBezierPath(ovalIn: $0).cgPath }
+      .sink {
+        instance.layer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
+        instance.layer.shadowRadius = $0.height/8
+      }
       .store(in: &subscriptions)
     
     background.addEquallyTo(to: instance)

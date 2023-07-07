@@ -47,6 +47,7 @@ class SubscriptionsController: UIViewController, TintColorable {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
+  private let padding: CGFloat = 8
   private var userprofile: Userprofile? {
     didSet {
       guard let userprofile = userprofile else { return }
@@ -169,6 +170,23 @@ class SubscriptionsController: UIViewController, TintColorable {
     isOnScreen = false
   }
   
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    if let shadow = navigationItem.rightBarButtonItems?.filter({ $0.customView?.accessibilityIdentifier == "subscribers" }).first?.customView,
+       let btn = shadow.getSubview(type: UIButton.self) {
+      shadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+      btn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+      btn.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+      btn.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
+                                                attributes: [
+                                                  .font: UIFont(name: Fonts.Rubik.Medium, size: 16) as Any,
+                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+                                                ]),
+                             for: .normal)
+    }
+  }
+  
   //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
   //        super.traitCollectionDidChange(previousTraitCollection)
   //
@@ -272,16 +290,52 @@ private extension SubscriptionsController {
     var rightButton: UIBarButtonItem!
     switch mode {
     case .Default:
-      let button = UIButton()
-      button.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
-                                                   attributes: [
-                                                    .font: UIFont(name: Fonts.Semibold, size: 16) as Any,
-                                                    .foregroundColor: tintColor as Any
-                                                   ]),
-                                for: .normal)
-      button.addTarget(self,
-                       action: #selector(self.onSubscribersTapped),
-                       for: .touchUpInside)
+      let button: UIView = { let shadowView = UIView.opaque()
+        shadowView.layer.masksToBounds = false
+        shadowView.accessibilityIdentifier = "subscribers"
+        shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+        shadowView.layer.shadowOffset = .zero
+        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+        shadowView.publisher(for: \.bounds)
+          .sink {
+            shadowView.layer.shadowRadius = $0.height/8
+            shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+          }
+          .store(in: &subscriptions)
+        let button = UIButton()
+        button.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Rubik.Medium, size: 16) as Any,
+                                                      .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+                                                     ]),
+                                  for: .normal)
+        button.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding*2, bottom: padding, right: padding*2)
+        button.accessibilityIdentifier = "profileButton"
+        button.imageEdgeInsets.left = padding/2
+        button.semanticContentAttribute = .forceRightToLeft
+        button.adjustsImageWhenHighlighted = false
+        button.setImage(UIImage(systemName: ("person.fill.checkmark"), withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+        button.addTarget(self, action: #selector(self.onSubscribersTapped), for: .touchUpInside)
+        button.publisher(for: \.bounds)
+          .sink { button.cornerRadius = $0.height/2 }
+          .store(in: &subscriptions)
+        button.place(inside: shadowView)
+        
+        return shadowView
+      }()
+      
+//      let button = UIButton()
+//      button.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
+//                                                   attributes: [
+//                                                    .font: UIFont(name: Fonts.Rubik.SemiBold, size: 16) as Any,
+//                                                    .foregroundColor: tintColor as Any
+//                                                   ]),
+//                                for: .normal)
+//      button.addTarget(self,
+//                       action: #selector(self.onSubscribersTapped),
+//                       for: .touchUpInside)
       
       //      rightButton = UIBarButtonItem(title: "subscribers".localized.capitalized,
 //                                    image: UIImage(systemName: "person.3.sequence.fill",
