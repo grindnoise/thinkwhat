@@ -86,7 +86,7 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.text = "account_management".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
     
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"

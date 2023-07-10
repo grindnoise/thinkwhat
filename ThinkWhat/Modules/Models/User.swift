@@ -413,12 +413,7 @@ class Userprofile: Decodable {
 //  var choices: [Survey: Answer] = [:]
   ///Store answers`[Survey.id: Answer.id]`
   var answers = [Int: Int]()
-  var hasSocialMedia: Bool {
-    guard !facebookURL.isNil || !instagramURL.isNil || !tiktokURL.isNil else {
-      return false
-    }
-    return true
-  }
+  var hasSocialMedia: Bool { !facebookURL.isNil || !instagramURL.isNil || !tiktokURL.isNil }
   var subscribedAt: Bool {
     didSet {
       guard oldValue != subscribedAt,

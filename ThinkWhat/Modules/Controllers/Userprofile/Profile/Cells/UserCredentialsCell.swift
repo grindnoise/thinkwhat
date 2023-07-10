@@ -17,7 +17,6 @@ class UserCredentialsCell: UICollectionViewListCell {
       guard !userprofile.isNil else { return }
       
       setupUI()
-      updateUI()
       setTasks()
     }
   }
@@ -26,25 +25,7 @@ class UserCredentialsCell: UICollectionViewListCell {
   public var subscriptionPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var imagePublisher = CurrentValueSubject<UIImage?, Never>(nil)
   //UI
-  public var color: UIColor = .gray {
-    didSet {
-      subscriptionButton.backgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
-      if #available(iOS 15, *) {
-        subscriptionButton.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [unowned self] incoming in
-          var outgoing = incoming
-          outgoing.foregroundColor = self.userprofile.subscribedAt ? UIColor.systemRed : self.color
-          outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
-          
-          return outgoing
-        }
-        subscriptionButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { [unowned self] _ in
-          return self.userprofile.subscribedAt ? UIColor.systemRed : self.color
-        }
-      } else {
-        
-      }
-    }
-  }
+  public var color: UIColor = .gray
   
   
   
@@ -53,177 +34,111 @@ class UserCredentialsCell: UICollectionViewListCell {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  private let padding : CGFloat = 16
+  private let padding : CGFloat = 8
   private lazy var avatar: Avatar = {
-    let instance = Avatar(isShadowed: true)
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-    instance.clipsToBounds = false
-    
-    instance.buttonBgDarkColor = .secondarySystemBackground
-    instance.tapPublisher.sink { [weak self] in
-      guard let self = self else { return }
-      
-      self.imagePublisher.send($0.image)
-    }.store(in: &subscriptions)
+    let instance = Avatar(userprofile: userprofile, isShadowed: traitCollection.userInterfaceStyle != .dark)
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+    instance.tapPublisher
+      .sink { [unowned self] _ in self.imagePublisher.send(instance.image) }
+      .store(in: &subscriptions)
     
     return instance
   }()
-  private lazy var username: InsetLabel = {
-    let instance = InsetLabel()
-    instance.insets.top = -4
+  private lazy var usernameLabel: UILabel = {
+    let instance = UILabel()
     instance.textAlignment = .left
-    instance.numberOfLines = 1
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title1)
-    instance.adjustsFontSizeToFitWidth = true
-    
-    return instance
-  }()
-  private lazy var info: InsetLabel = {
-    let instance = InsetLabel()
-    //        instance.insets = .uniform(size: 2)
-    instance.insets.left = 2
-    instance.insets.right = 2
-    instance.insets.top = -2
-    instance.insets.bottom = 2
-    instance.textAlignment = .left
-    instance.numberOfLines = 1
-    instance.textColor = .secondaryLabel
-    instance.adjustsFontSizeToFitWidth = true
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .headline)
-    
-    return instance
-  }()
-  private lazy var socialMediaStack: UIStackView = {
-    let instance = UIStackView()
-    instance.axis = .horizontal
-    instance.distribution = .fillEqually
-    instance.accessibilityIdentifier = "socialMediaStack"
-    
-    return instance
-  }()
-  private lazy var subscriptionButton: UIButton = {
-    let instance = UIButton()
-    instance.accessibilityIdentifier = "subscriptionButton"
-    instance.addTarget(self, action: #selector(self.buttonTapped), for: .touchUpInside)
-    
-    if #available(iOS 15, *) {
-      var config = UIButton.Configuration.filled()
-      config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { [unowned self] incoming in
-        var outgoing = incoming
-        outgoing.foregroundColor = self.userprofile.subscribedAt ? UIColor.systemRed : self.color
-        outgoing.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .subheadline)
-        
-        return outgoing
-      }
-      config.cornerStyle = .small
-      config.buttonSize = .mini
-      config.contentInsets.leading = 4
-      config.contentInsets.top = 0
-      config.contentInsets.bottom = 0
-      config.contentInsets.trailing = 4
-      config.imagePlacement = .trailing
-      config.imagePadding = 4.0
-      config.imageColorTransformer = UIConfigurationColorTransformer { [unowned self] _ in
-        return self.userprofile.subscribedAt ? UIColor.systemRed : self.color
-      }
-      instance.configuration = config
-    } else {
-      instance.semanticContentAttribute = .forceRightToLeft
-      instance.tintColor = .systemRed
-      instance.imageEdgeInsets.left = 4.0
+    instance.numberOfLines = 3
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.lineSpacing = padding
+
+    let attrStr = NSMutableAttributedString(string: "\(userprofile.username)\n", attributes: [
+      .font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title2) as Any,
+      .paragraphStyle: paragraphStyle
+    ])
+    if !userprofile.fullName.isEmpty {
+      attrStr.append(NSAttributedString(string: "\(userprofile.fullName) (\(userprofile.gender.rawValue.localized.lowercased()), \(userprofile.age))", attributes: [
+        .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .subheadline) as Any,
+        .foregroundColor: UIColor.secondaryLabel
+      ]))
     }
+//    attrStr.append(NSAttributedString(string: "\n\(userprofile.gender.rawValue.localized), \(userprofile.age)", attributes: [
+//      .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote) as Any,
+//      .foregroundColor: UIColor.tertiaryLabel
+//    ]))
+    instance.attributedText = attrStr
     
     return instance
   }()
-  private lazy var statsStack: UIStackView = {
-    //Left side
-    let publicationsLabel = UILabel()
-    publicationsLabel.text = "publications".localized.lowercased()
-    publicationsLabel.font = UIFont.scaledFont(fontName: Fonts.Semibold,
-                                               forTextStyle: .caption1)
-    let publicationsButton = UIButton()
-    publicationsButton.accessibilityIdentifier = "publicationsButton"
-    publicationsButton.tintColor = .systemBlue
-    publicationsButton.setAttributedTitle(NSAttributedString(string: "32",
-                                                             attributes: [
-                                                              .font: UIFont.scaledFont(fontName: Fonts.Semibold,
-                                                                                       forTextStyle: .caption1) as Any,
-                                                              .foregroundColor: UIColor.systemBlue as Any
-                                                             ]),
-                                          for: .normal)
+  private lazy var subscriptionButton: UIView = {
+    let shadowView = UIView.opaque()
+    shadowView.layer.masksToBounds = false
+    shadowView.accessibilityIdentifier = "subscriptionButton"
+    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    shadowView.layer.shadowOffset = .zero
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.publisher(for: \.bounds)
+      .sink {
+        shadowView.layer.shadowRadius = $0.height/8
+        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+      }
+      .store(in: &subscriptions)
+    let button = UIButton()
+    button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+                                                 attributes: [
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                  .foregroundColor: UIColor.systemRed as Any
+                                                 ]),
+                              for: .normal)
+    button.accessibilityIdentifier = "subscriptionButton"
+    button.contentEdgeInsets = UIEdgeInsets(top: padding/1.5, left: padding, bottom: padding/1.5, right: padding)
+    button.imageEdgeInsets.left = padding/2
+    button.adjustsImageWhenHighlighted = false
+    button.semanticContentAttribute = .forceRightToLeft
+    button.setImage(UIImage(systemName: ("xmark"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+    button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
+    button.tintColor = .systemRed
+    button.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
+    button.publisher(for: \.bounds)
+      .sink { button.cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
+    button.place(inside: shadowView)
     
-    let publicationsStack = UIStackView(arrangedSubviews: [
-      publicationsLabel,
-      publicationsButton
-    ])
-    publicationsStack.contentMode = .center
-    
-    //Right side
-    let subscribersLabel = UILabel()
-    subscribersLabel.text = "subscribers".localized.lowercased()
-    subscribersLabel.font = UIFont.scaledFont(fontName: Fonts.Semibold,
-                                              forTextStyle: .caption1)
-    let subscribersButton = UIButton()
-    subscribersButton.accessibilityIdentifier = "subscribersButton"
-    subscribersButton.tintColor = .systemBlue
-    subscribersButton.setAttributedTitle(NSAttributedString(string: "141",
-                                                            attributes: [
-                                                              .font: UIFont.scaledFont(fontName: Fonts.Semibold,
-                                                                                       forTextStyle: .caption1) as Any,
-                                                              .foregroundColor: UIColor.systemBlue as Any
-                                                            ]),
-                                         for: .normal)
-    
-    let subscribersStack = UIStackView(arrangedSubviews: [
-      subscribersLabel,
-      subscribersButton
-    ])
-    subscribersStack.axis = .vertical
-    subscribersStack.contentMode = .center
-    
-    let instance = UIStackView(arrangedSubviews: [
-      publicationsStack,
-      subscribersStack
-    ])
-    instance.axis = .horizontal
-    
-    return instance
-  }()
-  private lazy var verticalStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      username,
-      info,
-    ])
-    instance.axis = .vertical
-    instance.alignment = .leading
-    instance.spacing = 4
-    
-    return instance
+    return shadowView
   }()
   private lazy var stack: UIStackView = {
-    let opaque = UIView()
-    opaque.backgroundColor = .clear
-    opaque.addSubview(verticalStack)
+    let nested = UIStackView(arrangedSubviews: [
+      usernameLabel,
+      UIView.opaque(),
+      subscriptionButton,
+    ])
+    nested.alignment = .leading
+    nested.axis = .vertical
+    nested.spacing = padding
+    nested.accessibilityIdentifier = "nested"
+    
+    let opaque = UIView.opaque()
+    opaque.addSubview(avatar)
     
     let instance = UIStackView(arrangedSubviews: [
       avatar,
-      opaque
+      nested,
     ])
+    instance.layer.masksToBounds = false
     instance.axis = .horizontal
-    instance.spacing = padding
-    instance.clipsToBounds = false
+    instance.spacing = padding*2
+    instance.alignment = .center
     
-    avatar.translatesAutoresizingMaskIntoConstraints = false
-    verticalStack.translatesAutoresizingMaskIntoConstraints = false
-    
-    NSLayoutConstraint.activate([
-      avatar.topAnchor.constraint(equalTo: instance.topAnchor),
-      avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-      avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-      avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/3),
-      verticalStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor),
-      verticalStack.centerYAnchor.constraint(equalTo: opaque.centerYAnchor),
-    ])
+//    opaque.translatesAutoresizingMaskIntoConstraints = false
+////    opaque.widthAnchor.constraint(equalTo: opaque.heightAnchor).isActive = true
+////    opaque.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.3).isActive = true
+//    avatar.translatesAutoresizingMaskIntoConstraints = false
+//    avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
+//    avatar.centerYAnchor.constraint(equalTo: instance.centerYAnchor).isActive = true
+//    avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor).isActive = true
+//    avatar.trailingAnchor.constraint(equalTo: instance.trailingAnchor).isActive = true
+//    instance.translatesAutoresizingMaskIntoConstraints = false
+//    instance.heightAnchor.constraint(equalTo: opaque.heightAnchor).isActive = true
     
     return instance
   }()
@@ -257,7 +172,7 @@ class UserCredentialsCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    updateUI()
+    avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
     
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
@@ -277,26 +192,10 @@ private extension UserCredentialsCell {
   @MainActor
   func setupUI() {
     backgroundColor = .clear
-    clipsToBounds = true
-    
-    contentView.addSubview(stack)
-    contentView.translatesAutoresizingMaskIntoConstraints = false
-    stack.translatesAutoresizingMaskIntoConstraints = false
-    
-    NSLayoutConstraint.activate([
-      contentView.topAnchor.constraint(equalTo: topAnchor),
-      contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      stack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding),
-      stack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-      stack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-    ])
-    
-    let constraint = stack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
-    constraint.priority = .defaultLow
-    constraint.identifier = "bottomAnchor"
-    constraint.isActive = true
+  
+    stack.place(inside: contentView,
+                insets: .init(top: padding*2, left: padding*2, bottom: padding, right: padding*2),
+                bottomPriority: .defaultLow)
   }
   
   @MainActor
@@ -338,178 +237,50 @@ private extension UserCredentialsCell {
     
     //Subscription api error
     tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
-        guard let self = self,
-              let userprofile = notification.object as? Userprofile,
-              self.userprofile == userprofile
-        else { return }
+      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
+        guard let self = self else { return }
         
-        self.toggleSubscription(error: true)
+        self.toggleSubscription()
       }
     })
   }
   
   @MainActor
-  func updateUI() {
-    func setupSocialMediaStack() {
-      //FB
-      if !userprofile.facebookURL.isNil, socialMediaStack.arrangedSubviews.filter({ $0.accessibilityIdentifier == SocialMedia.Facebook.rawValue }).isEmpty {
-        let instance = FacebookLogo()
-        instance.accessibilityIdentifier = SocialMedia.Facebook.rawValue
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.isOpaque = false
-        instance.isUserInteractionEnabled = true
-        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.urlTapped(recognizer:))))
-        
-        socialMediaStack.addArrangedSubview(instance)
-      }
-      //Instagram
-      if !userprofile.instagramURL.isNil, socialMediaStack.arrangedSubviews.filter({ $0.accessibilityIdentifier == SocialMedia.Instagram.rawValue }).isEmpty {
-        let instance = InstagramLogo()
-        instance.accessibilityIdentifier = SocialMedia.Instagram.rawValue
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.isOpaque = false
-        instance.isUserInteractionEnabled = true
-        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.urlTapped(recognizer:))))
-        
-        socialMediaStack.addArrangedSubview(instance)
-      }
-      //Tiktok
-      if !userprofile.tiktokURL.isNil, socialMediaStack.arrangedSubviews.filter({ $0.accessibilityIdentifier == SocialMedia.TikTok.rawValue }).isEmpty {
-        let instance = TikTokLogo()
-        instance.accessibilityIdentifier = SocialMedia.TikTok.rawValue
-        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-        instance.isOpaque = false
-        instance.isUserInteractionEnabled = true
-        instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.urlTapped(recognizer:))))
-        
-        socialMediaStack.addArrangedSubview(instance)
-      }
-      
-      guard let first = socialMediaStack.arrangedSubviews.first else { return }
-      
-      first.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: .greatestFiniteMagnitude,
-                                                                   font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                                                                           forTextStyle: .title2)!)).isActive = true
-    }
-    
-    username.text = userprofile.firstNameSingleWord + (userprofile.lastNameSingleWord.isEmpty ? "" : " \(userprofile.lastNameSingleWord)")
-    avatar.userprofile = userprofile
-    info.text = "\(userprofile.gender.rawValue.localized.lowercased()), \(userprofile.age)"//, \(userprofile.cityTitle)"
-    subscriptionButton.backgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
-    
-    if #available(iOS 15, *) {
-      subscriptionButton.configuration?.title = (userprofile.subscribedAt ? "unsubscribe" : "subscribe").localized.uppercased()
-      subscriptionButton.configuration?.activityIndicatorColorTransformer = UIConfigurationColorTransformer { [unowned self] _ in
-        guard let userprofile = self.userprofile else { return UIColor.systemBlue }
-        
-        return !userprofile.subscribedAt ? color : .systemRed
-      }
-      subscriptionButton.configuration?.image = UIImage(systemName: userprofile.subscribedAt ? "hand.raised.slash.fill" : "hand.point.left.fill",
-                                                        withConfiguration: UIImage.SymbolConfiguration(weight: .semibold))
-        subscriptionButton.configuration?.baseBackgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
-    } else {
-      let attrString = NSMutableAttributedString(string: (userprofile.subscribedAt ? "unsubscribe" : "subscribe").localized.uppercased(),
-                                                 attributes: [
-                                                  .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                                                           forTextStyle: .subheadline) as Any,
-                                                  .foregroundColor: self.userprofile.subscribedAt ? UIColor.systemRed : color
-                                                 ])
-      subscriptionButton.setImage(UIImage(systemName: userprofile.subscribedAt ? "hand.raised.slash.fill" : "hand.point.left.fill",
-                                          withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                  for: .normal)
-      subscriptionButton.setAttributedTitle(attrString, for: .normal)
-      subscriptionButton.imageView?.tintColor = self.userprofile.subscribedAt ? UIColor.systemRed : color
-    }
-    
-    //Social network
-    if userprofile.hasSocialMedia {
-      setupSocialMediaStack()
-      
-      
-      
-      verticalStack.addArrangedSubview(socialMediaStack)
-    }
-    
-    //Subscription
-    guard !verticalStack.arrangedSubviews.contains(subscriptionButton) else { return }
-    
-    verticalStack.addArrangedSubview(subscriptionButton)
-    
-    //        //Bottom spacer
-    //        guard verticalStack.arrangedSubviews.filter({ $0.accessibilityIdentifier == "spacer" }).isEmpty else { return }
-    //
-    //        let spacer = UIView()
-    //        spacer.accessibilityIdentifier = "spacer"
-    //        spacer.backgroundColor = .clear
-    //        verticalStack.addArrangedSubview(spacer)
-  }
-  
-  @MainActor
-  func toggleSubscription(error: Bool = false) {
+  func toggleSubscription() {
     subscriptionButton.isUserInteractionEnabled = true
-    
-    if #available(iOS 15, *) {
-      subscriptionButton.configuration?.showsActivityIndicator = false
-      
-      guard !error else { return }
-      
-      subscriptionButton.configuration?.title = (userprofile.subscribedAt ? "unsubscribe" : "subscribe").localized.uppercased()
-      subscriptionButton.configuration?.image = UIImage(systemName: userprofile.subscribedAt ? "hand.raised.slash.fill" : "hand.point.left.fill")
-      subscriptionButton.backgroundColor = userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : color.withAlphaComponent(0.15)
-    } else {
-      guard let imageView = subscriptionButton.imageView,
-            let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+    subscriptionButton.setSpinning(on: false) { [weak self] in
+      guard let self = self,
+            let button = subscriptionButton.getSubview(type: UIButton.self)
       else { return }
       
-      let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2,
-                                                             delay: 0,
-                                                             animations: { [weak self] in
-        guard let self = self else { return }
-        
-        indicator.alpha = 0
-        imageView.tintColor = self.userprofile.subscribedAt ? K_COLOR_RED : self.color
-        self.subscriptionButton.backgroundColor = self.userprofile.subscribedAt ? .systemRed.withAlphaComponent(0.15) : self.color.withAlphaComponent(0.15)
-      }) { _ in indicator.removeFromSuperview() }
-      
-      guard !error else { return }
-      
-      let attrString = NSMutableAttributedString(string: (self.userprofile.subscribedAt ? "unsubscribe" : "subscribe").localized.uppercased(),
-                                                 attributes: [
-                                                  .font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
-                                                                           forTextStyle: .subheadline) as Any,
-                                                  .foregroundColor: self.userprofile.subscribedAt ? .systemRed : color
-                                                 ])
-      self.subscriptionButton.setAttributedTitle(attrString, for: .normal)
-      self.subscriptionButton.setImage(UIImage(systemName: userprofile.subscribedAt ? "hand.raised.slash.fill" : "hand.point.left.fill"),
-                                       for: .normal)
-      self.subscriptionButton.imageView?.tintColor = color
+      button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+                                                   attributes: [
+                                                    .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                    .foregroundColor: UIColor.systemRed as Any
+                                                   ]),
+                                for: .normal)
+      button.imageView?.tintColor = .systemRed
     }
   }
   
   @objc
-  func buttonTapped() {
+  func handleTap() {
     subscriptionButton.isUserInteractionEnabled = false
     subscriptionPublisher.send(!userprofile.subscribedAt)
     
-    if #available(iOS 15, *), !subscriptionButton.configuration.isNil {
-      subscriptionButton.configuration!.showsActivityIndicator = true
-    } else {
-      guard let imageView = subscriptionButton.imageView else { return }
+    subscriptionButton.isUserInteractionEnabled = false
+    subscriptionButton.setSpinning(on: true, color: .systemRed) { [weak self] in
+      guard let self = self,
+            let button = self.subscriptionButton.getSubview(type: UIButton.self)
+      else { return }
       
-      imageView.clipsToBounds = false
-      let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
-                                                            size: CGSize(width: imageView.bounds.height,
-                                                                         height: imageView.bounds.height)))
-      indicator.layoutCentered(in: imageView)
-      indicator.color = userprofile.subscribedAt ? UIColor.systemRed : self.color
-      indicator.startAnimating()
-      indicator.accessibilityIdentifier = "indicator"
-      
-      UIView.animate(withDuration: 0.2) {
-        indicator.alpha = 1
-        imageView.tintColor = .clear
-      }
+      button.imageView?.tintColor = .clear
+      button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+                                                   attributes: [
+                                                    .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                    .foregroundColor: UIColor.clear as Any
+                                                   ]),
+                                for: .normal)
     }
   }
   

@@ -177,7 +177,7 @@ class UserSettingsEmailCell: UICollectionViewListCell {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.text = "mailTF".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
 
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"

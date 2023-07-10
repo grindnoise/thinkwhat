@@ -166,9 +166,17 @@ class CompatibilityView: UIView {
     let instance = CAShapeLayer()
     instance.path = UIBezierPath(ovalIn: .zero).cgPath
     instance.fillColor = UIColor.clear.cgColor
-    instance.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.systemGray.withAlphaComponent(0.1).cgColor
+    instance.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.white.blended(withFraction: 0.1, of: UIColor.lightGray).cgColor
 //    instance.lineWidth = 10
     instance.lineCap = .round
+    instance.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    instance.shadowRadius = padding/2
+    instance.shadowOffset = .zero
+    instance.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    instance.masksToBounds = false
+//    instance.publisher(for: \.bounds)
+//      .sink { instance.shadowPath = UIBezierPath(ovalIn: $0).cgPath }
+//      .store(in: &subscriptions)
     
     return instance
   }()
@@ -238,6 +246,8 @@ class CompatibilityView: UIView {
   
   // MARK: - Public methods
   public func animate(duration: TimeInterval, delay: TimeInterval) {
+    var color = UIColor.systemGray
+    
     func setDescriptionLabel() {
       var attributedString: NSMutableAttributedString!
       let paragraph = NSMutableParagraphStyle()
@@ -254,16 +264,22 @@ class CompatibilityView: UIView {
         text = "userprofile_compatibility_level_zero".localized
       } else if  1..<20 ~= Int(percent) {
         text = "userprofile_compatibility_level_ultra_low".localized
+        color = .systemGreen
       } else if  20..<40 ~= Int(percent) {
         text = "userprofile_compatibility_level_low".localized
+        color = .systemYellow
       } else if  40..<60 ~= Int(percent) {
         text = "userprofile_compatibility_level_middle".localized
+        color = .systemOrange
       } else if  60..<80 ~= Int(percent) {
         text = "userprofile_compatibility_level_high".localized
+        color = .systemRed
       } else if  80..<100 ~= Int(percent) {
         text = "userprofile_compatibility_level_ultra_high".localized
+        color = .systemPink
       } else {
         text = "userprofile_compatibility_level_max".localized
+        color = .systemPurple
       }
       
       if percent.isZero {
@@ -344,6 +360,22 @@ class CompatibilityView: UIView {
     //    timer.sink(receiveCompletion: { _ in print("completed", to: &logger)} , receiveValue: { _ in print("started", to: &logger)} )//
     
     isAnimating = true
+    
+    let colorAnim = Animations.get(property: .StrokeColor,
+                                   fromValue: foregroundCircle.strokeColor as Any,
+                                   toValue: color.cgColor,
+                                   duration: animDuration,
+                                   delay: delay,
+                                   timingFunction: .easeInEaseOut,
+                                   delegate: self,
+                                   isRemovedOnCompletion: false,
+                                   completionBlocks: [{ [weak self] in
+           guard let self = self else { return }
+
+      self.foregroundCircle.strokeColor = color.cgColor
+         }])
+    foregroundCircle.add(colorAnim, forKey: nil)
+    
     let anim = Animations.get(property: .StrokeEnd,
                               fromValue: 0,
                               toValue: 1,

@@ -55,6 +55,7 @@ class UserCompatibilityHeaderCell: UICollectionViewListCell {
                               withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
                       for: .normal)
     instance.tintColor = .secondaryLabel
+    instance.alpha = 0
     instance.addTarget(self, action: #selector(self.hintTapped), for: .touchUpInside)
     
     return instance
@@ -80,9 +81,9 @@ class UserCompatibilityHeaderCell: UICollectionViewListCell {
   }()
   private lazy var stack: UIStackView = {
     let stack = UIStackView(arrangedSubviews: [
-      label,
+      headerImage,
+      headerLabel,
       UIView.opaque(),
-      hintButton
     ])
     stack.axis = .horizontal
     
@@ -95,11 +96,21 @@ class UserCompatibilityHeaderCell: UICollectionViewListCell {
     
     return instance
   }()
-  private lazy var label: UILabel = {
+  private lazy var headerImage: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "person.2.fill",
+                                              withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
+    instance.tintColor = .secondaryLabel
+    instance.contentMode = .scaleAspectFit
+//    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
+    
+    return instance
+  }()
+  private lazy var headerLabel: UILabel = {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.text = "userprofile_compatibility".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
     
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"
@@ -120,7 +131,6 @@ class UserCompatibilityHeaderCell: UICollectionViewListCell {
     
     return instance
   }()
-  
   
   
   // MARK: - Destructor

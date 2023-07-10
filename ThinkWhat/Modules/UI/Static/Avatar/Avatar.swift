@@ -99,7 +99,7 @@ class Avatar: UIView {
   }
   public var isShadowed: Bool {
     didSet {
-      shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+      layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
     }
   }
   public var isBordered: Bool
@@ -119,9 +119,9 @@ class Avatar: UIView {
       coloredBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? darkBorderColor : lightBorderColor
     }
   }
-  public var shadowColor: UIColor = .clear {
+  public var shadowColor: UIColor = UIColor.lightGray.withAlphaComponent(0.5) {
     didSet {
-      shadowView.layer.shadowColor = shadowColor.withAlphaComponent(0.4).cgColor
+      layer.shadowColor = shadowColor.cgColor
     }
   }
   public var color: UIColor = Colors.System.Red.rawValue {
@@ -262,27 +262,27 @@ class Avatar: UIView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
-  private lazy var shadowView: UIView = {
-    let instance = UIView()
-    instance.layer.masksToBounds = false
-    instance.backgroundColor = .clear
-    instance.accessibilityIdentifier = "shadowView"
-    instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-    instance.layer.shadowOffset = .zero
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-    instance.publisher(for: \.bounds)
-      .filter { $0 != .zero }
-      .sink {
-        instance.layer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
-        instance.layer.shadowRadius = $0.height/8
-      }
-      .store(in: &subscriptions)
-    
-    background.addEquallyTo(to: instance)
-    return instance
-  }()
+  ///**UI**
+//  private lazy var shadowView: UIView = {
+//    let instance = UIView()
+//    instance.layer.masksToBounds = false
+//    instance.backgroundColor = .clear
+//    instance.accessibilityIdentifier = "shadowView"
+//    instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+//    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+//    instance.layer.shadowOffset = .zero
+//    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
+//    instance.publisher(for: \.bounds)
+//      .filter { $0 != .zero }
+//      .sink {
+//        instance.layer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
+//        instance.layer.shadowRadius = $0.height/8
+//      }
+//      .store(in: &subscriptions)
+//
+//    background.addEquallyTo(to: instance)
+//    return instance
+//  }()
   private lazy var button: UIButton = {
     let instance = UIButton()
     instance.alpha = mode == .Default ? 0 : 1
@@ -549,8 +549,8 @@ class Avatar: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    shadowView.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
-    //        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+    
     button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
     
     guard let coloredBg = background.getSubview(type: UIView.self, identifier: "coloredBg") else { return }
@@ -578,18 +578,19 @@ private extension Avatar {
     backgroundColor = .clear
     clipsToBounds = false
     
-    addSubview(shadowView)
-    //        contentView.translatesAutoresizingMaskIntoConstraints = false
-    shadowView.translatesAutoresizingMaskIntoConstraints = false
+    layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+    layer.shadowColor = shadowColor.cgColor//UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    layer.shadowOffset = .zero
+//    layer.shadowRadius = 8
+    publisher(for: \.bounds)
+      .filter { $0 != .zero }
+      .sink { [unowned self] in
+        self.layer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
+        self.layer.shadowRadius = min($0.height/8, 8)
+      }
+      .store(in: &subscriptions)
     
-    NSLayoutConstraint.activate([
-      shadowView.topAnchor.constraint(equalTo: topAnchor),
-      shadowView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      shadowView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      shadowView.bottomAnchor.constraint(equalTo: bottomAnchor),
-    ])
-    
-    //        guard mode != .Default else { return }
+    background.place(inside: self)
     
     addSubview(button)
     button.translatesAutoresizingMaskIntoConstraints = false
@@ -605,10 +606,6 @@ private extension Avatar {
     let constraintY = button.centerYAnchor.constraint(equalTo: topAnchor)
     constraintY.isActive = true
     constraintY.identifier = "constraintY"
-    
-//    guard userprofile == Userprofile.anonymous else { return }
-//
-//    imageView.image = UIImage(named: "anon")
   }
   
   func setTasks() {
@@ -724,8 +721,7 @@ private extension Avatar {
     case .Selection:
       isSelected = !isSelected
       button.setImage(UIImage(systemName: isSelected ? "checkmark" : "",
-                              withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
-                                                                             weight: .heavy)),
+                              withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,weight: .heavy)),
                       for: .normal)
       
       switch isSelected {

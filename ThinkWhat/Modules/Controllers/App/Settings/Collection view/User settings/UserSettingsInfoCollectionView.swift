@@ -264,9 +264,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
         .sink { cell.color = $0! }
         .store(in: &self.subscriptions)
       
-      guard let userprofile = Userprofiles.shared.current else { return }
+//      guard let userprofile = Userprofiles.shared.current else { return }
       
-      cell.userprofile = userprofile
+      cell.userprofile = self.userprofile
       cell.color = self.color
     }
     
@@ -298,7 +298,9 @@ class UserSettingsInfoCollectionView: UICollectionView {
     }
     
     var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-    snapshot.appendSections([.About])
+    if userprofile.isCurrent || !userprofile.description.isEmpty {
+      snapshot.appendSections([.About])
+    }
     snapshot.appendSections([.City])
     if userprofile.isCurrent, mode != .Creation {
       snapshot.appendSections([.Email])
@@ -308,13 +310,17 @@ class UserSettingsInfoCollectionView: UICollectionView {
       snapshot.appendSections([.Interests])
     }
     
-    snapshot.appendItems([0], toSection: .About)
+    if userprofile.isCurrent || !userprofile.description.isEmpty {
+      snapshot.appendItems([0], toSection: .About)
+    }
     snapshot.appendItems([1], toSection: .City)
     if userprofile.isCurrent, mode != .Creation {
       snapshot.appendItems([2], toSection: .Email)
 //      snapshot.appendItems([3], toSection: .SocialMedia)
     }
-    snapshot.appendItems([3], toSection: .SocialMedia)
+    if userprofile.isCurrent || userprofile.hasSocialMedia {
+      snapshot.appendItems([3], toSection: .SocialMedia)
+    }
     if mode != .Creation && !userprofile.preferences.isEmpty {
       snapshot.appendItems([4], toSection: .Interests)
     }

@@ -100,7 +100,7 @@ private extension UserSettingsSocialCollectionView {
     }
     
     let cellRegistration = UICollectionView.CellRegistration<UserSettingsSocialMediaCell, AnyHashable> { [unowned self] cell, indexPath, item in
-      guard let mode = Section(rawValue: indexPath.section) else { return }
+      guard let mode = Section(rawValue: item as! Int) else { return }
       
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
@@ -117,6 +117,7 @@ private extension UserSettingsSocialCollectionView {
       case .Twitter:
         cell.mode = .Twitter
       }
+      cell.userprofile = self.userprofile
       cell.openURLPublisher
         .eraseToAnyPublisher()
         .sink { [weak self] in
@@ -167,14 +168,30 @@ private extension UserSettingsSocialCollectionView {
     }
     
     var snapshot = Snapshot()
-    snapshot.appendSections([
-      .Instagram,
-      .TikTok,
-      .Facebook
-    ])
-    snapshot.appendItems([0], toSection: .Instagram)
-    snapshot.appendItems([1], toSection: .TikTok)
-    snapshot.appendItems([2], toSection: .Facebook)
+    
+    if userprofile.isCurrent {
+      snapshot.appendSections([
+        .Instagram,
+        .TikTok,
+        .Facebook
+      ])
+      snapshot.appendItems([0], toSection: .Instagram)
+      snapshot.appendItems([1], toSection: .TikTok)
+      snapshot.appendItems([2], toSection: .Facebook)
+    } else {
+      if !userprofile.instagramURL.isNil {
+        snapshot.appendSections([.Instagram])
+        snapshot.appendItems([0], toSection: .Instagram)
+      }
+      if !userprofile.tiktokURL.isNil {
+        snapshot.appendSections([.TikTok])
+        snapshot.appendItems([1], toSection: .TikTok)
+      }
+      if !userprofile.facebookURL.isNil {
+        snapshot.appendSections([.Facebook])
+        snapshot.appendItems([2], toSection: .Facebook)
+      }
+    }
     source.apply(snapshot, animatingDifferences: false)
   }
 }

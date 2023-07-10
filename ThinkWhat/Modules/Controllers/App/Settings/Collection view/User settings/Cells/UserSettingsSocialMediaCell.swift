@@ -16,13 +16,14 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
   }
   
   // MARK: - Public properties
-  public var mode: Mode! {
+  public weak var userprofile: Userprofile! {
     didSet {
-      guard !mode.isNil else { return }
+      guard !userprofile.isNil else { return }
       
-      updateUI()
+      setupUI()
     }
   }
+  public var mode: Mode!
   ///`Publishers`
   public let urlStringPublisher = PassthroughSubject<String, Never>()
   public var openURLPublisher = PassthroughSubject<URL, Never>()
@@ -67,18 +68,19 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
     instance.addArrangedSubview(disclosureIndicator)
     instance.addArrangedSubview(rightSpacer)
     instance.axis = .horizontal
-    instance.spacing = padding/2
+    instance.spacing = userprofile.isCurrent ? padding/2 : 0
     instance.clipsToBounds = false
-//    instance.backgroundColor = .secondarySystemFill
-    
-    
+
     opaque.translatesAutoresizingMaskIntoConstraints = false
     opaque.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor).isActive = true
 
-    icon.placeInCenter(of: opaque, heightMultiplier: 0.75)
-    //    icon.translatesAutoresizingMaskIntoConstraints = false
-//    icon.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    if userprofile.isCurrent {
+      icon.placeInCenter(of: opaque, heightMultiplier: 0.75)
+    } else {
+      icon.placeLeadingYCentered(inside: opaque)
+      icon.widthAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 0.75).isActive = true
+    }
 
     return instance
   }()
@@ -148,6 +150,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
     instance.delegate = self
     instance.clipsToBounds = false
     instance.layer.masksToBounds = false
+//    instance.textColor = userprofile.isCurrent ? .label : .blue
     
     // Commented due to app crash 01.07.2023
 //    instance.publisher(for: \.bounds, options: .new)
@@ -205,7 +208,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     setTasks()
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -250,6 +253,55 @@ private extension UserSettingsSocialMediaCell {
     clipsToBounds = false
     stack.place(inside: contentView,
                 bottomPriority: .defaultLow)
+    
+    var logo: UIView!
+    var url: URL?
+    var placeholder = ""
+    
+    switch mode {
+    case .Facebook:
+      logo = FacebookLogo()
+      url = userprofile.facebookURL
+      placeholder = "facebook_link".localized
+    case .Instagram:
+      logo = InstagramLogo()
+      url = userprofile.instagramURL
+      placeholder = "instagram_link".localized
+    case .TikTok:
+      logo = TikTokLogo()
+      url = userprofile.tiktokURL
+      placeholder = "tiktok_link".localized
+      //    case .Twitter:
+      //      logo = UIView.opaque()
+      //      url = userprofile.facebookURL?.absoluteString ?? ""
+    default:
+      logo = UIView.opaque()
+#if DEBUG
+      print("")
+#endif
+    }
+    
+    if !url.isNil {
+      if userprofile.isCurrent {
+        textField.text = url!.absoluteString
+      } else {
+        guard var string = url?.absoluteString else { return }
+        
+        if string.last == "/" { string.removeLast() }
+        
+        textField.text = string.components(separatedBy: "/").last
+      }
+    }
+    textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [
+      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
+      NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
+    ])
+    logo.isOpaque = false
+    logo.place(inside: icon)
+//    setNeedsLayout()
+//    layoutIfNeeded()
+//    logo.placeInCenter(of: icon, heightMultiplier: 1)
+    disclosureIndicator.alpha = url.isNil ? 0 : 1
   }
   
   func setTasks() {
@@ -288,55 +340,26 @@ private extension UserSettingsSocialMediaCell {
     //        guard let text = instance.text, text.count >= 4 else { return }
     //        fatalError()
   }
-  
-  @MainActor
-  func updateUI() {
-    guard let userprofile = Userprofiles.shared.current else { return }
-    
-    var logo: UIView!
-    var url: URL?
-    var placeholder = ""
-    
-    switch mode {
-    case .Facebook:
-      logo = FacebookLogo()
-      url = userprofile.facebookURL
-      placeholder = "facebook_link".localized
-    case .Instagram:
-      logo = InstagramLogo()
-      url = userprofile.instagramURL
-      placeholder = "instagram_link".localized
-    case .TikTok:
-      logo = TikTokLogo()
-      url = userprofile.tiktokURL
-      placeholder = "tiktok_link".localized
-      //    case .Twitter:
-      //      logo = UIView.opaque()
-      //      url = userprofile.facebookURL?.absoluteString ?? ""
-    default:
-      logo = UIView.opaque()
-#if DEBUG
-      print("")
-#endif
-    }
-    textField.text = url.isNil ? "" : url!.absoluteString
-    textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [
-      NSAttributedString.Key.font : UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
-      NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
-    ])
-    logo.isOpaque = false
-    logo.place(inside: icon)
-//    setNeedsLayout()
-//    layoutIfNeeded()
-//    logo.placeInCenter(of: icon, heightMultiplier: 1)
-    disclosureIndicator.alpha = url.isNil ? 0 : 1
-  }
+
   
   @objc
   func handleTap(sender: UIButton) {
-    guard let text = textField.text, let url = URL(string: text) else { return }
+    guard let url = getURL() else { return }
     
     openURLPublisher.send(url)
+  }
+  
+  func getURL() -> URL? {
+    switch mode {
+    case .Facebook:
+      return userprofile.facebookURL
+    case .Instagram:
+      return userprofile.instagramURL
+    case .TikTok:
+      return userprofile.tiktokURL
+    default:
+      return nil
+    }
   }
 }
 
@@ -346,9 +369,17 @@ extension UserSettingsSocialMediaCell: UITextFieldDelegate {
   }
   
   func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-    scrollPublisher = textField.convert(textField.frame.origin, to: self)
+    if userprofile.isCurrent {
+      scrollPublisher = textField.convert(textField.frame.origin, to: self)
+      
+      return true
+    } else {
+      guard let url = getURL() else { return false }
+      
+      openURLPublisher.send(url)
+    }
     
-    return true
+    return false
   }
   
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {

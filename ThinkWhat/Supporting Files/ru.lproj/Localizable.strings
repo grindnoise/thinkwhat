@@ -228,7 +228,7 @@
 "subscribers" = "Подписчики";
 "subscribed_for" = "Подписки";
 "subscribe" = "Подписаться";
-"unsubscribe" = "Отписаться";
+"unsubscribe" = "Отменить подписку";
 "unsubscribe_question" = "Вы уверены, что хотите отписаться?";
 
 //New VC

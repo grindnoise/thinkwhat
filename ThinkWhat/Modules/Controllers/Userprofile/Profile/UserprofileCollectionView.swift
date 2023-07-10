@@ -134,6 +134,9 @@ private extension UserprofileCollectionView {
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
       cell.color = self.color
+      cell.openURLPublisher
+        .sink { [unowned self] in self.urlPublisher.send($0) }
+        .store(in: &self.subscriptions)
       cell.$scrollPublisher
         .eraseToAnyPublisher()
         .filter { !$0.isNil }

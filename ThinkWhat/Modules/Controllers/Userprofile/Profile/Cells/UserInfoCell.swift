@@ -83,7 +83,7 @@ class UserInfoCell: UICollectionViewListCell {
     let instance = UILabel()
     instance.textColor = .secondaryLabel
     instance.text = "userprofile_about".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
     
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"

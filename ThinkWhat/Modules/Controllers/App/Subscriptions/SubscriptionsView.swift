@@ -70,7 +70,7 @@ class SubscriptionsView: UIView {
       viewInput?.setUserprofileFilter(userprofile)
       surveysCollectionView.userprofile = userprofile
       onUserSelected(userprofile: userprofile)
-      usernameLabel.text = userprofile.firstNameSingleWord + (userprofile.lastNameSingleWord.isEmpty ? "" : " \(userprofile.lastNameSingleWord)")
+      usernameLabel.text = userprofile.username//userprofile.firstNameSingleWord + (userprofile.lastNameSingleWord.isEmpty ? "" : " \(userprofile.lastNameSingleWord)")
       mode = .User
     }
   }
@@ -481,7 +481,7 @@ class SubscriptionsView: UIView {
                                                   .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
                                                  ]),
                               for: .normal)
-    button.contentEdgeInsets = UIEdgeInsets(top: padding/2, left: padding, bottom: padding/2, right: padding)
+    button.contentEdgeInsets = UIEdgeInsets(top: padding/1.5, left: padding, bottom: padding/1.5, right: padding)
     button.accessibilityIdentifier = "profileButton"
     button.imageEdgeInsets.left = padding/2
     button.semanticContentAttribute = .forceRightToLeft
@@ -518,7 +518,7 @@ class SubscriptionsView: UIView {
                                                  ]),
                               for: .normal)
     button.accessibilityIdentifier = "subscriptionButton"
-    button.contentEdgeInsets = UIEdgeInsets(top: padding/2, left: padding, bottom: padding/2, right: padding)
+    button.contentEdgeInsets = UIEdgeInsets(top: padding/1.5, left: padding, bottom: padding/1.5, right: padding)
     button.imageEdgeInsets.left = padding/2
     button.adjustsImageWhenHighlighted = false
     button.semanticContentAttribute = .forceRightToLeft
@@ -566,21 +566,6 @@ class SubscriptionsView: UIView {
     avatar.trailingAnchor.constraint(equalTo: opaque.trailingAnchor).isActive = true
     
     return instance
-//    let opaque = UIView()
-//    opaque.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
-//
-//    let instance = UIStackView(arrangedSubviews: [
-//      usernameLabel,
-//      profileButton,
-//      subscriptionButton,
-//      opaque
-//    ])
-//    instance.alignment = .leading
-//    instance.axis = .vertical
-//    instance.spacing = 4
-//    instance.accessibilityIdentifier = "userStack"
-//
-//    return instance
   }()
   private lazy var userView: UIView = {
     let instance = UIView()
@@ -965,7 +950,7 @@ private extension SubscriptionsView {
 
     let temp = UIImageView(image: userprofile.image)
     temp.contentMode = .scaleAspectFill
-    temp.frame = CGRect(origin: cell.avatar.convert(cell.avatar.frame.origin, to: topView), size: cell.avatar.bounds.size)
+    temp.frame = CGRect(origin: cell.avatar.superview!.convert(cell.avatar.frame.origin, to: topView), size: cell.avatar.bounds.size)
     temp.cornerRadius = cell.avatar.bounds.height/2
     topView.addSubview(temp)
     cell.avatar.alpha = 0
