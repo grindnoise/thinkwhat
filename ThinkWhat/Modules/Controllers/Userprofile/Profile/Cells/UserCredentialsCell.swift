@@ -128,17 +128,7 @@ class UserCredentialsCell: UICollectionViewListCell {
     instance.spacing = padding*2
     instance.alignment = .center
     
-//    opaque.translatesAutoresizingMaskIntoConstraints = false
-////    opaque.widthAnchor.constraint(equalTo: opaque.heightAnchor).isActive = true
-////    opaque.heightAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
-    avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.3).isActive = true
-//    avatar.translatesAutoresizingMaskIntoConstraints = false
-//    avatar.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
-//    avatar.centerYAnchor.constraint(equalTo: instance.centerYAnchor).isActive = true
-//    avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor).isActive = true
-//    avatar.trailingAnchor.constraint(equalTo: instance.trailingAnchor).isActive = true
-//    instance.translatesAutoresizingMaskIntoConstraints = false
-//    instance.heightAnchor.constraint(equalTo: opaque.heightAnchor).isActive = true
+    avatar.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.35).isActive = true
     
     return instance
   }()
@@ -173,6 +163,8 @@ class UserCredentialsCell: UICollectionViewListCell {
     super.traitCollectionDidChange(previousTraitCollection)
     
     avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
+    subscriptionButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    subscriptionButton.getSubview(type: UIButton.self)?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
     
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }

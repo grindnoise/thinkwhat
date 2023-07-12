@@ -35,7 +35,8 @@ class InterestsCollectionView: UICollectionView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  
+  ///**UI**
+  private let padding: CGFloat = 8
   //Collection
   private var source: UICollectionViewDiffableDataSource<Section, Topic>!
   
@@ -150,7 +151,6 @@ class InterestsCollectionView: UICollectionView {
 }
 
 extension InterestsCollectionView: TagCellLayoutDelegate {
-  
   func tagCellLayoutTagSize(layout: TagCellLayout, atIndex index: Int) -> CGSize {
     guard let container = userprofile.preferencesSorted,
           let items = container.compactMap ({ dict in
@@ -159,11 +159,12 @@ extension InterestsCollectionView: TagCellLayoutDelegate {
           items.count > index
     else { return .zero }
     
-    let height: CGFloat = 30
+    // We need to calculated estimated size 
+    let height: CGFloat = "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!) + padding*2//30
 //    items[index].title.uppercased().height(withConstrainedWidth: 100,
 //                                                        font: UIFont(name: Fonts.Bold, size: 14)!)
     let width = items[index].title.uppercased().width(withConstrainedHeight: 1000,
-                                                      font: UIFont(name: Fonts.Bold, size: 14)!) + height + 8 + 2 + 4
+                                                      font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!) + height + padding//+ 8 + 8 + 4
     
     return CGSize(width: width, height: height)
     

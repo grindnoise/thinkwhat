@@ -189,8 +189,8 @@ class EmailVerificationPopupContent: UIView {
     return instance
   }()
   private lazy var tagCapsule: TagCapsule = { TagCapsule(text: "verification_code".localized.uppercased(),
-                                                         padding: 8,
-                                                         textPadding: 8,
+                                                         padding: padding,
+                                                         textPadding: .uniform(size: padding),
                                                          color: color,
                                                          font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
                                                          iconCategory: .Key) }()

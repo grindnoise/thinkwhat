@@ -93,23 +93,23 @@ class TagCapsule: UIView {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat
-  private let textPadding: CGFloat
+  private let textPadding: UIEdgeInsets
   private let isShadowed: Bool
   private lazy var stack: UIStackView = {
     let opaque = UIView.opaque()
     opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor).isActive = true
     if !iconCategory.isNil, let icon = icon {
-      icon.place(inside: opaque)
+//      icon.place(inside: opaque)
+      icon.placeInCenter(of: opaque)
     } else if !image.isNil, let imageView = imageView {
       imageView.placeInCenter(of: opaque)
     }
     
-    
     let opaque2 = UIView.opaque()
-    label.place(inside: opaque2, insets: .uniform(size: textPadding))
+    label.place(inside: opaque2, insets: textPadding)
     
     let instance = UIStackView(arrangedSubviews: [
-      UIView.horizontalSpacer(padding),
+      UIView.horizontalSpacer(iconCategory.isNil ? padding : 0),
       opaque,
 //      label,
 //      opaque,
@@ -122,6 +122,7 @@ class TagCapsule: UIView {
       .store(in: &subscriptions)
     instance.backgroundColor = color
     instance.spacing = 0//padding
+
     
     return instance
   }()
@@ -130,7 +131,7 @@ class TagCapsule: UIView {
     instance.iconColor = .white
     instance.isRounded = false
     instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.65
+    instance.scaleMultiplicator = 1.2
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     
     return instance
@@ -147,11 +148,13 @@ class TagCapsule: UIView {
     let instance = UILabel()
     instance.font = font
     instance.textAlignment = .center
-    let constraint = instance.widthAnchor.constraint(equalToConstant: text.width(withConstrainedHeight: 100, font: font))
-    constraint.identifier = "widthAnchor"
-    constraint.isActive = true
     instance.text = text
     instance.textColor = .white
+    
+//    let constraint = instance.widthAnchor.constraint(equalToConstant: text.width(withConstrainedHeight: 100, font: font))
+//    constraint.identifier = "widthAnchor"
+//    constraint.isActive = true
+//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: font)).isActive = true
     
     return instance
   }()
@@ -173,6 +176,7 @@ class TagCapsule: UIView {
   }()
   
   
+  
   // MARK: - Deinitialization
   deinit {
     if !iconCategory.isNil {
@@ -192,7 +196,7 @@ class TagCapsule: UIView {
   // MARK: - Initialization
   init(text: String,
        padding: CGFloat = 4,
-       textPadding: CGFloat = 0,
+       textPadding: UIEdgeInsets = .zero,
        color: UIColor = Colors.Logo.Flame.rawValue,
        font: UIFont,
        isShadowed: Bool = false,
@@ -232,11 +236,16 @@ private extension TagCapsule {
     layer.masksToBounds = false
     backgroundColor = .clear
     if isShadowed {
-      shadowView.place(inside: self,
-                       bottomPriority: .required)
+      shadowView.place(inside: self, bottomPriority: .required)
     }
-    stack.place(inside: self,
-                bottomPriority: .required)
+    stack.place(inside: self, bottomPriority: .required)
+    
+    if !iconCategory.isNil {
+      icon?.heightAnchor.constraint(equalTo: label.heightAnchor).isActive = true
+    }
+    if !image.isNil {
+      imageView?.heightAnchor.constraint(equalTo: label.heightAnchor).isActive = true
+    }
   }
 }
 

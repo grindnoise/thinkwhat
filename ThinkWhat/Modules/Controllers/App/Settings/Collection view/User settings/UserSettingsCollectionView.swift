@@ -270,10 +270,10 @@ override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout
     let statsCellRegistration = UICollectionView.CellRegistration<UserStatsCell, AnyHashable> { [unowned self] cell, _, _ in
       guard let userprofile = Userprofiles.shared.current else { return }
       
+      cell.mode = .Settings
       cell.userprofile = userprofile
       cell.color = self.color
       cell.insets = UIEdgeInsets(top: padding*2, left: padding, bottom: padding*2, right: padding)
-      cell.mode = .Settings
       cell.publicationsPublisher
 //        .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
         .sink { [weak self] _ in

@@ -20,7 +20,9 @@ class UserStatsCell: UICollectionViewListCell {
     didSet {
       guard let userprofile = userprofile else { return }
       
-      collectionView.userprofile = userprofile
+//      setupUI()
+//      collectionView.mode = mode
+//      collectionView.userprofile = userprofile
     }
   }
   ///`Publishers`
@@ -30,11 +32,7 @@ class UserStatsCell: UICollectionViewListCell {
   public var subscriptionsPublisher = PassthroughSubject<Userprofile, Never>()
   
   ///`Logic`
-  public var mode: Mode = .Userprofile {
-    didSet {
-      collectionView.mode = mode
-    }
-  }
+  public var mode: Mode = .Userprofile
   ///`UI`
   public var color: UIColor = .label {
     didSet {
@@ -136,7 +134,8 @@ class UserStatsCell: UICollectionViewListCell {
     return instance
   }()
   private lazy var collectionView: UserStatsCollectionView = {
-    let instance = UserStatsCollectionView(color: color)
+//    let instance = UserStatsCollectionView(color: color)
+    let instance = UserStatsCollectionView(userprofile: userprofile, mode: mode, color: color)
     instance.backgroundColor = .clear
     
     let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
@@ -224,7 +223,7 @@ class UserStatsCell: UICollectionViewListCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {

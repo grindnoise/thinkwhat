@@ -90,6 +90,21 @@ class UserStatsCollectionView: UICollectionView {
     self.color = color
   }
   
+  init(userprofile: Userprofile,
+       mode: UserStatsCell.Mode,
+       color: UIColor) {
+    self.mode = mode
+    self.userprofile = userprofile
+    
+    super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
+    
+    setTasks()
+    
+    self.color = color
+    setupUI()
+  }
+
+  
   override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
     super.init(frame: frame, collectionViewLayout: UICollectionViewLayout())
     

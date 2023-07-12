@@ -69,16 +69,6 @@ class UserCompatibilityHeaderCell: UICollectionViewListCell {
     
     return instance
   }()
-  private lazy var verticalStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      stack,
-      compatibilityView
-    ])
-    instance.axis = .vertical
-    instance.spacing = padding
-    
-    return instance
-  }()
   private lazy var stack: UIStackView = {
     let stack = UIStackView(arrangedSubviews: [
       headerImage,

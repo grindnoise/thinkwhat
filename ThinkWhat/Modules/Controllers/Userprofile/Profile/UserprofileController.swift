@@ -42,20 +42,7 @@ class UserprofileController: UIViewController, TintColorable {
     }
   }
   private let padding: CGFloat = 8
-  private lazy var titleView: UILabel = {
-    let instance = UILabel()
-    instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    instance.font = UIFont(name: Fonts.Bold, size: 20)
-    instance.textAlignment = .center
-    instance.text = "profile".localized.uppercased()
-    instance.widthAnchor.constraint(equalToConstant: "profile".localized.uppercased().width(withConstrainedHeight: 100, font: instance.font) + padding*2).isActive = true
-    instance.textColor = .white
-    instance.backgroundColor = tintColor
-    
-    return instance
-  }()
+  private lazy var titleView: TagCapsule = { TagCapsule(text: "profile".localized.uppercased(), padding: padding/2, textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding), color: tintColor, font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!, isShadowed: false, iconCategory: nil, image: UIImage(systemName: "person.fill")) }()
   
   
   

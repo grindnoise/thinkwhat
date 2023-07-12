@@ -32,19 +32,9 @@ class CompatibilityView: UIView {
     }
   }
   //Publishers
-  @Published var showDetails = false {
-    didSet {
-      guard oldValue != showDetails else { return }
-      
-      setButtonTitle()
-    }
-  }
+  @Published var showDetails = false
   //UI
-  public var color: UIColor = .clear {
-    didSet {
-      updateUI()
-    }
-  }
+  public var color: UIColor = .clear
   
   
   
@@ -67,43 +57,44 @@ class CompatibilityView: UIView {
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     instance.publisher(for: \.bounds)
       .filter { $0 != .zero }
-      .sink { instance.font = UIFont(name: Fonts.Semibold, size: $0.height * 0.3) }
+      .sink { instance.font = UIFont(name: Fonts.Rubik.SemiBold, size: $0.height * 0.3) }
       .store(in: &subscriptions)
+    instance.textColor = .systemGray
     instance.textAlignment = .center
     instance.numberOfLines = 1
-    instance.text = "100%"
+    instance.text = "0%"
     
     return instance
   }()
-  private lazy var disclosureView: UIStackView = {
-    let label = UILabel()
-    label.isUserInteractionEnabled = true
-    label.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)
-    label.textColor = color
-    label.textAlignment = .center
-    label.text = "more_info".localized.uppercased()
-    label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
-    
-    
-    let disclosureIndicator = UIImageView(image: UIImage(systemName: "chevron.right"))
-    disclosureIndicator.accessibilityIdentifier = "chevron"
-    disclosureIndicator.clipsToBounds = true
-    disclosureIndicator.tintColor = .label
-    disclosureIndicator.contentMode = .center
-    disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
-    disclosureIndicator.isUserInteractionEnabled = true
-    disclosureIndicator.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
-    disclosureIndicator.heightAnchor.constraint(equalTo: disclosureIndicator.widthAnchor, multiplier: 1/1).isActive = true
-    disclosureIndicator.widthAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 1000, font: label.font!)).isActive = true///3)
-    
-    let instance = UIStackView(arrangedSubviews: [
-      label,
-      disclosureIndicator
-    ])
-    instance.axis = .horizontal
-    
-    return instance
-  }()
+//  private lazy var disclosureView: UIStackView = {
+//    let label = UILabel()
+//    label.isUserInteractionEnabled = true
+//    label.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)
+//    label.textColor = color
+//    label.textAlignment = .center
+//    label.text = "more_info".localized.uppercased()
+//    label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+//
+//
+//    let disclosureIndicator = UIImageView(image: UIImage(systemName: "chevron.right"))
+//    disclosureIndicator.accessibilityIdentifier = "chevron"
+//    disclosureIndicator.clipsToBounds = true
+//    disclosureIndicator.tintColor = .label
+//    disclosureIndicator.contentMode = .center
+//    disclosureIndicator.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
+//    disclosureIndicator.isUserInteractionEnabled = true
+//    disclosureIndicator.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+//    disclosureIndicator.heightAnchor.constraint(equalTo: disclosureIndicator.widthAnchor, multiplier: 1/1).isActive = true
+//    disclosureIndicator.widthAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 1000, font: label.font!)).isActive = true///3)
+//
+//    let instance = UIStackView(arrangedSubviews: [
+//      label,
+//      disclosureIndicator
+//    ])
+//    instance.axis = .horizontal
+//
+//    return instance
+//  }()
 //  private lazy var disclosureButton: UIButton = {
 //    let instance = UIButton()
 //    instance.tintColor = color
@@ -113,9 +104,44 @@ class CompatibilityView: UIView {
 ////                                                                                                font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote)!)).isActive = true
 //    return instance
 //  }()
+  private lazy var button: UIView = {
+    let shadowView = UIView.opaque()
+    shadowView.layer.masksToBounds = false
+    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    shadowView.layer.shadowOffset = .zero
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.publisher(for: \.bounds)
+      .sink {
+        shadowView.layer.shadowRadius = $0.height/8
+        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+      }
+      .store(in: &subscriptions)
+    let button = UIButton()
+    button.setAttributedTitle(NSAttributedString(string: "show_details".localized.uppercased(),
+                                                 attributes: [
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+                                                 ]),
+                              for: .normal)
+    button.contentEdgeInsets = UIEdgeInsets(top: padding/1.5, left: padding, bottom: padding/1.5, right: padding)
+    button.accessibilityIdentifier = "profileButton"
+    button.imageEdgeInsets.left = padding/2
+    button.semanticContentAttribute = .forceRightToLeft
+    button.adjustsImageWhenHighlighted = false
+    button.setImage(UIImage(systemName: ("magnifyingglass"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+    button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
+    button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+    button.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
+    button.publisher(for: \.bounds)
+      .sink { button.cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
+    button.place(inside: shadowView)
+    
+    return shadowView
+  }()
   private lazy var percentageView: UIView = {
     let instance = UIView()
-    instance.alpha = 0
+//    instance.alpha = 0
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     instance.layer.addSublayer(backgroundCircle)
     instance.layer.addSublayer(foregroundCircle)
@@ -139,16 +165,23 @@ class CompatibilityView: UIView {
     return instance
   }()
   private lazy var descriptionView: UIStackView = {
+    let opaque = UIView.opaque()
+    button.placeInCenter(of: opaque)
     let instance = UIStackView(arrangedSubviews: [
+      UIView.opaque(),
       descriptionLabel,
+      button,
+      UIView.opaque()
     ])
     instance.alpha = 0
     instance.axis = .vertical
+    instance.spacing = padding * 2
+    instance.alignment = .center
 //    descriptionLabel.place(inside: instance)
-    instance.addSubview(disclosureView)
-    disclosureView.translatesAutoresizingMaskIntoConstraints = false
-    disclosureView.bottomAnchor.constraint(equalTo: instance.bottomAnchor).isActive = true
-    disclosureView.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
+//    instance.addSubview(button)
+//    button.translatesAutoresizingMaskIntoConstraints = false
+//    button.bottomAnchor.constraint(equalTo: instance.bottomAnchor).isActive = true
+//    button.centerXAnchor.constraint(equalTo: instance.centerXAnchor).isActive = true
     
     return instance
   }()
@@ -157,8 +190,9 @@ class CompatibilityView: UIView {
       percentageView,
       descriptionView
     ])
-    instance.spacing = padding
+    instance.spacing = padding*2
     instance.axis = .horizontal
+//    instance.alignment = .center
     
     return instance
   }()
@@ -187,6 +221,11 @@ class CompatibilityView: UIView {
     instance.strokeColor = color.cgColor
 //    instance.lineWidth = 10
     instance.lineCap = .round
+    instance.shadowColor = color.withAlphaComponent(0.35).cgColor
+    instance.shadowRadius = padding/2
+    instance.shadowOffset = .zero
+    instance.masksToBounds = false
+    instance.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
 //    instance.publisher(for: \.bounds)
 //      .sink { [weak self] in
 //        guard let self = self else { return }
@@ -246,19 +285,17 @@ class CompatibilityView: UIView {
   
   // MARK: - Public methods
   public func animate(duration: TimeInterval, delay: TimeInterval) {
-    var color = UIColor.systemGray
-    
     func setDescriptionLabel() {
       var attributedString: NSMutableAttributedString!
-      let paragraph = NSMutableParagraphStyle()
-      paragraph.alignment = .center
+//      let paragraph = NSMutableParagraphStyle()
+//      paragraph.alignment = .center
       var text = ""
-      
-      if #available(iOS 15.0, *) {
-          paragraph.usesDefaultHyphenation = true
-      } else {
-          paragraph.hyphenationFactor = 1
-      }
+//
+//      if #available(iOS 15.0, *) {
+//          paragraph.usesDefaultHyphenation = true
+//      } else {
+//          paragraph.hyphenationFactor = 1
+//      }
       
       if percent.isZero {
         text = "userprofile_compatibility_level_zero".localized
@@ -282,25 +319,27 @@ class CompatibilityView: UIView {
         color = .systemPurple
       }
       
+      foregroundCircle.shadowColor = color.withAlphaComponent(0.25).cgColor
+      
       if percent.isZero {
         attributedString = NSMutableAttributedString(string: "userprofile_compatibility_level_zero".localized,
                                                    attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
+                                                    .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .headline) as Any,
 //                                                    .paragraphStyle: paragraph,
                                                    ])
-        disclosureView.alpha = 0
+        button.alpha = 0
       } else {
-        attributedString = NSMutableAttributedString(string: text.uppercased() + "\n", attributes: [
-          .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
+        attributedString = NSMutableAttributedString(string: text.uppercased(), attributes: [// + "\n", attributes: [
+          .font: UIFont.scaledFont(fontName: Fonts.Rubik.Bold, forTextStyle: .headline) as Any,
           .foregroundColor: color as Any,
-          .paragraphStyle: paragraph,
+//          .paragraphStyle: paragraph,
         ])
         
-        attributedString.append(NSAttributedString(string: "userprofile_compatibility_level".localized,
-                                                   attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
-                                                    .paragraphStyle: paragraph,
-                                                   ]))
+//        attributedString.append(NSAttributedString(string: "userprofile_compatibility_level".localized,
+//                                                   attributes: [
+//                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
+//                                                    .paragraphStyle: paragraph,
+//                                                   ]))
         //      let attributedString = NSMutableAttributedString(string: "userprofile_compatibility_level_with_user".localized,
         //                                                       attributes: [
         //                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
@@ -326,13 +365,13 @@ class CompatibilityView: UIView {
     let maxDuration: Double = 2
     let animDuration = maxDuration * Double(percent) / Double(100)
     setDescriptionLabel()
-    descriptionView.transform = .init(scaleX: 0.75, y: 0.75)
-    percentageView.transform = .init(scaleX: 0.75, y: 0.75)
+//    descriptionView.transform = .init(scaleX: 0.75, y: 0.75)
+//    percentageView.transform = .init(scaleX: 0.75, y: 0.75)
     UIView.animate(withDuration: 0.35, delay: 0.1) { [weak self] in
       guard let self = self else { return }
-      
+
       self.descriptionView.alpha = 1
-      self.descriptionView.transform = .identity
+//      self.descriptionView.transform = .identity
     }
     UIView.animate(withDuration: 0.35) { [weak self] in
       guard let self = self else { return }
@@ -360,6 +399,21 @@ class CompatibilityView: UIView {
     //    timer.sink(receiveCompletion: { _ in print("completed", to: &logger)} , receiveValue: { _ in print("started", to: &logger)} )//
     
     isAnimating = true
+    
+    UIView.transition(with: percentageLabel, duration: animDuration) { [weak self] in
+      guard let self = self else { return }
+      
+      self.percentageLabel.textColor = self.traitCollection.userInterfaceStyle == .dark ? .white : color.darker(0.5)
+      if let button = self.button.getSubview(type: UIButton.self) {
+        button.tintColor = self.traitCollection.userInterfaceStyle == .dark ? UIColor.white : color
+        button.setAttributedTitle(NSAttributedString(string: "show_details".localized.uppercased(),
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                      .foregroundColor: self.traitCollection.userInterfaceStyle == .dark ? UIColor.white : color as Any
+                                                     ]),
+                                  for: .normal)
+      }
+    }
     
     let colorAnim = Animations.get(property: .StrokeColor,
                                    fromValue: foregroundCircle.strokeColor as Any,
@@ -394,17 +448,25 @@ class CompatibilityView: UIView {
     foregroundCircle.add(anim, forKey: nil)
   }
   
-  // MARK: - Overridden methods
-  open override func layoutSubviews() {
-    super.layoutSubviews()
-    
-    updateUI()
-  }
-  
+  // MARK: - Overridden methods  
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    backgroundCircle.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.systemGray.withAlphaComponent(0.1).cgColor
+    backgroundCircle.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.white.blended(withFraction: 0.1, of: UIColor.lightGray).cgColor
+    backgroundCircle.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    foregroundCircle.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    button.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    if let btn = button.getSubview(type: UIButton.self) {
+      btn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .white
+      btn.tintColor = self.traitCollection.userInterfaceStyle == .dark ? UIColor.white : color
+      btn.setAttributedTitle(NSAttributedString(string: "show_details".localized.uppercased(),
+                                                                                    attributes: [
+                                                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                                                      .foregroundColor: self.traitCollection.userInterfaceStyle == .dark ? UIColor.white : color as Any
+                                                                                    ]),
+                                                                 for: .normal)
+    }
+    percentageLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .white : color.darker(0.5)
   }
 }
 
@@ -416,18 +478,6 @@ private extension CompatibilityView {
     foregroundCircle.strokeEnd = 0
     backgroundCircle.strokeStart = 0
     backgroundCircle.strokeEnd  = 1
-  }
-  
-  @MainActor
-  func updateUI() {
-    foregroundCircle.strokeColor = color.cgColor
-    
-    guard let label = disclosureView.arrangedSubviews.filter({ $0 is UILabel }).first as? UILabel,
-          let imageView = disclosureView.arrangedSubviews.filter({ $0 is UIImageView }).first as? UIImageView
-    else { return }
-    
-    label.textColor = color
-    imageView.tintColor = color
   }
   
   func getProgressPath(in rect: CGRect, progress: Double, lineWidth: CGFloat) -> CGPath {
@@ -443,32 +493,39 @@ private extension CompatibilityView {
   @objc
   func handleTap() {
     showDetails = !showDetails
-  }
-  
-  func setButtonTitle() {
-    guard let imageView = disclosureView.arrangedSubviews.filter({ $0 is UIImageView }).first as? UIImageView else { return }
+    let temp = {
+      let instance = UILabel()
+      instance.textAlignment = .center
+      instance.numberOfLines = 0
+      instance.attributedText = descriptionLabel.attributedText
+      
+      return instance
+    }() // try! descriptionLabel.copyObject() as! UIView
+    temp.frame = CGRect(origin: descriptionLabel.superview!.convert(descriptionLabel.frame.origin, to: descriptionView), size: descriptionLabel.bounds.size)
+    descriptionLabel.alpha = 0
+    descriptionView.addSubview(temp)
     
-//    label.text = showDetails ? "hide_details".localized.uppercased() : "show_details".localized.uppercased()
-    UIView.animate(withDuration: 0.3) { [weak self] in
+    UIView.animate(withDuration: 0.3,
+                   delay: 0,
+                   options: .curveEaseOut) { [weak self] in
       guard let self = self else { return }
       
-      imageView.transform = self.showDetails ? CGAffineTransform(rotationAngle: .pi/2) : .identity
+      temp.center = .init(x: self.descriptionView.bounds.midX, y: self.descriptionView.bounds.midY)
+      self.button.alpha = 0
+      self.button.transform = .init(scaleX: 0.5, y: 0.5)
+    } completion: { [weak self] _ in
+      guard let self = self else { return }
+      
+      self.descriptionLabel.alpha = 1
+      temp.removeFromSuperview()
+      descriptionView.arrangedSubviews.forEach { [weak self] in
+        guard let self = self else { return }
+        if $0 !== self.descriptionLabel {
+          self.descriptionView.removeArrangedSubview($0)
+          $0.removeFromSuperview()
+        }
+      }
     }
-    
-//    UIView.setAnimationsEnabled(false)
-//    disclosureButton.setAttributedTitle(NSMutableAttributedString(string: showDetails ? "hide_details".localized.uppercased() : "show_details".localized.uppercased(),
-//                                                     attributes: [
-//                                                      .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .footnote) as Any,
-//                                                      .foregroundColor: color as Any,
-//                                                     ]),
-//                                        for: .normal)
-////    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//      UIView.setAnimationsEnabled(true)
-////    }
-  }
-  
-  func setZeroCompatibility() {
-    
   }
 }
 

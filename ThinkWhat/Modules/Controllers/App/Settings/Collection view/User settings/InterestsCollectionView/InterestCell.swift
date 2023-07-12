@@ -26,44 +26,55 @@ class InterestCell: UICollectionViewCell {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
-  private lazy var topicIcon: Icon = {
-    let instance = Icon(category: item.iconCategory)
-    instance.iconColor = .white
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.85
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    
-    return instance
+  ///**UI**
+  private let padding: CGFloat = 8
+  private lazy var topicView: TagCapsule = {
+    TagCapsule(text: item.title.uppercased(),
+               padding: padding,
+               textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: 0),
+               color: item.tagColor,
+               font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!,
+               isShadowed: false,
+               iconCategory: item.iconCategory,
+               image: nil)
   }()
-  private lazy var topicTitle: InsetLabel = {
-    let instance = InsetLabel()
-    instance.font = UIFont(name: Fonts.Bold, size: 14)
-    instance.text = item.title.uppercased()
-    instance.textColor = .white
-    instance.isUserInteractionEnabled = true
-    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
-    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
-    
-    return instance
-  }()
-  private lazy var topicView: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      topicIcon,
-      topicTitle
-    ])
-    instance.backgroundColor = item.tagColor
-    instance.axis = .horizontal
-    instance.spacing = 2
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
+  //  private lazy var topicIcon: Icon = {
+  //    let instance = Icon(category: item.iconCategory)
+//    instance.iconColor = .white
+//    instance.isRounded = false
+//    instance.clipsToBounds = false
+//    instance.scaleMultiplicator = 1.85
+//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+//
+//    return instance
+//  }()
+//  private lazy var topicTitle: InsetLabel = {
+//    let instance = InsetLabel()
+//    instance.font = UIFont(name: Fonts.Bold, size: 14)
+//    instance.text = item.title.uppercased()
+//    instance.textColor = .white
+//    instance.isUserInteractionEnabled = true
+//    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap)))
+//    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+//
+//    return instance
+//  }()
+//  private lazy var topicView: UIStackView = {
+//    let instance = UIStackView(arrangedSubviews: [
+//      topicIcon,
+//      topicTitle
+//    ])
+//    instance.backgroundColor = item.tagColor
+//    instance.axis = .horizontal
+//    instance.spacing = 2
+//    instance.publisher(for: \.bounds)
+//      .receive(on: DispatchQueue.main)
+//      .filter { $0 != .zero}
+//      .sink { instance.cornerRadius = $0.height/2.25 }
+//      .store(in: &subscriptions)
+//
+//    return instance
+//  }()
   
   
   

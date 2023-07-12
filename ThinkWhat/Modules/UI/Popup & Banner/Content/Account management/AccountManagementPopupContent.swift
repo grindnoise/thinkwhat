@@ -75,7 +75,7 @@ class AccountManagementPopupContent: UIView {
     
     return TagCapsule(text: text,
                       padding: padding,
-                      textPadding: padding,
+                      textPadding: .init(top: padding, left: 0, bottom: padding, right: padding),
                       color: color,
                       font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
                       isShadowed: true,
