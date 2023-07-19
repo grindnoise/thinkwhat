@@ -77,7 +77,8 @@ class NewAccountViewController: UIViewController {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+//    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
   }
 }
 
@@ -157,7 +158,8 @@ private extension NewAccountViewController {
   func setupUI() {
 //    navigationController?.navigationBar.backItem?.title = ""
     navigationController?.setNavigationBarHidden(false, animated: false)
-    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+//    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
 //    navigationItem.titleView = tagCapsule
     
   }

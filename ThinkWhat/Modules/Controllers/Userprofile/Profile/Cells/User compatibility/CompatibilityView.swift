@@ -19,6 +19,11 @@ class CompatibilityView: UIView {
   public var username = ""
   public var percent: Double = .zero {
     didSet {
+      if let opaque = stack.arrangedSubviews.filter({ $0.accessibilityIdentifier == "opaque"}).first {
+        stack.removeArrangedSubview(opaque)
+      }
+      stack.addArrangedSubview(descriptionView)
+//      setupUI()
 //      guard percent != oldValue else {
 //        setZeroCompatibility()
 //
@@ -49,6 +54,7 @@ class CompatibilityView: UIView {
     instance.textAlignment = .center
     instance.numberOfLines = 0
     instance.text = "100%"
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Bold, forTextStyle: .headline)
     
     return instance
   }()
@@ -167,12 +173,16 @@ class CompatibilityView: UIView {
   private lazy var descriptionView: UIStackView = {
     let opaque = UIView.opaque()
     button.placeInCenter(of: opaque)
-    let instance = UIStackView(arrangedSubviews: [
-      UIView.opaque(),
-      descriptionLabel,
-      button,
-      UIView.opaque()
-    ])
+    let instance = UIStackView()
+    if !percent.isZero {
+      instance.addArrangedSubview(UIView.opaque())
+      instance.addArrangedSubview(descriptionLabel)
+      instance.addArrangedSubview(button)
+      instance.addArrangedSubview(UIView.opaque())
+    } else {
+      instance.addArrangedSubview(descriptionLabel)
+      descriptionLabel.widthAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+    }
     instance.alpha = 0
     instance.axis = .vertical
     instance.spacing = padding * 2
@@ -188,7 +198,8 @@ class CompatibilityView: UIView {
   private lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
       percentageView,
-      descriptionView
+      //descriptionView
+      UIView.opaque()
     ])
     instance.spacing = padding*2
     instance.axis = .horizontal
@@ -266,16 +277,15 @@ class CompatibilityView: UIView {
     super.init(frame: .zero)
     
     accessibilityIdentifier = "CompatibilityView"
-    setupUI()
-  }
+  
 //  init(color: UIColor) {
 //    self.color = color
 //
 //    super.init(frame: .zero)
 //
 //    accessibilityIdentifier = "CompatibilityView"
-//    setupUI()
-//  }
+    setupUI()
+  }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
@@ -299,67 +309,30 @@ class CompatibilityView: UIView {
       
       if percent.isZero {
         text = "userprofile_compatibility_level_zero".localized
-      } else if  1..<20 ~= Int(percent) {
+        color = .systemGray
+      } else if  1..<15 ~= Int(percent) {
         text = "userprofile_compatibility_level_ultra_low".localized
         color = .systemGreen
-      } else if  20..<40 ~= Int(percent) {
+      } else if  15..<40 ~= Int(percent) {
         text = "userprofile_compatibility_level_low".localized
         color = .systemYellow
       } else if  40..<60 ~= Int(percent) {
         text = "userprofile_compatibility_level_middle".localized
         color = .systemOrange
-      } else if  60..<80 ~= Int(percent) {
+      } else if  60..<75 ~= Int(percent) {
         text = "userprofile_compatibility_level_high".localized
-        color = .systemRed
-      } else if  80..<100 ~= Int(percent) {
-        text = "userprofile_compatibility_level_ultra_high".localized
         color = .systemPink
+      } else if  75..<90 ~= Int(percent) {
+        text = "userprofile_compatibility_level_ultra_high".localized
+        color = .systemRed
       } else {
         text = "userprofile_compatibility_level_max".localized
         color = .systemPurple
       }
       
       foregroundCircle.shadowColor = color.withAlphaComponent(0.25).cgColor
-      
-      if percent.isZero {
-        attributedString = NSMutableAttributedString(string: "userprofile_compatibility_level_zero".localized,
-                                                   attributes: [
-                                                    .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .headline) as Any,
-//                                                    .paragraphStyle: paragraph,
-                                                   ])
-        button.alpha = 0
-      } else {
-        attributedString = NSMutableAttributedString(string: text.uppercased(), attributes: [// + "\n", attributes: [
-          .font: UIFont.scaledFont(fontName: Fonts.Rubik.Bold, forTextStyle: .headline) as Any,
-          .foregroundColor: color as Any,
-//          .paragraphStyle: paragraph,
-        ])
-        
-//        attributedString.append(NSAttributedString(string: "userprofile_compatibility_level".localized,
-//                                                   attributes: [
-//                                                    .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
-//                                                    .paragraphStyle: paragraph,
-//                                                   ]))
-        //      let attributedString = NSMutableAttributedString(string: "userprofile_compatibility_level_with_user".localized,
-        //                                                       attributes: [
-        //                                                        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
-        //                                                        .paragraphStyle: paragraph,
-        //                                                       ])
-        //      attributedString.append(NSAttributedString(string: username, attributes: [
-        //        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
-        //        .paragraphStyle: paragraph,
-        //      ]))
-        //      attributedString.append(NSAttributedString(string: "userprofile_compatibility_level_with_user_is".localized, attributes: [
-        //        .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline) as Any,
-        //        .paragraphStyle: paragraph,
-        //      ]))
-        //      attributedString.append(NSAttributedString(string: text, attributes: [
-        //        .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
-        //        .foregroundColor: color as Any,
-        //        .paragraphStyle: paragraph,
-        //      ]))
-      }
-      descriptionLabel.attributedText = attributedString
+      descriptionLabel.text = text.uppercased()
+      descriptionLabel.textColor = color
     }
     
     let maxDuration: Double = 2
@@ -448,7 +421,7 @@ class CompatibilityView: UIView {
     foregroundCircle.add(anim, forKey: nil)
   }
   
-  // MARK: - Overridden methods  
+  // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
@@ -505,14 +478,14 @@ private extension CompatibilityView {
     descriptionLabel.alpha = 0
     descriptionView.addSubview(temp)
     
-    UIView.animate(withDuration: 0.3,
+    UIView.animate(withDuration: 0.15,
                    delay: 0,
-                   options: .curveEaseOut) { [weak self] in
+                   options: .curveEaseInOut) { [weak self] in
       guard let self = self else { return }
       
       temp.center = .init(x: self.descriptionView.bounds.midX, y: self.descriptionView.bounds.midY)
       self.button.alpha = 0
-      self.button.transform = .init(scaleX: 0.5, y: 0.5)
+      self.button.transform = .init(scaleX: 0.35, y: 0.35)
     } completion: { [weak self] _ in
       guard let self = self else { return }
       

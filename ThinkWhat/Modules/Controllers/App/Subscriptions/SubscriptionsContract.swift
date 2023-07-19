@@ -64,4 +64,6 @@ protocol SubsciptionsControllerOutput: AnyObject {
   func onWillAppear()
   func onRequestCompleted(_: Result<Bool, Error>)
   func hideUserCard(_: Closure?)
+  func didAppear()
+  func didDisappear()
 }

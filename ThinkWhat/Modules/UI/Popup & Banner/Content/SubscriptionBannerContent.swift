@@ -19,19 +19,17 @@ class UserBannerContentView: UIView {
     case DontNotifyOnPublication = "user_publication_notification_off"
     
     func localizedDescription(userprofile: Userprofile) -> String {
-      let name = userprofile.firstNameSingleWord + (userprofile.lastNameSingleWord.isEmpty ? "" : " \(userprofile.lastNameSingleWord)")
-      
       switch self {
       case .Username:
-        return name
+        return userprofile.username
       case .Subscribe:
-        return self.rawValue.localized + " " + name + " ✅"
+        return self.rawValue.localized + " " + userprofile.username + " ✅"
       case .Unsubscribe:
-        return self.rawValue.localized + " " + name + " ⛔️"
+        return self.rawValue.localized + " " + userprofile.username + " ⛔️"
       case .NotifyOnPublication:
-        return "user_publication_notification_begin".localized + name + self.rawValue.localized + " 🔔"
+        return "user_publication_notification_begin".localized + userprofile.username + self.rawValue.localized + " 🔔"
       case .DontNotifyOnPublication:
-        return "user_publication_notification_begin".localized + name + self.rawValue.localized + " 🔕"
+        return "user_publication_notification_begin".localized + userprofile.username + self.rawValue.localized + " 🔕"
       }
     }
   }
@@ -61,7 +59,7 @@ class UserBannerContentView: UIView {
     let instance = UILabel()
     instance.textColor = textColor
     instance.numberOfLines = 0
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .headline)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .subheadline)
     instance.text = mode.localizedDescription(userprofile: userprofile)
     instance.textAlignment = .center
     

@@ -99,7 +99,8 @@ class HotController: UIViewController, TintColorable {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    setNavigationBarTintColor(initialColor)
+//    setNavigationBarTintColor(initialColor)
+    navigationController?.setBarTintColor(initialColor)
     
     guard isDataReady else { return }
     

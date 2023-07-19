@@ -111,7 +111,7 @@ class UserCompatibilityCell: UICollectionViewListCell {
     let instance = UIView.opaque()
     instance.layer.masksToBounds = false
     instance.accessibilityIdentifier = "shadowView"
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.3).cgColor
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.15).cgColor
     instance.layer.shadowOffset = .zero
     instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
     instance.layer.shadowRadius = padding*0.85
@@ -161,10 +161,10 @@ private extension UserCompatibilityCell {
   @MainActor
   func setupUI() {
     shadowView.place(inside: self,
-                     insets: insets ?? .init(top: padding*3, left: padding, bottom: padding*3, right: padding),
+                     insets: insets ?? .init(top: padding*2, left: padding, bottom: padding*2, right: padding),
                      bottomPriority: .defaultLow)
     collectionView.place(inside: self,
-                         insets: insets ?? .init(top: padding*3, left: padding, bottom: padding*3, right: padding),
+                         insets: insets ?? .init(top: padding*2, left: padding, bottom: padding*2, right: padding),
                          bottomPriority: .defaultLow)
   }
   

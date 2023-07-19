@@ -54,7 +54,7 @@ class TopicCompatibilityCell: UICollectionViewListCell {
   }()
   private lazy var rightButton: UIButton = {
     let instance = UIButton()
-    instance.imageEdgeInsets.left = padding/2
+    instance.imageEdgeInsets.left = padding/4
     instance.semanticContentAttribute = .forceRightToLeft
     instance.adjustsImageWhenHighlighted = false
     instance.addTarget(self, action: #selector(self.disclose), for: .touchUpInside)

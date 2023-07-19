@@ -44,7 +44,8 @@ class TopicsController: UIViewController, TintColorable {
   var isDataReady = false
   public var tintColor: UIColor = .clear {
     didSet {
-      setNavigationBarTintColor(tintColor)
+//      setNavigationBarTintColor(tintColor)
+      navigationController?.setBarTintColor(tintColor)
     }
   }
   ///**UI**
@@ -545,7 +546,8 @@ private extension TopicsController {
       toggleTopicView(on: true)
       
     default:
-      setNavigationBarTintColor(tintColor)
+//      setNavigationBarTintColor(tintColor)
+      navigationController?.setBarTintColor(tintColor)
       mainController.toggleLogo(on: true)
       toggleSearchField(on: false)
       toggleTopicView(on: false)

@@ -127,8 +127,8 @@ class ListController: UIViewController, TintColorable {
     navigationController?.navigationBar.prefersLargeTitles = false//true
     navigationItem.largeTitleDisplayMode = .never//.always
     navigationController?.setNavigationBarHidden(false, animated: true)
-    
-    setNavigationBarTintColor(tintColor)
+    navigationController?.setBarShadow(on: false)
+    navigationController?.setBarTintColor(tintColor)
     titleStack.alpha = 1
     tabBarController?.setTabBarVisible(visible: true, animated: true)
     

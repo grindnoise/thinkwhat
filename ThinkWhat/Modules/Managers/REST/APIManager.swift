@@ -1046,11 +1046,20 @@ class API {
     
     public func getSubscriptions(for userprofile: Userprofile) async throws {
       guard let url = API_URLS.Profiles.subscribedFor else { throw APIError.invalidURL }
+      
       //Exclude
-      let parameters: Parameters = ["exclude_ids": userprofile.subscriptions.map{ return $0.id}]
+      let parameters: Parameters = [
+        "exclude_ids": Array(userprofile.subscriptions.intersection(Userprofiles.shared.all.map { $0.id })),
+        "userprofile_id": userprofile.id
+      ]
       
       do {
-        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: parent.headers())
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: parent.headers())
+        
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
                                                    DateFormatter.dateTimeFormatter,
@@ -1067,15 +1076,12 @@ class API {
     
     public func getSubscribers(for userprofile: Userprofile) async throws {
       guard let url = API_URLS.Profiles.subscribers else { throw APIError.invalidURL }
+      
       //Exclude
-      var subscribers = userprofile.subscribers.map({ return $0.id })
-      var parameters: Parameters = [:]
-      if !subscribers.isEmpty {
-        parameters["exclude_ids"] = subscribers
-      }
-      if !userprofile.isCurrent {
-        parameters["userprofile_id"] = userprofile.id
-      }
+      let parameters: Parameters = [
+        "exclude_ids": Array(userprofile.subscribers.intersection(Userprofiles.shared.all.map { $0.id })),
+        "userprofile_id": userprofile.id
+      ]
       
       do {
         let data = try await parent.requestAsync(url: url,
@@ -1084,9 +1090,11 @@ class API {
                                                  encoding: JSONEncoding.default,
                                                  headers: parent.headers())
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                   DateFormatter.dateTimeFormatter,
-                                                   DateFormatter.dateFormatter ]
+        decoder.dateDecodingStrategyFormatters = [
+          DateFormatter.ddMMyyyy,
+          DateFormatter.dateTimeFormatter,
+          DateFormatter.dateFormatter
+        ]
         
         Userprofiles.shared.append(try decoder.decode([Userprofile].self, from: data))
       } catch let error {
@@ -1096,6 +1104,7 @@ class API {
         throw error
       }
     }
+    
     
     public func subscribe(at userprofiles: [Userprofile]) async throws {
       guard let url = API_URLS.Profiles.subscribe else { throw APIError.invalidURL }
@@ -1113,7 +1122,10 @@ class API {
           current.subscriptionsTotal += userprofiles.count
         }
       } catch let error {
-        NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
+//        NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
+        if let userprofile = userprofiles.first {
+          Userprofiles.shared.subscriptionFailure.send(userprofile)
+        }
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif
@@ -1161,7 +1173,10 @@ class API {
           current.subscriptionsTotal -= userprofiles.count
         }
       } catch let error {
-        NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
+//        NotificationCenter.default.post(name: Notifications.Userprofiles.SubscriptionOperationFailure, object: userprofiles.first)
+        if let userprofile = userprofiles.first {
+          Userprofiles.shared.subscriptionFailure.send(userprofile)
+        }
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif

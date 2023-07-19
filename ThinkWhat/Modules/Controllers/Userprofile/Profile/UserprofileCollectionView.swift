@@ -73,7 +73,7 @@ class UserprofileCollectionView: UICollectionView {
   // MARK: - Initialization
 //  init(color: UIColor) {
 //    self.color = color
-//    
+//
 //    super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
 //
 //    setTasks()
@@ -166,7 +166,7 @@ private extension UserprofileCollectionView {
     let compatibilityCellRegistration = UICollectionView.CellRegistration<UserCompatibilityCell, AnyHashable> { [unowned self] cell, _, _ in
       guard let userprofile = self.userprofile else { return }
       
-      cell.insets = .init(top: self.padding*2, left: self.padding*2, bottom: self.padding*2, right: self.padding*2)
+      cell.insets = .init(top: self.padding, left: self.padding*2, bottom: self.padding, right: self.padding*2)
       cell.isShadowed = !userprofile.isCurrent
       self.colorPublisher
         .filter { !$0.isNil }
@@ -203,6 +203,10 @@ private extension UserprofileCollectionView {
       
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
+      self.colorPublisher
+        .filter { !$0.isNil }
+        .sink { cell.color = $0! }
+        .store(in: &self.subscriptions)
       cell.backgroundConfiguration = config
       cell.automaticallyUpdatesBackgroundConfiguration = false
       cell.userprofile = userprofile
@@ -235,16 +239,11 @@ private extension UserprofileCollectionView {
           self.urlPublisher.send(image)
         }
         .store(in: &self.subscriptions)
-      
-      self.colorPublisher
-        .filter { !$0.isNil }
-        .sink { cell.color = $0! }
-        .store(in: &self.subscriptions)
     }
     
 //    let interestsCellRegistration = UICollectionView.CellRegistration<UserInterestsCell, AnyHashable> { [unowned self] cell, indexPath, item in
 //      guard let userprofile = self.userprofile else { return }
-//      
+//
 //      cell.color = self.color
 //      cell.insets = UIEdgeInsets(top: 16, left: 16, bottom: 0, right: 16)
 //      self.colorPublisher
@@ -256,11 +255,11 @@ private extension UserprofileCollectionView {
 //      cell.topicPublisher
 //        .sink { [weak self] in
 //          guard let self = self else { return }
-//          
+//
 //          self.topicPublisher.send($0)
 //        }
 //        .store(in: &subscriptions)
-//      
+//
 //      var config = UIBackgroundConfiguration.listPlainCell()
 //      config.backgroundColor = .clear
 //      cell.backgroundConfiguration = config
@@ -273,7 +272,7 @@ private extension UserprofileCollectionView {
       
       cell.userprofile = userprofile
       cell.isShadowed = true
-      cell.insets = UIEdgeInsets(top: self.padding*2, left: self.padding*2, bottom: self.padding*3, right: self.padding*2)
+      cell.insets = UIEdgeInsets(top: self.padding*1, left: self.padding*2, bottom: self.padding*1, right: self.padding*2)
       cell.color = self.color
       self.colorPublisher
         .filter { !$0.isNil }

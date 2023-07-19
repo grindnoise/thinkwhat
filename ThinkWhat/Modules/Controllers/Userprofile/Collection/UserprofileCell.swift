@@ -24,7 +24,7 @@ class UserprofileCell: UICollectionViewCell {
       guard !isFooter else { return }
       
       avatar.userprofile = userprofile.isCurrent ? Userprofiles.shared.current : userprofile
-      label.text = userprofile.firstNameSingleWord
+      label.text = userprofile.isCurrent ? "you".localized : userprofile.username
     }
   }
   public var textStyle: UIFont.TextStyle = .subheadline {
@@ -34,13 +34,11 @@ class UserprofileCell: UICollectionViewCell {
   }
   //UI
   public private(set) lazy var avatar: Avatar = {
-    let instance = Avatar(isShadowed: true)
+    let instance = Avatar()//isShadowed: traitCollection.userInterfaceStyle != .dark)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     instance.tapPublisher
-      .sink { [unowned self] in
-        
-        self.userPublisher.send($0)
-      }
+      .filter { !$0.isCurrent }
+      .sink { [unowned self] in self.userPublisher.send($0) }
       .store(in: &subscriptions)
     
     instance.selectionPublisher
@@ -75,8 +73,8 @@ class UserprofileCell: UICollectionViewCell {
   }
   private lazy var label: UILabel = {
     let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: textStyle)
-    instance.numberOfLines = 2
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: textStyle)
+    instance.numberOfLines = 1
     instance.textAlignment = .center
     
     return instance
@@ -197,6 +195,8 @@ class UserprofileCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+//    avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
+    
     guard isFooter else { return }
     
     footer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_TABBAR
@@ -238,7 +238,7 @@ private extension UserprofileCell {
   }
   
   func updateUI() {
-    label.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: textStyle)
+    label.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: textStyle)
   }
   
   @objc

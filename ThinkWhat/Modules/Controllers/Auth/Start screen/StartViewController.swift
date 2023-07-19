@@ -100,7 +100,7 @@ private extension StartViewController {
     }
     
     currentLaguage = L10n.shared.language
-    setNavigationBarTintColor(.label)
+    navigationController?.setBarTintColor(.label)
     navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil,
                                                         image: UIImage(systemName: "globe",
                                                                        withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline,

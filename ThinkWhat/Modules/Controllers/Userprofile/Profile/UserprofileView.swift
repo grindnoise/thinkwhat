@@ -85,11 +85,11 @@ class UserprofileView: UIView {
       }
       .store(in: &subscriptions)
     
-    instance.subscribersPublisher
+    instance.commentsPublisher
       .sink { [weak self] _ in
         guard let self = self else { return }
         
-        self.viewInput?.subscribers()
+        self.viewInput?.comments()
       }
       .store(in: &subscriptions)
     
@@ -108,6 +108,22 @@ class UserprofileView: UIView {
         self.viewInput?.crossingSurveys($0)
       }
       .store(in: &self.subscriptions)
+    
+    instance.subscribersPublisher
+      .sink { [unowned self] _ in self.viewInput?.onSubscribersSelected() }
+      .store(in: &subscriptions)
+    
+    instance.subscriptionsPublisher
+      .sink { [unowned self] _ in self.viewInput?.onSubscriptionsSelected() }
+      .store(in: &subscriptions)
+    
+    instance.commentsPublisher
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.viewInput?.comments()
+      }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -164,7 +180,7 @@ class UserprofileView: UIView {
 private extension UserprofileView {
   
   func setupUI() {
-    backgroundColor = .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBackground : .systemBackground.blended(withFraction: 0.04, of: .lightGray)
     collectionView.place(inside: self)
 //    collectionView.color = color
 //    collectionView.colorPublisher.send(color)

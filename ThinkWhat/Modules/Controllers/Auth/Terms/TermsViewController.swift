@@ -168,7 +168,8 @@ private extension TermsViewController {
   func setupUI() {
     navigationController?.setNavigationBarHidden(false, animated: false)
 //    setNavigationBarTintColor(Colors.main)
-    fillNavigationBar()
+//    fillNavigationBar()
+    navigationController?.setBarColor()
 //    navigationItem.titleView = logoStack
     
     guard let navBar = navigationController?.navigationBar else { return }

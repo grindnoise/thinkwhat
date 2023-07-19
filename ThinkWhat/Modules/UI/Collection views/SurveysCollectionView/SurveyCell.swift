@@ -16,6 +16,7 @@ class SurveyCell: UICollectionViewCell {
     didSet {
       guard !item.isNil else { return }
       
+//      setupUI()
       updateUI()
       updateProgress(animated: false)
       
@@ -27,6 +28,10 @@ class SurveyCell: UICollectionViewCell {
           guard let self = self else { return }
           
           self.comleteButton.tintColor = self.item.isComplete ? self.item.topic.tagColor : .systemGray4
+          self.buttonsStack.insertArrangedSubview(self.watchButton, at: 0)
+          self.buttonsStack.insertArrangedSubview(self.comleteButton, at: 1)
+          self.buttonsStack.removeArrangedSubview(self.claimButton)
+          self.claimButton.removeFromSuperview()
         }
         .store(in: &subscriptions)
       
@@ -60,7 +65,7 @@ class SurveyCell: UICollectionViewCell {
   public private(set) var settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
   //UI
   public private(set) lazy var avatar: Avatar = {
-    let instance = Avatar(isShadowed: true)
+    let instance = Avatar(isShadowed: traitCollection.userInterfaceStyle != .dark)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.isUserInteractionEnabled = true
     instance.tapPublisher
@@ -91,29 +96,55 @@ class SurveyCell: UICollectionViewCell {
   //UI
   let padding: CGFloat = 8
   //Header
-  private lazy var headerView: UIStackView = {
-    func createStack() -> UIStackView {
-      //Topic & progress
-      let nestedStack = UIStackView(arrangedSubviews: [
-        topicView,
-        progressView
-      ])
-      nestedStack.axis = .horizontal
-      nestedStack.accessibilityIdentifier = "nestedStack"
-      nestedStack.spacing = 4
-      
-      let stack = UIStackView(arrangedSubviews: [
-        nestedStack,
+  private lazy var tagCapsule: TagCapsule = {
+//    let title = item.topic.isOther ? "\(item.topic.parent!.title.localized)/\(item.topic.title.localized)" : { item.topic.title.localized }()
+    let instance = TagCapsule(text: "",//title.uppercased(),
+                              padding: padding,
+                              textPadding: .init(top: padding/3, left: 0, bottom: padding/3, right: 0),
+                              color: .clear,//item.topic.tagColor,
+                              font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!,
+                              isShadowed: false,
+                              iconCategory: .Null,//item.topic.isOther ? item.topic.parent!.iconCategory : item.topic.iconCategory,
+                              image: nil)
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding/2).isActive = true
+    
+    return instance
+  }()
+  private lazy var topView: UIStackView = {
+//    func createStack() -> UIStackView {
+//      //Topic & progress
+//      let nestedStack = UIStackView(arrangedSubviews: [
+//        topicView,
+//        progressView
+//      ])
+//      nestedStack.axis = .horizontal
+//      nestedStack.accessibilityIdentifier = "nestedStack"
+//      nestedStack.spacing = 4
+//
+//      let stack = UIStackView(arrangedSubviews: [
+//        nestedStack,
+//        dateLabel
+//      ])
+//      stack.axis = .vertical
+//      stack.spacing = 4
+//
+//      return stack
+//    }
+    
+    let nested = {
+      let instance = UIStackView(arrangedSubviews: [
+        tagCapsule,
         dateLabel
       ])
-      stack.axis = .vertical
-      stack.spacing = 4
-      
-      return stack
-    }
+      instance.axis = .vertical
+      instance.spacing = padding/2
+      instance.alignment = .leading
+
+      return instance
+    }()
         
     let instance = UIStackView(arrangedSubviews: [
-      createStack(),
+      nested,
       UIView.opaque(),
       usernameLabel,
       avatar
@@ -123,129 +154,129 @@ class SurveyCell: UICollectionViewCell {
     
     return instance
   }()
-  private lazy var topicGradient: CAGradientLayer = {
-    let instance = CAGradientLayer()
-    instance.type = .radial
-    instance.colors = getGradientColors(color: .systemGray)
-    instance.locations = [0, 0.5, 1.15]
-    instance.setIdentifier("radialGradient")
-    instance.startPoint = CGPoint(x: 0.5, y: 0.5)
-    instance.endPoint = CGPoint(x: 1, y: 1)
-    instance.publisher(for: \.bounds)
-      .filter { $0 != .zero }
-      .sink { instance.cornerRadius = $0.height/2.25}
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
+//  private lazy var topicGradient: CAGradientLayer = {
+//    let instance = CAGradientLayer()
+//    instance.type = .radial
+//    instance.colors = getGradientColors(color: .systemGray)
+//    instance.locations = [0, 0.5, 1.15]
+//    instance.setIdentifier("radialGradient")
+//    instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+//    instance.endPoint = CGPoint(x: 1, y: 1)
+//    instance.publisher(for: \.bounds)
+//      .filter { $0 != .zero }
+//      .sink { instance.cornerRadius = $0.height/2.25}
+//      .store(in: &subscriptions)
+//
+//    return instance
+//  }()
   private lazy var usernameLabel: UILabel = {
     let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption1)
     instance.textAlignment = .right
     instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     instance.numberOfLines = 2
     
     return instance
   }()
-  private lazy var topicIcon: Icon = {
-    let instance = Icon(category: Icon.Category.Logo)
-    instance.iconColor = .white//Colors.Logo.Flame.rawValue
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.65
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    
-    return instance
-  }()
-  private lazy var topicTitle: InsetLabel = {
-    let instance = InsetLabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .subheadline)
-#if DEBUG
-    instance.text = "TEST TOPIC"
-#endif
-    instance.textColor = .white
-    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
-    
-    return instance
-  }()
-  private lazy var topicView: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      topicIcon,
-      topicTitle
-    ])
-    instance.backgroundColor = .clear
-    instance.axis = .horizontal
-    instance.spacing = 2
-    instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
-    instance.layer.insertSublayer(topicGradient, at: 0)//(gradient)
-    instance.publisher(for: \.bounds)
-    //            .filter { $0 != .zero }
-      .sink {
-        instance.cornerRadius = $0.height/2.25
-        
-        guard let layer = instance.layer.getSublayer(identifier: "radialGradient") else { return }
-        
-        layer.frame = $0
-      }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
-  private lazy var progressView: UIView = {
-    //        let font = UIFont(name: Fonts.Bold, size: 20)
-    let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .subheadline)
-    let instance = UIView()
-    instance.alpha = 0
-    instance.backgroundColor = .systemGray4
-    instance.accessibilityIdentifier = "progressView"
-    instance.widthAnchor.constraint(equalToConstant: "000000".width(withConstrainedHeight: 100, font: font!)).isActive = true
-    //        instance.layer.insertSublayer(topicGradient, at: 0)//(gradient)
-    //        instance.publisher(for: \.bounds)
-    //            .filter { $0 != .zero && $0 != instance.bounds }
-    //            .sink {
-    //                instance.cornerRadius = $0.height/2.25
-    //
-    //                guard let layer = instance.layer.getSublayer(identifier: "radialGradient") else { return }
-    //
-    //                layer.frame = $0
-    //            }
-    //            .store(in: &subscriptions)
-    
-    instance.publisher(for: \.bounds, options: .new)
-      .filter { $0 != .zero }
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    
-    let progressBar = UIView()
-    instance.addSubview(progressBar)
-    progressBar.accessibilityIdentifier = "progress"
-    progressBar.translatesAutoresizingMaskIntoConstraints = false
-    
-    NSLayoutConstraint.activate([
-      progressBar.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-      progressBar.topAnchor.constraint(equalTo: instance.topAnchor),
-      progressBar.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-    ])
-    
-    let constraint = progressBar.widthAnchor.constraint(equalToConstant: 30)
-    constraint.identifier = "width"
-    constraint.isActive = true
-    
-    let label = UILabel()
-    label.accessibilityIdentifier = "progressLabel"
-    label.font = font
-    label.textAlignment = .center
-    label.textColor = .white
-    label.place(inside: instance)
-#if DEBUG
-    label.text = "100%"
-#endif
-    
-    return instance
-  }()
+//  private lazy var topicIcon: Icon = {
+//    let instance = Icon(category: Icon.Category.Logo)
+//    instance.iconColor = .white//Colors.Logo.Flame.rawValue
+//    instance.isRounded = false
+//    instance.clipsToBounds = false
+//    instance.scaleMultiplicator = 1.65
+//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
+//
+//    return instance
+//  }()
+//  private lazy var topicTitle: InsetLabel = {
+//    let instance = InsetLabel()
+//    instance.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .subheadline)
+//#if DEBUG
+//    instance.text = "TEST TOPIC"
+//#endif
+//    instance.textColor = .white
+//    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+//
+//    return instance
+//  }()
+//  private lazy var topicView: UIStackView = {
+//    let instance = UIStackView(arrangedSubviews: [
+//      topicIcon,
+//      topicTitle
+//    ])
+//    instance.backgroundColor = .clear
+//    instance.axis = .horizontal
+//    instance.spacing = 2
+//    instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
+//    instance.layer.insertSublayer(topicGradient, at: 0)//(gradient)
+//    instance.publisher(for: \.bounds)
+//    //            .filter { $0 != .zero }
+//      .sink {
+//        instance.cornerRadius = $0.height/2.25
+//
+//        guard let layer = instance.layer.getSublayer(identifier: "radialGradient") else { return }
+//
+//        layer.frame = $0
+//      }
+//      .store(in: &subscriptions)
+//
+//    return instance
+//  }()
+//  private lazy var progressView: UIView = {
+//    //        let font = UIFont(name: Fonts.Bold, size: 20)
+//    let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .subheadline)
+//    let instance = UIView()
+//    instance.alpha = 0
+//    instance.backgroundColor = .systemGray4
+//    instance.accessibilityIdentifier = "progressView"
+//    instance.widthAnchor.constraint(equalToConstant: "000000".width(withConstrainedHeight: 100, font: font!)).isActive = true
+//    //        instance.layer.insertSublayer(topicGradient, at: 0)//(gradient)
+//    //        instance.publisher(for: \.bounds)
+//    //            .filter { $0 != .zero && $0 != instance.bounds }
+//    //            .sink {
+//    //                instance.cornerRadius = $0.height/2.25
+//    //
+//    //                guard let layer = instance.layer.getSublayer(identifier: "radialGradient") else { return }
+//    //
+//    //                layer.frame = $0
+//    //            }
+//    //            .store(in: &subscriptions)
+//
+//    instance.publisher(for: \.bounds, options: .new)
+//      .filter { $0 != .zero }
+//      .sink { instance.cornerRadius = $0.height/2.25 }
+//      .store(in: &subscriptions)
+//
+//    let progressBar = UIView()
+//    instance.addSubview(progressBar)
+//    progressBar.accessibilityIdentifier = "progress"
+//    progressBar.translatesAutoresizingMaskIntoConstraints = false
+//
+//    NSLayoutConstraint.activate([
+//      progressBar.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
+//      progressBar.topAnchor.constraint(equalTo: instance.topAnchor),
+//      progressBar.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
+//    ])
+//
+//    let constraint = progressBar.widthAnchor.constraint(equalToConstant: 30)
+//    constraint.identifier = "width"
+//    constraint.isActive = true
+//
+//    let label = UILabel()
+//    label.accessibilityIdentifier = "progressLabel"
+//    label.font = font
+//    label.textAlignment = .center
+//    label.textColor = .white
+//    label.place(inside: instance)
+//#if DEBUG
+//    label.text = "100%"
+//#endif
+//
+//    return instance
+//  }()
   private lazy var dateLabel: InsetLabel = {
     let instance = InsetLabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption1)
     instance.textAlignment = .left
     instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
     instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
@@ -259,8 +290,12 @@ class SurveyCell: UICollectionViewCell {
   private lazy var contextInteraction: UIContextMenuInteraction = { .init(delegate: self) }()
   //Content
   private lazy var middleView: UIStackView = {
+    let opaque = UIView.opaque()
+    titleLabel.place(inside: opaque,
+                     insets: .init(top: padding, left: 0, bottom: 0, right: 0))
+    
     let instance = UIStackView(arrangedSubviews: [
-      titleLabel,
+      opaque,
       descriptionLabel,
 //      imageContainer
     ])
@@ -272,7 +307,7 @@ class SurveyCell: UICollectionViewCell {
   private lazy var titleLabel: UILabel = {
     let instance = UILabel()
     instance.textAlignment = .left
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue,
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold,
                                       forTextStyle: .title1)
     instance.numberOfLines = 0
     instance.lineBreakMode = .byTruncatingTail
@@ -287,7 +322,7 @@ class SurveyCell: UICollectionViewCell {
   private lazy var descriptionLabel: UILabel = {
     let instance = UILabel()
     instance.textAlignment = .left
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .body)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.numberOfLines = 0
     instance.lineBreakMode = .byTruncatingTail
     instance.textColor = .label
@@ -301,8 +336,7 @@ class SurveyCell: UICollectionViewCell {
   private lazy var imageView: UIImageView = {
     let instance = UIImageView()
     instance.clipsToBounds = true
-    instance.backgroundColor = .clear//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    instance.translatesAutoresizingMaskIntoConstraints = false
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.contentMode = .scaleAspectFill
     
     return instance
@@ -310,12 +344,18 @@ class SurveyCell: UICollectionViewCell {
   private lazy var imageContainer: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
-    instance.clipsToBounds = true
-    //        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
+    instance.layer.masksToBounds = false
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    instance.layer.shadowOffset = .zero
+    instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    instance.layer.shadowRadius = padding
     instance.publisher(for: \.bounds)
-      .filter { $0 != .zero }
-      .sink { instance.cornerRadius = $0.width*0.025 }
+      .sink { [unowned self] in
+        instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.025).cgPath
+        self.imageView.cornerRadius = $0.width*0.025
+      }
       .store(in: &subscriptions)
+    
     imageView.place(inside: instance)
     
     return instance
@@ -361,7 +401,7 @@ class SurveyCell: UICollectionViewCell {
   }()
   private lazy var ratingLabel: UILabel = {
     let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption1)
     instance.textAlignment = .center
     instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     instance.publisher(for: \.bounds)
@@ -390,7 +430,7 @@ class SurveyCell: UICollectionViewCell {
   }()
   private lazy var viewsLabel: UILabel = {
     let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption1)
     instance.textAlignment = .center
     instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     
@@ -407,7 +447,7 @@ class SurveyCell: UICollectionViewCell {
   }()
   private lazy var commentsLabel: UILabel = {
     let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption1)
     instance.textAlignment = .center
     instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     
@@ -415,9 +455,9 @@ class SurveyCell: UICollectionViewCell {
   }()
   private lazy var buttonsStack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
-      comleteButton,
-      watchButton,
-      claimButton,
+//      comleteButton,
+//      watchButton,
+//      claimButton,
     ])
     instance.spacing = 8
     instance.alignment = .center
@@ -502,7 +542,7 @@ class SurveyCell: UICollectionViewCell {
     super.traitCollectionDidChange(previousTraitCollection)
     
     backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground//.white.blended(withFraction: 0.2, of: .gray)
-    
+    avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
     ratingLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     viewsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     commentsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
@@ -533,13 +573,13 @@ class SurveyCell: UICollectionViewCell {
     descriptionLabel.text = ""
     titleLabel.text = ""
     imageView.image = nil
-    progressView.alpha = 0
+//    progressView.alpha = 0
     avatar.removeInteraction(contextInteraction)
     avatar.clearImage()
     
-    guard let constraint = imageContainer.getConstraint(identifier: "imageContainer") else { return }
-    
-    imageContainer.removeConstraint(constraint)
+    if let constraint = imageContainer.getConstraint(identifier: "imageContainer") {
+      imageContainer.removeConstraint(constraint)
+    }
   }
 }
 
@@ -553,14 +593,16 @@ private extension SurveyCell {
     clipsToBounds = true
     
     let stackView = UIStackView(arrangedSubviews: [
-      headerView,
+      topView,
       middleView,
       bottomView
     ])
     stackView.axis = .vertical
     stackView.spacing = padding*2
     
-    stackView.place(inside: contentView, insets: .uniform(size: 8), bottomPriority: .defaultLow)
+    stackView.place(inside: contentView,
+                    insets: .uniform(size: 10), // .init(top: padding*2, left: padding, bottom: padding*2, right: padding),
+                    bottomPriority: .defaultLow)
   }
   
   func setTasks() { }
@@ -587,8 +629,10 @@ private extension SurveyCell {
       .sink { [weak self] flag in
         guard let self = self else { return }
         
-        UIView.animate(withDuration: duration) {
-          self.watchButton.tintColor = flag ? .label : .systemGray4
+        watchButton.setSpinning(on: false, animated: false) { [weak self] in
+          guard let self = self else { return }
+          
+          self.watchButton.imageView?.tintColor = flag ? .label : .systemGray4
         }
         
         //                guard flag else { return }
@@ -640,59 +684,57 @@ private extension SurveyCell {
   
   @MainActor
   func updateProgress(animated: Bool = true) {
-    guard let progressIndicator = progressView.getSubview(type: UIView.self, identifier: "progress"),
-          let progressLabel = progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
-          let constraint = progressIndicator.getConstraint(identifier: "width")
-    else { return }
-    
-    progressView.setNeedsLayout()
-    progressView.layoutIfNeeded()
-    
-    progressIndicator.backgroundColor = item.topic.tagColor
-    //        progressView.setNeedsLayout()
-    let progress = progressView.bounds.width * CGFloat(item.progress)*0.01
-    
-    guard animated else {
-      progressLabel.text = String(describing: item.progress) + "%"
-      constraint.constant = progress
-      progressView.layoutIfNeeded()
-      return
-    }
-    
-    UIView.transition(with: progressLabel,
-                      duration: 0.15,
-                      options: .transitionCrossDissolve) { [weak self] in
-      guard let self = self else { return }
-      
-      constraint.constant = progress
-      self.progressView.layoutIfNeeded()
-    } completion: { _ in }
+//    guard let progressIndicator = progressView.getSubview(type: UIView.self, identifier: "progress"),
+//          let progressLabel = progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
+//          let constraint = progressIndicator.getConstraint(identifier: "width")
+//    else { return }
+//
+//    progressView.setNeedsLayout()
+//    progressView.layoutIfNeeded()
+//
+//    progressIndicator.backgroundColor = item.topic.tagColor
+//    //        progressView.setNeedsLayout()
+//    let progress = progressView.bounds.width * CGFloat(item.progress)*0.01
+//
+//    guard animated else {
+//      progressLabel.text = String(describing: item.progress) + "%"
+//      constraint.constant = progress
+//      progressView.layoutIfNeeded()
+//      return
+//    }
+//
+//    UIView.transition(with: progressLabel,
+//                      duration: 0.15,
+//                      options: .transitionCrossDissolve) { [weak self] in
+//      guard let self = self else { return }
+//
+//      constraint.constant = progress
+//      self.progressView.layoutIfNeeded()
+//    } completion: { _ in }
   }
   
   @MainActor
   func updateUI() {
     func updateHeader() {
-      if item.isComplete {
-        //                titleLabel.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title2)
-        progressView.alpha = 1
-      }
-      topicGradient.colors = getGradientColors(color: item.topic.tagColor)
-      topicIcon.category = item.topic.iconCategory
-      topicTitle.text = item.topic.title.uppercased()
-      //            updateProgress(animated: false)
+      let title = item.topic.isOther ? "\(item.topic.parent!.title.localized)/\(item.topic.title.localized)" : { item.topic.title.localized }()
+      tagCapsule.text = title.uppercased()
+      tagCapsule.color = item.topic.tagColor
+      tagCapsule.iconCategory = item.topic.isOther ? item.topic.parent!.iconCategory : item.topic.iconCategory
+//      if item.isComplete {
+//        //                titleLabel.font = UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title2)
+//        progressView.alpha = 1
+//      }
       dateLabel.text = item.startDate.timeAgoDisplay()
-      let array = [item.owner.firstName, item.owner.lastName]
-      var username = ""
-      array.forEach { username += $0 + "\n" }
-      usernameLabel.text = String(username.prefix(username.count - 1))
-      
+
       if item.isAnonymous {
         avatar.userprofile = Userprofile.anonymous
         usernameLabel.text = ""
       } else {
         avatar.userprofile = item.owner.isCurrent ? Userprofiles.shared.current : item.owner
-        guard !item.owner.isCurrent else { return }
+        usernameLabel.text = item.owner.username
         
+        guard !item.owner.isCurrent else { return }
+
         avatar.addInteraction(UIContextMenuInteraction(delegate: self))
       }
     }
@@ -778,28 +820,40 @@ private extension SurveyCell {
       ratingLabel.text = String(describing: String(describing: item.rating))
       commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
       viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-      
       comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray4
       watchButton.tintColor = item.isFavorite ? .label : .systemGray4
+      
+      if item.isOwn || item.isComplete {
+        buttonsStack.removeArrangedSubview(watchButton)
+        watchButton.removeFromSuperview()
+        buttonsStack.removeArrangedSubview(claimButton)
+        claimButton.removeFromSuperview()
+        if item.isComplete {
+          buttonsStack.insertArrangedSubview(watchButton, at: 0)
+          buttonsStack.insertArrangedSubview(comleteButton, at: 1)
+        } else {
+          buttonsStack.removeArrangedSubview(comleteButton)
+          comleteButton.removeFromSuperview()
+          buttonsStack.removeArrangedSubview(watchButton)
+          watchButton.removeFromSuperview()
+        }
+      } else if buttonsStack.arrangedSubviews.filter({ $0 === claimButton }).isEmpty {
+        buttonsStack.addArrangedSubview(claimButton)
+        if item.isComplete {
+          buttonsStack.insertArrangedSubview(watchButton, at: 0)
+          buttonsStack.insertArrangedSubview(comleteButton, at: 1)
+        } else {
+          buttonsStack.removeArrangedSubview(comleteButton)
+          comleteButton.removeFromSuperview()
+          buttonsStack.removeArrangedSubview(watchButton)
+          watchButton.removeFromSuperview()
+        }
+      }
     }
     
-    //#if DEBUG
-    //        print(frame.size)
-    //#endif
-    
-    //#if DEBUG
-    //        print(frame.size)
-    //#endif
-    //        setNeedsLayout()
     updateHeader()
     updateMiddle()
     updateBottom()
-    
-    //#if DEBUG
-    //        print(frame.size)
-    //#endif
-    //        contentView.setNeedsLayout()
-    //        contentView.layoutIfNeeded()
   }
   
   @objc
@@ -807,6 +861,8 @@ private extension SurveyCell {
     guard !item.isNil else { return }
     
     if sender === watchButton {
+      watchButton.imageView?.tintColor = .clear
+      watchButton.setSpinning(on: true, animated: true)
       watchSubject.send(item)
     } else if sender === claimButton {
       claimSubject.send(item)
@@ -876,7 +932,7 @@ private extension SurveyCell {
   
   func setFinished() {
     guard !item.isActive,
-          let stack = headerView.getSubview(type: UIStackView.self, identifier: "nestedStack")
+          let stack = topView.getSubview(type: UIStackView.self, identifier: "nestedStack")
     else { return }
     
     let imageView = UIImageView(image: UIImage(systemName: "flag.checkered.2.crossed"))
@@ -885,20 +941,20 @@ private extension SurveyCell {
     imageView.contentMode = .center
     imageView.alpha = 0
     
-    UIView.animate(withDuration: 0.2) { [weak self] in
-      guard let self = self else { return }
-      
-      self.progressView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-      self.progressView.alpha = 0
-    } completion: { _ in
-      stack.removeArrangedSubview(self.progressView)
-      stack.spacing = self.padding
-      stack.addArrangedSubview(imageView)
-      self.progressView.removeFromSuperview()
-      UIView.animate(withDuration: 0.15) {
-        imageView.alpha = 1
-      }
-    }
+//    UIView.animate(withDuration: 0.2) { [weak self] in
+//      guard let self = self else { return }
+//
+//      self.progressView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+//      self.progressView.alpha = 0
+//    } completion: { _ in
+//      stack.removeArrangedSubview(self.progressView)
+//      stack.spacing = self.padding
+//      stack.addArrangedSubview(imageView)
+//      self.progressView.removeFromSuperview()
+//      UIView.animate(withDuration: 0.15) {
+//        imageView.alpha = 1
+//      }
+//    }
   }
 }
 

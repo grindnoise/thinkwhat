@@ -65,12 +65,14 @@ class SignInViewController: UIViewController {
     
     navigationItem.setHidesBackButton(true, animated: false)
     navigationController?.setNavigationBarHidden(false, animated: false)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+//    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
   }
 }
 

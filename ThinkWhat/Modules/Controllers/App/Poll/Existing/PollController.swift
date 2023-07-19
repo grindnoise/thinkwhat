@@ -210,6 +210,7 @@ class PollController: UIViewController {
     super.viewWillAppear(animated)
     
     guard !item.isNil else { return }
+    
     setupUI()
   }
   
@@ -230,7 +231,7 @@ class PollController: UIViewController {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
   }
 }
 
@@ -239,7 +240,8 @@ private extension PollController {
   @MainActor
   func setupUI() {
     navigationController?.interactivePopGestureRecognizer?.delegate = self
-    setNavigationBarTintColor(item.topic.tagColor)
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark)
+    navigationController?.setBarTintColor(item.topic.tagColor)
     navigationItem.titleView = topicView
     setBarButtonItems()
     

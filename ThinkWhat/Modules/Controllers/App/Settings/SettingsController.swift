@@ -39,7 +39,8 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
   }
   public var tintColor: UIColor = .clear {
     didSet {
-      setNavigationBarTintColor(tintColor)
+//      setNavigationBarTintColor(tintColor)
+      navigationController?.setBarTintColor(tintColor)
       settingsSwitch.color = tintColor
     }
   }

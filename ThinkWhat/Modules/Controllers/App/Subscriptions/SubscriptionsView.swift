@@ -93,13 +93,13 @@ class SubscriptionsView: UIView {
   private var isCollectionViewSetupCompleted = false
   private var needsAnimation = true
   private var isRevealed = false
-  private var isEmpty = false {
-    didSet {
-      guard isEmpty != oldValue else { return }
-      
-      switchEmptyLabel(isEmpty: isEmpty)
-    }
-  }
+  private var isEmpty = false //{
+//    didSet {
+//      guard isEmpty != oldValue else { return }
+//
+//      switchEmptyLabel(isEmpty: isEmpty)
+//    }
+//  }
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var filterView: UIView = {
@@ -153,7 +153,7 @@ class SubscriptionsView: UIView {
     
     return instance
   }()
-  private lazy var emptySubscriptionsView: EmptySubscriptionsView = { EmptySubscriptionsView() }()
+  private var emptySubscriptionsView: EmptySubscriptionsView?// = { EmptySubscriptionsView() }()
   private lazy var surveysCollectionView: SurveysCollectionView = {
     let instance = SurveysCollectionView(category: .Subscriptions)
     
@@ -276,12 +276,6 @@ class SubscriptionsView: UIView {
       
       self.viewInput?.share(value)
     }.store(in: &self.subscriptions)
-    
-    instance.claimSubject
-      .sink { [weak self] in
-      guard let self = self,
-            let surveyReference = $0
-      else { return }
       
       instance.claimSubject
         .sink { [weak self] in
@@ -303,10 +297,6 @@ class SubscriptionsView: UIView {
             .store(in: &self.subscriptions)
         }
         .store(in: &self.subscriptions)
-      
-      
-    }
-    .store(in: &self.subscriptions)
     
     instance.userprofilePublisher
       .sink { [weak self] in
@@ -376,18 +366,30 @@ class SubscriptionsView: UIView {
       .store(in: &subscriptions)
     
     ///If zero subscriptions -> show info label
-    instance.dataItemsCountPublisher
+    instance.zeroSubscriptions
+//      .filter { $0 == true }
       .sink { [weak self] in
         guard let self = self,
-              let isEmpty = $0
+              let zero = $0
         else { return }
         
-        self.viewInput?.onSubcriptionsCountEvent(zeroSubscriptions: isEmpty)
-        self.emptySubscriptionsView.place(inside: self)
-        if isEmpty {
-          self.emptySubscriptionsView.addEquallyTo(to: self)
-          self.emptySubscriptionsView.transform = .init(scaleX: 0.75, y: 0.75)
+        if zero {
+          self.emptySubscriptionsView = EmptySubscriptionsView()
+          self.addSubview(self.emptySubscriptionsView!)
+          self.emptySubscriptionsView?.translatesAutoresizingMaskIntoConstraints = false
+          self.emptySubscriptionsView?.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor).isActive = true
+          self.emptySubscriptionsView?.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor).isActive = true
+          self.emptySubscriptionsView?.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor).isActive = true
+          self.emptySubscriptionsView?.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor).isActive = true
+          self.emptySubscriptionsView?.setAnimationsEnabled(true)
+          //        self.viewInput?.onSubcriptionsCountEvent(zeroSubscriptions: isEmpty)
+          //        self.emptySubscriptionsView.place(inside: self)
+          //        if isEmpty {
+          //          self.emptySubscriptionsView.addEquallyTo(to: self)
+          //          self.emptySubscriptionsView.transform = .init(scaleX: 0.75, y: 0.75)
+          //        }
         }
+        
         
         UIView.animate(
           withDuration: 0.4,
@@ -398,12 +400,15 @@ class SubscriptionsView: UIView {
           animations: { [weak self] in
             guard let self = self else { return }
             
-          self.emptySubscriptionsView.alpha =  isEmpty ? 1 : 0
-          self.emptySubscriptionsView.transform = isEmpty ? .identity : .init(scaleX: 0.75, y: 0.75)
-          self.shadowView.alpha = isEmpty ? 0 : 1
-          self.filterView.alpha = isEmpty ? 0 : 1
+          self.emptySubscriptionsView?.alpha =  zero ? 1 : 0
+          self.emptySubscriptionsView?.transform = zero ? .identity : .init(scaleX: 0.75, y: 0.75)
+          self.shadowView.alpha = zero ? 0 : 1
+          self.filterView.alpha = zero ? 0 : 1
         }) { _ in
-          if !isEmpty { self.emptySubscriptionsView.removeFromSuperview() }
+          if !zero {
+            self.emptySubscriptionsView?.setAnimationsEnabled(false)
+            self.emptySubscriptionsView?.removeFromSuperview()
+          }
         }
       }
       .store(in: &subscriptions)
@@ -768,7 +773,6 @@ private extension SubscriptionsView {
                   let button = subscriptionButton.getSubview(type: UIButton.self)
             else { return }
             
-            self.feedCollectionView.removeItem(unsubscribed)
             button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
                                                          attributes: [
                                                           .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
@@ -777,15 +781,43 @@ private extension SubscriptionsView {
                                       for: .normal)
             button.imageView?.tintColor = .systemRed
           }
+          delay(seconds: 0.3) { [weak self] in
+            guard let self = self else { return }
+            
+            self.feedCollectionView.removeItem(unsubscribed)
+          }
         } else {
           self.feedCollectionView.removeItem(unsubscribed)
           self.feedCollectionView.alpha = 1
           self.userView.alpha = 0
+          self.viewInput?.setDefaultMode()
+          if let constraint = self.topView.getConstraint(identifier: "height") {
+            self.setNeedsLayout()
+            constraint.constant = self.topViewHeight
+            self.layoutIfNeeded()
+          }
         }
       })
       .store(in: &subscriptions)
     
-    
+    // We need to show filterView on new subscription when view is not on screen
+    userprofile.subscriptionsPublisher
+      .receive(on: DispatchQueue.main)
+      .sink(receiveCompletion: {
+        if case .failure(let error) = $0 {
+#if DEBUG
+          print(error)
+#endif
+        }
+      }, receiveValue: { [weak self] subscribers in
+        guard let self = self,
+              let viewInput = self.viewInput,
+              !viewInput.isOnScreen
+        else { return }
+
+        self.toggleDateFilter(on: true)
+      })
+      .store(in: &subscriptions)
 //    tasks.append( Task {@MainActor [weak self] in
 //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
 //        guard let self = self,
@@ -818,12 +850,11 @@ private extension SubscriptionsView {
 //      }
 //    })
     
-    tasks.append(Task {@MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
-        guard let self = self,
-              let userprofile = notification.object as? Userprofile,
-              self.userprofile == userprofile
-        else { return }
+    
+    //Subscription operation API error
+    Userprofiles.shared.subscriptionFailure
+      .sink { [weak self] _ in
+        guard let self = self else { return }
         
         self.subscriptionButton.setSpinning(on: false) { [weak self] in
           guard let self = self,
@@ -838,18 +869,41 @@ private extension SubscriptionsView {
                                     for: .normal)
           button.imageView?.tintColor = .systemRed
         }
-//        if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
-//          self.subscriptionButton.configuration!.showsActivityIndicator = false
-//        } else {
-//          guard let imageView = self.subscriptionButton.imageView,
-//                let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+      }
+      .store(in: &subscriptions)
+    
+//    tasks.append(Task {@MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
+//        guard let self = self,
+//              let userprofile = notification.object as? Userprofile,
+//              self.userprofile == userprofile
+//        else { return }
+//
+//        self.subscriptionButton.setSpinning(on: false) { [weak self] in
+//          guard let self = self,
+//                let button = subscriptionButton.getSubview(type: UIButton.self)
 //          else { return }
 //
-//          indicator.removeFromSuperview()
-//          imageView.tintColor = .systemRed
+//          button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+//                                                       attributes: [
+//                                                        .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+//                                                        .foregroundColor: UIColor.systemRed as Any
+//                                                       ]),
+//                                    for: .normal)
+//          button.imageView?.tintColor = .systemRed
 //        }
-      }
-    })
+////        if #available(iOS 15, *), !self.subscriptionButton.configuration.isNil {
+////          self.subscriptionButton.configuration!.showsActivityIndicator = false
+////        } else {
+////          guard let imageView = self.subscriptionButton.imageView,
+////                let indicator = imageView.getSubview(type: UIActivityIndicatorView.self, identifier: "indicator")
+////          else { return }
+////
+////          indicator.removeFromSuperview()
+////          imageView.tintColor = .systemRed
+////        }
+//      }
+//    })
   }
   
   @MainActor
@@ -948,7 +1002,18 @@ private extension SubscriptionsView {
     
     avatar.userprofile = userprofile
 
-    let temp = UIImageView(image: userprofile.image)
+    let temp = UIImageView(image: userprofile.image ?? UIImage(named: "person"))
+    if userprofile.image.isNil {
+//      temp.tintColor = .systemGray
+//      temp.contentMode = .center
+//      temp.publisher(for: \.bounds)
+//        .sink {
+          temp.backgroundColor = .secondarySystemBackground
+//          temp.image = UIImage(systemName: "person.fill",
+//                               withConfiguration: UIImage.SymbolConfiguration(pointSize: $0.height * 0.65))
+//        }
+//        .store(in: &subscriptions)
+    }
     temp.contentMode = .scaleAspectFill
     temp.frame = CGRect(origin: cell.avatar.superview!.convert(cell.avatar.frame.origin, to: topView), size: cell.avatar.bounds.size)
     temp.cornerRadius = cell.avatar.bounds.height/2
@@ -1097,7 +1162,7 @@ private extension SubscriptionsView {
   }
   
   @MainActor
-  func toggleDateFilter(on: Bool) {
+  func toggleDateFilter(on: Bool, animated: Bool = true) {
     guard let heightConstraint = filterView.getConstraint(identifier: "height"),
           let constraint1 = filterView.getConstraint(identifier: "top_1"),
           let constraint2 = shadowView.getConstraint(identifier: "top")
@@ -1107,6 +1172,17 @@ private extension SubscriptionsView {
     else { return }
     
     setNeedsLayout()
+    
+    guard animated else {
+      filterView.alpha = on ? 1 : 0
+      filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
+      constraint1.constant = on ? 16 : mode == .Default ? 0 : 10
+      constraint2.constant = on ? 16 : 0
+      heightConstraint.constant = on ? filterViewHeight : 0
+      layoutIfNeeded()
+      
+      return
+    }
     UIView.animate(withDuration: 0.15, delay: 0, options: .curveLinear) { [weak self] in
       guard let self = self else { return }
       
@@ -1124,58 +1200,70 @@ private extension SubscriptionsView {
     }
   }
   
-  func switchEmptyLabel(isEmpty: Bool) {
-    func emptyLabel() -> UILabel {
-      let label = UILabel()
-      label.accessibilityIdentifier = "emptyLabel"
-      label.backgroundColor = .clear
-      label.alpha = 0
-      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title3)
-      label.text = "publications_not_found".localized// + "\n⚠︎"
-      label.textColor = .secondaryLabel
-      label.numberOfLines = 0
-      label.textAlignment = .center
-      
-      return label
-    }
-    
-    if isEmpty {
-      let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") ?? emptyLabel()
-      label.place(inside: shadowView,
-                  insets: .uniform(size: self.padding*2))
-      label.transform = .init(scaleX: 0.75, y: 0.75)
-      UIView.animate(
-        withDuration: 0.4,
-        delay: 0,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [weak self] in
-          guard let self = self else { return }
-          
-          label.transform = .identity
-          label.alpha = 1
-          self.surveysCollectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .clear
-        }) { _ in }
-    } else if let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") {
-      UIView.animate(
-        withDuration: 0.4,
-        delay: 0,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [weak self] in
-          guard let self = self else { return }
-          
-          label.transform = .init(scaleX: 0.75, y: 0.75)
-          label.alpha = 0
-          self.surveysCollectionView.backgroundColor = .clear
-        }) { _ in label.removeFromSuperview() }
-    }
-  }
+//  func switchEmptyLabel(isEmpty: Bool) {
+//    func emptyLabel() -> UILabel {
+//      let label = UILabel()
+//      label.accessibilityIdentifier = "emptyLabel"
+//      label.backgroundColor = .clear
+//      label.alpha = 0
+//      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title3)
+//      label.text = "publications_not_found".localized// + "\n⚠︎"
+//      label.textColor = .secondaryLabel
+//      label.numberOfLines = 0
+//      label.textAlignment = .center
+//      
+//      return label
+//    }
+//    
+//    if isEmpty {
+//      let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") ?? emptyLabel()
+//      label.place(inside: shadowView,
+//                  insets: .uniform(size: self.padding*2))
+//      label.transform = .init(scaleX: 0.75, y: 0.75)
+//      UIView.animate(
+//        withDuration: 0.4,
+//        delay: 0,
+//        usingSpringWithDamping: 0.8,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut],
+//        animations: { [weak self] in
+//          guard let self = self else { return }
+//          
+//          label.transform = .identity
+//          label.alpha = 1
+//          self.surveysCollectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .clear
+//        }) { _ in }
+//    } else if let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") {
+//      UIView.animate(
+//        withDuration: 0.4,
+//        delay: 0,
+//        usingSpringWithDamping: 0.8,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut],
+//        animations: { [weak self] in
+//          guard let self = self else { return }
+//          
+//          label.transform = .init(scaleX: 0.75, y: 0.75)
+//          label.alpha = 0
+//          self.surveysCollectionView.backgroundColor = .clear
+//        }) { _ in label.removeFromSuperview() }
+//    }
+//  }
 }
 
 extension SubscriptionsView: SubsciptionsControllerOutput {
+  func didAppear() {
+//    guard !emptySubscriptionsView.alpha.isZero else { return }
+    
+    emptySubscriptionsView?.setAnimationsEnabled(true)
+  }
+  
+  func didDisappear() {
+//    guard !emptySubscriptionsView.alpha.isZero else { return }
+    
+    emptySubscriptionsView?.setAnimationsEnabled(false)
+  }
+  
   func hideUserCard(_ completion: Closure? = nil) {
     mode = .Default
     surveysCollectionView.category = .Subscriptions
@@ -1204,7 +1292,10 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
 //    surveysCollectionView.category = .Subscriptions
     toggleDateFilter(on: true)
     
-    let temp = UIImageView(image: userprofile.image)
+    let temp = UIImageView(image: userprofile.image ?? UIImage(named: "person"))
+    if userprofile.image.isNil {
+      temp.backgroundColor = .secondarySystemBackground
+    }
     temp.contentMode = .scaleAspectFill
     temp.frame = CGRect(origin: avatar.superview!.convert(avatar.frame.origin, to: topView),
                         size: avatar.bounds.size)

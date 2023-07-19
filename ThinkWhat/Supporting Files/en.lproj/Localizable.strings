@@ -17,7 +17,7 @@
 "maximum_characters_exceeded" = "Maximum characters exceeded: ";
 "minimum_characters_needed" = "Minimum characters needed: ";
 "invalid_url" = "Invalid URL format";
-"images_limit" = "You can attach no maore than 3 images";
+"images_limit" = "You can attach no more than 3 images";
 "minimum_choices" = "2 choices are required at least";
 "minimum_limits" = "At least 10 participants required";
 "replies" = "Replies";
@@ -33,6 +33,7 @@
 "api_not_supported" = "App version is outdated. Please update Thinkwhat";
 
 //Common
+"you" = "You";
 "ready" = "Ready";
 "all" = "All";
 "title" = "Title";
@@ -192,7 +193,7 @@
 "all_time" = "all time";
 "per_all_time" = "of all time";
 "cancel_subscription" = "Cancel subscription";
-"zero_subscriptions" = "You haven't subscribed to anybody";
+"zero_subscriptions" = "No subscriptions";
 
 //List VC
 "list" = "Feed";
@@ -434,12 +435,12 @@
 "userprofile_compatibility_level" = "compatibility level";
 "userprofile_compatibility_level_with_user" = "Your compatibility with ";
 "userprofile_compatibility_level_with_user_is" = " is ";
-"userprofile_compatibility_level_zero" = "Your interests do not overlap";
+"userprofile_compatibility_level_zero" = "incompatible";
 "userprofile_compatibility_level_ultra_low" = "ultra low";
 "userprofile_compatibility_level_low" = "low";
 "userprofile_compatibility_level_middle" = "middle";
 "userprofile_compatibility_level_high" = "high";
-"userprofile_compatibility_level_ultra_high" = "ultra high";
+"userprofile_compatibility_level_ultra_high" = "like-minded";
 "userprofile_compatibility_level_max" = "maximum";
 "userprofile_contrib_hint" = "Topics which user is interested in to discuss within community";
 "userprofile_сompatibility_hint" = "The indicator is calculated on the results of surveys in which you both participated";

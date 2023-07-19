@@ -536,7 +536,6 @@ private extension ListView {
   
   @MainActor
   func toggleDateFilter(on: Bool) {
-    print(on)
     guard let heightConstraint = filterView.getConstraint(identifier: "height"),
           let constraint1 = filterView.getConstraint(identifier: "top_1")//,
 //          let constraint2 = filterView.getConstraint(identifier: "top")

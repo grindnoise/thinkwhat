@@ -26,7 +26,7 @@ class UserprofilesFeedCollectionView: UICollectionView {
   // MARK: - Public properties
   public let userPublisher = PassthroughSubject<[Userprofile: IndexPath], Never>()
   public let footerPublisher = CurrentValueSubject<UserprofilesViewMode?, Never>(nil)
-  public let dataItemsCountPublisher = CurrentValueSubject<Bool?, Never>(nil)
+  public let zeroSubscriptions = CurrentValueSubject<Bool?, Never>(nil)
   
   
   
@@ -38,20 +38,22 @@ class UserprofilesFeedCollectionView: UICollectionView {
   private let maxUsers = 20
   private var source: Source!
   private var dataItems: [Userprofile] {
+    var items = [Userprofile]()
+    
     switch mode {
     case .Subscribers:
-      let userprofiles = userprofile.subscribers.suffix(maxUsers)
-      guard userprofiles.count >= maxUsers else {
-        return userprofile.subscribers.suffix(maxUsers)
+      items = userprofile.subscribers.compactMap { id in
+        Userprofiles.shared.all.filter({ $0.id == id }).first
       }
-      return userprofile.subscribers.suffix(maxUsers) + [Userprofile.anonymous]
     case .Subscriptions:
-      let userprofiles = userprofile.subscriptions.suffix(maxUsers)
-      guard userprofiles.count >= maxUsers else {
-        return userprofile.subscriptions.suffix(maxUsers)
+      items = userprofile.subscriptions.compactMap { id in
+        Userprofiles.shared.all.filter({ $0.id == id }).first
       }
-      return userprofile.subscriptions.suffix(maxUsers) + [Userprofile.anonymous]
-      default: return [] }
+    default:
+      return []
+    }
+    
+    return items.count >= maxUsers ? items.suffix(maxUsers).sorted { $0.username < $1.username } + [Userprofile.anonymous] : items.suffix(maxUsers).sorted { $0.username < $1.username }
   }
   private let userprofile: Userprofile
   private let mode: UserprofilesViewMode
@@ -103,7 +105,7 @@ class UserprofilesFeedCollectionView: UICollectionView {
     source.apply(snap, animatingDifferences: true) { [weak self] in
       guard let self = self else { return }
       
-      self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+      self.zeroSubscriptions.send(snap.itemIdentifiers.isEmpty)
     }
   }
   
@@ -172,7 +174,7 @@ private extension UserprofilesFeedCollectionView {
     let cellRegistration = UICollectionView.CellRegistration<UserprofileCell, Userprofile> { [unowned self] cell, indexPath, userprofile in
       cell.userprofile = userprofile
       cell.avatar.isUserInteractionEnabled = false
-      cell.textStyle = .footnote
+      cell.textStyle = .caption2
 //      cell.userPublisher
 //        .sink { [unowned self] in
 //          guard let instance = $0 else { return }
@@ -210,7 +212,7 @@ private extension UserprofilesFeedCollectionView {
     source.apply(snap) { [weak self] in
       guard let self = self else { return }
       
-      self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+      self.zeroSubscriptions.send(snap.itemIdentifiers.isEmpty)
     }
   }
   
@@ -230,7 +232,7 @@ private extension UserprofilesFeedCollectionView {
     //                self.source.apply(snap) { [weak self] in
     //                    guard let self = self else { return }
     //
-    //                    self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+    //                    self.zeroSubscriptions.send(snap.itemIdentifiers.isEmpty)
     //                }
     //            }
     //            .store(in: &subscriptions)
@@ -257,7 +259,11 @@ private extension UserprofilesFeedCollectionView {
         snap.appendItems(existingSet.isEmpty ? Array(appendingSet) : Array(appendingSet.subtracting(existingSet)),
                          toSection: .Main)
         
-        self.source.apply(snap, animatingDifferences: true) { [unowned self] in self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty) }
+        self.source.apply(snap, animatingDifferences: true) { [weak self] in
+          guard let self = self else { return }
+          
+          self.zeroSubscriptions.send(snap.itemIdentifiers.isEmpty)
+        }
       })
       .store(in: &subscriptions)
     
@@ -285,7 +291,7 @@ private extension UserprofilesFeedCollectionView {
         guard !crossingSet.isEmpty else { return }
         
         snap.deleteItems(Array(deletingSet))
-        self.source.apply(snap, animatingDifferences: true) { [unowned self] in self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty) }
+        self.source.apply(snap, animatingDifferences: true) { [unowned self] in self.zeroSubscriptions.send(snap.itemIdentifiers.isEmpty) }
       })
       .store(in: &subscriptions)
     
@@ -305,7 +311,7 @@ private extension UserprofilesFeedCollectionView {
     //          self.source.apply(snap) { [weak self] in
     //              guard let self = self else { return }
     //
-    //              self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+    //              self.zeroSubscriptions.send(snap.itemIdentifiers.isEmpty)
     //          }
     //        }
     //        .store(in: &subscriptions)
@@ -330,7 +336,7 @@ private extension UserprofilesFeedCollectionView {
     //                self.source.apply(snap) { [weak self] in
     //                    guard let self = self else { return }
     //
-    //                    self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+    //                    self.zeroSubscriptions.send(snap.itemIdentifiers.isEmpty)
     //                }
     //            }
     //        })
@@ -354,7 +360,7 @@ private extension UserprofilesFeedCollectionView {
     //                    self.source.apply(snap) { [weak self] in
     //                        guard let self = self else { return }
     //
-    //                        self.dataItemsCountPublisher.send(snap.itemIdentifiers.isEmpty)
+    //                        self.zeroSubscriptions.send(snap.itemIdentifiers.isEmpty)
     //                    }
     //                }
     //            }

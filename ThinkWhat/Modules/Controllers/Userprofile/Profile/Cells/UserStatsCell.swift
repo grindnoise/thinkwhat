@@ -101,7 +101,7 @@ class UserStatsCell: UICollectionViewListCell {
   private lazy var headerImage: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "chart.bar.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.tintColor = .secondaryLabel
+    instance.tintColor = Colors.cellHeader
     instance.contentMode = .scaleAspectFit
 //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
@@ -110,7 +110,7 @@ class UserStatsCell: UICollectionViewListCell {
   }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = .secondaryLabel
+    instance.textColor = Colors.cellHeader
     instance.text = "stats".localized.uppercased()
     instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
     
@@ -193,7 +193,7 @@ class UserStatsCell: UICollectionViewListCell {
     let instance = UIView.opaque()
     instance.layer.masksToBounds = false
     instance.accessibilityIdentifier = "shadowView"
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.3).cgColor
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.15).cgColor
     instance.layer.shadowOffset = .zero
     instance.layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
     instance.layer.shadowRadius = padding*0.85//*2

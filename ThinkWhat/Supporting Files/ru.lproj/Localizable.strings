@@ -1,4 +1,4 @@
-/* 
+/*
   Localizable.strings
   ThinkWhat
 
@@ -33,6 +33,7 @@
 "api_not_supported" = "Вы используете устаревшую версию приложения. Пожалуйста, обновите Thinkwhat";
 
 //Common
+"you" = "Вы";
 "ready" = "Готово";
 "all" = "Все";
 "title" = "Титул";
@@ -192,7 +193,7 @@
 "all_time" = "все время";
 "per_all_time" = "за все время";
 "cancel_subscription" = "Отказаться от подписки";
-"zero_subscriptions" = "Вы ни на кого не подписаны";
+"zero_subscriptions" = "Подписок нет";
 
 //List VC
 "list" = "Лента";
@@ -434,13 +435,13 @@
 "userprofile_compatibility_level" = "уровень совместимости";
 "userprofile_compatibility_level_with_user" = "Ваш уровень совместимости с ";
 "userprofile_compatibility_level_with_user_is" = " ";
-"userprofile_compatibility_level_zero" = "Интересы не совпадают";
+"userprofile_compatibility_level_zero" = "отсутствует";
 "userprofile_compatibility_level_ultra_low" = "очень низкая";
 "userprofile_compatibility_level_low" = "низкая";
 "userprofile_compatibility_level_middle" = "средняя";
 "userprofile_compatibility_level_high" = "высокая";
 "userprofile_compatibility_level_ultra_high" = "очень высокая";
-"userprofile_compatibility_level_max" = "максимальная";
+"userprofile_compatibility_level_max" = "единомышленник";
 "userprofile_contrib_hint" = "Интересующие пользователя темы, которые он обсудил с сообществом";
 "userprofile_сompatibility_hint" = "Индикатор расчитывается на основании результатов опросов, в которых вы оба участвовали";
 

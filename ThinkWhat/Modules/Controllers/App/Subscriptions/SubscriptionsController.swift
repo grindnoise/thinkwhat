@@ -134,23 +134,32 @@ class SubscriptionsController: UIViewController, TintColorable {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    clearNavigationBar(clear: true)
-    setNavigationBarTintColor(tintColor)
+//    clearNavigationBar(clear: true)
+//    setNavigationBarTintColor(tintColor)
+    navigationController?.setBarOpaque()
+    navigationController?.setBarTintColor(tintColor)
+    navigationController?.setBarShadow(on: false)
     navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationItem.largeTitleDisplayMode = .never
     controllerOutput?.onWillAppear()
     tabBarController?.setTabBarVisible(visible: true, animated: true)
     //        titleLabel.alpha = 1
-    guard let main = tabBarController as? MainController else { return }
-    
-    main.toggleLogo(on: true)
+//    guard let main = tabBarController as? MainController else { return }
+//
+//    main.toggleLogo(on: true)
   }
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
+    controllerOutput?.didAppear()
+    
     isOnScreen = true
+    
+    guard let main = tabBarController as? MainController else { return }
+    
+    main.toggleLogo(on: true)
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -168,6 +177,7 @@ class SubscriptionsController: UIViewController, TintColorable {
     super.viewDidDisappear(animated)
     
     isOnScreen = false
+    controllerOutput?.didDisappear()
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -305,16 +315,17 @@ private extension SubscriptionsController {
         let button = UIButton()
         button.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
                                                      attributes: [
-                                                      .font: UIFont(name: Fonts.Rubik.Medium, size: 16) as Any,
+                                                      .font: UIFont(name: Fonts.Rubik.Medium, size: 14) as Any,
                                                       .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
                                                      ]),
                                   for: .normal)
-        button.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding*2, bottom: padding, right: padding*2)
+        button.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
         button.accessibilityIdentifier = "profileButton"
         button.imageEdgeInsets.left = padding/2
+        button.imageEdgeInsets.right = padding/2
         button.semanticContentAttribute = .forceRightToLeft
         button.adjustsImageWhenHighlighted = false
-        button.setImage(UIImage(systemName: ("person.fill.checkmark"), withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+        button.setImage(UIImage(systemName: ("arrow.right"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
         button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
         button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
         button.addTarget(self, action: #selector(self.onSubscribersTapped), for: .touchUpInside)
@@ -398,7 +409,7 @@ private extension SubscriptionsController {
                                                    withConfiguration: UIImage.SymbolConfiguration(weight: .regular)),
                                     primaryAction: notifyAction,
                                     menu: nil)
-      rightButton.tintColor = tintColor 
+      rightButton.tintColor = tintColor
       
       let action = UIAction { [weak self] _ in
         guard let self = self else { return }
@@ -581,7 +592,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
   }
   
   func onSubcriptionsCountEvent(zeroSubscriptions: Bool) {
-    if mode == .Userprofile {
+    if !zeroSubscriptions, mode == .Userprofile {
       mode = .Default
     }
     setBarItems(zeroSubscriptions: zeroSubscriptions)

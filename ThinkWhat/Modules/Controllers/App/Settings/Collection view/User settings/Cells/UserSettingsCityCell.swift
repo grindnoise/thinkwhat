@@ -191,7 +191,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
   private lazy var headerImage: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "location.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.tintColor = .secondaryLabel
+    instance.tintColor = Colors.cellHeader
     instance.contentMode = .scaleAspectFit
 //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
@@ -200,7 +200,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
   }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = .secondaryLabel
+    instance.textColor = Colors.cellHeader
     instance.text = "location".localized.uppercased()
     instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
 

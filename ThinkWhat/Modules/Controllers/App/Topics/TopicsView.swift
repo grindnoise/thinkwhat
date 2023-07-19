@@ -250,7 +250,7 @@ class TopicsView: UIView {
         else { return }
         
         self.viewInput?.onTopicSelected(topic)
-        self.viewInput?.setNavigationBarTintColor(topic.tagColor)
+        self.viewInput?.navigationController?.setBarTintColor(topic.tagColor)//.setNavigationBarTintColor(topic.tagColor)
         self.touchLocation = point
         self.surveysCollectionView.topic = topic
         self.surveysCollectionView.isOnScreen = true

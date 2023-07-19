@@ -51,68 +51,43 @@ class UserprofilesController: UIViewController, TintColorable {
       button.menu = prepareMenu()
     }
   }
-  private lazy var titleView: UIStackView = {
-    let topicTitle = InsetLabel()
-    topicTitle.font = UIFont(name: Fonts.Bold, size: 20)
-    topicTitle.textColor = .white
-    topicTitle.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-    topicTitle.insets.right = 8
-    
-    var instance: UIStackView!
-    let opaque = UIView.opaque()
-    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 1/1).isActive = true
+  private lazy var titleView: TagCapsule = {
+    var image: UIImage?
+    var iconCategory: Icon.Category?
+    var user: Userprofile?
+    var text: String = ""
     
     switch mode {
     case .Subscribers, .Subscriptions:
-      guard let userprofile = userprofile else { return UIStackView() }
-      
-      if userprofile.isCurrent {
-        instance = UIStackView(arrangedSubviews: [
-          topicTitle
-        ])
-        topicTitle.text = (mode == .Subscribers ? "my_subscribers" : "my_subscriptions").localized.uppercased()
-        topicTitle.insets.left = 8
-      } else {
-        let avatar = Avatar(userprofile: userprofile.isCurrent ? Userprofiles.shared.current! : userprofile,
-                            isBordered: true,
-                            lightBorderColor: .white,
-                            darkBorderColor: .white)
-        avatar.placeInCenter(of: opaque, heightMultiplier: 0.75)
-        instance = UIStackView(arrangedSubviews: [
-          opaque,
-          topicTitle
-        ])
-        topicTitle.text = (mode == .Subscribers ? "subscribers" : "subscribed_for").localized.uppercased()
+      if let userprofile = userprofile {
+        if userprofile.isCurrent {
+          image = UIImage(systemName: "person.fill.checkmark")
+          text = (mode == .Subscribers ? "my_subscribers" : "my_subscriptions").localized.uppercased()
+        } else {
+          user = userprofile
+          text = (mode == .Subscribers ? "subscribers" : "subscribed_for").localized.uppercased()
+        }
       }
-      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
-    default:
-      guard let answer = answer,
-            let topic = answer.survey?.topic,
-            let navigationBar = navigationController?.navigationBar
-      else { return UIStackView() }
-      
-      topicTitle.text = answer.description.count > 15 ? answer.description.prefix(15).trimmingCharacters(in: .whitespacesAndNewlines).uppercased() + "..." : answer.description.uppercased()
-      
-      let imageView = UIImageView(image: UIImage(systemName: "\(answer.order+1).circle.fill"))
-      imageView.contentMode = .center
-      imageView.tintColor = .white
-      imageView.placeInCenter(of: opaque, heightMultiplier: 0.75)
-
-      instance = UIStackView(arrangedSubviews: [
-        opaque,
-        topicTitle
-      ])
+    case .Voters:
+      if let answer = answer,  let topic = answer.survey?.topic {
+        
+        let maxChars = 12
+        text = answer.description.count > maxChars ? answer.description.prefix(maxChars).trimmingCharacters(in: .whitespacesAndNewlines).uppercased() + "..." : answer.description.uppercased()
+        
+        image = UIImage(systemName: "\(answer.order+1).circle.fill")
+      }
     }
-    instance.isUserInteractionEnabled = true
-    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(recognizer: ))))
-    instance.backgroundColor = tintColor
-    instance.axis = .horizontal
-    instance.spacing = 2
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
+    
+    let instance = TagCapsule(text: text,
+                              padding: padding/2,
+                              textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding),
+                              color: tintColor,
+                              font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
+                              isShadowed: false,
+                              iconCategory: iconCategory,
+                              image: image,
+                              userprofile: user)
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding).isActive = true
     
     return instance
   }()
@@ -185,6 +160,7 @@ class UserprofilesController: UIViewController, TintColorable {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark)
     navigationController?.navigationBar.alpha = 1
   }
   
@@ -197,6 +173,7 @@ class UserprofilesController: UIViewController, TintColorable {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark)
   }
 }
 

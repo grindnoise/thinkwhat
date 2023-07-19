@@ -56,10 +56,10 @@ class UserStatsPlainCell: UICollectionViewListCell {
       leftLabel,
       opaque,
       rightButton,
-      disclosureIndicator
     ])
     instance.axis = .horizontal
     instance.spacing = padding/2
+    instance.layer.masksToBounds = false
     instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100,
                                                                     font: leftLabel.font)).isActive  = true
     
@@ -82,26 +82,19 @@ class UserStatsPlainCell: UICollectionViewListCell {
 //  }()
   private lazy var rightButton: UIButton = {
     let instance = UIButton()
-    instance.tintColor = .systemBlue
-    instance.contentHorizontalAlignment = .right
-    instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
-    
-    return instance
-  }()
-  private lazy var disclosureIndicator: UIImageView = {
-    let instance = UIImageView(image: UIImage(systemName: "chevron.right"))
-    instance.accessibilityIdentifier = "chevron"
-    instance.clipsToBounds = true
-    instance.tintColor = .label
-    instance.alpha = 0
-    instance.contentMode = .center
-    instance.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
-    instance.isUserInteractionEnabled = true
-    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:))))
-    
-    let constraint = instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/3)
-    constraint.identifier = "widthAnchor"
-    constraint.isActive = true
+    instance.imageEdgeInsets.left = padding/4
+//    instance.imageEdgeInsets.right = padding/2
+    instance.semanticContentAttribute = .forceRightToLeft
+    instance.adjustsImageWhenHighlighted = false
+    instance.layer.masksToBounds = false
+    instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
+//    instance.setAttributedTitle(NSAttributedString(string: String(describing: compatibility.surveys.count), attributes: [
+//      .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)!,
+//      .foregroundColor: compatibility.topic.tagColor
+//    ]), for: .normal)
+    instance.contentEdgeInsets = UIEdgeInsets(top: 0, left: padding, bottom: 0, right: padding)
+    instance.setImage(UIImage(systemName: ("chevron.right"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+    instance.imageView?.tintColor = .clear
     
     return instance
   }()
@@ -154,8 +147,6 @@ private extension UserStatsPlainCell {
   }
   
   func updateUI() {
-    disclosureIndicator.tintColor = color
-    
     guard let mode = mode,
           let userprofile = userprofile
     else { return }
@@ -169,7 +160,7 @@ private extension UserStatsPlainCell {
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = true
-      disclosureIndicator.alpha = 1
+      rightButton.imageView?.tintColor = color
     case .DateJoined:
       let fullComponents = Date.dateComponents(from: userprofile.dateJoined, to: Date())
       //
@@ -206,7 +197,7 @@ private extension UserStatsPlainCell {
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = userprofile.publicationsTotal.isZero ? false : true
-      disclosureIndicator.alpha = userprofile.publicationsTotal.isZero ? 0 : 1
+      rightButton.imageView?.tintColor = color
     case .Votes:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.votesReceivedTotal.roundedWithAbbreviations),
                                                attributes: [
@@ -245,7 +236,7 @@ private extension UserStatsPlainCell {
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = userprofile.subscribersTotal.isZero ? false : true
-      disclosureIndicator.alpha = userprofile.subscribersTotal.isZero ? 0 : 1
+      rightButton.imageView?.tintColor =  !userprofile.subscribersTotal.isZero ? color : .clear
     case .Subscriptions:
       let attributedTitle = NSAttributedString(string: String(describing: userprofile.subscriptionsTotal.roundedWithAbbreviations),
                                                attributes: [
@@ -254,20 +245,18 @@ private extension UserStatsPlainCell {
                                                ])
       rightButton.setAttributedTitle(attributedTitle, for: .normal)
       rightButton.isUserInteractionEnabled = userprofile.subscriptionsTotal.isZero ? false : true
-      disclosureIndicator.alpha = userprofile.subscriptionsTotal.isZero ? 0 : 1
+      rightButton.imageView?.tintColor =  !userprofile.subscriptionsTotal.isZero ? color : .clear
     }
   }
   
   @objc
-  func handleTap(sender: UIView) {
-    if sender == rightButton {
-      buttonPublisher.send(true)
-    }
+  func handleTap() {
+    buttonPublisher.send(true)
   }
   
   func setTasks() {
     guard let userprofile = userprofile else { return }
-    print(mode)
+    
     userprofile.$subscriptionsTotal
       .filter { [unowned self] _ in self.mode == .Subscriptions }
       .receive(on: DispatchQueue.main)

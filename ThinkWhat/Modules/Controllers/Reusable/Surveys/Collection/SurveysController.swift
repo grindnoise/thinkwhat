@@ -63,95 +63,50 @@ class SurveysController: UIViewController, TintColorable {
     }
   }
   private var willMoveToParent = false
-  //UI
-  private lazy var titleView: UIStackView = {
-    let topicTitle = InsetLabel()
-    topicTitle.font = UIFont(name: Fonts.Bold, size: 20)
-    topicTitle.textColor = .white
-    topicTitle.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-    topicTitle.insets.right = 8
-    
-    var instance: UIStackView!
+  ///**UI**
+  private let padding: CGFloat = 8
+  private lazy var titleView: TagCapsule = {
+    var image: UIImage?
+    var iconCategory: Icon.Category?
+    var user: Userprofile?
+    var text: String = ""
     
     switch mode {
     case .Compatibility:
-      guard let compatibility = compatibility,
-            let userprofile = compatibility.userprofile
-      else { return UIStackView() }
-      
-      let opaque = UIView.opaque()
-      opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 1/1).isActive = true
-      let avatar = Avatar(userprofile: userprofile,
-                          isBordered: true,
-                          lightBorderColor: .white,
-                          darkBorderColor: .white)
-      avatar.placeInCenter(of: opaque, heightMultiplier: 0.75)
-      
-      topicTitle.text = compatibility.topic.title.uppercased()
-      instance = UIStackView(arrangedSubviews: [
-        opaque,
-        topicTitle
-      ])
-      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
-      instance.backgroundColor = compatibility.topic.tagColor
+      if let compatibility = compatibility,
+         let userprofile = compatibility.userprofile
+      {
+        text = "userprofile_compatibility".localized.uppercased()
+        user = userprofile
+//        image = UIImage(systemName: "person.2.fill")
+      }
     case .ByOwner:
-      guard let userprofile = userprofile else { return UIStackView() }
-      
-      let opaque = UIView.opaque()
-      opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 1/1).isActive = true
-      let avatar = Avatar(userprofile: userprofile,
-                          isBordered: true,
-                          lightBorderColor: .white,
-                          darkBorderColor: .white)
-      avatar.placeInCenter(of: opaque, heightMultiplier: 0.75)
-      
-      topicTitle.text = "publications".localized.uppercased()
-      instance = UIStackView(arrangedSubviews: [
-        opaque,
-        topicTitle
-      ])
-      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
-      instance.backgroundColor = tintColor
+      if let userprofile = userprofile {
+        user = userprofile
+        text = "publications".localized.uppercased()
+      }
     case .Own:
-      topicTitle.insets.left = 8
-      topicTitle.text = "my_publications".localized.uppercased()
-      instance = UIStackView(arrangedSubviews: [ topicTitle ])
-      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
-      instance.backgroundColor = tintColor
+      image = Userprofiles.shared.current?.image
+      text = "my_publications".localized.uppercased()
     case .Favorite:
-      topicTitle.text = "watching".localized.uppercased()
-      instance = UIStackView(arrangedSubviews: [topicTitle])
-      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
-      instance.backgroundColor = tintColor
+      text = "watching".localized.uppercased()
+      image = UIImage(systemName: "binoculars.fill")
     default:
-      guard let topic = topic else { return UIStackView() }
-      
-      topicTitle.text = topic.title.uppercased()
-//      topicTitle.insets.right = 8
-      
-      let topicIcon = Icon(category: topic.iconCategory)
-      topicIcon.iconColor = .white
-      topicIcon.isRounded = false
-      topicIcon.clipsToBounds = false
-      topicIcon.scaleMultiplicator = 1.65
-      topicIcon.heightAnchor.constraint(equalTo: topicIcon.widthAnchor, multiplier: 1/1).isActive = true
-      instance = UIStackView(arrangedSubviews: [
-        topicIcon,
-        topicTitle
-      ])
-      instance.backgroundColor = topic.tagColor
+      if let topic = topic  {
+        text = topic.title.uppercased()
+        iconCategory = topic.iconCategory
+      }
     }
     
-    instance.axis = .horizontal
-    instance.spacing = 2
-//      instance.alpha = 0
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    
-    return instance
+    return TagCapsule(text: text,
+                      padding: padding/2,
+                      textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding),
+                      color: tintColor,
+                      font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
+                      isShadowed: false,
+                      iconCategory: iconCategory,
+                      image: image,
+                      userprofile: user)
   }()
   private lazy var searchField: InsetTextField = {
     let instance = InsetTextField()
@@ -159,13 +114,14 @@ class SurveysController: UIViewController, TintColorable {
     instance.placeholder = "search".localized
     instance.alpha = 0
     instance.delegate = self
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.backgroundColor = .secondarySystemBackground//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     instance.tintColor = tintColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
     instance.addTarget(self, action: #selector(TopicsController.textFieldDidChange(_:)), for: .editingChanged)
     instance.returnKeyType = .done
-    instance.publisher(for: \.bounds, options: .new)
+    instance.publisher(for: \.bounds)
       .sink { rect in
-        instance.cornerRadius = rect.height/2.25
+        instance.cornerRadius = rect.width*0.025
         
         guard instance.insets == .zero else { return }
         
@@ -499,17 +455,18 @@ private extension SurveysController {
     default:
       color = tintColor
     }
-    setNavigationBarTintColor(color)
-    
+//    setNavigationBarTintColor(color)
+    navigationController?.setBarTintColor(color)
     navigationBar.addSubview(searchField)
     navigationBar.addSubview(titleView)
     searchField.translatesAutoresizingMaskIntoConstraints = false
     titleView.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      searchField.heightAnchor.constraint(equalToConstant: 40),
+      searchField.heightAnchor.constraint(equalToConstant: UINavigationController.Constants.NavBarHeightSmallState - padding),
       searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 44 + 4),
 //      titleView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
+      titleView.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: titleView.font) + padding),
       titleView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor)
     ])
     
@@ -602,46 +559,6 @@ private extension SurveysController {
   
   @objc
   func handleTap() {}
-  
-  func setNavigationBarAppearance(largeTitleColor: UIColor, smallTitleColor: UIColor) {
-    guard let navigationBar = navigationController?.navigationBar else { return }
-    
-    let appearance = UINavigationBarAppearance()
-    appearance.configureWithOpaqueBackground()
-    appearance.largeTitleTextAttributes = [
-      .foregroundColor: largeTitleColor,
-      .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle) as Any
-    ]
-    appearance.titleTextAttributes = [
-      .foregroundColor: smallTitleColor,
-      .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3) as Any
-    ]
-    appearance.shadowColor = nil
-    
-    switch mode {
-    case .Topic:
-      guard let topic = topic else { return }
-      
-      appearance.backgroundColor = topic.tagColor
-      navigationBar.tintColor = .white
-      navigationBar.barTintColor = .white
-    case .Own:
-      navigationBar.tintColor = .label
-      navigationBar.barTintColor = .label
-    default:
-#if DEBUG
-      print("")
-#endif
-    }
-    
-    navigationBar.standardAppearance = appearance
-    navigationBar.scrollEdgeAppearance = appearance
-    navigationBar.prefersLargeTitles = true
-    
-    if #available(iOS 15.0, *) {
-      navigationBar.compactScrollEdgeAppearance = appearance
-    }
-  }
   
   func setBarItems() {
     var button: UIBarButtonItem!

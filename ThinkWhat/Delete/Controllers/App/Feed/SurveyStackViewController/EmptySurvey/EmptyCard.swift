@@ -11,7 +11,7 @@ import UIKit
 class EmptyCard: UIView {
 
     deinit {
-        print("EmptySurvey deinit")
+        print("EmptySurvey deinit ")
     }
     
     var startingPoint: CGPoint!

@@ -401,15 +401,17 @@ class Avatar: UIView {
   
   public func setUserprofileDefaultImage() {
     imageView.tintColor = .systemGray
-    imageView.contentMode = .center
-    imageView.publisher(for: \.bounds)
-      .sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.imageView.image = UIImage(systemName: "person.fill",
-                                       withConfiguration: UIImage.SymbolConfiguration(pointSize: $0.height * 0.65))
-      }
-      .store(in: &subscriptions)
+    imageView.backgroundColor = .secondarySystemBackground
+    imageView.image = UIImage(named: "person")
+//    imageView.publisher(for: \.bounds)
+//      .sink { [weak self] in
+//        guard let self = self else { return }
+//
+//        self.imageView.backgroundColor = .secondarySystemBackground
+//        self.imageView.image = UIImage(systemName: "person.fill",
+//                                       withConfiguration: UIImage.SymbolConfiguration(pointSize: $0.height * 0.65))
+//      }
+//      .store(in: &subscriptions)
   }
   
   public func setSelected(_ isSelected: Bool) {
@@ -651,8 +653,8 @@ private extension Avatar {
     }
     
     guard let image = userprofile.image else {
-      shimmer.startShimmering()
       if !userprofile.imageURL.isNil {
+        shimmer.startShimmering()
         userprofile.downloadImage()
         return
       }

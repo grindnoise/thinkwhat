@@ -71,7 +71,7 @@ class SurveysCollectionView: UICollectionView {
   
   //Publishers
   public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-  public var claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
+  public let claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
   public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
   public let paginationPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
   public let paginationByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()

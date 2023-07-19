@@ -80,7 +80,7 @@ extension UIView {
   }
   
   func setSpinning(on: Bool,
-                   color: UIColor = .systemBackground,
+                   color: UIColor = .secondaryLabel,
                    animated: Bool = true,
                    completion: Closure? = nil) {
     switch on {

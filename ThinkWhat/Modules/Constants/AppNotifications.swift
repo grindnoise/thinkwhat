@@ -53,7 +53,7 @@ struct Notifications {
 //        static let SubscribersRemove                = Notification.Name("Notifications.Userprofiles.SubscribersRemove")
 //        static let SubscriptionsAppend              = Notification.Name("Notifications.Userprofiles.SubscriptionsAppend")
 //        static let SubscriptionsRemove              = Notification.Name("Notifications.Userprofiles.SubscriptionsRemove")
-        static let SubscriptionOperationFailure     = Notification.Name("Notifications.Userprofiles.SubscriptionOperationFailure")
+//        static let SubscriptionOperationFailure     = Notification.Name("Notifications.Userprofiles.SubscriptionOperationFailure")
 //        static let SubscribersEmpty                 = Notification.Name("Notifications.Userprofiles.SubscribersEmpty")
 //        static let SubscriptionsEmpty               = Notification.Name("Notifications.Userprofiles.SubscriptionsEmpty")
 //        static let NotifyOnPublications             = Notification.Name("Notifications.Userprofiles.NotifyOnPublications")

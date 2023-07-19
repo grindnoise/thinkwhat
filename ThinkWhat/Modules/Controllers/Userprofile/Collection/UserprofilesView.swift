@@ -34,31 +34,12 @@ class UserprofilesView: UIView {
   
   //UI
   private lazy var collectionView: UserprofilesCollectionView = {
-    guard let color = viewInput?.tintColor,
-          let mode = viewInput?.mode
-    else { return UserprofilesCollectionView() }
-    
-    var instance: UserprofilesCollectionView!
-    
-    switch mode {
-    case .Subscribers, .Subscriptions:
-      guard let userprofile = viewInput?.userprofile else { return UserprofilesCollectionView() }
-
-      instance = UserprofilesCollectionView(userprofile: userprofile, mode: mode, color: color)
-    case .Voters:
-      guard let answer = viewInput?.answer else { return UserprofilesCollectionView() }
-
-      instance = UserprofilesCollectionView(answer: answer, mode: mode, color: Colors.getColor(forId: answer.order))
-    }
-
-    //Pagination #1
-    let paginationPublisher = instance.requestPublisher
-      .debounce(for: .seconds(3), scheduler: DispatchQueue.main)
-
-    paginationPublisher
+    let instance = UserprofilesCollectionView()
+    instance.requestPublisher
+      .throttle(for: .seconds(3), scheduler: DispatchQueue.main, latest: true)
       .sink { [unowned self] _ in
         guard let viewInput = self.viewInput else { return }
-
+        
         switch viewInput.mode {
         case .Subscribers, .Subscriptions:
           guard let userprofile = viewInput.userprofile else { return }
@@ -71,47 +52,63 @@ class UserprofilesView: UIView {
         }
       }
       .store(in: &subscriptions)
-
-    gridItemSizePublisher.subscribe(instance.gridItemSizePublisher).store(in: &subscriptions)
-
-    instance.userPublisher
-      .sink { [unowned self] in self.viewInput?.onUserprofileTap($0) }
-      .store(in: &subscriptions)
-
-    instance.selectionPublisher
-      .sink { [unowned self] in self.viewInput?.onSelection($0) }
-      .store(in: &subscriptions)
-
-
-    instance.refreshPublisher
-      .filter { !$0.isNil }
-      .sink { [unowned self] _ in
-        guard let viewInput = self.viewInput,
-              let userprofile = viewInput.userprofile
-        else { return }
-
-        self.viewInput?.loadUsers(for: userprofile, mode: viewInput.mode)
+    if let color = viewInput?.tintColor,
+       let mode = viewInput?.mode {
+      
+      instance.mode = mode
+      switch mode {
+      case .Subscribers, .Subscriptions:
+        guard let userprofile = viewInput?.userprofile else { return UserprofilesCollectionView() }
+        
+        instance.userprofile = viewInput?.userprofile
+      case .Voters:
+        guard let answer = viewInput?.answer else { return UserprofilesCollectionView() }
+        
+        instance.answer = answer
+        instance.color = Colors.getColor(forId: answer.order)
       }
-      .store(in: &subscriptions)
-    //Subscribe
-    instance.subscribePublisher
-      .sink { [unowned self] in self.viewInput?.subscribe(at: $0) }
-      .store(in: &subscriptions)
-
-    //Unsubscribe
-    instance.unsubscribePublisher
-      .sink { [unowned self] in
-
-        switch self.viewInput?.mode {
-        case .Subscriptions:
-          self.viewInput?.unsubscribe(from: $0)
-//        case .Subscribers:
-//          self.viewInput?.removeSubscribers($0)
-        default:
-          print("")
+      
+      gridItemSizePublisher.subscribe(instance.gridItemSizePublisher).store(in: &subscriptions)
+      
+      instance.userPublisher
+        .sink { [unowned self] in self.viewInput?.onUserprofileTap($0) }
+        .store(in: &subscriptions)
+      
+      instance.selectionPublisher
+        .sink { [unowned self] in self.viewInput?.onSelection($0) }
+        .store(in: &subscriptions)
+      
+      
+      instance.refreshPublisher
+        .filter { !$0.isNil }
+        .sink { [unowned self] _ in
+          guard let viewInput = self.viewInput,
+                let userprofile = viewInput.userprofile
+          else { return }
+          
+          self.viewInput?.loadUsers(for: userprofile, mode: viewInput.mode)
         }
-      }
-      .store(in: &subscriptions)
+        .store(in: &subscriptions)
+      //Subscribe
+      instance.subscribePublisher
+        .sink { [unowned self] in self.viewInput?.subscribe(at: $0) }
+        .store(in: &subscriptions)
+      
+      //Unsubscribe
+      instance.unsubscribePublisher
+        .sink { [unowned self] in
+          
+          switch self.viewInput?.mode {
+          case .Subscriptions:
+            self.viewInput?.unsubscribe(from: $0)
+            //        case .Subscribers:
+            //          self.viewInput?.removeSubscribers($0)
+          default:
+            print("")
+          }
+        }
+        .store(in: &subscriptions)
+    }
 
     return instance
   }()

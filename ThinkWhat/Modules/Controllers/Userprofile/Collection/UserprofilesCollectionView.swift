@@ -26,23 +26,23 @@ class UserprofilesCollectionView: UICollectionView {
   
   // MARK: - Public properties
   //Logic
-  public var mode: UserprofilesViewMode = .Subscribers {
-    didSet {
-      guard !userprofile.isNil else { return }
-      
-      reloadDataSource()
-    }
-  }
+  public var mode: UserprofilesViewMode = .Subscribers 
   public weak var userprofile: Userprofile? {
     didSet {
       guard !userprofile.isNil else { return }
       
       setTasks()
+      reloadDataSource()
     }
   }
-  public weak var answer: Answer?
+  public weak var answer: Answer? {
+    didSet {
+      setTasks()
+      reloadDataSource()
+    }
+  }
   //Publishers
-  public let requestPublisher = PassthroughSubject<Bool, Never>()
+  public let requestPublisher = PassthroughSubject<Void, Never>()
   public let userPublisher = PassthroughSubject<Userprofile, Never>()
   public let selectionPublisher = PassthroughSubject<[Userprofile], Never>()
   public let refreshPublisher = CurrentValueSubject<Bool?, Never>(nil)
@@ -59,7 +59,8 @@ class UserprofilesCollectionView: UICollectionView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   
-  //UI
+  ///**UI**
+  private let padding: CGFloat = 8
   //    private var isEditing = false
   private var selectedItems: [Userprofile] = []
   private var gridItemSize: UserprofilesController.GridItemSize = .third {
@@ -82,17 +83,31 @@ class UserprofilesCollectionView: UICollectionView {
   private var source: Source!
   private var dataItems: [Userprofile] {
     switch mode {
-    case .Subscribers:
+    case .Subscribers, .Subscriptions:
       guard let userprofile = userprofile else { return [] }
-      
-      return userprofile.subscribers
-    case .Subscriptions:
-      guard let userprofile = userprofile else { return [] }
-      
-      return userprofile.subscriptions
+
+      var items = [Userprofile]()
+      if mode == .Subscribers {
+        items = userprofile.subscribers.compactMap { id in
+          Userprofiles.shared.all.filter({ $0.id == id }).first
+        }.sorted { $0.username < $1.username }
+        
+        if items.count != userprofile.subscribers.count {
+          requestPublisher.send()
+        }
+      } else {
+        items = userprofile.subscriptions.compactMap { id in
+          Userprofiles.shared.all.filter({ $0.id == id }).first
+        }.sorted { $0.username < $1.username }
+        
+        if items.count != userprofile.subscriptions.count {
+          requestPublisher.send()
+        }
+      }
+      return items
     case .Voters:
       guard let answer = answer else { return [] }
-      
+
       return answer.voters
     }
   }
@@ -131,7 +146,7 @@ class UserprofilesCollectionView: UICollectionView {
     super.init(frame: .zero, collectionViewLayout: .init())
     
     setupUI()
-    setTasks()
+//    setTasks()
   }
   
   init(userprofile: Userprofile, mode: UserprofilesViewMode, color: UIColor) {
@@ -143,7 +158,7 @@ class UserprofilesCollectionView: UICollectionView {
     self.mode = mode
     
     setupUI()
-    setTasks()
+//    setTasks()
   }
   
   init(answer: Answer, mode: UserprofilesViewMode, color: UIColor) {
@@ -247,13 +262,15 @@ private extension UserprofilesCollectionView {
     let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(gridItemSize.rawValue),
                                           heightDimension: .fractionalHeight(1.0))
     let item = NSCollectionLayoutItem(layoutSize: itemSize)
-    item.contentInsets = .uniform(size: 5)
+    item.contentInsets = .uniform(size: padding)
     
     let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                            heightDimension: .fractionalWidth(gridItemSize.rawValue))
     let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
     
     let section = NSCollectionLayoutSection(group: group)
+    section.contentInsets = .uniform(size: padding)
+
     
     let layout = UICollectionViewCompositionalLayout(section: section)
     
@@ -327,122 +344,130 @@ private extension UserprofilesCollectionView {
                                            item: userprofile)
     }
     
-    var snapshot = NSDiffableDataSourceSnapshot<Section, Userprofile>()
-    snapshot.appendSections([.Main])
-    source.apply(snapshot, animatingDifferences: false)
+//    var snapshot = NSDiffableDataSourceSnapshot<Section, Userprofile>()
+//    snapshot.appendSections([.Main])
+//    source.apply(snapshot, animatingDifferences: false)
     
     reloadDataSource()
   }
   
   func setTasks() {
-    guard let userprofile = userprofile else { return }
+    if !userprofile.isNil {
+      Userprofiles.shared.instancesPublisher
+        .collect(.byTimeOrCount(DispatchQueue.main, 2, 10), options: nil)
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] _ in self.reloadDataSource() }
+        .store(in: &subscriptions)
+    }
     
-    ///**Append**
-    userprofile.subscribersPublisher
-      .receive(on: DispatchQueue.main)
-      .sink { [weak self] subscribers in
-        guard let self = self,
-              self.mode == .Subscribers
-        else { return }
-        
-        var snap = self.source.snapshot()
-        let existingSet = Set(snap.itemIdentifiers)
-        var appendingSet = Set(subscribers.filter { !$0.isBanned })
-        snap.appendItems(existingSet.isEmpty ? Array(appendingSet) : Array(appendingSet.subtracting(existingSet)),
-                         toSection: .Main)
-        
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.loadingIndicator.stopAnimating()
-        }
-      }
-      .store(in: &subscriptions)
-    ///
-    userprofile.subscriptionsPublisher
-      .receive(on: DispatchQueue.main)
-      .sink(receiveCompletion: {
-        if case .failure(let error) = $0 {
-#if DEBUG
-          print(error)
-#endif
-        }
-      }, receiveValue: { [weak self] subscribers in
-        guard let self = self,
-              self.mode == .Subscriptions
-        else { return }
-        
-        var snap = self.source.snapshot()
-        let existingSet = Set(snap.itemIdentifiers)
-        let appendingSet = Set(subscribers.filter { !$0.isBanned })
-        snap.appendItems(existingSet.isEmpty ? Array(appendingSet) : Array(appendingSet.subtracting(existingSet)),
-                         toSection: .Main)
-        
-        self.source.apply(snap, animatingDifferences: true) { [weak self] in
-          guard let self = self else { return }
-          
-          self.loadingIndicator.stopAnimating()
-        }
-      })
-      .store(in: &subscriptions)
     
-    ///**Remove**
-    Userprofiles.shared.unsubscribedPublisher
-      .filter { [weak self] in
-        guard let self = self,
-              let userprofile = self.userprofile,
-              userprofile.isCurrent,
-              self.source.snapshot().itemIdentifiers.contains($0)
-        else { return false }
-        
-        return true
-      }
-      .receive(on: DispatchQueue.main)
-      .sink { [unowned self] in
-        var snap = self.source.snapshot()
-        snap.deleteItems([$0])
-        self.source.apply(snap, animatingDifferences: true)
-      }
-      .store(in: &subscriptions)
-    
-    //    //Subscriber remove
-    //    tasks.append( Task {@MainActor [weak self] in
-    //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersRemove) {
-    //        guard let self = self,
-    //              self.mode == .Subscribers,
-    //              let dict = notification.object as? [Userprofile: Userprofile],
-    //              let owner = dict.keys.first,
-    //              owner == self.userprofile,
-    //              let subscriber = dict.values.first,
-    //              self.source.snapshot().itemIdentifiers.contains(subscriber)
-    //        else { return }
-    //
-    //        self.removeFromDataSource(item: subscriber)
-    //        self.loadingIndicator.stopAnimating()
-    //      }
-    //    })
-//    //Subscription remove
-//    tasks.append( Task {@MainActor [weak self] in
-//      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+//    guard let userprofile = userprofile else { return }
+//
+//    ///**Append**
+//    userprofile.subscribersPublisher
+//      .receive(on: DispatchQueue.main)
+//      .sink { [weak self] subscribers in
 //        guard let self = self,
-//              self.mode == .Subscriptions,
-//              let dict = notification.object as? [Userprofile: Userprofile],
-//              let owner = dict.keys.first,
-//              owner == self.userprofile,
-//              let userprofile = dict.values.first,
-//              self.source.snapshot().itemIdentifiers.contains(userprofile)
+//              self.mode == .Subscribers
 //        else { return }
-//        
-//        self.removeFromDataSource(item: userprofile)
+//
+//        var snap = self.source.snapshot()
+//        let existingSet = Set(snap.itemIdentifiers)
+//        let appendingSet = Set(subscribers.filter { !$0.isBanned })
+//        snap.appendItems(existingSet.isEmpty ? Array(appendingSet) : Array(appendingSet.subtracting(existingSet)),
+//                         toSection: .Main)
+//
+//        self.source.apply(snap, animatingDifferences: true) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.loadingIndicator.stopAnimating()
+//        }
 //      }
-//    })
+//      .store(in: &subscriptions)
+//    ///
+//    userprofile.subscriptionsPublisher
+//      .receive(on: DispatchQueue.main)
+//      .sink(receiveCompletion: {
+//        if case .failure(let error) = $0 {
+//#if DEBUG
+//          print(error)
+//#endif
+//        }
+//      }, receiveValue: { [weak self] subscribers in
+//        guard let self = self,
+//              self.mode == .Subscriptions
+//        else { return }
+//
+//        var snap = self.source.snapshot()
+//        let existingSet = Set(snap.itemIdentifiers)
+//        let appendingSet = Set(subscribers.filter { !$0.isBanned })
+//        snap.appendItems(existingSet.isEmpty ? Array(appendingSet) : Array(appendingSet.subtracting(existingSet)),
+//                         toSection: .Main)
+//
+//        self.source.apply(snap, animatingDifferences: true) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.loadingIndicator.stopAnimating()
+//        }
+//      })
+//      .store(in: &subscriptions)
+//
+//    ///**Remove**
+//    Userprofiles.shared.unsubscribedPublisher
+//      .filter { [weak self] in
+//        guard let self = self,
+//              let userprofile = self.userprofile,
+//              userprofile.isCurrent,
+//              self.source.snapshot().itemIdentifiers.contains($0)
+//        else { return false }
+//
+//        return true
+//      }
+//      .receive(on: DispatchQueue.main)
+//      .sink { [unowned self] in
+//        var snap = self.source.snapshot()
+//        snap.deleteItems([$0])
+//        self.source.apply(snap, animatingDifferences: true)
+//      }
+//      .store(in: &subscriptions)
+//
+//    //    //Subscriber remove
+//    //    tasks.append( Task {@MainActor [weak self] in
+//    //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscribersRemove) {
+//    //        guard let self = self,
+//    //              self.mode == .Subscribers,
+//    //              let dict = notification.object as? [Userprofile: Userprofile],
+//    //              let owner = dict.keys.first,
+//    //              owner == self.userprofile,
+//    //              let subscriber = dict.values.first,
+//    //              self.source.snapshot().itemIdentifiers.contains(subscriber)
+//    //        else { return }
+//    //
+//    //        self.removeFromDataSource(item: subscriber)
+//    //        self.loadingIndicator.stopAnimating()
+//    //      }
+//    //    })
+////    //Subscription remove
+////    tasks.append( Task {@MainActor [weak self] in
+////      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
+////        guard let self = self,
+////              self.mode == .Subscriptions,
+////              let dict = notification.object as? [Userprofile: Userprofile],
+////              let owner = dict.keys.first,
+////              owner == self.userprofile,
+////              let userprofile = dict.values.first,
+////              self.source.snapshot().itemIdentifiers.contains(userprofile)
+////        else { return }
+////
+////        self.removeFromDataSource(item: userprofile)
+////      }
+////    })
   }
   
   @MainActor
   func reloadDataSource(useFilterder: Bool = false,
                         animated: Bool = true) {
     
-    var items = useFilterder ? filtered : dataItems
     
     
 //    guard !source.isNil,
@@ -454,7 +479,7 @@ private extension UserprofilesCollectionView {
     
     var snapshot = Snapshot()
     snapshot.appendSections([.Main])
-    snapshot.appendItems(items)
+    snapshot.appendItems(useFilterder ? filtered : dataItems)
     source.apply(snapshot, animatingDifferences: animated)
   }
   
@@ -484,14 +509,8 @@ private extension UserprofilesCollectionView {
 
 extension UserprofilesCollectionView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-    if dataItems.count < 10 {
-      requestPublisher.send(true)
-      
-      guard !loadingIndicator.isAnimating else { return }
-      
-      loadingIndicator.startAnimating()
-    } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
-      requestPublisher.send(true)
+    if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
+      requestPublisher.send()
       
       guard !loadingIndicator.isAnimating else { return }
       

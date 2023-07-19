@@ -19,26 +19,34 @@ class TagCapsule: UIView {
   ///**Logic**
   public var text: String = "" {
     didSet {
-      guard oldValue != text,
-            let constraint = label.getConstraint(identifier: "widthAnchor")
+      guard oldValue != text//,
+//            let constraint = label.getConstraint(identifier: "widthAnchor")
       else { return }
       
-      UIView.transition(with: label, duration: 0.3, options: .transitionCrossDissolve) {[weak self] in
-        guard let self = self else { return }
+      let constraint = label.getConstraint(identifier: "widthAnchor") ?? {
+            let instance = label.widthAnchor.constraint(equalToConstant: text.width(withConstrainedHeight: 100, font: font))
+        instance.identifier = "widthAnchor"
+        instance.isActive = true
+        
+        return instance
+      }()
+      
+//      UIView.transition(with: label, duration: 0.3, options: .transitionCrossDissolve) {[weak self] in
+//        guard let self = self else { return }
           
         self.label.text = self.text.uppercased()
-      } completion: { _ in }
+//      } completion: { _ in }
 
       
       setNeedsLayout()
-      UIView.animate(withDuration: 0.3,
-                     delay: 0,
-                     options: .curveEaseInOut) { [weak self] in
-        guard let self = self else { return }
-        
+//      UIView.animate(withDuration: 0.3,
+//                     delay: 0,
+//                     options: .curveEaseInOut) { [weak self] in
+//        guard let self = self else { return }
+//
         constraint.constant = self.text.uppercased().width(withConstrainedHeight: 100, font: self.font)
-        self.layoutIfNeeded()
-      }
+//        self.layoutIfNeeded()
+//      }
     }
   }
   public var iconCategory: Icon.Category? {
@@ -47,17 +55,18 @@ class TagCapsule: UIView {
             oldValue != iconCategory
       else { return }
       
-      icon?.icon.add(Animations.get(property: .Path,
-                                   fromValue: (self.icon?.icon as! CAShapeLayer).path!,
-                                   toValue: (self.icon?.getLayer(iconCategory) as! CAShapeLayer).path!,
-                                   duration: 0.3,
-                                   delay: 0,
-                                   repeatCount: 0,
-                                   autoreverses: false,
-                                   timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                   delegate: nil,
-                                   isRemovedOnCompletion: false),
-                    forKey: nil)
+      icon?.category = iconCategory
+//      icon?.icon.add(Animations.get(property: .Path,
+//                                   fromValue: (self.icon?.icon as! CAShapeLayer).path!,
+//                                   toValue: (self.icon?.getLayer(iconCategory) as! CAShapeLayer).path!,
+//                                   duration: 0.3,
+//                                   delay: 0,
+//                                   repeatCount: 0,
+//                                   autoreverses: false,
+//                                   timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+//                                   delegate: nil,
+//                                   isRemovedOnCompletion: false),
+//                    forKey: nil)
     }
   }
   public var image: UIImage? {
@@ -82,6 +91,28 @@ class TagCapsule: UIView {
       }
     }
   }
+  public var userprofile: Userprofile? {
+    didSet {
+      guard let userprofile = userprofile,
+            userprofile.image.isNil
+      else { return }
+      
+      // Subscribe for image downloaded
+      userprofile.imagePublisher
+        .sink {
+          if case .failure(let error) = $0 {
+#if DEBUG
+            print(error)
+#endif
+          }
+        } receiveValue: { [weak self] in
+          guard let self = self else { return }
+          
+          self.imageView?.image = $0
+        }
+        .store(in: &subscriptions)
+    }
+  }
   ///**UI**
   public let font: UIFont
   
@@ -102,6 +133,8 @@ class TagCapsule: UIView {
 //      icon.place(inside: opaque)
       icon.placeInCenter(of: opaque)
     } else if !image.isNil, let imageView = imageView {
+      imageView.placeInCenter(of: opaque)
+    } else if !userprofile.isNil, let imageView = imageView {
       imageView.placeInCenter(of: opaque)
     }
     
@@ -137,11 +170,11 @@ class TagCapsule: UIView {
     return instance
   }()
   private lazy var imageView: UIImageView? = {
-    let instance = UIImageView(image: image)
-    instance.contentMode = .center
+    let instance = UIImageView(image: image ?? userprofile?.image)
+    instance.contentMode = !image.isNil ? .center : .scaleAspectFill
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.tintColor = .white
-    
+
     return instance
   }()
   private lazy var label: UILabel = {
@@ -201,7 +234,10 @@ class TagCapsule: UIView {
        font: UIFont,
        isShadowed: Bool = false,
        iconCategory: Icon.Category? = nil,
-       image: UIImage? = nil) {
+       image: UIImage? = nil,
+       userprofile: Userprofile? = nil
+  ) {
+    self.userprofile = userprofile
     self.image = image
     self.text = text
     self.textPadding = textPadding
@@ -243,8 +279,22 @@ private extension TagCapsule {
     if !iconCategory.isNil {
       icon?.heightAnchor.constraint(equalTo: label.heightAnchor).isActive = true
     }
-    if !image.isNil {
+    if !image.isNil || !userprofile.isNil {
       imageView?.heightAnchor.constraint(equalTo: label.heightAnchor).isActive = true
+      
+      if !userprofile.isNil {
+        if userprofile!.image.isNil {
+          imageView?.contentMode = .center
+          imageView?.backgroundColor = .clear
+          imageView?.image = UIImage(systemName: "person.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))
+          imageView?.tintColor = .white
+        } else {
+          imageView?.backgroundColor = .white
+        }
+        imageView?.publisher(for: \.bounds)
+          .sink { [unowned self] in self.imageView?.cornerRadius = $0.height / 2 }
+          .store(in: &subscriptions)
+      }
     }
   }
 }

@@ -42,8 +42,15 @@ class UserprofileController: UIViewController, TintColorable {
     }
   }
   private let padding: CGFloat = 8
-  private lazy var titleView: TagCapsule = { TagCapsule(text: "profile".localized.uppercased(), padding: padding/2, textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding), color: tintColor, font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!, isShadowed: false, iconCategory: nil, image: UIImage(systemName: "person.fill")) }()
-  
+  private lazy var titleView: TagCapsule = { TagCapsule(text: "profile".localized.uppercased(),
+                                                        padding: padding/2,
+                                                        textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding),
+                                                        color: tintColor,
+                                                        font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
+                                                        isShadowed: false,
+                                                        iconCategory: nil,
+                                                        image: UIImage(systemName: "person.fill"))
+  }()
   
   
   // MARK: - Deinitialization
@@ -101,8 +108,11 @@ class UserprofileController: UIViewController, TintColorable {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    setNavigationBarTintColor(tintColor)
+    navigationController?.setBarColor()
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark)
+    navigationController?.setBarTintColor(tintColor)
     navigationController?.navigationBar.alpha = 1
+    
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -116,6 +126,7 @@ class UserprofileController: UIViewController, TintColorable {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
   }
 }
 
@@ -178,7 +189,7 @@ private extension UserprofileController {
 //    })
     
     //Subscriptions
-    userprofile.subscriptionFlagPublisher
+    userprofile.$subscribedAt
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] _ in self.setBarItems() }
       .store(in: &subscriptions)
@@ -259,6 +270,29 @@ private extension UserprofileController {
 }
 
 extension UserprofileController: UserprofileViewInput {
+  func onSubscribersSelected() {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.pushViewController(UserprofilesController(mode: .Subscribers, userprofile: userprofile, color: tintColor), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard let controller = tabBarController as? MainController else { return }
+    
+    controller.toggleLogo(on: false)
+  }
+  
+  func onSubscriptionsSelected() {
+    let backItem = UIBarButtonItem()
+    backItem.title = ""
+    navigationItem.backBarButtonItem = backItem
+    navigationController?.pushViewController(UserprofilesController(mode: .Subscriptions, userprofile: userprofile, color: tintColor), animated: true)
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard let controller = tabBarController as? MainController else { return }
+    
+    controller.toggleLogo(on: false)
+  }
   func crossingSurveys(_ compatibility: TopicCompatibility) {
     let backItem = UIBarButtonItem()
     backItem.title = ""

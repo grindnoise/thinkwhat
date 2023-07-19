@@ -506,6 +506,7 @@ extension SignInView: SignInControllerOutput {
                                                                     size: logoIcon.bounds.size))
 //    let fakeLogo = {
 //      let instance = Icon()
+    fakeLogo.removeConstraints(fakeLogo.getAllConstraints())
     fakeLogo.accessibilityIdentifier = "fakeLogo"
 //      //      instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
 //      instance.iconColor = Colors.main

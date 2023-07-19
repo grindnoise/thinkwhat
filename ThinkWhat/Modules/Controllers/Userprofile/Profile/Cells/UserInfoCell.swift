@@ -14,7 +14,7 @@ class UserInfoCell: UICollectionViewListCell {
   // MARK: - Public properties
   public weak var userprofile: Userprofile! {
     didSet {
-      guard let userprofile = userprofile else { return }
+      guard !userprofile.isNil else { return }
 
 //      defer {
 //        setupTextView(textView)
@@ -81,7 +81,7 @@ class UserInfoCell: UICollectionViewListCell {
 //  }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = .secondaryLabel
+    instance.textColor = Colors.cellHeader
     instance.text = "userprofile_about".localized.uppercased()
     instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
     
@@ -107,7 +107,7 @@ class UserInfoCell: UICollectionViewListCell {
   private lazy var headerImage: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "person.text.rectangle.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.tintColor = .secondaryLabel
+    instance.tintColor = Colors.cellHeader
     instance.contentMode = .scaleAspectFit
 //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true

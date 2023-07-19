@@ -54,6 +54,7 @@ class Userprofiles {
   public let instancesPublisher = PassthroughSubject<[Userprofile], Never>()
   public let newSubscriptionPublisher = PassthroughSubject<Userprofile, Never>()
   public let removeSubscriptionPublisher = PassthroughSubject<Userprofile, Never>()
+  public let subscriptionFailure = PassthroughSubject<Userprofile, Never>()
   
   class func updateUserData(_ json: JSON) throws {
     guard let current = Userprofiles.shared.current,
@@ -202,6 +203,8 @@ class Userprofile: Decodable {
          topPublicationCategories = "top_pub_categories",
          wasEdited                = "is_edited",
          balance                  = "credit",
+         subscribers              = "subscribers",
+         subscriptions            = "subscriptions",
          subscribedAt             = "subscribed_at",
          subscribedToMe           = "subscribed_to_me",
          notifyOnPublication      = "notify_on_publication"
@@ -358,9 +361,9 @@ class Userprofile: Decodable {
   @Published var votesReceivedTotal: Int = 0
   @Published var commentsTotal: Int = 0
   @Published var commentsReceivedTotal: Int = 0
-  @Published var favoritesTotal: Int = 0 
+  @Published var favoritesTotal: Int = 0
   @Published var publicationsTotal: Int = 0
-  @Published var subscribersTotal: Int = 0 
+  @Published var subscribersTotal: Int = 0
   @Published var subscriptionsTotal: Int = 0
   var lastVisit: Date
   var wasEdited: Bool?
@@ -414,13 +417,13 @@ class Userprofile: Decodable {
   ///Store answers`[Survey.id: Answer.id]`
   var answers = [Int: Int]()
   var hasSocialMedia: Bool { !facebookURL.isNil || !instagramURL.isNil || !tiktokURL.isNil }
-  var subscribedAt: Bool {
+  @Published var subscribedAt: Bool {
     didSet {
       guard oldValue != subscribedAt,
             let current = Userprofiles.shared.current
       else { return }
                                             
-      subscriptionFlagPublisher.send(subscribedAt)
+//      subscriptionFlagPublisher.send(subscribedAt)
       subscribedAt ? { current.subscriptionsPublisher.send([self]) }() : { current.subscriptionsRemovePublisher.send([self]) }()
       
       if subscribedAt {
@@ -450,15 +453,15 @@ class Userprofile: Decodable {
   }
   var isCurrent: Bool { Userprofiles.shared.current == self }
   var isAnonymous: Bool { Userprofile.anonymous == self }
-  var subscribers: [Userprofile] { Userprofiles.shared.all.filter { $0.subscribedToMe && !$0.isBanned }}
-  var subscriptions: [Userprofile] { Userprofiles.shared.all.filter { $0.subscribedAt && !$0.isBanned }}
+  @Published var subscribers: Set<Int> = Set() //: [Int] { Userprofiles.shared.all.filter { $0.subscribedToMe && !$0.isBanned }}
+  @Published var subscriptions: Set<Int> = Set() // : [Int] { Userprofiles.shared.all.filter { $0.subscribedAt && !$0.isBanned }}
   //    var contentLocales: [String] = []
   
   ///**Publishers**
   public let imagePublisher = PassthroughSubject<UIImage, Error>()
   public let cityFetchPublisher = PassthroughSubject<[City], Error>()
   public let compatibilityPublisher = PassthroughSubject<UserCompatibility, Error>()
-  public let subscriptionFlagPublisher = PassthroughSubject<Bool, Never>()
+//  public let subscriptionFlagPublisher = PassthroughSubject<Bool, Never>()
   public let subscribersPublisher = PassthroughSubject<[Userprofile], Never>()
   public let subscribersRemovePublisher = PassthroughSubject<[Userprofile], Never>()
   public let subscriptionsPublisher = PassthroughSubject<[Userprofile], Error>()
@@ -532,6 +535,8 @@ class Userprofile: Decodable {
       commentsTotal       = try container.decode(Int.self, forKey: .commentsTotal)
       commentsReceivedTotal = try container.decode(Int.self, forKey: .commentsReceivedTotal)
       publicationsTotal   = try container.decode(Int.self, forKey: .publicationsTotal)
+      subscribers         = try container.decode(Set.self, forKey: .subscribers)
+      subscriptions       = try container.decode(Set.self, forKey: .subscriptions)
       subscribersTotal    = try container.decode(Int.self, forKey: .subscribersTotal)
       subscriptionsTotal  = try container.decode(Int.self, forKey: .subscriptionsTotal)
       tiktokURL           = URL(string: try container.decodeIfPresent(String.self, forKey: .tiktokURL) ?? "")

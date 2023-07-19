@@ -9,9 +9,6 @@
 import UIKit
 import Combine
 
-import UIKit
-import Combine
-
 class UserSettingsEmailCell: UICollectionViewListCell {
   
   public weak var userprofile: Userprofile? {
@@ -166,7 +163,7 @@ class UserSettingsEmailCell: UICollectionViewListCell {
   private lazy var headerImage: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "envelope.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.tintColor = .secondaryLabel
+    instance.tintColor = Colors.cellHeader
     instance.contentMode = .scaleAspectFit
 //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
@@ -175,7 +172,7 @@ class UserSettingsEmailCell: UICollectionViewListCell {
   }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = .secondaryLabel
+    instance.textColor = Colors.cellHeader
     instance.text = "mailTF".localized.uppercased()
     instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
 

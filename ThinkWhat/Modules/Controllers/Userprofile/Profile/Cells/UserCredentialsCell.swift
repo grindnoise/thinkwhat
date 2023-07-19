@@ -83,10 +83,10 @@ class UserCredentialsCell: UICollectionViewListCell {
       }
       .store(in: &subscriptions)
     let button = UIButton()
-    button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+    button.setAttributedTitle(NSAttributedString(string: (userprofile.subscribedAt ? "unsubscribe" : "subscribe").localized.uppercased(),
                                                  attributes: [
                                                   .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
-                                                  .foregroundColor: UIColor.systemRed as Any
+                                                  .foregroundColor: userprofile.subscribedAt ? UIColor.systemRed : color as Any
                                                  ]),
                               for: .normal)
     button.accessibilityIdentifier = "subscriptionButton"
@@ -94,9 +94,9 @@ class UserCredentialsCell: UICollectionViewListCell {
     button.imageEdgeInsets.left = padding/2
     button.adjustsImageWhenHighlighted = false
     button.semanticContentAttribute = .forceRightToLeft
-    button.setImage(UIImage(systemName: ("xmark"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+    button.setImage(UIImage(systemName: (userprofile.subscribedAt ? "xmark" : "plus"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
     button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
-    button.tintColor = .systemRed
+    button.tintColor = userprofile.subscribedAt ? .systemRed : color
     button.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
     button.publisher(for: \.bounds)
       .sink { button.cornerRadius = $0.height/2 }
@@ -194,7 +194,7 @@ private extension UserCredentialsCell {
   func setTasks() {
     ///**Subscription events**
     ///Subscribed at added
-    userprofile.subscriptionFlagPublisher
+    userprofile.$subscribedAt
       .receive(on: DispatchQueue.main )
       .sink { [unowned self] _ in self.toggleSubscription() }
       .store(in: &subscriptions)
@@ -227,14 +227,17 @@ private extension UserCredentialsCell {
 //      }
 //    })
     
-    //Subscription api error
-    tasks.append(Task {@MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
-        guard let self = self else { return }
-        
-        self.toggleSubscription()
-      }
-    })
+    //Subscription operation API error
+    Userprofiles.shared.subscriptionFailure
+      .sink { [unowned self] _ in self.toggleSubscription() }
+      .store(in: &subscriptions)
+//    tasks.append(Task {@MainActor [weak self] in
+//      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionOperationFailure) {
+//        guard let self = self else { return }
+//
+//        self.toggleSubscription()
+//      }
+//    })
   }
   
   @MainActor
@@ -242,16 +245,17 @@ private extension UserCredentialsCell {
     subscriptionButton.isUserInteractionEnabled = true
     subscriptionButton.setSpinning(on: false) { [weak self] in
       guard let self = self,
-            let button = subscriptionButton.getSubview(type: UIButton.self)
+            let button = self.subscriptionButton.getSubview(type: UIButton.self)
       else { return }
-      
-      button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+
+      button.setAttributedTitle(NSAttributedString(string: (self.userprofile.subscribedAt ? "unsubscribe" : "subscribe").localized.uppercased(),
                                                    attributes: [
                                                     .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
-                                                    .foregroundColor: UIColor.systemRed as Any
+                                                    .foregroundColor: self.userprofile.subscribedAt ? UIColor.systemRed : self.color as Any
                                                    ]),
                                 for: .normal)
-      button.imageView?.tintColor = .systemRed
+      button.setImage(UIImage(systemName: (userprofile.subscribedAt ? "xmark" : "plus"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+      button.imageView?.tintColor = self.userprofile.subscribedAt ? .systemRed : self.color
     }
   }
   
@@ -261,19 +265,28 @@ private extension UserCredentialsCell {
     subscriptionPublisher.send(!userprofile.subscribedAt)
     
     subscriptionButton.isUserInteractionEnabled = false
-    subscriptionButton.setSpinning(on: true, color: .systemRed) { [weak self] in
-      guard let self = self,
-            let button = self.subscriptionButton.getSubview(type: UIButton.self)
-      else { return }
-      
-      button.imageView?.tintColor = .clear
-      button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
-                                                   attributes: [
-                                                    .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
-                                                    .foregroundColor: UIColor.clear as Any
-                                                   ]),
-                                for: .normal)
-    }
+    subscriptionButton.setSpinning(on: true, color: userprofile.subscribedAt ? .systemRed : color) // { [weak self] in
+//      guard let self = self,
+//            let button = self.subscriptionButton.getSubview(type: UIButton.self)
+//      else { return }
+//
+//      button.imageView?.tintColor = .clear
+//      button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+//                                                   attributes: [
+//                                                    .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+//                                                    .foregroundColor: UIColor.clear as Any
+//                                                   ]),
+//                                for: .normal)
+//    }
+    guard let button = subscriptionButton.getSubview(type: UIButton.self) else { return }
+    
+    button.imageView?.tintColor = .clear
+    button.setAttributedTitle(NSAttributedString(string: "unsubscribe".localized.uppercased(),
+                                                 attributes: [
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
+                                                  .foregroundColor: UIColor.clear as Any
+                                                 ]),
+                              for: .normal)
   }
   
   @objc

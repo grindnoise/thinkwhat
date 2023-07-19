@@ -41,7 +41,7 @@ class NewBanner: UIView {
       subscriptions.forEach { $0.cancel() }
     }
   }
-  private let padding: CGFloat = 8
+  private let padding: CGFloat
   private let contentPadding: UIEdgeInsets
   private let isModal: Bool
   private let isShadowed: Bool
@@ -110,6 +110,7 @@ class NewBanner: UIView {
   
   // MARK: - Initialization
   init(contentView: UIView,
+       padding: CGFloat = 8,
        contentPadding: UIEdgeInsets = .uniform(size: 8),
        isModal: Bool,
        isShadowed: Bool = true,
@@ -119,6 +120,7 @@ class NewBanner: UIView {
     self.isModal = isModal
     self.contentView = contentView
     self.useContentViewHeight = useContentViewHeight
+    self.padding = padding
     self.contentPadding = contentPadding
     self.shouldDismissAfter = shouldDismissAfter
     

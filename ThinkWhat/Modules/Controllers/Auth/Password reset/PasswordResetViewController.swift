@@ -94,7 +94,8 @@ private extension PasswordResetViewController {
   @MainActor
   func setupUI() {
     navigationController?.setNavigationBarHidden(false, animated: false)
-    fillNavigationBar()
+    navigationController?.setBarColor()
+//    fillNavigationBar()
     
     navigationItem.titleView = logoStack
     

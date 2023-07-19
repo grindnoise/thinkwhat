@@ -218,7 +218,8 @@ extension NewPollController: NewPollViewInput {
   }
   
   func setColor(_ color: UIColor) {
-    setNavigationBarTintColor(color)
+//    setNavigationBarTintColor(color)
+    navigationController?.setBarTintColor(color)
     progressCapsule.setColor(color)
   }
   
@@ -275,7 +276,8 @@ extension NewPollController: NewPollModelOutput {
 // MARK: - Private
 private extension NewPollController {
   func setupUI() {
-    setNavigationBarTintColor(tintColor)
+//    setNavigationBarTintColor(tintColor)
+    navigationController?.setBarTintColor(tintColor)
     
     guard let navigationBar = navigationController?.navigationBar else { return }
     
