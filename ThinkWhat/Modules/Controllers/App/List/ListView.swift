@@ -56,6 +56,18 @@ class ListView: UIView {
       toggleDateFilter(on: !isDateFilterHidden)
     }
   }
+  private lazy var emptyPublicationsView: EmptyPublicationsView = {
+    let instance = EmptyPublicationsView(showsButton: true,
+                                         buttonText: "create_post",
+                                         buttonColor: viewInput?.tintColor ?? Colors.main,
+                                         backgroundLightColor: .systemBackground,
+                                         backgroundDarkColor: Colors.darkTheme,
+                                         spiralLightColor: Colors.spiralLight,
+                                         spiralDarkColor: Colors.spiralDark)
+    instance.alpha = 0
+    
+    return instance
+  }()
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
@@ -63,12 +75,13 @@ class ListView: UIView {
     let shadowView = UIView.opaque()
     shadowView.layer.masksToBounds = false
     shadowView.accessibilityIdentifier = "shadow"
-    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-    shadowView.layer.shadowOffset = .zero
-    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    instance.layer.shadowRadius = 5
+    instance.layer.shadowOffset = .zero
     shadowView.publisher(for: \.bounds)
       .sink {
-        shadowView.layer.shadowRadius = $0.height/8
+//        shadowView.layer.shadowRadius = $0.height/8
         shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
       }
       .store(in: &subscriptions)
@@ -106,7 +119,8 @@ class ListView: UIView {
   }()
   private lazy var collectionView: SurveysCollectionView = {
     let instance = SurveysCollectionView(category: .New,
-                                         color: viewInput?.tintColor ?? Colors.System.Red.rawValue)
+                                         color: viewInput?.tintColor ?? Colors.System.Red.rawValue,
+                                         period: .PerMonth)
     
     //Pagination #1
     let paginationPublisher = instance.paginationPublisher
@@ -281,10 +295,11 @@ class ListView: UIView {
       .store(in: &subscriptions)
     
     instance.emptyPublicationsPublisher
+      .filter { !$0.isNil }
       .sink { [weak self] in
         guard let self = self else { return }
         
-        self.isEmpty = $0
+        self.isEmpty = $0!
       }
       .store(in: &subscriptions)
     
@@ -335,7 +350,7 @@ class ListView: UIView {
     let instance = UIView()
     instance.accessibilityIdentifier = "bg"
     instance.layer.masksToBounds = false
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
     instance.publisher(for: \.bounds)
       .sink { [unowned self] in instance.cornerRadius = $0.width * 0.05 }
       .store(in: &subscriptions)
@@ -358,7 +373,7 @@ class ListView: UIView {
     didSet {
       guard isEmpty != oldValue else { return }
       
-      switchEmptyLabel(isEmpty: isEmpty)
+      onEmptyList(isEmpty: isEmpty)
     }
   }
   
@@ -399,7 +414,7 @@ class ListView: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
-    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
 //    if #available(iOS 15, *) {
 //      periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
 //    } else {
@@ -419,9 +434,11 @@ private extension ListView {
     guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
     
     addSubview(contentView)
+//    contentView.addSubview(emptyPublicationsView)
     contentView.addSubview(filterView)
     contentView.addSubview(shadowView)
     contentView.translatesAutoresizingMaskIntoConstraints = false
+    emptyPublicationsView.translatesAutoresizingMaskIntoConstraints = false
     filterView.translatesAutoresizingMaskIntoConstraints = false
     shadowView.translatesAutoresizingMaskIntoConstraints = false
     
@@ -430,13 +447,12 @@ private extension ListView {
       contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
       contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
       contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      //            filterView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 20),
       filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8),
       filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8),
-      //            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
-      //            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-      //            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-      //            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
+//      emptyPublicationsView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+//      emptyPublicationsView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+//      emptyPublicationsView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+//      emptyPublicationsView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
     ])
     
     let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8)
@@ -463,10 +479,13 @@ private extension ListView {
     setNeedsLayout()
     layoutIfNeeded()
     filterViewHeight = periodButton.bounds.height
+    
     let constraint = filterView.heightAnchor.constraint(equalToConstant: filterViewHeight)
     constraint.identifier = "height"
     constraint.isActive = true
     constraint.priority = .defaultLow
+    
+    emptyPublicationsView.place(inside: background)
   }
   
   @MainActor
@@ -537,8 +556,7 @@ private extension ListView {
   @MainActor
   func toggleDateFilter(on: Bool) {
     guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-          let constraint1 = filterView.getConstraint(identifier: "top_1")//,
-//          let constraint2 = filterView.getConstraint(identifier: "top")
+          let constraint1 = filterView.getConstraint(identifier: "top_1")
     else { return }
     
     setNeedsLayout()
@@ -548,7 +566,6 @@ private extension ListView {
       self.filterView.alpha = on ? 1 : 0
       self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
       constraint1.constant = on ? 16 : 0
-//      constraint2.constant = on ? 16 : 0
       heightConstraint.constant = on ? self.filterViewHeight : 0
       self.layoutIfNeeded()
     }
@@ -584,59 +601,100 @@ private extension ListView {
     periodButton.setAttributedTitle(attrString1, for: .highlighted)
   }
 
-  func switchEmptyLabel(isEmpty: Bool) {
-    func emptyLabel() -> UILabel {
-      let label = UILabel()
-      label.accessibilityIdentifier = "emptyLabel"
-      label.backgroundColor = .clear
-      label.alpha = 0
-      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title3)
-      label.text = "publications_not_found".localized// + "\n⚠︎"
-      label.textColor = .secondaryLabel
-      label.numberOfLines = 0
-      label.textAlignment = .center
-      
-      return label
-    }
-    
+  func onEmptyList(isEmpty: Bool) {
+    guard let mode = viewInput?.category else { return }
+
     if isEmpty {
-      let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") ?? emptyLabel()
-      label.place(inside: shadowView,
-                  insets: .uniform(size: self.padding*2))
-      label.transform = .init(scaleX: 0.75, y: 0.75)
-      UIView.animate(
-        withDuration: 0.4,
-        delay: 0,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [weak self] in
-          guard let self = self else { return }
-          
-          label.transform = .identity
-          label.alpha = 1
-          self.collectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .clear
-        }) { _ in }
-    } else if let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") {
-      UIView.animate(
-        withDuration: 0.4,
-        delay: 0,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut],
-        animations: { [weak self] in
-          guard let self = self else { return }
-          
-          label.transform = .init(scaleX: 0.75, y: 0.75)
-          label.alpha = 0
-          self.collectionView.backgroundColor = .clear
-        }) { _ in label.removeFromSuperview() }
+//      emptyPublicationsView.mode = mode
+      emptyPublicationsView.alpha = 0
+      emptyPublicationsView.setAnimationsEnabled(true)
     }
+
+
+    UIView.animate(
+      withDuration: 0.2,
+      delay: 0,
+      options: [.curveEaseInOut],
+      animations: { [weak self] in
+        guard let self = self else { return }
+
+      self.emptyPublicationsView.alpha =  isEmpty ? 1 : 0
+//      self.shadowView.alpha = isEmpty ? 0 : 1
+      }) { [weak self] _ in
+        guard let self = self,
+              !isEmpty
+        else { return }
+
+        self.emptyPublicationsView.setAnimationsEnabled(false)
+//        self.emptyPublicationsView?.removeFromSuperview()
+//        self.emptyPublicationsView = nil
+      }
   }
+  
+//    func emptyLabel() -> UILabel {
+//      let label = UILabel()
+//      label.accessibilityIdentifier = "emptyLabel"
+//      label.backgroundColor = .clear
+//      label.alpha = 0
+//      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title3)
+//      label.text = "publications_not_found".localized// + "\n⚠︎"
+//      label.textColor = .secondaryLabel
+//      label.numberOfLines = 0
+//      label.textAlignment = .center
+//
+//      return label
+//    }
+//
+//    if isEmpty {
+//      let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") ?? emptyLabel()
+//      label.place(inside: shadowView,
+//                  insets: .uniform(size: self.padding*2))
+//      label.transform = .init(scaleX: 0.75, y: 0.75)
+//      UIView.animate(
+//        withDuration: 0.4,
+//        delay: 0,
+//        usingSpringWithDamping: 0.8,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut],
+//        animations: { [weak self] in
+//          guard let self = self else { return }
+//
+//          label.transform = .identity
+//          label.alpha = 1
+//          self.collectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .clear
+//        }) { _ in }
+//    } else if let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") {
+//      UIView.animate(
+//        withDuration: 0.4,
+//        delay: 0,
+//        usingSpringWithDamping: 0.8,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut],
+//        animations: { [weak self] in
+//          guard let self = self else { return }
+//
+//          label.transform = .init(scaleX: 0.75, y: 0.75)
+//          label.alpha = 0
+//          self.collectionView.backgroundColor = .clear
+//        }) { _ in label.removeFromSuperview() }
+//    }
+//  }
 }
 
 // MARK: - Controller Output
 extension ListView: ListControllerOutput {
+  func didAppear() {
+//    guard isEmpty else { return }
+//
+//    emptyPublicationsView.setAnimationsEnabled(true)
+//    collectionView.didAppear()
+  }
+  
+  func didDisappear() {
+//    emptyPublicationsView.setAnimationsEnabled(false)
+    
+//    collectionView.didDisappear()
+  }
   //    func setPeriod(_ period: Period) {
   //        collectionView.period = period
   //    }
@@ -647,6 +705,7 @@ extension ListView: ListControllerOutput {
   func onDataSourceChanged() {
     guard let category = viewInput?.category else { return }
     
+//    emptyPublicationsView.mode = category
     if category == .New, period == .AllTime {
       period = .PerMonth
     }

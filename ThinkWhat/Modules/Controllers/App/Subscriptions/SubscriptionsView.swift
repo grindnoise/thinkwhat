@@ -153,7 +153,7 @@ class SubscriptionsView: UIView {
     
     return instance
   }()
-  private var emptySubscriptionsView: EmptySubscriptionsView?// = { EmptySubscriptionsView() }()
+  private var emptyPublicationsView: EmptyPublicationsView?
   private lazy var surveysCollectionView: SurveysCollectionView = {
     let instance = SurveysCollectionView(category: .Subscriptions)
     
@@ -328,10 +328,11 @@ class SubscriptionsView: UIView {
       .store(in: &subscriptions)
     
     instance.emptyPublicationsPublisher
+      .filter { !$0.isNil }
       .sink { [weak self] in
         guard let self = self else { return }
         
-        self.isEmpty = $0
+        self.isEmpty = $0!
       }
       .store(in: &subscriptions)
     
@@ -374,20 +375,18 @@ class SubscriptionsView: UIView {
         else { return }
         
         if zero {
-          self.emptySubscriptionsView = EmptySubscriptionsView()
-          self.addSubview(self.emptySubscriptionsView!)
-          self.emptySubscriptionsView?.translatesAutoresizingMaskIntoConstraints = false
-          self.emptySubscriptionsView?.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor).isActive = true
-          self.emptySubscriptionsView?.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor).isActive = true
-          self.emptySubscriptionsView?.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor).isActive = true
-          self.emptySubscriptionsView?.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor).isActive = true
-          self.emptySubscriptionsView?.setAnimationsEnabled(true)
-          //        self.viewInput?.onSubcriptionsCountEvent(zeroSubscriptions: isEmpty)
-          //        self.emptySubscriptionsView.place(inside: self)
-          //        if isEmpty {
-          //          self.emptySubscriptionsView.addEquallyTo(to: self)
-          //          self.emptySubscriptionsView.transform = .init(scaleX: 0.75, y: 0.75)
-          //        }
+          self.emptyPublicationsView = EmptyPublicationsView(mode: .Subscriptions,
+                                                             backgroundLightColor: .systemBackground,
+                                                             backgroundDarkColor: .systemBackground,
+                                                             spiralLightColor: Colors.spiralLight,
+                                                             spiralDarkColor: Colors.spiralDark)
+          self.addSubview(self.emptyPublicationsView!)
+          self.emptyPublicationsView?.translatesAutoresizingMaskIntoConstraints = false
+          self.emptyPublicationsView?.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor).isActive = true
+          self.emptyPublicationsView?.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor).isActive = true
+          self.emptyPublicationsView?.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor).isActive = true
+          self.emptyPublicationsView?.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor).isActive = true
+          self.emptyPublicationsView?.setAnimationsEnabled(true)
         }
         
         
@@ -400,14 +399,22 @@ class SubscriptionsView: UIView {
           animations: { [weak self] in
             guard let self = self else { return }
             
-          self.emptySubscriptionsView?.alpha =  zero ? 1 : 0
-          self.emptySubscriptionsView?.transform = zero ? .identity : .init(scaleX: 0.75, y: 0.75)
+          self.emptyPublicationsView?.alpha =  zero ? 1 : 0
+          self.emptyPublicationsView?.transform = zero ? .identity : .init(scaleX: 0.75, y: 0.75)
           self.shadowView.alpha = zero ? 0 : 1
           self.filterView.alpha = zero ? 0 : 1
         }) { _ in
+//          delay(seconds: 3) { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.emptyPublicationsView?.setAnimationsEnabled(false)
+//            self.emptyPublicationsView?.removeFromSuperview()
+//            self.emptyPublicationsView = nil
+//          }
           if !zero {
-            self.emptySubscriptionsView?.setAnimationsEnabled(false)
-            self.emptySubscriptionsView?.removeFromSuperview()
+            self.emptyPublicationsView?.setAnimationsEnabled(false)
+            self.emptyPublicationsView?.removeFromSuperview()
+            self.emptyPublicationsView = nil
           }
         }
       }
@@ -1253,15 +1260,15 @@ private extension SubscriptionsView {
 
 extension SubscriptionsView: SubsciptionsControllerOutput {
   func didAppear() {
-//    guard !emptySubscriptionsView.alpha.isZero else { return }
+    guard let current = Userprofiles.shared.current, current.subscriptions.isEmpty else { return }
     
-    emptySubscriptionsView?.setAnimationsEnabled(true)
+    emptyPublicationsView?.setAnimationsEnabled(true)
   }
   
   func didDisappear() {
-//    guard !emptySubscriptionsView.alpha.isZero else { return }
+//    guard let current = Userprofiles.shared.current, !current.subscriptions.isEmpty else { return }
     
-    emptySubscriptionsView?.setAnimationsEnabled(false)
+    emptyPublicationsView?.setAnimationsEnabled(false)
   }
   
   func hideUserCard(_ completion: Closure? = nil) {

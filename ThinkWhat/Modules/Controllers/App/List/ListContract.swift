@@ -65,5 +65,7 @@ protocol ListControllerOutput: AnyObject {
   
   func onDataSourceChanged()
   func onRequestCompleted(_: Result<Bool, Error>)
+  func didAppear()
+  func didDisappear()
   //    func onAddFavoriteCallback(_: Result<Bool,Error>)
 }

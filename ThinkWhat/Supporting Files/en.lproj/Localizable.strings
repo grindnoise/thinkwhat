@@ -193,7 +193,6 @@
 "all_time" = "all time";
 "per_all_time" = "of all time";
 "cancel_subscription" = "Cancel subscription";
-"zero_subscriptions" = "No subscriptions";
 
 //List VC
 "list" = "Feed";
@@ -502,3 +501,10 @@
 "pn_own_post_completed_title" = "Your post has ended!";
 "pn_own_post_completed" = "See the results 🔍";
 
+// EmptyPublicationsView
+"empty_pub_view_subscriptions" = "No subscriptions";
+"empty_pub_view_new" = "No new posts\nfor the specified period";
+"empty_pub_view_top" = "No top posts\nfor the specified period";
+"empty_pub_view_own" = "No own posts\nfor the specified period";
+"empty_pub_view_watching" = "No tracked posts\nfor the specified period";
+"empty_pub_view_default" = "No posts\nfor the specified period";

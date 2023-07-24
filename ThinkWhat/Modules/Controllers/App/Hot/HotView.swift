@@ -123,11 +123,8 @@ class HotView: UIView {
     func push(_ instance: Survey?) {
       incoming = !instance.isNil ? {  HotCard(item: instance!, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance!.topic.tagColor) }() : {
         let empty = EmptyHotCard()
-        empty.tapPublisher
-          .sink { [unowned self] in
-            
-            self.viewInput?.createPost()
-          }
+        empty.buttonTapEvent
+          .sink { [unowned self] in self.viewInput?.createPost() }
           .store(in: &subscriptions)
         
         return empty
@@ -140,19 +137,32 @@ class HotView: UIView {
 //
 //      incoming = HotCard(item: instance, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance.topic.tagColor)
       current = self.incoming
-      incoming?.placeXCentered(inside: self,
-                               topInset: viewInput.navBarHeight + statusBarFrame.height + padding,
-                               size: CGSize(width: bounds.width - padding*2,
-                                            height: bounds.height - (viewInput.navBarHeight + statusBarFrame.height + viewInput.tabBarHeight + padding*2)))
-
-      guard let constraint = incoming?.getConstraint(identifier: "centerXAnchor" ) else { return }
+      addSubview(incoming!)
+      incoming?.translatesAutoresizingMaskIntoConstraints = false
+      incoming?.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: padding).isActive = true
+//      incoming?.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -padding).isActive = true
+//      incoming?.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -(padding + tabBarHeight)).isActive = true
+//      incoming?.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding).isActive = true
+//      incoming?.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding).isActive = true
+      incoming?.widthAnchor.constraint(equalToConstant: appDelegate.window!.bounds.width - padding*2).isActive = true
+      incoming?.heightAnchor.constraint(equalToConstant: bounds.height - (viewInput.navBarHeight + statusBarFrame.height + viewInput.tabBarHeight + padding*2)).isActive = true
+      
+      let constraint = incoming!.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor, constant: appDelegate.window!.bounds.width + padding*2)
+      constraint.identifier = "centerXAnchor"
+      constraint.isActive = true
+      //      incoming?.placeXCentered(inside: self,
+      //                               topInset: min(viewInput.navBarHeight, UINavigationController.Constants.NavBarHeightSmallState) + statusBarFrame.height + padding,
+      //                               size: CGSize(width: bounds.width - padding*2,
+      //                                            height: bounds.height - (viewInput.navBarHeight + statusBarFrame.height + viewInput.tabBarHeight + padding*2)))
+      
+//      guard let constraint = incoming?.getConstraint(identifier: "centerXAnchor" ) else { return }
       
       setNeedsLayout()
       layoutIfNeeded()
       
-      setNeedsLayout()
-      constraint.constant += incoming!.bounds.width + padding*2
-      layoutIfNeeded()
+//      setNeedsLayout()
+//      constraint.constant += incoming!.bounds.width + padding*2
+//      layoutIfNeeded()
       
       incoming?.transform = .init(scaleX: 0.75, y: 0.75)
       
@@ -195,7 +205,7 @@ class HotView: UIView {
         }) { [unowned self] _ in
           guard let card = instance as? EmptyHotCard else { return }
           
-          card.removeAllAnimations()
+          card.toggleAnimations(false)
           
           self.outgoing = nil
           instance.removeFromSuperview()
@@ -258,13 +268,13 @@ extension HotView: HotControllerOutput {
       return
     }
     
-    card.animate()
+    card.toggleAnimations(true)
   }
   
   func didDisappear() {
     guard let card = current as? EmptyHotCard else { return }
     
-    card.removeAllAnimations()
+    card.toggleAnimations(false)
   }
   
   func didLoad() {

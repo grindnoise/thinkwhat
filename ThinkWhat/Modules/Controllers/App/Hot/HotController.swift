@@ -101,6 +101,7 @@ class HotController: UIViewController, TintColorable {
     
 //    setNavigationBarTintColor(initialColor)
     navigationController?.setBarTintColor(initialColor)
+    navigationController?.setBarShadow(on: false)
     
     guard isDataReady else { return }
     
@@ -157,7 +158,7 @@ private extension HotController {
     Surveys.shared.instancesPublisher
       .filter { !$0.isEmpty }
       .receive(on: DispatchQueue.main)
-      .map { array in array.filter { $0.isHot && !$0.isRejected && !$0.isClaimed && $0.id != Survey.fakeId }}
+      .map { array in array.filter { $0.isHot && !$0.isRejected && !$0.isClaimed && !$0.isComplete && $0.id != Survey.fakeId }}
       .sink { [unowned self] in
         self.queue.enqueue($0)
         
@@ -281,7 +282,7 @@ extension HotController: HotViewInput {
   }
   
   func vote(_ instance: Survey) {
-    navigationController?.delegate = appDelegate.transitionCoordinator
+    navigationController?.delegate = nil//appDelegate.transitionCoordinator
     navigationController?.navigationBar.backItem?.title = ""
     navigationController?.pushViewController(PollController(surveyReference: instance.reference), animated: true)
     navigationController?.delegate = nil

@@ -142,7 +142,7 @@ class ListController: UIViewController, TintColorable {
     super.viewDidAppear(animated)
     
     isOnScreen = true
-    
+    controllerOutput?.didAppear()
     setSwitchHidden(false)
     
     guard let main = tabBarController as? MainController else { return }
@@ -153,6 +153,7 @@ class ListController: UIViewController, TintColorable {
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     
+    controllerOutput?.didDisappear()
     setSwitchHidden(true)
   }
   

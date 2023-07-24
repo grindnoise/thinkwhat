@@ -49,47 +49,55 @@ class LinkPreviewCell: UICollectionViewCell {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  private lazy var disclosureLabel: UILabel = {
+  private lazy var headerImage: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "link", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
+    instance.tintColor = Colors.cellHeader
+    instance.contentMode = .scaleAspectFit
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
+    
+    return instance
+  }()
+  private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = .secondaryLabel
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
+    instance.textColor = Colors.cellHeader
     instance.text = "web_link".localized.uppercased()
-    
-    let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
-    constraint.identifier = "width"
-    constraint.isActive = true
-    
+    instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
+
+    let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
+    heightConstraint.identifier = "height"
+    heightConstraint.priority = .defaultHigh
+    heightConstraint.isActive = true
+
+    instance.publisher(for: \.bounds, options: .new)
+      .sink { [weak self] rect in
+        guard let self = self,
+              let constraint = instance.getConstraint(identifier: "height")
+        else { return }
+
+        self.setNeedsLayout()
+        constraint.constant = instance.text!.height(withConstrainedWidth: 1000, font: instance.font)
+        self.layoutIfNeeded()
+      }
+      .store(in: &subscriptions)
+
     return instance
   }()
   private lazy var disclosureIndicator: UIImageView = {
     let instance = UIImageView()
     instance.image = UIImage(systemName: "chevron.down")
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
-    instance.tintColor = .secondaryLabel
+    instance.tintColor = Colors.cellHeader
     instance.contentMode = .center
     instance.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
     
     return instance
   }()
-  private lazy var icon: UIView = {
-    let imageView = UIImageView(image: UIImage(systemName: "link"))
-    imageView.tintColor = .secondaryLabel
-    imageView.contentMode = .center
-    imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 1/1).isActive = true
-    imageView.publisher(for: \.bounds)
-      .filter { $0 != .zero }
-      .sink {
-        imageView.image = UIImage(systemName: "link",
-                                  withConfiguration: UIImage.SymbolConfiguration(pointSize: $0.height*0.75))
-      }
-      .store(in: &subscriptions)
-    
-    return imageView
-  }()
   private lazy var horizontalStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [icon, disclosureLabel, disclosureIndicator])
+    let instance = UIStackView(arrangedSubviews: [headerImage,
+                                                  headerLabel,
+                                                  disclosureIndicator,
+                                                  UIView.opaque()])
     instance.alignment = .center
-    let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
+    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font))
     constraint.identifier = "height"
     constraint.isActive = true
     instance.spacing = 4
@@ -98,15 +106,16 @@ class LinkPreviewCell: UICollectionViewCell {
     return instance
   }()
   private lazy var verticalStack: UIStackView = {
-    let opaque = UIView()
-    opaque.backgroundColor = .clear
-    opaque.addSubview(horizontalStack)
-    horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-    horizontalStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor, constant: padding).isActive = true
-    horizontalStack.topAnchor.constraint(equalTo: opaque.topAnchor).isActive = true
-    horizontalStack.bottomAnchor.constraint(equalTo: opaque.bottomAnchor).isActive = true
+//    let opaque = UIView()
+//    opaque.backgroundColor = .clear
+//    opaque.addSubview(horizontalStack)
+//    horizontalStack.translatesAutoresizingMaskIntoConstraints = false
+//    horizontalStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor, constant: padding).isActive = true
+//    horizontalStack.topAnchor.constraint(equalTo: opaque.topAnchor).isActive = true
+//    horizontalStack.bottomAnchor.constraint(equalTo: opaque.bottomAnchor).isActive = true
     
-    let verticalStack = UIStackView(arrangedSubviews: [opaque, linkPreview])
+    let verticalStack = UIStackView(arrangedSubviews: [horizontalStack,
+                                                       shadowView])
     verticalStack.axis = .vertical
     verticalStack.spacing = padding
     return verticalStack
@@ -114,9 +123,20 @@ class LinkPreviewCell: UICollectionViewCell {
   // Constraints
   private var closedConstraint: NSLayoutConstraint!
   private var openConstraint: NSLayoutConstraint!
+  private lazy var shadowView: UIView = {
+    let instance = UIView.opaque()
+    instance.layer.masksToBounds = false
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    instance.layer.shadowOffset = .zero
+    instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    instance.layer.shadowRadius = padding
+    
+    return instance
+  }()
   private lazy var linkPreview: LPLinkView = {
     let instance = LPLinkView()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
+    instance.place(inside: shadowView)
     instance.publisher(for: \.bounds)
       .filter { $0 != .zero }
       .sink { instance.cornerRadius = $0.width*0.025 }
@@ -156,6 +176,7 @@ class LinkPreviewCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     //        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
     //        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     //        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
@@ -163,19 +184,19 @@ class LinkPreviewCell: UICollectionViewCell {
     //            imageView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     //        }
     
-    //Set dynamic font size
-    guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
-    
-    disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
-                                             forTextStyle: .caption1)
-    guard let constraint = horizontalStack.getConstraint(identifier: "height"),
-          let constraint_2 = disclosureLabel.getConstraint(identifier: "width")
-    else { return }
-    
-    setNeedsLayout()
-    constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
-    constraint_2.constant = disclosureLabel.text!.width(withConstrainedHeight: 100, font: disclosureLabel.font)
-    layoutIfNeeded()
+//    //Set dynamic font size
+//    guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
+//
+//    disclosureLabel.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue,
+//                                             forTextStyle: .caption1)
+//    guard let constraint = horizontalStack.getConstraint(identifier: "height"),
+//          let constraint_2 = disclosureLabel.getConstraint(identifier: "width")
+//    else { return }
+//
+//    setNeedsLayout()
+//    constraint.constant = "test".height(withConstrainedWidth: disclosureLabel.bounds.width, font: disclosureLabel.font)
+//    constraint_2.constant = disclosureLabel.text!.width(withConstrainedHeight: 100, font: disclosureLabel.font)
+//    layoutIfNeeded()
   }
 }
 

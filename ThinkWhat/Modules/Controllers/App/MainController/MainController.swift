@@ -572,7 +572,10 @@ private extension MainController {
         
         let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
                                                               text: "watch_survey_notification",
-                                                              tintColor: .label),
+                                                              tintColor: .label,
+                                                              fontName: Fonts.Rubik.Regular,
+                                                              textStyle: .subheadline,
+                                                              textAlignment: .natural),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,

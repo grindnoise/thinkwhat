@@ -40,8 +40,8 @@ class SurveyCell: UICollectionViewCell {
         .sink { [weak self] _ in
           guard let self = self else { return }
           
-          self.titleLabel.textColor = self.item.isVisited ? .secondaryLabel : .label
-          self.descriptionLabel.textColor = self.item.isVisited ? .secondaryLabel : .label
+          self.titleLabel.textColor = self.item.isOwn ? .label : self.item.isVisited ? .secondaryLabel : .label
+          self.descriptionLabel.textColor = self.item.isOwn ? .label : self.item.isVisited ? .secondaryLabel : .label
         }
         .store(in: &subscriptions)
       
@@ -541,7 +541,7 @@ class SurveyCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground//.white.blended(withFraction: 0.2, of: .gray)
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCellDark : Colors.surveyCellLight
     avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
     ratingLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     viewsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
@@ -552,6 +552,8 @@ class SurveyCell: UICollectionViewCell {
     
     comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray4
     watchButton.tintColor = item.isFavorite ? .label : .systemGray4
+    
+    imageContainer.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
   
   override func prepareForReuse() {
@@ -589,7 +591,7 @@ class SurveyCell: UICollectionViewCell {
 private extension SurveyCell {
   @MainActor
   func setupUI() {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground//.white.blended(withFraction: 0.2, of: .gray)
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCellDark : Colors.surveyCellLight//.white.blended(withFraction: 0.2, of: .gray)
     clipsToBounds = true
     
     let stackView = UIStackView(arrangedSubviews: [
@@ -745,7 +747,7 @@ private extension SurveyCell {
       else { return }
       
       titleLabel.text = item.title
-      titleLabel.textColor = item.isVisited ? .secondaryLabel : .label
+      titleLabel.textColor = item.isOwn ? .label : item.isVisited ? .secondaryLabel : .label
       descriptionLabel.text = item.truncatedDescription
       descriptionLabel.textColor = item.isVisited ? .secondaryLabel : .label
       
@@ -828,9 +830,11 @@ private extension SurveyCell {
         watchButton.removeFromSuperview()
         buttonsStack.removeArrangedSubview(claimButton)
         claimButton.removeFromSuperview()
-        if item.isComplete {
-          buttonsStack.insertArrangedSubview(watchButton, at: 0)
-          buttonsStack.insertArrangedSubview(comleteButton, at: 1)
+        if item.isComplete && item.isOwn {
+          buttonsStack.insertArrangedSubview(comleteButton, at: 0)
+        } else if item.isComplete {
+            buttonsStack.insertArrangedSubview(watchButton, at: 0)
+            buttonsStack.insertArrangedSubview(comleteButton, at: 1)
         } else {
           buttonsStack.removeArrangedSubview(comleteButton)
           comleteButton.removeFromSuperview()
@@ -839,9 +843,11 @@ private extension SurveyCell {
         }
       } else if buttonsStack.arrangedSubviews.filter({ $0 === claimButton }).isEmpty {
         buttonsStack.addArrangedSubview(claimButton)
-        if item.isComplete {
-          buttonsStack.insertArrangedSubview(watchButton, at: 0)
-          buttonsStack.insertArrangedSubview(comleteButton, at: 1)
+        if item.isComplete && item.isOwn {
+          buttonsStack.insertArrangedSubview(comleteButton, at: 0)
+        } else if item.isComplete {
+            buttonsStack.insertArrangedSubview(watchButton, at: 0)
+            buttonsStack.insertArrangedSubview(comleteButton, at: 1)
         } else {
           buttonsStack.removeArrangedSubview(comleteButton)
           comleteButton.removeFromSuperview()

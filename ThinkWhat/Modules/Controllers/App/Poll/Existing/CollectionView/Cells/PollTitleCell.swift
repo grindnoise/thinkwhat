@@ -68,36 +68,49 @@ class PollTitleCell: UICollectionViewCell {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
-  private lazy var topicView: UIStackView = {
-    let topicTitle = InsetLabel()
-    topicTitle.font = UIFont(name: Fonts.Bold, size: 14)
-    topicTitle.text = item.topic.title.uppercased()
-    topicTitle.textColor = .white
-    topicTitle.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
-    
-    let topicIcon = Icon(category: item.topic.iconCategory)
-    topicIcon.iconColor = .white
-    topicIcon.isRounded = false
-    topicIcon.clipsToBounds = false
-    topicIcon.scaleMultiplicator = 1.65
-    topicIcon.heightAnchor.constraint(equalTo: topicIcon.widthAnchor, multiplier: 1/1).isActive = true
-    
-    let instance = UIStackView(arrangedSubviews: [
-      topicIcon,
-      topicTitle
-    ])
-    instance.backgroundColor = item.topic.tagColor
-    instance.axis = .horizontal
-    instance.spacing = 2
-    instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
+  private lazy var tagCapsule: TagCapsule = {
+    let instance = TagCapsule(text: item.topic.isOther ? item.topic.parent!.title.uppercased() + item.topic.title.uppercased() : item.topic.title.uppercased(),
+                              padding: padding,
+                              textPadding: .init(top: padding/3, left: 0, bottom: padding/3, right: 0),
+                              color: item.topic.tagColor,
+                              font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!,
+                              isShadowed: false,
+                              iconCategory: item.topic.isOther ? item.topic.parent!.iconCategory : item.topic.iconCategory,
+                              image: nil)
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding/2).isActive = true
     
     return instance
   }()
+//  private lazy var topicView: UIStackView = {
+//    let topicTitle = InsetLabel()
+//    topicTitle.font = UIFont(name: Fonts.Rubik.SemiBold, size: 14)
+//    topicTitle.text = item.topic.title.uppercased()
+//    topicTitle.textColor = .white
+//    topicTitle.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+//    
+//    let topicIcon = Icon(category: item.topic.iconCategory)
+//    topicIcon.iconColor = .white
+//    topicIcon.isRounded = false
+//    topicIcon.clipsToBounds = false
+//    topicIcon.scaleMultiplicator = 1.65
+//    topicIcon.heightAnchor.constraint(equalTo: topicIcon.widthAnchor, multiplier: 1/1).isActive = true
+//    
+//    let instance = UIStackView(arrangedSubviews: [
+//      topicIcon,
+//      topicTitle
+//    ])
+//    instance.backgroundColor = item.topic.tagColor
+//    instance.axis = .horizontal
+//    instance.spacing = 2
+//    instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
+//    instance.publisher(for: \.bounds)
+//      .receive(on: DispatchQueue.main)
+//      .filter { $0 != .zero}
+//      .sink { instance.cornerRadius = $0.height/2.25 }
+//      .store(in: &subscriptions)
+//    
+//    return instance
+//  }()
   private lazy var avatar: Avatar = {
     let instance = Avatar(isShadowed: true)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
@@ -140,7 +153,7 @@ class PollTitleCell: UICollectionViewCell {
   }()
   private lazy var dateLabel: InsetLabel = {
     let instance = InsetLabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote)
     instance.textAlignment = .left
     instance.insets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 4)
     instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
@@ -154,7 +167,7 @@ class PollTitleCell: UICollectionViewCell {
   }()
   private lazy var usernameLabel: UILabel = {
     let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue,
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular,
                                       forTextStyle: .footnote)
     instance.textAlignment = .right
     instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
@@ -188,7 +201,7 @@ class PollTitleCell: UICollectionViewCell {
   }()
   private lazy var ratingLabel: UILabel = {
     let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote)
     instance.textAlignment = .center
     instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     instance.publisher(for: \.bounds)
@@ -217,7 +230,7 @@ class PollTitleCell: UICollectionViewCell {
   }()
   private lazy var viewsLabel: UILabel = {
     let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .footnote)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote)
     instance.textAlignment = .center
     instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     
@@ -260,7 +273,7 @@ class PollTitleCell: UICollectionViewCell {
   private lazy var titleLabel: UILabel = {
     let instance = UILabel()
     instance.textAlignment = .center
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .largeTitle)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .largeTitle)
     instance.numberOfLines = 0
     
 //    let constraint = instance.heightAnchor.constraint(equalToConstant: 0)
@@ -359,16 +372,16 @@ class PollTitleCell: UICollectionViewCell {
     
     leftStack.alpha = 0
     leftStack.transform = .init(scaleX: 0.75, y: 0.75)
-    topicView.placeTopLeading(inside: headerStack)
-    topicView.alpha = 1
+    tagCapsule.placeTopLeading(inside: headerStack)
+    tagCapsule.alpha = 1
     
     UIView.animate(withDuration: duration,
                    delay: 0,
                    options: .curveEaseInOut) { [weak self] in
       guard let self = self else { return }
       
-      self.topicView.alpha = 0
-      self.topicView.transform = .init(scaleX: 0.75, y: 0.75)
+      self.tagCapsule.alpha = 0
+      self.tagCapsule.transform = .init(scaleX: 0.75, y: 0.75)
       leftStack.alpha = 1
       leftStack.transform = .identity
     } completion: { _ in }
@@ -408,12 +421,12 @@ private extension PollTitleCell {
       headerStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
       headerStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
       headerStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
-      titleLabel.topAnchor.constraint(equalTo: headerStack.bottomAnchor, constant: padding*4),
+      titleLabel.topAnchor.constraint(equalTo: headerStack.bottomAnchor, constant: padding*5),
       titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding*2),
       titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding*2),
     ])
     
-    let constraint = titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding*4)
+    let constraint = titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding*5)
     constraint.priority = .defaultLow
     constraint.isActive = true
     
@@ -421,7 +434,7 @@ private extension PollTitleCell {
     titleLabel.text = item.title
     ratingLabel.text = String(describing: item.rating)
     viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
-    usernameLabel.text = item.isAnonymous ? "" : item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n\(item.owner.lastNameSingleWord)")
+    usernameLabel.text = item.isAnonymous ? "" : item.owner.username//item.owner.firstNameSingleWord + (item.owner.lastNameSingleWord.isEmpty ? "" : "\n\(item.owner.lastNameSingleWord)")
     avatar.userprofile = item.isAnonymous ? Userprofile.anonymous : item.owner
     
     guard let leftStack = headerStack.getSubview(type: UIStackView.self, identifier: "leftStack") else { return }
@@ -430,8 +443,8 @@ private extension PollTitleCell {
     
     if mode == .Preview || mode == .Transition {
       leftStack.transform = .init(scaleX: 0.75, y: 0.75)
-      topicView.placeTopLeading(inside: headerStack)
-      topicView.alpha = 1
+      tagCapsule.placeTopLeading(inside: headerStack)
+      tagCapsule.alpha = 1
     }
 
 //    guard let constraint = titleLabel.getConstraint(identifier: "height") else { return }

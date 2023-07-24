@@ -59,7 +59,6 @@ class Survey: Decodable {
       }
     }
     
-    
     var url: URL? {
       switch self {
       case .Hot:
@@ -84,6 +83,22 @@ class Survey: Decodable {
         return API_URLS.Surveys.byUserprofile
       case .Compatibility:
         return API_URLS.Surveys.listByIds
+      }
+    }
+    var localizedDescription: String {
+      switch self {
+      case .Subscriptions:
+        return "empty_pub_view_subscriptions".localized
+      case .New:
+        return "empty_pub_view_new".localized
+      case .Top:
+        return "empty_pub_view_top".localized
+      case .Own:
+        return "empty_pub_view_own".localized
+      case .Favorite:
+        return "empty_pub_view_watching".localized
+      default:
+        return "empty_pub_view_default".localized
       }
     }
   }

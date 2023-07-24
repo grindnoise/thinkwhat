@@ -23,9 +23,11 @@ class PercentageView: UIView {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
+  ///**UI**
   private let backgroundLine = CAShapeLayer()
   private let foregroundLine = CAShapeLayer()
+  private let bgLightColor: UIColor
+  private let bgDarkColor: UIColor
   private let lineWidth: CGFloat
   private var isAnimating = false
   
@@ -45,20 +47,16 @@ class PercentageView: UIView {
   
   // MARK: - Initialization
   init(lineWidth: CGFloat,
-       foregoundColor: UIColor? = nil,
-       backgroundColor: UIColor? = nil
-  ) {
+       foregoundColor: UIColor,
+       backgroundLightColor: UIColor = .secondarySystemBackground,
+       backgroundDarkColor: UIColor = .tertiarySystemBackground) {
     self.lineWidth = lineWidth
+    self.bgLightColor = backgroundLightColor
+    self.bgDarkColor = backgroundDarkColor
     
     super.init(frame: .zero)
     
-    if !foregoundColor.isNil {
-      foregroundLine.strokeColor = foregoundColor!.cgColor
-    }
-    if !backgroundColor.isNil {
-      backgroundLine.strokeColor = backgroundColor!.cgColor
-    }
-    accessibilityIdentifier = "PercentageView"
+    foregroundLine.strokeColor = foregoundColor.cgColor
     setupUI()
   }
   
@@ -112,6 +110,12 @@ class PercentageView: UIView {
     
     updateUI()
   }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    backgroundLine.strokeColor = traitCollection.userInterfaceStyle == .dark ? bgDarkColor.cgColor : bgLightColor.cgColor
+  }
 }
 
 private extension PercentageView {
@@ -122,6 +126,8 @@ private extension PercentageView {
     
     foregroundLine.strokeStart = 0
     foregroundLine.strokeEnd = 0
+    backgroundLine.strokeColor = traitCollection.userInterfaceStyle == .dark ? bgDarkColor.cgColor : bgLightColor.cgColor
+    accessibilityIdentifier = "PercentageView"
   }
   
   @MainActor
@@ -132,8 +138,8 @@ private extension PercentageView {
     backgroundPath.stroke()
     
     backgroundLine.path = backgroundPath.cgPath
-    backgroundLine.strokeColor = UIColor.systemGray6.cgColor
-    backgroundLine.lineWidth = 10
+//    backgroundLine.strokeColor = backgroundColor.cgColor
+    backgroundLine.lineWidth = lineWidth
     backgroundLine.lineCap = .round
 
     let foregroundPath = UIBezierPath()

@@ -31,9 +31,9 @@ class CommentsSectionCell: UICollectionViewCell {
       disclosureIndicator.alpha = item.isCommentingAllowed ? 1 : 0
       
       if item.isCommentingAllowed {
-        disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
+        headerLabel.text = "comments".localized.uppercased() + " (\(String(describing: item.commentsTotal)))"
       } else {
-        disclosureLabel.text = "comments_disabled".localized.uppercased()
+        headerLabel.text = "comments_disabled".localized.uppercased()
         closedConstraint.isActive = true
         openConstraint.isActive = false
       }
@@ -43,10 +43,10 @@ class CommentsSectionCell: UICollectionViewCell {
         .sink { [weak self] count in
           guard let self = self else { return }
           
-          self.disclosureLabel.text = "comments".localized.uppercased() + " (\(String(describing: count)))"
-          guard let constraint = self.disclosureLabel.getConstraint(identifier: "width") else { return }
+          self.headerLabel.text = "comments".localized.uppercased() + " (\(String(describing: count)))"
+          guard let constraint = self.headerLabel.getConstraint(identifier: "width") else { return }
           self.horizontalStack.setNeedsLayout()
-          constraint.constant = self.disclosureLabel.text!.width(withConstrainedHeight: 100, font: self.disclosureLabel.font)
+          constraint.constant = self.headerLabel.text!.width(withConstrainedHeight: 100, font: self.headerLabel.font)
           self.horizontalStack.layoutIfNeeded()
         }
         .store(in: &subscriptions)
@@ -80,48 +80,57 @@ class CommentsSectionCell: UICollectionViewCell {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
+  ///**UI**
   private let padding: CGFloat = 8
-  // Stacks
-  private lazy var disclosureLabel: UILabel = {
+  private lazy var headerImage: UIImageView = {
+    let instance = UIImageView(image: UIImage(systemName: "bubble.right.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
+    instance.tintColor = Colors.cellHeader
+    instance.contentMode = .scaleAspectFit
+    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
+    
+    return instance
+  }()
+  private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = .secondaryLabel
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)
+    instance.textColor = Colors.cellHeader
     instance.text = "comments".localized.uppercased()
-    
-//    let constraint = instance.widthAnchor.constraint(equalToConstant: instance.text!.width(withConstrainedHeight: 100, font: instance.font))
-//    constraint.identifier = "width"
-//    constraint.isActive = true
-    
+    instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
+
+    let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
+    heightConstraint.identifier = "height"
+    heightConstraint.priority = .defaultHigh
+    heightConstraint.isActive = true
+
+    instance.publisher(for: \.bounds, options: .new)
+      .sink { [weak self] rect in
+        guard let self = self,
+              let constraint = instance.getConstraint(identifier: "height")
+        else { return }
+
+        self.setNeedsLayout()
+        constraint.constant = instance.text!.height(withConstrainedWidth: 1000, font: instance.font)
+        self.layoutIfNeeded()
+      }
+      .store(in: &subscriptions)
+
     return instance
   }()
   private lazy var disclosureIndicator: UIImageView = {
     let instance = UIImageView()
     instance.image = UIImage(systemName: "chevron.down")
-    instance.tintColor = .secondaryLabel
+    instance.tintColor = Colors.cellHeader
     instance.contentMode = .center
     instance.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
     
     return instance
   }()
-  private lazy var icon: UIView = {
-    let imageView = UIImageView(image: UIImage(systemName: "bubble.right.fill",
-                                               withConfiguration: UIImage.SymbolConfiguration(pointSize: "1".height(withConstrainedWidth: 100,
-                                                                                                                    font: disclosureLabel.font)*0.75)))
-    imageView.tintColor = .secondaryLabel
-    imageView.contentMode = .center
-    imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: 1/1).isActive = true
-    
-    return imageView
-  }()
   private lazy var horizontalStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      icon,
-      disclosureLabel,
-      disclosureIndicator
-    ])
+    let instance = UIStackView(arrangedSubviews: [headerImage,
+                                                  headerLabel,
+                                                  disclosureIndicator,
+                                                  UIView.opaque()])
     instance.alignment = .center
-    let constraint = instance.heightAnchor.constraint(equalToConstant: "test".height(withConstrainedWidth: contentView.bounds.width, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .caption1)!))
+    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font))
     constraint.identifier = "height"
     constraint.isActive = true
     instance.spacing = 4
@@ -130,16 +139,8 @@ class CommentsSectionCell: UICollectionViewCell {
     return instance
   }()
   private lazy var verticalStack: UIStackView = {
-    let opaque = UIView()
-    opaque.backgroundColor = .clear
-    opaque.addSubview(horizontalStack)
-    horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-    horizontalStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor, constant: padding).isActive = true
-    horizontalStack.topAnchor.constraint(equalTo: opaque.topAnchor).isActive = true
-    horizontalStack.bottomAnchor.constraint(equalTo: opaque.bottomAnchor).isActive = true
-    
     let verticalStack = UIStackView(arrangedSubviews: [
-      opaque,
+      horizontalStack,
       collectionView
     ])
     verticalStack.axis = .vertical

@@ -19,6 +19,13 @@ class SurveysCollectionView: UICollectionView {
   typealias Source = UICollectionViewDiffableDataSource<Section, SurveyReference>
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, SurveyReference>
   
+//  override var bounds: CGRect {
+//    didSet {
+//      guard bounds.size != emptyPublicationsView.bounds.size else { return }
+//
+//      emptyPublicationsView.frame = bounds
+//    }
+//  }
   // MARK: - Public properties
   public weak var topic: Topic? {
     didSet {
@@ -91,7 +98,7 @@ class SurveysCollectionView: UICollectionView {
   public var settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public let scrollPublisher = PassthroughSubject<Bool, Never>()
   public let deinitPublisher = PassthroughSubject<Bool, Never>()
-  public let emptyPublicationsPublisher = PassthroughSubject<Bool, Never>()
+  public let emptyPublicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
   ///**UI**
   public var color: UIColor = .secondaryLabel {
     didSet {
@@ -164,6 +171,13 @@ class SurveysCollectionView: UICollectionView {
     return items.uniqued().sorted { $0.startDate > $1.startDate }
   }
   private let isLoadingPublisher = PassthroughSubject<Bool, Never>()
+//  private var zeroItems = false {
+//    didSet {
+//      guard oldValue != zeroItems else { return }
+//
+//      toggleEmptyView(zeroItems)
+//    }
+//  }
   ///Scroll direction
   private var lastStopYPoint: CGFloat = .zero
   private var lastContentOffsetY: CGFloat = 0 {
@@ -199,6 +213,13 @@ class SurveysCollectionView: UICollectionView {
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var spinner: SpiralSpinner = { SpiralSpinner() }()
+//  private lazy var emptyPublicationsView: EmptyPublicationsView = {
+//    let instance = EmptyPublicationsView()
+//    instance.alpha = 0
+//    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+//    
+//    return instance
+//  }()
 //  private lazy var loadingIndicator: LoadingIndicator = {
 //    let instance = LoadingIndicator(color: color,
 //                                    duration: 0.5,
@@ -246,9 +267,11 @@ class SurveysCollectionView: UICollectionView {
   }
   
   init(category: Survey.SurveyCategory,
-       color: UIColor? = nil) {
+       color: UIColor? = nil,
+       period: Period = .AllTime) {
     self.category = category
     self.color = color ?? .secondaryLabel
+    self.period = period
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
@@ -310,6 +333,18 @@ class SurveysCollectionView: UICollectionView {
   }
   
   // MARK: - Public methods
+  public func didAppear() {
+//    guard category != .Subscriptions, source.snapshot().itemIdentifiers.isEmpty else { return }
+//
+//    emptyPublicationsView.setAnimationsEnabled(true)
+  }
+  
+  public func didDisappear() {
+//    guard category != .Subscriptions else { return }
+//
+//    emptyPublicationsView.setAnimationsEnabled(false)
+  }
+  
   @MainActor @objc
   public func endRefreshing() {
     refreshControl?.endRefreshing()
@@ -335,6 +370,14 @@ class SurveysCollectionView: UICollectionView {
 //
 //      self.searchSpinner.alpha = 1
 //    } completion: { _ indff self.searchSpinner.stopAnimating() }
+  }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+//    guard category != .Subscriptions else { return }
+//
+//    emptyPublicationsView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
   }
 }
 
@@ -413,7 +456,7 @@ private extension SurveysCollectionView {
       
       let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
       sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-      sectionLayout.interGroupSpacing = 20
+      sectionLayout.interGroupSpacing = 1
       
       return sectionLayout
     }
@@ -509,10 +552,10 @@ private extension SurveysCollectionView {
         }
         .store(in: &self.subscriptions)
       
-      var config = UIBackgroundConfiguration.listPlainCell()
-      config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
-      cell.backgroundConfiguration = config
-      cell.automaticallyUpdatesBackgroundConfiguration = false
+//      var config = UIBackgroundConfiguration.listPlainCell()
+//      config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.surveyCellDark : Colors.surveyCellLight
+//      cell.backgroundConfiguration = config
+//      cell.automaticallyUpdatesBackgroundConfiguration = true
     }
     
     let loaderRegistration = UICollectionView.SupplementaryRegistration<LoaderCell>(elementKind: UICollectionView.elementKindSectionFooter) { [unowned self] supplementaryView,_,_ in
@@ -543,6 +586,16 @@ private extension SurveysCollectionView {
     source.supplementaryViewProvider = { collectionView, elementKind, indexPath -> UICollectionReusableView? in
       return collectionView.dequeueConfiguredReusableSupplementary(using: loaderRegistration, for: indexPath)
     }
+    
+//    if category != .Subscriptions {
+//      addSubview(emptyPublicationsView)
+////      emptyPublicationsView.translatesAutoresizingMaskIntoConstraints = false
+////      emptyPublicationsView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+////      emptyPublicationsView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+////      emptyPublicationsView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+////      emptyPublicationsView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+////      emptyPublicationsView.place(inside: self)
+//    }
     
     setDataSource(animatingDifferences: false)
   }
@@ -579,12 +632,13 @@ private extension SurveysCollectionView {
         self.updateStatsPublisher.send(items)
       }
       .store(in: &subscriptions)
+    
     ///Check if survey became old
     Timer.publish(every: 5, on: .main, in: .common)
       .autoconnect()
       .filter {[weak self] _ in
         guard let self = self else { return false }
-        
+
         return !self.source.snapshot().itemIdentifiers.isEmpty
       }
       .sink { [weak self] _ in
@@ -593,13 +647,13 @@ private extension SurveysCollectionView {
               self.category == .New,
               let expiredDate = Calendar.current.date(byAdding: .day, value: -30, to: Date())
         else { return }
-        
+
         var snap = self.source.snapshot()
         snap.deleteItems(snap.itemIdentifiers.filter { $0.startDate < expiredDate })
-//        self.source.apply(snap, animatingDifferences: true)
-        self.apply(source: self.source, snapshot: snap)
+//        self.source.apply(snap, animatingDifferences: true)        self.apply(source: self.source, snapshot: snap)
       }
       .store(in: &subscriptions)
+    
     ///If bottom spinner is on screen more than n seconds, then hide it
     Timer.publish(every: 8, on: .main, in: .common)
       .autoconnect()
@@ -898,10 +952,13 @@ private extension SurveysCollectionView {
 #if DEBUG
       print("isLoading", self.isLoading, to: &logger)
 #endif
-
+      
       if !isLoading {
         self.isLoadingPublisher.send(self.isLoading)
       }
+      
+      self.emptyPublicationsPublisher.send(snapshot.itemIdentifiers.isEmpty)
+//      self.zeroItems = snapshot.itemIdentifiers.isEmpty
       
       source.apply(snapshot, animatingDifferences: true) { [weak self] in
         guard let self = self else { return }
@@ -912,7 +969,9 @@ private extension SurveysCollectionView {
           self.isLoadingPublisher.send(self.isLoading)
         }
 //        switchEmptyLabel()
-        self.emptyPublicationsPublisher.send(self.source.snapshot().itemIdentifiers.isEmpty)
+//        if self.source.snapshot().itemIdentifiers.isEmpty {
+//          self.emptyPublicationsPublisher.send(self.source.snapshot().itemIdentifiers.isEmpty)
+//        }
         
         if let completion = completion { completion() }
       }
@@ -924,9 +983,9 @@ private extension SurveysCollectionView {
       guard let self = self else { return }
       
       self.isApplyingSnapshot = true
-#if DEBUG
-      print("isLoading", self.isLoading, to: &logger)
-#endif
+//#if DEBUG
+//      print("isLoading", self.isLoading, to: &logger)
+//#endif
 
       if !self.isLoading {
         self.isLoadingPublisher.send(self.isLoading)
@@ -949,4 +1008,30 @@ private extension SurveysCollectionView {
       }
     }
   }
+  
+//  func toggleEmptyView(_ isEmpty: Bool) {
+//    guard category != .Subscriptions else { return }
+//
+//    if isEmpty {
+//      emptyPublicationsView.mode = category
+//      emptyPublicationsView.alpha = 0
+//      emptyPublicationsView.setAnimationsEnabled(true)
+//    }
+//
+//    UIView.animate(
+//      withDuration: 0.2,
+//      delay: 0,
+//      options: [.curveEaseInOut],
+//      animations: { [weak self] in
+//        guard let self = self else { return }
+//
+//        self.emptyPublicationsView.alpha =  isEmpty ? 1 : 0
+//      }) { [weak self] _ in
+//        guard let self = self else { return }
+//
+//        if !isEmpty {
+//          self.emptyPublicationsView.setAnimationsEnabled(false)
+//        }
+//      }
+//  }
 }

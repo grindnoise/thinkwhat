@@ -9,39 +9,91 @@
 import UIKit
 import Combine
 
-class EmptySubscriptionsView: UIView {
-  
+class EmptyPublicationsView: UIView {
   // MARK: - Overridden properties
   
   
   
   // MARK: - Public properties
-  public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: "#1E1E1E".hexColor!.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.7 : 0.03)) }()
-  
-  
+  public private(set) lazy var spiral: Icon = {
+    Icon(frame: .zero, category: .Spiral,
+         scaleMultiplicator: 1,
+         iconColor: traitCollection.userInterfaceStyle == .dark ? spiralDarkColor : spiralLightColor) }()
+  ///**Publishers**
+  public let buttonTapEvent = PassthroughSubject<Void, Never>()
+  ///**UI**
+  public var backgroundLightColor: UIColor {
+    didSet {
+      guard oldValue != backgroundLightColor, traitCollection.userInterfaceStyle != .dark else { return }
+      
+      backgroundColor = backgroundLightColor
+      updateGradient()
+    }
+  }
+  public var backgroundDarkColor: UIColor {
+    didSet {
+      guard oldValue != backgroundDarkColor, traitCollection.userInterfaceStyle == .dark else { return }
+      
+      backgroundColor = backgroundDarkColor
+      updateGradient()
+    }
+  }
+  public var spiralLightColor: UIColor {
+    didSet {
+      guard oldValue != spiralLightColor, traitCollection.userInterfaceStyle != .dark else { return }
+      
+      backgroundColor = spiralLightColor
+    }
+  }
+  public var spiralDarkColor: UIColor {
+    didSet {
+      guard oldValue != spiralDarkColor, traitCollection.userInterfaceStyle == .dark else { return }
+      
+      backgroundColor = spiralDarkColor
+    }
+  }
   
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
+  ///**Logic**
+  private let mode: Survey.SurveyCategory
+  private let showsButton: Bool
+  private let showsLogo: Bool
   ///**UI**
-  private let padding: CGFloat = 16
-  private lazy var label: UIView = {
-    let opaque = UIView.opaque()
-    opaque.layer.masksToBounds = false
-    
+  private let labelText: String
+  private let buttonText: String
+  private let buttonColor: UIColor
+  private lazy var logoIcon: Logo = { Logo() }()
+  private lazy var label: UILabel = {
     let instance = UILabel()
-    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold,
-                                      forTextStyle: .largeTitle)
-    instance.text = "zero_subscriptions".localized
-    instance.textColor = .secondaryLabel
-    instance.textAlignment = .center
     instance.numberOfLines = 0
+    instance.attributedText = NSAttributedString(string: !labelText.isEmpty ? labelText.localized : mode == .Subscriptions ? mode.localizedDescription : Survey.SurveyCategory.All.localizedDescription,
+                                                 attributes: [
+                                                  .font: UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .headline) as Any,
+                                                  .foregroundColor: UIColor.secondaryLabel,
+                                                  .paragraphStyle: { let paragraphStyle = NSMutableParagraphStyle(); paragraphStyle.lineSpacing = padding/2; return paragraphStyle }(),
+                                                 ])
+    instance.textAlignment = .center
     
-    instance.place(inside: opaque)
+    return instance
+  }()
+  private lazy var stack: UIStackView = {
+    let instance = UIStackView()
+    instance.axis = .vertical
+    instance.spacing = 20
     
-    return opaque
+    return instance
+  }()
+  private let padding: CGFloat = 16
+  private lazy var blur: UIVisualEffectView = {
+    let instance = UIVisualEffectView(effect: UIBlurEffect(style: traitCollection.userInterfaceStyle == .dark ? .systemUltraThinMaterialDark : .systemUltraThinMaterial))
+    instance.cornerRadius = padding
+    stack.place(inside: instance.contentView, insets: .uniform(size: padding*2))
+    
+    return instance
   }()
   private let maxItems = 16
   private var items = [Icon]() {
@@ -54,12 +106,58 @@ class EmptySubscriptionsView: UIView {
   private var shouldTerminate = false
   private lazy var fadeGradient: CAGradientLayer = {
     let instance = CAGradientLayer()
-    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.systemBackground.cgColor
+    let clear = (traitCollection.userInterfaceStyle == .dark ? backgroundDarkColor : backgroundLightColor).withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? backgroundDarkColor.cgColor : backgroundLightColor.cgColor
     instance.setGradient(colors: [feathered, clear, clear, feathered],
                          locations: [0.0, 0.15, 0.85, 1.0])
     
     return instance
+  }()
+  public private(set) lazy var button: UIView = {
+    let opaque = UIView.opaque()
+    opaque.layer.masksToBounds = false
+    
+    let instance = UIButton()
+    instance.layer.zPosition = 100
+    instance.addTarget(self,
+                       action: #selector(self.handleTap),
+                       for: .touchUpInside)
+    if #available(iOS 15, *) {
+      var config = UIButton.Configuration.filled()
+      config.cornerStyle = .capsule
+      config.baseBackgroundColor = buttonColor
+      config.attributedTitle = AttributedString(buttonText.localized,
+                                                attributes: AttributeContainer([
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                  .foregroundColor: UIColor.white as Any
+                                                ]))
+      instance.configuration = config
+    } else {
+      instance.backgroundColor = buttonColor
+      instance.publisher(for: \.bounds)
+        .sink { instance.cornerRadius = $0.height/2 }
+        .store(in: &subscriptions)
+      instance.setAttributedTitle(NSAttributedString(string: buttonText.localized,
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                      .foregroundColor: UIColor.white as Any
+                                                     ]),
+                                  for: .normal)
+    }
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
+    opaque.publisher(for: \.bounds)
+      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
+      .sink { [unowned self] in
+        opaque.layer.shadowOpacity = 1
+        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+      }
+      .store(in: &subscriptions)
+    instance.place(inside: opaque)
+    
+    return opaque
   }()
   
   
@@ -78,7 +176,27 @@ class EmptySubscriptionsView: UIView {
   
   
   // MARK: - Initialization
-  init() {
+  init(mode: Survey.SurveyCategory = .All,
+       labelText: String = "",
+       showsButton: Bool = false,
+       showsLogo: Bool = false,
+       buttonText: String = "",
+       buttonColor: UIColor = Colors.main,
+       backgroundLightColor: UIColor = .clear,
+       backgroundDarkColor: UIColor = .clear,
+       spiralLightColor: UIColor = "#1E1E1E".hexColor!.withAlphaComponent(0.04),
+       spiralDarkColor: UIColor = "#1E1E1E".hexColor!.withAlphaComponent(0.7)) {
+    self.mode = mode
+    self.labelText = labelText
+    self.showsLogo = showsLogo
+    self.showsButton = showsButton
+    self.buttonText = buttonText
+    self.buttonColor = buttonColor
+    self.backgroundLightColor = backgroundLightColor
+    self.backgroundDarkColor = backgroundDarkColor
+    self.spiralDarkColor = spiralDarkColor
+    self.spiralLightColor = spiralLightColor
+    
     super.init(frame: .zero)
     
     setupUI()
@@ -108,23 +226,31 @@ class EmptySubscriptionsView: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    label.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
-    spiral.setIconColor("#1E1E1E".hexColor!.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.7 : 0.03))
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? backgroundDarkColor : backgroundLightColor
+    spiral.setIconColor(traitCollection.userInterfaceStyle == .dark ? spiralDarkColor : spiralLightColor)
     
-    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.systemBackground.cgColor
-    fadeGradient.setGradient(colors: [feathered, clear, clear, feathered], locations: [0.0, 0.15, 0.85, 1.0])
+    // Set gradient colors
+    updateGradient()
+    
+    // Blur effect
+    blur.effect = UIBlurEffect(style: traitCollection.userInterfaceStyle == .dark ? .systemUltraThinMaterialDark : .systemUltraThinMaterial)
   }
 }
 
-private extension EmptySubscriptionsView {
+private extension EmptyPublicationsView {
   @MainActor
   func setupUI() {
     layer.masksToBounds = true
-    backgroundColor = .clear
-    label.placeInCenter(of: self)
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? backgroundDarkColor : backgroundLightColor
     
-    insertSubview(spiral, belowSubview: label)
+    if showsLogo {
+      stack.addArrangedSubview(logoIcon)
+    }
+    
+    blur.placeInCenter(of: self)
+    stack.addArrangedSubview(label)
+    
+    insertSubview(spiral, belowSubview: blur)
     spiral.translatesAutoresizingMaskIntoConstraints = false
     spiral.heightAnchor.constraint(equalTo: spiral.widthAnchor).isActive = true
     spiral.widthAnchor.constraint(equalTo: heightAnchor, multiplier: 1.5).isActive = true
@@ -132,23 +258,42 @@ private extension EmptySubscriptionsView {
     spiral.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
     spiral.startRotating(duration: 15)
     
-    label.layer.masksToBounds = false
-    label.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
-    label.layer.shadowOffset = .zero
-    label.layer.shadowRadius = padding
-    label.layer.shadowOpacity = 1
-    label.publisher(for: \.bounds)
-//      .filter { [unowned self] in $0.size != self.label.bounds.size }
-      .sink { [unowned self] in self.label.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath }
-      .store(in: &subscriptions)
+    if showsLogo {
+      logoIcon.translatesAutoresizingMaskIntoConstraints = false
+      logoIcon.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.31).isActive = true
+    }
+    
+    //    label.layer.masksToBounds = false
+    //    label.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    //    label.layer.shadowOffset = .zero
+    //    label.layer.shadowRadius = padding
+    //    label.layer.shadowOpacity = 1
+    //    label.publisher(for: \.bounds)
+    ////      .filter { [unowned self] in $0.size != self.label.bounds.size }
+    //      .sink { [unowned self] in
+    //        self.label.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+    //
+    ////        guard let bg = self.label.getSubview(type: UIView.self, identifier: "bg") else { return }
+    ////
+    ////        bg.cornerRadius = $0.width * 0.025
+    //      }
+    //      .store(in: &subscriptions)
     
     publisher(for: \.bounds)
       .sink { [unowned self] in self.fadeGradient.frame = $0 }
       .store(in: &subscriptions)
     
-    setAnimationsEnabled(true)
+    //    setAnimationsEnabled(true)
     
     layer.addSublayer(fadeGradient)
+    
+    if showsButton {
+      addSubview(button)
+      button.translatesAutoresizingMaskIntoConstraints = false
+      button.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
+      button.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+      button.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -padding*2).isActive = true
+    }
   }
   
   @MainActor
@@ -158,27 +303,36 @@ private extension EmptySubscriptionsView {
   
   func generateItems(_ count: Int) {
     func getRandomCategory() -> Icon.Category {
-      let all = [
-        10038,
-        10039,
-        10040,
-        10041,
-        10064,
-        10047,
-        11002,
-        42,
-      ].map { Icon.Category(rawValue: $0)! }
-      
-      return all[Int.random(in: 0..<all.count-1)]
+      switch self.mode {
+      case.Subscriptions:
+        let all = [
+          10038,
+          10039,
+          10040,
+          10041,
+          10064,
+          10047,
+          11002,
+          42,
+        ].map { Icon.Category(rawValue: $0)! }
+        
+        return all[Int.random(in: 0..<all.count-1)]
+      default:
+        let all = Set(Topics.shared.all.filter({ !$0.isOther }).map { $0.iconCategory })
+        let current = Set(items.map { $0.category })
+        let diff = all.subtracting(current)
+        
+        return Array(diff)[Int.random(in: 0...diff.count - 1)]
+      }
     }
     
-    delay(seconds: Double.random(in: 0.2...2)) {[weak self] in
+    delay(seconds: items.count < maxItems/2 ? 0 : Double.random(in: 0.2...2)) {[weak self] in
       guard let self = self,
             self.items.count < self.maxItems
       else { return }
       
       let category = getRandomCategory()
-      let random = Icon(frame: CGRect(origin: self.randomPoint(), size: .uniform(size: CGFloat.random(in: 30...70))))
+      let random = Icon(frame: CGRect(origin: self.randomPoint(), size: .uniform(size: CGFloat.random(in: 20...50))))
       let color = UIColor.random()
       random.iconColor = color
       random.scaleMultiplicator = 1
@@ -195,7 +349,7 @@ private extension EmptySubscriptionsView {
       random.icon.shadowColor = color.cgColor
       random.icon.shadowRadius = random.bounds.width * 0.3
       
-      self.insertSubview(random, belowSubview: self.label)
+      self.insertSubview(random, belowSubview: self.blur)
       self.items.append(random)
       let duration = TimeInterval.random(in: 4...12)
       UIView.animate(withDuration: duration) {
@@ -211,11 +365,25 @@ private extension EmptySubscriptionsView {
         }
       })
       
-      UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
-        random.alpha = CGFloat.random(in: 0.2...0.6)
+      UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) { [weak self] in
+        guard let self = self else { return }
+        
+        random.alpha = CGFloat.random(in: self.traitCollection.userInterfaceStyle == .dark ? 0.2...0.6 : 0.3...0.7)
         random.transform = .identity
       }
     }
+  }
+  
+  func updateGradient() {
+    let clear = (traitCollection.userInterfaceStyle == .dark ? backgroundDarkColor : backgroundLightColor).withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? backgroundDarkColor.cgColor : backgroundLightColor.cgColor
+    fadeGradient.setGradient(colors: [feathered, clear, clear, feathered],
+                         locations: [0.0, 0.15, 0.85, 1.0])
+  }
+  
+  @objc
+  func handleTap() {
+    buttonTapEvent.send()
   }
 }
 

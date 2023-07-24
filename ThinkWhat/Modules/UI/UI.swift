@@ -407,6 +407,12 @@ enum Colors {
   static var bannerDark: UIColor { UIColor(hexString: "#494949") }
   static var bannerLight: UIColor { UIColor.systemBackground } // UIColor { UIColor(hexString: "#F1F0F0") }
   static var cellHeader: UIColor { UIColor.lightGray }
+  static var spiralLight: UIColor { "#1E1E1E".hexColor!.withAlphaComponent(0.03) }
+  static var spiralDark: UIColor { "#1E1E1E".hexColor!.withAlphaComponent(0.55) }
+  static var surveyCollectionLight: UIColor { .secondarySystemBackground }
+  static var surveyCollectionDark: UIColor { .secondarySystemBackground }
+  static var surveyCellLight: UIColor { .white }
+  static var surveyCellDark: UIColor { UIColor(hexString: "#262626") }
 }
 
 //extension Color: RawRepresentable {
