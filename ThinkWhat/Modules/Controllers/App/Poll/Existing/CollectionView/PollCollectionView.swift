@@ -271,7 +271,7 @@ private extension PollCollectionView {
                           right: self.padding)
       cell.attributes = [
         .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
-        .foregroundColor: UIColor.secondaryLabel,
+        .foregroundColor: UIColor.label,
         .paragraphStyle: paragraphStyle
       ]
       cell.text = self.item.question

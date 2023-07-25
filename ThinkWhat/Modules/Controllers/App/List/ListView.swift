@@ -75,29 +75,22 @@ class ListView: UIView {
     let shadowView = UIView.opaque()
     shadowView.layer.masksToBounds = false
     shadowView.accessibilityIdentifier = "shadow"
-    instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-    instance.layer.shadowRadius = 5
-    instance.layer.shadowOffset = .zero
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    shadowView.layer.shadowRadius = 5
+    shadowView.layer.shadowOffset = .zero
     shadowView.publisher(for: \.bounds)
-      .sink {
-//        shadowView.layer.shadowRadius = $0.height/8
-        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
-      }
+      .sink { shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath }
       .store(in: &subscriptions)
 
     periodButton.placeInCenter(of: instance)
-    
+    instance.insertSubview(shadowView, belowSubview: periodButton)
     shadowView.translatesAutoresizingMaskIntoConstraints = false
-        instance.insertSubview(shadowView, belowSubview: periodButton)
+    shadowView.heightAnchor.constraint(equalTo: periodButton.heightAnchor).isActive = true
+    shadowView.widthAnchor.constraint(equalTo: periodButton.widthAnchor).isActive = true
+    shadowView.centerXAnchor.constraint(equalTo: periodButton.centerXAnchor).isActive = true
+    shadowView.centerYAnchor.constraint(equalTo: periodButton.centerYAnchor).isActive = true
     
-    NSLayoutConstraint.activate([
-      shadowView.leadingAnchor.constraint(equalTo: periodButton.leadingAnchor),
-      shadowView.topAnchor.constraint(equalTo: periodButton.topAnchor),
-      shadowView.trailingAnchor.constraint(equalTo: periodButton.trailingAnchor),
-      shadowView.bottomAnchor.constraint(equalTo: periodButton.bottomAnchor),
-    ])
-
     return instance
   }()
   private lazy var periodButton: UIButton = {
@@ -413,6 +406,7 @@ class ListView: UIView {
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+//    filterView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .label : .darkGray
     background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
 //    if #available(iOS 15, *) {

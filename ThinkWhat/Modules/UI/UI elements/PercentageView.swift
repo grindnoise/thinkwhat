@@ -26,9 +26,21 @@ class PercentageView: UIView {
   ///**UI**
   private let backgroundLine = CAShapeLayer()
   private let foregroundLine = CAShapeLayer()
-  private let bgLightColor: UIColor
-  private let bgDarkColor: UIColor
-  private let lineWidth: CGFloat
+  private var bgLightColor: UIColor {
+    didSet {
+      guard oldValue != bgLightColor, traitCollection.userInterfaceStyle != .dark else { return }
+      
+      backgroundLine.strokeColor = bgLightColor.cgColor
+    }
+  }
+  private var bgDarkColor: UIColor {
+    didSet {
+      guard oldValue != bgDarkColor, traitCollection.userInterfaceStyle == .dark else { return }
+      
+      backgroundLine.strokeColor = bgDarkColor.cgColor
+    }
+  }
+  public let lineWidth: CGFloat
   private var isAnimating = false
   
   
@@ -102,6 +114,14 @@ class PercentageView: UIView {
       backgroundLine.strokeColor = background.cgColor
       return
     }
+  }
+  
+  public func setBackgroundLightColor(_ color: UIColor) {
+    bgLightColor = color
+  }
+  
+  public func setBackgroundDarkColor(_ color: UIColor) {
+    bgDarkColor = color
   }
   
   // MARK: - Overridden methods

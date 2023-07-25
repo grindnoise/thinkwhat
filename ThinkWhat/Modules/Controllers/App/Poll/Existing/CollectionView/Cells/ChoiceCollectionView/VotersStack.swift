@@ -106,6 +106,7 @@ class VotersStack: UIView {
           insertSubview(pushed, belowSubview: listener)
           pushed.translatesAutoresizingMaskIntoConstraints = false
           pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+          pushed.widthAnchor.constraint(equalTo: heightAnchor).isActive = true
           let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
           constraint.identifier = "anchor"
           constraint.isActive = true
@@ -114,6 +115,7 @@ class VotersStack: UIView {
           insertSubview(pushed, belowSubview: listener)
           pushed.translatesAutoresizingMaskIntoConstraints = false
           pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+          pushed.widthAnchor.constraint(equalTo: heightAnchor).isActive = true
           let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
           constraint.identifier = "anchor"
           constraint.isActive = true
@@ -270,8 +272,8 @@ private extension VotersStack {
     
     ///Intersection by 1/3
     let constraint = widthAnchor.constraint(equalTo: heightAnchor,
-                           multiplier: CGFloat(capacity - 1))
-    constraint.constant = -intersection//(36)*(1/3)
+                                            multiplier: CGFloat(Double(capacity)-0.5))// - 1))
+    constraint.constant = -intersection/2//(36)*(1/3)
     constraint.isActive = true
     //*0.7).isActive = true
 //

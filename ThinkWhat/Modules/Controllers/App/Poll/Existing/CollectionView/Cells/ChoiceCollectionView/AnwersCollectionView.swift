@@ -97,6 +97,7 @@ private extension AnswersCollectionView {
   func setupUI() {
     delegate = self
     clipsToBounds = false
+    layer.masksToBounds = false
 //    allowsMultipleSelection = //mode == .ReadOnly ? true : false
     
     collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
@@ -113,6 +114,7 @@ private extension AnswersCollectionView {
     let cellRegistration = UICollectionView.CellRegistration<AnswerCell, Answer> { [weak self] cell, indexPath, item in
       guard let self = self else { return }
       
+      cell.contentView.layer.masksToBounds = false
       cell.item = item
       cell.selectionPublisher
         .sink { [unowned self] in

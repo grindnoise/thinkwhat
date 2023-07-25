@@ -34,60 +34,16 @@ class PollController: UIViewController {
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var avatar: Avatar = { Avatar() }()
-  private lazy var topicIcon: Icon = {
-    let instance = Icon(category: item.topic.iconCategory)
-    instance.iconColor = .white
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.65
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    
-    return instance
+  private lazy var titleView: TagCapsule = {
+    TagCapsule(text: item.topic.title.uppercased(),
+               padding: padding/2,
+               textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding),
+               color: item.topic.tagColor,
+               font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
+               isShadowed: false,
+               iconCategory: item.topic.iconCategory)
   }()
-  private lazy var topicTitle: InsetLabel = {
-    let instance = InsetLabel()
-    instance.font = UIFont(name: Fonts.Bold, size: 20)
-    instance.text = item.topic.title.uppercased()
-    instance.textColor = .white
-    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
-    
-    return instance
-  }()
-  private lazy var topicView: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      topicIcon,
-      topicTitle
-    ])
-    instance.backgroundColor = item.topic.tagColor
-    instance.axis = .horizontal
-    instance.spacing = 2
-    instance.alpha = 0
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
-  private var spinner: SpiralSpinner!// = { SpiralSpinner() }()
-//  private lazy var loadingIndicator: LoadingIndicator = {
-//    let instance = LoadingIndicator(color: item.isNil ? Colors.main : item.topic.tagColor,
-//                                    duration: 0.5)
-//    instance.didDisappearPublisher
-//      .sink { [weak self] _ in
-//        guard let self = self,
-//              let survey = self.item.survey
-//        else { return }
-//
-//        self.navigationController?.setNavigationBarHidden(false, animated: true)
-//        self.controllerOutput?.presentView(survey)
-//        instance.removeFromSuperview()
-//      }
-//      .store(in: &subscriptions)
-//
-//    return instance
-//  }()
+  private var spinner: SpiralSpinner!
 
   
   
@@ -242,7 +198,7 @@ private extension PollController {
     navigationController?.interactivePopGestureRecognizer?.delegate = self
     navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark)
     navigationController?.setBarTintColor(item.topic.tagColor)
-    navigationItem.titleView = topicView
+    navigationItem.titleView = titleView
     setBarButtonItems()
     
 //    guard let navigationBar = navigationController?.navigationBar else { return }

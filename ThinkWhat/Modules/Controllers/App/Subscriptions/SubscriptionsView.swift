@@ -119,18 +119,14 @@ class SubscriptionsView: UIView {
         shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
       }
       .store(in: &subscriptions)
-
+    
     periodButton.placeInCenter(of: instance)
-    
+    instance.insertSubview(shadowView, belowSubview: periodButton)
     shadowView.translatesAutoresizingMaskIntoConstraints = false
-        instance.insertSubview(shadowView, belowSubview: periodButton)
-    
-    NSLayoutConstraint.activate([
-      shadowView.leadingAnchor.constraint(equalTo: periodButton.leadingAnchor),
-      shadowView.topAnchor.constraint(equalTo: periodButton.topAnchor),
-      shadowView.trailingAnchor.constraint(equalTo: periodButton.trailingAnchor),
-      shadowView.bottomAnchor.constraint(equalTo: periodButton.bottomAnchor),
-    ])
+    shadowView.heightAnchor.constraint(equalTo: periodButton.heightAnchor).isActive = true
+    shadowView.widthAnchor.constraint(equalTo: periodButton.widthAnchor).isActive = true
+    shadowView.centerXAnchor.constraint(equalTo: periodButton.centerXAnchor).isActive = true
+    shadowView.centerYAnchor.constraint(equalTo: periodButton.centerYAnchor).isActive = true
 
     return instance
   }()

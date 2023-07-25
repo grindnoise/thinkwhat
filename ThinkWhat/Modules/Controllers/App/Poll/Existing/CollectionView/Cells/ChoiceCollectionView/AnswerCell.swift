@@ -45,21 +45,20 @@ class AnswerCell: UICollectionViewCell {
           self.updatePublisher.send(true)
           self.setChosen()
           
-          self.rightButton.imageView?.alpha = self.item.totalVotes > 0 ? 1 : 0
+          self.rightButton.imageView?.alpha = (item.totalVotes > 0 && !survey.isAnonymous) ? 1 : 0
           self.rightButton.setAttributedTitle(NSAttributedString(string: self.item.totalVotes.roundedWithAbbreviations, attributes: [
-            .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
-            .foregroundColor: self.color
+            .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .subheadline) as Any,
+            .foregroundColor: item.totalVotes > 0 ? self.color : .secondaryLabel
            ]), for: .normal)
-//          self.setSelected(forceDeselect: true) { [weak self] _ in
-//            guard let self = self else { return }
-//
-//            self.setChosen()
-//          }
-//          DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-//            guard let self = self else { return }
-//
-//            self.observeVoters()
-//          }
+          
+          UIView.animate(withDuration: 0.15) { [weak self] in
+            guard let self = self else { return }
+            
+            self.statsStack.alpha = 1
+          }
+          
+          self.percentageView.setBackgroundDarkColor(self.isAnswerSelected || self.isChosen ? .secondarySystemBackground : .tertiarySystemBackground)
+          self.percentageView.setBackgroundDarkColor(self.isAnswerSelected || self.isChosen ? .secondarySystemBackground : .systemFill)
         }
         .store(in: &subscriptions)
       ///Update stats
@@ -72,10 +71,10 @@ class AnswerCell: UICollectionViewCell {
             self.percentageLabel.text = item.percentString
           } completion: { _ in }
 
-          self.rightButton.imageView?.alpha = self.item.totalVotes > 0 ? 1 : 0
+          self.rightButton.imageView?.alpha = (item.totalVotes > 0 && !survey.isAnonymous) ? 1 : 0
           self.rightButton.setAttributedTitle(NSAttributedString(string: self.item.totalVotes.roundedWithAbbreviations, attributes: [
-            .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
-            .foregroundColor: self.color
+            .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .subheadline) as Any,
+            .foregroundColor: self.item.totalVotes > 0 ? self.color : .secondaryLabel
            ]), for: .normal)
           self.percentageView.setPercent(value: item.percent, animated: true)
         }
@@ -139,13 +138,29 @@ class AnswerCell: UICollectionViewCell {
       textView,
       opaque
     ])
-    instance.clipsToBounds = false
+    instance.layer.masksToBounds = false
     instance.axis = .vertical
     instance.spacing = 0
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    instance.layer.shadowOffset = .zero
+    instance.layer.shadowOpacity = (isChosen || isSelected) ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+    instance.layer.shadowRadius = padding*0.75///2
+    
+    // Add layer
+    let sublayer = CALayer()
+    sublayer.name  = "bgLayer"
+    sublayer.backgroundColor = isChosen ? traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.systemBackground.cgColor : UIColor.clear.cgColor
+    instance.layer.insertSublayer(sublayer, at: 0)
     instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .sink { instance.cornerRadius = $0.width*0.025 }
+      .filter { sublayer.bounds.height != $0.height || sublayer.bounds.width != $0.width }
+      .sink {
+        let cornerRadius = $0.width*0.025
+        sublayer.frame = $0
+        sublayer.cornerRadius = cornerRadius
+        instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: cornerRadius).cgPath
+      }
       .store(in: &subscriptions)
+    
     
     return instance
   }()
@@ -199,30 +214,45 @@ class AnswerCell: UICollectionViewCell {
     checkmark.placeInCenter(of: opaque, leadingInset: 0, trailingInset: 0)
     
     let instance = UIStackView(arrangedSubviews: [
-//      percentageLabel,
-      percentageView,
-      opaque,
 //      UIView.opaque(),
+      percentageView,
+//      opaque,
+      //      UIView.opaque(),
     ])
+    percentageView.translatesAutoresizingMaskIntoConstraints = false
+    percentageView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: item.survey!.isAnonymous ? 0.85 : 0.575).isActive = true
+    instance.addArrangedSubview(UIView.opaque())
     
     if let survey = item.survey, !survey.isAnonymous {
       instance.addArrangedSubview(votersStack)
     }
-    let opaque2 = UIView.opaque()
-    opaque2.accessibilityIdentifier = "opaque2"
-    opaque2.translatesAutoresizingMaskIntoConstraints = false
-    let constraint = opaque2.widthAnchor.constraint(equalToConstant: 999_999_999.roundedWithAbbreviations.width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)!) + padding/2)
-      constraint.isActive = true
-    constraint.identifier = "widthAnchor"
-    opaque2.addSubview(rightButton)
-    rightButton.translatesAutoresizingMaskIntoConstraints = false
-    rightButton.trailingAnchor.constraint(equalTo: opaque2.trailingAnchor).isActive = true
-    rightButton.centerYAnchor.constraint(equalTo: opaque2.centerYAnchor).isActive = true
+    //    let opaque2 = UIView.opaque()
+    //    opaque2.accessibilityIdentifier = "opaque2"
+    //    opaque2.translatesAutoresizingMaskIntoConstraints = false
+    //    let constraint = opaque2.widthAnchor.constraint(equalToConstant: 999_999_999.roundedWithAbbreviations.width(withConstrainedHeight: 100, font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)!) + padding/2)
+    //      constraint.isActive = true
+    //    constraint.identifier = "widthAnchor"
+    //    opaque2.addSubview(rightButton)
+    //    rightButton.translatesAutoresizingMaskIntoConstraints = false
+    //    rightButton.trailingAnchor.constraint(equalTo: opaque2.trailingAnchor).isActive = true
+    //    rightButton.centerYAnchor.constraint(equalTo: opaque2.centerYAnchor).isActive = true
     
-    instance.addArrangedSubview(opaque2)
+    //    instance.addSubview(votersStack)
+    //    votersStack.translatesAutoresizingMaskIntoConstraints = false
+    //    votersStack.topAnchor.constraint(equalTo: instance.topAnchor).isActive = true
+    //    votersStack.bottomAnchor.constraint(equalTo: instance.bottomAnchor).isActive = true
+    //    let trailing = votersStack.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: rightButton.bounds.width)
+    //    trailing.identifier = "trailingAnchor"
+    //    trailing.isActive = true
+    ////    votersStack.trailingAnchor.constraint(equalTo: rightButton.imageView!.leadingAnchor, constant: instance.spacing).isActive = true
+    
+    instance.addArrangedSubview(rightButton)
     instance.axis = .horizontal
     instance.clipsToBounds = false
     instance.spacing = 4
+    if let survey = item.survey {
+      instance.alpha = survey.isComplete ? 1 : 0
+    }
     
     return instance
   }()
@@ -231,7 +261,7 @@ class AnswerCell: UICollectionViewCell {
     instance.backgroundColor = .clear
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .caption2)
     instance.textAlignment = .center
-    instance.widthAnchor.constraint(equalToConstant: "100 %".width(withConstrainedHeight: 100, font: instance.font)).isActive = true
+//    instance.widthAnchor.constraint(equalToConstant: "100 %".width(withConstrainedHeight: 100, font: instance.font)).isActive = true
     instance.textColor = .white // color
     
     return instance
@@ -239,12 +269,31 @@ class AnswerCell: UICollectionViewCell {
   private lazy var percentageView: PercentageView = {
     let instance = PercentageView(lineWidth: "T".height(withConstrainedWidth: 100,
                                                         font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold,
-                                                                                                           forTextStyle: .caption2)!) + padding/2,
-                                  foregoundColor: color,
+                                                                                forTextStyle: .caption2)!) + padding/4,
+                                  foregoundColor: traitCollection.userInterfaceStyle == .dark ? color : .white.blended(withFraction: 0.85, of: color),
                                   backgroundLightColor: (isAnswerSelected || isChosen) ? .secondarySystemBackground : .systemFill,
-                                  backgroundDarkColor: (isAnswerSelected || isChosen) ? .secondarySystemBackground : .tertiarySystemBackground)//,
-    //backgroundColor: .tertiarySystemBackground)//(isAnswerSelected || isChosen) ? .systemBackground : traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemFill)
-    percentageLabel.placeLeadingYCentered(inside: instance, leadingInset: padding/2)
+                                  backgroundDarkColor: (isAnswerSelected || isChosen) ? .secondarySystemBackground : .tertiarySystemBackground)
+    instance.addSubview(checkmark)
+    instance.addSubview(percentageLabel)
+    checkmark.translatesAutoresizingMaskIntoConstraints = false
+    percentageLabel.translatesAutoresizingMaskIntoConstraints = false
+    checkmark.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: padding/2).isActive = true
+    checkmark.centerYAnchor.constraint(equalTo: instance.centerYAnchor).isActive = true
+    checkmark.heightAnchor.constraint(equalToConstant: instance.lineWidth - padding/2).isActive = true
+//    checkmark.widthAnchor.constraint(equalTo: checkmark.heightAnchor).isActive = true
+    if isChosen, let widthAnchor = checkmark.getConstraint(identifier: "widthAnchor") {
+      widthAnchor.constant = instance.lineWidth // - padding/2
+    }
+
+    percentageLabel.leadingAnchor.constraint(equalTo: checkmark.trailingAnchor, constant: padding/2).isActive = true
+    percentageLabel.centerYAnchor.constraint(equalTo: instance.centerYAnchor).isActive = true
+    percentageLabel.heightAnchor.constraint(equalTo: checkmark.heightAnchor).isActive = true
+    
+    
+//    checkmark.widthAnchor.constraint(equalTo: checkmark.heightAnchor).isActive = true
+    
+//    checkmark.placeLeadingYCentered(inside: instance, leadingInset: padding/2)
+//    percentageLabel.placeLeadingYCentered(inside: instance, leadingInset: padding/2)
     
     return instance
   }()
@@ -257,8 +306,7 @@ class AnswerCell: UICollectionViewCell {
     instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
     instance.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: padding)
     instance.setImage(UIImage(systemName: ("chevron.right"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
-    instance.imageView?.tintColor = color
-    
+    instance.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? color : .white.blended(withFraction: 0.85, of: color)
     instance.publisher(for: \.bounds)
       .filter { $0.width > 0 }
       .sink { [weak self] in
@@ -273,49 +321,53 @@ class AnswerCell: UICollectionViewCell {
         self.layoutIfNeeded()
       }
       .store(in: &subscriptions)
-//    instance.setAttributedTitle(NSAttributedString(string: "999 K", attributes: [
-//      .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
-//      .foregroundColor: self.color
-//     ]), for: .normal)
+    //    instance.setAttributedTitle(NSAttributedString(string: "999 K", attributes: [
+    //      .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
+    //      .foregroundColor: self.color
+    //     ]), for: .normal)
     
     return instance
   }()
-//  private lazy var disclosureIndicator: UIImageView = {
-//    let instance = UIImageView(image: UIImage(systemName: "chevron.right"))
-//    instance.accessibilityIdentifier = "chevron"
-//    instance.clipsToBounds = true
-//    instance.tintColor = .label
-//    instance.contentMode = .center
-//    instance.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .small)
-//    instance.isUserInteractionEnabled = true
-//    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(sender:))))
-//    instance.alpha = item.totalVotes == 0 ? 0 : 1
-//    instance.tintColor = color
-//
-//    let constraint = instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/3)
-//    constraint.identifier = "widthAnchor"
-//    constraint.isActive = true
-//
-//    return instance
-//  }()
+  //  private lazy var disclosureIndicator: UIImageView = {
+  //    let instance = UIImageView(image: UIImage(systemName: "chevron.right"))
+  //    instance.accessibilityIdentifier = "chevron"
+  //    instance.clipsToBounds = true
+  //    instance.tintColor = .label
+  //    instance.contentMode = .center
+  //    instance.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .small)
+  //    instance.isUserInteractionEnabled = true
+  //    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(sender:))))
+  //    instance.alpha = item.totalVotes == 0 ? 0 : 1
+  //    instance.tintColor = color
+  //
+  //    let constraint = instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/3)
+  //    constraint.identifier = "widthAnchor"
+  //    constraint.isActive = true
+  //
+  //    return instance
+  //  }()
   private lazy var checkmark: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.contentMode = .center
+    instance.contentMode = .scaleAspectFit
     instance.alpha = (isAnswerSelected || isChosen) ? 1 : 0
-    instance.tintColor = color
-//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote)!)).isActive = true
-//    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    instance.tintColor = .white//traitCollection.userInterfaceStyle == .dark ? color : .white.blended(withFraction: 0.85, of: color)
     
-//    instance.widthAnchor.constraint(equalToConstant: 30).isActive = true
+    let widthAnchor = instance.widthAnchor.constraint(equalToConstant: 0)
+    widthAnchor.isActive = true
+    widthAnchor.identifier = "widthAnchor"
+    //    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote)!)).isActive = true
+    //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    
+    //    instance.widthAnchor.constraint(equalToConstant: 30).isActive = true
     
     return instance
   }()
   private lazy var votersStack: VotersStack = {
     let instance = VotersStack(userprofiles: Array(item.voters.prefix(avatarsThreshold)),
                                capacity: avatarsThreshold,
-                               lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.2) : .clear,
-                               darkBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.4) : .clear,
+                               lightBorderColor: .systemBackground,
+                               darkBorderColor: .tertiarySystemBackground,
                                height: statsHeight-padding)
     instance.tapPublisher
       .sink { [weak self] _ in
@@ -376,7 +428,11 @@ class AnswerCell: UICollectionViewCell {
     
 //    updateUI(animated: false)
     
-    stackView.backgroundColor = !isChosen ? .clear : color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
+//    stackView.backgroundColor = !isChosen ? .clear : color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
+    stackView.layer.shadowOpacity = isChosen ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+    if let bgLayer = stackView.layer.getSublayer(name: "bgLayer") {
+      bgLayer.backgroundColor = isChosen ? traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.systemBackground.cgColor : UIColor.clear.cgColor
+    }
   }
 }
 
@@ -403,7 +459,7 @@ private extension AnswerCell {
     }()
     
     backgroundColor = .clear
-    clipsToBounds = true
+    contentView.layer.masksToBounds = false
     let inset = padding/2 + lineSpacing
     let views = [
       stackView,
@@ -427,25 +483,27 @@ private extension AnswerCell {
     textView.attributedText = NSAttributedString(string: item.description, attributes: attributes)
     
     percentageLabel.text = item.percentString
-    rightButton.setAttributedTitle(NSAttributedString(string: item.totalVotes.roundedWithAbbreviations, attributes: [
-      .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any,
-      .foregroundColor: survey.isComplete ? color : UIColor.clear
-     ]), for: .normal)
-    rightButton.imageView?.alpha = (item.totalVotes > 0 && !survey.isAnonymous) ? 1 : 0
     ///UI settings
-    imageView.tintColor = survey.isComplete ? color : (isChosen || isAnswerSelected) ? survey.topic.tagColor : .systemGray
+    imageView.tintColor = survey.isComplete ? traitCollection.userInterfaceStyle == .dark ? color : .white.blended(withFraction: 0.85, of: color) : (isChosen || isAnswerSelected) ? survey.topic.tagColor : .systemGray
     imageView.setImage(UIImage(systemName: "\(item.order+1).circle.fill")!)
     
     if survey.isComplete {
       openConstraint.isActive = true
       percentageView.setPercent(value: item.percent, animated: false)
-      stackView.backgroundColor = !isChosen ? .clear : color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
-      if survey.isAnonymous {
-        rightButton.imageView?.alpha = 0
-      }
+//      stackView.backgroundColor = !isChosen ? .clear : color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.1)
+      stackView.layer.shadowOpacity = isChosen ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
     } else {
       closedConstraint.isActive = true
-      stackView.backgroundColor = !isChosen ? .clear : color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2)
+//      stackView.backgroundColor = !isChosen ? .clear : color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.1)
+      stackView.layer.shadowOpacity = isChosen ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
+    }
+    
+    if let survey = item.survey {
+      self.rightButton.setAttributedTitle(NSAttributedString(string: self.item.totalVotes.roundedWithAbbreviations, attributes: [
+        .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .subheadline) as Any,
+        .foregroundColor: item.totalVotes > 0 ? self.color : .secondaryLabel
+       ]), for: .normal)
+      rightButton.imageView?.alpha = (item.totalVotes > 0 && !survey.isAnonymous) ? 1 : 0
     }
   }
   
@@ -480,52 +538,42 @@ private extension AnswerCell {
       selection.name  = "selection"
       selection.backgroundColor = survey.topic.tagColor.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
       selection.frame = CGRect(origin: .zero, size: textView.bounds.size)
-      selection.cornerRadius = stackView.cornerRadius
+      selection.cornerRadius = stackView.bounds.width*0.025
       selection.opacity = 0
-      stackView.layer.insertSublayer(selection, at: 0)
+      stackView.layer.insertSublayer(selection, at: 1)
       
       Animations.unmaskLayerCircled(layer: selection,
                                     location: touchLocation,
-                                    duration: 0.4,
+                                    duration: 0.3,
                                     opacityDurationMultiplier: 0.5,
                                     delegate: self) { completion(true) }
     case false:
-      guard let selection = stackView.getLayer(identifier: "selection") else { return }
-      
-      selection.add(Animations.get(property: .Opacity,
-                                   fromValue: 1,
-                                   toValue: 0,
-                                   duration: 0.2,
-                                   timingFunction: .easeOut,
-                                   delegate: self,
-                                   isRemovedOnCompletion: false,
-                                   completionBlocks: [{
-//        selection.opacity = 0
-//        selection.removeAllAnimations()
-        selection.removeFromSuperlayer() }]),
-                    forKey: nil)
-      selection.add(Animations.get(property: .Scale,
-                                   fromValue: selection.affineTransform(),
-                                   toValue: selection.setAffineTransform(CGAffineTransform(scaleX: 1, y: 0.1)),//0.1,
-                                   duration: 0.2,
-                                   timingFunction: .easeOut,
-                                   delegate: self,
-                                   isRemovedOnCompletion: false,
-                                   completionBlocks: [{
-//        selection.setAffineTransform(CGAffineTransform(scaleX: 1, y: 0.1))
-//        selection.removeAllAnimations()
-        selection.removeFromSuperlayer() }]),
-                    forKey: nil)
+      deselect()
     }
   }
   
   @MainActor
   func setChosen() {
-    votersStack.setColors(lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.2) : .clear,
-                          darkBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.4) : .clear)
+    votersStack.setColors(lightBorderColor: .systemBackground,
+                          darkBorderColor: .tertiarySystemBackground)
 //    votersStack.setColors(lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.2) : .clear,
 //                          darkBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.4) : .clear)
     
+    deselect()
+    if let bgLayer = self.stackView.layer.getSublayer(name: "bgLayer"), isChosen || isAnswerSelected {
+      
+      bgLayer.add(Animations.get(property: .BackgroundColor,
+                                 fromValue: bgLayer.backgroundColor as Any,
+                                 toValue:  self.traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.systemBackground.cgColor,
+                                 duration: 0.2,
+                                 delegate: nil), forKey: nil)
+      bgLayer.backgroundColor = UIColor.tertiarySystemBackground.cgColor
+    }
+    
+    if traitCollection.userInterfaceStyle != .dark, isChosen || isAnswerSelected {
+      stackView.layer.add(Animations.get(property: .ShadowOpacity, fromValue: 0, toValue: 1, duration: 0.2, delegate: nil), forKey: nil)
+      stackView.layer.shadowOpacity = 1
+    }
     
     UIView.animate(
       withDuration: 0.3,
@@ -535,39 +583,45 @@ private extension AnswerCell {
       options: [.curveEaseInOut]) { [weak self] in
         guard let self = self else { return }
 
-        self.imageView.tintColor = self.color
-        self.textView.backgroundColor = .clear
+        self.imageView.tintColor = self.traitCollection.userInterfaceStyle == .dark ? self.color : .white.blended(withFraction: 0.85, of: self.color)
         self.checkmark.alpha = (self.isChosen || self.isAnswerSelected) ? 1 : 0
+        if self.isChosen || self.isAnswerSelected, let constraint = checkmark.getConstraint(identifier: "widthAnchor") {
+          self.percentageView.setNeedsLayout()
+          constraint.constant = self.percentageView.lineWidth
+          self.percentageView.setNeedsLayout()
+        }
       }
     
-    guard let selection = stackView.getLayer(identifier: "selection") else {
-      UIView.animate(
-        withDuration: 0.3,
-        delay: 0,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut]) { [weak self] in
-          guard let self = self else { return }
-          
-          self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ?  self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2) : .clear
-        }
-      
-      return
-    }
+//    guard let selection = stackView.getLayer(identifier: "selection") else {
+//      UIView.animate(
+//        withDuration: 0.3,
+//        delay: 0,
+//        usingSpringWithDamping: 0.8,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut]) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.stackView.backgroundColor = (self.isChosen || self.isAnswerSelected) ?  self.color.withAlphaComponent(self.traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2) : .clear
+//        }
+//
+//      return
+//    }
+    
+    
 //    stackView.publisher(for: \.bounds)
 //      .sink { selection.bounds.size.height = $0.height }
     //      .store(in: &subscriptions)
-    UIView.animate(
-      withDuration: 0.3,
-      delay: 0,
-      usingSpringWithDamping: 0.8,
-      initialSpringVelocity: 0.3,
-      options: [.curveEaseInOut]) { [weak self] in
-        guard let self = self else { return }
-        
-        selection.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? self.color.withAlphaComponent(0.4).cgColor : self.color.withAlphaComponent(0.2).cgColor
-        selection.frame = self.stackView.frame
-      }
+//    UIView.animate(
+//      withDuration: 0.3,
+//      delay: 0,
+//      usingSpringWithDamping: 0.8,
+//      initialSpringVelocity: 0.3,
+//      options: [.curveEaseInOut]) { [weak self] in
+//        guard let self = self else { return }
+//
+//        selection.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? self.color.withAlphaComponent(0.4).cgColor : self.color.withAlphaComponent(0.2).cgColor
+//        selection.frame = self.stackView.frame
+//      }
   }
   
   func observeVoters() {
@@ -605,7 +659,34 @@ private extension AnswerCell {
   
   @objc
   func handleTap() {
+    guard let survey = item.survey, !survey.isAnonymous else { return }
+    
     votersPublisher.send(item)
+  }
+  
+  func deselect(_ completion: Closure? = nil) {
+    guard let selection = stackView.getLayer(identifier: "selection") else { return }
+    
+    selection.add(Animations.get(property: .Opacity,
+                                 fromValue: 1,
+                                 toValue: 0,
+                                 duration: 0.2,
+                                 timingFunction: .easeOut,
+                                 delegate: self,
+                                 isRemovedOnCompletion: false,
+                                 completionBlocks: [{
+      selection.removeFromSuperlayer(); completion?()}]),
+                  forKey: nil)
+    selection.add(Animations.get(property: .Scale,
+                                 fromValue: selection.affineTransform(),
+                                 toValue: selection.setAffineTransform(CGAffineTransform(scaleX: 1, y: 0.1)),//0.1,
+                                 duration: 0.2,
+                                 timingFunction: .easeOut,
+                                 delegate: self,
+                                 isRemovedOnCompletion: false,
+                                 completionBlocks: [{
+      selection.removeFromSuperlayer(); completion?()}]),
+                  forKey: nil)
   }
 }
 

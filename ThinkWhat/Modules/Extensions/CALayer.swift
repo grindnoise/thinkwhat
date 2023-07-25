@@ -36,4 +36,7 @@ extension CALayer {
         })
     }
 
+  func getSublayer(name: String) -> CALayer? {
+    self.sublayers?.filter({ $0.name == name }).first
+  }
 }

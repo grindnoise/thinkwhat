@@ -152,9 +152,9 @@ class Avatar: UIView {
       coloredBg.accessibilityIdentifier = "coloredBg"
       coloredBg.backgroundColor = traitCollection.userInterfaceStyle == .dark ? darkBorderColor : lightBorderColor
       coloredBg.place(inside: instance)
-      shimmer.place(inside: coloredBg)
-      //        shimmer.placeInCenter(of: instance, heightMultiplier: 0.85)
+//      shimmer.place(inside: coloredBg)
       imageView.placeInCenter(of: coloredBg, heightMultiplier: 0.85)
+      shimmer.place(inside: imageView)
     } else {
       shimmer.place(inside: instance)
       imageView.place(inside: instance)
@@ -167,7 +167,7 @@ class Avatar: UIView {
   }()
   public lazy var shimmer: Shimmer = {
     let instance = Shimmer()
-    instance.accessibilityIdentifier = "coloredBackground"
+    instance.accessibilityIdentifier = "shimmer"
     instance.clipsToBounds = true
     instance.publisher(for: \.bounds)
       .filter { $0 != .zero }
@@ -179,7 +179,7 @@ class Avatar: UIView {
   public lazy var imageView: UIImageView = {
     let instance = UIImageView()
     instance.contentMode = .scaleAspectFill
-    instance.tintColor = .systemGray
+//    instance.tintColor = .systemGray
 //    instance.alpha = 0
     instance.accessibilityIdentifier = "imageView"
     instance.layer.masksToBounds = true
@@ -217,8 +217,13 @@ class Avatar: UIView {
     didSet {
       guard let image = image else { return }
       
+      self.shimmer.stopShimmering()
+      self.shimmer.alpha = 0
+      self.shimmer.removeFromSuperview()
+      
       guard !self.ciFilterName.isEmpty else {
         imageView.image = image
+//        shimmer.backgroundColor = .clear
         
         return
       }
