@@ -61,7 +61,7 @@ class LinkPreviewCell: UICollectionViewCell {
     let instance = UILabel()
     instance.textColor = Colors.cellHeader
     instance.text = "web_link".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
+    instance.font = Fonts.cellHeader
 
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"

@@ -170,11 +170,8 @@ extension PollModel: PollControllerInput {
                       let _total = dict["total"]?.int else { break }
                 answer.totalVotes = _total
                 totalVotes += _total
-                let decoder = JSONDecoder()
-                decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                           DateFormatter.dateTimeFormatter,
-                                                           DateFormatter.dateFormatter ]
-                let instances = try decoder.decode([Userprofile].self, from: data)
+                
+                let instances = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode([Userprofile].self, from: data)
                 var voters: [Userprofile] = []
 
                 instances.forEach { instance in voters.append(Userprofiles.shared.all.filter({ $0 == instance }).first ?? instance) }
@@ -187,7 +184,7 @@ extension PollModel: PollControllerInput {
               print(error.localizedDescription)
 #endif
               await MainActor.run {
-                modelOutput?.onVoteCallback(.failure(error))
+                modelOutput?.voteCallback(.failure(error))
               }
               return
             }
@@ -200,11 +197,11 @@ extension PollModel: PollControllerInput {
 //        }
 
         await MainActor.run {
-          modelOutput?.onVoteCallback(.success(true))
+          modelOutput?.voteCallback(.success(true))
         }
       } catch {
         await MainActor.run {
-          modelOutput?.onVoteCallback(.failure(error))
+          modelOutput?.voteCallback(.failure(error))
         }
       }
     }
@@ -224,9 +221,9 @@ extension PollModel: PollControllerInput {
     Task {
       do {
         let instance = try await API.shared.surveys.getSurvey(byReference: reference, incrementCounter: incrementViewCounter)
-        await MainActor.run { modelOutput?.onLoadCallback(.success(instance)) }
+        await MainActor.run { modelOutput?.loadCallback(.success(instance)) }
       } catch {
-        await MainActor.run { modelOutput?.onLoadCallback(.failure(error)) }
+        await MainActor.run { modelOutput?.loadCallback(.failure(error)) }
       }
     }
   }
@@ -235,9 +232,9 @@ extension PollModel: PollControllerInput {
     Task {
       do {
         let instance = try await API.shared.surveys.getSurvey(byReferenceId: referenceId)
-        await MainActor.run { modelOutput?.onLoadCallback(.success(instance)) }
+        await MainActor.run { modelOutput?.loadCallback(.success(instance)) }
       } catch {
-        await MainActor.run { modelOutput?.onLoadCallback(.failure(error)) }
+        await MainActor.run { modelOutput?.loadCallback(.failure(error)) }
       }
     }
   }

@@ -106,13 +106,12 @@ class PollCollectionView: UICollectionView {
               let source = self.source
         else { return }
         
-        source.refresh()// { [weak self] in
-//          guard let self = self else { return }
-//          self.scrollToItem(at: IndexPath(row: 0,
-//                                          section: self.numberOfSections - 2),
-//                            at: .bottom,
-//                            animated: true)
-//        }
+        source.refresh() { [weak self] in
+          guard let self = self else { return }
+          self.scrollToItem(at: IndexPath(row: 0, section: self.numberOfSections - 1),
+                            at: .bottom,
+                            animated: true)
+        }
       }
       .store(in: &subscriptions)
     
@@ -139,6 +138,7 @@ class PollCollectionView: UICollectionView {
   // MARK: - Public methods
   public func onImageScroll(_ index: Int) {
     guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
+    
     cell.scrollToImage(at: index)
   }
 }
@@ -298,7 +298,11 @@ private extension PollCollectionView {
           guard self.isFirstAnswerSelection else { return }
           
           self.isFirstAnswerSelection = false
-          self.scrollToItem(at: IndexPath(row: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
+          delay(seconds: 0.2) { [weak self] in
+            guard let self = self else { return }
+             
+            self.scrollToItem(at: IndexPath(row: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
+          }
         }
         .store(in: &self.subscriptions)
       cell.deselectionPublisher

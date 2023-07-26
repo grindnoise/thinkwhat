@@ -134,6 +134,8 @@ class SurveysController: UIViewController, TintColorable {
     
     return instance
   }()
+  ///**Publishers**
+  private let searchPublisher = PassthroughSubject<[String:Any], Never>()
   
   
   
@@ -211,6 +213,7 @@ class SurveysController: UIViewController, TintColorable {
     self.view = view as UIView
     
     setupUI()
+    setTasks()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -393,7 +396,8 @@ extension SurveysController: SurveysViewInput {
                            substring: String,
                            except: [SurveyReference],
                            ownersIds: [Int],
-                           topicsIds: [Int]) {
+                           topicsIds: [Int],
+                           ids: [Int]) {
     if source == .Search {
       controllerInput?.search(substring: searchString,
                               localized: false,
@@ -405,7 +409,8 @@ extension SurveysController: SurveysViewInput {
                                            dateFilter: dateFilter,
                                            topic: topic,
                                            userprofile: userprofile,
-                                           compatibility: compatibility)
+                                           compatibility: compatibility,
+                                           ids: ids)
     }
   }
 }
@@ -485,6 +490,26 @@ private extension SurveysController {
     
     navigationBar.setNeedsLayout()
     navigationBar.layoutIfNeeded()
+  }
+  
+  func setTasks() {
+    searchPublisher
+      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+      .eraseToAnyPublisher()
+      .sink { [weak self] in
+        guard let self = self,
+              let substring = $0["substring"] as? String,
+              let ownersIds = $0["ownersIds"] as? [Int],
+              let topicsIds = $0["topicsIds"] as? [Int]
+        else { return }
+        
+        self.controllerInput?.search(substring: substring.lowercased(),
+                                     localized: false,
+                                     except: [],
+                                     ownersIds: ownersIds,
+                                     topicsIds: topicsIds)
+      }
+      .store(in: &subscriptions)
   }
   
   @MainActor
@@ -641,11 +666,16 @@ extension SurveysController: UITextFieldDelegate {
       return [topic.id]
     }()
     
-    controllerInput?.search(substring: text,
-                            localized: false,
-                            except: [],
-                            ownersIds: ownerPredicate,
-                            topicsIds: topicPredicate)
+    searchPublisher.send([
+      "substring": text,
+      "ownersIds": ownerPredicate,
+      "topicsIds": topicPredicate
+    ])
+//    controllerInput?.search(substring: text,
+//                            localized: false,
+//                            except: [],
+//                            ownersIds: ownerPredicate,
+//                            topicsIds: topicPredicate)
   }
   
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {

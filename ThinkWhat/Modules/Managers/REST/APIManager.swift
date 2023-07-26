@@ -1453,6 +1453,7 @@ class API {
     }
     
     public func surveyReferences(category: Survey.SurveyCategory,
+                                 ids: [Int]? = nil,
                                  period: Period? = nil,
                                  topic: Topic? = nil,
                                  userprofile: Userprofile? = nil,
@@ -1470,11 +1471,20 @@ class API {
         parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
         parameters["userprofile_id"] = userprofile.id
       } else if category == .Compatibility, let compatibility = compatibility {
-        let fullSet = Set(compatibility.surveys)
-        let existingSet = Set(Set(category.dataItems(compatibility: compatibility).map { $0.id }))
-        let difference = fullSet.symmetricDifference(existingSet)
-        
-        parameters = ["ids": Array(difference)]
+        var list = [Int]()
+        if let ids = ids, !ids.isEmpty {
+          list = ids
+        } else {
+          let fullSet = Set(compatibility.surveys)
+          let existingSet = Set(Set(category.dataItems(compatibility: compatibility).map { $0.id }))
+          list = Array(fullSet.symmetricDifference(existingSet))
+        }
+        guard !list.isEmpty else { return }
+            
+#if DEBUG
+        print("APIManager.Polls.surveyReferences() by compatibility", list)
+#endif
+        parameters = ["ids": list]
       } else if category == .Search {
         parameters = ["exclude_ids": fetchResult.map { $0.id }]
       } else {

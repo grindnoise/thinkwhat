@@ -59,9 +59,9 @@ protocol PollModelOutput: AnyObject {
   var item: SurveyReference! { get }
   
   func postCallback(_: Result<Bool, Error>)
-  func onLoadCallback(_: Result<Survey, Error>)
-  func onAddFavoriteCallback(_: Result<Bool, Error>)
-  func onVoteCallback(_: Result<Bool, Error>)
+  func loadCallback(_: Result<Survey, Error>)
+  func voteCallback(_: Result<Bool, Error>)
+  func favoriteCallback(_: Result<Bool, Error>)
   func commentPostCallback(_: Result<Comment, Error>)
   func commentDeleteError()
 }
@@ -72,8 +72,8 @@ protocol PollControllerOutput: AnyObject {
   
   func presentView(_: Survey)
   func postCallback(_ result: Result<Bool, Error>)
-  func onLoadCallback(_: Result<Bool, Error>)
-  func onVoteCallback(_: Result<Bool, Error>)
+  func loadCallback(_: Result<Bool, Error>)
+  func voteCallback(_: Result<Bool, Error>)
   func commentPostCallback(_: Result<Comment, Error>)
   func commentDeleteError()
 }

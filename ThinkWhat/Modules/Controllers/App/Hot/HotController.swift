@@ -40,6 +40,7 @@ class HotController: UIViewController, TintColorable {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
+  private var isFirstLaunch = true
   ///**UI**
   private var isViewLayedOut = false
   private var isNetworking = false
@@ -103,9 +104,10 @@ class HotController: UIViewController, TintColorable {
     navigationController?.setBarTintColor(initialColor)
     navigationController?.setBarShadow(on: false)
     
-    guard isDataReady else { return }
-    
+    guard isDataReady, isFirstLaunch else { return }
+
     tabBarController?.setTabBarVisible(visible: true, animated: surveyId.isNil ? true : false)
+    isFirstLaunch = false
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -118,10 +120,14 @@ class HotController: UIViewController, TintColorable {
           let tabBarController = tabBarController as? MainController
     else { return }
     
+    tabBarController.toggleLogo(on: true)
+//    tabBarController.setTabBarVisible(visible: true, animated: surveyId.isNil ? true : false)
     tabBarController.setLogoInitialFrame(size: navigationBar.bounds.size,
                                          y: abs(navigationBar.center.y))
+    guard isDataReady, !isFirstLaunch else { return }
+
+    tabBarController.setTabBarVisible(visible: true, animated: surveyId.isNil ? true : false)
     
-    tabBarController.toggleLogo(on: true)
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -129,6 +135,7 @@ class HotController: UIViewController, TintColorable {
     
     isOnScreen = false
     controllerOutput?.didDisappear()
+//    tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
 }
 

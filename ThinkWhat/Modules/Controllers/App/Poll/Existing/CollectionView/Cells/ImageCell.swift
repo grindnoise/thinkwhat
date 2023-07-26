@@ -46,7 +46,7 @@ class ImageCell: UICollectionViewCell {
     let instance = UILabel()
     instance.textColor = Colors.cellHeader
     instance.text = "images".localized.uppercased()
-    instance.font = UIFont.scaledFont(fontName: Fonts.System.UserprofileCellHeader, forTextStyle: .footnote)
+    instance.font = Fonts.cellHeader
 
     let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
     heightConstraint.identifier = "height"
@@ -158,7 +158,7 @@ class ImageCell: UICollectionViewCell {
     instance.insets = .uniform(size: 8)
     instance.alpha = 0
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .caption1)
-    instance.backgroundColor = .black.withAlphaComponent(0.8)
+    instance.backgroundColor = .black.withAlphaComponent(0.75)
     instance.textColor = .white
     instance.textAlignment = .center
     instance.text = "1"
@@ -317,22 +317,22 @@ private extension ImageCell {
       
       //Text & button
       let textView = UITextView()
-      textView.backgroundColor = .black.withAlphaComponent(0.8)
+      textView.backgroundColor = .black.withAlphaComponent(0.75)
       textView.font = UIFont.scaledFont(fontName: Fonts.Rubik.Italic, forTextStyle: .subheadline)
       textView.textColor = .white
       textView.alpha = 0
       textView.text = media.title
       textView.isEditable = false
       textView.isSelectable = false
-      textView.publisher(for: \.bounds)
-        .filter { $0 != .zero }
-        .sink { textView.cornerRadius = $0.height*0.25 }
-        .store(in: &subscriptions)
+//      textView.publisher(for: \.bounds)
+//        .filter { $0 != .zero }
+//        .sink { textView.cornerRadius = $0.height*0.25 }
+//        .store(in: &subscriptions)
       imageView.addSubview(textView)
       textView.translatesAutoresizingMaskIntoConstraints = false
-      textView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -padding).isActive = true
-      textView.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: padding).isActive = true
-      textView.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -padding).isActive = true
+      textView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
+      textView.leadingAnchor.constraint(equalTo: imageView.leadingAnchor).isActive = true
+      textView.trailingAnchor.constraint(equalTo: imageView.trailingAnchor).isActive = true
       let textViewConstraint = textView.heightAnchor.constraint(equalToConstant: 1)
       textViewConstraint.identifier = "height"
       textViewConstraint.isActive = true
@@ -340,7 +340,7 @@ private extension ImageCell {
       let button = UIImageView()
       button.alpha = 0
       button.isUserInteractionEnabled = true
-      button.backgroundColor = .black.withAlphaComponent(0.8)
+      button.backgroundColor = .black.withAlphaComponent(0.75)
       button.contentMode = .center
       button.tintColor = .white
       button.layer.setValue(false, forKey: "isSelected")
@@ -353,7 +353,7 @@ private extension ImageCell {
           guard let isSelected = button.layer.value(forKey: "isSelected") as? Bool else { return }
           
           button.image = UIImage(systemName: "quote.bubble.fill",//isSelected ? "quote.bubble" : "quote.bubble.fill",
-                                 withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5))
+                                 withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.35))
         }
         .store(in: &subscriptions)
       
@@ -362,19 +362,19 @@ private extension ImageCell {
       
       button.translatesAutoresizingMaskIntoConstraints = false
       button.heightAnchor.constraint(equalTo: button.widthAnchor, multiplier: 1/1).isActive = true
-      let bottomConstraint = button.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: 0)
+      let bottomConstraint = button.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -self.padding)
       bottomConstraint.isActive = true
-      bottomConstraint.identifier = "bottom"
+//      bottomConstraint.identifier = "bottom"
       button.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -padding).isActive = true
       button.layer.setValue(media, forKey: "media")
       button.layer.setValue(imageView, forKey: "imageView")
       
-      let buttonConstraint = button.heightAnchor.constraint(equalToConstant: "1".height(withConstrainedWidth: 100, font: pages.font))
+      let buttonConstraint = button.heightAnchor.constraint(equalToConstant: 40) // "1".height(withConstrainedWidth: 100, font: pages.font))
       buttonConstraint.isActive = true
-      pages.publisher(for: \.bounds)
-        .filter { $0 != .zero }
-        .sink { buttonConstraint.constant = $0.height }
-        .store(in: &subscriptions)
+//      pages.publisher(for: \.bounds)
+//        .filter { $0 != .zero }
+//        .sink { buttonConstraint.constant = $0.height }
+//        .store(in: &subscriptions)
       
       media.imagePublisher
         .receive(on: DispatchQueue.main)
@@ -473,7 +473,7 @@ private extension ImageCell {
           let _isSelected = button.layer.value(forKey: "isSelected") as? Bool,
           let imageView = button.layer.value(forKey: "imageView") as? UIImageView,
           let textView = imageView.getSubview(type: UITextView.self),
-          let bottomConstraint = textView.getConstraint(identifier: "bottom"),
+//          let bottomConstraint = textView.getConstraint(identifier: "bottom"),
           let heightConstraint = textView.getConstraint(identifier: "height")
     else { return }
     
@@ -481,18 +481,13 @@ private extension ImageCell {
     
     button.layer.setValue(isSelected, forKey: "isSelected")
     imageView.setNeedsLayout()
-    Animations.changeImageCrossDissolve(imageView: button,
-                                        image: UIImage(systemName: isSelected ? "quote.bubble.fill" : "quote.bubble",
-                                                       withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.5))!,
-                                        duration: 0.2,
-                                        animations: [{ [weak self] in
-      guard let self = self else { return }
-      
+
+    UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) {
       textView.alpha = isSelected ? 1 : 0
-      bottomConstraint.constant = isSelected ? -self.padding : 0
+//      bottomConstraint.constant = isSelected ? -self.padding : 0
       heightConstraint.constant = isSelected ? textView.contentSize.height : 0
       imageView.layoutIfNeeded()
-    }])
+    } completion: { _ in }
   }
   
   func setObservers() {

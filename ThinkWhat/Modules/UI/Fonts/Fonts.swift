@@ -46,7 +46,9 @@ struct Fonts {
     static let SemiBoldItalic   = "Rubik-SemiBoldItalic"
   }
   
-  struct System {
-    static let UserprofileCellHeader = "Rubik-Regular"
-  }
+//  struct System {
+//    static let UserprofileCellHeader = "Rubik-Regular"
+//  }
+  
+  static let cellHeader = UIFont(name: "Rubik-Regular", size: 11)
 }

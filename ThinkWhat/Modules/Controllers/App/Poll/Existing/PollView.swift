@@ -17,64 +17,10 @@ class PollView: UIView {
   //Logic
   public weak var item: Survey? {
     didSet {
-      guard !viewInput.isNil,
-            let item = item
-      else { return }
+      guard !viewInput.isNil, !item.isNil else { return }
       
-      collectionView.place(inside: self)
-      
-      guard !item.isComplete else { return }
-      
-      item.reference.isCompletePublisher
-        .receive(on: DispatchQueue.main)
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.selectedAnswer = nil
-        }
-        .store(in: &subscriptions)
-      
-      addSubview(actionButton)
-      actionButton.translatesAutoresizingMaskIntoConstraints = false
-      actionButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-      
-      let constraint = actionButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)//, constant: -tabBarHeight)
-      constraint.identifier = "top"
-      constraint.isActive = true
-
-      if #available(iOS 15, *) {
-        actionButton.configuration?.baseBackgroundColor = item.topic.tagColor
-      } else {
-        actionButton.backgroundColor = item.topic.tagColor
-      }
-      actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-      
-      guard viewInput!.mode == .Preview,
-            let constraint = actionButton.getConstraint(identifier: "top")
-      else { return }
-      
-      delay(seconds: 0.5) {[weak self] in
-        guard let self = self else { return }
-        
-        self.toggleFade(true)
-        setNeedsLayout()
-        //      layoutIfNeeded()
-        //      setNeedsLayout()
-        UIView.animate(
-          withDuration: 0.35,
-          delay: 0,
-          usingSpringWithDamping: 0.8,
-          initialSpringVelocity: 0.3,
-          options: [.curveEaseInOut],
-          animations: { [weak self] in
-            guard let self = self else { return }
-            
-            self.actionButton.transform = .identity
-            self.actionButton.alpha = 1
-            constraint.constant = -(self.actionButton.bounds.height + tabBarHeight)
-            self.layoutIfNeeded()
-          }) { _ in }
-      }
+      setupUI()
+      setTasks()
     }
   }
   
@@ -97,43 +43,17 @@ class PollView: UIView {
   //Logic
   private var selectedAnswer: Answer? {
     didSet {
-//      print("selectedAnswer", selectedAnswer)
-//      assert(!selectedAnswer.isNil)
       guard let constraint = actionButton.getConstraint(identifier: "top") else { return }
       
       if oldValue.isNil, !selectedAnswer.isNil {
-        toggleFade(true)
-        setNeedsLayout()
-        UIView.animate(
-          withDuration: 0.35,
-          delay: 0,//!selectedAnswer.isNil ? 0 : 0.25,
-          usingSpringWithDamping: 0.8,
-          initialSpringVelocity: 0.3,
-          options: [.curveEaseInOut],
-          animations: { [weak self] in
-            guard let self = self else { return }
-            
-            self.actionButton.transform = self.selectedAnswer.isNil ? CGAffineTransform(scaleX: 0.75, y: 0.75) : .identity
-            self.actionButton.alpha = self.selectedAnswer.isNil ? 0 : 1
-            constraint.constant = self.selectedAnswer.isNil ? 0 : -(self.actionButton.bounds.height + tabBarHeight)
-            self.layoutIfNeeded()
-          }) { _ in }
+        showButton(delay: 0, flag: true)
       } else if selectedAnswer.isNil {
-        toggleFade(false)
-        setNeedsLayout()
-        UIView.animate(
-          withDuration: 0.35,
-          delay: 0,//!selectedAnswer.isNil ? 0 : 0.25,
-          usingSpringWithDamping: 0.8,
-          initialSpringVelocity: 0.3,
-          options: [.curveEaseInOut]) { [weak self] in
-            guard let self = self else { return }
-            
-            self.actionButton.transform = self.selectedAnswer.isNil ? CGAffineTransform(scaleX: 0.75, y: 0.75) : .identity
-            self.actionButton.alpha = self.selectedAnswer.isNil ? 0 : 1
-            constraint.constant = self.selectedAnswer.isNil ? 0 : -(self.actionButton.bounds.height + tabBarHeight)
-            self.layoutIfNeeded()
-          }
+        showButton(delay: 0, flag: false)
+      }
+      if #available(iOS 15, *) {
+        self.actionButton.getSubview(type: UIButton.self)?.configuration?.baseBackgroundColor = self.selectedAnswer.isNil ? .systemGray : Colors.getColor(forId: self.selectedAnswer!.order)
+      } else {
+        self.actionButton.getSubview(type: UIButton.self)?.backgroundColor = self.selectedAnswer.isNil ? .systemGray : Colors.getColor(forId: self.selectedAnswer!.order)
       }
     }
   }
@@ -154,9 +74,9 @@ class PollView: UIView {
     }
     
     let instance = PollCollectionView(item: item!, mode: viewInput!.mode)
-    instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: deviceType == .iPhoneSE ? 0 : 60, right: 0.0)
+//    instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0.0)
     instance.layer.masksToBounds = false
-    instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: 100, right: instance.contentInset.right)
+    instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: item.isNil ? 100 : item!.isComplete ? 100 : 120, right: instance.contentInset.right)
     instance.imagePublisher
       .sink {[weak self] in
         guard let self = self,
@@ -328,93 +248,55 @@ class PollView: UIView {
     return instance
   }()
   private var actionButtonState: ButtonState = .Send
-  private lazy var actionButton: UIButton = {
-    let instance = UIButton()
-    instance.alpha = 0
-    instance.layer.zPosition = 2
-    instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
+  
+  public private(set) lazy var actionButton: UIView = {
+    let opaque = UIView.opaque()
+    opaque.layer.masksToBounds = false
     
+    let instance = UIButton()
+    instance.addTarget(self,
+                       action: #selector(self.handleTap),
+                       for: .touchUpInside)
     if #available(iOS 15, *) {
-      let attrString = AttributedString((viewInput!.mode == .Preview ? "post_poll" : "vote").localized.uppercased(), attributes: AttributeContainer([
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.white
-      ]))
       var config = UIButton.Configuration.filled()
-      config.attributedTitle = attrString
-      config.baseBackgroundColor = .systemGray2//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-      config.image = UIImage(systemName: viewInput!.mode == .Preview ? "megaphone.fill" : "hand.point.left.fill",
-                             withConfiguration: UIImage.SymbolConfiguration(scale: .large))
-      config.imagePlacement = .trailing
-      config.imagePadding = padding
-      config.contentInsets.top = padding
-      config.contentInsets.bottom = padding
-      config.contentInsets.leading = 20
-      config.contentInsets.trailing = 20
-      config.buttonSize = .large
-
+      config.cornerStyle = .capsule
+      config.baseBackgroundColor = .systemGray2
+      config.attributedTitle = AttributedString((viewInput!.mode == .Preview ? "post_poll" : "vote").localized,
+                                                attributes: AttributeContainer([
+                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                  .foregroundColor: UIColor.white
+                                                ]))
       instance.configuration = config
     } else {
-      let attrString = NSMutableAttributedString(string: (viewInput!.mode == .Preview ? "post_poll" : "vote").localized.uppercased(), attributes: [
-        NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2) as Any,
-        NSAttributedString.Key.foregroundColor: UIColor.white
-      ])
-      instance.titleEdgeInsets.left = 20
-      instance.titleEdgeInsets.right = 20
-      instance.setImage(UIImage(systemName: viewInput!.mode == .Preview ? "megaphone.fill" : "hand.point.left.fill",
-                                withConfiguration: UIImage.SymbolConfiguration(scale: .large)),
-                        for: .normal)
-      instance.imageView?.tintColor = .white
-      instance.imageEdgeInsets.left = 8
-      //            instance.imageEdgeInsets.right = 8
-      instance.setAttributedTitle(attrString, for: .normal)
-      instance.semanticContentAttribute = .forceRightToLeft
-      instance.backgroundColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
-    instance.translatesAutoresizingMaskIntoConstraints = false
-      
-      let constraint = instance.widthAnchor.constraint(equalToConstant: self.actionButtonState.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!))
-      constraint.identifier = "width"
-      constraint.isActive = true
-      
+      instance.backgroundColor = .systemGray//item.topic.tagColor
       instance.publisher(for: \.bounds)
-        .sink { [weak self] rect in
-          guard let self = self else { return }
-          
-          instance.cornerRadius = rect.height/3.25
-          
-          guard let constraint = instance.getConstraint(identifier: "width") else { return }
-//          self.setNeedsLayout()
-          constraint.constant = self.actionButtonState.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .title2)!) + 40 + (instance .imageView?.bounds.width ?? 0)
-//          self.layoutIfNeeded()
-        }
+        .sink { instance.cornerRadius = $0.height/2 }
         .store(in: &subscriptions)
+      instance.setAttributedTitle(NSAttributedString(string: (viewInput!.mode == .Preview ? "post_poll" : "vote").localized,
+                                                     attributes: [
+                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                      .foregroundColor: UIColor.white as Any
+                                                     ]),
+                                  for: .normal)
     }
+    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
+    opaque.publisher(for: \.bounds)
+      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
+      .sink { [unowned self] in
+        opaque.layer.shadowOpacity = 1
+        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+        opaque.layer.shadowColor = UIColor.black.withAlphaComponent(0.25).cgColor // self.traitCollection.userInterfaceStyle == .dark ? self.item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.lightGray.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+        opaque.layer.shadowOffset = .zero // self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+      }
+      .store(in: &subscriptions)
+    instance.place(inside: opaque)
     
-//    let shadowView = UIView()
-//    shadowView.clipsToBounds = false
-//    shadowView.backgroundColor = .clear
-//    shadowView.accessibilityIdentifier = "shadow"
-//    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-//    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.7).cgColor
-//    shadowView.layer.shadowRadius = 16
-//    shadowView.layer.shadowOffset = .zero
-//    shadowView.layer.zPosition = 1
-//    shadowView.publisher(for: \.bounds)
-//      .receive(on: DispatchQueue.main)
-//      .sink { [weak self] in
-//        guard let self = self else { return }
-//
-//        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0,
-//                                                   cornerRadius: instance.cornerRadius).cgPath
-//      }
-//      .store(in: &subscriptions)
-//    shadowView.place(inside: instance)
-//    instance.layer.zPosition = 2
-    
-    return instance
+    return opaque
   }()
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
-    let clear = UIColor.clear.cgColor
+    let clear = UIColor.systemBackground.withAlphaComponent(0).cgColor
     instance.colors = [clear, clear, clear]
     instance.locations = [0.0, 1, 1]
     instance.frame = frame
@@ -445,8 +327,9 @@ class PollView: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setTasks()
-    setupUI()
+    backgroundColor = .systemBackground
+//    setTasks()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -460,7 +343,7 @@ class PollView: UIView {
     super.traitCollectionDidChange(previousTraitCollection)
     
     let clear = UIColor.systemBackground.withAlphaComponent(0).cgColor
-    let feathered = UIColor.systemBackground.cgColor
+    let feathered = UIColor.systemBackground.withAlphaComponent(0.975).cgColor
     gradient.colors = [clear, clear, feathered]
   }
 }
@@ -469,7 +352,71 @@ class PollView: UIView {
 private extension PollView {
   @MainActor
   func setupUI() {
-    backgroundColor = .systemBackground
+//    backgroundColor = .systemBackground
+    
+    collectionView.place(inside: self)
+//    addSubview(collectionView)
+//    collectionView.translatesAutoresizingMaskIntoConstraints = false
+//    collectionView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
+//    collectionView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor).isActive = true
+//    collectionView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor).isActive = true
+//    collectionView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
+    
+    guard !item!.isComplete else { return }
+    
+//    item!.reference.isCompletePublisher
+//      .receive(on: DispatchQueue.main)
+//      .sink { [weak self] _ in
+//        guard let self = self else { return }
+//
+//        self.selectedAnswer = nil
+//      }
+//      .store(in: &subscriptions)
+    
+//    layer.addSublayer(gradient)
+    addSubview(actionButton)
+    actionButton.translatesAutoresizingMaskIntoConstraints = false
+    actionButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+    actionButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
+    actionButton.layer.zPosition = 10
+    
+    let constraint = actionButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)//, constant: -tabBarHeight)
+    constraint.identifier = "top"
+    constraint.isActive = true
+
+//      if #available(iOS 15, *) {
+//        actionButton.configuration?.baseBackgroundColor = item.topic.tagColor
+//      } else {
+//        actionButton.backgroundColor = item.topic.tagColor
+//      }
+    actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+    
+    guard viewInput!.mode == .Preview,
+          let constraint = actionButton.getConstraint(identifier: "top")
+    else { return }
+    
+//    delay(seconds: 0.5) {[weak self] in
+//      guard let self = self else { return }
+//
+//      self.toggleFade(true)
+//      setNeedsLayout()
+//      //      layoutIfNeeded()
+//      //      setNeedsLayout()
+//      UIView.animate(
+//        withDuration: 0.35,
+//        delay: 0,
+//        usingSpringWithDamping: 0.8,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut],
+//        animations: { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.actionButton.transform = .identity
+//          self.actionButton.alpha = 1
+//          constraint.constant = -(self.actionButton.bounds.height + tabBarHeight)
+//          self.layoutIfNeeded()
+//        }) { _ in }
+//    }
   }
   
   func setTasks() {
@@ -494,88 +441,124 @@ private extension PollView {
     viewInput.mode == .Preview ? { viewInput.post() }() : { isVotingPublisher.send(true) }()
     actionButtonState = .Sending
     actionButton.isUserInteractionEnabled = false
-    
     if #available(iOS 15, *) {
-      actionButton.configuration?.showsActivityIndicator = true
+      actionButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString((viewInput.mode == .Preview ? "post_poll" : "vote").localized,
+                                                                                                      attributes: AttributeContainer([
+                                                                                                        .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                                        .foregroundColor: UIColor.clear
+                                                                                                      ]))
     } else {
-      actionButton.setImage(UIImage(), for: .normal)
-      actionButton.setAttributedTitle(nil, for: .normal)
-      let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
-                                                            size: CGSize(width: actionButton.frame.height,
-                                                                         height: actionButton.frame.height)))
-      indicator.alpha = 0
-      indicator.layoutCentered(in: actionButton)
-      indicator.startAnimating()
-      indicator.color = .white
-      indicator.accessibilityIdentifier = "indicator"
-      UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
+      actionButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: (viewInput.mode == .Preview ? "post_poll" : "vote").localized,
+                                                                                          attributes: [
+                                                                                            .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                            .foregroundColor: UIColor.clear as Any
+                                                                                          ]),
+                                                                       for: .normal)
     }
+    actionButton.setSpinning(on: true, color: .white, animated: true)
+    
+//    if #available(iOS 15, *) {
+//      actionButton.configuration?.showsActivityIndicator = true
+//    } else {
+//      actionButton.setImage(UIImage(), for: .normal)
+//      actionButton.setAttributedTitle(nil, for: .normal)
+//      let indicator = UIActivityIndicatorView(frame: CGRect(origin: .zero,
+//                                                            size: CGSize(width: actionButton.frame.height,
+//                                                                         height: actionButton.frame.height)))
+//      indicator.alpha = 0
+//      indicator.layoutCentered(in: actionButton)
+//      indicator.startAnimating()
+//      indicator.color = .white
+//      indicator.accessibilityIdentifier = "indicator"
+//      UIView.animate(withDuration: 0.2) { indicator.alpha = 1 }
+//    }
   }
   
-  func toggleFade(_ enable: Bool) {
+  func showButton(delay: Double, flag: Bool) {
+    // Animate gradient
     let clear = UIColor.systemBackground.withAlphaComponent(0).cgColor
-    let feathered = UIColor.systemBackground.cgColor
+    let feathered = UIColor.systemBackground.withAlphaComponent(0.975).cgColor
     
     let colorAnimation = Animations.get(property: .Colors,
                                         fromValue: gradient.colors as Any,
-                                        toValue: enable ? [clear, clear, feathered] : [clear, clear, clear] as Any,
+                                        toValue: flag ? [clear, clear, feathered] : [clear, clear, clear] as Any,
                                         duration: 0.2,
-                                        timingFunction: enable ? CAMediaTimingFunctionName.easeOut : CAMediaTimingFunctionName.easeIn,
+                                        delay: delay,
+                                        timingFunction: flag ? CAMediaTimingFunctionName.easeOut : CAMediaTimingFunctionName.easeIn,
                                         delegate: self,
                                         isRemovedOnCompletion: false,
                                         completionBlocks: [
                                           { [weak self] in
                                             guard let self = self else { return }
                                             
-                                            self.gradient.colors = enable ? [clear, clear, feathered] : [clear, clear, clear]
+                                            self.gradient.colors = flag ? [clear, clear, feathered] : [clear, clear, clear]
                                           }
                                         ])
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: gradient.locations as Any,
-                                           toValue: enable ? [0.0, 0.815, 0.875] : [0.0, 1, 1] as Any,
+                                           toValue: flag ? [0.0, 0.785, 0.81] : [0.0, 1, 1] as Any,
                                            duration: 0.2,
-                                           timingFunction: enable ? CAMediaTimingFunctionName.easeOut : CAMediaTimingFunctionName.easeIn,
+                                           delay: delay,
+                                           timingFunction: flag ? CAMediaTimingFunctionName.easeOut : CAMediaTimingFunctionName.easeIn,
                                            delegate: self,
                                            isRemovedOnCompletion: false,
                                            completionBlocks: [
                                              { [weak self] in
                                                guard let self = self else { return }
                                                
-                                               self.gradient.locations = enable ? [0.0, 0.815, 0.875] : [0.0, 1, 1]
+                                               self.gradient.locations = flag ? [0.0, 0.785, 0.81] : [0.0, 1, 1]
                                                self.gradient.removeAllAnimations()
                                              }
                                            ])
     
     gradient.add(locationAnimation, forKey: nil)
-//    gradient.colors = enable ? [clear, clear, feathered] : [clear, clear, clear]
     gradient.add(colorAnimation, forKey: nil)
-//    gradient.locations = enable ? [0.0, 0.815, 0.875] : [0.0, 1, 1]
+    
+    // Animate button position
+    guard let constraint = actionButton.getConstraint(identifier: "top") else { return }
+    
+    setNeedsLayout()
+    UIView.animate(
+      withDuration: 0.35,
+      delay: delay,//!selectedAnswer.isNil ? 0 : 0.25,
+      usingSpringWithDamping: 0.8,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut],
+      animations: { [weak self] in
+        guard let self = self else { return }
+
+        self.actionButton.transform = flag ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
+        self.actionButton.alpha = flag ? 1 : 0
+        constraint.constant = flag ? -(self.actionButton.bounds.height + tabBarHeight) : 0
+        self.layoutIfNeeded()
+      }) { _ in }
   }
 }
   
   // MARK: - Controller Output
 extension PollView: PollControllerOutput {
   func postCallback(_ result: Result<Bool, Error>) {
-    guard let constraint = actionButton.getConstraint(identifier: "top") else { return }
-    
-    delay(seconds: 0.5) {[weak self] in
-      guard let self = self else { return }
-      
-      self.toggleFade(false)
-      setNeedsLayout()
-      UIView.animate(
-        withDuration: 0.4,
-        delay: 0,
-        usingSpringWithDamping: 0.8,
-        initialSpringVelocity: 0.3,
-        options: [.curveEaseInOut]) {
-          
-          self.actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-          self.actionButton.alpha = 0
-          constraint.constant = 0
-          self.layoutIfNeeded()
-        }
-    }
+//    guard let constraint = actionButton.getConstraint(identifier: "top") else { return }
+//
+//
+//    delay(seconds: 0.5) { [weak self] in
+//      guard let self = self else { return }
+//
+//      self.toggleFade(false)
+//      setNeedsLayout()
+//      UIView.animate(
+//        withDuration: 0.4,
+//        delay: 0,
+//        usingSpringWithDamping: 0.8,
+//        initialSpringVelocity: 0.3,
+//        options: [.curveEaseInOut]) {
+//
+//          self.actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+//          self.actionButton.alpha = 0
+//          constraint.constant = 0
+//          self.layoutIfNeeded()
+//        }
+//    }
   }
   
   func presentView(_ item: Survey) {
@@ -591,12 +574,31 @@ extension PollView: PollControllerOutput {
     }
   }
   
-  func onLoadCallback(_: Result<Bool, Error>) {
+  func loadCallback(_: Result<Bool, Error>) {
     
   }
   
-  func onVoteCallback(_: Result<Bool, Error>) {
-    
+  func voteCallback(_ result: Result<Bool, Error>) {
+    actionButton.setSpinning(on: false, animated: false)
+    switch result {
+    case .success(_):
+      showButton(delay: 0.25, flag: false)
+    case .failure(_):
+      if #available(iOS 15, *) {
+        actionButton.getSubview(type: UIButton.self)!.configuration?.attributedTitle = AttributedString((viewInput?.mode == .Preview ? "post_poll" : "vote").localized,
+                                                                                                        attributes: AttributeContainer([
+                                                                                                          .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                                          .foregroundColor: UIColor.clear
+                                                                                                        ]))
+      } else {
+        actionButton.getSubview(type: UIButton.self)!.setAttributedTitle(NSAttributedString(string: (viewInput?.mode == .Preview ? "post_poll" : "vote").localized,
+                                                                                            attributes: [
+                                                                                              .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+                                                                                              .foregroundColor: UIColor.clear as Any
+                                                                                            ]),
+                                                                         for: .normal)
+      }
+    }
   }
   
   func commentPostCallback(_: Result<Comment, Error>) {

@@ -767,7 +767,7 @@ extension PollController: PollViewInput {
 // MARK: - Output
 extension PollController: PollModelOutput {
   @MainActor
-  func onLoadCallback(_ result: Result<Survey, Error>) {
+  func loadCallback(_ result: Result<Survey, Error>) {
     switch result {
     case .success(let instance):
       if item.isNil {
@@ -814,11 +814,13 @@ extension PollController: PollModelOutput {
     }
   }
   
-  func onAddFavoriteCallback(_: Result<Bool, Error>) {
+  func favoriteCallback(_: Result<Bool, Error>) {
     
   }
   
-  func onVoteCallback(_ result: Result<Bool, Error>) {
+  func voteCallback(_ result: Result<Bool, Error>) {
+    controllerOutput?.voteCallback(result)
+    
     switch result {
     case .success:
       guard let survey = self.item.survey,
@@ -899,6 +901,7 @@ extension PollController: PollModelOutput {
   
   func postCallback(_ result: Result<Bool, Error>) {
     controllerOutput?.postCallback(result)
+    
     switch result {
     case .success:
       let banner = NewPopup(padding: padding*5,

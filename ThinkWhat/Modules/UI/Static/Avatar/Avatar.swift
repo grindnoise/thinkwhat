@@ -73,20 +73,7 @@ class Avatar: UIView {
       //                }
       //                .store(in: &subscriptions)
       
-      
-      
-      userprofile.imagePublisher
-        .receive(on: DispatchQueue.main)
-        .sink(receiveCompletion: { error in
-#if DEBUG
-          print(error)
-#endif
-        }, receiveValue: { [weak self] in
-          guard let self = self else { return }
-          
-          self.image = $0
-        })
-        .store(in: &subscriptions)
+      setTasks()
     }
   }
   public var isSelected: Bool = false {
@@ -622,6 +609,7 @@ private extension Avatar {
     
     userprofile.imagePublisher
       .receive(on: DispatchQueue.main)
+      .filter { [unowned self] _ in self.isUploading }
       .sink(receiveCompletion: { [weak self] in
         guard let self = self else { return }
 
@@ -636,6 +624,25 @@ private extension Avatar {
         guard self.isUploading else { self.image = $0; return }
         
         self.imageUploadFinished(.success($0))
+      })
+      .store(in: &subscriptions)
+    
+    userprofile.imagePublisher
+      .filter { [unowned self] _ in !self.isUploading }
+      .receive(on: DispatchQueue.main)
+      .sink(receiveCompletion: { [weak self] in
+        guard let self = self else { return }
+        
+        if case .failure(let error) = $0 {
+          self.setUserprofileDefaultImage()
+#if DEBUG
+          print(error)
+#endif
+        }
+      }, receiveValue: { [weak self] in
+        guard let self = self else { return }
+        
+        self.image = $0
       })
       .store(in: &subscriptions)
     

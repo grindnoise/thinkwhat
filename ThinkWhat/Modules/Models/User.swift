@@ -723,15 +723,18 @@ class Userprofile: Decodable {
     guard image.isNil, !isDownloading, let url = imageURL else { return }
     
     isDownloading = true
-    Task {
+    Task { [weak self] in
+      guard let self = self else { return }
       //#if DEBUG
       //            print(self.id, "\(String(describing: self)).\(#function)")
       //#endif
       do {
         let image = try await API.shared.system.downloadImageAsync(from: url)
         self.image = image
+        self.isDownloading = false
       } catch {
-        imagePublisher.send(completion: .failure(error))
+        self.imagePublisher.send(completion: .failure(error))
+        self.isDownloading = false
       }
     }
   }
@@ -747,6 +750,7 @@ class Userprofile: Decodable {
       //#endif
       isDownloading = true
       image = try await API.shared.system.downloadImageAsync(from: url)
+      self.isDownloading = false
     } catch {
       isDownloading = false
       imagePublisher.send(completion: .failure(error))

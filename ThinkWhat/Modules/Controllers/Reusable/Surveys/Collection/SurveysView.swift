@@ -72,12 +72,10 @@ class SurveysView: UIView {
     
     //        let instance = SurveysCollectionView(topic: viewInput.topic)
     
-    //Pagination #1
-    let paginationPublisher = instance.paginationPublisher
+    //Pagination
+    instance.paginationPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
       .eraseToAnyPublisher()
-    
-    paginationPublisher
       .sink { [unowned self] in
         guard let source = $0.keys.first,
               let period = $0.values.first
@@ -91,16 +89,15 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
-                                            topicsIds: [])
+                                            topicsIds: [],
+                                            ids: [])
       }
       .store(in: &subscriptions)
     
-    //Pagination #2
-    let paginationByTopicPublisher = instance.paginationByTopicPublisher
+    //Pagination by topic
+    instance.paginationByTopicPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
       .eraseToAnyPublisher()
-    
-    paginationByTopicPublisher
       .sink { [weak self] in
         guard let self = self,
               let topic = $0.keys.first,
@@ -115,16 +112,15 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
-                                            topicsIds: [])
+                                            topicsIds: [],
+                                            ids: [])
       }
       .store(in: &subscriptions)
     
-    //Pagination #3
-    let paginationByOwnerPublisher = instance.paginationByOwnerPublisher
+    // Pagination by owner
+    instance.paginationByOwnerPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
       .eraseToAnyPublisher()
-    
-    paginationByOwnerPublisher
       .sink { [weak self] in
         guard let self = self,
               let userprofile = $0.keys.first,
@@ -139,19 +135,15 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
-                                            topicsIds: [])
+                                            topicsIds: [],
+                                            ids: [])
       }
       .store(in: &subscriptions)
     
-    ///Pagination #4
-    /// Request data when searching in user's surveys
-    /// - Parameters:
-    ///   - completion: A closure to be called on completion of reapplying the snapshot.
-    let paginationByOwnerSearchPublisher = instance.paginationByOwnerSearchPublisher
+    // Pagination for search by owner
+    instance.paginationByOwnerSearchPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
       .eraseToAnyPublisher()
-    
-    paginationByOwnerSearchPublisher
       .sink { [weak self] in
         guard let self = self,
               let userprofile = $0.keys.first,
@@ -166,17 +158,15 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: excluded,
                                             ownersIds: [userprofile.id],
-                                            topicsIds: [])
+                                            topicsIds: [],
+                                            ids: [])
       }
       .store(in: &subscriptions)
     
-    ///Pagination #5
-    /// Request data when searching in topic
-    let paginationByTopicSearchPublisher = instance.paginationByTopicSearchPublisher
+    //Pagination when searching in topic
+    instance.paginationByTopicSearchPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
       .eraseToAnyPublisher()
-    
-    paginationByTopicSearchPublisher
       .sink { [weak self] in
         guard let self = self,
               let topic = $0.keys.first,
@@ -191,17 +181,15 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: excluded,
                                             ownersIds: [],
-                                            topicsIds: [topic.id])
+                                            topicsIds: [topic.id],
+                                            ids: [])
       }
       .store(in: &subscriptions)
     
-    ///Pagination #6
-    /// By topic compatibiity
-    let paginationByCompatibilityPublisher = instance.paginationByCompatibilityPublisher
+    // Pagination  topic compatibiity
+    instance.paginationByCompatibilityPublisher
       .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
       .eraseToAnyPublisher()
-    
-    paginationByCompatibilityPublisher
       .sink { [weak self] in
         guard let self = self else { return }
         
@@ -213,7 +201,28 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
-                                            topicsIds: [])
+                                            topicsIds: [],
+                                            ids: [])
+      }
+      .store(in: &subscriptions)
+    
+    // Request by list of ids
+    instance.paginationByIdsPublisher
+      .filter { !$0.isNil }
+      .eraseToAnyPublisher()
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.onDataSourceRequest(source: .Compatibility,
+                                            dateFilter: .AllTime,
+                                            topic: nil,
+                                            userprofile: nil,
+                                            compatibility: nil,
+                                            substring: "",
+                                            except: [],
+                                            ownersIds: [],
+                                            topicsIds: [],
+                                            ids: $0!)
       }
       .store(in: &subscriptions)
     
@@ -233,7 +242,8 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
-                                            topicsIds: [])
+                                            topicsIds: [],
+                                            ids: [])
       }
       .store(in: &subscriptions)
     
@@ -253,7 +263,8 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
-                                            topicsIds: [])
+                                            topicsIds: [],
+                                            ids: [])
       }
       .store(in: &subscriptions)
     
@@ -271,7 +282,8 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
-                                            topicsIds: [])
+                                            topicsIds: [],
+                                            ids: [])
       }
       .store(in: &subscriptions)
     
@@ -291,7 +303,8 @@ class SurveysView: UIView {
                                             substring: "",
                                             except: [],
                                             ownersIds: [],
-                                            topicsIds: [])
+                                            topicsIds: [],
+                                            ids: [])
       }
       .store(in: &subscriptions)
     

@@ -67,10 +67,12 @@ extension SurveysModel: SurveysControllerInput {
                            dateFilter: Period?,
                            topic: Topic?,
                            userprofile: Userprofile?,
-                           compatibility: TopicCompatibility?) {
+                           compatibility: TopicCompatibility?,
+                           ids: [Int]?) {
     Task {
       do {
         try await API.shared.surveys.surveyReferences(category: source,
+                                                      ids: ids,
                                                       period: dateFilter,
                                                       topic: topic,
                                                       userprofile: userprofile,
@@ -94,7 +96,7 @@ extension SurveysModel: SurveysControllerInput {
     
     var existing: [SurveyReference] {
       var instances =  SurveyReferences.shared.all
-        .filter({ $0.title.contains(substring) })
+        .filter({ $0.title.lowercased().contains(substring) })
         .filter({ !surveys.map({ $0.id }).contains($0.id) })
       
       if !ownersIds.isEmpty { instances = instances.filter({ ownersIds.contains($0.owner.id) }) }

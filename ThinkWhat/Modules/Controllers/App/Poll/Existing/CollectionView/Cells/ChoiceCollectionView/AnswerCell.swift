@@ -32,14 +32,17 @@ class AnswerCell: UICollectionViewCell {
 //      updateUI(animated: false)
 //
       guard let survey = item.survey else { return }
-
+      
+//      votersStack.push(userprofiles: item.voters)
+      
       survey.reference.isCompletePublisher
         .filter { $0 }
+        .delay(for: .seconds(0.35), scheduler: DispatchQueue.main)
         .receive(on: DispatchQueue.main)
         .sink { [weak self] _ in
           guard let self = self else { return }
-
-          self.observeVoters()
+          
+//          self.observeVoters()
           self.closedConstraint.isActive = false
           self.openConstraint.isActive = true
           self.updatePublisher.send(true)
@@ -80,9 +83,17 @@ class AnswerCell: UICollectionViewCell {
         }
         .store(in: &subscriptions)
 
-      guard survey.reference.isComplete else { return }
-      ///Voters append
-      observeVoters()
+      item.votersPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.votersStack.push(userprofiles: $0.suffix(5))
+        }
+        .store(in: &subscriptions)
+//      guard survey.reference.isComplete else { return }
+//      ///Voters append
+//      observeVoters()
     }
   }
   ///**Publishers**
@@ -141,10 +152,10 @@ class AnswerCell: UICollectionViewCell {
     instance.layer.masksToBounds = false
     instance.axis = .vertical
     instance.spacing = 0
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.35).cgColor
     instance.layer.shadowOffset = .zero
     instance.layer.shadowOpacity = (isChosen || isSelected) ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
-    instance.layer.shadowRadius = padding*0.75///2
+    instance.layer.shadowRadius = padding*0.65///2
     
     // Add layer
     let sublayer = CALayer()
@@ -484,7 +495,7 @@ private extension AnswerCell {
     
     percentageLabel.text = item.percentString
     ///UI settings
-    imageView.tintColor = survey.isComplete ? traitCollection.userInterfaceStyle == .dark ? color : .white.blended(withFraction: 0.85, of: color) : (isChosen || isAnswerSelected) ? survey.topic.tagColor : .systemGray
+    imageView.tintColor = survey.isComplete ? traitCollection.userInterfaceStyle == .dark ? color : .white.blended(withFraction: 0.85, of: color) : (isChosen || isAnswerSelected) ? traitCollection.userInterfaceStyle == .dark ? color : .white.blended(withFraction: 0.85, of: color) : .systemGray
     imageView.setImage(UIImage(systemName: "\(item.order+1).circle.fill")!)
     
     if survey.isComplete {
@@ -514,7 +525,6 @@ private extension AnswerCell {
     
     if forceDeselect {
       guard let selection = stackView.getLayer(identifier: "selection") else { return }
-      
       UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut) {
         selection.opacity = 0
         selection.transform = CATransform3DMakeTranslation(1, 0.01, 1)
@@ -523,20 +533,21 @@ private extension AnswerCell {
       return
     }
     
-    guard !item.survey!.isComplete else { return }
+    guard !survey.isComplete else { return }
     
     UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) { [weak self] in
       guard let self = self else { return }
       
-      self.imageView.tintColor = self.isAnswerSelected ? survey.topic.tagColor : .systemGray
+      self.imageView.tintColor = self.isAnswerSelected ? traitCollection.userInterfaceStyle == .dark ? self.color : .white.blended(withFraction: 0.85, of: self.color) : .systemGray
     }
     
     switch isAnswerSelected {
     case true:
+      stackView.getLayer(identifier: "selection")?.removeFromSuperlayer()
       selectionPublisher.send(item)
       let selection = CALayer()
       selection.name  = "selection"
-      selection.backgroundColor = survey.topic.tagColor.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+      selection.backgroundColor = /*survey.topic.tagColor*/color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
       selection.frame = CGRect(origin: .zero, size: textView.bounds.size)
       selection.cornerRadius = stackView.bounds.width*0.025
       selection.opacity = 0
@@ -624,18 +635,18 @@ private extension AnswerCell {
 //      }
   }
   
-  func observeVoters() {
-    guard let item = item else { return }
-    
-    item.votersPublisher
-      .receive(on: DispatchQueue.main)
-      .sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.votersStack.push(userprofiles: $0.suffix(5))
-      }
-      .store(in: &subscriptions)
-  }
+//  func observeVoters() {
+//    guard let item = item else { return }
+//
+//    item.votersPublisher
+//      .receive(on: DispatchQueue.main)
+//      .sink { [weak self] in
+//        guard let self = self else { return }
+//
+//        self.votersStack.push(userprofiles: $0.suffix(5))
+//      }
+//      .store(in: &subscriptions)
+//  }
   
   @objc
   func handleGesture(sender: UITapGestureRecognizer) {

@@ -29,7 +29,8 @@ protocol SurveysViewInput: AnyObject {
                            substring: String,
                            except: [SurveyReference],
                            ownersIds: [Int],
-                           topicsIds: [Int])
+                           topicsIds: [Int],
+                           ids: [Int])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -47,7 +48,8 @@ protocol SurveysControllerInput: AnyObject {
                            dateFilter: Period?,
                            topic: Topic?, 
                            userprofile: Userprofile?,
-                           compatibility: TopicCompatibility?)
+                           compatibility: TopicCompatibility?,
+                           ids: [Int]?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(_: [SurveyReference: Claim])

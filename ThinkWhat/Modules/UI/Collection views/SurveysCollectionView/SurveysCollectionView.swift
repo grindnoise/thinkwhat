@@ -81,6 +81,7 @@ class SurveysCollectionView: UICollectionView {
   public let claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
   public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
   public let paginationPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
+  public let paginationByIdsPublisher = CurrentValueSubject<[Int]?, Never>(nil)
   public let paginationByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
   public let paginationByOwnerPublisher = PassthroughSubject<[Userprofile: Period], Never>()
   public let paginationByOwnerSearchPublisher = PassthroughSubject<[Userprofile: [SurveyReference]], Never>()
@@ -163,6 +164,8 @@ class SurveysCollectionView: UICollectionView {
       items = category.dataItems(topic: topic)
     } else if category == .Compatibility, !compatibility.isNil {
       items = category.dataItems(compatibility: compatibility)
+      // Request crossing items by ids
+      paginationByIdsPublisher.send(Array(Set(compatibility!.surveys).subtracting(Set(SurveyReferences.shared.all.map { $0.id }))))
     } else if category == .Search {
       items = fetchResult
     } else {
@@ -448,15 +451,28 @@ private extension SurveysCollectionView {
     delegate = self
     setRefreshControl()
     
-    collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
-      var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
-      layoutConfig.backgroundColor = .clear
-      layoutConfig.showsSeparators = false//true
-      layoutConfig.footerMode = section == 0 ? .none : .supplementary
+    collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
+      var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
+      configuration.backgroundColor = .clear
+      configuration.showsSeparators = false//true
+      configuration.footerMode = section == 0 ? .none : .supplementary
+      configuration.showsSeparators = true
+      if #available(iOS 14.5, *) {
+        configuration.itemSeparatorHandler = { indexPath, config -> UIListSeparatorConfiguration in
+          var config = UIListSeparatorConfiguration(listAppearance: .plain)
+          config.topSeparatorVisibility = .hidden
+          if indexPath.row != self.dataItems.count - 1 {
+            config.bottomSeparatorVisibility = .visible
+          } else {
+            config.bottomSeparatorVisibility = .hidden
+          }
+          return config
+        }
+      }
       
-      let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
+      let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
       sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-      sectionLayout.interGroupSpacing = 1
+//      sectionLayout.interGroupSpacing = 1
       
       return sectionLayout
     }
@@ -606,16 +622,17 @@ private extension SurveysCollectionView {
     Timer
       .publish(every: 10, on: .current, in: .common)
       .autoconnect()
-      .filter { [unowned self] _ in !self.isLoading }
-      .sink { [weak self] seconds in
+      .filter { [weak self] seconds in
         guard let self = self,
+              !self.isLoading,
               self.category != .Search,
               let cells = self.visibleCells as? [SurveyCell],
               cells.isEmpty
-        else { return }
+        else { return false }
 
-        self.refresh()
+        return true
       }
+      .sink { [unowned self] _ in self.refresh() }
       .store(in: &subscriptions)
     ///Update stats for visible cells
     Timer
