@@ -13,6 +13,10 @@ class CommentsCollectionView: UICollectionView {
   
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Comment>
   
+  struct Constants {
+    static let commentsStatsUpdateInterval = 10.0
+  }
+  
   enum Section: Int {
     case main
   }
@@ -265,7 +269,7 @@ class CommentsCollectionView: UICollectionView {
   
   private func setupUI() {
     Timer
-      .publish(every: 8, on: .current, in: .common)
+      .publish(every: Constants.commentsStatsUpdateInterval, on: .current, in: .common)
       .autoconnect()
       .sink { [weak self] seconds in
         guard let self = self,
@@ -432,13 +436,13 @@ class CommentsCollectionView: UICollectionView {
         
         guard comment.isOwn else { return }
         
-        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "checkmark.bubble.fill")!,
-                                                              text: "comment_posted",
-                                                              tintColor: survey.topic.tagColor),
+        let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Comment, scaleMultiplicator: 1.5, iconColor: survey.topic.tagColor),
+                                                              text: "comment_posted"),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
-                               shouldDismissAfter: 1)
+                               shouldDismissAfter: 2)
+
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)

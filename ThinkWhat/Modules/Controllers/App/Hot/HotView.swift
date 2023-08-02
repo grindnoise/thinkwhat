@@ -203,12 +203,12 @@ class HotView: UIView {
           instance.alpha = 0
           self.layoutIfNeeded()
         }) { [unowned self] _ in
-          guard let card = instance as? EmptyHotCard else { return }
-          
-          card.toggleAnimations(false)
-          
-          self.outgoing = nil
+          if let card = instance as? EmptyHotCard {
+            card.toggleAnimations(false)
+          }
+          instance.subscriptions.forEach { $0.cancel() }
           instance.removeFromSuperview()
+          self.outgoing = nil
         }
     }
     
@@ -246,18 +246,31 @@ private extension HotView {
     Timer.publish(every: 1, on: .main, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in self.viewInput?.isOnScreen == true }
-      .filter { [unowned self] _ in !self.current.isNil && current!.isKind(of: HotCard.self) }
+      .filter { [unowned self] _ in !self.current.isNil && self.current!.isKind(of: HotCard.self) }
       .filter { [unowned self] _ in !(self.current! as! HotCard).isBanned }
       .filter { [unowned self] _ in (self.current! as! HotCard).item.isBanned }
       .delay(for: .seconds(1), scheduler: DispatchQueue.main)
-      .sink { [unowned self] _ in (self.current as! HotCard).setBanned() { [unowned self] in self.next(self.viewInput?.deque()) } }
+      .sink { [unowned self] _ in
+        if let hotCard = self.current as? HotCard {
+          hotCard.setBanned() { [unowned self] in self.next(self.viewInput?.deque()) }
+//        } else {
+//          self.next(self.viewInput?.deque())
+        }
+      }
       .store(in: &subscriptions)
   }
 }
 
 extension HotView: HotControllerOutput {
   func setSurvey(_ instance: Survey?) {
-//    guard let instance = instance else { return }
+//    let aaaa = Surveys.shared.all.first!
+//    let test = HotCard(item: aaaa, nextColor: aaaa.topic.tagColor)
+//    addSubview(test)
+//    delay(seconds: 1) { [weak self] in
+//      guard let self = self else { return }
+//      
+//      self.next(nil)
+//    }
     
     next(instance)
   }
@@ -283,13 +296,17 @@ extension HotView: HotControllerOutput {
           (current.item.isBanned || current.item.isClaimed || current.item.isComplete)
     else { return }
     
-    if current.item.isComplete {
-      current.setComplete() { [unowned self] in
-        self.next(viewInput?.deque())
+//    delay(seconds: 0.5) { [weak self] in
+//      guard let self = self else { return }
+      
+      if current.item.isComplete {
+        current.setComplete() { [unowned self] in
+          self.next(self.viewInput?.deque())
+        }
+      } else {
+        next(viewInput?.deque())
       }
-    } else {
-      next(viewInput?.deque())
-    }
+//    }
   }
 }
 

@@ -54,7 +54,7 @@ struct Animations {
                   autoreverses: Bool = false,
                   fillMode: CAMediaTimingFillMode = .forwards,
                   timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default,
-                  delegate: CAAnimationDelegate?,
+                  delegate: CAAnimationDelegate? = nil,
                   isRemovedOnCompletion: Bool = true,
                   completionBlocks: [Closure]? = nil,
                   delay: CFTimeInterval = 0.0) -> CAAnimation {

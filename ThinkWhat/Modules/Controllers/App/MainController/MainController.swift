@@ -460,6 +460,14 @@ class MainController: UITabBarController {//}, StorageProtocol {
 
 private extension MainController {
   func setTasks() {
+    tasks.append(Task {@MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+        guard let self = self, !self.isDataLoaded else { return }
+        
+        self.spiral.startRotating(duration: 5)
+      }
+    })
+    
     guard let userprofile = Userprofiles.shared.current else { return }
 
     ///Subscription push notifications
@@ -503,8 +511,7 @@ private extension MainController {
       .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] in
-        let banner = NewBanner(contentView: UserBannerContentView(mode: .Unsubscribe,
-                                                                  userprofile: $0),
+        let banner = NewBanner(contentView: UserBannerContentView(mode: .Unsubscribe, userprofile: $0),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
@@ -514,6 +521,7 @@ private extension MainController {
           .store(in: &self.subscriptions)
       }
       .store(in: &subscriptions)
+    
 //    userprofile.subscriptionsPublisher
 //      .filter { !$0.isEmpty }
 //      .first()
@@ -571,11 +579,7 @@ private extension MainController {
       .sink { _ in
         
         let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
-                                                              text: "watch_survey_notification",
-                                                              tintColor: .label,
-                                                              fontName: Fonts.Rubik.Regular,
-                                                              textStyle: .subheadline,
-                                                              textAlignment: .natural),
+                                                              text: "watch_survey_notification"),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
@@ -787,12 +791,8 @@ private extension MainController {
 #if DEBUG
                       error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-                      let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                                            text: AppError.server.localizedDescription,
-                                                                            tintColor: .systemRed,
-                                                                            fontName: Fonts.Rubik.Regular,
-                                                                            textStyle: .subheadline,
-                                                                            textAlignment: .natural),
+                      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                                            text: AppError.server.localizedDescription),
                                              contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                              isModal: false,
                                              useContentViewHeight: true,
@@ -889,25 +889,25 @@ private extension MainController {
     viewControllers = [
       createNavigationController(for: surveyId.isNil ? HotController(commentId: commentId) : HotController(surveyId: surveyId),
                                  title: "hot",
-                                 image: UIImage(systemName: "flame", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//
-                                 selectedImage: UIImage(systemName: "flame.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),
+                                 image: UIImage(systemName: "flame", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//
+                                 selectedImage: UIImage(systemName: "flame.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),
                                  color: Colors.main),//Logo.Flame.rawValue),
       createNavigationController(for: SubscriptionsController(),
                                  title: "subscriptions",
-                                 image: UIImage(systemName: "bell", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
-                                 selectedImage: UIImage(systemName: "bell.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
+                                 image: UIImage(systemName: "bell", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
+                                 selectedImage: UIImage(systemName: "bell.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
                                  color: Colors.main),//Colors.Logo.CoolGray.rawValue),
       createNavigationController(for: ListController(), title: "list",
-                                 image: UIImage(systemName: "square.stack.3d.up", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
-                                 selectedImage: UIImage(systemName: "square.stack.3d.up.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
+                                 image: UIImage(systemName: "square.stack.3d.up", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
+                                 selectedImage: UIImage(systemName: "square.stack.3d.up.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
                                  color: Colors.main),//Colors.Logo.GreenMunshell.rawValue),
       createNavigationController(for: TopicsController(), title: "topics",
-                                 image: UIImage(systemName: "chart.bar.doc.horizontal", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
-                                 selectedImage: UIImage(systemName: "chart.bar.doc.horizontal.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
+                                 image: UIImage(systemName: "chart.bar.doc.horizontal", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
+                                 selectedImage: UIImage(systemName: "chart.bar.doc.horizontal.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
                                  color: Colors.main),//Colors.Logo.Marigold.rawValue),
       createNavigationController(for: SettingsController(), title: "settings",
-                                 image: UIImage(systemName: "gearshape", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
-                                 selectedImage: UIImage(systemName: "gearshape.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),//),
+                                 image: UIImage(systemName: "gearshape", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
+                                 selectedImage: UIImage(systemName: "gearshape.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
                                  color: Colors.main),//Colors.Logo.AirBlue.rawValue),
     ]
   }
@@ -921,7 +921,7 @@ private extension MainController {
 //    tabBarController?.view.backgroundColor = .white
     view.isUserInteractionEnabled = false
     tabBar.backgroundColor = .systemBackground
-    tabBar.tintColor = Colors.main//.Logo.Flame.rawValue
+    tabBar.tintColor = Colors.Logo.Flame.rawValue
     tabBar.shadowImage = UIImage()
     tabBar.backgroundImage = UIImage()
     tabBar.clipsToBounds = true
@@ -930,14 +930,14 @@ private extension MainController {
       let tabBarAppearance = UITabBarAppearance()
       tabBarAppearance.backgroundColor = .systemBackground
       tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [.font: UIFont(name: Fonts.Rubik.Regular, size: 11) as Any]
-      tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.font: UIFont(name: Fonts.Rubik.Medium, size: 11) as Any]
+//      tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.font: UIFont(name: Fonts.Rubik.Medium, size: 11) as Any]
       tabBar.standardAppearance = tabBarAppearance
       tabBar.scrollEdgeAppearance = tabBarAppearance
     } else {
       UITabBarItem.appearance().setTitleTextAttributes([.font: StringAttributes.font(name: Fonts.Rubik.Regular, size: 11)],
                                                        for: .normal)
-      UITabBarItem.appearance().setTitleTextAttributes([.font: StringAttributes.font(name: Fonts.Rubik.SemiBold, size: 11)],
-                                                       for: .selected)
+//      UITabBarItem.appearance().setTitleTextAttributes([.font: StringAttributes.font(name: Fonts.Rubik.SemiBold, size: 11)],
+//                                                       for: .selected)
     }
     
     delegate = self
@@ -1171,8 +1171,8 @@ extension MainController: UITabBarControllerDelegate {
       }
     }
     
-    func setColors(_ color: UIColor) {
-      tabBar.tintColor = color
+//    func setColors(_ color: UIColor) {
+//      tabBar.tintColor = color
 //      let logoColorAnim = Animations.get(property: .FillColor,
 //                                         fromValue: logoIcon.iconColor.cgColor as Any,
 //                                         toValue: color.cgColor as Any,
@@ -1198,31 +1198,32 @@ extension MainController: UITabBarControllerDelegate {
 //                                         isRemovedOnCompletion: false)
 //      self.logoText.icon.add(textColorAnim, forKey: nil)
 //      self.logoText.iconColor = color
-    }
-    
+//    }
+    tabBar.tintColor = traitCollection.userInterfaceStyle == .dark ? Colors.tabBarDark : Colors.tabBarLight//Colors.bannerDark
     if let nav = viewController as? UINavigationController,
        let controller = nav.viewControllers.first {
       switch controller.self {
       case is HotController:
+        tabBar.tintColor = Colors.Logo.Flame.rawValue
         currentTab = .Hot
-        setColors(Colors.main)//.Logo.Flame.rawValue)
+//        setColors(Colors.main)//.Logo.Flame.rawValue)
         setLogoCentered(animated: true)
         toggleLogo(on: true)
       case is SubscriptionsController:
-        setColors(Colors.main)
+//        setColors(Colors.main)
 //        setColors(Colors.Logo.CoolGray.rawValue)
         let controller = controller as! SubscriptionsController
         controller.isUserSelected ? { setLogoCentered(animated: true) }() : { setLogoLeading(constant: 10, animated: true) }() 
         toggleLogo(on: true)
       case is ListController:
         currentTab = .Feed
-        setColors(Colors.main)
+//        setColors(Colors.main)
 //setColors(Colors.Logo.GreenMunshell.rawValue)
         setLogoLeading(constant: 10, animated: true)
         toggleLogo(on: true)
       case is TopicsController:
         currentTab = .Topics
-        setColors(Colors.main)
+//        setColors(Colors.main)
 //setColors(Colors.Logo.Marigold.rawValue)
         setLogoCentered(animated: true)
         guard let instance = controller as? TopicsController,
@@ -1233,7 +1234,7 @@ extension MainController: UITabBarControllerDelegate {
         toggleLogo(on: false)
       case is SettingsController:
         currentTab = .Settings
-        setColors(Colors.main)
+//        setColors(Colors.main)
 //setColors(Colors.Logo.AirBlue.rawValue)
         setLogoCentered(animated: true)
         //                setLogoLeading(constant: 10, animated: true)

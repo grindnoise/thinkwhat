@@ -101,6 +101,7 @@ class HotController: UIViewController, TintColorable {
     super.viewWillAppear(animated)
     
 //    setNavigationBarTintColor(initialColor)
+    navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.setBarTintColor(initialColor)
     navigationController?.setBarShadow(on: false)
     
@@ -167,6 +168,8 @@ private extension HotController {
       .receive(on: DispatchQueue.main)
       .map { array in array.filter { $0.isHot && !$0.isRejected && !$0.isClaimed && !$0.isComplete && $0.id != Survey.fakeId }}
       .sink { [unowned self] in
+        
+        $0.forEach { $0.media.forEach { $0.downloadImage() }}
         self.queue.enqueue($0)
         
         guard let controllerOutput = controllerOutput,
@@ -269,6 +272,7 @@ private extension HotController {
   }
   
   func setData() {
+    Surveys.shared.hot.forEach { $0.media.forEach { $0.downloadImage() }}
     queue.enqueue(Surveys.shared.hot)
   }
 }

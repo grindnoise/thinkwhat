@@ -16,6 +16,8 @@ class PollTitleCell: UICollectionViewCell {
     didSet {
       guard let item = item else { return }
       
+      setupUI()
+      
       item.reference.viewsPublisher
         .receive(on: DispatchQueue.main)
         .sink { [weak self] in
@@ -34,12 +36,14 @@ class PollTitleCell: UICollectionViewCell {
         }
         .store(in: &subscriptions)
       
-      
-//      titleInsets = .init(top: 0,
-//                          left: mode == .Default ? padding : 0,
-//                          bottom: 0,
-//                          right: mode == .Default ? padding : 0)
-      setupUI()
+      item.reference.progressPublisher
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.avatar.setProgress(value: Double($0), animated: true)
+        }
+        .store(in: &subscriptions)
     }
   }
   public var mode: PollCollectionView.ViewMode = .Default {
@@ -112,7 +116,7 @@ class PollTitleCell: UICollectionViewCell {
 //    return instance
 //  }()
   private lazy var avatar: Avatar = {
-    let instance = Avatar(isShadowed: true)
+    let instance = Avatar(isShadowed: true, showsProgress: true, progressColor: item.topic.tagColor, progressValue: Double(item.progress))
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.isUserInteractionEnabled = true
     instance.tapPublisher
@@ -147,7 +151,7 @@ class PollTitleCell: UICollectionViewCell {
       avatar
     ])
     instance.axis = .horizontal
-    instance.spacing = 4
+    instance.spacing = padding
     
     return instance
   }()

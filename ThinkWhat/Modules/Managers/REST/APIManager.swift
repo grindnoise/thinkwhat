@@ -1529,8 +1529,7 @@ class API {
                                                  parameters: parameters,
                                                  encoding: JSONEncoding.default,
                                                  headers: headers)
-        let json = try JSON(data: data,
-                            options: .mutableContainers)
+        let json = try JSON(data: data, options: .mutableContainers)
         
         await MainActor.run {
           Surveys.shared.updateStats(json)

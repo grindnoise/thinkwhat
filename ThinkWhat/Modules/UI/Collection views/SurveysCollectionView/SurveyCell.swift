@@ -50,7 +50,7 @@ class SurveyCell: UICollectionViewCell {
         .sink { [weak self] _ in
           guard let self = self else { return }
           
-          self.updateProgress()
+          self.updateProgress(animated: true)
         }
         .store(in: &subscriptions)
     }
@@ -65,7 +65,7 @@ class SurveyCell: UICollectionViewCell {
   public private(set) var settingsTapPublisher = CurrentValueSubject<Bool?, Never>(nil)
   //UI
   public private(set) lazy var avatar: Avatar = {
-    let instance = Avatar(isShadowed: traitCollection.userInterfaceStyle != .dark)
+    let instance = Avatar(isShadowed: traitCollection.userInterfaceStyle != .dark, showsProgress: true)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     instance.isUserInteractionEnabled = true
     instance.tapPublisher
@@ -150,7 +150,7 @@ class SurveyCell: UICollectionViewCell {
       avatar
     ])
     instance.axis = .horizontal
-    instance.spacing = padding/2
+    instance.spacing = padding
     
     return instance
   }()
@@ -686,33 +686,7 @@ private extension SurveyCell {
   
   @MainActor
   func updateProgress(animated: Bool = true) {
-//    guard let progressIndicator = progressView.getSubview(type: UIView.self, identifier: "progress"),
-//          let progressLabel = progressView.getSubview(type: UIView.self, identifier: "progressLabel") as? UILabel,
-//          let constraint = progressIndicator.getConstraint(identifier: "width")
-//    else { return }
-//
-//    progressView.setNeedsLayout()
-//    progressView.layoutIfNeeded()
-//
-//    progressIndicator.backgroundColor = item.topic.tagColor
-//    //        progressView.setNeedsLayout()
-//    let progress = progressView.bounds.width * CGFloat(item.progress)*0.01
-//
-//    guard animated else {
-//      progressLabel.text = String(describing: item.progress) + "%"
-//      constraint.constant = progress
-//      progressView.layoutIfNeeded()
-//      return
-//    }
-//
-//    UIView.transition(with: progressLabel,
-//                      duration: 0.15,
-//                      options: .transitionCrossDissolve) { [weak self] in
-//      guard let self = self else { return }
-//
-//      constraint.constant = progress
-//      self.progressView.layoutIfNeeded()
-//    } completion: { _ in }
+    avatar.setProgress(value: Double(item.progress), animated: animated)
   }
   
   @MainActor
@@ -727,7 +701,8 @@ private extension SurveyCell {
 //        progressView.alpha = 1
 //      }
       dateLabel.text = item.startDate.timeAgoDisplay()
-
+      avatar.setProgressColor(item.topic.tagColor)
+      
       if item.isAnonymous {
         avatar.userprofile = Userprofile.anonymous
         usernameLabel.text = ""

@@ -19,11 +19,15 @@ class YoutubeCell: UICollectionViewCell {
   public var item: Survey! {
     didSet {
       guard !item.isNil, let url = item.url, let id = url.absoluteString.youtubeID else { return }
-      color = item.topic.tagColor
+      
       playerView.load(withVideoId: id)
+      setupUI()
     }
   }
   public weak var callbackDelegate: CallbackObservable?
+  public var mode: PollCollectionView.ViewMode = .Default
+  
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -87,17 +91,14 @@ class YoutubeCell: UICollectionViewCell {
     return instance
   }()
   private lazy var verticalStack: UIStackView = {
-//    let opaque = UIView()
-//    opaque.backgroundColor = .clear
-//    opaque.addSubview(horizontalStack)
-//    horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-//    horizontalStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor, constant: padding).isActive = true
-//    horizontalStack.topAnchor.constraint(equalTo: opaque.topAnchor).isActive = true
-//    horizontalStack.bottomAnchor.constraint(equalTo: opaque.bottomAnchor).isActive = true
-    
-    let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, shadowView])
+    let verticalStack = UIStackView()//arrangedSubviews: [horizontalStack, imageContainer])
+    if mode == .Default {
+      verticalStack.addArrangedSubview(horizontalStack)
+    }
+    verticalStack.addArrangedSubview(shadowView)
     verticalStack.axis = .vertical
     verticalStack.spacing = padding
+    
     return verticalStack
   }()
   private var closedConstraint: NSLayoutConstraint!
@@ -105,10 +106,14 @@ class YoutubeCell: UICollectionViewCell {
   private lazy var shadowView: UIView = {
     let instance = UIView.opaque()
     instance.layer.masksToBounds = false
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.35).cgColor
     instance.layer.shadowOffset = .zero
     instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowRadius = padding
+    instance.layer.shadowRadius = padding*0.65///2
+    instance.publisher(for: \.bounds)
+      .sink { instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.025).cgPath }
+      .store(in: &subscriptions)
+    playerView.place(inside: instance)
     
     return instance
   }()
@@ -118,14 +123,14 @@ class YoutubeCell: UICollectionViewCell {
     instance.webView?.backgroundColor = .clear
     instance.webView?.scrollView.isOpaque = false
     instance.webView?.scrollView.backgroundColor = .clear
-    instance.backgroundColor = .secondarySystemBackground
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 9/16).isActive = true
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
     instance.publisher(for: \.bounds)
       .filter { $0 != .zero }
       .sink { instance.cornerRadius = $0.width*0.025 }
       .store(in: &subscriptions)
     instance.delegate = self
-    instance.place(inside: shadowView)
+    
     let shimmer = Shimmer()
     shimmer.layer.zPosition = 100
     shimmer.place(inside: instance)
@@ -159,6 +164,8 @@ class YoutubeCell: UICollectionViewCell {
   }()
   var isPresentingBanner = false
   
+  
+  
   // MARK: - Destructor
   deinit {
 #if DEBUG
@@ -166,22 +173,26 @@ class YoutubeCell: UICollectionViewCell {
 #endif
   }
   
+  
+  
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
+  
+  
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : !isSelected ? 1 : 0
 //    verticalStack.get(all: UIView.self).filter({ $0.accessibilityIdentifier == "shadow" }).forEach {
 //      $0.layer.shadowOpacity = self.traitCollection.userInterfaceStyle == .dark ? 0 : 1
 //    }
@@ -219,17 +230,24 @@ private extension YoutubeCell {
     verticalStack.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-        contentView.topAnchor.constraint(equalTo: topAnchor),
-        contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-        contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-        contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-        verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
-        verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
-        verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
+      contentView.topAnchor.constraint(equalTo: topAnchor),
+      contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding*2),
+      verticalStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+      verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
     ])
 
-    setNeedsLayout()
-    layoutIfNeeded()
+    color = item.topic.tagColor
+//    setNeedsLayout()
+//    layoutIfNeeded()
+    
+//    guard mode == .Default else {
+//      playerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding).isActive = true
+//
+//      return
+//    }
 
     closedConstraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
     closedConstraint.priority = .defaultLow
@@ -248,11 +266,14 @@ private extension YoutubeCell {
     guard animated else {
       let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
       self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+      shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : !isSelected ? 1 : 0
+      
       return
     }
     UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
       let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
       self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+      self.shadowView.alpha = !self.isSelected ? 1 : 0
     }
   }
   

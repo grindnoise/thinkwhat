@@ -15,6 +15,9 @@ class Avatar: UIView {
     case Default, Editing, Choice, Selection
   }
   
+  struct Constants {
+    static let animationDuration = 0.4
+  }
   //    @Published private var image: UIImage?
   
 //  override var debugDescription: String { "Avatar for: \(userprofile!.name)" }
@@ -329,6 +332,40 @@ class Avatar: UIView {
   }()
   private var choiceImage: UIImage?
   private var ciFilterName: String
+  // Progress circle
+  private let showsProgress: Bool
+  private lazy var progressLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.path = UIBezierPath(ovalIn: .zero).cgPath
+    instance.fillColor = UIColor.clear.cgColor
+    instance.lineCap = .round
+    instance.shadowOffset = .zero
+    instance.masksToBounds = false
+    instance.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    instance.strokeEnd = 0
+    
+    return instance
+  }()
+  private lazy var progressBackgroundLayer: CAShapeLayer = {
+    let instance = CAShapeLayer()
+    instance.path = UIBezierPath(ovalIn: .zero).cgPath
+    instance.fillColor = UIColor.clear.cgColor
+//    instance.strokeStart = 0
+//    instance.strokeEnd  = 1
+    instance.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.white.blended(withFraction: 0.1, of: UIColor.lightGray).cgColor
+    
+    return instance
+  }()
+  private var progressColor: UIColor {
+    didSet {
+      progressLayer.strokeColor = progressColor.cgColor
+      progressLayer.shadowColor = progressColor.withAlphaComponent(0.5).cgColor
+    }
+  }
+  private var progressValue: Double
+  private let progressLineWidthMultiplier: CGFloat = 0.09
+  private let progressBgLineWidthMultiplier: CGFloat = 0.15
+  
   
   
   // MARK: - Destructor
@@ -350,7 +387,10 @@ class Avatar: UIView {
        lightBorderColor: UIColor = .clear,
        darkBorderColor: UIColor = .clear,
        mode: Mode = .Default,
-       filter: String = "") {
+       filter: String = "",
+       showsProgress: Bool = false,
+       progressColor: UIColor = .systemGray,
+       progressValue: Double = .zero) {
     self.mode = mode
     self.isShadowed = isShadowed
     self.isBordered = isBordered
@@ -358,6 +398,9 @@ class Avatar: UIView {
     self.darkBorderColor = darkBorderColor
     self.userprofile = userprofile
     self.ciFilterName = filter
+    self.showsProgress = showsProgress
+    self.progressColor = progressColor
+    self.progressValue = progressValue
     let frame = CGRect(origin: .zero, size: size)
     
     super.init(frame: frame)
@@ -386,11 +429,7 @@ class Avatar: UIView {
     //        imageView.contentMode = .center
     imageView.image = nil
   }
-  
-  //    public func setSelectionMode(_ on: Bool) {
-  //        mode = on ? .Selection : .Default
-  //    }
-  
+
   public func setUserprofileDefaultImage() {
     imageView.tintColor = .systemGray
     imageView.backgroundColor = .secondarySystemBackground
@@ -511,23 +550,13 @@ class Avatar: UIView {
     //    button.imageView?.contentMode = .center
   }
   
-  /**
-   Sets photo filter by using CICategoryColorEffect
-   - parameter name: CICategoryColorEffect string. If empty - sets back default image
-   - parameter duration: time interval to animate.
-   */
+  
+  /// Sets photo filter by using CICategoryColorEffect
+  /// - Parameters:
+  ///   - name: CICategoryColorEffect string. If empty - sets back default image
+  ///   - duration: time interval to animate.
+  ///
   public func toggleFilter(on: Bool, duration: TimeInterval = .zero) {
-//    guard let image = userprofile?.image,
-//          let newImage = name.isEmpty ? image : image.setFilter(filter: name)
-//    else { return }
-//
-//
-//    guard !duration.isZero else {
-//      imageView.image = newImage
-//
-//      return
-//    }
-//
     guard let image = on ? self.filteredImage : self.image else { return }
     
     if duration != .zero {
@@ -538,6 +567,62 @@ class Avatar: UIView {
       imageView.image = image
     }
   }
+   
+  /// Sets circular progress path
+  /// - Parameters:
+  ///   - value: percent
+  ///   - animated: animation flag
+  public func setProgress(value: Double, animated: Bool) {
+    guard !value.isZero,
+          value != progressValue
+    else { return }
+    
+    let strokeEnd = value/100
+    
+    if animated {
+      progressLayer.add(Animations.get(property: .LineWidth,
+                                       fromValue: progressLayer.lineWidth,
+                                       toValue: progressLayer.lineWidth*1.25,
+                                       duration: Constants.animationDuration/2,
+                                       autoreverses: true,
+                                       timingFunction: .linear,
+                                       isRemovedOnCompletion: true), forKey: nil)
+      
+//      progressLayer.add(Animations.get(property: .StrokeColor,
+//                                       fromValue: progressLayer.strokeColor as Any,
+//                                       toValue: progressColor.withLuminosity(0.65).cgColor,
+//                                       duration: Constants.animationDuration/2,
+//                                       autoreverses: true,
+//                                       timingFunction: .linear,
+//                                       isRemovedOnCompletion: true), forKey: nil)
+      
+      progressLayer.add(Animations.get(property: .StrokeEnd,
+                                       fromValue: progressLayer.strokeEnd,
+                                       toValue: strokeEnd,
+                                       duration: Constants.animationDuration,
+                                       timingFunction: .easeInEaseOut,
+                                       delegate: self,
+                                       isRemovedOnCompletion: false,
+                                       completionBlocks: [{ [weak self] in
+        guard let self = self else { return }
+        
+        self.progressLayer.strokeEnd = strokeEnd
+        self.progressLayer.removeAllAnimations()
+        self.progressValue = strokeEnd
+      }]), forKey: nil)
+    } else {
+      progressLayer.strokeEnd = strokeEnd
+    }
+    progressValue = strokeEnd
+  }
+  
+  /// Sets progress path color
+  /// - Parameter color: path color
+  public func setProgressColor(_ color: UIColor) {
+    progressColor = color
+  }
+  
+  
   
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -546,6 +631,10 @@ class Avatar: UIView {
     layer.shadowOpacity = isShadowed ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
     
     button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
+    
+    if showsProgress {
+      progressBackgroundLayer.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.white.blended(withFraction: 0.1, of: UIColor.lightGray).cgColor
+    }
     
     guard let coloredBg = background.getSubview(type: UIView.self, identifier: "coloredBg") else { return }
     
@@ -579,8 +668,16 @@ private extension Avatar {
     publisher(for: \.bounds)
       .filter { $0 != .zero }
       .sink { [unowned self] in
-        self.layer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
-        self.layer.shadowRadius = min($0.height/8, 8)
+        if self.showsProgress {
+          self.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.75).cgColor
+          let lineWidth = $0.width*self.progressBgLineWidthMultiplier
+          let newRect = CGRect(origin: .zero, size: CGSize(width: $0.width + lineWidth,
+                                                           height: $0.height + lineWidth))
+          self.layer.shadowPath = UIBezierPath(ovalIn: newRect.offsetBy(dx: -lineWidth/2, dy: -lineWidth/2)).cgPath
+        } else {
+          self.layer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
+        }
+        self.layer.shadowRadius = min($0.height/8, 8) //self.showsProgress ? $0.height/4 : min($0.height/8, 8)
       }
       .store(in: &subscriptions)
     
@@ -600,6 +697,56 @@ private extension Avatar {
     let constraintY = button.centerYAnchor.constraint(equalTo: topAnchor)
     constraintY.isActive = true
     constraintY.identifier = "constraintY"
+    
+    // Setup progress layer
+    guard showsProgress else { return }
+    
+    layer.addSublayer(progressBackgroundLayer)
+    layer.addSublayer(progressLayer)
+    if !progressValue.isZero {
+      progressLayer.strokeEnd = progressValue/100
+    }
+    publisher(for: \.bounds)
+      .filter { $0 != .zero }
+      .sink { [weak self] rect in
+        guard let self = self else { return }
+        
+        let lineWidthBg = rect.width * self.progressBgLineWidthMultiplier
+        let newRect = CGRect(origin: .zero, size: CGSize(width: rect.width + lineWidthBg,
+                                                         height: rect.height + lineWidthBg))
+        
+        let path = UIBezierPath(arcCenter: CGPoint(x: newRect.midX - lineWidthBg/2, y: newRect.midY - lineWidthBg/2),
+                                radius: newRect.width/2,
+                                startAngle: -CGFloat.pi / 2,
+                                endAngle: CGFloat.pi * 2,
+                                clockwise: true).cgPath
+        //UIBezierPath(ovalIn: newRect.offsetBy(dx: -lineWidthBg/4, dy: -lineWidthBg/4)).cgPath
+        self.progressBackgroundLayer.lineWidth = lineWidthBg
+        self.progressBackgroundLayer.path = path // UIBezierPath(ovalIn: newRect.offsetBy(dx: -lineWidthBg/4, dy: -lineWidthBg/4)).cgPath
+        
+        let lineWidth = rect.width * self.progressLineWidthMultiplier
+        let newRect2 = CGRect(origin: .zero, size: CGSize(width: newRect.width + (lineWidthBg - lineWidth),
+                                                          height: newRect.height + (lineWidthBg - lineWidth)))
+        self.progressLayer.lineWidth = lineWidth
+        self.progressLayer.path = UIBezierPath(arcCenter: CGPoint(x: newRect2.midX - (lineWidthBg + (lineWidthBg - lineWidth))/2, y: newRect2.midY - (lineWidthBg + (lineWidthBg - lineWidth))/2),
+                                               radius: newRect2.width/2,
+                                               startAngle: -.pi / 2,
+                                               endAngle: -.pi / 2 + .pi * 2,
+                                               clockwise: true).cgPath
+        
+        self.setProgressColor(self.progressColor)
+        self.progressLayer.shadowRadius = newRect2.width*0.025
+//        self.progressLayer.path = UIBezierPath(ovalIn: newRect.offsetBy(dx: -lineWidthBg/4, dy: -lineWidthBg/4)).cgPath
+//        self.progressLayer.path = UIBezierPath(
+//          arcCenter: CGPoint(x: rect.width / 2.0, y: rect.height / 2.0),
+//          radius: rect.width - lineWidth,
+//          startAngle: CGFloat(-Double.pi / 2),
+//          endAngle: CGFloat(-Double.pi / 2) + (2 * .pi),
+//          clockwise: true
+//      ).cgPath
+      }
+      .store(in: &subscriptions)
+    
   }
   
   func setTasks() {
@@ -667,10 +814,20 @@ private extension Avatar {
     guard let image = userprofile.image else {
       if !userprofile.imageURL.isNil {
         shimmer.startShimmering()
-        userprofile.downloadImage()
+//        userprofile.downloadImage()
+        Task {
+          do {
+            try await userprofile.downloadImageAsync()
+          } catch {
+            await MainActor.run { [weak self] in
+              guard let self = self else { return }
+                
+              self.setUserprofileDefaultImage()
+            }
+          }
+        }
         return
       }
-      setUserprofileDefaultImage()
       
       return
     }
@@ -767,7 +924,42 @@ private extension Avatar {
       self.filteredImage = image.setFilter(filter: filterName)
     }
   }
+  
+  /// Animates progress
+  /// - Parameter duration: animation duration
+  func animateProgressLayer(duration: TimeInterval) {
+    progressLayer.add(Animations.get(property: .StrokeEnd,
+                                     fromValue: 0,
+                                     toValue: 1,
+                                     duration: duration,
+                                     timingFunction: .easeInEaseOut,
+                                     delegate: self,
+                                     isRemovedOnCompletion: false,
+                                     completionBlocks: [{ [weak self] in
+      guard let self = self else { return }
+      
+      self.progressLayer.strokeEnd = 1
+      self.progressLayer.removeAllAnimations()
+    }]), forKey: nil)
+  }
 }
+
+
+extension Avatar: CAAnimationDelegate {
+  func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
+      completionBlocks.forEach{ $0() }
+    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
+      completionBlocks.forEach{ $0() }
+    } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
+      initialLayer.path = path as! CGPath
+      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
+        completionBlock()
+      }
+    }
+  }
+}
+
 
 //extension Avatar: UIContextMenuInteractionDelegate {
 //

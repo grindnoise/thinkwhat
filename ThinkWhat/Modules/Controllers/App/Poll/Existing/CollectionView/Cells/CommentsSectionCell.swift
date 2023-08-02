@@ -235,9 +235,12 @@ class CommentsSectionCell: UICollectionViewCell {
       }
       .store(in: &subscriptions)
     
+    // Update comments thread stats only comments are opened
     instance.updateStatsPublisher
       .sink { [weak self] in
-        guard let self = self else { return }
+        guard let self = self,
+              self.openConstraint.isActive
+        else { return }
         
         self.updateStatsPublisher.send($0)
       }

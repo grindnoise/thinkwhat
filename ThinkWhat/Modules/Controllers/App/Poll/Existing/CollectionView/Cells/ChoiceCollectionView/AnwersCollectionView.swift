@@ -115,7 +115,9 @@ private extension AnswersCollectionView {
       guard let self = self else { return }
       
       cell.contentView.layer.masksToBounds = false
-      cell.item = item
+      if cell.item.isNil {
+        cell.item = item
+      }
       cell.selectionPublisher
         .sink { [unowned self] in
           self.selectionPublisher.send($0)

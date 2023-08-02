@@ -193,6 +193,20 @@ class HotCard: UIView, Card {
     
     return instance
   }()
+  // Animation for popular vote
+  private let maxItems = 16
+  private var items = [Icon]() {
+    didSet {
+      guard !shouldTerminate && items.count < maxItems else { return }
+
+      if item.isComplete {
+        animateCompletion()
+      } else if item.isBanned {
+        animateBan()
+      }
+    }
+  }
+  private var shouldTerminate = false
   
   
   
@@ -245,20 +259,43 @@ class HotCard: UIView, Card {
 //                                               attributes: [
 //
 //                                               ])
+    let blur: UIVisualEffectView = {
+      let instance = UIVisualEffectView(effect: UIBlurEffect(style: traitCollection.userInterfaceStyle == .dark ? .systemUltraThinMaterialDark : .systemUltraThinMaterial))
+      instance.cornerRadius = padding*2
+      instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+      instance.alpha = 0
+      
+      let label = UILabel()
+      label.backgroundColor = .clear
+      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.Bold, forTextStyle: .title1)
+      label.text = "survey_banned_notification".localized
+      label.textColor = .white
+      label.numberOfLines = 0
+      label.textAlignment = .center
+      label.place(inside: instance.contentView, insets: .uniform(size: padding))
+      
+      return instance
+    }()
     
-    let label = UILabel()
-    label.backgroundColor = .clear
-    label.alpha = 0
-    label.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle)
-    label.text = "survey_banned_notification".localized// + "\n⚠︎"
-    label.textColor = .white
-    label.numberOfLines = 0
-    label.textAlignment = .center
-//    label.attributedText = attrString
+    blur.placeInCenter(of: self, widthMultiplier: 0.65)
+    blur.transform = .init(scaleX: 0.5, y: 0.5)
     
+    animateBan()
     
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
     let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.cgColor
+    
+    UIView.animate(
+      withDuration: 0.6,
+      delay: 0,
+      usingSpringWithDamping: 0.8,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut],
+      animations: {
+        blur.transform = .identity
+        blur.alpha = 1
+      })
+    
     let colorAnimation = Animations.get(property: .Colors,
                                         fromValue: [clear, clear, feathered] as Any,
                                         toValue: [clear, UIColor.systemRed.cgColor, UIColor.systemRed.cgColor] as Any,
@@ -271,19 +308,10 @@ class HotCard: UIView, Card {
                                             guard let self = self else { return }
                                             
                                             self.fadeGradient.colors = [clear, UIColor.systemRed.cgColor, UIColor.systemRed.cgColor]
-                                            label.place(inside: self,
-                                                        insets: .uniform(size: self.padding*2))
-                                            label.transform = .init(scaleX: 1.25, y: 1.25)
-                                            UIView.animate(
-                                              withDuration: 0.6,
-                                              delay: 0,
-                                              usingSpringWithDamping: 0.8,
-                                              initialSpringVelocity: 0.3,
-                                              options: [.curveEaseInOut],
-                                              animations: {
-                                                label.transform = .identity
-                                                label.alpha = 1
-                                              }) { _ in delay(seconds: 1) { completion() } }
+                                            delay(seconds: 2.5) {
+                                                self.fadeGradient.removeAllAnimations()
+                                                completion()
+                                              }
                                           }])
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: [0.0, 0.5, 0.9] as Any,
@@ -316,21 +344,28 @@ class HotCard: UIView, Card {
       self.collectionView.alpha = 0.25
     }
     
-//    let attrString = NSMutableAttributedString(string: "".localized,
-//                                               attributes: [
-//
-//                                               ])
+    let blur: UIVisualEffectView = {
+      let instance = UIVisualEffectView(effect: UIBlurEffect(style: traitCollection.userInterfaceStyle == .dark ? .systemUltraThinMaterialDark : .systemUltraThinMaterial))
+      instance.cornerRadius = padding*2
+      instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+      instance.alpha = 0
+      
+      let label = UILabel()
+      label.backgroundColor = .clear
+      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.Bold, forTextStyle: .largeTitle)
+      label.text = "survey_complete_notification".localized + "\n🥳"
+      label.textColor = .white
+      label.numberOfLines = 0
+      label.textAlignment = .center
+      label.place(inside: instance.contentView, insets: .uniform(size: padding))
+      
+      return instance
+    }()
     
-    let label = UILabel()
-    label.backgroundColor = .clear
-    label.alpha = 0
-    label.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle)
-    label.text = "survey_complete_notification".localized + "\n🥳"
-    label.textColor = .white
-    label.numberOfLines = 0
-    label.textAlignment = .center
-//    label.attributedText = attrString
+    blur.placeInCenter(of: self, widthMultiplier: 0.65)
+    blur.transform = .init(scaleX: 0.5, y: 0.5)
     
+    animateCompletion()
     
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
     let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.cgColor
@@ -346,9 +381,9 @@ class HotCard: UIView, Card {
                                             guard let self = self else { return }
                                             
                                             self.fadeGradient.colors = [clear, UIColor.systemGreen.cgColor, UIColor.systemGreen.cgColor]
-                                            label.place(inside: self,
-                                                        insets: .uniform(size: self.padding*2))
-                                            label.transform = .init(scaleX: 1.25, y: 1.25)
+//                                            label.place(inside: self,
+//                                                        insets: .uniform(size: self.padding*2))
+//                                            label.transform = .init(scaleX: 1.25, y: 1.25)
                                             UIView.animate(
                                               withDuration: 0.6,
                                               delay: 0,
@@ -356,9 +391,13 @@ class HotCard: UIView, Card {
                                               initialSpringVelocity: 0.3,
                                               options: [.curveEaseInOut],
                                               animations: {
-                                                label.transform = .identity
-                                                label.alpha = 1
-                                              }) { _ in delay(seconds: 0.5) { completion() } }
+                                                blur.transform = .identity
+                                                blur.alpha = 1
+                                              }) { _ in delay(seconds: 1.5) {
+                                                self.fadeGradient.removeAllAnimations()
+                                                completion()
+                                              }
+                                              }
                                           }])
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: [0.0, 0.5, 0.9] as Any,
@@ -504,7 +543,9 @@ private extension HotCard {
     let constraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor)
     constraint.isActive = true
     publisher(for: \.bounds)
-      .sink { [unowned self] in
+      .sink { [weak self]  in
+        guard let self = self else { return }
+        
         self.setNeedsLayout()
         constraint.constant = -$0.height/32
         self.layoutIfNeeded()
@@ -549,6 +590,79 @@ private extension HotCard {
       isUserInteractionEnabled = sender != nextButton
     }
   }
+  
+  /// Shows completion animation with floating checkmark seals
+  func animateCompletion() {
+    let third = UIScreen.main.bounds.width * 1/3
+    let random = Icon(frame: CGRect(origin: self.randomPoint(center.x - third...center.x + third, center.y - third...center.y + third),
+                                    size: .uniform(size: CGFloat.random(in: 40...60))))
+    let color = UIColor.white.withAlphaComponent(CGFloat.random(in: 0.7...0.9))
+    random.iconColor = color
+    random.scaleMultiplicator = 1
+    random.category = .CheckMarkSealFill
+    random.startRotating(duration: Double.random(in: 10...20),
+                         repeatCount: .infinity,
+                         clockwise: Int.random(in: 1...3) % 2 == 0 ? true : false)
+    random.setAnchorPoint(CGPoint(x: Int.random(in: -5...5), y: Int.random(in: -5...5)))
+//    random.layer.masksToBounds = false
+//    random.icon.shadowOffset = .zero
+//    random.icon.shadowOpacity = Float.random(in: 0.5...0.8)
+//    random.icon.shadowColor = color.cgColor
+//    random.icon.shadowRadius = random.bounds.width * 0.3
+    
+    self.insertSubview(random, belowSubview: self.getSubview(type: UIVisualEffectView.self) ?? collectionView)
+    self.items.append(random)
+    let duration = TimeInterval.random(in: 6...8)
+      UIView.animate(withDuration: duration) {
+        random.transform = CGAffineTransform(rotationAngle: Int.random(in: 0...9) % 2 == 0 ? .pi : -.pi)
+      }
+      Timer.scheduledTimer(withTimeInterval: duration*0.9, repeats: false, block: { _ in
+        UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
+          random.alpha = 0
+          random.transform = .init(scaleX: 0.25, y: 0.25)
+        } completion: { _ in
+          random.removeFromSuperview()
+        }
+      })
+    }
+  
+  /// Shows ban animation
+  func animateBan() {
+    let third = UIScreen.main.bounds.width * 1/3
+    let random = Icon(frame: CGRect(origin: self.randomPoint(center.x - third...center.x + third, center.y - third...center.y + third),
+                                    size: .uniform(size: CGFloat.random(in: 40...60))))
+    let color = UIColor.white.withAlphaComponent(CGFloat.random(in: 0.7...0.9))
+    random.iconColor = color
+    random.scaleMultiplicator = 1
+    random.alpha = 0
+    random.transform = .init(scaleX: 0.5, y: 0.5)
+    random.category = .ExclamationMark
+    random.startRotating(duration: Double.random(in: 10...20),
+                         repeatCount: .infinity,
+                         clockwise: Int.random(in: 1...3) % 2 == 0 ? true : false)
+    random.setAnchorPoint(CGPoint(x: Int.random(in: -5...5), y: Int.random(in: -5...5)))
+    
+    self.insertSubview(random, belowSubview: self.getSubview(type: UIVisualEffectView.self) ?? collectionView)
+    self.items.append(random)
+    let duration = TimeInterval.random(in: 6...8)
+    UIView.animate(withDuration: duration) {
+      random.transform = CGAffineTransform(rotationAngle: Int.random(in: 0...9) % 2 == 0 ? .pi : -.pi)
+    }
+    Timer.scheduledTimer(withTimeInterval: duration*0.9, repeats: false, block: { _ in
+      UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
+        random.alpha = 0
+        random.transform = .init(scaleX: 0.25, y: 0.25)
+      } completion: { _ in
+        random.removeFromSuperview()
+      }
+    })
+    UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.6)) { [weak self] in
+      guard let self = self else { return }
+      
+      random.alpha = CGFloat.random(in: self.traitCollection.userInterfaceStyle == .dark ? 0.3...0.7 : 0.7...0.9)
+      random.transform = .identity
+    }
+    }
 }
 
 extension HotCard: CAAnimationDelegate {

@@ -665,7 +665,7 @@ class SubscriptionsView: UIView {
     let instance = UIView()
     instance.accessibilityIdentifier = "bg"
     instance.layer.masksToBounds = true
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .tertiarySystemBackground
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
     //        instance.addEquallyTo(to: shadowView)
     surveysCollectionView.place(inside: instance)
     instance.publisher(for: \.bounds)
@@ -732,7 +732,7 @@ class SubscriptionsView: UIView {
 //    avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
     userView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-//    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .tertiarySystemBackground
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
     periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
     periodButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
     updatePeriodButton()
@@ -915,7 +915,7 @@ private extension SubscriptionsView {
     
     addSubview(contentView)
     
-    var views = [
+    let views = [
       topView,
       filterView,
       shadowView,

@@ -402,14 +402,16 @@ enum Colors {
     return color.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.05 : 0.6)
   }
   
+  static let tabBarLight = UIColor(red: 0.416, green: 0.400, blue: 0.639, alpha: 1.000)
+  static let tabBarDark = UIColor.white
   static var main: UIColor { UIColor(hexString: "#21A038") } //Colors.Logo.Flame.rawValue }
   static var darkTheme: UIColor { UIColor(hexString: "#262626") }
   static var bannerDark: UIColor { UIColor(hexString: "#494949") }
   static var bannerLight: UIColor { UIColor.systemBackground } // UIColor { UIColor(hexString: "#F1F0F0") }
   static var cellHeader: UIColor { UIColor.lightGray }
-  static var spiralLight: UIColor { "#1E1E1E".hexColor!.withAlphaComponent(0.03) }
+  static var spiralLight: UIColor { UIColor.white.blended(withFraction: 0.04, of: UIColor.lightGray) }//"#1E1E1E".hexColor!.withAlphaComponent(0.03) }
   static var spiralDark: UIColor { "#1E1E1E".hexColor!.withAlphaComponent(0.55) }
-  static var surveyCollectionLight: UIColor { .secondarySystemBackground }
+  static var surveyCollectionLight: UIColor { .white.blended(withFraction: 0.05, of: .lightGray) }
   static var surveyCollectionDark: UIColor { .secondarySystemBackground }
   static var surveyCellLight: UIColor { .white }
   static var surveyCellDark: UIColor { UIColor(hexString: "#262626") }

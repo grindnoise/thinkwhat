@@ -403,7 +403,7 @@
 "watch_survey_notification" = "Вы будете уведомлены о результатах при завершении публикации";
 "survey_finished_notification" = "Опрос завершился!";
 "survey_finished_vote_notification" = "Опрос завершился, но Вы еще можете проголосовать!";
-"survey_banned_notification" = "Публикация была заблокирована";
+"survey_banned_notification" = "Публикация заблокирована";
 "survey_complete_notification" = "Опрос пройден";
 "open_url_embedded" = "Открыть в приложении";
 "open_url_in_app" = "Открыть в ";

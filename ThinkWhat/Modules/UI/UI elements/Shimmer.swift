@@ -20,11 +20,18 @@ class Shimmer: UIView {
   private let darkColor: UIColor
   private lazy var gradient: CAGradientLayer = {
     backgroundColor = .clear
-    let light = lightColor.cgColor
-    let dark = darkColor.cgColor
+    var light: CGColor!
+    var dark: CGColor!
+    if traitCollection.userInterfaceStyle == .dark {
+      light = darkColor.cgColor
+      dark = lightColor.lighter(0.025).cgColor
+    } else {
+      light = lightColor.darker(0.025).cgColor
+      dark = lightColor.cgColor
+    }
     
     let instance = CAGradientLayer()
-    instance.colors = [dark, light, dark]
+    instance.colors = [light, dark, light]
     instance.startPoint = CGPoint(x: 0.0, y: 0.5)
     instance.endPoint = CGPoint(x: 1.0, y: 0.5)
     instance.locations = [0.2, 0.5, 0.9]
@@ -65,9 +72,11 @@ class Shimmer: UIView {
   
   
   // MARK: - Initialization
-  init(color: UIColor = .secondarySystemFill) {
-    self.lightColor = color.lighter(0.25)
-    self.darkColor = color
+//  init(color: UIColor = .secondarySystemFill) {
+  init(lightColor: UIColor = .systemBackground,
+       darkColor: UIColor = .tertiarySystemBackground) {
+    self.lightColor = lightColor.darker(0.025)
+    self.darkColor = darkColor.darker(0.05)
     
     super.init(frame: .zero)
     

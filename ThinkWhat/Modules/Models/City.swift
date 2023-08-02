@@ -44,10 +44,6 @@ class City: Decodable {
   var regionName: String
 //  var geonamesObject: GeonamesObject?
   
-  deinit {
-    print(self)
-  }
-  
   required init(from decoder: Decoder) throws {
     do {
       let container   = try decoder.container(keyedBy: CodingKeys.self)

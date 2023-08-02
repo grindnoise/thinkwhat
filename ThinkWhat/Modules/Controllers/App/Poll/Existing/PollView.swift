@@ -76,7 +76,7 @@ class PollView: UIView {
     let instance = PollCollectionView(item: item!, mode: viewInput!.mode)
 //    instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0.0)
     instance.layer.masksToBounds = false
-    instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: item.isNil ? 100 : item!.isComplete ? 100 : 120, right: instance.contentInset.right)
+    instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: item.isNil ? appDelegate.window!.bounds.height * 0.1 : item!.isComplete ? appDelegate.window!.bounds.height * 0.1 : appDelegate.window!.bounds.height * 0.15, right: instance.contentInset.right)
     instance.imagePublisher
       .sink {[weak self] in
         guard let self = self,
@@ -248,7 +248,6 @@ class PollView: UIView {
     return instance
   }()
   private var actionButtonState: ButtonState = .Send
-  
   public private(set) lazy var actionButton: UIView = {
     let opaque = UIView.opaque()
     opaque.layer.masksToBounds = false
@@ -307,6 +306,20 @@ class PollView: UIView {
     
     return instance
   }()
+  // Animation for popular vote
+  private let maxItems = 16
+  private var items = [Icon]() {
+    didSet {
+      guard !shouldTerminate && items.count < maxItems else { return }
+
+      if item!.isBanned {
+        animateBan()
+      } else {
+        showCongratulations()
+      }
+    }
+  }
+  private var shouldTerminate = false
   
   
   
@@ -347,6 +360,8 @@ class PollView: UIView {
     gradient.colors = [clear, clear, feathered]
   }
 }
+
+
 
 // MARK: - Private
 private extension PollView {
@@ -391,10 +406,10 @@ private extension PollView {
 //      }
     actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
     
-    guard viewInput!.mode == .Preview,
-          let constraint = actionButton.getConstraint(identifier: "top")
-    else { return }
-    
+//    guard viewInput!.mode == .Preview,
+//          let constraint = actionButton.getConstraint(identifier: "top")
+//    else { return }
+//
 //    delay(seconds: 0.5) {[weak self] in
 //      guard let self = self else { return }
 //
@@ -482,9 +497,9 @@ private extension PollView {
     let colorAnimation = Animations.get(property: .Colors,
                                         fromValue: gradient.colors as Any,
                                         toValue: flag ? [clear, clear, feathered] : [clear, clear, clear] as Any,
-                                        duration: 0.2,
+                                        duration: 0.3,
                                         delay: delay,
-                                        timingFunction: flag ? CAMediaTimingFunctionName.easeOut : CAMediaTimingFunctionName.easeIn,
+                                        timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                         delegate: self,
                                         isRemovedOnCompletion: false,
                                         completionBlocks: [
@@ -497,20 +512,19 @@ private extension PollView {
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: gradient.locations as Any,
                                            toValue: flag ? [0.0, 0.785, 0.81] : [0.0, 1, 1] as Any,
-                                           duration: 0.2,
+                                           duration: 0.3,
                                            delay: delay,
-                                           timingFunction: flag ? CAMediaTimingFunctionName.easeOut : CAMediaTimingFunctionName.easeIn,
+                                           timingFunction: CAMediaTimingFunctionName.easeOut,
                                            delegate: self,
                                            isRemovedOnCompletion: false,
                                            completionBlocks: [
-                                             { [weak self] in
-                                               guard let self = self else { return }
-                                               
-                                               self.gradient.locations = flag ? [0.0, 0.785, 0.81] : [0.0, 1, 1]
-                                               self.gradient.removeAllAnimations()
-                                             }
+                                            { [weak self] in
+                                              guard let self = self else { return }
+                                              
+                                              self.gradient.locations = flag ? [0.0, 0.785, 0.81] : [0.0, 1, 1]
+                                              self.gradient.removeAllAnimations()
+                                            }
                                            ])
-    
     gradient.add(locationAnimation, forKey: nil)
     gradient.add(colorAnimation, forKey: nil)
     
@@ -519,20 +533,58 @@ private extension PollView {
     
     setNeedsLayout()
     UIView.animate(
-      withDuration: 0.35,
+      withDuration: 0.3,
       delay: delay,//!selectedAnswer.isNil ? 0 : 0.25,
-      usingSpringWithDamping: 0.8,
-      initialSpringVelocity: 0.3,
+      //      usingSpringWithDamping: 0.8,
+      //      initialSpringVelocity: 0.3,
       options: [.curveEaseInOut],
       animations: { [weak self] in
         guard let self = self else { return }
-
+        
         self.actionButton.transform = flag ? .identity : CGAffineTransform(scaleX: 0.75, y: 0.75)
         self.actionButton.alpha = flag ? 1 : 0
         constraint.constant = flag ? -(self.actionButton.bounds.height + tabBarHeight) : 0
         self.layoutIfNeeded()
       }) { _ in }
   }
+  
+  /// Shows ban animation
+  func animateBan() {
+    let third = UIScreen.main.bounds.width * 1/3
+    let random = Icon(frame: CGRect(origin: self.randomPoint(center.x - third...center.x + third, center.y - third...center.y + third),
+                                    size: .uniform(size: CGFloat.random(in: 40...60))))
+    let color = UIColor.white.withAlphaComponent(CGFloat.random(in: 0.7...0.9))
+    random.iconColor = color
+    random.scaleMultiplicator = 1
+    random.alpha = 0
+    random.transform = .init(scaleX: 0.5, y: 0.5)
+    random.category = .ExclamationMark
+    random.startRotating(duration: Double.random(in: 10...20),
+                         repeatCount: .infinity,
+                         clockwise: Int.random(in: 1...3) % 2 == 0 ? true : false)
+    random.setAnchorPoint(CGPoint(x: Int.random(in: -5...5), y: Int.random(in: -5...5)))
+    
+    self.insertSubview(random, belowSubview: self.getSubview(type: UIVisualEffectView.self) ?? collectionView)
+    self.items.append(random)
+    let duration = TimeInterval.random(in: 6...8)
+    UIView.animate(withDuration: duration) {
+      random.transform = CGAffineTransform(rotationAngle: Int.random(in: 0...9) % 2 == 0 ? .pi : -.pi)
+    }
+    Timer.scheduledTimer(withTimeInterval: duration*0.9, repeats: false, block: { _ in
+      UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
+        random.alpha = 0
+        random.transform = .init(scaleX: 0.25, y: 0.25)
+      } completion: { _ in
+        random.removeFromSuperview()
+      }
+    })
+    UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.6)) { [weak self] in
+      guard let self = self else { return }
+      
+      random.alpha = CGFloat.random(in: self.traitCollection.userInterfaceStyle == .dark ? 0.3...0.7 : 0.7...0.9)
+      random.transform = .identity
+    }
+    }
 }
   
   // MARK: - Controller Output
@@ -607,6 +659,141 @@ extension PollView: PollControllerOutput {
   
   func commentDeleteError() {
     
+  }
+  
+  func showCongratulations() {
+    func getRandomCategory() -> Icon.Category {
+      let all = [
+        10072,
+        10073,
+        10074,
+        10075,
+        10076,
+        10077,
+        10078,
+        10080,
+        10081,
+      ].map { Icon.Category(rawValue: $0)! }
+      
+      return all[Int.random(in: 0..<all.count-1)]
+    }
+    
+    guard viewInput?.mode != .Preview else { return }
+    
+    let category = getRandomCategory()
+    let third = UIScreen.main.bounds.width * 1/3
+    let random = Icon(frame: CGRect(origin: self.randomPoint(center.x - third...center.x + third, center.y - third...center.y + third),
+                                    size: .uniform(size: CGFloat.random(in: 40...60))))
+    let color = UIColor.random()
+    random.iconColor = color
+    random.scaleMultiplicator = 1
+    random.category = category
+    random.transform = .init(scaleX: 0.75, y: 0.75)
+    random.alpha = 0
+    random.startRotating(duration: Double.random(in: 10...20),
+                         repeatCount: .infinity,
+                         clockwise: Int.random(in: 1...3) % 2 == 0 ? true : false)
+    random.setAnchorPoint(CGPoint(x: Int.random(in: -5...5), y: Int.random(in: -5...5)))
+    random.layer.masksToBounds = false
+    random.icon.shadowOffset = .zero
+    random.icon.shadowOpacity = Float.random(in: 0.5...0.8)
+    random.icon.shadowColor = color.cgColor
+    random.icon.shadowRadius = random.bounds.width * 0.3
+    
+    self.insertSubview(random, belowSubview: self.collectionView)
+    self.items.append(random)
+    let duration = TimeInterval.random(in: 4...6)
+    UIView.animate(withDuration: duration) {
+      random.transform = CGAffineTransform(rotationAngle: Int.random(in: 0...9) % 2 == 0 ? .pi : -.pi)
+    }
+    Timer.scheduledTimer(withTimeInterval: duration*0.9, repeats: false, block: { _ in
+      UIView.animate(withDuration: TimeInterval.random(in: 0.3...0.8)) {
+        random.alpha = 0
+        random.transform = .init(scaleX: 0.25, y: 0.25)
+      } completion: { _ in
+        random.removeFromSuperview()
+      }
+    })
+    
+    UIView.animate(withDuration: TimeInterval.random(in: 0.7...0.9)) { [weak self] in
+      guard let self = self else { return }
+      
+      random.alpha = CGFloat.random(in: self.traitCollection.userInterfaceStyle == .dark ? 0.3...0.7 : 0.5...0.7)
+      random.transform = .identity
+    }
+  }
+  
+  func setBanned(_ completion: @escaping () -> ()) {
+    let blur: UIVisualEffectView = {
+      let instance = UIVisualEffectView(effect: UIBlurEffect(style: traitCollection.userInterfaceStyle == .dark ? .systemUltraThinMaterialDark : .systemUltraThinMaterial))
+      instance.cornerRadius = padding*2
+      instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
+      instance.alpha = 0
+      
+      let label = UILabel()
+      label.backgroundColor = .clear
+      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.Bold, forTextStyle: .title1)
+      label.text = "survey_banned_notification".localized
+      label.textColor = .white
+      label.numberOfLines = 0
+      label.textAlignment = .center
+      label.place(inside: instance.contentView, insets: .uniform(size: padding))
+      
+      return instance
+    }()
+    
+    blur.placeInCenter(of: self, widthMultiplier: 0.65)
+    blur.transform = .init(scaleX: 0.5, y: 0.5)
+    
+    animateBan()
+    
+    let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.cgColor
+    
+    UIView.animate(
+      withDuration: 0.6,
+      delay: 0,
+      usingSpringWithDamping: 0.8,
+      initialSpringVelocity: 0.3,
+      options: [.curveEaseInOut],
+      animations: {
+        blur.transform = .identity
+        blur.alpha = 1
+      })
+    
+    let colorAnimation = Animations.get(property: .Colors,
+                                        fromValue: [clear, clear, feathered] as Any,
+                                        toValue: [clear, UIColor.systemRed.cgColor, UIColor.systemRed.cgColor] as Any,
+                                        duration: 0.4,
+                                        timingFunction: CAMediaTimingFunctionName.easeIn,
+                                        delegate: self,
+                                        isRemovedOnCompletion: false,
+                                        completionBlocks: [
+                                          {[weak self] in
+                                            guard let self = self else { return }
+                                            
+                                            self.gradient.colors = [clear, UIColor.systemRed.cgColor, UIColor.systemRed.cgColor]
+                                            delay(seconds: 2.5) {
+                                                self.gradient.removeAllAnimations()
+                                                completion()
+                                              }
+                                          }])
+    let locationAnimation = Animations.get(property: .Locations,
+                                           fromValue: [0.0, 0.5, 0.9] as Any,
+                                           toValue: [-1.0, 0, 1] as Any,
+                                           duration: 0.4,
+                                           timingFunction: CAMediaTimingFunctionName.easeIn,
+                                           delegate: self,
+                                           isRemovedOnCompletion: false,
+                                           completionBlocks: [
+                                            {[weak self] in
+                                              guard let self = self else { return }
+                                              
+                                              self.gradient.locations = [-1.0, 0, 1]
+                                            }])
+    
+    gradient.add(locationAnimation, forKey: nil)
+    gradient.add(colorAnimation, forKey: nil)
   }
 }
 

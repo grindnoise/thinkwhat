@@ -732,7 +732,6 @@ extension UIView {
 //}
 
 extension UIView {
-  
   func startRotating(duration: CFTimeInterval = 3, repeatCount: Float = Float.infinity, clockwise: Bool = true) {
     
     if self.layer.animation(forKey: "transform.rotation.z") != nil {
@@ -754,9 +753,9 @@ extension UIView {
     self.layer.removeAllAnimations()
   }
   
-  func randomPoint() -> CGPoint {
-    CGPoint(x: Int.random(in: 0...Int(bounds.width)),
-            y: Int.random(in: 0...Int(bounds.height)))
+  func randomPoint(_ xRange: ClosedRange<CGFloat>? = nil, _ yRange: ClosedRange<CGFloat>? = nil) -> CGPoint {
+    CGPoint(x: CGFloat.random(in: xRange.isNil ? 0.0...bounds.width : xRange!),
+            y: CGFloat.random(in: yRange.isNil ? 0.0...bounds.height : yRange!))
   }
 }
 

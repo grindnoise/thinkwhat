@@ -141,6 +141,7 @@ class SurveysCollectionView: UICollectionView {
       
       var snap = source.snapshot()
       if isLoading, snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
+        loaderStartedAt = Date()
         snap.appendSections([.loader])
         apply(source: self.source, snapshot: snap)
       } else if !isLoading, !snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
@@ -456,23 +457,23 @@ private extension SurveysCollectionView {
       configuration.backgroundColor = .clear
       configuration.showsSeparators = false//true
       configuration.footerMode = section == 0 ? .none : .supplementary
-      configuration.showsSeparators = true
-      if #available(iOS 14.5, *) {
-        configuration.itemSeparatorHandler = { indexPath, config -> UIListSeparatorConfiguration in
-          var config = UIListSeparatorConfiguration(listAppearance: .plain)
-          config.topSeparatorVisibility = .hidden
-          if indexPath.row != self.dataItems.count - 1 {
-            config.bottomSeparatorVisibility = .visible
-          } else {
-            config.bottomSeparatorVisibility = .hidden
-          }
-          return config
-        }
-      }
+//      configuration.showsSeparators = true
+//      if #available(iOS 14.5, *) {
+//        configuration.itemSeparatorHandler = { indexPath, config -> UIListSeparatorConfiguration in
+//          var config = UIListSeparatorConfiguration(listAppearance: .plain)
+//          config.topSeparatorVisibility = .hidden
+//          if indexPath.row != self.dataItems.count - 1 {
+//            config.bottomSeparatorVisibility = .visible
+//          } else {
+//            config.bottomSeparatorVisibility = .hidden
+//          }
+//          return config
+//        }
+//      }
       
       let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
       sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//      sectionLayout.interGroupSpacing = 1
+      sectionLayout.interGroupSpacing = self.padding
       
       return sectionLayout
     }
@@ -672,20 +673,12 @@ private extension SurveysCollectionView {
       .store(in: &subscriptions)
     
     ///If bottom spinner is on screen more than n seconds, then hide it
-    Timer.publish(every: 8, on: .main, in: .common)
+    Timer.publish(every: 1, on: .main, in: .common)
       .autoconnect()
+      .filter { [unowned self] _ in self.isLoading && self.isOnScreen && self.loaderStartedAt.distance(to: Date()) > 5 }
       .sink { [weak self] _ in
-        guard let self = self,
-              self.isLoading,
-              self.isOnScreen
-        else { return }
-        
-        let diff = self.loaderStartedAt.distance(to: Date())
-        
-        guard diff > 10 else { return }
-#if DEBUG
-        print("diff", diff)
-#endif
+        guard let self = self else { return }
+
         self.isLoading = false
       }
       .store(in: &subscriptions)
@@ -966,9 +959,9 @@ private extension SurveysCollectionView {
              completion: Closure? = nil) {
     guard isApplyingSnapshot else {
       self.isApplyingSnapshot = true
-#if DEBUG
-      print("isLoading", self.isLoading, to: &logger)
-#endif
+//#if DEBUG
+//      print("isLoading", self.isLoading, to: &logger)
+//#endif
       
       if !isLoading {
         self.isLoadingPublisher.send(self.isLoading)

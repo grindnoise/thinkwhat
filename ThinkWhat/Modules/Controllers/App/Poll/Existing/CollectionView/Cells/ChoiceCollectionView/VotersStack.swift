@@ -150,36 +150,32 @@ class VotersStack: UIView {
                           isBordered: true,
                           lightBorderColor: lightBorderColor,
                           darkBorderColor: darkBorderColor)
+      insertSubview(pushed, belowSubview: listener)
+      pushed.translatesAutoresizingMaskIntoConstraints = false
+      pushed.widthAnchor.constraint(equalTo: heightAnchor).isActive = true
+      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+      var constraint: NSLayoutConstraint!
       
       if subviews.filter({ $0 is Avatar }).isEmpty {
-//        addSubview(pushed)
-        insertSubview(pushed, belowSubview: listener)
-        pushed.translatesAutoresizingMaskIntoConstraints = false
-        pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-        let constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
-        constraint.identifier = "anchor"
-        constraint.isActive = true
+        constraint = pushed.trailingAnchor.constraint(equalTo: trailingAnchor)
       } else if let last = subviews.filter({ $0 is Avatar }).last as? Avatar {
-//        addSubview(pushed)
-        insertSubview(pushed, belowSubview: listener)
-        pushed.translatesAutoresizingMaskIntoConstraints = false
-        pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
-        let constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
-        constraint.identifier = "anchor"
-        constraint.isActive = true
+        constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
       }
       
-        pushed.transform = .init(scaleX: 0.5, y: 0.5)
-        pushed.alpha = 0
-        UIView.animate(
-          withDuration: 0.3,
-          delay: 0,
-          usingSpringWithDamping: 0.9,
-          initialSpringVelocity: 0.3,
-          options: [.curveEaseInOut]) {
-            pushed.alpha = 1
-            pushed.transform = .identity
-          }
+      constraint.identifier = "anchor"
+      constraint.isActive = true
+      pushed.transform = .init(scaleX: 0.5, y: 0.5)
+      pushed.alpha = 0
+      
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.9,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut]) {
+          pushed.alpha = 1
+          pushed.transform = .identity
+        }
       
       if let popped = stack.push(pushed),
          let constraint = popped.getConstraint(identifier: "anchor") {
@@ -213,8 +209,8 @@ class VotersStack: UIView {
             guard let peak = peak,
                   let peakConstraint = peak.getConstraint(identifier: "anchor")
             else { return }
-
-
+            
+            
             self.setNeedsLayout()
             peak.removeConstraint(peakConstraint)
             let new = peak.trailingAnchor.constraint(equalTo: self.trailingAnchor)
@@ -226,8 +222,8 @@ class VotersStack: UIView {
     }
     
     let currentSet = Set(stack.storage.compactMap { $0.userprofile })
-//    let appendingSet = Set(userprofiles)
-//    let appendingArray = Array(appendingSet.symmetricDifference(currentSet))
+    //    let appendingSet = Set(userprofiles)
+    //    let appendingArray = Array(appendingSet.symmetricDifference(currentSet))
     
     let newSet = Set(userprofiles)
     
@@ -237,7 +233,7 @@ class VotersStack: UIView {
     }
     
     let appendingSet = newSet.subtracting(currentSet)
-//    newSet.map { $0.id }
+    //    newSet.map { $0.id }
 //    currentSet.map { $0.id }
 //    appendingSet.map { $0.id }
     guard !appendingSet.isEmpty else { return }

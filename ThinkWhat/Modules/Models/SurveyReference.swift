@@ -172,12 +172,12 @@ class SurveyReference: Decodable {// NSObject,
       survey?.isFavorite = isFavorite
     }
   }
-  var isBanned: Bool {
+  @Published var isBanned: Bool {
     didSet {
       guard oldValue != isBanned else { return }
       
       survey?.isBanned = isBanned
-      isBannedPublisher.send(isBanned)
+//      isBannedPublisher.send(isBanned)
       SurveyReferences.shared.bannedPublisher.send(self)
       //            isBannedPublisher.send(completion: .finished)
       
@@ -220,7 +220,7 @@ class SurveyReference: Decodable {// NSObject,
   public let isFavoritePublisher     = PassthroughSubject<Bool, Never>()
   public let isCompletePublisher     = PassthroughSubject<Bool, Never>()
   public let isClaimedPublisher      = PassthroughSubject<Bool, Error>()
-  public let isBannedPublisher       = PassthroughSubject<Bool, Never>()
+//  public let isBannedPublisher       = PassthroughSubject<Bool, Never>()
   public let isVisitedPublisher      = PassthroughSubject<Bool, Never>()
   public let isHotPublisher          = PassthroughSubject<Bool, Never>()
   public let isRejectedPublisher     = PassthroughSubject<Bool, Never>()

@@ -18,31 +18,38 @@ class LinkPreviewCell: UICollectionViewCell {
   // MARK: - Public Properties
   var item: Survey! {
     didSet {
-      guard !item.isNil, !item.url.isNil else { return }
-      guard let url = item.url else { return }
+      guard !item.isNil, data.isNil, let url = item.url else { return }
+      
+      setupUI()
+      
       LPMetadataProvider().startFetchingMetadata(for: url) { [weak self] data, error in
         guard let self = self,
               let data = data,
               error.isNil
         else { return }
         
-        Task {
-//          await MainActor.run {
-            self.linkPreview.metadata = data
-//          }
-        }
-
-        delayAsync(delay: 1) {  [weak self] in
-          guard let self = self,
-                let shimmer = self.linkPreview.getSubview(type: Shimmer.self)
-          else { return }
-          
-          shimmer.stopShimmering()
-        }
+        self.data = data
+       
+//        Task {
+////          await MainActor.run {
+//            self.linkPreview.metadata = data
+////          }
+//        }
+//
+//        delayAsync(delay: 1) {  [weak self] in
+//          guard let self = self,
+//                let shimmer = self.linkPreview.getSubview(type: Shimmer.self)
+//          else { return }
+//
+//          shimmer.stopShimmering()
+//        }
       }
     }
   }
   public var tapPublisher = PassthroughSubject<URL, Never>()
+  public var mode: PollCollectionView.ViewMode = .Default
+  
+  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -106,18 +113,14 @@ class LinkPreviewCell: UICollectionViewCell {
     return instance
   }()
   private lazy var verticalStack: UIStackView = {
-//    let opaque = UIView()
-//    opaque.backgroundColor = .clear
-//    opaque.addSubview(horizontalStack)
-//    horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-//    horizontalStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor, constant: padding).isActive = true
-//    horizontalStack.topAnchor.constraint(equalTo: opaque.topAnchor).isActive = true
-//    horizontalStack.bottomAnchor.constraint(equalTo: opaque.bottomAnchor).isActive = true
-    
-    let verticalStack = UIStackView(arrangedSubviews: [horizontalStack,
-                                                       shadowView])
+    let verticalStack = UIStackView()//arrangedSubviews: [horizontalStack, imageContainer])
+    if mode == .Default {
+      verticalStack.addArrangedSubview(horizontalStack)
+    }
+    verticalStack.addArrangedSubview(shadowView)
     verticalStack.axis = .vertical
     verticalStack.spacing = padding
+    
     return verticalStack
   }()
   // Constraints
@@ -126,10 +129,13 @@ class LinkPreviewCell: UICollectionViewCell {
   private lazy var shadowView: UIView = {
     let instance = UIView.opaque()
     instance.layer.masksToBounds = false
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.35).cgColor
     instance.layer.shadowOffset = .zero
     instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowRadius = padding
+    instance.layer.shadowRadius = padding*0.65///2
+    instance.publisher(for: \.bounds)
+      .sink { instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.025).cgPath }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -149,6 +155,24 @@ class LinkPreviewCell: UICollectionViewCell {
     return instance
   }()
   private let padding: CGFloat = 8
+  // Cache data
+  private var data: LPLinkMetadata? {
+    didSet {
+      guard !data.isNil else { return }
+      
+      DispatchQueue.main.async { [weak self] in
+        guard let self = self,
+              let shimmer = self.linkPreview.getSubview(type: Shimmer.self)
+        else { return }
+        
+        self.linkPreview.metadata = self.data!
+        shimmer.stopShimmering()
+        shimmer.removeFromSuperview()
+      }
+    }
+  }
+  
+  
   
   // MARK: - Destructor
   deinit {
@@ -161,11 +185,13 @@ class LinkPreviewCell: UICollectionViewCell {
 #endif
   }
   
+  
+  
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -176,7 +202,7 @@ class LinkPreviewCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : !isSelected ? 1 : 0
     //        background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
     //        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     //        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
@@ -220,9 +246,6 @@ private extension LinkPreviewCell {
       verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
     ])
     
-    setNeedsLayout()
-    layoutIfNeeded()
-    
     closedConstraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
     closedConstraint.priority = .defaultLow
     
@@ -230,6 +253,10 @@ private extension LinkPreviewCell {
     openConstraint.priority = .defaultLow
     
     updateAppearance(animated: false)
+//
+//    if let subview = linkPreview.viewByClassName(className: "LPFlippedView") {
+//      subview.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
+//    }
   }
   
   /// Updates the views to reflect changes in selection
@@ -239,12 +266,17 @@ private extension LinkPreviewCell {
     
     guard animated else {
       let upsideDown = CGAffineTransform(rotationAngle: -.pi/2)
-      self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+      disclosureIndicator.transform = isSelected ? upsideDown : .identity
+      shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : !isSelected ? 1 : 0
+      
       return
     }
-    UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
+    UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) { [weak self] in
+      guard let self = self else { return }
+      
       let upsideDown = CGAffineTransform(rotationAngle: -.pi/2)
       self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+      self.shadowView.alpha = !self.isSelected ? 1 : 0
     }
   }
   

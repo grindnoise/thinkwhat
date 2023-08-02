@@ -30,7 +30,7 @@ class PollController: UIViewController {
   private var surveyId: String?
   private var userHasVoted = false
   private var isOnScreen = false
-  private var surveyStateUpdater: AnyCancellable?
+//  private var surveyStateUpdater: AnyCancellable?
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var avatar: Avatar = { Avatar() }()
@@ -67,32 +67,6 @@ class PollController: UIViewController {
     self.mode = mode
     
     super.init(nibName: nil, bundle: nil)
-    
-    self.item.isBannedPublisher
-      .receive(on: DispatchQueue.main)
-      .filter { $0 }
-      .sink { [weak self] _ in
-        guard let self = self else { return }
-        
-        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                              text: "survey_banned_notification",
-                                                              textColor: .systemRed,
-                                                              tintColor: .systemRed,
-                                                              fontName: Fonts.Semibold,
-                                                              textStyle: .headline),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: true,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 2)
-        banner.didDisappearPublisher
-          .sink { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.navigationController?.popViewController(animated: true)
-            banner.removeFromSuperview() }
-          .store(in: &self.subscriptions)
-      }
-      .store(in: &subscriptions)
   }
   
   // Init from push notification
@@ -135,13 +109,8 @@ class PollController: UIViewController {
       setTasks()
       return
     }
-    
-    let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                          text: "survey_banned_notification",
-                                                          textColor: .systemRed,
-                                                          tintColor: .systemRed,
-                                                          fontName: Fonts.Semibold,
-                                                          textStyle: .headline),
+    let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                          text: "survey_banned_notification"),
                            contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                            isModal: true,
                            useContentViewHeight: true,
@@ -236,24 +205,59 @@ private extension PollController {
   }
   
   func setTasks() {
-    guard mode != .Preview else { return }
-//    func updateResultsStats() {
-//      //Update survey stats every n seconds
-//      Timer
-//        .publish(every: 5, on: .current, in: .common)
-//        .autoconnect()
-//        .sink { [weak self] seconds in
-//          guard let self = self,
-//                let survey = self.item.survey
-//          else { return }
-//
-//          guard self.isOnScreen else { return }
-//
-//          self.controllerInput?.updateResultsStats(survey)
-//        }
-//        .store(in: &subscriptions)
-//    }
+    // Update stats and state in vote/preview mode
+    Timer.publish(every: 10, on: .current, in: .common)
+      .autoconnect()
+      .filter { [unowned self] _ in self.isOnScreen && self.mode != .Read }
+      .sink { [weak self] seconds in
+        guard let self = self else { return }
+        
+        self.controllerInput?.updateSurveyStats([self.item])
+      }
+      .store(in: &subscriptions)
     
+    // Update stats/state/results in read mode
+    Timer
+      .publish(every: 5, on: .current, in: .common)
+      .autoconnect()
+      .filter { [unowned self] _ in self.isOnScreen && self.mode == .Read }
+      .sink { [weak self] seconds in
+        guard let self = self,
+              let survey = self.item.survey,
+              survey.isComplete
+        else { return }
+        
+        self.controllerInput?.updateResultsStats(survey)
+      }
+      .store(in: &subscriptions)
+    
+    item.$isBanned
+      .receive(on: DispatchQueue.main)
+      .filter { $0 }
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+        self.controllerOutput?.setBanned { self.navigationController?.popViewController(animated: true) }
+          
+        }
+//        let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+//                                                              text: "survey_banned_notification"),
+//                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                               isModal: true,
+//                               useContentViewHeight: true,
+//                               shouldDismissAfter: 2)
+//        banner.didDisappearPublisher
+//          .sink { [weak self] _ in
+//            guard let self = self else { return }
+//
+//              self.navigationController?.popViewController(animated: true)
+//              banner.removeFromSuperview() }
+//            .store(in: &self.subscriptions)
+//        }
+        .store(in: &subscriptions)
+    
+    // Watch for favorite status
     item.isFavoritePublisher
       .receive(on: DispatchQueue.main)
       .sink { [weak self] _ in
@@ -265,17 +269,15 @@ private extension PollController {
       }
       .store(in: &subscriptions)
     
+    // Watch for active status
     item.isActivePublisher
       .receive(on: DispatchQueue.main)
       .filter { !$0 }
       .sink { [weak self] _ in
         guard let self = self else { return }
         
-        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "flag.checkered.2.crossed")!,
-                                                              text: self.item.isComplete ? "survey_finished_notification" : "survey_finished_vote_notification",
-                                                              tintColor: self.traitCollection.userInterfaceStyle == .dark ? .white : .black,
-                                                              fontName: Fonts.Bold,
-                                                              textStyle: .headline),
+        let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: self.item.topic.iconCategory, scaleMultiplicator: 1.5, iconColor: self.item.topic.tagColor),
+                                                              text: self.item.isComplete ? "survey_finished_notification" : "survey_finished_vote_notification"),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
@@ -286,30 +288,16 @@ private extension PollController {
       }
       .store(in: &subscriptions)
     
-    guard item.isComplete else {
-      updateSurveyState()
-      
-      item.isCompletePublisher
-        .receive(on: DispatchQueue.main)
-        .filter { $0 }
-//        .delay(for: .seconds(1), scheduler: DispatchQueue.main)
-        .sink { [weak self] _ in
-          guard let self = self,
-                self.isOnScreen
-          else { return }
-          
-          self.updateResultsStats()
-          
-          guard !self.surveyStateUpdater.isNil else { return }
-          
-          self.surveyStateUpdater?.cancel()
-        }
-        .store(in: &subscriptions)
-      
-      return
-    }
+    item.isCompletePublisher
+      .receive(on: DispatchQueue.main)
+      .filter { $0 }
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+
+        self.setBarButtonItems()
+      }
+      .store(in: &subscriptions)
     
-    updateResultsStats()
     
     
     //        tasks.append(Task { [weak self] in
@@ -471,38 +459,6 @@ private extension PollController {
     //        })
   }
   
-  func updateResultsStats() {
-    //Update survey stats every n seconds
-    Timer
-      .publish(every: 5, on: .current, in: .common)
-      .autoconnect()
-      .sink { [weak self] seconds in
-        guard let self = self,
-              let survey = self.item.survey,
-              survey.isComplete
-        else { return }
-        
-        guard self.isOnScreen else { return }
-        
-        self.controllerInput?.updateResultsStats(survey)
-      }
-      .store(in: &subscriptions)
-  }
-  
-  //Check completion & ban state
-  func updateSurveyState() {
-    surveyStateUpdater = Timer
-      .publish(every: 5, on: .current, in: .common)
-      .autoconnect()
-      .sink { [weak self] seconds in
-        guard let self = self else { return }
-        
-        guard self.isOnScreen else { return }
-        
-        self.controllerInput?.updateSurveyState(self.item)
-      }
-  }
-  
   /// Loads survey by reference or id if it's a push notification
   /// - Parameter surveyID: survey id extracted from push notification
   func loadData(surveyID: String = "") {
@@ -604,63 +560,53 @@ private extension PollController {
                                          state: .off,
                                          handler: { [unowned self] _ in
         guard item.isComplete else {
-          let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                                text: "finish_poll",
-                                                                tintColor: .systemOrange,
-                                                                fontName: Fonts.Semibold,
-                                                                textStyle: .title3,
-                                                                textAlignment: .natural),
+          let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemOrange),
+                                                                text: "finish_poll"),
                                  contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                  isModal: false,
                                  useContentViewHeight: true,
-                                 shouldDismissAfter: 1)
+                                 shouldDismissAfter: 2)
           banner.didDisappearPublisher
             .sink { _ in banner.removeFromSuperview() }
             .store(in: &self.subscriptions)
-//
-//          let banner = Banner(fadeBackground: false)
-//          banner.present(content: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-//                                                    text: "finish_poll",
-//                                                    tintColor: .systemOrange),
-//                         dismissAfter: 0.75)
-//          banner.didDisappearPublisher
-//            .sink { _ in banner.removeFromSuperview() }
-//            .store(in: &self.subscriptions)
           return
         }
         self.controllerInput?.toggleFavorite(!self.item.isFavorite)
       })
       
       watchAction.accessibilityIdentifier = "watch"
+
+      var actions = [watchAction, shareAction]
       
-      let claimAction : UIAction = .init(title: "make_claim".localized,
-                                         image: UIImage(systemName: "exclamationmark.triangle.fill"),
-                                         identifier: nil,
-                                         discoverabilityTitle: nil,
-                                         attributes: .destructive,
-                                         state: .off,
-                                         handler: { [unowned self] _ in
-        
-        let popup = NewPopup(padding: self.padding,
-                             contentPadding: .uniform(size: self.padding*2))
-        let content = ClaimPopupContent(parent: popup,
-                                        surveyReference: self.item)
-        content.$claim
-          .filter { !$0.isNil }
-          .sink { [unowned self] in self.controllerInput?.claim($0!) }
-          .store(in: &popup.subscriptions)
-        popup.setContent(content)
-        popup.didDisappearPublisher
-          .sink {[unowned self] _ in
-            popup.removeFromSuperview()
-            delayAsync(delay: 0.5) { [unowned self] in
-              self.navigationController?.popViewController(animated: true)
+      if !item.isComplete {
+        let claimAction : UIAction = .init(title: "make_claim".localized,
+                                           image: UIImage(systemName: "exclamationmark.triangle.fill"),
+                                           identifier: nil,
+                                           discoverabilityTitle: nil,
+                                           attributes: .destructive,
+                                           state: .off,
+                                           handler: { [unowned self] _ in
+          
+          let popup = NewPopup(padding: self.padding,
+                               contentPadding: .uniform(size: self.padding*2))
+          let content = ClaimPopupContent(parent: popup,
+                                          surveyReference: self.item)
+          content.$claim
+            .filter { !$0.isNil }
+            .sink { [unowned self] in self.controllerInput?.claim($0!) }
+            .store(in: &popup.subscriptions)
+          popup.setContent(content)
+          popup.didDisappearPublisher
+            .sink {[unowned self] _ in
+              popup.removeFromSuperview()
+              delayAsync(delay: 0.5) { [unowned self] in
+                self.navigationController?.popViewController(animated: true)
+              }
             }
-          }
-          .store(in: &self.subscriptions)
-      })
-      
-      let actions = [watchAction, shareAction, claimAction]
+            .store(in: &self.subscriptions)
+        })
+        actions.append(claimAction)
+      }
       let menu = UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
       let image =  UIImage(systemName: "ellipsis", withConfiguration: UIImage.SymbolConfiguration(textStyle: .headline, scale: .large))
       
@@ -772,7 +718,7 @@ extension PollController: PollModelOutput {
     case .success(let instance):
       if item.isNil {
         item = instance.reference
-        setTasks()
+//        setTasks()
         setupUI()
       }
 //      navigationController?.setNavigationBarHidden(false, animated: true)
@@ -796,16 +742,13 @@ extension PollController: PollModelOutput {
         }
       }
     case .failure:
-      let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                            text: AppError.server.localizedDescription,
-                                                            tintColor: .systemRed,
-                                                            fontName: Fonts.Semibold,
-                                                            textStyle: .subheadline,
-                                                            textAlignment: .natural),
+      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                            text: AppError.server.localizedDescription),
                              contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                              isModal: false,
                              useContentViewHeight: true,
                              shouldDismissAfter: 1)
+      
       banner.didDisappearPublisher
         .sink { _ in banner.removeFromSuperview() }
         .store(in: &self.subscriptions)
@@ -827,32 +770,26 @@ extension PollController: PollModelOutput {
             let details = survey.resultDetails
       else { return }
       
+      self.mode = .Read
+      
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
         guard let self = self else { return }
         
         if details.isPopular {
-          let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "dollarsign")!,
-                                                                icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemGreen),
-                                                                text: "most_popular_choice".localized + "🚀\n" + "got_points".localized + "\(String(describing: details.points)) " + "\("points".localized) 🥳",
-                                                                tintColor: .systemGreen,
-                                                                fontName: Fonts.Regular,
-                                                                textStyle: .headline,
-                                                                textAlignment: .center),
+          self.controllerOutput?.showCongratulations()
+          let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemGreen),
+                                                                text: "most_popular_choice".localized + "🚀\n" + "got_points".localized + "\(String(describing: details.points)) " + "\("points".localized) 🥳"),
                                  contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                  isModal: false,
                                  useContentViewHeight: true,
                                  shouldDismissAfter: 2)
+          
           banner.didDisappearPublisher
             .sink { _ in banner.removeFromSuperview() }
             .store(in: &self.subscriptions)
         } else {
-          let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "dollarsign")!,
-                                                                icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemGreen),
-                                                                text: "got_points".localized + "\(String(describing: details.points)) " + "points".localized,
-                                                                tintColor: .systemGreen,
-                                                                fontName: Fonts.Semibold,
-                                                                textStyle: .headline,
-                                                                textAlignment: .center),
+          let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemGreen),
+                                                                text: "got_points".localized + "\(String(describing: details.points)) " + "points".localized),
                                  contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                  isModal: false,
                                  useContentViewHeight: true,
@@ -875,16 +812,12 @@ extension PollController: PollModelOutput {
 #if DEBUG
       error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-      let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                            text: AppError.server.localizedDescription,
-                                                            tintColor: .systemRed,
-                                                            fontName: Fonts.Semibold,
-                                                            textStyle: .title3,
-                                                            textAlignment: .natural),
+      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                            text: AppError.server.localizedDescription),
                              contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                             isModal: false,
+                             isModal: true,
                              useContentViewHeight: true,
-                             shouldDismissAfter: 1)
+                             shouldDismissAfter: 2)
       banner.didDisappearPublisher
         .sink { _ in banner.removeFromSuperview() }
         .store(in: &self.subscriptions)
@@ -922,17 +855,13 @@ extension PollController: PollModelOutput {
         }
         .store(in: &self.subscriptions)
     case .failure(let error):
-      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "xmark.circle.fill")!,
-                                                            text: error.localizedDescription,
-                                                            textColor: .label,
-                                                            tintColor: .systemRed,
-                                                            fontName: Fonts.Regular,
-                                                            textStyle: .headline,
-                                                            textAlignment: .natural),
-                             contentPadding: UIEdgeInsets(top: padding*2, left: padding, bottom: padding*2, right: padding),
-                             isModal: false,
+      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                            text: error.localizedDescription),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: true,
                              useContentViewHeight: true,
-                             shouldDismissAfter: 3)
+                             shouldDismissAfter: 2)
+
       banner.didDisappearPublisher
         .sink { [weak self] _ in
           guard let self = self else { return }

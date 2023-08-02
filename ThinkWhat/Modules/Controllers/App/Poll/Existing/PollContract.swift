@@ -49,7 +49,7 @@ protocol PollControllerInput: AnyObject {
   func updateResultsStats(_: Survey)
   func postComment(body: String, replyTo: Comment?, username: String?)
   func updateCommentsStats(_: [Comment])
-  func updateSurveyState(_: SurveyReference)
+  func updateSurveyStats(_: [SurveyReference])
   func commentClaim(comment: Comment, reason: Claim)
   func requestComments(_:[Comment])
   func deleteComment(_:Comment)
@@ -70,10 +70,12 @@ protocol PollControllerOutput: AnyObject {
   var viewInput: (PollViewInput & UIViewController)? { get set }
   var item: Survey? { get set }
   
+  func showCongratulations()
   func presentView(_: Survey)
   func postCallback(_ result: Result<Bool, Error>)
   func loadCallback(_: Result<Bool, Error>)
   func voteCallback(_: Result<Bool, Error>)
   func commentPostCallback(_: Result<Comment, Error>)
   func commentDeleteError()
+  func setBanned(_ completion: @escaping () -> ())
 }

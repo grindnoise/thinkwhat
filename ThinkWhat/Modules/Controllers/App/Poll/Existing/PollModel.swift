@@ -37,14 +37,11 @@ extension PollModel: PollControllerInput {
     }
   }
   
-  func updateSurveyState(_ instance: SurveyReference) {
+  func updateSurveyStats(_ instances: [SurveyReference]) {
     Task {
       do {
-        try await API.shared.surveys.getSurveyState(instance)
+        try await API.shared.surveys.updateSurveyStats(instances)
       } catch {
-        await MainActor.run {
-          modelOutput?.commentDeleteError()
-        }
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif

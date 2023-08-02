@@ -502,6 +502,11 @@ private extension ClaimPopupContent {
   
   @objc
   func handleTap(sender: UIButton) {
+    if sender == cancelButton {
+      parent?.dismiss()
+      return
+    }
+    
     guard state != .Sending,
           let item = item
     else { return }

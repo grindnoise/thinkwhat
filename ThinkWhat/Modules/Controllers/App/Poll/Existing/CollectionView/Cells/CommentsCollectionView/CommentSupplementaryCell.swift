@@ -34,7 +34,7 @@ class CommentSupplementaryCell: UICollectionReusableView {
     label.accessibilityIdentifier = "label"
     label.isUserInteractionEnabled = true
     label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onTap)))
-    label.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .callout)
+    label.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     label.text = "add_comment".localized
     label.textColor = .secondaryLabel
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -54,7 +54,7 @@ class CommentSupplementaryCell: UICollectionReusableView {
     ])
     
     instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.size.height/2.25 }
+      .sink { instance.cornerRadius = $0.width*0.025 }
       .store(in: &subscriptions)
     
     return instance

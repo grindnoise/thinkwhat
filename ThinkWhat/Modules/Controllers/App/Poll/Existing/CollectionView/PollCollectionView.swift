@@ -106,11 +106,14 @@ class PollCollectionView: UICollectionView {
               let source = self.source
         else { return }
         
-        source.refresh() { [weak self] in
-          guard let self = self else { return }
-          self.scrollToItem(at: IndexPath(row: 0, section: self.numberOfSections - 1),
-                            at: .bottom,
-                            animated: true)
+        source.refresh() {
+          delay(seconds: 0.25) { [weak self] in
+            guard let self = self else { return }
+            
+            self.scrollToItem(at: IndexPath(row: 0, section: self.numberOfSections - 1),
+                              at: .bottom,
+                              animated: true)
+          }
         }
       }
       .store(in: &subscriptions)
@@ -220,8 +223,12 @@ private extension PollCollectionView {
     }
     
     let imagesCellRegistration = UICollectionView.CellRegistration<ImageCell, AnyHashable> { [unowned self] cell, _, _ in
-      cell.item = self.item
+      cell.mode = self.viewMode
+      if cell.item.isNil {
+        cell.item = self.item
+      }
       cell.isUserInteractionEnabled = self.mode != .Preview
+      cell.contentView.layer.masksToBounds = false
       cell.imagePublisher
         .sink {[unowned self] in self.imagePublisher.send($0) }
         .store(in: &self.subscriptions)
@@ -232,7 +239,11 @@ private extension PollCollectionView {
     }
     
     let youtubeCellRegistration = UICollectionView.CellRegistration<YoutubeCell, AnyHashable> { [unowned self] cell, _, _ in
-      cell.item = self.item
+      cell.mode = self.viewMode
+      if cell.item.isNil {
+        cell.item = self.item
+      }
+      cell.contentView.layer.masksToBounds = false
       var config = UIBackgroundConfiguration.listPlainCell()
       config.backgroundColor = .clear
       cell.backgroundConfiguration = config
@@ -240,8 +251,13 @@ private extension PollCollectionView {
     }
     
     let webCellRegistration = UICollectionView.CellRegistration<LinkPreviewCell, AnyHashable> { [unowned self] cell, _, _ in
+      cell.mode = self.viewMode
+      if cell.item.isNil {
+        
+      }
       cell.item = self.item
       cell.isUserInteractionEnabled = self.mode != .Preview
+      cell.contentView.layer.masksToBounds = false
       cell.tapPublisher
         .sink {[weak self] in
           guard let self = self else { return }
@@ -287,7 +303,10 @@ private extension PollCollectionView {
     let answersCellRegistration = UICollectionView.CellRegistration<AnswersCell, AnyHashable> { [weak self] cell, _, _ in
       guard let self = self else { return }
       
-      cell.item = self.item
+      if cell.item.isNil {
+        cell.item = self.item
+      }
+      cell.contentView.layer.masksToBounds = false
       cell.isUserInteractionEnabled = self.mode != .Preview
       cell.selectionPublisher
         .sink { [weak self] in
@@ -298,11 +317,11 @@ private extension PollCollectionView {
           guard self.isFirstAnswerSelection else { return }
           
           self.isFirstAnswerSelection = false
-          delay(seconds: 0.2) { [weak self] in
-            guard let self = self else { return }
-             
+//          delay(seconds: 0.2) { [weak self] in
+//            guard let self = self else { return }
+//
             self.scrollToItem(at: IndexPath(row: 0, section: self.numberOfSections-1), at: .bottom, animated: true)
-          }
+//          }
         }
         .store(in: &self.subscriptions)
       cell.deselectionPublisher
@@ -521,8 +540,10 @@ private extension PollCollectionView {
         snapshot.appendItems([4], toSection: .web)
       }
     }
-    snapshot.appendSections([.question])
-    snapshot.appendItems([5], toSection: .question)
+    if !item.question.isEmpty {
+      snapshot.appendSections([.question])
+      snapshot.appendItems([5], toSection: .question)
+    }
     if viewMode == .Default {
       snapshot.appendSections([.answers])
       snapshot.appendItems([6], toSection: .answers)
@@ -562,9 +583,9 @@ extension PollCollectionView: UICollectionViewDelegate {
                       shouldSelectItemAt indexPath: IndexPath) -> Bool {
     if let cell = cellForItem(at: indexPath) as? CommentsSectionCell {
       guard cell.item.isComplete else {
-        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                              text: "vote_to_view_comments",
-                                                              tintColor: .systemOrange),
+        let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "dollarsign")!,
+                                                              icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemOrange),
+                                                              text: "vote_to_view_comments"),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,
@@ -572,13 +593,14 @@ extension PollCollectionView: UICollectionViewDelegate {
         banner.didDisappearPublisher
           .sink { _ in banner.removeFromSuperview() }
           .store(in: &self.subscriptions)
-        
+
         return false
       }
       
       collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [.bottom])
-      source.refresh()
-      collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+      source.refresh() {
+        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+      }
       return true
     }
     //        // Allows for closing an already open cell

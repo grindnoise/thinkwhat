@@ -53,9 +53,11 @@ extension HotModel: HotControllerInput {
   func updateData() {
     guard let modelOutput = modelOutput else { return }
     
-    Task {
+    Task { [weak self] in
+      guard let self = self else { return }
+      
       do {
-        try await API.shared.surveys.updateSurveyStats(  modelOutput.queue.elements.map { $0.reference } + [modelOutput.currentSurvey].reduce(into: [SurveyReference]()) { result, next in
+        try await API.shared.surveys.updateSurveyStats(modelOutput.queue.elements.map { $0.reference } + [modelOutput.currentSurvey].reduce(into: [SurveyReference]()) { result, next in
           guard let instance = next?.reference else { return }
           
           result.append(instance)

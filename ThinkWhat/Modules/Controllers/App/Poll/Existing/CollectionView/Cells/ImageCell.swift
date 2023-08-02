@@ -16,10 +16,11 @@ class ImageCell: UICollectionViewCell {
     didSet {
       guard !item.isNil else { return }
       
-      updateUI()
+      setupUI()
     }
   }
   public var imagePublisher = PassthroughSubject<Mediafile, Never>()
+  public var mode: PollCollectionView.ViewMode = .Default
   
   
   // MARK: - Overriden properties
@@ -99,18 +100,26 @@ class ImageCell: UICollectionViewCell {
 //    horizontalStack.topAnchor.constraint(equalTo: opaque.topAnchor).isActive = true
 //    horizontalStack.bottomAnchor.constraint(equalTo: opaque.bottomAnchor).isActive = true
     
-    let verticalStack = UIStackView(arrangedSubviews: [horizontalStack, imageContainer])
+    let verticalStack = UIStackView()//arrangedSubviews: [horizontalStack, imageContainer])
+    if mode == .Default {
+      verticalStack.addArrangedSubview(horizontalStack)
+    }
+    verticalStack.addArrangedSubview(imageContainer)
     verticalStack.axis = .vertical
     verticalStack.spacing = padding
+    
     return verticalStack
   }()
   private lazy var imageContainer: UIView = {
     let instance = UIView.opaque()
     instance.layer.masksToBounds = false
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.35).cgColor
     instance.layer.shadowOffset = .zero
     instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowRadius = padding
+    instance.layer.shadowRadius = padding*0.65///2
+    instance.publisher(for: \.bounds)
+      .sink { instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.025).cgPath }
+      .store(in: &subscriptions)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true//9/16).isActive = true
     
     return instance
@@ -199,7 +208,7 @@ class ImageCell: UICollectionViewCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setupUI()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {
@@ -212,7 +221,7 @@ class ImageCell: UICollectionViewCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    imageContainer.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    imageContainer.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : !isSelected ? 1 : 0
     //        disclosureLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     //        disclosureIndicator.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : color
     //        if let imageView = icon.get(all: UIImageView.self).first {
@@ -262,8 +271,13 @@ private extension ImageCell {
       verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
     ])
     
-    setNeedsLayout()
-    layoutIfNeeded()
+    setImages()
+    
+    guard mode == .Default else {
+      imageContainer.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding).isActive = true
+      
+      return
+    }
     
     closedConstraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
     closedConstraint.priority = .defaultLow
@@ -281,16 +295,21 @@ private extension ImageCell {
     
     guard animated else {
       let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
-      self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+      disclosureIndicator.transform = isSelected ? upsideDown : .identity
+      imageContainer.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : !isSelected ? 1 : 0
+      
       return
     }
-    UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {
+    UIView.animate(withDuration: 0.3, delay: 0, options: isSelected ? .curveEaseOut : .curveEaseIn) {[weak self] in
+      guard let self = self else { return }
+      
       let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )
       self.disclosureIndicator.transform = self.isSelected ? upsideDown : .identity
+      self.imageContainer.alpha = !self.isSelected ? 1 : 0
     }
   }
   
-  func updateUI() {
+  func setImages() {
     item.media.sorted { $0.order < $1.order}.enumerated().forEach { index, media in
       let container = UIView()
       container.backgroundColor = .clear
@@ -306,75 +325,71 @@ private extension ImageCell {
       imageView.place(inside: container)
       imageView.isUserInteractionEnabled = false
       imageView.layer.setValue(media, forKey: "media")
-      imageView.addGestureRecognizer(UITapGestureRecognizer(target: self,
-                                                            action: #selector(self.imageTapped(recognizer:))))
+      imageView.addGestureRecognizer(UITapGestureRecognizer(target: self,action: #selector(self.imageTapped(recognizer:))))
       
-      //            imageView.place(inside: imageContainer)
-      let shimmer = Shimmer()//.secondarySystemBackground,
-//                            darkColor: .systemGray5)//.tertiarySystemBackground)
+      let shimmer = Shimmer()
       shimmer.place(inside: container)
       shimmer.startShimmering()
       
       //Text & button
-      let textView = UITextView()
-      textView.backgroundColor = .black.withAlphaComponent(0.75)
-      textView.font = UIFont.scaledFont(fontName: Fonts.Rubik.Italic, forTextStyle: .subheadline)
-      textView.textColor = .white
-      textView.alpha = 0
-      textView.text = media.title
-      textView.isEditable = false
-      textView.isSelectable = false
-//      textView.publisher(for: \.bounds)
-//        .filter { $0 != .zero }
-//        .sink { textView.cornerRadius = $0.height*0.25 }
-//        .store(in: &subscriptions)
-      imageView.addSubview(textView)
-      textView.translatesAutoresizingMaskIntoConstraints = false
-      textView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
-      textView.leadingAnchor.constraint(equalTo: imageView.leadingAnchor).isActive = true
-      textView.trailingAnchor.constraint(equalTo: imageView.trailingAnchor).isActive = true
-      let textViewConstraint = textView.heightAnchor.constraint(equalToConstant: 1)
-      textViewConstraint.identifier = "height"
-      textViewConstraint.isActive = true
-      
-      let button = UIImageView()
-      button.alpha = 0
-      button.isUserInteractionEnabled = true
-      button.backgroundColor = .black.withAlphaComponent(0.75)
-      button.contentMode = .center
-      button.tintColor = .white
-      button.layer.setValue(false, forKey: "isSelected")
-      button.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.quoteTapped(sender:))))
-      button.publisher(for: \.bounds)
-        .filter { $0 != .zero }
-        .sink {
-          button.cornerRadius = $0.height*0.25
-          
-          guard let isSelected = button.layer.value(forKey: "isSelected") as? Bool else { return }
-          
-          button.image = UIImage(systemName: "quote.bubble.fill",//isSelected ? "quote.bubble" : "quote.bubble.fill",
-                                 withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.35))
-        }
-        .store(in: &subscriptions)
-      
-      imageView.addSubview(button)
-      
-      
-      button.translatesAutoresizingMaskIntoConstraints = false
-      button.heightAnchor.constraint(equalTo: button.widthAnchor, multiplier: 1/1).isActive = true
-      let bottomConstraint = button.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -self.padding)
-      bottomConstraint.isActive = true
-//      bottomConstraint.identifier = "bottom"
-      button.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -padding).isActive = true
-      button.layer.setValue(media, forKey: "media")
-      button.layer.setValue(imageView, forKey: "imageView")
-      
-      let buttonConstraint = button.heightAnchor.constraint(equalToConstant: 40) // "1".height(withConstrainedWidth: 100, font: pages.font))
-      buttonConstraint.isActive = true
-//      pages.publisher(for: \.bounds)
-//        .filter { $0 != .zero }
-//        .sink { buttonConstraint.constant = $0.height }
-//        .store(in: &subscriptions)
+      var button: UIImageView!
+      if mode == .Default {
+        let textView = UITextView()
+        textView.backgroundColor = .black.withAlphaComponent(0.75)
+        textView.font = UIFont.scaledFont(fontName: Fonts.Rubik.Italic, forTextStyle: .subheadline)
+        textView.textColor = .white
+        textView.alpha = 0
+        textView.text = media.title
+        textView.isEditable = false
+        textView.isSelectable = false
+        //      textView.publisher(for: \.bounds)
+        //        .filter { $0 != .zero }
+        //        .sink { textView.cornerRadius = $0.height*0.25 }
+        //        .store(in: &subscriptions)
+        imageView.addSubview(textView)
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
+        textView.leadingAnchor.constraint(equalTo: imageView.leadingAnchor).isActive = true
+        textView.trailingAnchor.constraint(equalTo: imageView.trailingAnchor).isActive = true
+        let textViewConstraint = textView.heightAnchor.constraint(equalToConstant: 1)
+        textViewConstraint.identifier = "height"
+        textViewConstraint.isActive = true
+        
+        button = UIImageView()
+        button.alpha = 0
+        button.isUserInteractionEnabled = true
+        button.backgroundColor = .black.withAlphaComponent(0.75)
+        button.contentMode = .center
+        button.tintColor = .white
+        button.layer.setValue(false, forKey: "isSelected")
+        button.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.quoteTapped(sender:))))
+        button.publisher(for: \.bounds)
+          .filter { $0 != .zero }
+          .sink {
+            button.cornerRadius = $0.height*0.25
+            button.image = UIImage(systemName: "quote.bubble.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.35))
+          }
+          .store(in: &subscriptions)
+        
+        imageView.addSubview(button)
+        
+        
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.heightAnchor.constraint(equalTo: button.widthAnchor, multiplier: 1/1).isActive = true
+        let bottomConstraint = button.bottomAnchor.constraint(equalTo: textView.topAnchor, constant: -self.padding)
+        bottomConstraint.isActive = true
+        //      bottomConstraint.identifier = "bottom"
+        button.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -padding).isActive = true
+        button.layer.setValue(media, forKey: "media")
+        button.layer.setValue(imageView, forKey: "imageView")
+        
+        let buttonConstraint = button.heightAnchor.constraint(equalToConstant: 40) // "1".height(withConstrainedWidth: 100, font: pages.font))
+        buttonConstraint.isActive = true
+        //      pages.publisher(for: \.bounds)
+        //        .filter { $0 != .zero }
+        //        .sink { buttonConstraint.constant = $0.height }
+        //        .store(in: &subscriptions)
+      }
       
       media.imagePublisher
         .receive(on: DispatchQueue.main)
@@ -404,10 +419,12 @@ private extension ImageCell {
 //            shimmer.removeFromSuperview()
 //          }
           shimmer.stopShimmering(animated: true)
-          self.showPageControl(animated: false) { _ in
-            guard !media.title.isEmpty else { return }
-            
-            self.showQuoteButton(button, animated: false)
+          if self.mode == .Default {
+            self.showPageControl(animated: false) { _ in
+              guard !media.title.isEmpty else { return }
+              
+              self.showQuoteButton(button, animated: false)
+            }
           }
           shimmer.removeFromSuperview()
           imageView.image = $0

@@ -17,8 +17,8 @@ class AnswerCell: UICollectionViewCell {
     didSet {
       guard let item = item else { return }
       
-      setNeedsLayout()
-      layoutIfNeeded()
+//      setNeedsLayout()
+//      layoutIfNeeded()
       
       color = Colors.getColor(forId: item.order)
       
@@ -107,7 +107,7 @@ class AnswerCell: UICollectionViewCell {
     didSet {
       guard oldValue != isAnswerSelected else { return }
 
-      setSelected() { _ in }
+      setSelected()
     }
   }
   //Flag for user interaction
@@ -237,6 +237,8 @@ class AnswerCell: UICollectionViewCell {
     if let survey = item.survey, !survey.isAnonymous {
       instance.addArrangedSubview(votersStack)
     }
+    
+    
     //    let opaque2 = UIView.opaque()
     //    opaque2.accessibilityIdentifier = "opaque2"
     //    opaque2.translatesAutoresizingMaskIntoConstraints = false
@@ -519,8 +521,7 @@ private extension AnswerCell {
   }
   
   @MainActor
-  func setSelected(forceDeselect: Bool = false,
-                   completion: @escaping (Bool)-> ()) {
+  func setSelected(forceDeselect: Bool = false, _ completion: Closure? = nil) {
     guard let survey = item.survey else { return }
     
     if forceDeselect {
@@ -528,7 +529,7 @@ private extension AnswerCell {
       UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut) {
         selection.opacity = 0
         selection.transform = CATransform3DMakeTranslation(1, 0.01, 1)
-      } completion: { _ in selection.removeFromSuperlayer(); completion(true) }
+      } completion: { _ in selection.removeFromSuperlayer(); completion?() }
       
       return
     }
@@ -557,7 +558,7 @@ private extension AnswerCell {
                                     location: touchLocation,
                                     duration: 0.3,
                                     opacityDurationMultiplier: 0.5,
-                                    delegate: self) { completion(true) }
+                                    delegate: self) { completion?() }
     case false:
       deselect()
     }

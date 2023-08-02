@@ -284,7 +284,7 @@ class TopicsView: UIView {
     let instance = UIView()
     instance.accessibilityIdentifier = "bg"
     instance.layer.masksToBounds = true
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
     instance.publisher(for: \.bounds)
       .sink { [unowned self] rect in
         guard self.filterView.alpha != 0 else { return }
@@ -416,6 +416,7 @@ class TopicsView: UIView {
     collectionView.backgroundColor = .clear
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
 //    if #available(iOS 15, *) {
 //      periodButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
 //    } else {

@@ -66,7 +66,15 @@ class EmptyPublicationsView: UIView {
   private let labelText: String
   private let buttonText: String
   private let buttonColor: UIColor
-  private lazy var logoIcon: Logo = { Logo() }()
+  private lazy var logoIcon: Logo = {
+    let instance = Logo()
+    instance.layer.shadowOpacity = 1
+    instance.layer.shadowColor = Colors.main.withAlphaComponent(0.35).cgColor
+    instance.layer.shadowRadius = padding/2
+    instance.layer.shadowOffset = .zero
+    
+    return instance
+  }()
   private lazy var label: UILabel = {
     let instance = UILabel()
     instance.numberOfLines = 0
@@ -91,6 +99,7 @@ class EmptyPublicationsView: UIView {
   private lazy var blur: UIVisualEffectView = {
     let instance = UIVisualEffectView(effect: UIBlurEffect(style: traitCollection.userInterfaceStyle == .dark ? .systemUltraThinMaterialDark : .systemUltraThinMaterial))
     instance.cornerRadius = padding
+    instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     stack.place(inside: instance.contentView, insets: .uniform(size: padding*2))
     
     return instance
@@ -184,8 +193,8 @@ class EmptyPublicationsView: UIView {
        buttonColor: UIColor = Colors.main,
        backgroundLightColor: UIColor = .clear,
        backgroundDarkColor: UIColor = .clear,
-       spiralLightColor: UIColor = "#1E1E1E".hexColor!.withAlphaComponent(0.04),
-       spiralDarkColor: UIColor = "#1E1E1E".hexColor!.withAlphaComponent(0.7)) {
+       spiralLightColor: UIColor = Colors.spiralLight, // UIColor.white.blended(withFraction: 0.04, of: UIColor.lightGray),//"#1E1E1E".hexColor!.withAlphaComponent(0.04),
+       spiralDarkColor: UIColor = Colors.spiralDark) { // }"#1E1E1E".hexColor!.withAlphaComponent(0.7)) {
     self.mode = mode
     self.labelText = labelText
     self.showsLogo = showsLogo
@@ -245,9 +254,17 @@ private extension EmptyPublicationsView {
     
     if showsLogo {
       stack.addArrangedSubview(logoIcon)
+      stack.alignment = .center
+      UIView.animate(withDuration: 1, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut]) { [weak self] in
+        guard let self = self else { return }
+        
+        self.logoIcon.transform = .init(scaleX: 0.95, y: 0.95)
+        self.logoIcon.alpha = 0.95
+      }
     }
     
     blur.placeInCenter(of: self)
+    blur.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
     stack.addArrangedSubview(label)
     
     insertSubview(spiral, belowSubview: blur)
@@ -258,10 +275,10 @@ private extension EmptyPublicationsView {
     spiral.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
     spiral.startRotating(duration: 15)
     
-    if showsLogo {
-      logoIcon.translatesAutoresizingMaskIntoConstraints = false
-      logoIcon.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.31).isActive = true
-    }
+//    if showsLogo {
+//      logoIcon.translatesAutoresizingMaskIntoConstraints = false
+//      logoIcon.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.31).isActive = true
+//    }
     
     //    label.layer.masksToBounds = false
     //    label.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.lightGray.withAlphaComponent(0.25).cgColor

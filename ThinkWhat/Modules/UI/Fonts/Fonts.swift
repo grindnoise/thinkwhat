@@ -51,4 +51,5 @@ struct Fonts {
 //  }
   
   static let cellHeader = UIFont(name: "Rubik-Regular", size: 11)
+  static let banner = UIFont(name: "Rubik-Regular", size: 14)
 }
