@@ -348,6 +348,7 @@
 		AB93FD78247EA245009546DD /* EmptyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93FD77247EA245009546DD /* EmptyCard.swift */; };
 		AB93FD7A247EA255009546DD /* EmptyCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB93FD79247EA255009546DD /* EmptyCard.xib */; };
 		AB94E35529B734F300BC1821 /* Transition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB94E35429B734F300BC1821 /* Transition.swift */; };
+		AB96E88C2A7BB26600C42934 /* TabBarTappable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB96E88B2A7BB26600C42934 /* TabBarTappable.swift */; };
 		AB98307027B54D43002C5132 /* ContentLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98306F27B54D43002C5132 /* ContentLoader.swift */; };
 		AB9958B82A24B83C00127DF6 /* BadgeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */; };
 		AB99676123D9AA210037CD6C /* HideKeyboardIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */; };
@@ -909,6 +910,7 @@
 		AB93FD77247EA245009546DD /* EmptyCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyCard.swift; sourceTree = "<group>"; };
 		AB93FD79247EA255009546DD /* EmptyCard.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmptyCard.xib; sourceTree = "<group>"; };
 		AB94E35429B734F300BC1821 /* Transition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transition.swift; sourceTree = "<group>"; };
+		AB96E88B2A7BB26600C42934 /* TabBarTappable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTappable.swift; sourceTree = "<group>"; };
 		AB98306F27B54D43002C5132 /* ContentLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLoader.swift; sourceTree = "<group>"; };
 		AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeExtension.swift; sourceTree = "<group>"; };
 		AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideKeyboardIcon.swift; sourceTree = "<group>"; };
@@ -1200,6 +1202,7 @@
 		AB10030827BEB82900338EE4 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				AB511C1029F14D1000AF7830 /* AnyOptional.swift */,
 				ABADF5A127F7097F00A26474 /* BannerObservable.swift */,
 				ABB46F362344B1F900AF212B /* CallbackObservable.swift */,
 				AB913F742806C3C200609D51 /* DataCleanOnTerminateObservable.swift */,
@@ -1207,12 +1210,12 @@
 				AB463FAF27C1378D007D7240 /* KeyboardObservable.swift */,
 				AB10030927BEB83E00338EE4 /* Localizable.swift */,
 				AB913F762806C8DF00609D51 /* ProtocolSubscriptions.swift */,
-				AB4054F528783156000F7768 /* UIPropertyListener.swift */,
+				AB156F6529AF88BE00F5397E /* Queue.swift */,
+				AB46B3412A14B47F00D64EA3 /* ScreenVisible.swift */,
 				AB4054F72878375F000F7768 /* ThinkWhatProtocols.swift */,
 				AB5787F629228AD2009C1DBF /* TintColorable.swift */,
-				AB156F6529AF88BE00F5397E /* Queue.swift */,
-				AB511C1029F14D1000AF7830 /* AnyOptional.swift */,
-				AB46B3412A14B47F00D64EA3 /* ScreenVisible.swift */,
+				AB4054F528783156000F7768 /* UIPropertyListener.swift */,
+				AB96E88B2A7BB26600C42934 /* TabBarTappable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -3494,6 +3497,7 @@
 				AB38DD6B2819411A00FFEB3F /* AppNotifications.swift in Sources */,
 				AB72962527DB5A6100D45B54 /* ListController.swift in Sources */,
 				AB21795B27577ED300D19567 /* _InterestCell.swift in Sources */,
+				AB96E88C2A7BB26600C42934 /* TabBarTappable.swift in Sources */,
 				ABB19148286C526200C89142 /* ProcessInfo.swift in Sources */,
 				ABF20FB624C993D60092B223 /* UserVotesCell.swift in Sources */,
 				ABF2756C280D62710023CD1F /* UITableView.swift in Sources */,

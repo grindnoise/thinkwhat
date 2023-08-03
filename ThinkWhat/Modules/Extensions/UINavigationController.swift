@@ -64,6 +64,7 @@ extension UINavigationController {
                                              duration: 0.2,
                                              delegate: nil),
                               forKey: nil)
+      navigationBar.layer.shadowOpacity = on ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0
     } else {
       guard !navigationBar.layer.shadowOpacity.isZero else { return }
       
@@ -78,6 +79,7 @@ extension UINavigationController {
                                              duration: 0.2,
                                              delegate: nil),
                               forKey: nil)
+      navigationBar.layer.shadowOpacity = 0
     }
   }
   

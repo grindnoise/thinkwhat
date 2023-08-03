@@ -1205,23 +1205,28 @@ extension MainController: UITabBarControllerDelegate {
       switch controller.self {
       case is HotController:
         tabBar.tintColor = Colors.Logo.Flame.rawValue
-        currentTab = .Hot
 //        setColors(Colors.main)//.Logo.Flame.rawValue)
+        if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Hot ? .Repeat : .Primary ) }
+        currentTab = .Hot
         setLogoCentered(animated: true)
         toggleLogo(on: true)
       case is SubscriptionsController:
 //        setColors(Colors.main)
 //        setColors(Colors.Logo.CoolGray.rawValue)
+        if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Subscriptions ? .Repeat : .Primary ) }
+        currentTab = .Subscriptions
         let controller = controller as! SubscriptionsController
         controller.isUserSelected ? { setLogoCentered(animated: true) }() : { setLogoLeading(constant: 10, animated: true) }() 
         toggleLogo(on: true)
       case is ListController:
+        if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Feed ? .Repeat : .Primary ) }
         currentTab = .Feed
 //        setColors(Colors.main)
 //setColors(Colors.Logo.GreenMunshell.rawValue)
         setLogoLeading(constant: 10, animated: true)
         toggleLogo(on: true)
       case is TopicsController:
+        if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Topics ? .Repeat : .Primary ) }
         currentTab = .Topics
 //        setColors(Colors.main)
 //setColors(Colors.Logo.Marigold.rawValue)
@@ -1233,6 +1238,7 @@ extension MainController: UITabBarControllerDelegate {
         
         toggleLogo(on: false)
       case is SettingsController:
+        if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Settings ? .Repeat : .Primary ) }
         currentTab = .Settings
 //        setColors(Colors.main)
 //setColors(Colors.Logo.AirBlue.rawValue)

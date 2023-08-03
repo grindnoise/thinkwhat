@@ -109,7 +109,7 @@ class UserprofileController: UIViewController, TintColorable {
     super.viewWillAppear(animated)
     
     navigationController?.setBarColor()
-    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark)
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
     navigationController?.setBarTintColor(tintColor)
     navigationController?.navigationBar.alpha = 1
     
@@ -117,6 +117,14 @@ class UserprofileController: UIViewController, TintColorable {
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
+    
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
+  }
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    navigationController?.setBarShadow(on: false, animated: true)
   }
   
   override func viewDidLayoutSubviews() {

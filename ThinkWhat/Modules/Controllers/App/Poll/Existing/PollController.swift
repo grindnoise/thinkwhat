@@ -125,14 +125,24 @@ class PollController: UIViewController {
     //        navigationController?.delegate = appDelegate.transitionCoordinator
   }
   
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    
+    navigationController?.setBarShadow(on: false, animated: true)
+  }
+  
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
     isOnScreen = true
+    
+    tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
     
     guard !item.isNil else { return }
     
@@ -165,7 +175,7 @@ private extension PollController {
   @MainActor
   func setupUI() {
     navigationController?.interactivePopGestureRecognizer?.delegate = self
-    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark)
+//    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
     navigationController?.setBarTintColor(item.topic.tagColor)
     navigationItem.titleView = titleView
     setBarButtonItems()

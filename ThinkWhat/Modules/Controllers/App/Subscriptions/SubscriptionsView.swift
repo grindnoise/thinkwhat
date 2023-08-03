@@ -929,12 +929,12 @@ private extension SubscriptionsView {
       contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
       contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
       contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+      topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: padding),
       topView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
       topView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
       //            filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10),
-      filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8),
-      filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8),
+      filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding),
+      filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding),
       //            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
       //            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
       //            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
@@ -944,23 +944,23 @@ private extension SubscriptionsView {
 //    periodButton.backgroundColor = viewInput!.tintColor
     userView.alpha = 0
     
-    let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8)
+    let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding)
     shadowLeading.identifier = "leading"
     shadowLeading.isActive = true
     
-    let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -8)
+    let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding)
     shadowTrailing.identifier = "trailing"
     shadowTrailing.isActive = true
     
-    let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8)
+    let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -padding)
     shadowBottom.identifier = "bottom"
     shadowBottom.isActive = true
     
-    let topConstraint_1 = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 8)
+    let topConstraint_1 = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: padding)
     topConstraint_1.identifier = "top_1"
     topConstraint_1.isActive = true
     
-    let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 16)
+    let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: padding*2)
     topConstraint_2.identifier = "top"
     topConstraint_2.isActive = true
     

@@ -1667,7 +1667,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.SymbolicBreakpoint">
          <BreakpointContent
             uuid = "928B970B-C4E4-4AE7-BCAF-8300A31A45F4"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             nameForDebugger = "AutoLayoutFailure"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -1842,7 +1842,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "3BC121F9-E1A9-4D23-9FFC-9AD39836E01E"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Survey/Existing/Poll/CollectionView/Cells/ChoiceCollectionView/ChoiceCell.swift"
@@ -2018,7 +2018,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "A2977A24-129C-446D-A962-7E74BDB0FB49"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Survey/Existing/Poll/CollectionView/Cells/CommentsCollectionView/CommentCell.swift"
@@ -2319,7 +2319,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "0D7100A5-9120-4972-BD39-1D95D8991405"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Userprofile/Single/Cells/UserInfoCell.swift"
@@ -2383,7 +2383,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "AEAAF04E-9C8B-4F36-BF3F-9EA95A3D0E62"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Survey/Existing/Poll/CollectionView/Cells/YoutubeCell.swift"
@@ -2399,7 +2399,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "805EE802-08E6-4431-AF81-EA025740E84B"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Supporting Files/UI/Transitions/old/FadeTransition.swift"
@@ -2672,7 +2672,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "DF34959F-9411-45B0-A882-2A8AB649C4AC"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Supporting Files/UI/Transitions/old/FadeTransition.swift"
@@ -2922,7 +2922,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "178AC326-4748-41FA-BB8D-7BCD26852198"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Userprofile/Single/Cells/UserCredentialsCell.swift"
@@ -2986,7 +2986,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "CAB243E3-89D6-4346-8F68-C0C291D5A6F8"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Userprofile/Single/Cells/UserInfoCell.swift"
@@ -3098,7 +3098,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "C311AB8F-78C4-439A-AAF4-8DA566CC2659"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Remove/Create/Poll/Popup content/Topic selection modern/TopicSelectionModernCollectionView.swift"
@@ -3114,7 +3114,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "D612FC5F-E1A4-412D-8D6A-00159492FA66"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Remove/Create/Poll/Popup content/Topic selection modern/TopicSelectionModernCollectionView.swift"
@@ -3130,7 +3130,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "41E9DDB2-4AC8-420F-9DCF-DDE7870D1EE7"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Animations.swift"
@@ -3271,7 +3271,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "65CDBA20-03A3-496D-AB04-1060281272BE"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Models/Comment.swift"
@@ -3619,7 +3619,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "58349752-36FB-4434-BD17-0B829EBEAA09"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Extensions/UIView.swift"
@@ -3635,7 +3635,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "0D1E3CD0-F25C-44E9-A6AC-6E2F341E4E80"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/User settings/Cells/UserSettingsStatsCell.swift"
@@ -3683,7 +3683,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "999B6AD2-57CF-4634-937C-409E899D948C"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/User settings/Cells/UserSettingsStatsCell.swift"
@@ -3731,7 +3731,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "D80AE4D1-76CC-4DD8-83AD-C445BCC31060"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/User settings/Cells/UserSettingsStatsCell.swift"
@@ -3779,7 +3779,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "077A58DB-FDD7-4BC8-A23C-0D993B64487A"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/UI/UI elements/Progress indicators/LoadingIndicator.swift"
@@ -3873,7 +3873,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "183D96A2-4155-433B-A972-AD07A10FE535"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Push Mod/NotificationService.swift"
@@ -3889,7 +3889,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "D30E0325-CF6A-497A-BAF0-BB6DE8F2863B"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Payload Mod/NotificationService.swift"
@@ -3985,7 +3985,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "064280C2-6C4D-4FCE-803A-3578B5691E87"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Payload modification/NotificationService.swift"
@@ -4270,7 +4270,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "A43CADB7-C7B6-4B43-A5A7-766D5D38A400"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Auth/Sign in/SignInView.swift"
@@ -4333,7 +4333,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "1437D5FB-5208-4EA1-92E2-C497A7746C16"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Supporting Files/UI/Icons/Icon.swift"
@@ -4429,7 +4429,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "EBC114E4-6B2F-4790-8961-01D9D3F0210B"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Managers/REST/APIManager.swift"
@@ -4522,7 +4522,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "D0E85A1D-71DC-47E2-96E2-CC8BC896A206"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Userprofile/Profile/Cells/Stats/UserStatsCollectionView.swift"
@@ -4632,7 +4632,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "7BEF8727-216A-4E91-B7E5-A1A2D78ACAB9"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Managers/REST/APIManager.swift"
@@ -4680,7 +4680,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "D4B60AE9-65BE-4EBC-9D88-D1366EFA7F3A"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             condition = "self.category == .Compatibility"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -4774,7 +4774,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "2D06992A-226C-498E-8356-2D0059E3ECCA"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Surveys/Collection/SurveysView.swift"
@@ -4822,7 +4822,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "BBF9F5DD-6627-4B87-AD9A-8174D59C7A65"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Controllers/Reusable/Surveys/Collection/SurveysModel.swift"
@@ -4918,7 +4918,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "E65B5896-4823-4582-8744-E2C67D32EF0B"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/Models/User.swift"
@@ -4966,7 +4966,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "8D6C60F1-2382-42D7-8FC5-2982FD854ADF"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Modules/UI/Static/Avatar/Avatar.swift"
@@ -5192,6 +5192,35 @@
                   endingLineNumber = "246"
                   offsetFromSymbolStart = "104">
                </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "A4DC33B0-603B-42A7-B74C-46366C3BCECD"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Extensions/UINavigationController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "47"
+            endingLineNumber = "47"
+            landmarkName = "setBarShadow(on:color:animated:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.SymbolicBreakpoint">
+         <BreakpointContent
+            uuid = "9B3DF213-BF38-4F3B-9934-419549D93C44"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            symbolName = ""
+            moduleName = "">
+            <Locations>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>

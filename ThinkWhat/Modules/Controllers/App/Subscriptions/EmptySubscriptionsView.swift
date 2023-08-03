@@ -343,6 +343,10 @@ private extension EmptyPublicationsView {
       }
     }
     
+    func getAssociatedColor(_ category: Icon.Category) -> UIColor {
+      return mode == .Subscriptions ? UIColor.random() : Topics.shared.all.filter { $0.iconCategory == category }.first?.tagColor ?? UIColor.random()
+    }
+    
     delay(seconds: items.count < maxItems/2 ? 0 : Double.random(in: 0.2...2)) {[weak self] in
       guard let self = self,
             self.items.count < self.maxItems
@@ -350,7 +354,7 @@ private extension EmptyPublicationsView {
       
       let category = getRandomCategory()
       let random = Icon(frame: CGRect(origin: self.randomPoint(), size: .uniform(size: CGFloat.random(in: 20...50))))
-      let color = UIColor.random()
+      let color =  getAssociatedColor(category)
       random.iconColor = color
       random.scaleMultiplicator = 1
       random.category = category
@@ -394,8 +398,7 @@ private extension EmptyPublicationsView {
   func updateGradient() {
     let clear = (traitCollection.userInterfaceStyle == .dark ? backgroundDarkColor : backgroundLightColor).withAlphaComponent(0).cgColor
     let feathered = traitCollection.userInterfaceStyle == .dark ? backgroundDarkColor.cgColor : backgroundLightColor.cgColor
-    fadeGradient.setGradient(colors: [feathered, clear, clear, feathered],
-                         locations: [0.0, 0.15, 0.85, 1.0])
+    fadeGradient.setGradient(colors: [feathered, clear, clear, feathered], locations: [0.0, 0.15, 0.85, 1.0])
   }
   
   @objc

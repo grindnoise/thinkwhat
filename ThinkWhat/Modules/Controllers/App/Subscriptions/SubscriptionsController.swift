@@ -136,9 +136,10 @@ class SubscriptionsController: UIViewController, TintColorable {
     
 //    clearNavigationBar(clear: true)
 //    setNavigationBarTintColor(tintColor)
-    navigationController?.setBarOpaque()
+//    navigationController?.setBarOpaque()
+    navigationController?.setBarColor()
     navigationController?.setBarTintColor(tintColor)
-    navigationController?.setBarShadow(on: false)
+//    navigationController?.setBarShadow(on: false)
     navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationItem.largeTitleDisplayMode = .never
@@ -783,5 +784,13 @@ extension SubscriptionsController: DataObservable {
 extension SubscriptionsController: ScreenVisible {
   func setActive(_ flag: Bool) {
     isOnScreen = flag
+  }
+}
+
+extension SubscriptionsController: TabBarTappable {
+  func tabBarTapped(_ mode: TabBarTapMode) {
+    guard mode == .Repeat && self.mode == .Userprofile else { return }
+    
+    controllerOutput?.hideUserCard(nil)
   }
 }

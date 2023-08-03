@@ -225,11 +225,10 @@ private extension HotController {
     })
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
-        guard let self = self,
-              self.isOnScreen
-        else { return }
+        guard let self = self else { return }
         
         self.isOnScreen = false
+        self.controllerOutput?.didDisappear()
       }
     })
     tasks.append(Task { @MainActor [weak self] in
@@ -240,6 +239,7 @@ private extension HotController {
         else { return }
         
         self.isOnScreen = true
+        self.controllerOutput?.didAppear()
       }
     })
     

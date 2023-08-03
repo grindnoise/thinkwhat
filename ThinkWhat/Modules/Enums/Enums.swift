@@ -11,7 +11,10 @@ import UIKit
 
 enum EditingMode { case ReadOnly, Write }
 
-//Open side app or embedded html
+/// Used to detect primary/repeating tap on tab bar item
+enum TabBarTapMode { case Primary, Repeat }
+
+/// Open side app or embedded html
 enum SideAppPreference: String {
   case Embedded = "embedded"
   case App = "app"
