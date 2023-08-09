@@ -16,8 +16,8 @@ class Shimmer: UIView {
   // MARK: - Private methods
   private lazy var subscriptions = Set<AnyCancellable>()
   ///**UI**
-  private let lightColor: UIColor
-  private let darkColor: UIColor
+  private var lightColor: UIColor!
+  private var darkColor: UIColor!
   private lazy var gradient: CAGradientLayer = {
     backgroundColor = .clear
     var light: CGColor!
@@ -72,7 +72,15 @@ class Shimmer: UIView {
   
   
   // MARK: - Initialization
-//  init(color: UIColor = .secondarySystemFill) {
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
+    self.lightColor = traitCollection.userInterfaceStyle == .dark ? Colors.Shimmer.backgroundLightForDark : Colors.Shimmer.backgroundLightForLight
+    self.darkColor = traitCollection.userInterfaceStyle == .dark ? Colors.Shimmer.backgroundDarkForDark : Colors.Shimmer.backgroundDarkForLight
+    
+    backgroundColor = .clear
+  }
+  
   init(lightColor: UIColor = .systemBackground,
        darkColor: UIColor = .tertiarySystemBackground) {
     self.lightColor = lightColor.darker(0.025)

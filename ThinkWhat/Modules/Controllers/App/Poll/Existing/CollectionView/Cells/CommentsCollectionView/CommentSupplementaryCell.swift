@@ -34,7 +34,7 @@ class CommentSupplementaryCell: UICollectionReusableView {
     label.accessibilityIdentifier = "label"
     label.isUserInteractionEnabled = true
     label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.onTap)))
-    label.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
+    label.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote)
     label.text = "add_comment".localized
     label.textColor = .secondaryLabel
     label.translatesAutoresizingMaskIntoConstraints = false
@@ -83,7 +83,7 @@ class CommentSupplementaryCell: UICollectionReusableView {
   // MARK: - Private methods
   private func setupUI() {
     label.place(inside: self,
-                insets: UIEdgeInsets(top: 0, left: padding, bottom: padding, right: padding),
+                insets: UIEdgeInsets(top: 0, left: 0, bottom: padding, right: 0),
                 bottomPriority: .defaultLow)
   }
   
@@ -105,7 +105,7 @@ class CommentSupplementaryCell: UICollectionReusableView {
           let constraint = instance.getConstraint(identifier: "height")
     else { return }
     
-    instance.font = UIFont.scaledFont(fontName: Fonts.OpenSans.Regular.rawValue, forTextStyle: .callout)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote)
     setNeedsLayout()
     constraint.constant = "add_comment".height(withConstrainedWidth: 1000, font: instance.font)
     layoutIfNeeded()

@@ -67,6 +67,7 @@ class AnswerCell: UICollectionViewCell {
       ///Update stats
       survey.reference.votesPublisher
         .receive(on: DispatchQueue.main)
+        .delay(for: .seconds(Double.random(in: 0.4...0.8)), scheduler: DispatchQueue.main)
         .sink { [weak self] _ in
           guard let self = self else { return }
 
@@ -272,7 +273,7 @@ class AnswerCell: UICollectionViewCell {
   private lazy var percentageLabel: UILabel = {
     let instance = UILabel()
     instance.backgroundColor = .clear
-    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .caption2)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption2)
     instance.textAlignment = .center
 //    instance.widthAnchor.constraint(equalToConstant: "100 %".width(withConstrainedHeight: 100, font: instance.font)).isActive = true
     instance.textColor = .white // color
@@ -280,9 +281,9 @@ class AnswerCell: UICollectionViewCell {
     return instance
   }()
   private lazy var percentageView: PercentageView = {
-    let instance = PercentageView(lineWidth: "T".height(withConstrainedWidth: 100,
-                                                        font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold,
-                                                                                forTextStyle: .caption2)!) + padding/4,
+    let instance = PercentageView(lineWidth: "1".height(withConstrainedWidth: 100,
+                                                        font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular,
+                                                                                forTextStyle: .caption2)!) + padding/8,
                                   foregoundColor: traitCollection.userInterfaceStyle == .dark ? color : .white.blended(withFraction: 0.85, of: color),
                                   backgroundLightColor: (isAnswerSelected || isChosen) ? .secondarySystemBackground : .systemFill,
                                   backgroundDarkColor: (isAnswerSelected || isChosen) ? .secondarySystemBackground : .tertiarySystemBackground)
@@ -379,8 +380,8 @@ class AnswerCell: UICollectionViewCell {
   private lazy var votersStack: VotersStack = {
     let instance = VotersStack(userprofiles: Array(item.voters.prefix(avatarsThreshold)),
                                capacity: avatarsThreshold,
-                               lightBorderColor: .systemBackground,
-                               darkBorderColor: .tertiarySystemBackground,
+                               lightBorderColor: isChosen ? Colors.Poll.choiceSelectedBackgroundLight : Colors.Poll.choiceBackgroundLight,
+                               darkBorderColor: isChosen ? Colors.Poll.choiceSelectedBackgroundDark : Colors.Poll.choiceBackgroundDark,
                                height: statsHeight-padding)
     instance.tapPublisher
       .sink { [weak self] _ in
@@ -566,10 +567,8 @@ private extension AnswerCell {
   
   @MainActor
   func setChosen() {
-    votersStack.setColors(lightBorderColor: .systemBackground,
-                          darkBorderColor: .tertiarySystemBackground)
-//    votersStack.setColors(lightBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.2) : .clear,
-//                          darkBorderColor: (isChosen || isAnswerSelected) ? color.withAlphaComponent(0.4) : .clear)
+    votersStack.setColors(lightBorderColor: Colors.Poll.choiceSelectedBackgroundLight,
+                          darkBorderColor: Colors.Poll.choiceSelectedBackgroundDark)
     
     deselect()
     if let bgLayer = self.stackView.layer.getSublayer(name: "bgLayer"), isChosen || isAnswerSelected {

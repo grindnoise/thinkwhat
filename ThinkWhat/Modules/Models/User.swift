@@ -659,7 +659,7 @@ class Userprofile: Decodable {
     cityId = instance.cityId
     cityTitle = instance.cityTitle
 //    compatibility = instance.compatibility
-    image = instance.image
+//    image = instance.image
     completeTotal = instance.completeTotal
     votesReceivedTotal = instance.votesReceivedTotal
     commentsTotal = instance.commentsTotal
@@ -675,7 +675,7 @@ class Userprofile: Decodable {
     preferences = instance.preferences
 //    surveys = instance.surveys
 //    favorites = instance.favorites
-    answers = instance.answers
+//    answers = instance.answers
     subscribedAt = instance.subscribedAt
     subscribedToMe = instance.subscribedToMe
     notifyOnPublication = instance.notifyOnPublication
@@ -744,7 +744,7 @@ class Userprofile: Decodable {
     do {
       guard image.isNil, !isDownloading else { return }//UIImage() }
       
-      guard let url =  imageURL else { throw AppError.invalidURL }
+      guard let url = imageURL else { throw AppError.invalidURL }
       //#if DEBUG
       //            print(self.id, "\(String(describing: self)).\(#function)")
       //#endif

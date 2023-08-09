@@ -497,9 +497,10 @@
 "minimum_votes" = "Minimum number of votes: ";
 
 // Push notifications
-"pn_new_post" = "%@ posted a new post";
-"pn_own_post_completed_title" = "Your post has ended!";
+"pn_new_post" = "%@ posted a new post ⚡️";
+"pn_own_post_completed_title" = "Your post has completed 🏁";
 "pn_own_post_completed" = "See the results 🔍";
+"pn_new_comment_reply" = "%@ replied to your comment: %@";
 
 // EmptyPublicationsView
 "empty_pub_view_subscriptions" = "No subscriptions";

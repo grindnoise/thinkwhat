@@ -10,6 +10,11 @@ import UIKit
 import MapKit
 
 struct Animations {
+  
+  struct Duration {
+    static let percentageStroke = 0.75
+  }
+  
   enum AnimationProperty: String {
     case FillColor       = "fillColor"
     case ShadowPath      = "shadowPath"

@@ -111,7 +111,10 @@ class SurveysController: UIViewController, TintColorable {
   private lazy var searchField: InsetTextField = {
     let instance = InsetTextField()
     instance.autocorrectionType = .no
-    instance.placeholder = "search".localized
+    instance.attributedPlaceholder = NSAttributedString(string: "search".localized, attributes: [
+      .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote) as Any,
+      .foregroundColor: UIColor.secondaryLabel,
+    ])
     instance.alpha = 0
     instance.delegate = self
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
@@ -384,7 +387,7 @@ extension SurveysController: SurveysViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(PollController(surveyReference: instance), animated: true)
+    navigationController?.pushViewController(PollController(surveyReference: instance, mode: instance.isComplete ? .Read : .Vote), animated: true)
     //        tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
   

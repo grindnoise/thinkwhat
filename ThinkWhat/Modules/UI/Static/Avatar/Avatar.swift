@@ -540,9 +540,10 @@ class Avatar: UIView {
     choiceImage = image
     mode = .Choice
     
-//    button.setImage(image.withConfiguration(UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.75,
-//                                                                             weight: .semibold)),
-//                      for: .normal)
+    button.setImage(image.withConfiguration(UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.75,
+                                                                             weight: .semibold)),
+                      for: .normal)
+    button.tintColor = color
     button.alpha = 1
 //    button.setImage(image.withConfiguration(UIImage.SymbolConfiguration(pointSize: button.bounds.height*0.6,
 //                                                                           weight: .semibold)),

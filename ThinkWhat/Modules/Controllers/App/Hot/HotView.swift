@@ -275,13 +275,14 @@ extension HotView: HotControllerOutput {
     next(instance)
   }
   
-  func didAppear() {
-    guard let card = current as? EmptyHotCard else {
+  
+  func willAppear() {
+    if let instance = current as? EmptyHotCard {
+      instance.toggleAnimations(true)
+    } else if let instance = current as? HotCard {
+      instance.animateButtons()
       didLoad()
-      return
     }
-    
-    card.toggleAnimations(true)
   }
   
   func didDisappear() {

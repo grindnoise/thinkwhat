@@ -1168,8 +1168,8 @@ private extension SubscriptionsView {
   func toggleDateFilter(on: Bool, animated: Bool = true) {
     guard let heightConstraint = filterView.getConstraint(identifier: "height"),
           let constraint1 = filterView.getConstraint(identifier: "top_1"),
-          let constraint2 = shadowView.getConstraint(identifier: "top")
-            //              let constraint3 = shadowView.getConstraint(identifier: "leading"),
+          let constraint2 = shadowView.getConstraint(identifier: "top"),
+                          let constraint3 = topView.getConstraint(identifier: "height")
             //              let constraint4 = shadowView.getConstraint(identifier: "trailing")
             //              let constraint5 = shadowView.getConstraint(identifier: "bottom")
     else { return }
@@ -1195,6 +1195,13 @@ private extension SubscriptionsView {
       self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
       constraint1.constant = on ? 16 : self.mode == .Default ? 0 : 10
       constraint2.constant = on ? 16 : 0
+      
+//      if self.mode == .Default {
+//        constraint3.constant = 0
+//        self.topView.alpha = on ? 1 : 0
+//        self.topView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
+//      }
+      
       //            constraint3.constant = on ? 8 : 4
       //            constraint4.constant = on ? -8 : -4
       //            constraint5.constant = on ? -8 : -4

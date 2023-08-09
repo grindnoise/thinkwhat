@@ -22,6 +22,7 @@ class EmptyHotCard: UIView, Card {
   private var observers: [NSKeyValueObservation] = []
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
+  private let padding: CGFloat = 8
   private lazy var body: UIView = {
     let instance = UIView()
     emptyPublicationsView.place(inside: instance)
@@ -39,9 +40,9 @@ class EmptyHotCard: UIView, Card {
     instance.backgroundColor = .clear
     instance.accessibilityIdentifier = "shadow"
     instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-    instance.layer.shadowRadius = 5
-    instance.layer.shadowOffset = .zero
+    instance.layer.shadowColor = Shadows.Cards.color
+    instance.layer.shadowRadius = Shadows.radius(padding: padding)
+    instance.layer.shadowOffset = Shadows.Cards.offset
     body.addEquallyTo(to: instance)
     
     return instance

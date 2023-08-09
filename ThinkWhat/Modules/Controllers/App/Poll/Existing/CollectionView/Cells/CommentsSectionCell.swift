@@ -27,6 +27,9 @@ class CommentsSectionCell: UICollectionViewCell {
   var item: Survey! {
     didSet {
       guard let item = item else { return }
+      
+      setTasks()
+      setupUI()
       collectionView.survey = item
       disclosureIndicator.alpha = item.isCommentingAllowed ? 1 : 0
       
@@ -148,26 +151,41 @@ class CommentsSectionCell: UICollectionViewCell {
     return verticalStack
   }()
   private lazy var collectionView: CommentsCollectionView = {
-    let instance = CommentsCollectionView(rootComment: nil)
+    let instance = CommentsCollectionView()
     instance.isScrollEnabled = true
+    instance.layer.masksToBounds = false
     
-    let constraint = instance.heightAnchor.constraint(equalToConstant: 1)
+    let constraint = instance.heightAnchor.constraint(equalToConstant: 44)
     constraint.identifier = "height"
     constraint.isActive = true
     
-    observers.append(instance.observe(\.contentSize,
-                                       options: .new) { [weak self] view, change in
-      guard let self = self,
-            let value = change.newValue,
-            value != .zero,
-            value.height != constraint.constant
-      else { return }
-      
-      self.setNeedsLayout()
-      constraint.constant = value.height//min(value.height, UIScreen.main.bounds.height*0.75)
-      self.layoutIfNeeded()
-      self.boundsPublisher.send(true)
-    })
+    instance.publisher(for: \.contentSize)
+      .filter { $0 != .zero }
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] in
+        guard let self = self,
+              $0.height > constraint.constant
+        else { return }
+        
+        self.setNeedsLayout()
+        constraint.constant = $0.height
+        self.layoutIfNeeded()
+        self.boundsPublisher.send(true)
+      }
+      .store(in: &subscriptions)
+    
+//    observers.append(instance.observe(\.contentSize, options: .new) { [weak self] view, change in
+//      guard let self = self,
+//            let value = change.newValue,
+////            value != .zero//,
+//            value.height > constraint.constant
+//      else { return }
+//
+//      self.setNeedsLayout()
+//      constraint.constant = value.height//min(value.height, UIScreen.main.bounds.height*0.75)
+//      self.layoutIfNeeded()
+//      self.boundsPublisher.send(true)
+//    })
     
     instance.claimPublisher
       .sink { [weak self] in
@@ -246,6 +264,8 @@ class CommentsSectionCell: UICollectionViewCell {
       }
       .store(in: &subscriptions)
     
+    instance.setDataSource(survey: item, animatingDifferences: false)
+    
     return instance
   }()
   private lazy var container: UIView = {
@@ -280,8 +300,8 @@ class CommentsSectionCell: UICollectionViewCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setTasks()
-    setupUI()
+//    setTasks()
+//    setupUI()
   }
   
   required init?(coder: NSCoder) {

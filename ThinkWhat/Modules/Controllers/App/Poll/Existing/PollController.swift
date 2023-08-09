@@ -27,10 +27,11 @@ class PollController: UIViewController {
   private var tasks: [Task<Void, Never>?] = []
   private var subscriptions = Set<AnyCancellable>()
   ///**Logic**
-  private var surveyId: String?
+  private var surveyId: String? // For push notification
+  private var threadId: String? // For push notification
+  private var replyId: String? // For push notification
   private var userHasVoted = false
   private var isOnScreen = false
-//  private var surveyStateUpdater: AnyCancellable?
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var avatar: Avatar = { Avatar() }()
@@ -77,6 +78,17 @@ class PollController: UIViewController {
     super.init(nibName: nil, bundle: nil)
   }
   
+  init(surveyId: String,
+       threadId: String,
+       replyId: String) {
+    self.surveyId = surveyId
+    self.threadId = threadId
+    self.replyId = replyId
+    self.mode = .Read
+    
+    super.init(nibName: nil, bundle: nil)
+  }
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -99,8 +111,25 @@ class PollController: UIViewController {
     self.view = view as UIView
     
     // Check if init is from push notification
-    guard !item.isNil, surveyId.isNil else {
-      loadData(surveyID: surveyId!)
+    if item.isNil {
+      if let surveyId = surveyId, let threadId = threadId, let replyId = replyId {
+        // Check if survey already exists
+        if let survey = Surveys.shared.all.filter({ $0.id == Int(surveyId) }).first {
+          loadData(threadId: threadId, replyId: replyId)
+          item = survey.reference
+        } else {
+          loadData(surveyId: surveyId, threadId: threadId, replyId: replyId)
+        }
+      } else if let surveyId = surveyId {
+        // Check if survey already exists
+        guard let survey = Surveys.shared.all.filter({ $0.id == Int(surveyId) }).first else {
+          loadData(surveyID: surveyId)
+          
+          return
+        }
+        
+        item = survey.reference
+      }
       return
     }
     
@@ -469,34 +498,73 @@ private extension PollController {
     //        })
   }
   
-  /// Loads survey by reference or id if it's a push notification
-  /// - Parameter surveyID: survey id extracted from push notification
-  func loadData(surveyID: String = "") {
-    spinner = SpiralSpinner(color: !item.isNil ? item.topic.tagColor : Colors.main)
+  func loadData() {
+    spinner = SpiralSpinner(color: item.topic.tagColor)
     
-    switch surveyID.isEmpty {
-    case false:
-      navigationController?.setNavigationBarHidden(true, animated: false)
-      spinner.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-//      loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-//      loadingIndicator.start()
-      controllerInput?.load(surveyID)
-    case true:
-      guard item.survey.isNil else {
-        controllerOutput?.item = item.survey
-        
-        // Increment view counter
-        guard mode != .Preview else { return }
-        
-        controllerInput?.incrementViewCounter()
-        return
-      }
-      navigationController?.setNavigationBarHidden(true, animated: false)
-      spinner.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-//      loadingIndicator.placeInCenter(of: view, widthMultiplier: 0.25, yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-//      loadingIndicator.start()
-      controllerInput?.load(item, incrementViewCounter: true)
+    guard item.survey.isNil else {
+      controllerOutput?.item = item.survey
+      
+      // Increment view counter
+      guard mode != .Preview else { return }
+      
+      controllerInput?.incrementViewCounter()
+      return
     }
+    
+    navigationController?.setNavigationBarHidden(true, animated: false)
+    spinner.placeInCenter(of: view,
+                          widthMultiplier: 0.25,
+                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+    controllerInput?.load(item, incrementViewCounter: true)
+    spinner.start(duration: 1)
+  }
+  
+  /// Loads survey by id from push notification
+  /// - Parameter surveyID: survey id extracted from push notification
+  func loadData(surveyID: String) {
+    spinner = SpiralSpinner(color: Colors.main)
+    navigationController?.setNavigationBarHidden(true, animated: false)
+    spinner.placeInCenter(of: view,
+                          widthMultiplier: 0.25,
+                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+    controllerInput?.load(surveyID)
+    spinner.start(duration: 1)
+  }
+  
+  /// Loads survey by id and comments thread by root comment id from push notification
+  /// - Parameter surveyId: survey id
+  /// - Parameter threadId: root comment id
+  /// - Parameter replyId: reply comment id
+  func loadData(surveyId: String, threadId: String, replyId: String) {
+    spinner = SpiralSpinner(color: Colors.main)
+    navigationController?.setNavigationBarHidden(true, animated: false)
+    spinner.placeInCenter(of: view,
+                          widthMultiplier: 0.25,
+                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+    controllerInput?.loadSurveyAndThread(surveyId: surveyId,
+                                         threadId: threadId,
+                                         excludeList: [],
+                                         includeSelf: true,
+                                         onlyChildren: false,
+                                         threshold: 100)
+    spinner.start(duration: 1)
+  }
+  
+  /// Loads survey by id and comments thread by root comment id from push notification
+  /// - Parameter surveyId: survey id
+  /// - Parameter threadId: root comment id
+  /// - Parameter replyId: reply comment id
+  func loadData(threadId: String, replyId: String) {
+    spinner = SpiralSpinner(color: Colors.main)
+    navigationController?.setNavigationBarHidden(true, animated: false)
+    spinner.placeInCenter(of: view,
+                          widthMultiplier: 0.25,
+                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+    controllerInput?.loadThread(threadId: threadId,
+                                excludeList: [],
+                                includeSelf: true,
+                                onlyChildren: false,
+                                threshold: 100)
     spinner.start(duration: 1)
   }
   
@@ -722,6 +790,30 @@ extension PollController: PollViewInput {
 
 // MARK: - Output
 extension PollController: PollModelOutput {
+  func loadThreadCallback(_: Result<Void, Error>) {
+    fatalError()
+  }
+  
+  func loadSurveyAndThreadCallback(_ result: Result<Survey, Error>) {
+    switch result {
+    case .success(let survey):
+      item = survey.reference
+      // Push to comments thread
+      guard let threadId = threadId, let id = Int(threadId), let comment = Comments.shared.all.filter({ $0.id == id }).first else {
+        navigationController?.popViewController(animated: true)
+        
+        return
+      }
+      openCommentThread(comment)
+    case .failure(let error):
+#if DEBUG
+      error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      // Go back
+      navigationController?.popViewController(animated: true)
+    }
+  }
+  
   @MainActor
   func loadCallback(_ result: Result<Survey, Error>) {
     switch result {

@@ -333,26 +333,26 @@ class Icon: UIView {
         self.layer.addSublayer(icon)
         clipsToBounds = true
     }
-    
-    required init?(coder aDecoder: NSCoder) {
-        if let _frame = aDecoder.decodeCGRect(forKey: "frame") as? CGRect,  let colorData = aDecoder.decodeObject(forKey: "backgroundColor") as? Data, let categoryID = aDecoder.decodeInteger(forKey: "categoryID") as? Int, let text = aDecoder.decodeObject(forKey: "text") as? String {
-            
-            super.init(frame: _frame)
-            self.backgroundColor = NSKeyedUnarchiver.unarchiveObject(with: colorData) as? UIColor ?? K_COLOR_RED
-            self.text = text
-            self.category = Icon.Category(rawValue: categoryID) ?? .Null
-            self.icon = getLayer()
-            if icon is CAShapeLayer {
-                (self.icon as! CAShapeLayer).frame = bounds
-                (self.icon as! CAShapeLayer).fillColor  = UIColor.white.cgColor
-            }
-            self.layer.addSublayer(icon)
-        } else {
-            super.init(coder: aDecoder)
-        }
-//        guard let frame = aDecoder.decodeCGRect(forKey: "frame") as? CGRect,
-//              let data = aDecoder.decodeObject(forKey: "backgroundColor") as? Data,
-//              let category = aDecoder.decodeInteger(forKey: "categoryID") as? Int,
+  
+  required init?(coder aDecoder: NSCoder) {
+    if let _frame = aDecoder.decodeCGRect(forKey: "frame") as? CGRect,  let colorData = aDecoder.decodeObject(forKey: "backgroundColor") as? Data, let categoryID = aDecoder.decodeInteger(forKey: "categoryID") as? Int, let text = aDecoder.decodeObject(forKey: "text") as? String {
+      
+      super.init(frame: _frame)
+      self.backgroundColor = NSKeyedUnarchiver.unarchiveObject(with: colorData) as? UIColor ?? K_COLOR_RED
+      self.text = text
+      self.category = Icon.Category(rawValue: categoryID) ?? .Null
+      self.icon = getLayer()
+      if icon is CAShapeLayer {
+        (self.icon as! CAShapeLayer).frame = bounds
+        (self.icon as! CAShapeLayer).fillColor  = UIColor.white.cgColor
+      }
+      self.layer.addSublayer(icon)
+    } else {
+      super.init(coder: aDecoder)
+    }
+    //        guard let frame = aDecoder.decodeCGRect(forKey: "frame") as? CGRect,
+    //              let data = aDecoder.decodeObject(forKey: "backgroundColor") as? Data,
+    //              let category = aDecoder.decodeInteger(forKey: "categoryID") as? Int,
 //              let text = aDecoder.decodeObject(forKey: "text") as? String
 //        else {
 //            super.init(coder: aDecoder)
@@ -401,43 +401,43 @@ class Icon: UIView {
             iconColor = _color
         }
     }
+  
+  public func getLayer(_ _category: Icon.Category = .Null) -> CALayer {
     
-    public func getLayer(_ _category: Icon.Category = .Null) -> CALayer {
-        
-        let newLayer = CAShapeLayer()
-        newLayer.frame = bounds
-        
-        var iconPath = UIBezierPath()
-        
-        let switchCase = _category == .Null ? category : _category
-        
-        switch switchCase {
-        case .Spiral:
-          iconPath.move(to: CGPoint(x: 324.25, y: 194.54))
-          iconPath.addCurve(to: CGPoint(x: 271.34, y: 222.15), controlPoint1: CGPoint(x: 305.91, y: 202.32), controlPoint2: CGPoint(x: 288.22, y: 211.56))
-          iconPath.addCurve(to: CGPoint(x: 246.64, y: 239), controlPoint1: CGPoint(x: 262.9, y: 227.45), controlPoint2: CGPoint(x: 254.62, y: 233.01))
-          iconPath.addCurve(to: CGPoint(x: 223.3, y: 257.75), controlPoint1: CGPoint(x: 238.67, y: 244.99), controlPoint2: CGPoint(x: 230.84, y: 251.19))
-          iconPath.addCurve(to: CGPoint(x: 201.48, y: 278.31), controlPoint1: CGPoint(x: 215.77, y: 264.3), controlPoint2: CGPoint(x: 208.49, y: 271.18))
-          iconPath.addCurve(to: CGPoint(x: 189, y: 291.57), controlPoint1: CGPoint(x: 197.22, y: 282.63), controlPoint2: CGPoint(x: 193.06, y: 287.05))
-          iconPath.addCurve(to: CGPoint(x: 189, y: 190), controlPoint1: CGPoint(x: 189, y: 230.92), controlPoint2: CGPoint(x: 189, y: 190))
-          iconPath.addLine(to: CGPoint(x: 335.31, y: 190))
-          iconPath.addCurve(to: CGPoint(x: 324.25, y: 194.54), controlPoint1: CGPoint(x: 331.59, y: 191.44), controlPoint2: CGPoint(x: 327.9, y: 192.95))
-          iconPath.close()
-          iconPath.move(to: CGPoint(x: 799, y: 256.66))
-          iconPath.addCurve(to: CGPoint(x: 799, y: 655.12), controlPoint1: CGPoint(x: 799, y: 351.8), controlPoint2: CGPoint(x: 799, y: 528.97))
-          iconPath.addCurve(to: CGPoint(x: 754.59, y: 707.92), controlPoint1: CGPoint(x: 785.97, y: 674.13), controlPoint2: CGPoint(x: 771.09, y: 691.81))
-          iconPath.addLine(to: CGPoint(x: 752.88, y: 709.62))
-          iconPath.addCurve(to: CGPoint(x: 751.11, y: 711.26), controlPoint1: CGPoint(x: 752.3, y: 710.17), controlPoint2: CGPoint(x: 751.7, y: 710.71))
-          iconPath.addLine(to: CGPoint(x: 747.56, y: 714.5))
-          iconPath.addLine(to: CGPoint(x: 740.43, y: 720.98))
-          iconPath.addLine(to: CGPoint(x: 733.02, y: 727.18))
-          iconPath.addCurve(to: CGPoint(x: 725.52, y: 733.24), controlPoint1: CGPoint(x: 730.53, y: 729.2), controlPoint2: CGPoint(x: 728.12, y: 731.32))
-          iconPath.addLine(to: CGPoint(x: 717.81, y: 739.01))
-          iconPath.addCurve(to: CGPoint(x: 713.94, y: 741.86), controlPoint1: CGPoint(x: 716.52, y: 739.96), controlPoint2: CGPoint(x: 715.27, y: 740.96))
-          iconPath.addLine(to: CGPoint(x: 709.96, y: 744.57))
-          iconPath.addLine(to: CGPoint(x: 701.99, y: 749.93))
-          iconPath.addCurve(to: CGPoint(x: 697.9, y: 752.48), controlPoint1: CGPoint(x: 700.67, y: 750.85), controlPoint2: CGPoint(x: 699.27, y: 751.64))
-          iconPath.addLine(to: CGPoint(x: 693.8, y: 754.99))
+    let newLayer = CAShapeLayer()
+    newLayer.frame = bounds
+    
+    var iconPath = UIBezierPath()
+    
+    let switchCase = _category == .Null ? category : _category
+    
+    switch switchCase {
+    case .Spiral:
+      iconPath.move(to: CGPoint(x: 324.25, y: 194.54))
+      iconPath.addCurve(to: CGPoint(x: 271.34, y: 222.15), controlPoint1: CGPoint(x: 305.91, y: 202.32), controlPoint2: CGPoint(x: 288.22, y: 211.56))
+      iconPath.addCurve(to: CGPoint(x: 246.64, y: 239), controlPoint1: CGPoint(x: 262.9, y: 227.45), controlPoint2: CGPoint(x: 254.62, y: 233.01))
+      iconPath.addCurve(to: CGPoint(x: 223.3, y: 257.75), controlPoint1: CGPoint(x: 238.67, y: 244.99), controlPoint2: CGPoint(x: 230.84, y: 251.19))
+      iconPath.addCurve(to: CGPoint(x: 201.48, y: 278.31), controlPoint1: CGPoint(x: 215.77, y: 264.3), controlPoint2: CGPoint(x: 208.49, y: 271.18))
+      iconPath.addCurve(to: CGPoint(x: 189, y: 291.57), controlPoint1: CGPoint(x: 197.22, y: 282.63), controlPoint2: CGPoint(x: 193.06, y: 287.05))
+      iconPath.addCurve(to: CGPoint(x: 189, y: 190), controlPoint1: CGPoint(x: 189, y: 230.92), controlPoint2: CGPoint(x: 189, y: 190))
+      iconPath.addLine(to: CGPoint(x: 335.31, y: 190))
+      iconPath.addCurve(to: CGPoint(x: 324.25, y: 194.54), controlPoint1: CGPoint(x: 331.59, y: 191.44), controlPoint2: CGPoint(x: 327.9, y: 192.95))
+      iconPath.close()
+      iconPath.move(to: CGPoint(x: 799, y: 256.66))
+      iconPath.addCurve(to: CGPoint(x: 799, y: 655.12), controlPoint1: CGPoint(x: 799, y: 351.8), controlPoint2: CGPoint(x: 799, y: 528.97))
+      iconPath.addCurve(to: CGPoint(x: 754.59, y: 707.92), controlPoint1: CGPoint(x: 785.97, y: 674.13), controlPoint2: CGPoint(x: 771.09, y: 691.81))
+      iconPath.addLine(to: CGPoint(x: 752.88, y: 709.62))
+      iconPath.addCurve(to: CGPoint(x: 751.11, y: 711.26), controlPoint1: CGPoint(x: 752.3, y: 710.17), controlPoint2: CGPoint(x: 751.7, y: 710.71))
+      iconPath.addLine(to: CGPoint(x: 747.56, y: 714.5))
+      iconPath.addLine(to: CGPoint(x: 740.43, y: 720.98))
+      iconPath.addLine(to: CGPoint(x: 733.02, y: 727.18))
+      iconPath.addCurve(to: CGPoint(x: 725.52, y: 733.24), controlPoint1: CGPoint(x: 730.53, y: 729.2), controlPoint2: CGPoint(x: 728.12, y: 731.32))
+      iconPath.addLine(to: CGPoint(x: 717.81, y: 739.01))
+      iconPath.addCurve(to: CGPoint(x: 713.94, y: 741.86), controlPoint1: CGPoint(x: 716.52, y: 739.96), controlPoint2: CGPoint(x: 715.27, y: 740.96))
+      iconPath.addLine(to: CGPoint(x: 709.96, y: 744.57))
+      iconPath.addLine(to: CGPoint(x: 701.99, y: 749.93))
+      iconPath.addCurve(to: CGPoint(x: 697.9, y: 752.48), controlPoint1: CGPoint(x: 700.67, y: 750.85), controlPoint2: CGPoint(x: 699.27, y: 751.64))
+      iconPath.addLine(to: CGPoint(x: 693.8, y: 754.99))
           iconPath.addLine(to: CGPoint(x: 689.69, y: 757.49))
           iconPath.addLine(to: CGPoint(x: 687.63, y: 758.74))
           iconPath.addLine(to: CGPoint(x: 686.6, y: 759.36))

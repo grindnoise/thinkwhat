@@ -139,7 +139,7 @@ class SubscriptionsController: UIViewController, TintColorable {
 //    navigationController?.setBarOpaque()
     navigationController?.setBarColor()
     navigationController?.setBarTintColor(tintColor)
-//    navigationController?.setBarShadow(on: false)
+    navigationController?.setBarShadow(on: false, animated: true)
     navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationItem.largeTitleDisplayMode = .never
@@ -256,6 +256,7 @@ private extension SubscriptionsController {
         else { return }
         
         self.isOnScreen = false
+        self.controllerOutput?.didDisappear()
       }
     })
     tasks.append(Task { @MainActor [weak self] in
@@ -266,6 +267,14 @@ private extension SubscriptionsController {
         else { return }
         
         self.isOnScreen = true
+        self.controllerOutput?.didAppear()
+      }
+    })
+    tasks.append(Task { @MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
+        guard let self = self else { return }
+        
+        self.navigationController?.setBarShadow(on: false)
       }
     })
   }
@@ -686,7 +695,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(PollController(surveyReference: instance), animated: true)
+    navigationController?.pushViewController(PollController(surveyReference: instance, mode: instance.isComplete ? .Read : .Vote), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let controller = tabBarController as? MainController else { return }
@@ -781,16 +790,19 @@ extension SubscriptionsController: DataObservable {
 //  }
 //}
 
+/// Set/unset current active screen
 extension SubscriptionsController: ScreenVisible {
   func setActive(_ flag: Bool) {
     isOnScreen = flag
   }
 }
 
+/// If user taps current tab, then hide user card
 extension SubscriptionsController: TabBarTappable {
   func tabBarTapped(_ mode: TabBarTapMode) {
     guard mode == .Repeat && self.mode == .Userprofile else { return }
     
-    controllerOutput?.hideUserCard(nil)
+    // Set default mode & hide user card
+    self.mode = .Default
   }
 }

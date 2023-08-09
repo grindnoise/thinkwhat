@@ -150,10 +150,6 @@ class VotersStack: UIView {
                           isBordered: true,
                           lightBorderColor: lightBorderColor,
                           darkBorderColor: darkBorderColor)
-      insertSubview(pushed, belowSubview: listener)
-      pushed.translatesAutoresizingMaskIntoConstraints = false
-      pushed.widthAnchor.constraint(equalTo: heightAnchor).isActive = true
-      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
       var constraint: NSLayoutConstraint!
       
       if subviews.filter({ $0 is Avatar }).isEmpty {
@@ -161,6 +157,10 @@ class VotersStack: UIView {
       } else if let last = subviews.filter({ $0 is Avatar }).last as? Avatar {
         constraint = pushed.trailingAnchor.constraint(equalTo: last.leadingAnchor, constant: intersection)
       }
+      insertSubview(pushed, belowSubview: listener)
+      pushed.translatesAutoresizingMaskIntoConstraints = false
+      pushed.widthAnchor.constraint(equalTo: heightAnchor).isActive = true
+      pushed.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
       
       constraint.identifier = "anchor"
       constraint.isActive = true

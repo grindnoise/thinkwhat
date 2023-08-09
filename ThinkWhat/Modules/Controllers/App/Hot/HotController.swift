@@ -105,6 +105,8 @@ class HotController: UIViewController, TintColorable {
     navigationController?.setBarTintColor(initialColor)
     navigationController?.setBarShadow(on: false)
     
+//    controllerOutput?.willAppear()
+    
     guard isDataReady, isFirstLaunch else { return }
 
     tabBarController?.setTabBarVisible(visible: true, animated: surveyId.isNil ? true : false)
@@ -115,7 +117,8 @@ class HotController: UIViewController, TintColorable {
     super.viewDidAppear(animated)
     
     isOnScreen = true
-    controllerOutput?.didAppear()
+    
+    controllerOutput?.willAppear()
     
     guard let navigationBar = navigationController?.navigationBar,
           let tabBarController = tabBarController as? MainController
@@ -232,14 +235,14 @@ private extension HotController {
       }
     })
     tasks.append(Task { @MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
         guard let self = self,
               let main = self.tabBarController as? MainController,
               main.selectedIndex == 0
         else { return }
         
         self.isOnScreen = true
-        self.controllerOutput?.didAppear()
+        self.controllerOutput?.willAppear()
       }
     })
     
@@ -326,6 +329,19 @@ extension HotController: HotModelOutput {
 
 extension HotController: DataObservable {
   func onDataLoaded() {
+//    delay(seconds: 2) {
+//      let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
+//                                                            text: "watch_survey_notification",
+//                                                            tintColor: .label),
+//                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+//                             isModal: false,
+//                             useContentViewHeight: true,
+//                             shouldDismissAfter: 20)
+//      banner.didDisappearPublisher
+//        .sink { _ in banner.removeFromSuperview() }
+//        .store(in: &self.subscriptions)
+//    }
+    
     isDataReady = true
     navigationController?.setNavigationBarHidden(false, animated: surveyId.isNil ? true : false)
     

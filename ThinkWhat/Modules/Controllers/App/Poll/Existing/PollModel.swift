@@ -236,6 +236,58 @@ extension PollModel: PollControllerInput {
     }
   }
   
+  func load(surveyId: String) {
+    Task {
+      do {
+        let instance = try await API.shared.surveys.getSurvey(byReferenceId: surveyId)
+        await MainActor.run { modelOutput?.loadCallback(.success(instance)) }
+      } catch {
+        await MainActor.run { modelOutput?.loadCallback(.failure(error)) }
+      }
+    }
+  }
+  
+  func loadThread(threadId: String,
+                  excludeList: [String],
+                  includeSelf: Bool,
+                  onlyChildren: Bool,
+                  threshold: Int) {
+    Task {
+      do {
+        try await API.shared.surveys.getCommentsThread(rootId: threadId,
+                                                       excludeList: excludeList,
+                                                       includeSelf: includeSelf,
+                                                       threshold: threshold,
+                                                       onlyChildren: onlyChildren)
+        await MainActor.run { modelOutput?.loadThreadCallback(.success(())) }
+      } catch {
+        await MainActor.run { modelOutput?.loadThreadCallback(.failure(error)) }
+      }
+    }
+  }
+  
+  func loadSurveyAndThread(surveyId: String,
+                           threadId: String,
+                           excludeList: [String],
+                           includeSelf: Bool,
+                           onlyChildren: Bool,
+                           threshold: Int) {
+    Task {
+      do {
+        let instance = try await API.shared.surveys.getSurvey(byReferenceId: surveyId)
+        try await API.shared.surveys.getCommentsThread(rootId: threadId,
+                                                       excludeList: excludeList,
+                                                       includeSelf: includeSelf,
+                                                       threshold: threshold,
+                                                       onlyChildren: onlyChildren)
+        
+        await MainActor.run { modelOutput?.loadSurveyAndThreadCallback(.success(instance)) }
+      } catch {
+        await MainActor.run { modelOutput?.loadSurveyAndThreadCallback(.failure(error)) }
+      }
+    }
+  }
+  
   func toggleFavorite(_ mark: Bool) {
     guard let survey = item else { return }
     

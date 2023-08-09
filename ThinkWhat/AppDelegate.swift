@@ -24,8 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   let transitionCoordinator   = TransitionCoordinator()
   let center                  = UNUserNotificationCenter.current()
   
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
   
     API.shared.system.getCountryByIP()
     window = UIWindow()
@@ -75,6 +74,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     VK.handle(url: url, sourceApplication: options[.sourceApplication] as? String)
     return GIDSignIn.sharedInstance.handle(url)
   }
+  
+//  func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) async -> UIBackgroundFetchResult {
+//    print("didReceiveRemoteNotification")
+//  }
   
   func applicationWillResignActive(_ application: UIApplication) {
     // Reset badge

@@ -82,6 +82,7 @@ class NewBanner: UIView {
   }()
   private lazy var body: UIView = {
     let instance = UIView()
+    instance.accessibilityIdentifier = "body"
     instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? Colors.bannerLight : Colors.bannerDark
     instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:))))
     instance.publisher(for: \.bounds)
@@ -172,6 +173,19 @@ class NewBanner: UIView {
     body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? Colors.bannerLight : Colors.bannerDark
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
+
+  override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    if isModal {
+      return self
+    }
+
+    let view = super.hitTest(point, with: event)
+    if view == self {
+      return nil // avoid delivering touch events to the container view (self)
+    } else {
+      return view // the subviews will still receive touch events
+    }
+  }
 }
 
 private extension NewBanner {
@@ -246,11 +260,11 @@ private extension NewBanner {
           .store(in: &self.subscriptions)
       }
     
-    ///Dismiss on hand gesture
-    if !isModal {
-      addGestureRecognizer(UITapGestureRecognizer(target:self, action:#selector(self.dismiss)))
-      addGestureRecognizer(UIPanGestureRecognizer(target:self, action:#selector(self.dismiss)))
-    }
+//    ///Dismiss on hand gesture
+//    if !isModal {
+//      body.addGestureRecognizer(UITapGestureRecognizer(target:self, action:#selector(self.dismiss)))
+//      body.addGestureRecognizer(UIPanGestureRecognizer(target:self, action:#selector(self.dismiss)))
+//    }
   }
   
   @objc

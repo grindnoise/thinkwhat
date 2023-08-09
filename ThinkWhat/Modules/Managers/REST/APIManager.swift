@@ -1331,10 +1331,10 @@ class API {
       }
     }
     
-    @discardableResult
     /// Loads `Survey` by string id
     /// - Parameter referenceId: survey id
     /// - Returns: `Survey`
+    @discardableResult
     func getSurvey(byReferenceId referenceId: String) async throws -> Survey {
       guard let url = API_URLS.Surveys.surveyById,
             !headers.isNil
@@ -1353,11 +1353,7 @@ class API {
                                                  headers: parent.headers())
         
         let json = try JSON(data: data, options: .mutableContainers)
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                   DateFormatter.dateTimeFormatter,
-                                                   DateFormatter.dateFormatter ]
-        let instance = try decoder.decode(Survey.self, from: json.rawData())
+        let instance = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Survey.self, from: json.rawData())
         instance.isVisited = true
         Surveys.shared.append([instance])
         SurveyReferences.shared.append([instance.reference])
@@ -1720,15 +1716,11 @@ class API {
       do {
         let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
         
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                   DateFormatter.dateTimeFormatter,
-                                                   DateFormatter.dateFormatter ]
+        let instance = try JSONDecoder.withDateTimeDecodingStrategyFormatters()
+          .decode(Comment.self, from: data)
         
-        let instance = try decoder.decode(Comment.self, from: data)
         survey.commentsTotal += 1
         
-        NotificationCenter.default.post(name: Notifications.Comments.Post, object: nil)
         survey.survey?.commentPostedPublisher.send(instance)
         
         //Root comment children count increase notification
@@ -1768,7 +1760,7 @@ class API {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-        NotificationCenter.default.post(name: Notifications.Comments.ClaimFailure, object: comment)
+//        NotificationCenter.default.post(name: Notifications.Comments.ClaimFailure, object: comment)
         throw error
       }
     }
@@ -1831,27 +1823,41 @@ class API {
       }
     }
     
-    public func requestChildComments(rootComment: Comment, excludedComments: [Comment] = []) async throws {
-      guard let url = API_URLS.Surveys.getChildComments,
+    /// Requests comments thread
+    /// - Parameters:
+    ///   - rootId: root comment id
+    ///   - excludeList: list of excluded comments
+    ///   - threshold: batch size
+    ///   - onlyChildren: get only children without root
+    public func getCommentsThread(rootId: String,
+                                  excludeList: [String] = [],
+                                  includeSelf: Bool = false,
+                                  threshold: Int = 0,
+                                  onlyChildren: Bool = true) async throws {
+      
+      guard let url = API_URLS.Surveys.getCommentsThread,
             let headers = headers
       else { throw APIError.invalidURL }
       
-      var parameters: Parameters = ["root_id": rootComment.id]
+      var parameters: Parameters = [
+        "root_id": rootId,
+        "ids": excludeList,
+        "only_children": onlyChildren,
+        "include_self": includeSelf
+      ]
       
-      if !excludedComments.isEmpty {
-        parameters["ids"] = excludedComments.map { $0.id }
+      if !threshold.isZero {
+        parameters["threshold"] = threshold
       }
       
       do {
-        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: headers)
         
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                   DateFormatter.dateTimeFormatter,
-                                                   DateFormatter.dateFormatter ]
-        await MainActor.run {
-          let instances = try? decoder.decode([Comment].self, from: data)
-        }
+        let _ = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode([Comment].self, from: data)
       } catch let error {
         throw error
       }

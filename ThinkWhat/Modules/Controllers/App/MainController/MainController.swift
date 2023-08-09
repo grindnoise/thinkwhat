@@ -579,7 +579,8 @@ private extension MainController {
       .sink { _ in
         
         let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
-                                                              text: "watch_survey_notification"),
+                                                              text: "watch_survey_notification",
+                                                              tintColor: .label),
                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                isModal: false,
                                useContentViewHeight: true,

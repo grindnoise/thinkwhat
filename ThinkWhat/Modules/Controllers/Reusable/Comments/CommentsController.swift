@@ -22,44 +22,16 @@ class CommentsController: UIViewController {
   ///**Logic**
   private let item: Comment
   ///**UI**
-  private lazy var topicIcon: Icon = {
-    let instance = Icon(category: .Comments)
-    instance.iconColor = .white
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.65
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    
-    return instance
+  private let padding: CGFloat = 8
+  private lazy var titleView: TagCapsule = { TagCapsule(text: "replies".localized.uppercased() + ": \(item.replies)",
+                                                        padding: padding/2,
+                                                        textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding),
+                                                        color: item.survey?.topic.tagColor ?? .lightGray,
+                                                        font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
+                                                        isShadowed: false,
+                                                        iconCategory: nil,
+                                                        image: UIImage(systemName: "bubble.right.fill"))
   }()
-  private lazy var topicTitle: InsetLabel = {
-    let instance = InsetLabel()
-    instance.font = UIFont(name: Fonts.Bold, size: 20)
-    instance.text = "replies".localized.uppercased() + ": \(item.replies)"
-    instance.textColor = .white
-    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
-    
-    return instance
-  }()
-  private lazy var topicView: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      topicIcon,
-      topicTitle
-    ])
-    instance.backgroundColor = item.survey?.topic.tagColor ?? .systemGray
-    instance.axis = .horizontal
-    instance.spacing = 2
-    instance.alpha = 0
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
-  
-  
   
   // MARK: - Destructor
   deinit {
@@ -99,16 +71,30 @@ class CommentsController: UIViewController {
     self.view = view as UIView
     
     navigationController?.navigationBar.prefersLargeTitles = false
-//    title = "replies".localized + ": \(item.replies)"
-    navigationItem.titleView = topicView
+    //    title = "replies".localized + ": \(item.replies)"
+    navigationItem.titleView = titleView
     setTasks()
   }
   
-  // MARK: - Private methods
-  private func setTasks() {
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    navigationController?.setBarColor()
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
+  }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
+  }
+}
+  // MARK: - Private extension
+private extension CommentsController {
+  func setTasks() {
     item.repliesPublisher
       .receive(on: DispatchQueue.main)
-      .sink { [unowned self] in self.topicTitle.text = "replies".localized.uppercased() + ": \($0)" }
+      .sink { [unowned self] in self.titleView.text = "replies".localized.uppercased() + ": \($0)" }
       .store(in: &subscriptions)
     //        tasks.append(Task { [weak self] in
     //            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {

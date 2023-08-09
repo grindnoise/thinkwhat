@@ -82,16 +82,16 @@ struct Notifications {
 //        static let VotersAppend                     = Notification.Name("SurveyAnswerVotersAppend")
     }
     
-    struct Comments {
-        static let Post                             = Notification.Name("NotificationCommentPost")
-        static let Append                           = Notification.Name("NotificationCommentAppend")
-        static let ChildAppend                      = Notification.Name("NotificationCommentChildAppend")
-        static let Claim                            = Notification.Name("CommentClaim")
-        static let ClaimFailure                     = Notification.Name("CommentClaimFailure")
-        static let Ban                              = Notification.Name("CommentBan")
-//        static let ChildrenCountChange              = Notification.Name("CommentChildrenCountChange")
-        static let Delete                           = Notification.Name("CommentDelete")
-    }
+//    struct Comments {
+//        static let Post                             = Notification.Name("NotificationCommentPost")
+//        static let Append                           = Notification.Name("NotificationCommentAppend")
+//        static let ChildAppend                      = Notification.Name("NotificationCommentChildAppend")
+//        static let Claim                            = Notification.Name("CommentClaim")
+//        static let ClaimFailure                     = Notification.Name("CommentClaimFailure")
+//        static let Ban                              = Notification.Name("CommentBan")
+////        static let ChildrenCountChange              = Notification.Name("CommentChildrenCountChange")
+//        static let Delete                           = Notification.Name("CommentDelete")
+//    }
     
     struct Surveys {
 //        static let SubscriptionAppend               = Notification.Name("SurveysSubscriptionAppend")

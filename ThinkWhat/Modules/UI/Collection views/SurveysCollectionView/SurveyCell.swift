@@ -94,7 +94,7 @@ class SurveyCell: UICollectionViewCell {
   private var itemSubscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //UI
-  let padding: CGFloat = 8
+  let padding: CGFloat = 10
   //Header
   private lazy var tagCapsule: TagCapsule = {
 //    let title = item.topic.isOther ? "\(item.topic.parent!.title.localized)/\(item.topic.title.localized)" : { item.topic.title.localized }()
@@ -144,31 +144,19 @@ class SurveyCell: UICollectionViewCell {
     }()
         
     let instance = UIStackView(arrangedSubviews: [
+      UIView.horizontalSpacer(padding),
       nested,
       UIView.opaque(),
       usernameLabel,
-      avatar
+      UIView.horizontalSpacer(padding),
+      avatar,
+      UIView.horizontalSpacer(padding),
     ])
     instance.axis = .horizontal
-    instance.spacing = padding
+    instance.spacing = 0//padding
     
     return instance
   }()
-//  private lazy var topicGradient: CAGradientLayer = {
-//    let instance = CAGradientLayer()
-//    instance.type = .radial
-//    instance.colors = getGradientColors(color: .systemGray)
-//    instance.locations = [0, 0.5, 1.15]
-//    instance.setIdentifier("radialGradient")
-//    instance.startPoint = CGPoint(x: 0.5, y: 0.5)
-//    instance.endPoint = CGPoint(x: 1, y: 1)
-//    instance.publisher(for: \.bounds)
-//      .filter { $0 != .zero }
-//      .sink { instance.cornerRadius = $0.height/2.25}
-//      .store(in: &subscriptions)
-//
-//    return instance
-//  }()
   private lazy var usernameLabel: UILabel = {
     let instance = UILabel()
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption1)
@@ -178,102 +166,7 @@ class SurveyCell: UICollectionViewCell {
     
     return instance
   }()
-//  private lazy var topicIcon: Icon = {
-//    let instance = Icon(category: Icon.Category.Logo)
-//    instance.iconColor = .white//Colors.Logo.Flame.rawValue
-//    instance.isRounded = false
-//    instance.clipsToBounds = false
-//    instance.scaleMultiplicator = 1.65
-//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-//
-//    return instance
-//  }()
-//  private lazy var topicTitle: InsetLabel = {
-//    let instance = InsetLabel()
-//    instance.font = UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .subheadline)
-//#if DEBUG
-//    instance.text = "TEST TOPIC"
-//#endif
-//    instance.textColor = .white
-//    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
-//
-//    return instance
-//  }()
-//  private lazy var topicView: UIStackView = {
-//    let instance = UIStackView(arrangedSubviews: [
-//      topicIcon,
-//      topicTitle
-//    ])
-//    instance.backgroundColor = .clear
-//    instance.axis = .horizontal
-//    instance.spacing = 2
-//    instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)).isActive = true
-//    instance.layer.insertSublayer(topicGradient, at: 0)//(gradient)
-//    instance.publisher(for: \.bounds)
-//    //            .filter { $0 != .zero }
-//      .sink {
-//        instance.cornerRadius = $0.height/2.25
-//
-//        guard let layer = instance.layer.getSublayer(identifier: "radialGradient") else { return }
-//
-//        layer.frame = $0
-//      }
-//      .store(in: &subscriptions)
-//
-//    return instance
-//  }()
-//  private lazy var progressView: UIView = {
-//    //        let font = UIFont(name: Fonts.Bold, size: 20)
-//    let font = UIFont.scaledFont(fontName: Fonts.OpenSans.Bold.rawValue, forTextStyle: .subheadline)
-//    let instance = UIView()
-//    instance.alpha = 0
-//    instance.backgroundColor = .systemGray4
-//    instance.accessibilityIdentifier = "progressView"
-//    instance.widthAnchor.constraint(equalToConstant: "000000".width(withConstrainedHeight: 100, font: font!)).isActive = true
-//    //        instance.layer.insertSublayer(topicGradient, at: 0)//(gradient)
-//    //        instance.publisher(for: \.bounds)
-//    //            .filter { $0 != .zero && $0 != instance.bounds }
-//    //            .sink {
-//    //                instance.cornerRadius = $0.height/2.25
-//    //
-//    //                guard let layer = instance.layer.getSublayer(identifier: "radialGradient") else { return }
-//    //
-//    //                layer.frame = $0
-//    //            }
-//    //            .store(in: &subscriptions)
-//
-//    instance.publisher(for: \.bounds, options: .new)
-//      .filter { $0 != .zero }
-//      .sink { instance.cornerRadius = $0.height/2.25 }
-//      .store(in: &subscriptions)
-//
-//    let progressBar = UIView()
-//    instance.addSubview(progressBar)
-//    progressBar.accessibilityIdentifier = "progress"
-//    progressBar.translatesAutoresizingMaskIntoConstraints = false
-//
-//    NSLayoutConstraint.activate([
-//      progressBar.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-//      progressBar.topAnchor.constraint(equalTo: instance.topAnchor),
-//      progressBar.bottomAnchor.constraint(equalTo: instance.bottomAnchor),
-//    ])
-//
-//    let constraint = progressBar.widthAnchor.constraint(equalToConstant: 30)
-//    constraint.identifier = "width"
-//    constraint.isActive = true
-//
-//    let label = UILabel()
-//    label.accessibilityIdentifier = "progressLabel"
-//    label.font = font
-//    label.textAlignment = .center
-//    label.textColor = .white
-//    label.place(inside: instance)
-//#if DEBUG
-//    label.text = "100%"
-//#endif
-//
-//    return instance
-//  }()
+
   private lazy var dateLabel: InsetLabel = {
     let instance = InsetLabel()
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption1)
@@ -292,11 +185,13 @@ class SurveyCell: UICollectionViewCell {
   private lazy var middleView: UIStackView = {
     let opaque = UIView.opaque()
     titleLabel.place(inside: opaque,
-                     insets: .init(top: padding, left: 0, bottom: 0, right: 0))
-    
+                     insets: .init(top: padding, left: padding, bottom: 0, right: padding))
+    let opaque2 = UIView.opaque()
+    descriptionLabel.place(inside: opaque2,
+                     insets: .init(top: 0, left: padding, bottom: 0, right: padding))
     let instance = UIStackView(arrangedSubviews: [
       opaque,
-      descriptionLabel,
+      opaque2,
 //      imageContainer
     ])
     instance.axis = .vertical
@@ -345,16 +240,16 @@ class SurveyCell: UICollectionViewCell {
     let instance = UIView()
     instance.backgroundColor = .clear
     instance.layer.masksToBounds = false
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
-    instance.layer.shadowOffset = .zero
-    instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowRadius = padding
-    instance.publisher(for: \.bounds)
-      .sink { [unowned self] in
-        instance.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.025).cgPath
-        self.imageView.cornerRadius = $0.width*0.025
-      }
-      .store(in: &subscriptions)
+//    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.25).cgColor
+//    instance.layer.shadowOffset = .zero
+//    instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+//    instance.layer.shadowRadius = padding
+//    instance.publisher(for: \.bounds)
+//      .sink { [unowned self] in
+//        instance.layer.shadowPath = UIBezierPath(rect: $0).cgPath//roundedRect: $0, cornerRadius: $0.width*0.025).cgPath
+//        self.imageView.cornerRadius = $0.width*0.025
+//      }
+//      .store(in: &subscriptions)
     
     imageView.place(inside: instance)
     
@@ -365,12 +260,14 @@ class SurveyCell: UICollectionViewCell {
     let spacer = UIView()
     spacer.backgroundColor = .clear
     let instance = UIStackView(arrangedSubviews: [
+      UIView.horizontalSpacer(padding),
       statsStack,
       spacer,
-      buttonsStack
+      buttonsStack,
+      UIView.horizontalSpacer(padding),
     ])
     instance.axis = .horizontal
-    instance.spacing = 8
+    instance.spacing = 0//8
     
     return instance
   }()
@@ -553,7 +450,7 @@ class SurveyCell: UICollectionViewCell {
     comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray4
     watchButton.tintColor = item.isFavorite ? .label : .systemGray4
     
-    imageContainer.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+//    imageContainer.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
   
   override func prepareForReuse() {
@@ -603,7 +500,7 @@ private extension SurveyCell {
     stackView.spacing = padding*2
     
     stackView.place(inside: contentView,
-                    insets: .uniform(size: 10), // .init(top: padding*2, left: padding, bottom: padding*2, right: padding),
+                    insets: .init(top: padding, left: 0, bottom: padding, right: 0),
                     bottomPriority: .defaultLow)
   }
   
@@ -752,10 +649,10 @@ private extension SurveyCell {
         shimmer.translatesAutoresizingMaskIntoConstraints = false
         shimmer.clipsToBounds = true
         shimmer.place(inside: imageContainer)
-        shimmer.publisher(for: \.bounds)
-          .filter { $0 != .zero }
-          .sink { shimmer.cornerRadius = $0.width*0.025 }
-          .store(in: &subscriptions)
+//        shimmer.publisher(for: \.bounds)
+//          .filter { $0 != .zero }
+//          .sink { shimmer.cornerRadius = $0.width*0.025 }
+//          .store(in: &subscriptions)
         
         shimmer.startShimmering()
         media.imagePublisher

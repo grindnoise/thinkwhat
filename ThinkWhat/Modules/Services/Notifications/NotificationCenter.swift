@@ -17,7 +17,8 @@ extension NotificationCenter: UNUserNotificationCenterDelegate {
     _ center: UNUserNotificationCenter,
     willPresent notification: UNNotification
   ) async -> UNNotificationPresentationOptions {
-    return [.banner, .sound, .badge]
+    // Here we can decide what to do with the notification
+    return [.banner, .sound, .badge] // Show default banner, sound and badge
   }
   
   @MainActor
@@ -49,6 +50,18 @@ extension NotificationCenter: UNUserNotificationCenterDelegate {
       } else {
         navigationController.pushViewController(PollController(surveyId: surveyId, mode: .Read), animated: true)
       }
+      mainController.setTabBarVisible(visible: false, animated: true)
+      mainController.toggleLogo(on: false)
+    case "NewReply":
+      guard let surveyId = response.notification.request.content.userInfo["survey_id"] as? String,
+            let replyId = response.notification.request.content.userInfo["reply_id"] as? String, // Id of new reply
+            let threadId = response.notification.request.content.userInfo["thread_id"] as? String, // Id of your comment
+            let mainController = appDelegate.window?.rootViewController as? MainController,
+            let navigationController = mainController.selectedViewController as? UINavigationController
+      else { return }
+      
+      navigationController.navigationBar.backItem?.title = ""
+      navigationController.pushViewController(PollController(surveyId: surveyId, threadId: threadId, replyId: replyId), animated: true)
       mainController.setTabBarVisible(visible: false, animated: true)
       mainController.toggleLogo(on: false)
     default:

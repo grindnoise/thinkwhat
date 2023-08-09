@@ -11,39 +11,53 @@ import SwiftyJSON
 import Combine
 
 class Comments {
+  
+  public let instancesPublisher = PassthroughSubject<Comment, Never>()
+  
   static let shared = Comments()
   private init() {}
   var all: [Comment] = [] {
     didSet {
-      //Append
-      if oldValue.count < all.count {
-        //            Check for duplicates
+      guard !oldValue.isEmpty else {
+        all.forEach { instancesPublisher.send($0) }
+        return
+      }
+      
+      let existingSet = Set(oldValue)
+      let appendingSet = Set(all)
+      
+      ///Difference
+      appendingSet.subtracting(existingSet).forEach { instancesPublisher.send($0) }
+      
+//      //Append
+//      if oldValue.count < all.count {
+//        //            Check for duplicates
         guard let lastInstance = all.last,
               let survey = lastInstance.survey
         else { return }
-        
-        guard oldValue.filter({ $0 == lastInstance }).isEmpty else {
-          all.remove(object: lastInstance)
-          
-          return
-        }
-        
-        survey.commentAppendPublisher.send(lastInstance)
-        
-        guard lastInstance.isParentNode else {
-          NotificationCenter.default.post(name: Notifications.Comments.ChildAppend, object: lastInstance)
-//          survey.commentChildAppendPublisher.send(lastInstance)
-          return
-        }
-        //            if lastInstance.isBanned
-        guard !lastInstance.isDeleted else { return }
-        
-//        survey.commentRootAppendPublisher.send(lastInstance)
-        NotificationCenter.default.post(name: Notifications.Comments.Append, object: lastInstance)
-        //            if let survey = lastInstance.survey {
-        //                survey.reference.commentsTotal += 1
-        //            }
-      }
+//
+//        guard oldValue.filter({ $0 == lastInstance }).isEmpty else {
+//          all.remove(object: lastInstance)
+//
+//          return
+//        }
+//
+      survey.commentAppendPublisher.send(lastInstance)
+//
+//        guard lastInstance.isParentNode else {
+//          NotificationCenter.default.post(name: Notifications.Comments.ChildAppend, object: lastInstance)
+////          survey.commentChildAppendPublisher.send(lastInstance)
+//          return
+//        }
+//        //            if lastInstance.isBanned
+//        guard !lastInstance.isDeleted else { return }
+//
+////        survey.commentRootAppendPublisher.send(lastInstance)
+//        NotificationCenter.default.post(name: Notifications.Comments.Append, object: lastInstance)
+//        //            if let survey = lastInstance.survey {
+//        //                survey.reference.commentsTotal += 1
+//        //            }
+//      }
     }
   }
   
@@ -75,6 +89,25 @@ class Comments {
   func commentsCount(for survey: Survey) -> Int {
     return all.filter({ $0.surveyId == survey.id && !$0.isDeleted && !$0.isBanned && !$0.isClaimed }).count
   }
+  
+  func append(_ instances: [Comment]) {
+    guard !instances.isEmpty else {
+//      instancesPublisher.send([]);
+      return
+    }
+    
+    guard !all.isEmpty else { all.append(contentsOf: instances); return }
+    
+    let existingSet = Set(all)
+    let appendingSet = Set(replaceWithExisting(all, instances))
+    let difference = Array(appendingSet.subtracting(existingSet))
+    
+    guard !difference.isEmpty else { return }
+    
+    all.append(contentsOf: difference)
+  }
+  
+  subscript(id: Int) -> Comment? { Comments.shared.all.filter({ $0.id == id }).first }
 }
 
 class Comment: Decodable {
@@ -100,34 +133,18 @@ class Comment: Decodable {
       repliesPublisher.send(replies)
     }
   }
-  var survey: Survey? {
-    return Surveys.shared.all.filter { $0.id == surveyId }.first
-  }
+  var survey: Survey? { Surveys.shared.all.filter { $0.id == surveyId }.first }
   var userprofile: Userprofile?
   let anonUsername: String
   let createdAt: Date
   let replyToId: Int?
   let answerId: Int?
   //    let parentId: Int?
-  var replyTo: Comment? {
-    return Comments.shared.all.filter { $0.id == replyToId }.first
-  }
-  var isAnonymous: Bool {
-    return userprofile.isNil && !anonUsername.isEmpty
-  }
-  var parent: Comment? {
-    return Comments.shared.all.filter({ $0.id == parentId }).first
-    //        return Comments.shared.all.filter({ $0.children.contains(self) }).first
-  }
-  var children: [Comment] = [] //{
-  //        didSet {
-  //            NotificationCenter.default.post(name: Notifications.Comments.ChildrenCountChange, object: self)
-  //        }
-  //    }
-  var isParentNode: Bool {
-    return parentId.isNil
-    //        return !children.isEmpty
-  }
+  var replyTo: Comment? { Comments.shared.all.filter { $0.id == replyToId }.first }
+  var isAnonymous: Bool { userprofile.isNil && !anonUsername.isEmpty }
+  var parent: Comment? { Comments.shared.all.filter({ $0.id == parentId }).first }
+  @Published var children: [Comment] = []
+  var isParentNode: Bool { parentId.isNil }
   var isOwn: Bool {
     guard let userprofile = userprofile,
           let currentUser = Userprofiles.shared.current else {
@@ -142,12 +159,7 @@ class Comment: Decodable {
       
       isBannedPublisher.send(true)
       isBannedPublisher.send(completion: .finished)
-      
-      NotificationCenter.default.post(name: Notifications.Comments.Ban, object: self)
-      
-      guard let survey = survey else { return }
-      
-      survey.commentBannedPublisher.send(self)
+      survey?.commentBannedPublisher.send(self)
     }
   }
   var isDeleted: Bool = false {
@@ -156,12 +168,7 @@ class Comment: Decodable {
       
       isDeletedPublisher.send(true)
       isDeletedPublisher.send(completion: .finished)
-      
-      NotificationCenter.default.post(name: Notifications.Comments.Delete, object: self)
-      
-      guard let survey = survey else { return }
-      
-      survey.commentRemovePublisher.send(self)
+      survey?.commentRemovePublisher.send(self)
     }
   }
   var isClaimed: Bool = false {
@@ -170,12 +177,7 @@ class Comment: Decodable {
       
       isClaimedPublisher.send(true)
       isClaimedPublisher.send(completion: .finished)
-      
-      NotificationCenter.default.post(name: Notifications.Comments.Claim, object: self)
-      
-      guard let survey = survey else { return }
-      
-      survey.commentClaimedPublisher.send(self)
+      survey?.commentClaimedPublisher.send(self)
     }
   }
   var isRejected: Bool = false {
@@ -184,19 +186,14 @@ class Comment: Decodable {
       
       isClaimedPublisher.send(true)
       isClaimedPublisher.send(completion: .finished)
-      
-      NotificationCenter.default.post(name: Notifications.Comments.Claim, object: self)
-      
-      guard let survey = survey else { return }
-      
-      survey.commentClaimedPublisher.send(self)
+      survey?.commentClaimedPublisher.send(self)
     }
   }
-  var answer: Answer? {
+  var choice: Answer? {
     didSet {
-      guard let answer = answer else { return }
+      guard let choice = choice else { return }
       
-      choicePublisher.send(answer)
+      choicePublisher.send(choice)
     }
   }
   //Publishers

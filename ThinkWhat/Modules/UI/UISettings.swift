@@ -8,10 +8,6 @@
 
 import UIKit
 
-//MARK: - String & fonts
-
-
-
 struct StringAttributes {
     enum FontStyle: String {
         case Semibold     = "OpenSans-Semibold"
@@ -405,17 +401,43 @@ enum Colors {
   static let tabBarLight = UIColor(red: 0.416, green: 0.400, blue: 0.639, alpha: 1.000)
   static let tabBarDark = UIColor.white
   static var main: UIColor { UIColor(hexString: "#21A038") } //Colors.Logo.Flame.rawValue }
-  static var darkTheme: UIColor { UIColor(hexString: "#262626") }
+  static let lightTheme = UIColor.white
+  static let darkTheme = UIColor(hexString: "#262626")
   static var bannerDark: UIColor { UIColor(hexString: "#494949") }
   static var bannerLight: UIColor { UIColor.systemBackground } // UIColor { UIColor(hexString: "#F1F0F0") }
   static var cellHeader: UIColor { UIColor.lightGray }
   static var spiralLight: UIColor { UIColor.white.blended(withFraction: 0.04, of: UIColor.lightGray) }//"#1E1E1E".hexColor!.withAlphaComponent(0.03) }
   static var spiralDark: UIColor { "#1E1E1E".hexColor!.withAlphaComponent(0.55) }
-  static var surveyCollectionLight: UIColor { .white.blended(withFraction: 0.05, of: .lightGray) }
+  static var surveyCollectionLight: UIColor { .white.blended(withFraction: 0.075, of: .lightGray) }
   static var surveyCollectionDark: UIColor { .secondarySystemBackground }
   static var surveyCellLight: UIColor { .white }
   static var surveyCellDark: UIColor { UIColor(hexString: "#262626") }
+  
+  struct Poll {
+    static let choiceBackgroundLight = UIColor.systemBackground
+    static let choiceBackgroundDark = UIColor.systemBackground
+    static let choiceSelectedBackgroundLight = UIColor.systemBackground
+    static let choiceSelectedBackgroundDark = UIColor.tertiarySystemBackground
+  }
+  
+  struct Shimmer {
+    static let backgroundLightForLight = UIColor.systemBackground.darker(0.025)
+    static let backgroundDarkForLight = UIColor.systemBackground.darker(0.05)
+    static let backgroundLightForDark = UIColor.tertiarySystemBackground.lighter(0.05)
+    static let backgroundDarkForDark = UIColor.tertiarySystemBackground.lighter(0.15)
+  }
 }
+
+struct Shadows {
+  static func radius(padding: CGFloat) -> CGFloat { padding*0.65 }
+  
+  struct Cards {
+    static let color = UIColor.lightGray.withAlphaComponent(0.35).cgColor
+    static let offset = CGSize.zero
+  }
+}
+
+
 
 //extension Color: RawRepresentable {
 //    typealias RawValue = UIColor

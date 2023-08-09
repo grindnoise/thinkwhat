@@ -164,6 +164,12 @@ class UserprofilesController: UIViewController, TintColorable {
     navigationController?.navigationBar.alpha = 1
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    
+    navigationController?.setBarShadow(on: true)
+  }
+  
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     

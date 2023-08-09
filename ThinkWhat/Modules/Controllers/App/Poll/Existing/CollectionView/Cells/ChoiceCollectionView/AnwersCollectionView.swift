@@ -107,7 +107,7 @@ private extension AnswersCollectionView {
       
       let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
       sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: sectionLayout.contentInsets.leading, bottom: 0, trailing: sectionLayout.contentInsets.trailing)
-      sectionLayout.interGroupSpacing = 8
+      sectionLayout.interGroupSpacing = 16
       return sectionLayout
     }
     

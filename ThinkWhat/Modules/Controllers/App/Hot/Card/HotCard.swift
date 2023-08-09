@@ -12,7 +12,23 @@ import Combine
 class HotCard: UIView, Card {
   enum Action { case Next, Claim, Vote }
   // MARK: - Overridden properties
+//  override var bounds: CGRect {
+//    didSet {
+//      guard oldValue != bounds, bounds.size != .zero else { return }
+//
+//      maxBgItems = Int(bounds.width*bounds.height / bounds.width/20)
+//      setBackground()
+//    }
+//  }
   
+//  override var frame: CGRect {
+//    didSet {
+//      guard oldValue.size != frame.size, frame.size != .zero else { return }
+//
+//      maxBgItems = Int(frame.width*frame.height / frame.width/20)
+//      setBackground()
+//    }
+//  }
   
   
   // MARK: - Public properties
@@ -27,11 +43,16 @@ class HotCard: UIView, Card {
   public lazy var stack: UIStackView = {
     let instance = UIStackView(arrangedSubviews: [
       claimButton,
+//      UIView.opaque(),
       voteButton,
+//      UIView.opaque(),
       nextButton
     ])
     instance.axis = .horizontal
-    instance.spacing = padding*2
+//    instance.alignment = .center
+//    instance.distribution = .fillEqually
+//    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/5).isActive = true
+    instance.spacing = padding*5
     
     return instance
   }()
@@ -55,85 +76,111 @@ class HotCard: UIView, Card {
     
     return instance
   }()
-  public private(set) lazy var voteButton: UIView = {
-    let opaque = UIView.opaque()
-    opaque.layer.masksToBounds = false
-    
+  public private(set) lazy var voteButton: UIButton = {
+//    let opaque = UIView.opaque()
+//    opaque.layer.masksToBounds = false
+//
+//    let instance = UIButton()
+//    instance.addTarget(self,
+//                       action: #selector(self.handleTap(sender:)),
+//                       for: .touchUpInside)
+//    if #available(iOS 15, *) {
+//      var config = UIButton.Configuration.filled()
+//      config.cornerStyle = .capsule
+//      config.baseBackgroundColor = item.topic.tagColor
+//      config.attributedTitle = AttributedString("hot_participate".localized.capitalized,
+//                                                attributes: AttributeContainer([
+//                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+//                                                  .foregroundColor: UIColor.white as Any
+//                                                ]))
+//      instance.configuration = config
+//    } else {
+//      instance.backgroundColor = item.topic.tagColor
+//      instance.publisher(for: \.bounds)
+//        .sink { instance.cornerRadius = $0.height/2 }
+//        .store(in: &subscriptions)
+//      instance.setAttributedTitle(NSAttributedString(string: "hot_participate".localized.capitalized,
+//                                                     attributes: [
+//                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
+//                                                      .foregroundColor: UIColor.white as Any
+//                                                     ]),
+//                                  for: .normal)
+//    }
+//    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
+//    opaque.publisher(for: \.bounds)
+//      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
+//      .sink { [unowned self] in
+//        opaque.layer.shadowOpacity = 1
+//        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+//        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? self.item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+//        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
+//        opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
+//      }
+//      .store(in: &subscriptions)
+//    instance.place(inside: opaque)
+//
+//    return opaque
     let instance = UIButton()
-    instance.addTarget(self,
-                       action: #selector(self.handleTap(sender:)),
-                       for: .touchUpInside)
-    if #available(iOS 15, *) {
-      var config = UIButton.Configuration.filled()
-      config.cornerStyle = .capsule
-      config.baseBackgroundColor = item.topic.tagColor
-      config.attributedTitle = AttributedString("hot_participate".localized.capitalized,
-                                                attributes: AttributeContainer([
-                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
-                                                  .foregroundColor: UIColor.white as Any
-                                                ]))
-      instance.configuration = config
-    } else {
-      instance.backgroundColor = item.topic.tagColor
-      instance.publisher(for: \.bounds)
-        .sink { instance.cornerRadius = $0.height/2 }
-        .store(in: &subscriptions)
-      instance.setAttributedTitle(NSAttributedString(string: "hot_participate".localized.capitalized,
-                                                     attributes: [
-                                                      .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
-                                                      .foregroundColor: UIColor.white as Any
-                                                     ]),
-                                  for: .normal)
-    }
-    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
-    opaque.publisher(for: \.bounds)
-      .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
-      .sink { [unowned self] in
-        opaque.layer.shadowOpacity = 1
-        opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
-        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? self.item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
-        opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
-        opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
-      }
+    instance.publisher(for: \.bounds)
+      .sink { instance.setImage(UIImage(systemName: "play.fill",
+                                        withConfiguration: UIImage.SymbolConfiguration(pointSize: $0.width*0.75, weight: .semibold)), for: .normal) }
       .store(in: &subscriptions)
-    instance.place(inside: opaque)
+    //    instance.imageView?.contentMode = .scaleAspectFill
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1).isActive = true
+    instance.imageView?.contentMode = .scaleAspectFit
+    instance.tintColor = item.topic.tagColor
+    instance.imageView?.layer.masksToBounds = false
+    instance.imageView?.layer.shadowOpacity = 1
+    instance.imageView?.layer.shadowOffset = .zero
+    instance.imageView?.layer.shadowRadius = 4
+    instance.imageView?.layer.shadowColor = item.topic.tagColor.withAlphaComponent(0.35).cgColor
+    instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
     
-    return opaque
+//    UIView.animate(withDuration: 1, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut]) { [weak self] in
+//      guard !self.isNil else { return }
+//
+//      instance.transform = .init(scaleX: 0.95, y: 0.95)
+//      instance.alpha = 0.95
+//    }
+//    instance.imageView?.layer.masksToBounds = false
+    return instance
+    
   }()
   public lazy var nextButton: UIButton = {
     let instance = UIButton()
-    instance.layer.masksToBounds = false
-    instance.setImage(UIImage(systemName: "arrowshape.right.fill",
-                              withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
-    //    instance.imageView?.contentMode = .scaleAspectFill
+    instance.publisher(for: \.bounds)
+      .sink { instance.setImage(UIImage(systemName: "arrow.forward",
+                                        withConfiguration: UIImage.SymbolConfiguration(pointSize: $0.width*0.5, weight: .semibold)), for: .normal) }
+      .store(in: &subscriptions)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1).isActive = true
-//    instance.imageView?.contentMode = .center
-    instance.tintColor = item.topic.tagColor//nextColor
-    instance.addTarget(self,
-                       action: #selector(self.handleTap(sender:)),
-                       for: .touchUpInside)
+//    instance.heightAnchor.constraint(equalToConstant: 44).isActive = true
+    instance.imageView?.contentMode = .scaleAspectFit
+    instance.tintColor = nextColor
+    instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
     instance.imageView?.layer.shadowOpacity = 1
+    instance.imageView?.layer.masksToBounds = false
     instance.imageView?.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
     instance.imageView?.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 4 : 2
-    instance.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
-    instance.imageView?.layer.masksToBounds = false
+    instance.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? nextColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    
     return instance
   }()
   public lazy var claimButton: UIButton = {
     let instance = UIButton()
-    instance.setImage(UIImage(systemName: "exclamationmark.triangle.fill",
-                              withConfiguration: UIImage.SymbolConfiguration(scale: .large)), for: .normal)
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1).isActive = true
-//    instance.imageView?.contentMode = .center
+    instance.publisher(for: \.bounds)
+      .sink { instance.setImage(UIImage(systemName: "exclamationmark.triangle",
+                                        withConfiguration: UIImage.SymbolConfiguration(pointSize: $0.width*0.5, weight: .semibold)), for: .normal) }
+      .store(in: &subscriptions)
 
-    instance.tintColor = item.topic.tagColor
-    instance.addTarget(self,
-                       action: #selector(self.handleTap(sender:)),
-                       for: .touchUpInside)
+    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1).isActive = true
+//    instance.imageView?.contentMode = .scaleAspectFit
+
+    instance.tintColor = .systemYellow//item.topic.tagColor
+    instance.addTarget(self, action: #selector(self.handleTap(sender:)), for: .touchUpInside)
     instance.imageView?.layer.shadowOpacity = 1
     instance.imageView?.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
     instance.imageView?.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 4 : 2
-    instance.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    instance.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemYellow.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.2).cgColor
     instance.imageView?.layer.masksToBounds = false
     
     return instance
@@ -154,9 +201,9 @@ class HotCard: UIView, Card {
     instance.backgroundColor = .clear
     instance.accessibilityIdentifier = "shadow"
     instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-    instance.layer.shadowRadius = 5
-    instance.layer.shadowOffset = .zero
+    instance.layer.shadowColor = Shadows.Cards.color
+    instance.layer.shadowRadius = Shadows.radius(padding: padding)
+    instance.layer.shadowOffset = Shadows.Cards.offset
     body.addEquallyTo(to: instance)
     
     return instance
@@ -178,7 +225,7 @@ class HotCard: UIView, Card {
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.cgColor//.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.025, of: item.topic.tagColor).cgColor
     instance.setGradient(colors: [clear, feathered],
                          locations: [0.0, 0.5])
     
@@ -187,9 +234,9 @@ class HotCard: UIView, Card {
   private lazy var fadeGradient: CAGradientLayer = {
     let instance = CAGradientLayer()
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.025, of: item.topic.tagColor).cgColor
     instance.setGradient(colors: [clear, clear, feathered],
-                         locations: [0.0, 0.75, 0.9])
+                         locations: [0.0, 0.65, 0.875])
     
     return instance
   }()
@@ -207,7 +254,16 @@ class HotCard: UIView, Card {
     }
   }
   private var shouldTerminate = false
-  
+  // Background image setting
+  private var maxBgItems = 30
+  private let maxBgIconEdge: CGFloat = 40
+  private var bgItems = [Icon]() {
+    didSet {
+      guard bgItems.count < maxBgItems else { return }
+
+      setBackground()
+    }
+  }
   
   
   // MARK: - Deinitialization
@@ -492,12 +548,43 @@ class HotCard: UIView, Card {
     collectionView.viewMode = .Default
   }
   
+  /// Animate stack button
+  public func animateButtons() {
+    // Vote btn
+    let animation = CABasicAnimation(keyPath: "transform.scale")
+    animation.toValue = 1.15
+    animation.autoreverses = true
+    animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+    animation.duration = 1
+//    animation.beginTime = CACurrentMediaTime() + 0.5
+    animation.repeatCount = .infinity
+    voteButton.imageView?.layer.add(animation, forKey: nil)
+    
+    // Claim btn
+    let keyframeAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
+    
+    keyframeAnimation.values = [NSNumber(value: -CGFloat(5).degreesToRadians),
+                                NSNumber(value: CGFloat(5).degreesToRadians),
+                                NSNumber(value: -CGFloat(5).degreesToRadians)]
+    keyframeAnimation.keyTimes = [0, 0.5, 1]
+    keyframeAnimation.duration = 3
+    keyframeAnimation.repeatCount = .infinity
+    claimButton.imageView?.layer.add(keyframeAnimation, forKey:"transform.rotation.z")
+    
+    // Next btn
+    UIView.animate(withDuration: 0.75, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut]) { [weak self] in
+      guard let self = self else { return }
+      
+      self.nextButton.imageView?.center.x += self.padding/2
+    }
+  }
+  
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
     let clear = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.withAlphaComponent(0).cgColor : UIColor.white.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.05, of: item.topic.tagColor).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? UIColor.tertiarySystemBackground.cgColor : UIColor.white.blended(withFraction: 0.025, of: item.topic.tagColor).cgColor
     
     fadeGradient.setGradient(colors: [clear, clear, feathered],
                              locations: [0.0, 0.75, 0.9])
@@ -514,10 +601,12 @@ class HotCard: UIView, Card {
     voteButton.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
     claimButton.imageView?.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
     claimButton.imageView?.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 4 : 2
-    claimButton.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    claimButton.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.2).cgColor
     nextButton.imageView?.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 1)
     nextButton.imageView?.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 4 : 2
     nextButton.imageView?.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? item.topic.tagColor.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    
+    bgItems.forEach { $0.iconColor = .lightGray.withAlphaComponent(CGFloat.random(in: traitCollection.userInterfaceStyle == .dark ? 0.015...0.03 : 0.04...0.045)) }
   }
 }
 
@@ -534,25 +623,39 @@ private extension HotCard {
     setNeedsLayout()
     layoutIfNeeded()
     
-    addSubview(stack)
-    voteButton.translatesAutoresizingMaskIntoConstraints = false
-    stack.translatesAutoresizingMaskIntoConstraints = false
-//    stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding*2).isActive = true
-    stack.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+    let views = [
+      voteButton,
+      claimButton,
+      nextButton
+    ]
+    addSubviews(views)
+    views.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     
-    let constraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor)
-    constraint.isActive = true
     publisher(for: \.bounds)
-      .sink { [weak self]  in
+      .filter { $0.size != .zero }
+      .receive(on: DispatchQueue.main )
+      .sink { [weak self] in
         guard let self = self else { return }
         
-        self.setNeedsLayout()
-        constraint.constant = -$0.height/32
-        self.layoutIfNeeded()
+        let count = Int($0.width*$0.height / $0.width/20)
+        
+        if count != maxBgItems {
+          self.maxBgItems = count
+          self.setBackground()
         }
+      }
       .store(in: &subscriptions)
-//    stack.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height/4).isActive = true
-    voteButton.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5).isActive = true
+    voteButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+    voteButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -padding*1).isActive = true
+    voteButton.heightAnchor.constraint(equalTo: widthAnchor, multiplier: 1/7).isActive = true
+    claimButton.trailingAnchor.constraint(equalTo: voteButton.leadingAnchor, constant: -padding*5).isActive = true
+    claimButton.centerYAnchor.constraint(equalTo: voteButton.centerYAnchor).isActive = true
+    claimButton.heightAnchor.constraint(equalTo: voteButton.heightAnchor).isActive = true
+    nextButton.leadingAnchor.constraint(equalTo: voteButton.trailingAnchor, constant: padding*5).isActive = true
+    nextButton.centerYAnchor.constraint(equalTo: voteButton.centerYAnchor).isActive = true
+    nextButton.heightAnchor.constraint(equalTo: voteButton.heightAnchor).isActive = true
+    
+    animateButtons()
   }
   
   @MainActor
@@ -579,11 +682,28 @@ private extension HotCard {
 //    layer.locations = locations//[0.0, 0.75, 0.9]
 //  }
   
+  /// Adds random scattered topic icons to background
+  @MainActor
+  func setBackground() {
+    let icon = Icon(frame: body.randomFrame(size: .uniform(size: CGFloat.random(in: maxBgIconEdge*0.75...maxBgIconEdge)),
+                                            excludeAreas: bgItems.map { CGRect(origin: $0.frame.origin,
+                                                                               size: .uniform(size: $0.bounds.width + $0.bounds.width*0.5)) } ))
+//                    category: item.topic.iconCategory,
+//                    scaleMultiplicator: 1,
+//                    iconColor: .brown)
+    icon.iconColor = .lightGray.withAlphaComponent(CGFloat.random(in: traitCollection.userInterfaceStyle == .dark ? 0.015...0.03 : 0.045...0.05))
+    icon.scaleMultiplicator = 1
+    icon.category = item.topic.iconCategory
+    icon.transform = .init(rotationAngle: CGFloat.random(in: (-.pi / 2)...(-.pi / 2 + .pi * 2)))
+    
+//    body.addSubview(icon)
+    body.insertSubview(icon, belowSubview: collectionView)
+    bgItems.append(icon)
+  }
+  
   @objc
-  func handleTap(sender: UIView) {
-//    setBanned {}
-//    collectionView.mode = .Default
-    if sender == voteButton.getSubview(type: UIButton.self) {
+  func handleTap(sender: UIButton) {
+    if sender == voteButton {
       action = .Vote
     } else {
       action = sender == claimButton ? .Claim : .Next

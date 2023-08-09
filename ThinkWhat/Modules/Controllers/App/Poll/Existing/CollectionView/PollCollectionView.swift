@@ -83,6 +83,7 @@ class PollCollectionView: UICollectionView {
   private let item: Survey
   private var source: Source!
   private var isFirstAnswerSelection = true
+  private var isBannerOnScreen = false
   ///**UI**
   private let padding: CGFloat = 8
   
@@ -362,6 +363,7 @@ private extension PollCollectionView {
       
       cell.item = self.item
       cell.isUserInteractionEnabled = self.mode != .Preview
+      cell.contentView.layer.masksToBounds = false
       //Claim
       //      cell.claimPublisher
       //        .sink { [weak self] in
@@ -372,6 +374,7 @@ private extension PollCollectionView {
       //        .store(in: &self.subscriptions)
       
       cell.boundsPublisher
+        .receive(on: DispatchQueue.main)
         .sink { [weak self] _ in
           guard let self = self else { return }
           
@@ -583,6 +586,8 @@ extension PollCollectionView: UICollectionViewDelegate {
                       shouldSelectItemAt indexPath: IndexPath) -> Bool {
     if let cell = cellForItem(at: indexPath) as? CommentsSectionCell {
       guard cell.item.isComplete else {
+        guard !isBannerOnScreen else { return false }
+        isBannerOnScreen = true
         let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "dollarsign")!,
                                                               icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemOrange),
                                                               text: "vote_to_view_comments"),
@@ -591,7 +596,7 @@ extension PollCollectionView: UICollectionViewDelegate {
                                useContentViewHeight: true,
                                shouldDismissAfter: 2)
         banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
+          .sink { [unowned self] _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
           .store(in: &self.subscriptions)
 
         return false
@@ -599,8 +604,9 @@ extension PollCollectionView: UICollectionViewDelegate {
       
       collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [.bottom])
       source.refresh() {
-        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
+//        collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
       }
+      collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
       return true
     }
     //        // Allows for closing an already open cell

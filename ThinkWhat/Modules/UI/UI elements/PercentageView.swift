@@ -91,8 +91,8 @@ class PercentageView: UIView {
     let anim = Animations.get(property: .StrokeEnd,
                               fromValue: foregroundLine.strokeEnd,
                               toValue: value,
-                              duration: 0.75,
-                              timingFunction: .easeOut,
+                              duration: Animations.Duration.percentageStroke,
+                              timingFunction: .easeInEaseOut,
                               delegate: self,
                               isRemovedOnCompletion: false,
                               completionBlocks: [{ [weak self] in

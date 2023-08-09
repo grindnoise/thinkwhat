@@ -42,6 +42,8 @@ protocol PollControllerInput: AnyObject {
   func claim(_: [SurveyReference :Claim])
   func load(_: SurveyReference, incrementViewCounter: Bool)
   func load(_: String)
+  func loadThread(threadId: String, excludeList: [String], includeSelf: Bool, onlyChildren: Bool, threshold: Int)
+  func loadSurveyAndThread(surveyId: String, threadId: String, excludeList: [String], includeSelf: Bool, onlyChildren: Bool, threshold: Int)
   func toggleFavorite(_: Bool)
   func vote(_: Answer)
   func post(_: Survey)
@@ -60,6 +62,8 @@ protocol PollModelOutput: AnyObject {
   
   func postCallback(_: Result<Bool, Error>)
   func loadCallback(_: Result<Survey, Error>)
+  func loadThreadCallback(_: Result<Void, Error>)
+  func loadSurveyAndThreadCallback(_: Result<Survey, Error>)
   func voteCallback(_: Result<Bool, Error>)
   func favoriteCallback(_: Result<Bool, Error>)
   func commentPostCallback(_: Result<Comment, Error>)

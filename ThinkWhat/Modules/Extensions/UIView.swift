@@ -757,6 +757,23 @@ extension UIView {
     CGPoint(x: CGFloat.random(in: xRange.isNil ? 0.0...bounds.width : xRange!),
             y: CGFloat.random(in: yRange.isNil ? 0.0...bounds.height : yRange!))
   }
+  
+  func randomFrame(size: CGSize, excludeAreas: [CGRect]) -> CGRect {
+    let random = CGRect(origin: CGPoint(x: CGFloat.random(in: 0.0...bounds.width),
+                                        y: CGFloat.random(in: 0.0...bounds.height)),
+                        size: size)
+    
+    let test = excludeAreas.map({ random.intersects($0) })
+      .filter({ $0 == true })
+    
+    if excludeAreas
+      .map({ random.intersects($0) })
+      .filter({ $0 == true }).isEmpty {
+      return random
+    }
+    
+    return randomFrame(size: size, excludeAreas: excludeAreas)
+  }
 }
 
 extension UIView {

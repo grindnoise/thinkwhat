@@ -293,7 +293,7 @@ extension ListController: ListViewInput {
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
     //        navigationController?.pushViewController(TestViewController(), animated: true)
-    navigationController?.pushViewController(PollController(surveyReference: instance), animated: true)
+    navigationController?.pushViewController(PollController(surveyReference: instance, mode: instance.isComplete ? .Read : .Vote), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let controller = tabBarController as? MainController else { return }

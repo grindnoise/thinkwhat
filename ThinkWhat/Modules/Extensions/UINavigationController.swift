@@ -51,6 +51,7 @@ extension UINavigationController {
       navigationBar.layer.shadowColor = color.cgColor
       navigationBar.layer.shadowOffset = .zero
       navigationBar.layer.shadowRadius = 8
+      navigationBar.layer.shadowPath = UIBezierPath(rect: navigationBar.bounds).cgPath
       
       guard animated else {
         navigationBar.layer.shadowOpacity = on ? traitCollection.userInterfaceStyle == .dark ? 0 : 1 : 0

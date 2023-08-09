@@ -171,7 +171,7 @@
 		AB463FBE27C7E6C8007D7240 /* delAvatar.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB463FBD27C7E6C8007D7240 /* delAvatar.xib */; };
 		AB46B3422A14B47F00D64EA3 /* ScreenVisible.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB46B3412A14B47F00D64EA3 /* ScreenVisible.swift */; };
 		AB46B3452A14F3F800D64EA3 /* UserSettingsEmailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB46B3442A14F3F800D64EA3 /* UserSettingsEmailCell.swift */; };
-		AB4727A9268C6444002A9563 /* UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4727A8268C6444002A9563 /* UI.swift */; };
+		AB4727A9268C6444002A9563 /* UISettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4727A8268C6444002A9563 /* UISettings.swift */; };
 		AB48E2B6287DA68B0020F81B /* SurveyResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB48E2B5287DA68B0020F81B /* SurveyResult.swift */; };
 		AB48E2B8287DD7D60020F81B /* UICollectionView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB48E2B7287DD7D60020F81B /* UICollectionView+.swift */; };
 		AB49EBC42A20E69A0036584E /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB309C7827ADB4E1005BBCB4 /* UserDefaults.swift */; };
@@ -725,7 +725,7 @@
 		AB463FBD27C7E6C8007D7240 /* delAvatar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = delAvatar.xib; sourceTree = "<group>"; };
 		AB46B3412A14B47F00D64EA3 /* ScreenVisible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenVisible.swift; sourceTree = "<group>"; };
 		AB46B3442A14F3F800D64EA3 /* UserSettingsEmailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsEmailCell.swift; sourceTree = "<group>"; };
-		AB4727A8268C6444002A9563 /* UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UI.swift; sourceTree = "<group>"; };
+		AB4727A8268C6444002A9563 /* UISettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISettings.swift; sourceTree = "<group>"; };
 		AB48E2B5287DA68B0020F81B /* SurveyResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyResult.swift; sourceTree = "<group>"; };
 		AB48E2B7287DD7D60020F81B /* UICollectionView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+.swift"; sourceTree = "<group>"; };
 		AB4A0CA429CD95D600E6D57A /* NewPollCommentsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollCommentsCell.swift; sourceTree = "<group>"; };
@@ -2240,6 +2240,7 @@
 		AB913F8928097D8A00609D51 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				AB4727A8268C6444002A9563 /* UISettings.swift */,
 				AB0B7FDC294788DE00941FA1 /* PassthroughView.swift */,
 				ABD2A2B428841AE600591568 /* Collection views */,
 				AB3C6835223FD3EE00B57580 /* Fonts */,
@@ -2249,7 +2250,6 @@
 				AB4EE75628CE4AA30016EEC8 /* Text fields */,
 				AB38DD73281A76FE00FFEB3F /* Text layers */,
 				AB913F8D28097DAA00609D51 /* UI elements */,
-				AB4727A8268C6444002A9563 /* UI.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -3456,7 +3456,7 @@
 				ABF51D29237EB2790053EB75 /* UserSurveysTableViewController.swift in Sources */,
 				ABE56C1D298AC4FB004C761D /* TopicCompatibilityCell.swift in Sources */,
 				AB6525542A03CEE4008B9E6A /* LinkedList.swift in Sources */,
-				AB4727A9268C6444002A9563 /* UI.swift in Sources */,
+				AB4727A9268C6444002A9563 /* UISettings.swift in Sources */,
 				AB6016FE29A6299000BF4365 /* JSONDecoder.swift in Sources */,
 				AB090D85287727FA00FAFAB0 /* AnswerCell.swift in Sources */,
 				AB46B3452A14F3F800D64EA3 /* UserSettingsEmailCell.swift in Sources */,

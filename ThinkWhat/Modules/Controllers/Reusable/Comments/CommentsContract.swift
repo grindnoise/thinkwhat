@@ -13,9 +13,10 @@ import UIKit
 /// **Controller** conforms to this protocol
 protocol CommentsViewInput: AnyObject {
     
-    var controllerOutput: CommentsControllerOutput? { get set }
-    var controllerInput: CommentsControllerInput? { get set }
-    
+  var controllerOutput: CommentsControllerOutput? { get set }
+  var controllerInput: CommentsControllerInput? { get set }
+  var survey: Survey? { get }
+  
     func requestComments(exclude: [Comment])
     func postComment(body: String, replyTo: Comment?, username: String?)
     func postClaim(comment: Comment, reason: Claim)

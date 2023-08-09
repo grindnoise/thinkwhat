@@ -49,6 +49,7 @@ final class AccessoryInputTextField: UITextField {
   private let color: UIColor
   private let minLength: Int
   private let maxLength: Int
+  private var isBannerOnScreen = false
 //  private weak var customDelegate: AccessoryInputTextFieldDelegate?
   private var isAnon = false
   //UI
@@ -73,7 +74,8 @@ final class AccessoryInputTextField: UITextField {
       NSLayoutConstraint.activate([
         avatar.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: textViewFont) + 16),
         avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
-        avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+//        avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+        avatar.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
         usernameTextView.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 8),
         usernameTextView.trailingAnchor.constraint(equalTo: textView.trailingAnchor),
 //        usernameTextView.widthAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 0.5),
@@ -84,21 +86,26 @@ final class AccessoryInputTextField: UITextField {
         textView.bottomAnchor.constraint(equalTo: instance.layoutMarginsGuide.bottomAnchor, constant: -8),
         sendButton.leadingAnchor.constraint(equalTo: textView.trailingAnchor, constant: 0),
         sendButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
-        sendButton.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+        sendButton.heightAnchor.constraint(equalTo: avatar.heightAnchor),
+        sendButton.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
+//        sendButton.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
       ])
     } else {
       
       NSLayoutConstraint.activate([
         avatar.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: textViewFont) + 16),
         avatar.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: 8),
-        avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+//        avatar.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+        avatar.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
         textView.leadingAnchor.constraint(equalTo: avatar.trailingAnchor, constant: 8),
         textView.trailingAnchor.constraint(equalTo: sendButton.leadingAnchor, constant: 0),
         textView.topAnchor.constraint(equalTo: instance.topAnchor,constant: 8),
         textView.bottomAnchor.constraint(equalTo: instance.layoutMarginsGuide.bottomAnchor, constant: -8),
         sendButton.leadingAnchor.constraint(equalTo: textView.trailingAnchor, constant: 0),
         sendButton.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -8),
-        sendButton.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
+        sendButton.heightAnchor.constraint(equalTo: avatar.heightAnchor),
+        sendButton.centerYAnchor.constraint(equalTo: textView.centerYAnchor),
+//        sendButton.topAnchor.constraint(equalTo: instance.topAnchor, constant: 8),
       ])
     }
     
@@ -123,13 +130,11 @@ final class AccessoryInputTextField: UITextField {
     instance.font = textViewFont
     instance.tintColor = color
     instance.maxHeight = 80
-    instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: 8, bottom: instance.contentInset.bottom, right: 8)
-    
-    observers.append(instance.observe(\FlexibleTextView.bounds, options: .new) { view, change in
-      guard let value = change.newValue else { return }
-      view.cornerRadius = value.width * 0.05
-    })
-    
+//    instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: 0, bottom: instance.contentInset.bottom, right: 0)
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.width * 0.025 }
+      .store(in: &subscriptions)
+
     return instance
   }()
   private lazy var usernameTextView: FlexibleTextView = {
@@ -141,7 +146,7 @@ final class AccessoryInputTextField: UITextField {
     instance.maxHeight = 80
     instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: 8, bottom: instance.contentInset.bottom, right: 8)
     instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.height/2 }
+      .sink { instance.cornerRadius = $0.width * 0.025 }
       .store(in: &subscriptions)
     instance.text.publisher
       .filter { !$0.isEmpty }
@@ -207,75 +212,63 @@ final class AccessoryInputTextField: UITextField {
   
   @objc
   private func handleSend() {
-    switch isAnon {
-    case true:
+    if isAnon {
       guard usernameTextView.text.count >= ModelProperties.shared.anonMinLength else {
-        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                              text: "add_pseudonym",
-                                                              tintColor: .systemOrange),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 1)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
-          .store(in: &self.subscriptions)
+        if !isBannerOnScreen {
+          isBannerOnScreen = true
+          let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                                text: "add_pseudonym",
+                                                                tintColor: .systemRed),
+                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                 isModal: false,
+                                 isShadowed: false,
+                                 useContentViewHeight: true,
+                                 shouldDismissAfter: 1)
+          banner.layer.zPosition = .greatestFiniteMagnitude
+          banner.didDisappearPublisher
+            .sink { [weak self] _ in
+              guard let self = self else { return }
+              
+              self.isBannerOnScreen = false
+              banner.removeFromSuperview()
+            }
+            .store(in: &self.subscriptions)
+        }
         
         return
       }
-      
-      guard textView.text.count >= minLength else {
-        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                              text: "minimum_characters_needed".localized + "\(minLength)",
-                                                              tintColor: .systemOrange),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 1)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
-          .store(in: &self.subscriptions)
-        
-        return
-      }
-      
-      messageAnonPublisher.send([usernameTextView.text: textView.text])
-    case false:
-      guard textView.text.count >= minLength else {
-        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "exclamationmark.triangle.fill")!,
-                                                              text: "minimum_characters_needed".localized + "\(minLength)",
-                                                              tintColor: .systemOrange),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 1)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
-          .store(in: &self.subscriptions)
-        
-        return
-      }
-      
-      messagePublisher.send(textView.text)
     }
-      textView.resignFirstResponder()
     
-//    if isAnon, usernameTextView.text.count < ModelProperties.shared.anonMinLength {
-//      showBanner(bannerDelegate: self, text: "add_pseudonym".localized, content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1), shadowed: false)
-//      return
-//    }
+    let text = textView.text.trimmingCharacters(in: .whitespacesAndNewlines)
     
-//    guard textView.text.count >= minLength else {
-//      showBanner(bannerDelegate: self, text: "minimum_characters_needed".localized + "\(minLength)", content: UIImageView(image: UIImage(systemName: "exclamationmark.icloud.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))), color: UIColor.white, textColor: .white, dismissAfter: 0.75, backgroundColor: UIColor.systemOrange.withAlphaComponent(1), shadowed: false)
-//      return
-//    }
+    guard text.count >= minLength else {
+      if !isBannerOnScreen {
+        isBannerOnScreen = true
+        let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                              text: "minimum_characters_needed".localized + "\(minLength)",
+                                                              tintColor: .systemRed),
+                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                               isModal: false,
+                               isShadowed: false,
+                               useContentViewHeight: true,
+                               shouldDismissAfter: 1)
+        banner.layer.zPosition = .greatestFiniteMagnitude
+        banner.didDisappearPublisher
+          .sink { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.isBannerOnScreen = false
+            banner.removeFromSuperview()
+          }
+          .store(in: &self.subscriptions)
+      }
+      
+      return
+    }
     
-//    textView.resignFirstResponder()
-//    if isAnon {
-//      customDelegate?.onAnonSendEvent(username: usernameTextView.text, text: textView.text)
-//    } else {
-//      customDelegate?.onSendEvent(textView.text)
-//    }
+    
+    isAnon ? { messageAnonPublisher.send([usernameTextView.text: text]) }() : { messagePublisher.send(text) }()
+    textView.resignFirstResponder()
   }
   
   // MARK: - Public methods
