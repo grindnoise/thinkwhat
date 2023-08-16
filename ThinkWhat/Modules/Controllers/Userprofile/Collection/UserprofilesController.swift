@@ -27,7 +27,7 @@ class UserprofilesController: UIViewController, TintColorable {
   //UI
   public var tintColor: UIColor
   //Logic
-  public private(set) var mode: UserprofilesViewMode
+  public private(set) var mode: Enums.UserprofilesViewMode
   public private(set) var userprofile: Userprofile?
   public private(set) var answer: Answer?
   
@@ -106,7 +106,7 @@ class UserprofilesController: UIViewController, TintColorable {
   
   
   // MARK: - Initialization
-  init(mode: UserprofilesViewMode, userprofile: Userprofile, color: UIColor = .label) {
+  init(mode: Enums.UserprofilesViewMode, userprofile: Userprofile, color: UIColor = .label) {
     self.mode = mode
     self.userprofile = userprofile
     self.tintColor = color
@@ -117,7 +117,7 @@ class UserprofilesController: UIViewController, TintColorable {
     setTasks()
   }
   
-  init(mode: UserprofilesViewMode, answer: Answer) {
+  init(mode: Enums.UserprofilesViewMode, answer: Answer) {
     self.mode = .Voters
     self.answer = answer
     self.tintColor = Colors.getColor(forId: answer.order)
@@ -576,7 +576,7 @@ extension UserprofilesController: UserprofilesViewInput {
     controllerInput?.loadVoters(for: answer)
   }
   
-  func loadUsers(for userprofile: Userprofile, mode: UserprofilesViewMode) {
+  func loadUsers(for userprofile: Userprofile, mode: Enums.UserprofilesViewMode) {
     controllerInput?.loadUsers(for: userprofile, mode: mode)
   }
   

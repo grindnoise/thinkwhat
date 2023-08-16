@@ -22,7 +22,7 @@ protocol SurveysViewInput: AnyObject {
   
   func onSurveyTapped(_: SurveyReference)
   func onDataSourceRequest(source: Survey.SurveyCategory,
-                           dateFilter: Period?,
+                           dateFilter: Enums.Period?,
                            topic: Topic?,
                            userprofile: Userprofile?,
                            compatibility: TopicCompatibility?,
@@ -45,7 +45,7 @@ protocol SurveysControllerInput: AnyObject {
   var modelOutput: SurveysModelOutput? { get set }
   
   func onDataSourceRequest(source: Survey.SurveyCategory,
-                           dateFilter: Period?,
+                           dateFilter: Enums.Period?,
                            topic: Topic?, 
                            userprofile: Userprofile?,
                            compatibility: TopicCompatibility?,

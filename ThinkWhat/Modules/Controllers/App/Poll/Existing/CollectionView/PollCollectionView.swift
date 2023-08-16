@@ -52,10 +52,11 @@ class PollCollectionView: UICollectionView {
   public let answerDeselectionPublisher = PassthroughSubject<Bool, Never>()
   public let isVotingSubscriber = PassthroughSubject<Bool, Never>()
   public let votersPublisher = PassthroughSubject<Answer, Never>()
-  public var commentPublisher = PassthroughSubject<String, Never>()
-  public var commentsUpdateStatsPublisher = PassthroughSubject<[Comment], Never>()
+  public var postCommentPublisher = PassthroughSubject<String, Never>()
+  public var postAnonCommentPublisher = PassthroughSubject<[String: String], Never>()
+//  public var updateCommentsStatsPublisher = PassthroughSubject<[Comment], Never>()
+  public let updateCommentsPublisher = PassthroughSubject<[Comment], Never>()
 //  public let commentsCellBoundsPublisher = PassthroughSubject<Bool, Never>()
-  public var anonCommentPublisher = PassthroughSubject<[String: String], Never>()
   public var replyPublisher = PassthroughSubject<[Comment: String], Never>()
   public var anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
 //  public var commentClaimPublisher = PassthroughSubject<Comment, Never>()
@@ -382,43 +383,42 @@ private extension PollCollectionView {
         }
         .store(in: &self.subscriptions)
       
-      //Update comments stats (replies count)
-      cell.updateStatsPublisher
-        .sink { [weak self] in
-          guard let self = self else { return }
-          
-          self.commentsUpdateStatsPublisher.send($0)
-        }
-        .store(in: &self.subscriptions)
-      
-      //Comments
-      cell.commentPublisher
-        .sink { [weak self] in
-          guard let self = self else { return }
-          
-          self.commentPublisher.send($0)
-        }
-        .store(in: &self.subscriptions)
-      cell.anonCommentPublisher
-        .sink { [weak self] in
-          guard let self = self else { return }
-          
-          self.anonCommentPublisher.send($0)
-        }
-        .store(in: &self.subscriptions)
-      
-      
-      //      cell.anonCommentSubject.sink { [weak self] in
-//        guard let self = self,
-//              let dict = $0,
-//              let username = dict.values.first,
-//              let body = dict.keys.first
-//        else { return }
+//      //Update comments stats (replies count)
+//      cell.updateStatsPublisher
+//        .sink { [weak self] in
+//          guard let self = self else { return }
 //
-//        fatalError()
-//        //        self.host.postComment(body: body, username: username)
-//      }.store(in: &self.subscriptions)
-
+//          self.updateCommentsStatsPublisher.send($0)
+//        }
+//        .store(in: &self.subscriptions)
+      
+      //Update comments
+      cell.getRootCommentsPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.updateCommentsPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
+      // Post comment
+      cell.postCommentPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.postCommentPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
+      // Post anon comment
+      cell.postAnonCommentPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.postAnonCommentPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
       //Subscription for commenting
       cell.deletePublisher
         .sink { [weak self] in
@@ -436,6 +436,7 @@ private extension PollCollectionView {
           self.replyPublisher.send($0)
         }
         .store(in: &self.subscriptions)
+      
       //Anon reply
       cell.anonReplyPublisher
         .sink { [weak self] in
@@ -444,6 +445,7 @@ private extension PollCollectionView {
           self.anonReplyPublisher.send($0)
         }
       .store(in: &self.subscriptions)
+      
       //Open thread
       cell.threadPublisher
         .sink { [weak self] in

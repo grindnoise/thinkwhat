@@ -350,7 +350,7 @@ class TopicsView: UIView {
   private lazy var filterViewHeight: CGFloat = .zero
   ///**Logic**
   private var touchLocation: CGPoint = .zero
-  private var period: Period = .AllTime {
+  private var period: Enums.Period = .AllTime {
     didSet {
       guard oldValue != period else { return }
       
@@ -612,7 +612,7 @@ private extension TopicsView {
   
   @MainActor
   func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
-    let perDay: UIAction = .init(title: "per_\(Period.PerDay.rawValue)".localized.lowercased(),
+    let perDay: UIAction = .init(title: "per_\(Enums.Period.PerDay.rawValue)".localized.lowercased(),
                                  image: nil,
                                  identifier: nil,
                                  discoverabilityTitle: nil,
@@ -624,7 +624,7 @@ private extension TopicsView {
       self.period = .PerDay
     })
     
-    let perWeek: UIAction = .init(title: "per_\(Period.PerWeek.rawValue)".localized.lowercased(),
+    let perWeek: UIAction = .init(title: "per_\(Enums.Period.PerWeek.rawValue)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,
@@ -636,7 +636,7 @@ private extension TopicsView {
       self.period = .PerWeek
     })
     
-    let perMonth: UIAction = .init(title: "per_\(Period.PerMonth.rawValue)".localized.lowercased(),
+    let perMonth: UIAction = .init(title: "per_\(Enums.Period.PerMonth.rawValue)".localized.lowercased(),
                                    image: nil,
                                    identifier: nil,
                                    discoverabilityTitle: nil,
@@ -648,7 +648,7 @@ private extension TopicsView {
       self.period = .PerMonth
     })
     
-    let allTime: UIAction = .init(title: "per_\(Period.AllTime.rawValue)".localized.lowercased(),
+    let allTime: UIAction = .init(title: "per_\(Enums.Period.AllTime.rawValue)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,

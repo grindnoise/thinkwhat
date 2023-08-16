@@ -301,7 +301,7 @@ extension ListController: ListViewInput {
     controller.toggleLogo(on: false)
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?) {
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?) {
     guard isOnScreen else { return }
     
     controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic)
@@ -313,7 +313,7 @@ private extension ListController {
     tasks.append(Task { @MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
         guard let self = self,
-              let tab = notification.object as? Tab
+              let tab = notification.object as? Enums.Tab
         else { return }
         
         self.isOnScreen = tab == .Feed

@@ -38,7 +38,7 @@ class ClaimPopupContent: UIView {
   ///**Logic**
   private let surveyReference: SurveyReference
   private weak var parent: NewPopup?
-  private var state: ButtonState = .Send
+  private var state: Enums.ButtonState = .Send
   ///**UI**
   private let padding: CGFloat
   private lazy var collectionView: ClaimCollectionView = {

@@ -14,7 +14,7 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
     
     
     // MARK: - Public properties
-    public var mode: AppSettings! {
+  public var mode: Enums.PushNotificationsLanguagesSettings! {
         didSet {
             guard !mode.isNil else { return }
             
@@ -27,7 +27,7 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
         }
     }
     //Publishers
-    public var valuePublisher = CurrentValueSubject<[AppSettings: Bool]?, Never>(nil)
+  public var valuePublisher = CurrentValueSubject<[Enums.PushNotificationsLanguagesSettings: Bool]?, Never>(nil)
     //UI
     public var color: UIColor = Colors.System.Red.rawValue {
         didSet {
@@ -132,7 +132,7 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
         super.prepareForReuse()
         
         //Reset publishers
-        valuePublisher = CurrentValueSubject<[AppSettings: Bool]?, Never>(nil)
+      valuePublisher = CurrentValueSubject<[Enums.PushNotificationsLanguagesSettings: Bool]?, Never>(nil)
     }
 }
 
@@ -167,11 +167,11 @@ private extension AppSettingsSwitchCell {
       
       switch mode {
       case .notifications(.Completed):
-          titleLabel.text = AppSettings.Notifications.Completed.rawValue.localized
+        titleLabel.text = Enums.PushNotificationsLanguagesSettings.Notifications.Completed.rawValue.localized
       case .notifications(.Subscriptions):
-          titleLabel.text = AppSettings.Notifications.Subscriptions.rawValue.localized
+        titleLabel.text = Enums.PushNotificationsLanguagesSettings.Notifications.Subscriptions.rawValue.localized
       case .notifications(.Watchlist):
-          titleLabel.text = AppSettings.Notifications.Watchlist.rawValue.localized
+        titleLabel.text = Enums.PushNotificationsLanguagesSettings.Notifications.Watchlist.rawValue.localized
       default:
           print("")
       }

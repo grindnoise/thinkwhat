@@ -49,7 +49,7 @@ class SurveysCollectionView: UICollectionView {
       scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: category == .Topic ? false : true)
     }
   }
-  public var period: Period = .AllTime {
+  public var period: Enums.Period = .AllTime {
     didSet {
       setDataSource()
     }
@@ -80,17 +80,17 @@ class SurveysCollectionView: UICollectionView {
   public var watchSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
   public let claimSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
   public var shareSubject = CurrentValueSubject<SurveyReference?, Never>(nil)
-  public let paginationPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
+  public let paginationPublisher = PassthroughSubject<[Survey.SurveyCategory: Enums.Period], Never>()
   public let paginationByIdsPublisher = CurrentValueSubject<[Int]?, Never>(nil)
-  public let paginationByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
-  public let paginationByOwnerPublisher = PassthroughSubject<[Userprofile: Period], Never>()
+  public let paginationByTopicPublisher = PassthroughSubject<[Topic: Enums.Period], Never>()
+  public let paginationByOwnerPublisher = PassthroughSubject<[Userprofile: Enums.Period], Never>()
   public let paginationByOwnerSearchPublisher = PassthroughSubject<[Userprofile: [SurveyReference]], Never>()
   public let paginationByTopicSearchPublisher = PassthroughSubject<[Topic: [SurveyReference]], Never>()
   public let paginationByCompatibilityPublisher = PassthroughSubject<TopicCompatibility, Never>()
-  public let refreshPublisher = PassthroughSubject<[Survey.SurveyCategory: Period], Never>()
-  public let refreshByTopicPublisher = PassthroughSubject<[Topic: Period], Never>()
+  public let refreshPublisher = PassthroughSubject<[Survey.SurveyCategory: Enums.Period], Never>()
+  public let refreshByTopicPublisher = PassthroughSubject<[Topic: Enums.Period], Never>()
   public let refreshByCompatibilityPublisher = PassthroughSubject<TopicCompatibility, Never>()
-  public let refreshByOwnerPublisher = PassthroughSubject<[Userprofile: Period], Never>()
+  public let refreshByOwnerPublisher = PassthroughSubject<[Userprofile: Enums.Period], Never>()
   public var rowPublisher = CurrentValueSubject<SurveyReference?, Never>(nil)
   public var updateStatsPublisher = CurrentValueSubject<[SurveyReference]?, Never>(nil)
   public var subscribePublisher = CurrentValueSubject<Userprofile?, Never>(nil)
@@ -272,7 +272,7 @@ class SurveysCollectionView: UICollectionView {
   
   init(category: Survey.SurveyCategory,
        color: UIColor? = nil,
-       period: Period = .AllTime) {
+       period: Enums.Period = .AllTime) {
     self.category = category
     self.color = color ?? .secondaryLabel
     self.period = period

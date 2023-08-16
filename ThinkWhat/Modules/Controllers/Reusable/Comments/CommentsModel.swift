@@ -14,6 +14,10 @@ class CommentsModel {
 
 // MARK: - Controller Input
 extension CommentsModel: CommentsControllerInput {
+  func updateCommentsAndGetNew(mode: CommentsCollectionView.Mode, excludeList: [Int], updateList: [Int]) {
+    
+  }
+  
   func deleteComment(_ comment: Comment) {
     Task {
       do {
@@ -43,6 +47,7 @@ extension CommentsModel: CommentsControllerInput {
   
   func postComment(body: String, replyTo: Comment?, username: String?) {
     guard let survey = replyTo?.survey?.reference else { return }
+    
     Task {
       do {
         let _ = try await API.shared.surveys.postComment(body, survey: survey, replyTo: replyTo, username: username)
@@ -57,15 +62,50 @@ extension CommentsModel: CommentsControllerInput {
     }
   }
   
-  func requestComments(rootComment: Comment, exclude: [Comment]) {
+  func getComments(rootComment: Comment, excludeList: [Int], includeList: [Int]) {
     Task {
       do {
-        try await API.shared.surveys.getCommentsThread(rootId: String(describing: rootComment.id),
-                                                       excludeList: exclude.map { String(describing: $0.id) })
+        try await API.shared.surveys.getThreadComments(threadId: String(describing: rootComment.id),
+                                                       excludeList: excludeList.map { String(describing: $0) },
+                                                       includeList: includeList.map { String(describing: $0) })
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif
+      }
+    }
+  }
+  
+  func getReply(threadId: Int, replyId: Int) {
+    Task {
+      do {
+        try await API.shared.surveys.getThreadComments(threadId: String(describing: threadId),
+                                                       excludeList: Comments.shared.all.filter({ $0.parentId == threadId }).map { String(describing: $0.id) },
+                                                       includeList: [String(describing: replyId)],
+                                                       includeSelf: false)
+        await MainActor.run { modelOutput?.getReplyCallback(.success(Comments.shared.all.filter({ $0.id == threadId }).first )) }
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        await MainActor.run { modelOutput?.getReplyCallback(.failure(error)) }
+      }
+    }
+  }
+  
+  func loadThread(root: Comment) {
+    Task {
+      do {
+        try await API.shared.surveys.getThreadComments(threadId: String(describing: root.id),
+                                                       excludeList: Comments.shared.all.filter({ $0.parent == root }).map { String(describing: $0.id) },
+                                                       includeList: [],
+                                                       includeSelf: false)
+//        await MainActor.run { modelOutput?.loadThreadCallback(.success(())) }
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+//        await MainActor.run { modelOutput?.loadThreadCallback(.failure(error)) }
       }
     }
   }

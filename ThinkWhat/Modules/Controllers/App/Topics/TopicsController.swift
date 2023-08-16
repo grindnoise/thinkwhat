@@ -332,7 +332,7 @@ private extension TopicsController {
     tasks.append(Task { @MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
         guard let self = self,
-              let tab = notification.object as? Tab
+              let tab = notification.object as? Enums.Tab
         else { return }
         
         self.isOnScreen = tab == .Feed
@@ -745,7 +745,7 @@ extension TopicsController: TopicsViewInput {
     main.toggleLogo(on: false)
   }
   
-  func onDataSourceRequest(dateFilter: Period, topic: Topic) {
+  func onDataSourceRequest(dateFilter: Enums.Period, topic: Topic) {
     guard isOnScreen else { return }
     
     controllerInput?.onDataSourceRequest(dateFilter: dateFilter, topic: topic)

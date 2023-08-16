@@ -10,12 +10,12 @@ import UIKit
 
 class LoginButton: StateButton {
     
-    var authVariant: AuthProvider!
+  var authVariant: Enums.AuthProvider!
 }
 
 class StateButton: UIView, AnimationsRemover, StateSwitchable {
     
-    var state: State = .enabled
+  var state: Enums.EnabledState = .enabled
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -34,7 +34,7 @@ class StateButton: UIView, AnimationsRemover, StateSwitchable {
 }
 
 protocol StateSwitchable {
-    var state: State { get set }
+    var state: Enums.EnabledState { get set }
 }
 
 protocol AnimationsRemover {

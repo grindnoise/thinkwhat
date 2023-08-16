@@ -13,7 +13,7 @@ import L10n_swift
 class AppSettingsLanguageCell: UICollectionViewListCell {
     
     // MARK: - Public properties
-    public var mode: AppSettings! {
+  public var mode: Enums.PushNotificationsLanguagesSettings! {
         didSet {
             guard !mode.isNil else { return }
             
@@ -21,7 +21,7 @@ class AppSettingsLanguageCell: UICollectionViewListCell {
         }
     }
     //Publishers
-    public var appLanguagePublisher = CurrentValueSubject<[AppSettings: String]?, Never>(nil)
+  public var appLanguagePublisher = CurrentValueSubject<[Enums.PushNotificationsLanguagesSettings: String]?, Never>(nil)
     public var contentLanguagePublisher = CurrentValueSubject<Bool?, Never>(nil)//CurrentValueSubject<[AppSettings: [String: Bool]]?, Never>(nil)
     //UI
     public var color: UIColor = Colors.System.Red.rawValue {
@@ -174,7 +174,7 @@ class AppSettingsLanguageCell: UICollectionViewListCell {
         super.prepareForReuse()
         
         //Reset publishers
-        appLanguagePublisher = CurrentValueSubject<[AppSettings: String]?, Never>(nil)
+      appLanguagePublisher = CurrentValueSubject<[Enums.PushNotificationsLanguagesSettings: String]?, Never>(nil)
         contentLanguagePublisher = CurrentValueSubject<Bool?, Never>(nil)//CurrentValueSubject<[AppSettings: [String: Bool]]?, Never>(nil)
     }
 }
@@ -240,11 +240,11 @@ private extension AppSettingsLanguageCell {
     func updateUI() {
         switch mode {
         case .languages(.App):
-            titleLabel.text = AppSettings.Languages.App.rawValue.localized
+          titleLabel.text = Enums.PushNotificationsLanguagesSettings.Languages.App.rawValue.localized
             disclosureButton.showsMenuAsPrimaryAction = true
             languageLabel.text = Locale.current.localizedString(forIdentifier: L10n.shared.language.localized)?.capitalized
         case .languages(.Content):
-            titleLabel.text = AppSettings.Languages.Content.rawValue.localized
+          titleLabel.text = Enums.PushNotificationsLanguagesSettings.Languages.Content.rawValue.localized
             disclosureButton.showsMenuAsPrimaryAction = false
             var languages = ""
             for (row, languageCode) in UserDefaults.App.contentLanguages.enumerated() {
@@ -274,9 +274,9 @@ private extension AppSettingsLanguageCell {
                                   handler: { [weak self] action in
                 guard let self = self else { return }
 
-                self.titleLabel.text = AppSettings.Languages.App.rawValue.localized
+              self.titleLabel.text = Enums.PushNotificationsLanguagesSettings.Languages.App.rawValue.localized
                 self.languageLabel.text = Locale(identifier: language).localizedString(forIdentifier: language)?.capitalized
-                self.appLanguagePublisher.send([AppSettings.languages(.App) : language])
+              self.appLanguagePublisher.send([Enums.PushNotificationsLanguagesSettings.languages(.App) : language])
             })
             actions.append(action)
         }

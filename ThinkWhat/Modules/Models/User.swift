@@ -245,7 +245,7 @@ class Userprofile: Decodable {
   var age: Int {
     return birthDate?.age ?? 18
   }
-  @Published var gender: Gender {
+  @Published var gender: Enums.Gender {
     didSet {
       guard oldValue != gender,
             isCurrent
@@ -548,7 +548,7 @@ class Userprofile: Decodable {
       subscribedAt        = try container.decode(Bool.self, forKey: .subscribedAt)
       subscribedToMe      = try container.decode(Bool.self, forKey: .subscribedToMe)
       notifyOnPublication = try container.decode(Bool.self, forKey: .notifyOnPublication)
-      gender              = Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
+      gender              = Enums.Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
       ///City decoding
       if /*!isCurrent, */let decodedCity = try? container.decodeIfPresent(City.self, forKey: .city) {
         let cityInstance = Cities.shared.all.filter({ $0 == decodedCity }).first ?? decodedCity

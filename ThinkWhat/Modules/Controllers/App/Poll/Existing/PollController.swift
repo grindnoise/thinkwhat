@@ -27,9 +27,10 @@ class PollController: UIViewController {
   private var tasks: [Task<Void, Never>?] = []
   private var subscriptions = Set<AnyCancellable>()
   ///**Logic**
-  private var surveyId: String? // For push notification
-  private var threadId: String? // For push notification
-  private var replyId: String? // For push notification
+  private var surveyId: Int? // For push notification
+  private var threadId: Int? // For push notification
+  private var replyId: Int? // For push notification
+  private var replyToId: Int? // For push notification
   private var userHasVoted = false
   private var isOnScreen = false
   ///**UI**
@@ -71,19 +72,21 @@ class PollController: UIViewController {
   }
   
   // Init from push notification
-  init(surveyId: String, mode: Mode = .Vote) {
+  init(surveyId: Int, mode: Mode = .Vote) {
     self.surveyId = surveyId
     self.mode = mode
     
     super.init(nibName: nil, bundle: nil)
   }
   
-  init(surveyId: String,
-       threadId: String,
-       replyId: String) {
+  init(surveyId: Int,
+       threadId: Int? = nil,
+       replyId: Int? = nil,
+       replyToId: Int? = nil) {
     self.surveyId = surveyId
     self.threadId = threadId
     self.replyId = replyId
+    self.replyToId = replyToId
     self.mode = .Read
     
     super.init(nibName: nil, bundle: nil)
@@ -115,14 +118,25 @@ class PollController: UIViewController {
       if let surveyId = surveyId, let threadId = threadId, let replyId = replyId {
         // Check if survey already exists
         if let survey = Surveys.shared.all.filter({ $0.id == Int(surveyId) }).first {
-          loadData(threadId: threadId, replyId: replyId)
+          // Check if root comment is loaded
+          if let root = Comments.shared.all.filter({ $0.id == threadId }).first {
+            loadThread(root: root, replyId: replyId)
+          } else {
+            loadData(threadId: threadId, replyId: replyId)
+          }
           item = survey.reference
+          controllerOutput?.item = item.survey
+          
+          // Increment view counter
+          guard mode != .Preview else { return }
+          
+          controllerInput?.incrementViewCounter()
         } else {
           loadData(surveyId: surveyId, threadId: threadId, replyId: replyId)
         }
       } else if let surveyId = surveyId {
         // Check if survey already exists
-        guard let survey = Surveys.shared.all.filter({ $0.id == Int(surveyId) }).first else {
+        guard let survey = Surveys.shared.all.filter({ $0.id == surveyId }).first else {
           loadData(surveyID: surveyId)
           
           return
@@ -149,9 +163,9 @@ class PollController: UIViewController {
         guard let self = self else { return }
         
         self.navigationController?.popViewController(animated: true)
-        banner.removeFromSuperview() }
+        banner.removeFromSuperview()
+      }
       .store(in: &self.subscriptions)
-    //        navigationController?.delegate = appDelegate.transitionCoordinator
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -196,6 +210,26 @@ class PollController: UIViewController {
     super.traitCollectionDidChange(previousTraitCollection)
     
     navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
+  }
+  
+  // MARK: - Public methods
+  public func setThreadAndReplyFromPushNotification(threadId: Int, replyId: Int, replyToId: Int) {
+    self.threadId = threadId
+    self.replyId = replyId
+    self.replyToId = replyToId
+    
+    // Check if thread is already loaded
+    if let thread = Comments.shared.all.filter({ $0.id == threadId }).first {
+      controllerInput?.loadThread(root: thread,
+                                  includeList: [replyId, replyToId],
+                                  threshold: 100)
+    } else {
+      controllerInput?.loadThread(threadId: threadId,
+                                  excludeList: [],
+                                  includeList: [replyId, replyToId],
+                                  includeSelf: true,
+                                  threshold: 100)
+    }
   }
 }
 
@@ -245,7 +279,7 @@ private extension PollController {
   
   func setTasks() {
     // Update stats and state in vote/preview mode
-    Timer.publish(every: 10, on: .current, in: .common)
+    Timer.publish(every: AppSettings.TimeIntervals.updateStatsComments, on: .current, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in self.isOnScreen && self.mode != .Read }
       .sink { [weak self] seconds in
@@ -257,7 +291,7 @@ private extension PollController {
     
     // Update stats/state/results in read mode
     Timer
-      .publish(every: 5, on: .current, in: .common)
+      .publish(every: 10, on: .current, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in self.isOnScreen && self.mode == .Read }
       .sink { [weak self] seconds in
@@ -266,7 +300,7 @@ private extension PollController {
               survey.isComplete
         else { return }
         
-        self.controllerInput?.updateResultsStats(survey)
+        self.controllerInput?.getCommentsSurveyStateCommentsUpdates(survey)
       }
       .store(in: &subscriptions)
     
@@ -280,21 +314,7 @@ private extension PollController {
         self.controllerOutput?.setBanned { self.navigationController?.popViewController(animated: true) }
           
         }
-//        let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-//                                                              text: "survey_banned_notification"),
-//                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-//                               isModal: true,
-//                               useContentViewHeight: true,
-//                               shouldDismissAfter: 2)
-//        banner.didDisappearPublisher
-//          .sink { [weak self] _ in
-//            guard let self = self else { return }
-//
-//              self.navigationController?.popViewController(animated: true)
-//              banner.removeFromSuperview() }
-//            .store(in: &self.subscriptions)
-//        }
-        .store(in: &subscriptions)
+      .store(in: &subscriptions)
     
     // Watch for favorite status
     item.isFavoritePublisher
@@ -336,166 +356,6 @@ private extension PollController {
         self.setBarButtonItems()
       }
       .store(in: &subscriptions)
-    
-    
-    
-    //        tasks.append(Task { [weak self] in
-    //            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchFavorite) {
-    //                guard let self = self,
-    //                      let instance = notification.object as? SurveyReference,
-    //                      self._surveyReference == instance
-    //                else { return }
-    //
-    //                await MainActor.run {
-    //                    self.setBarButtonItem()
-    //
-    //                    switch instance.isFavorite {
-    //                    case true:
-    //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-    //                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isFavorite"}).isEmpty
-    //                        else { return }
-    //
-    //                        let container = UIView()
-    //                        container.backgroundColor = .clear
-    //                        container.accessibilityIdentifier = "isFavorite"
-    //                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-    //
-    //                        let instance = UIImageView(image: UIImage(systemName: "binoculars.fill"))
-    ////                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
-    //                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? self.surveyReference.topic.tagColor : .darkGray
-    //                        instance.contentMode = .scaleAspectFit
-    //                        instance.addEquallyTo(to: container)
-    //                        marksStackView.insertArrangedSubview(container,
-    //                                                             at: marksStackView.arrangedSubviews.isEmpty ? 0 : marksStackView.arrangedSubviews.count > 1 ? marksStackView.arrangedSubviews.count-1 : marksStackView.arrangedSubviews.count)
-    //                    case false:
-    //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-    //                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isFavorite") else { return }
-    //                        marksStackView.removeArrangedSubview(mark)
-    //                        mark.removeFromSuperview()
-    //                    }
-    //                }
-    //            }
-    //        })
-    
-    //        tasks.append(Task { [weak self] in
-    //            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Completed) {
-    //                await MainActor.run {
-    //                    guard let self = self,
-    //                          let instance = notification.object as? SurveyReference,
-    //                          self._surveyReference == instance
-    //                    else { return }
-    //
-    //                    switch instance.isComplete {
-    //                    case true:
-    //                        let _anim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.5, delegate: nil)
-    //                        self.titleView.oval.add(_anim, forKey: nil)
-    //                        self.titleView.ovalBg.add(_anim, forKey: nil)
-    //                        self.titleView.oval.opacity = 1
-    //                        self.titleView.ovalBg.opacity = 1
-    //
-    //                        if let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress") {
-    //                            let anim = Animations.get(property: .Opacity, fromValue: 0, toValue: 1, duration: 0.5, delegate: nil)
-    //                            indicator.oval.add(anim, forKey: nil)
-    //                            indicator.ovalBg.add(anim, forKey: nil)
-    //                            indicator.oval.opacity = 1
-    //                            indicator.ovalBg.opacity = 1
-    //                        }
-    //
-    //                        self.setUpdaters()
-    //
-    //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-    //                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isComplete"}).isEmpty
-    //                        else { return }
-    //
-    //                        let container = UIView()
-    //                        container.backgroundColor = .clear
-    //                        container.accessibilityIdentifier = "isComplete"
-    //                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-    //
-    //                        let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill"))
-    //                        instance.contentMode = .center
-    ////                        instance.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : self._surveyReference.topic.tagColor
-    //                        instance.tintColor = self._surveyReference.topic.tagColor
-    //                        instance.contentMode = .scaleAspectFit
-    //                        instance.addEquallyTo(to: container)
-    //
-    //                        marksStackView.insertArrangedSubview(container, at: 0)
-    //
-    //                        self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
-    //                            guard let newValue = change.newValue else { return }
-    //                            view.cornerRadius = newValue.size.height/2
-    //                            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
-    //                            let image = UIImage(systemName: "checkmark.seal.fill", withConfiguration: largeConfig)
-    //                            view.image = image
-    //                        })
-    //                    case false:
-    //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-    //                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isComplete") else { return }
-    //                        marksStackView.removeArrangedSubview(mark)
-    //                        mark.removeFromSuperview()
-    //                    }
-    //                }
-    //            }
-    //        })
-    
-    //        tasks.append(Task { [weak self] in
-    //            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.SwitchHot) {
-    //                await MainActor.run {
-    //                    guard let self = self,
-    //                          let instance = notification.object as? SurveyReference,
-    //                          self._surveyReference == instance
-    //                    else { return }
-    //
-    //                    switch instance.isHot {
-    //                    case true:
-    //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-    //                              marksStackView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "isHot"}).isEmpty
-    //                        else { return }
-    //
-    //                        let container = UIView()
-    //                        container.backgroundColor = .clear
-    //                        container.accessibilityIdentifier = "isHot"
-    //                        container.widthAnchor.constraint(equalTo: container.heightAnchor, multiplier: 1/1).isActive = true
-    //
-    //                        let instance = UIImageView(image: UIImage(systemName: "flame.fill"))
-    //                        instance.contentMode = .center
-    //                        instance.tintColor = .systemRed
-    //                        instance.contentMode = .scaleAspectFit
-    //                        instance.addEquallyTo(to: container)
-    //
-    //                        marksStackView.insertArrangedSubview(container, at: marksStackView.arrangedSubviews.count == 0 ? 0 : marksStackView.arrangedSubviews.count)
-    //
-    //                        self.observers.append(instance.observe(\UIImageView.bounds, options: .new) { view, change in
-    //                            guard let newValue = change.newValue else { return }
-    //                            view.cornerRadius = newValue.size.height/2
-    //                            let largeConfig = UIImage.SymbolConfiguration(pointSize: newValue.size.height * 1.9, weight: .semibold, scale: .medium)
-    //                            let image = UIImage(systemName: "flame.fill", withConfiguration: largeConfig)
-    //                            view.image = image
-    //                        })
-    //                    case false:
-    //                        guard let marksStackView = self.stackView.getSubview(type: UIStackView.self, identifier: "marksStackView"),
-    //                              let mark = marksStackView.getSubview(type: UIView.self, identifier: "isHot") else { return }
-    //                        marksStackView.removeArrangedSubview(mark)
-    //                        mark.removeFromSuperview()
-    //                    }
-    //                }
-    //            }
-    //        })
-    
-    //        //Observe progress
-    //        tasks.append(Task { @MainActor [weak self] in
-    //            for await notification in NotificationCenter.default.notifications(for: Notifications.Surveys.Progress) {
-    //                guard let self = self,
-    //                      let instance = notification.object as? SurveyReference,
-    //                      self._surveyReference == instance
-    //                else { return }
-    //
-    //                if let indicator = self.stackView.getSubview(type: CircleButton.self, identifier: "progress") {
-    //                    indicator.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
-    //                }
-    //                self.titleView.oval.strokeStart = CGFloat(1) - CGFloat(instance.progress)/100
-    //            }
-    //        })
   }
   
   func loadData() {
@@ -521,13 +381,13 @@ private extension PollController {
   
   /// Loads survey by id from push notification
   /// - Parameter surveyID: survey id extracted from push notification
-  func loadData(surveyID: String) {
+  func loadData(surveyID: Int) {
     spinner = SpiralSpinner(color: Colors.main)
     navigationController?.setNavigationBarHidden(true, animated: false)
     spinner.placeInCenter(of: view,
                           widthMultiplier: 0.25,
                           yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-    controllerInput?.load(surveyID)
+    controllerInput?.loadSurvey(surveyID)
     spinner.start(duration: 1)
   }
   
@@ -535,7 +395,7 @@ private extension PollController {
   /// - Parameter surveyId: survey id
   /// - Parameter threadId: root comment id
   /// - Parameter replyId: reply comment id
-  func loadData(surveyId: String, threadId: String, replyId: String) {
+  func loadData(surveyId: Int, threadId: Int, replyId: Int) {
     spinner = SpiralSpinner(color: Colors.main)
     navigationController?.setNavigationBarHidden(true, animated: false)
     spinner.placeInCenter(of: view,
@@ -543,9 +403,7 @@ private extension PollController {
                           yOffset: -NavigationController.Constants.NavBarHeightSmallState)
     controllerInput?.loadSurveyAndThread(surveyId: surveyId,
                                          threadId: threadId,
-                                         excludeList: [],
-                                         includeSelf: true,
-                                         onlyChildren: false,
+                                         includeList: [replyId],
                                          threshold: 100)
     spinner.start(duration: 1)
   }
@@ -554,7 +412,7 @@ private extension PollController {
   /// - Parameter surveyId: survey id
   /// - Parameter threadId: root comment id
   /// - Parameter replyId: reply comment id
-  func loadData(threadId: String, replyId: String) {
+  func loadData(threadId: Int, replyId: Int) {
     spinner = SpiralSpinner(color: Colors.main)
     navigationController?.setNavigationBarHidden(true, animated: false)
     spinner.placeInCenter(of: view,
@@ -562,10 +420,17 @@ private extension PollController {
                           yOffset: -NavigationController.Constants.NavBarHeightSmallState)
     controllerInput?.loadThread(threadId: threadId,
                                 excludeList: [],
+                                includeList: [replyId],
                                 includeSelf: true,
-                                onlyChildren: false,
                                 threshold: 100)
     spinner.start(duration: 1)
+  }
+  
+  
+  /// Loads thread child comments, when root is already loaded
+  /// - Parameter root: root comment
+  func loadThread(root: Comment, replyId: Int) {
+    controllerInput?.loadThread(root: root, includeList: [replyId], threshold: 100)
   }
   
   func setBarButtonItems() {
@@ -717,11 +582,11 @@ extension PollController: PollViewInput {
     controllerInput?.post(survey)
   }
   
-  func updateCommentsStats(_ comments: [Comment]) {
-    guard isOnScreen else { return }
-    
-    controllerInput?.updateCommentsStats(comments)
-  }
+//  func updateCommentsStats(_ comments: [Comment]) {
+//    guard isOnScreen else { return }
+//
+//    controllerInput?.updateCommentsStats(comments)
+//  }
   
   func openUserprofile() {
     let backItem = UIBarButtonItem()
@@ -770,17 +635,21 @@ extension PollController: PollViewInput {
     controllerInput?.postComment(body: body, replyTo: replyTo, username: username)
   }
   
-  func requestComments(_: [Comment]) {
-    
-  }
+//  func updateComments(excludeList: [Comment]) {
+//    controllerInput?.updateComments(excludeList: excludeList)
+//  }
   
-  func openCommentThread(_ comment: Comment) {
+  func openCommentThread(root: Comment, reply: Comment? = nil, shouldRequest: Bool, _ completion: Closure?) {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
     
-    navigationController?.pushViewController(CommentsController(comment), animated: true)
+    navigationController?.pushViewController(CommentsController(root: root, shouldRequest: shouldRequest, reply: reply), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard !completion.isNil else { return }
+    
+    delay(seconds: 0.4) { completion?() }
   }
   
   func deleteComment(_ comment: Comment) {
@@ -790,21 +659,52 @@ extension PollController: PollViewInput {
 
 // MARK: - Output
 extension PollController: PollModelOutput {
-  func loadThreadCallback(_: Result<Void, Error>) {
-    fatalError()
+  func loadThreadCallback(_ result: Result<Comment?, Error>) {
+    switch result {
+    case .success(let root):
+      guard let comment = root else { return }
+      
+      openCommentThread(root: comment,
+                        reply: replyId.isNil ? nil : Comments.shared.all.filter({ [unowned self] in $0.id == Int(self.replyId!) }).first,
+                        shouldRequest: false) {}
+    case .failure(_):
+      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                            text: AppError.server.localizedDescription),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 1)
+      
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
+    }
   }
   
+  // Push notification action
   func loadSurveyAndThreadCallback(_ result: Result<Survey, Error>) {
     switch result {
     case .success(let survey):
       item = survey.reference
+      setTasks()
       // Push to comments thread
-      guard let threadId = threadId, let id = Int(threadId), let comment = Comments.shared.all.filter({ $0.id == id }).first else {
+      guard !threadId.isNil,
+            let root = Comments.shared.all.filter({ $0.id == threadId! }).first,
+            !replyId.isNil,
+            let reply = Comments.shared.all.filter({ $0.id == replyId! }).first
+      else {
         navigationController?.popViewController(animated: true)
         
         return
       }
-      openCommentThread(comment)
+//      Surveys.shared.all.filter({ $0.id == root.surveyId })
+      openCommentThread(root: root, reply: reply, shouldRequest: false) { [weak self] in
+        guard let self = self else { return }
+        
+        self.controllerOutput?.presentView(item: survey, animated: false)
+        self.spinner.stop()
+        self.spinner.removeFromSuperview()
+      }
     case .failure(let error):
 #if DEBUG
       error.printLocalized(class: type(of: self), functionName: #function)
@@ -838,7 +738,7 @@ extension PollController: PollModelOutput {
           else { return }
           
           self.navigationController?.setNavigationBarHidden(false, animated: true)
-          self.controllerOutput?.presentView(survey)
+          self.controllerOutput?.presentView(item: survey, animated: true)
           self.spinner.stop()
           self.spinner.removeFromSuperview()
         }

@@ -73,16 +73,20 @@ class Comments {
     }
   }
   
-  func updateStats(_ json: JSON) {
+  func update(_ json: JSON) {
     guard let array = json.array else { return }
     
     array.forEach {
       guard let id = $0["id"].int,
             let comment = all.filter({ $0.id == id }).first,
-            let replies = $0["replies"].int
+            let replies = $0["replies"].int,
+            let isDeleted = $0["is_deleted"].bool,
+            let isBanned = $0["is_banned"].bool
       else { return }
       
       comment.replies = replies
+      comment.isDeleted = isDeleted
+      comment.isBanned = isBanned
     }
   }
   

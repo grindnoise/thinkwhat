@@ -151,7 +151,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
   ///**Publishers**
   public var namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
   public var datePublisher = CurrentValueSubject<Date?, Never>(nil)
-  public var genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
+  public var genderPublisher = CurrentValueSubject<Enums.Gender?, Never>(nil)
   public var galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
@@ -519,7 +519,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
     
     namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
     datePublisher = CurrentValueSubject<Date?, Never>(nil)
-    genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
+    genderPublisher = CurrentValueSubject<Enums.Gender?, Never>(nil)
     galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
     cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
     previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
@@ -865,16 +865,16 @@ private extension UserSettingsCredentialsCell {
   func prepareMenu() -> UIMenu {
     var actions: [UIAction]!
     
-    let male: UIAction = .init(title: Gender.Male.rawValue.localized.capitalized, image: UIImage(systemName: "mustache.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+    let male: UIAction = .init(title: Enums.Gender.Male.rawValue.localized.capitalized, image: UIImage(systemName: "mustache.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.genderPublisher.send(Gender.Male)
+      self.genderPublisher.send(Enums.Gender.Male)
     })
     
-    let female: UIAction = .init(title: Gender.Female.rawValue.localized.capitalized, image: UIImage(systemName: "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+    let female: UIAction = .init(title: Enums.Gender.Female.rawValue.localized.capitalized, image: UIImage(systemName: "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.genderPublisher.send(Gender.Female)
+      self.genderPublisher.send(Enums.Gender.Female)
     })
     
     

@@ -20,7 +20,7 @@ class UserSettingsCollectionView: UICollectionView {
   public let topicPublisher = PassthroughSubject<Topic, Never>()
   public let namePublisher = CurrentValueSubject<[String: String]?, Never>(nil)
   public let datePublisher = CurrentValueSubject<Date?, Never>(nil)
-  public let genderPublisher = CurrentValueSubject<Gender?, Never>(nil)
+  public let genderPublisher = CurrentValueSubject<Enums.Gender?, Never>(nil)
   public let galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public let cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public let previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)

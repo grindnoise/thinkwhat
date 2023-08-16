@@ -21,7 +21,7 @@ class VKButtonView: LoginButton, CAAnimationDelegate {
     var color2 : UIColor!
     
     //MARK: - Life Cycle
-    override var state: State {
+  override var state: Enums.EnabledState {
         didSet {
             if oldValue != state {
                 if state == .enabled {

@@ -20,7 +20,7 @@ protocol SubscriptionsViewInput: AnyObject {
   func onSubscpitionsTapped()
   //    func toggleBarButton()
   func onSurveyTapped(_: SurveyReference)
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?)
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?, userprofile: Userprofile?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -29,7 +29,7 @@ protocol SubscriptionsViewInput: AnyObject {
   func openUserprofile(_: Userprofile)
   func toggleUserSelected(_: Bool)
   func unsubscribe(from: Userprofile)
-  func onAllUsersTapped(mode: UserprofilesViewMode)
+  func onAllUsersTapped(mode: Enums.UserprofilesViewMode)
   func onSubcriptionsCountEvent(zeroSubscriptions: Bool)
   func setDefaultMode()
 }
@@ -40,7 +40,7 @@ protocol SubscriptionsViewInput: AnyObject {
 protocol SubsciptionsControllerInput: AnyObject {
   var modelOutput: SubsciptionsModelOutput? { get set }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?)
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?, userprofile: Userprofile?)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(_: [SurveyReference: Claim])

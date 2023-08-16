@@ -72,7 +72,7 @@ class API {
                              lastName: String? = nil,
                              email: String? = nil,
                              description: String? = nil,
-                             gender: Gender? = nil,
+                             gender: Enums.Gender? = nil,
                              birthDate: String? = nil,
                              city: City? = nil,
                              image: UIImage? = nil,
@@ -219,13 +219,13 @@ class API {
     }
   }
   
-  private func checkForReachability(completion: @escaping(ApiReachabilityState) -> ()) {
+  private func checkForReachability(completion: @escaping(Enums.ApiReachabilityState) -> ()) {
     let url = URL(string: API_URLS.BASE)!.appendingPathComponent(API_URLS.CURRENT_TIME)
     self.sessionManager.request(url, method: .get, parameters: [:], encoding: URLEncoding(), headers: nil).response { response in
-      var state = ApiReachabilityState.None
+      var state = Enums.ApiReachabilityState.None
       switch response.result {
       case .success:
-        state = ApiReachabilityState.Reachable
+        state = Enums.ApiReachabilityState.Reachable
       case .failure(let error):
         print(error.localizedDescription)
       }
@@ -463,11 +463,11 @@ class API {
       }
     }
     
-    public func loginViaProviderAsync(provider: AuthProvider,
+    public func loginViaProviderAsync(provider: Enums.AuthProvider,
                                       token: String) async throws  {
       
       var url: URL!
-      if provider == .Apple {
+      if provider == Enums.AuthProvider.Apple {
         guard let _url = API_URLS.Auth.appleSignIn else { throw APIError.invalidURL }
         
         url = _url
@@ -676,7 +676,7 @@ class API {
     
     ///**OAuth**
     ///Social media auhorization. Store access token if finished successful
-    public func loginViaProvider(provider: AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
+    public func loginViaProvider(provider: Enums.AuthProvider, token: String, completion: @escaping (Result<Bool, Error>) -> ()) {
       guard let url = API_URLS.Auth.convertToken else { completion(.failure(APIError.invalidURL)); return }
       
       let parameters = ["client_id": API_URLS.CLIENT_ID,
@@ -1008,7 +1008,7 @@ class API {
       if let image = dict.removeValue(forKey: "image") as? UIImage {
         assert(dict["image"] == nil)
         let multipartFormData = MultipartFormData()
-        var fileFormat: FileFormat = .Unknown
+        var fileFormat: Enums.FileFormat = .Unknown
         var imageData: Data!
         if let data = image.jpegData(compressionQuality: 1) {
           imageData = data
@@ -1019,7 +1019,7 @@ class API {
         }
         
         guard imageData != nil,
-              fileFormat != .Unknown
+              fileFormat != Enums.FileFormat.Unknown
         else {
           throw APIError.badData
         }
@@ -1316,16 +1316,13 @@ class API {
                                                  headers: parent.headers())
         
         let json = try JSON(data: data, options: .mutableContainers)
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                   DateFormatter.dateTimeFormatter,
-                                                   DateFormatter.dateFormatter ]
-        Surveys.shared.append([try decoder.decode(Survey.self, from: json.rawData())])
+        let new = try JSONDecoder.withDateTimeDecodingStrategyFormatters()
+          .decode(Survey.self, from: json.rawData())
+        Surveys.shared.append([new])
+        let instance = Surveys.shared[surveyReference.id] ?? new
+        instance.isVisited = true
         
-        let instance = Surveys.shared[surveyReference.id]
-        instance!.isVisited = true
-        
-        return instance!
+        return instance
       } catch let error {
         throw error
       }
@@ -1450,7 +1447,7 @@ class API {
     
     public func surveyReferences(category: Survey.SurveyCategory,
                                  ids: [Int]? = nil,
-                                 period: Period? = nil,
+                                 period: Enums.Period? = nil,
                                  topic: Topic? = nil,
                                  userprofile: Userprofile? = nil,
                                  compatibility: TopicCompatibility? = nil,
@@ -1557,21 +1554,34 @@ class API {
     }
     
     //Requests stats updates for survey
-    public func updateResultStats(_ instance: Survey) async throws {
-      guard let url = API_URLS.Surveys.updateResults,
+    public func getCommentsSurveyStateCommentsUpdates(surveyId: Int,
+                                                      threadId: Int? = nil,
+                                                      excludeComments: [Int] = [],
+                                                      commentsToUpdate: [Int] = []) async throws {
+      guard let url = API_URLS.Surveys.getCommentsSurveyStateCommentsUpdates,
             let headers = headers
       else { throw APIError.invalidURL }
       
-      let parameters: Parameters = [
-        "id": instance.id,
-        "excluded_root_comment_ids": Comments.shared.all.filter({ $0.survey == instance && $0.isParentNode }).map { $0.id }
+      var parameters: Parameters = [
+        "survey_id": surveyId,
+        "comments_ids": commentsToUpdate,
+        "exclude_list": excludeComments,
+        "threshold": 100
       ]
+      
+      if !threadId.isNil {
+        parameters["thread_id"] = threadId!
+      }
 
       do {
-        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: headers)
         let json = try JSON(data: data, options: .mutableContainers)
         await MainActor.run {
-          Surveys.shared.updateResultsStats(json)
+          Surveys.shared.updateCommentsAndResultsStats(json)
         }
       } catch let error {
         throw error
@@ -1593,7 +1603,7 @@ class API {
                                                  encoding: JSONEncoding.default,
                                                  headers: headers)
         
-        Comments.shared.updateStats(try JSON(data: data, options: .mutableContainers))
+        Comments.shared.update(try JSON(data: data, options: .mutableContainers))
       } catch let error {
         throw error
       }
@@ -1797,58 +1807,58 @@ class API {
     }
     
     
-    public func requestRootComments(survey: SurveyReference, excludedComments: [Comment] = []) async throws {
-      guard let url = API_URLS.Surveys.getRootComments,
+    /// Get root comments
+    /// - Parameters:
+    ///   - surveyId: survey for comments
+    ///   - excludeList: exclude existing
+    public func getRootComments(surveyId: String,
+                                excludeList: [String] = []) async throws {
+      guard let url = API_URLS.Surveys.getComments,
             let headers = headers
       else { throw APIError.invalidURL }
       
-      var parameters: Parameters = ["survey": survey.id]
-      
-      if !excludedComments.isEmpty {
-        parameters["ids"] = excludedComments.map { $0.id }
-      }
+      let parameters: Parameters = [
+        "survey_id": surveyId,
+        "exclude_list": excludeList
+      ]
       
       do {
-        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-        
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                   DateFormatter.dateTimeFormatter,
-                                                   DateFormatter.dateFormatter ]
-        await MainActor.run {
-          let instances = try? decoder.decode([Comment].self, from: data)
-        }
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: headers)
+
+        let _ = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode([Comment].self, from: data)
       } catch let error {
         throw error
       }
     }
     
-    /// Requests comments thread
+    /// Get thread comments
     /// - Parameters:
-    ///   - rootId: root comment id
+    ///   - threadId: root comment id
     ///   - excludeList: list of excluded comments
+    ///   - includeList: list of included comments
+    ///   - includeSelf: include root comment
     ///   - threshold: batch size
-    ///   - onlyChildren: get only children without root
-    public func getCommentsThread(rootId: String,
+    public func getThreadComments(threadId: String,
                                   excludeList: [String] = [],
+                                  includeList: [String] = [],
                                   includeSelf: Bool = false,
-                                  threshold: Int = 0,
-                                  onlyChildren: Bool = true) async throws {
+                                  threshold: Int = 100) async throws {
       
-      guard let url = API_URLS.Surveys.getCommentsThread,
+      guard let url = API_URLS.Surveys.getComments,
             let headers = headers
       else { throw APIError.invalidURL }
       
-      var parameters: Parameters = [
-        "root_id": rootId,
-        "ids": excludeList,
-        "only_children": onlyChildren,
-        "include_self": includeSelf
+      let parameters: Parameters = [
+        "thread_id": threadId,
+        "exclude_list": excludeList,
+        "include_list": includeList,
+        "include_self": includeSelf,
+        "threshold": threshold
       ]
-      
-      if !threshold.isZero {
-        parameters["threshold"] = threshold
-      }
       
       do {
         let data = try await parent.requestAsync(url: url,
@@ -1858,6 +1868,50 @@ class API {
                                                  headers: headers)
         
         let _ = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode([Comment].self, from: data)
+      } catch let error {
+        throw error
+      }
+    }
+    
+    /// Get survey and thread comments
+    /// - Parameters:
+    ///   - threadId: root comment id
+    ///   - survey_id: survey id
+    ///   - includeList: list of included comments
+    ///   - threshold: batch size
+    public func getSurveyThreadComments(surveyId: String,
+                                        threadId: String,
+                                        includeList: [String] = [],
+                                        threshold: Int = 100) async throws -> Survey {
+      
+      guard let url = API_URLS.Surveys.getSurveyThreadComments,
+            let headers = headers
+      else { throw APIError.invalidURL }
+      
+      let parameters: Parameters = [
+        "thread_id": threadId,
+        "survey_id": surveyId,
+        "include_list": includeList,
+        "threshold": threshold
+      ]
+      
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: parameters,
+                                                 encoding: JSONEncoding.default,
+                                                 headers: headers)
+        
+        let json = try JSON(data: data, options: .mutableContainers)
+        let surveyData = try json["survey"].rawData()
+        let commentsData = try json["thread_comments"].rawData()
+        let new = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Survey.self, from: surveyData)
+        Surveys.shared.append([new])
+        let instance = Surveys.shared[new.id] ?? new
+        instance.isVisited = true
+        let _ = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode([Comment].self, from: commentsData)
+        
+        return instance
       } catch let error {
         throw error
       }
@@ -2023,7 +2077,7 @@ class API {
             if let title = dict["title"] as? String { multipartFormData.append(title.data(using: .utf8)!, withName: "media[\(index)]title") }
             if let image = dict["image"] as? UIImage,
                let jpegData = image.jpegData(compressionQuality: 1) {
-              multipartFormData.append(jpegData, withName: "media[\(index)]image", fileName: "\(UUID().uuidString).\(FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
+              multipartFormData.append(jpegData, withName: "media[\(index)]image", fileName: "\(UUID().uuidString).\(Enums.FileFormat.JPEG.rawValue)", mimeType: "jpg/png")
             }
           }
           

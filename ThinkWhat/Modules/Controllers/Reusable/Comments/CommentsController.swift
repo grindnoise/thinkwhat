@@ -11,16 +11,20 @@ import Combine
 
 class CommentsController: UIViewController {
   
-  // MARK: - MVC
+  // MARK: - Public properties
   var controllerOutput: CommentsControllerOutput?
   var controllerInput: CommentsControllerInput?
+  ///**UI**
+  public let item: Comment
+  public private(set) var reply: Comment?
+  public private(set) var isOnScreen = false
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private let item: Comment
+  private let shouldRequest: Bool // Flag for loading new comments
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var titleView: TagCapsule = { TagCapsule(text: "replies".localized.uppercased() + ": \(item.replies)",
@@ -45,8 +49,12 @@ class CommentsController: UIViewController {
   }
   
   // MARK: - Initialization
-  init(_ comment: Comment) {
-    self.item = comment
+  init(root: Comment,
+       shouldRequest: Bool = true,
+       reply: Comment? = nil) {
+    self.item = root
+    self.shouldRequest = shouldRequest
+    self.reply = reply
     
     super.init(nibName: nil, bundle: nil)
   }
@@ -70,17 +78,30 @@ class CommentsController: UIViewController {
     
     self.view = view as UIView
     
-    navigationController?.navigationBar.prefersLargeTitles = false
-    //    title = "replies".localized + ": \(item.replies)"
-    navigationItem.titleView = titleView
+    // Refresh comments
+    if shouldRequest {
+      controllerInput?.loadThread(root: item)
+    }
+    
     setTasks()
   }
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    navigationController?.setBarColor()
-    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
+    setupUI()
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    
+    isOnScreen = true
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+     
+    isOnScreen = false
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -88,31 +109,53 @@ class CommentsController: UIViewController {
     
     navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
   }
+  
+  // MARK: - Public methods
+  public func setReply(_ replyId: Int) {
+    // Check if exists
+    if let reply = Comments.shared.all.filter({ $0.id == replyId }).first {
+      controllerOutput?.focusOnReply(reply)
+    } else {
+      // Download reply
+      controllerInput?.getReply(threadId: item.id, replyId: replyId)
+    }
+  }
 }
   // MARK: - Private extension
 private extension CommentsController {
+  @MainActor
+  func setupUI() {
+    navigationController?.setNavigationBarHidden(false, animated: true)
+    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
+    navigationController?.setBarTintColor(item.survey?.topic.tagColor ?? .systemGray)
+    navigationController?.setBarColor()
+    navigationItem.titleView = titleView
+  }
+  
   func setTasks() {
+    // Update title count
     item.repliesPublisher
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] in self.titleView.text = "replies".localized.uppercased() + ": \($0)" }
       .store(in: &subscriptions)
-    //        tasks.append(Task { [weak self] in
-    //            for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ChildrenCountChange) {
-    //                guard let self = self,
-    //                      let instance = notification.object as? Comment,
-    //                      instance == self.item
-    //                else { return }
-    //
-    //                await MainActor.run {
-    //                    self.title = "replies".localized + " (\(instance.replies))"
-    //                }
-    //            }
-    //        })
+    
+    // Control shadow
+    tasks.append(Task { @MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
+        guard let self = self, self.isOnScreen else { return }
+        
+        self.navigationController?.setBarShadow(on: self.traitCollection.userInterfaceStyle != .dark, animated: true)
+      }
+    })
   }
 }
 
 // MARK: - View Input
 extension CommentsController: CommentsViewInput {
+  func updateCommentsAndGetNew(mode: CommentsCollectionView.Mode, excludeList: [Int], updateList: [Int]) {
+    controllerInput?.updateCommentsAndGetNew(mode: mode, excludeList: excludeList, updateList: updateList)
+  }
+  
   func deleteComment(_ comment: Comment) {
     controllerInput?.deleteComment(comment)
   }
@@ -125,13 +168,35 @@ extension CommentsController: CommentsViewInput {
     controllerInput?.postComment(body: body, replyTo: replyTo, username: username)
   }
   
-  func requestComments(exclude: [Comment]) {
-    controllerInput?.requestComments(rootComment: item, exclude: exclude)
+  func getComments(excludeList: [Int], includeList: [Int]) {
+    controllerInput?.getComments(rootComment: item, excludeList: excludeList, includeList: includeList)
   }
 }
 
 // MARK: - Model Output
 extension CommentsController: CommentsModelOutput {
+  func getReplyCallback(_ result: Result<Comment?, Error>) {
+    switch result {
+    case .success(let reply):
+      guard let reply = reply else { return }
+      
+      controllerOutput?.focusOnReply(reply)
+    case .failure(let error):
+#if DEBUG
+      error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                            text: AppError.server.localizedDescription),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 2)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
+    }
+  }
+  
   func commentDeleteError() {
     controllerOutput?.commentDeleteError()
   }

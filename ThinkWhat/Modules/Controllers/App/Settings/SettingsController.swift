@@ -254,7 +254,7 @@ private extension SettingsController {
     tasks.append(Task { @MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
         guard let self = self,
-              let tab = notification.object as? Tab
+              let tab = notification.object as? Enums.Tab
         else { return }
         
         self.isOnScreen = tab == .Settings
@@ -487,7 +487,7 @@ extension SettingsController: SettingsViewInput {
     setSwitchHidden(true)
   }
   
-  func updateAppSettings(_ settings: [AppSettings : Any]) {
+  func updateAppSettings(_ settings: [Enums.PushNotificationsLanguagesSettings : Any]) {
     controllerInput?.updateAppSettings(settings)
   }
   
@@ -618,7 +618,7 @@ extension SettingsController: SettingsViewInput {
     present(imagePicker, animated: true, completion: nil)
   }
   
-  func updateGender(_ gender: Gender) {
+  func updateGender(_ gender: Enums.Gender) {
     let parameters = API.prepareUserData(gender: gender)
     controllerInput?.updateUserprofile(parameters: parameters, image: nil)
   }

@@ -137,30 +137,30 @@ final class VKWorker {
                 .send()
         }
     }
+  
+  class func prepareDjangoData(id: String, firstName: String, lastName: String, email: String, gender: Int, domain: String, birthDate: String?, image: UIImage? = nil) -> [String: Any] {
     
-    class func prepareDjangoData(id: String, firstName: String, lastName: String, email: String, gender: Int, domain: String, birthDate: String?, image: UIImage? = nil) -> [String: Any] {
-        
-        var parameters = [String: Any]()
-        parameters["owner.\(DjangoVariables.User.firstName)"] = firstName
-        parameters["owner.\(DjangoVariables.User.lastName)"] = lastName
-        parameters["owner.\(DjangoVariables.User.email)"] = email
-        parameters[DjangoVariables.UserProfile.gender] = gender == 1 ? Gender.Female.rawValue : Gender.Male.rawValue
-        parameters[DjangoVariables.UserProfile.birthDate] = birthDate
-        parameters[DjangoVariables.UserProfile.vkID] = id
-        parameters[DjangoVariables.UserProfile.vkURL] = "https://vk.com/\(domain)"
-        if let image = image {
-            parameters[DjangoVariables.UserProfile.image] = image
-        }
-        return parameters
+    var parameters = [String: Any]()
+    parameters["owner.\(DjangoVariables.User.firstName)"] = firstName
+    parameters["owner.\(DjangoVariables.User.lastName)"] = lastName
+    parameters["owner.\(DjangoVariables.User.email)"] = email
+    parameters[DjangoVariables.UserProfile.gender] = gender == 1 ? Enums.Gender.Female.rawValue : Enums.Gender.Male.rawValue
+    parameters[DjangoVariables.UserProfile.birthDate] = birthDate
+    parameters[DjangoVariables.UserProfile.vkID] = id
+    parameters[DjangoVariables.UserProfile.vkURL] = "https://vk.com/\(domain)"
+    if let image = image {
+      parameters[DjangoVariables.UserProfile.image] = image
     }
-    
-    class func uploadPhoto() {
-//        guard
-//            let pathToImage = Bundle.main.path(forResource: "testImage", ofType: "png"),
-//            let data = try? Data(contentsOf: URL(fileURLWithPath: pathToImage))
-//            else {
-//                print("Can not find testImage.png")
-//                return
+    return parameters
+  }
+  
+  class func uploadPhoto() {
+    //        guard
+    //            let pathToImage = Bundle.main.path(forResource: "testImage", ofType: "png"),
+    //            let data = try? Data(contentsOf: URL(fileURLWithPath: pathToImage))
+    //            else {
+    //                print("Can not find testImage.png")
+    //                return
 //        }
 //
 //        let media = Media.image(data: data, type: .png)

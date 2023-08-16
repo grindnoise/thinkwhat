@@ -56,9 +56,11 @@ class CommentsSectionCell: UICollectionViewCell {
     }
   }
   //Publishers
-  public var updateStatsPublisher = PassthroughSubject<[Comment], Never>()
-  public var commentPublisher = PassthroughSubject<String, Never>()
-  public var anonCommentPublisher = PassthroughSubject<[String: String], Never>()
+//  public var updateStatsPublisher = PassthroughSubject<[Comment], Never>()
+  public let getRootCommentsPublisher = PassthroughSubject<[Comment], Never>()
+  public let getThreadCommentsPublisher = PassthroughSubject<[Comment], Never>()
+  public var postCommentPublisher = PassthroughSubject<String, Never>()
+  public var postAnonCommentPublisher = PassthroughSubject<[String: String], Never>()
   public var replyPublisher = PassthroughSubject<[Comment: String], Never>()
   public var anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
   public var claimPublisher = PassthroughSubject<Comment, Never>()
@@ -195,12 +197,21 @@ class CommentsSectionCell: UICollectionViewCell {
       }
       .store(in: &subscriptions)
     
-    instance.commentPublisher
+    instance.postCommentPublisher
       .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
       .sink { [weak self] in
         guard let self = self else { return }
         
-        self.commentPublisher.send($0)
+        self.postCommentPublisher.send($0)
+      }
+      .store(in: &subscriptions)
+    
+    instance.postAnonCommentPublisher
+      .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.postAnonCommentPublisher.send($0)
       }
       .store(in: &subscriptions)
     
@@ -209,14 +220,6 @@ class CommentsSectionCell: UICollectionViewCell {
         guard let self = self else { return }
         
         self.replyPublisher.send($0)
-      }
-      .store(in: &subscriptions)
-    
-    instance.anonCommentPublisher
-      .sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.anonCommentPublisher.send($0)
       }
       .store(in: &subscriptions)
     
@@ -253,16 +256,27 @@ class CommentsSectionCell: UICollectionViewCell {
       }
       .store(in: &subscriptions)
     
-    // Update comments thread stats only comments are opened
-    instance.updateStatsPublisher
-      .sink { [weak self] in
-        guard let self = self,
-              self.openConstraint.isActive
-        else { return }
-        
-        self.updateStatsPublisher.send($0)
-      }
-      .store(in: &subscriptions)
+//    // Update comments thread stats only comments are opened
+//    instance.updateStatsPublisher
+//      .sink { [weak self] in
+//        guard let self = self,
+//              self.openConstraint.isActive
+//        else { return }
+//        
+//        self.updateStatsPublisher.send($0)
+//      }
+//      .store(in: &subscriptions)
+    
+    // Update comments only when comments are opened
+//    instance.updateCommentsPublisher
+//      .sink { [weak self] in
+//        guard let self = self,
+//              self.openConstraint.isActive
+//        else { return }
+//
+//        self.updateStatsPublisher.send($0)
+//      }
+//      .store(in: &subscriptions)
     
     instance.setDataSource(survey: item, animatingDifferences: false)
     
@@ -313,9 +327,9 @@ class CommentsSectionCell: UICollectionViewCell {
     super.prepareForReuse()
     
     threadPublisher = PassthroughSubject<Comment, Never>()
-    updateStatsPublisher = PassthroughSubject<[Comment], Never>()
-    commentPublisher = PassthroughSubject<String, Never>()
-    anonCommentPublisher = PassthroughSubject<[String: String], Never>()
+//    updateStatsPublisher = PassthroughSubject<[Comment], Never>()
+    postCommentPublisher = PassthroughSubject<String, Never>()
+    postAnonCommentPublisher = PassthroughSubject<[String: String], Never>()
     replyPublisher = PassthroughSubject<[Comment: String], Never>()
     anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
     claimPublisher = PassthroughSubject<Comment, Never>()

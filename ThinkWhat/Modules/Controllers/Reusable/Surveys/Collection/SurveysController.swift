@@ -392,7 +392,7 @@ extension SurveysController: SurveysViewInput {
   }
   
   func onDataSourceRequest(source: Survey.SurveyCategory,
-                           dateFilter: Period?,
+                           dateFilter: Enums.Period?,
                            topic: Topic?,
                            userprofile: Userprofile?,
                            compatibility: TopicCompatibility?,

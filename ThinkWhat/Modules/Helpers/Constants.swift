@@ -95,14 +95,14 @@ var emailResponse: EmailResponse? {
     }
 }
 var firstLaunch                                 = true
-var internetConnection: InternetConnection      = .Available {
+var internetConnection: Enums.InternetConnection = .Available {
     didSet {
         if internetConnection != oldValue {
             NotificationCenter.default.post(name: Notifications.Network.InternetConnectionChange, object: nil)
         }
     }
 }
-var apiReachability: ApiReachabilityState = .Reachable {
+var apiReachability: Enums.ApiReachabilityState = .Reachable {
     didSet {
         if apiReachability == .None {
             NotificationCenter.default.post(name: Notifications.Network.RemoteNotReachable, object: nil)

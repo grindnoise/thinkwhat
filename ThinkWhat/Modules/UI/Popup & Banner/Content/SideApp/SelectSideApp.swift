@@ -22,7 +22,7 @@ final class SelectSideApp: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //Logic
-  private let app: ThirdPartyApp
+  private let app: Enums.ThirdPartyApp
   //UI
   private let padding: CGFloat = 8
   private lazy var horizontalStack: UIStackView = {
@@ -164,7 +164,7 @@ final class SelectSideApp: UIView {
   }
 
   // MARK: - Initialization
-  init(app: ThirdPartyApp) {
+  init(app: Enums.ThirdPartyApp) {
     self.app = app
     
     super.init(frame: .zero)

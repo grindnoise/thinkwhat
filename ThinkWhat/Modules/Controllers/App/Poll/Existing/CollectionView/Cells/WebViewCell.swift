@@ -50,7 +50,7 @@ class WebViewCell: UICollectionViewCell {
     let appUrl = URL(string: appScheme)
     return UIApplication.shared.canOpenURL(appUrl! as URL)
   }
-  private var app: ThirdPartyApp  = .Null
+  private var app: Enums.ThirdPartyApp  = .Null
   private var opaqueView: UIView?
   private lazy var background: UIView = {
     let instance = UIView()
@@ -158,8 +158,8 @@ class WebViewCell: UICollectionViewCell {
     return instance
   }()
   private let padding: CGFloat = 10
-  private var tempAppPreference: SideAppPreference?
-  private var sideAppPreference: SideAppPreference? {
+  private var tempAppPreference: Enums.SideAppPreference?
+  private var sideAppPreference: Enums.SideAppPreference? {
     if UserDefaults.App.tiktokPlay == nil {
       return nil
     } else {
@@ -320,7 +320,7 @@ class WebViewCell: UICollectionViewCell {
 // MARK: - CallbackObservable
 extension WebViewCell: CallbackObservable {
   func callbackReceived(_ sender: Any) {
-    if let preference = sender as? SideAppPreference {
+    if let preference = sender as? Enums.SideAppPreference {
       opaqueView?.removeFromSuperview()
       if preference == .App {
         tempAppPreference = .App

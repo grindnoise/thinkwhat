@@ -16,7 +16,7 @@ protocol TopicsViewInput: AnyObject {
   
   func openSettings()
   func onSurveyTapped(_: SurveyReference)
-  func onDataSourceRequest(dateFilter: Period, topic: Topic)
+  func onDataSourceRequest(dateFilter: Enums.Period, topic: Topic)
   func onTopicSelected(_: Topic)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
@@ -31,7 +31,7 @@ protocol TopicsControllerInput: AnyObject {
   
   var modelOutput: TopicsModelOutput? { get set }
   
-  func onDataSourceRequest(dateFilter: Period, topic: Topic)
+  func onDataSourceRequest(dateFilter: Enums.Period, topic: Topic)
   func search(substring: String,
               localized: Bool,
               topic: Topic?)

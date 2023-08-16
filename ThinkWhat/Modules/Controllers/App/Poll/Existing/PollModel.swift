@@ -76,26 +76,30 @@ extension PollModel: PollControllerInput {
     }
   }
   
-  func requestComments(_ comments: [Comment]) {
-    guard let survey = item else { return }
-    
-    Task {
-      do {
-        try await API.shared.surveys.requestRootComments(survey: survey, excludedComments: comments)
-      } catch {
-#if DEBUG
-        error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-      }
-    }
-  }
+//  func updateComments(excludeList: [Comment]) {
+//    guard let survey = item else { return }
+//    
+//    Task {
+//      do {
+//        try await API.shared.surveys.getRootComments(surveyId: String(describing: survey.id),
+//                                                     excludeList: excludeList.map { String(describing: $0.id) })
+//      } catch {
+//#if DEBUG
+//        error.printLocalized(class: type(of: self), functionName: #function)
+//#endif
+//      }
+//    }
+//  }
   
   func postComment(body: String, replyTo: Comment? = nil, username: String? = nil) {
     guard let survey = item else { return }
     
     Task {
       do {
-        let instance = try await API.shared.surveys.postComment(body, survey: survey, replyTo: replyTo, username: username)
+        let instance = try await API.shared.surveys.postComment(body,
+                                                                survey: survey,
+                                                                replyTo: replyTo,
+                                                                username: username)
         guard replyTo.isNil else { return }
         await MainActor.run {
           modelOutput?.commentPostCallback(.success(instance))
@@ -225,10 +229,10 @@ extension PollModel: PollControllerInput {
     }
   }
   
-  func load(_ referenceId: String) {
+  func loadSurvey(_ referenceId: Int) {
     Task {
       do {
-        let instance = try await API.shared.surveys.getSurvey(byReferenceId: referenceId)
+        let instance = try await API.shared.surveys.getSurvey(byReferenceId: String(referenceId))
         await MainActor.run { modelOutput?.loadCallback(.success(instance)) }
       } catch {
         await MainActor.run { modelOutput?.loadCallback(.failure(error)) }
@@ -236,50 +240,63 @@ extension PollModel: PollControllerInput {
     }
   }
   
-  func load(surveyId: String) {
-    Task {
-      do {
-        let instance = try await API.shared.surveys.getSurvey(byReferenceId: surveyId)
-        await MainActor.run { modelOutput?.loadCallback(.success(instance)) }
-      } catch {
-        await MainActor.run { modelOutput?.loadCallback(.failure(error)) }
-      }
-    }
-  }
+//  func load(surveyId: Int) {
+//    Task {
+//      do {
+//        let instance = try await API.shared.surveys.getSurvey(byReferenceId: String(surveyId))
+//        await MainActor.run { modelOutput?.loadCallback(.success(instance)) }
+//      } catch {
+//        await MainActor.run { modelOutput?.loadCallback(.failure(error)) }
+//      }
+//    }
+//  }
   
-  func loadThread(threadId: String,
-                  excludeList: [String],
+  func loadThread(threadId: Int,
+                  excludeList: [Int],
+                  includeList: [Int],
                   includeSelf: Bool,
-                  onlyChildren: Bool,
                   threshold: Int) {
     Task {
       do {
-        try await API.shared.surveys.getCommentsThread(rootId: threadId,
-                                                       excludeList: excludeList,
+        try await API.shared.surveys.getThreadComments(threadId: String(threadId),
+                                                       excludeList: excludeList.map { String($0) },
                                                        includeSelf: includeSelf,
-                                                       threshold: threshold,
-                                                       onlyChildren: onlyChildren)
-        await MainActor.run { modelOutput?.loadThreadCallback(.success(())) }
+                                                       threshold: threshold)
+        await MainActor.run { modelOutput?.loadThreadCallback(.success(Comments.shared.all.filter({ $0.id == threadId }).first)) }
       } catch {
         await MainActor.run { modelOutput?.loadThreadCallback(.failure(error)) }
       }
     }
   }
   
-  func loadSurveyAndThread(surveyId: String,
-                           threadId: String,
-                           excludeList: [String],
-                           includeSelf: Bool,
-                           onlyChildren: Bool,
+  func loadThread(root: Comment, includeList: [Int], threshold: Int) {
+    Task {
+      do {
+        try await API.shared.surveys.getThreadComments(threadId: String(describing: root.id),
+                                                       excludeList: Comments.shared.all.filter({ $0.parent == root }).map { String(describing: $0.id) },
+                                                       includeList: includeList.map { String($0) },
+                                                       includeSelf: false,
+                                                       threshold: threshold)
+        await MainActor.run { modelOutput?.loadThreadCallback(.success(root)) }
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        await MainActor.run { modelOutput?.loadThreadCallback(.failure(error)) }
+      }
+    }
+  }
+  
+  func loadSurveyAndThread(surveyId: Int,
+                           threadId: Int,
+                           includeList: [Int],
                            threshold: Int) {
     Task {
       do {
-        let instance = try await API.shared.surveys.getSurvey(byReferenceId: surveyId)
-        try await API.shared.surveys.getCommentsThread(rootId: threadId,
-                                                       excludeList: excludeList,
-                                                       includeSelf: includeSelf,
-                                                       threshold: threshold,
-                                                       onlyChildren: onlyChildren)
+        let instance = try await API.shared.surveys.getSurveyThreadComments(surveyId: String(surveyId),
+                                                             threadId: String(threadId),
+                                                             includeList: includeList.map { String($0) },
+                                                             threshold: threshold)
         
         await MainActor.run { modelOutput?.loadSurveyAndThreadCallback(.success(instance)) }
       } catch {
@@ -296,10 +313,14 @@ extension PollModel: PollControllerInput {
     }
   }
   
-  func updateResultsStats(_ instance: Survey) {
+  func getCommentsSurveyStateCommentsUpdates(_ instance: Survey) {
     Task {
       do {
-        try await API.shared.surveys.updateResultStats(instance)
+        // Existing comments
+        let comments = Comments.shared.all.filter { $0.isParentNode && $0.survey == instance }.map { $0.id }
+        try await API.shared.surveys.getCommentsSurveyStateCommentsUpdates(surveyId: instance.id,
+                                                                           excludeComments: comments,
+                                                                           commentsToUpdate: comments)
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)

@@ -491,7 +491,7 @@ extension SignInView: SignInControllerOutput {
   /**
    Disable UI interaction and show loading animation.
    */
-  func startAuthorizationUI(provider: AuthProvider) {
+  func startAuthorizationUI(provider: Enums.AuthProvider) {
     isUserInteractionEnabled = false
 //    let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
 //    blurEffectView.effect = nil

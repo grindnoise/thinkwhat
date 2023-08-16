@@ -21,7 +21,7 @@ class MailButtonView: LoginButton, CAAnimationDelegate {
     var color3 : UIColor!
     
     //MARK: - Life Cycle
-    override var state: State {
+  override var state: Enums.EnabledState {
         didSet {
             if oldValue != state {
                 if state == .enabled {

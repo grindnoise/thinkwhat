@@ -25,7 +25,7 @@ class UserprofilesFeedCollectionView: UICollectionView {
   
   // MARK: - Public properties
   public let userPublisher = PassthroughSubject<[Userprofile: IndexPath], Never>()
-  public let footerPublisher = CurrentValueSubject<UserprofilesViewMode?, Never>(nil)
+  public let footerPublisher = CurrentValueSubject<Enums.UserprofilesViewMode?, Never>(nil)
   public let zeroSubscriptions = CurrentValueSubject<Bool?, Never>(nil)
   
   
@@ -56,7 +56,7 @@ class UserprofilesFeedCollectionView: UICollectionView {
     return items.count >= maxUsers ? items.suffix(maxUsers).sorted { $0.username < $1.username } + [Userprofile.anonymous] : items.suffix(maxUsers).sorted { $0.username < $1.username }
   }
   private let userprofile: Userprofile
-  private let mode: UserprofilesViewMode
+  private let mode: Enums.UserprofilesViewMode
   
   
   // MARK: - Deinitialization
@@ -73,7 +73,7 @@ class UserprofilesFeedCollectionView: UICollectionView {
   
   
   // MARK: - Initialization
-  init(userprofile: Userprofile, mode: UserprofilesViewMode) {
+  init(userprofile: Userprofile, mode: Enums.UserprofilesViewMode) {
     self.userprofile = userprofile
     self.mode = mode
     

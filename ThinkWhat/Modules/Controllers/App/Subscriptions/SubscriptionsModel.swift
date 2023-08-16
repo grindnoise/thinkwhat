@@ -50,7 +50,7 @@ extension SubscriptionsModel: SubsciptionsControllerInput {
     }
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?) {
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?, userprofile: Userprofile?) {
     Task {
       do {
         try await API.shared.surveys.surveyReferences(category: source,

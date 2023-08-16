@@ -15,7 +15,7 @@ protocol ProfileCreationViewInput: AnyObject {
   func updateUsername(_: [String: String])
   func updateBirthDate(_: Date)
   func updateDescription(_: String)
-  func updateGender(_: Gender)
+  func updateGender(_: Enums.Gender)
   func updateCity(_ : City)
   func updateFacebook(_ : String)
   func updateInstagram(_ : String)

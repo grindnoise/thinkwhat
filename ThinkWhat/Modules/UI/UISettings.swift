@@ -428,12 +428,14 @@ enum Colors {
   }
 }
 
-struct Shadows {
-  static func radius(padding: CGFloat) -> CGFloat { padding*0.65 }
-  
-  struct Cards {
-    static let color = UIColor.lightGray.withAlphaComponent(0.35).cgColor
-    static let offset = CGSize.zero
+struct UISettings {
+  struct Shadows {
+    static func radius(padding: CGFloat) -> CGFloat { padding*0.65 }
+    
+//    struct Cards {
+      static let color = UIColor.lightGray.withAlphaComponent(0.35).cgColor
+      static let offset = CGSize.zero
+//    }
   }
 }
 

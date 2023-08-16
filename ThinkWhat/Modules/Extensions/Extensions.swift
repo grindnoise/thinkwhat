@@ -405,7 +405,7 @@ extension UITextView {
 }
 
 extension NSData{
-  var fileFormat: FileFormat{
+  var fileFormat: Enums.FileFormat{
     var buffer = [UInt8](repeating: 0, count: 1)
     self.getBytes(&buffer, range: NSRange(location: 0,length: 1))
     if buffer == ImageHeaderData.PNG

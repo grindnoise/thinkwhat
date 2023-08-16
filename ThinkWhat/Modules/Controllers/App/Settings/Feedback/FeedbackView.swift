@@ -28,7 +28,7 @@ class FeedbackView: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //Logic
-  private var state: ButtonState = .Send
+  private var state: Enums.ButtonState = .Send
   //UI
   private let padding: CGFloat = 16
   private lazy var label: UILabel = {

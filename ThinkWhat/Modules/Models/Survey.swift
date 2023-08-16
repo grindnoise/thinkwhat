@@ -618,7 +618,7 @@ class Surveys {
     }
   }
   
-  func updateResultsStats(_ json: JSON) {
+  func updateCommentsAndResultsStats(_ json: JSON) {
     guard let id = json["id"].int,
           let survey = Surveys.shared.all.filter({ $0.id == id }).first,
           let progress = json["progress"].int,
@@ -628,7 +628,8 @@ class Surveys {
           let isActive = json["active"].bool,
           let isBanned = json["is_banned"].bool,
           let commentsTotal = json["comments_total"].int,
-          let comments = try? json["comments"].rawData()
+          let comments = try? json["comments"].rawData(),
+          let commentsStats = try? json["comments_stats"].rawData()
     else { return }
     
     survey.rating = rating
@@ -666,8 +667,11 @@ class Surveys {
       instance.totalVotes = totalVotes
     }
     
-    //Comments
+    // Comments
     let _ = try? decoder.decode([Comment].self, from: comments)
+    
+    // Update comments stats
+    Comments.shared.update(try! JSON(data: commentsStats, options: .mutableContainers))
   }
   
   func load(_ json: JSON) throws {

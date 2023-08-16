@@ -211,7 +211,7 @@ private extension SubscriptionsController {
     tasks.append(Task { @MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
         guard let self = self,
-              let tab = notification.object as? Tab
+              let tab = notification.object as? Enums.Tab
         else { return }
         
         self.isOnScreen = tab == .Subscriptions
@@ -272,9 +272,9 @@ private extension SubscriptionsController {
     })
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
-        guard let self = self else { return }
+        guard let self = self, self.isOnScreen else { return }
         
-        self.navigationController?.setBarShadow(on: false)
+        self.navigationController?.setBarShadow(on: self.traitCollection.userInterfaceStyle != .dark, animated: true)
       }
     })
   }
@@ -703,7 +703,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
     controller.toggleLogo(on: false)
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Period?, topic: Topic?, userprofile: Userprofile?) {
+  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?, userprofile: Userprofile?) {
     guard isOnScreen else { return }
     
     controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic, userprofile: userprofile)
@@ -746,7 +746,7 @@ extension SubscriptionsController: SubscriptionsViewInput {
   //            self.isBarButtonOn = !self.isBarButtonOn
   //        }
   //    }
-  func onAllUsersTapped(mode: UserprofilesViewMode) {
+  func onAllUsersTapped(mode: Enums.UserprofilesViewMode) {
     guard let userprofile = Userprofiles.shared.current else { return }
     
     let backItem = UIBarButtonItem()
@@ -799,7 +799,7 @@ extension SubscriptionsController: ScreenVisible {
 
 /// If user taps current tab, then hide user card
 extension SubscriptionsController: TabBarTappable {
-  func tabBarTapped(_ mode: TabBarTapMode) {
+  func tabBarTapped(_ mode: Enums.TabBarTapMode) {
     guard mode == .Repeat && self.mode == .Userprofile else { return }
     
     // Set default mode & hide user card

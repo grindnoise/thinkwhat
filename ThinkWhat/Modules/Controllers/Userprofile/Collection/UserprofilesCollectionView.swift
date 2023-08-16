@@ -26,7 +26,7 @@ class UserprofilesCollectionView: UICollectionView {
   
   // MARK: - Public properties
   //Logic
-  public var mode: UserprofilesViewMode = .Subscribers 
+  public var mode: Enums.UserprofilesViewMode = .Subscribers
   public weak var userprofile: Userprofile? {
     didSet {
       guard !userprofile.isNil else { return }
@@ -113,7 +113,7 @@ class UserprofilesCollectionView: UICollectionView {
   }
   private var selectedMinAge: Int = 18
   private var selectedMaxAge: Int = 99
-  private var selectedGender: Gender = .Unassigned
+  private var selectedGender: Enums.Gender = .Unassigned
   private var filtered: [Userprofile] = [] {
     didSet {
       guard selectedGender == .Unassigned, selectedMaxAge == 99, selectedMinAge == 18 else {
@@ -149,7 +149,7 @@ class UserprofilesCollectionView: UICollectionView {
 //    setTasks()
   }
   
-  init(userprofile: Userprofile, mode: UserprofilesViewMode, color: UIColor) {
+  init(userprofile: Userprofile, mode: Enums.UserprofilesViewMode, color: UIColor) {
     self.color = color
     
     super.init(frame: .zero, collectionViewLayout: .init())
@@ -161,7 +161,7 @@ class UserprofilesCollectionView: UICollectionView {
 //    setTasks()
   }
   
-  init(answer: Answer, mode: UserprofilesViewMode, color: UIColor) {
+  init(answer: Answer, mode: Enums.UserprofilesViewMode, color: UIColor) {
     self.color = color
     
     super.init(frame: .zero, collectionViewLayout: .init())

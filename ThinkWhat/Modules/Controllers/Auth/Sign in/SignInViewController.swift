@@ -113,7 +113,7 @@ extension SignInViewController: SignInViewInput {
     navigationController?.delegate = nil
   }
   
-  func providerSignIn(provider: AuthProvider) {
+  func providerSignIn(provider: Enums.AuthProvider) {
     switch provider {
     case .VK:
       VKWorker.wakeUp()

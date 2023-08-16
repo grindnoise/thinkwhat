@@ -40,9 +40,9 @@ class EmptyHotCard: UIView, Card {
     instance.backgroundColor = .clear
     instance.accessibilityIdentifier = "shadow"
     instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowColor = Shadows.Cards.color
-    instance.layer.shadowRadius = Shadows.radius(padding: padding)
-    instance.layer.shadowOffset = Shadows.Cards.offset
+    instance.layer.shadowColor = UISettings.Shadows.color
+    instance.layer.shadowRadius = UISettings.Shadows.radius(padding: padding)
+    instance.layer.shadowOffset = UISettings.Shadows.offset
     body.addEquallyTo(to: instance)
     
     return instance

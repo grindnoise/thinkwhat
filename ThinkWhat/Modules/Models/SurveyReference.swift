@@ -390,7 +390,7 @@ class SurveyReference: Decodable {// NSObject,
   
   
   //MARK: - Public methods
-  public func isValid(byBeriod period: Period) -> Bool {
+  public func isValid(byBeriod period: Enums.Period) -> Bool {
     guard let dateBound = period.date() else { return false }
     
     return startDate >= dateBound

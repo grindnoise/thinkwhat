@@ -58,7 +58,7 @@ extension ListModel: ListControllerInput {
   }
   
   func onDataSourceRequest(source: Survey.SurveyCategory,
-                           dateFilter: Period?,
+                           dateFilter: Enums.Period?,
                            topic: Topic?) {
     Task {
       do {

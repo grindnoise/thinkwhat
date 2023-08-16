@@ -22,7 +22,7 @@ extension SignInModel: SignInControllerInput {
    - parameter instance: For Google instance is `GIDGoogleUser`, for VK instance is.
    - returns: Void. Completion is handled via `modelOutput.providerSignInCallback()` protocol func
    */
-  func providerSignIn(provider: AuthProvider, accessToken: String) {
+  func providerSignIn(provider: Enums.AuthProvider, accessToken: String) {
     @Sendable
     func providerLogout() {
       switch provider {

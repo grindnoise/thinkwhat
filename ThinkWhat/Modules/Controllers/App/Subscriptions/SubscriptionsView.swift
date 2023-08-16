@@ -74,7 +74,7 @@ class SubscriptionsView: UIView {
       mode = .User
     }
   }
-  private var period: Period = .AllTime {
+  private var period: Enums.Period = .AllTime {
     didSet {
       guard oldValue != period else { return }
       
@@ -245,10 +245,12 @@ class SubscriptionsView: UIView {
     instance.updateStatsPublisher
       .sink { [weak self] in
         guard let self = self,
-              let instances = $0
+              let instances = $0,
+              let viewInput = self.viewInput,
+              viewInput.isOnScreen
         else { return }
         
-        self.viewInput?.updateSurveyStats(instances)
+        viewInput.updateSurveyStats(instances)
       }
       .store(in: &subscriptions)
     
@@ -1086,7 +1088,7 @@ private extension SubscriptionsView {
   
   @MainActor
   func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
-    let perDay: UIAction = .init(title: "per_\(Period.PerDay.rawValue)".localized.lowercased(),
+    let perDay: UIAction = .init(title: "per_\(Enums.Period.PerDay.rawValue)".localized.lowercased(),
                                  image: nil,
                                  identifier: nil,
                                  discoverabilityTitle: nil,
@@ -1098,7 +1100,7 @@ private extension SubscriptionsView {
       self.period = .PerDay
     })
     
-    let perWeek: UIAction = .init(title: "per_\(Period.PerWeek.rawValue)".localized.lowercased(),
+    let perWeek: UIAction = .init(title: "per_\(Enums.Period.PerWeek.rawValue)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,
@@ -1110,7 +1112,7 @@ private extension SubscriptionsView {
       self.period = .PerWeek
     })
     
-    let perMonth: UIAction = .init(title: "per_\(Period.PerMonth.rawValue)".localized.lowercased(),
+    let perMonth: UIAction = .init(title: "per_\(Enums.Period.PerMonth.rawValue)".localized.lowercased(),
                                    image: nil,
                                    identifier: nil,
                                    discoverabilityTitle: nil,
@@ -1122,7 +1124,7 @@ private extension SubscriptionsView {
       self.period = .PerMonth
     })
     
-    let allTime: UIAction = .init(title: "per_\(Period.AllTime.rawValue)".localized.lowercased(),
+    let allTime: UIAction = .init(title: "per_\(Enums.Period.AllTime.rawValue)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,

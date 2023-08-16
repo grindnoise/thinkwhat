@@ -139,8 +139,8 @@ class YoutubeCell: UICollectionViewCell {
     return instance
   }()
   private let padding: CGFloat = 8
-  private var tempAppPreference: SideAppPreference?
-  private var sideAppPreference: SideAppPreference? {
+  private var tempAppPreference: Enums.SideAppPreference?
+  private var sideAppPreference: Enums.SideAppPreference? {
     if UserDefaults.App.youtubePlay == nil {
       return nil
     } else {

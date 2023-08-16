@@ -19,8 +19,8 @@ class AppSettingsCollectionView: UICollectionView {
     
     // MARK: - Public properties
     //Publishers
-    public var notificationSettingsPublisher = CurrentValueSubject<[AppSettings: Bool]?, Never>(nil)
-    public var appLanguagePublisher = CurrentValueSubject<[AppSettings: String]?, Never>(nil)
+  public var notificationSettingsPublisher = CurrentValueSubject<[Enums.PushNotificationsLanguagesSettings: Bool]?, Never>(nil)
+  public var appLanguagePublisher = CurrentValueSubject<[Enums.PushNotificationsLanguagesSettings: String]?, Never>(nil)
     public var contentLanguagePublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var aboutPublisher = CurrentValueSubject<AppSettingsTextCell.Mode?, Never>(nil)
     //UI

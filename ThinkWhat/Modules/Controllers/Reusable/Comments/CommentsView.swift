@@ -12,7 +12,14 @@ import Combine
 class CommentsView: UIView {
   
   // MARK: - Public properties
-  public weak var viewInput: CommentsViewInput?
+  public weak var viewInput: CommentsViewInput? {
+    didSet {
+      guard !viewInput.isNil else { return }
+      
+      setupUI()
+      setTasks()
+    }
+  }
   public let rootComment: Comment
   
   // MARK: - Private properties
@@ -80,30 +87,48 @@ class CommentsView: UIView {
     }.store(in: &self.subscriptions)
     
     instance.paginationPublisher
-      .throttle(for: .seconds(2), scheduler: DispatchQueue.main, latest: false)
+      .throttle(for: .seconds(2),
+                scheduler: DispatchQueue.main,
+                latest: false)
       .sink { [weak self] in
         guard let self = self else { return }
         
-        self.viewInput?.requestComments(exclude: $0)
+        self.viewInput?.getComments(excludeList: $0.map { $0.id }, includeList: [])
       }
       .store(in: &subscriptions)
     
-    //        instance.threadPublisher.sink { [weak self] in
-    //            guard let self = self else { return }
-    //
-    ////          self.viewInput?.
-    //        }.store(in: &subscriptions)
+    // Update comments and get new
+    instance.getThreadCommentsPublisher
+      .sink { [weak self] in
+      guard let self = self else { return }
+      
+        self.viewInput?.updateCommentsAndGetNew(mode: .Thread, excludeList: $0.map { $0.id },
+                                                updateList: Comments.shared.all.filter{ $0.parent == self.viewInput?.item }.map { $0.id })
+//        self.viewInput?.getComments(excludeList: $0.map { $0.id}, includeList: [])
+    }
+    .store(in: &subscriptions)
     
     //Delete comment
-    instance.deletePublisher.sink { [weak self] in
+    instance.deletePublisher
+      .sink { [weak self] in
       guard let self = self else { return }
       
       self.viewInput?.deleteComment($0)
-    }.store(in: &self.subscriptions)
+    }
+      .store(in: &self.subscriptions)
     
     instance.setDataSource(rootComment: rootComment,
                            survey: rootComment.survey!,
-                           animatingDifferences: false)
+                           animatingDifferences: true) { [weak self] in
+      guard let self = self,
+            let input = self.viewInput,
+            let reply = input.reply
+      else { return }
+      
+      delay(seconds: 0.3) {
+        instance.focus(on: reply)
+      }
+    }
     
     return instance
   }()
@@ -122,10 +147,8 @@ class CommentsView: UIView {
   // MARK: - Initialization
   init(comment: Comment) {
     self.rootComment = comment
-    super.init(frame: .zero)
     
-    setupUI()
-    setTasks()
+    super.init(frame: .zero)
   }
   
   override init(frame: CGRect) {
@@ -158,6 +181,10 @@ private extension CommentsView {
 
 // MARK: - Controller Output
 extension CommentsView: CommentsControllerOutput {
+  func focusOnReply(_ reply: Comment) {
+    collectionView.focus(on: reply)
+  }
+  
     func commentDeleteError() {
       let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
                                                             text: AppError.server.localizedDescription),

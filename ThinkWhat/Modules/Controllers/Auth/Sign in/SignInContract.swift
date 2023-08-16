@@ -13,7 +13,7 @@ protocol SignInViewInput: AnyObject {
   var controllerInput: SignInControllerInput? { get set }
   
   func mailSignIn(username: String, password: String)
-  func providerSignIn(provider: AuthProvider)
+  func providerSignIn(provider: Enums.AuthProvider)
   func nextScene()
 //  func openProfile()
   func signUp()
@@ -24,7 +24,7 @@ protocol SignInControllerInput: AnyObject {
   var modelOutput: SignInModelOutput? { get set }
   
   func mailSignIn(username: String, password: String)
-  func providerSignIn(provider: AuthProvider, accessToken: String)
+  func providerSignIn(provider: Enums.AuthProvider, accessToken: String)
   func sendVerificationCode(_: @escaping(Result<[String: Any], Error>)->())
   func updateUserprofile(parameters: [String: Any], image: UIImage?) throws
 }
@@ -39,7 +39,7 @@ protocol SignInControllerOutput: AnyObject {
   
   func mailSignInCallback(result: Result<Bool, Error>)
   func providerSignInCallback(result: Result<Bool, Error>)
-  func startAuthorizationUI(provider: AuthProvider)
+  func startAuthorizationUI(provider: Enums.AuthProvider)
   func animateTransitionToApp(_ completion: @escaping Closure) 
 //  func stopAuthorizationUI(completion: @escaping Closure)
 }

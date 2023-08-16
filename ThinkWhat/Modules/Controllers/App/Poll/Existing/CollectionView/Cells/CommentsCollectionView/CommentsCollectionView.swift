@@ -13,9 +13,7 @@ class CommentsCollectionView: UICollectionView {
   
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Comment>
   
-  struct Constants {
-    static let commentsStatsUpdateInterval = 10.0
-  }
+  
   
   enum Section: Int {
     case main
@@ -36,7 +34,7 @@ class CommentsCollectionView: UICollectionView {
       guard !rootComment.isNil else { return }
       
       mode = .Thread
-//      reload()
+      //      reload()
     }
   }
   public var dataItems: [Comment] {
@@ -48,9 +46,12 @@ class CommentsCollectionView: UICollectionView {
     return []
   }
   //Publishers
-  public let updateStatsPublisher = PassthroughSubject<[Comment], Never>()
-  public let commentPublisher = PassthroughSubject<String, Never>()
-  public let anonCommentPublisher = PassthroughSubject<[String: String], Never>()
+  //  public let updateStatsPublisher = PassthroughSubject<[Comment], Never>()
+//  public let getNewCommentsUpdateExistingPublisher = PassthroughSubject<[Comment], Never>() // Timer based. Array of excluded items
+  public let getRootCommentsPublisher = PassthroughSubject<[Comment], Never>() // Timer based. Array of excluded items
+  public let getThreadCommentsPublisher = PassthroughSubject<[Comment], Never>() // Timer based. Array of excluded items
+  public let postCommentPublisher = PassthroughSubject<String, Never>()
+  public let postAnonCommentPublisher = PassthroughSubject<[String: String], Never>()
   public let replyPublisher = PassthroughSubject<[Comment: String], Never>()
   public let anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
   public let claimPublisher = PassthroughSubject<Comment, Never>()
@@ -100,9 +101,10 @@ class CommentsCollectionView: UICollectionView {
           return
         }
         instance.staticText = ""
-        self.commentPublisher.send(text)
+        self.postCommentPublisher.send(text)
       }
       .store(in: &subscriptions)
+    
     //Comment anon
     instance.messageAnonPublisher
       .sink { [weak self] in
@@ -124,7 +126,7 @@ class CommentsCollectionView: UICollectionView {
           self.anonReplyPublisher.send([item: [username: replaced]])
           return
         }
-        self.anonCommentPublisher.send([username: replaced])
+        self.postAnonCommentPublisher.send([username: replaced])
       }
       .store(in: &subscriptions)
     
@@ -142,7 +144,7 @@ class CommentsCollectionView: UICollectionView {
     
     return instance
   }()
-  
+  private var reply: Comment? // Use that to highlight
   
   // MARK: - Initialization
   init() {
@@ -163,9 +165,9 @@ class CommentsCollectionView: UICollectionView {
   //    setTasks(for: survey)
   //  }
   
-    required init?(coder: NSCoder) {
-      fatalError("init(coder:) has not been implemented")
-    }
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   // MARK: - Destructor
   deinit {
@@ -181,14 +183,17 @@ class CommentsCollectionView: UICollectionView {
   
   
   // MARK: - Public funcs
-  public func setDataSource(rootComment: Comment? = nil, survey: Survey, animatingDifferences: Bool = true) {
+  public func setDataSource(rootComment: Comment? = nil,
+                            survey: Survey,
+                            animatingDifferences: Bool = true,
+                            completion: Closure? = nil) {
     self.survey = survey
     self.rootComment = rootComment
     self.mode = rootComment.isNil ? .All : .Thread
     
     setupUI()
     setTasks()
-    reload(animatingDifferences: animatingDifferences)
+    reload(animatingDifferences: animatingDifferences) { completion?() }
   }
   
   public func reload(animatingDifferences: Bool = true, _ completion: Closure? = nil) {
@@ -205,17 +210,38 @@ class CommentsCollectionView: UICollectionView {
   
   public func scrollToBottom() {
     scrollToItem(at: IndexPath(row: dataItems.count-1, section: 0), at: .top, animated: true)
-//    UIView.animate(withDuration: 0.3) { [weak self] in
-//      guard let self = self else { return }
+    //    UIView.animate(withDuration: 0.3) { [weak self] in
+    //      guard let self = self else { return }
+    //
+    //      self.contentOffset.y = self.contentSize.height
+    //    }
+  }
+  
+  public func focus(on comment: Comment) {
+    guard let item = source.snapshot().itemIdentifiers.enumerated().filter({ index, item in item.id == comment.id }).first else { return }
+    
+    reply = item.element
+    scrollToItem(at: IndexPath(row: item.offset, section: 0), at: .top, animated: true)
+    
+    // Highlight reply if cell is visible
+    if let cells = visibleCells as? [CommentCell],
+       let cell = cells.filter({ $0.item == reply }).first {
+         cell.highlight()
+    }
 //
-//      self.contentOffset.y = self.contentSize.height
+//    delay(seconds: 0.3) { [weak self] in
+//      guard let self = self,
+//            let cell = self.cellForItem(at: indexPath) as? CommentCell
+//      else { return }
+//
+//      cell.highlight()
 //    }
   }
 }
-  
+
 private extension CommentsCollectionView {
   // MARK: - UI functions
-  private func setTasks() {
+  func setTasks() {
     tasks.append(Task {@MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
         guard let self = self else { return }
@@ -237,26 +263,26 @@ private extension CommentsCollectionView {
           guard comment.isParentNode else { return }
           
           guard !snap.itemIdentifiers.isEmpty else {
-            //1. Empty
+            // 1. Empty
             snap.appendItems([comment])
             self.source.apply(snap, animatingDifferences: true)
             
             return
           }
           
-          //2. Compare
+          // 2. Compare
           guard let newest = snap.itemIdentifiers.first,
                 let oldest = snap.itemIdentifiers.last
           else { return }
           
-          //3. If newest comment in collection is older than added comment
+          // 3. If newest comment in collection is older than added comment
           if comment.createdAt >= newest.createdAt {
             snap.insertItems([comment], beforeItem: newest)
           } else if oldest.createdAt >= comment.createdAt  {
-            //4. If oldest comment in collection is newer than added comment
+            // 4. If oldest comment in collection is newer than added comment
             snap.appendItems([comment])
           } else {
-            //5.
+            // 5.
             if let item = snap.itemIdentifiers.filter({ comment.createdAt >= $0.createdAt }).first {
               snap.insertItems([comment], beforeItem: item)
             }
@@ -276,111 +302,75 @@ private extension CommentsCollectionView {
         self.source.apply(snap, animatingDifferences: true)
       }
       .store(in: &self.subscriptions)
-
+    
     //Claimed
-     survey.commentClaimedPublisher
-       .receive(on: DispatchQueue.main)
-       .sink { [weak self] comment in
-         guard let self = self,
-               self.source.snapshot().itemIdentifiers.contains(comment)
-         else { return }
-         
-         var snap = self.source.snapshot()
-         snap.deleteItems([comment])
-         self.source.apply(snap, animatingDifferences: true)
-       }
-       .store(in: &self.subscriptions)
-  }
-  
-  private func setupUI() {
-    backgroundColor = .clear
-    Timer
-      .publish(every: Constants.commentsStatsUpdateInterval, on: .current, in: .common)
-      .autoconnect()
-      .sink { [weak self] seconds in
+    survey.commentClaimedPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] comment in
         guard let self = self,
-              let cells = self.visibleCells as? [CommentCell]
+              self.source.snapshot().itemIdentifiers.contains(comment)
         else { return }
         
-        let items = cells.compactMap{ $0.item }
-        self.updateStatsPublisher.send(items)
+        var snap = self.source.snapshot()
+        snap.deleteItems([comment])
+        self.source.apply(snap, animatingDifferences: true)
+      }
+      .store(in: &self.subscriptions)
+  }
+  
+  func setupUI() {
+    backgroundColor = .clear
+//    bounces = false
+    //    Timer
+    //      .publish(every: Constants.commentsStatsUpdateInterval, on: .current, in: .common)
+    //      .autoconnect()
+    //      .filter { [unowned self] _ in self.mode == .All }
+    //      .sink { [weak self] seconds in
+    //        guard let self = self else { return }
+    //
+    //        self.updateStatsPublisher.send(self.dataItems)
+    //      }
+    //      .store(in: &subscriptions)
+    
+    Timer
+      .publish(every: AppSettings.TimeIntervals.updateStatsComments, on: .current, in: .common)
+      .autoconnect()
+      .sink { [weak self] seconds in
+        guard let self = self else { return }
+        
+        switch self.mode {
+        case .All:
+          self.getRootCommentsPublisher.send(self.dataItems)
+        case .Thread:
+          self.getThreadCommentsPublisher.send(self.dataItems)
+        }
       }
       .store(in: &subscriptions)
     
     delegate = self
     
-//    switch mode {
-//    case .All:
-      collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
-        
-        var configuration = UICollectionLayoutListConfiguration(appearance: self.mode == .Thread ? .plain : .grouped)
-        configuration.backgroundColor = .clear
-        configuration.showsSeparators = false
-        configuration.headerMode = .supplementary
-        
-        let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
-        sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0,//self.mode == .Thread ? 8 : 0,
-                                                              leading: self.mode == .Thread ? 16 : sectionLayout.contentInsets.leading,
-                                                              bottom: self.mode == .Thread ? 60 : 0,
-                                                              trailing: sectionLayout.contentInsets.trailing)
-        //      sectionLayout.
-//        sectionLayout.interGroupSpacing = 8
-        
-        return sectionLayout
+    //    switch mode {
+    //    case .All:
+    collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
+      
+      var configuration = UICollectionLayoutListConfiguration(appearance: self.mode == .Thread ? .plain : .grouped)
+      configuration.backgroundColor = .clear
+      configuration.showsSeparators = false
+      configuration.headerMode = .supplementary
+      
+      let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
+      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: sectionLayout.contentInsets.top,//self.mode == .Thread ? 8 : 0,
+                                                            leading: self.mode == .Thread ? 16 : sectionLayout.contentInsets.leading,
+                                                            bottom: self.mode == .Thread ? 80 : 0,
+                                                            trailing: self.mode == .Thread ? 16 : sectionLayout.contentInsets.trailing)
+      if #available(iOS 16.0, *) {
+        sectionLayout.supplementaryContentInsetsReference = .none
       }
-//    default:
-//      let layout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
-//
-//        var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
-////        configuration.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : Colors.lightTheme
-//        configuration.showsSeparators = false
-////        if #available(iOS 14.5, *) {
-////          configuration.itemSeparatorHandler = { indexPath, config -> UIListSeparatorConfiguration in
-////            var config = UIListSeparatorConfiguration(listAppearance: .plain)
-////            config.topSeparatorVisibility = .hidden
-////            if self.mode == .Thread, indexPath.row == 0 {
-////              config.bottomSeparatorVisibility = .visible
-////            } else {
-////              config.bottomSeparatorVisibility = .hidden
-////            }
-////            return config
-////          }
-////        }
-//        configuration.headerMode = .supplementary
-////        configuration.headerMode = self.mode == .All ? .supplementary : .firstItemInSection
-//
-//        let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
-//        sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 8,
-//                                                              leading: self.mode == .Thread ? 8 : sectionLayout.contentInsets.leading,
-//                                                              bottom: 0,
-//                                                              trailing: self.mode == .Thread ? 8 : sectionLayout.contentInsets.trailing)
-////        sectionLayout.interGroupSpacing = 8
-//
-//        return sectionLayout
-//      }
-//
-////      let supplementary = NSCollectionLayoutBoundarySupplementaryItem(
-////        layoutSize: .init(
-////          widthDimension: .fractionalWidth(1),
-////          heightDimension: .absolute(150)
-////        ),
-////        elementKind: UICollectionView.elementKindSectionHeader,
-////        alignment: .top
-////      )
-////      supplementary.pinToVisibleBounds = true
-//
-//      let configuration = UICollectionViewCompositionalLayoutConfiguration()
-////      configuration.interSectionSpacing = 20
-////      configuration.boundarySupplementaryItems = [supplementary]
-//
-//      layout.configuration = configuration
-//
-//      collectionViewLayout = layout
-//    }
-//    //        let headerRegistration = UICollectionView.SupplementaryRegistration
-//    //        <UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionHeader) {
-//    //            [unowned self] (headerView, elementKind, indexPath) in
-//    //        }
+//      sectionLayout.interGroupSpacing = 8
+      
+      
+      return sectionLayout
+    }
     
     let commentCellRegistration = UICollectionView.SupplementaryRegistration<CommentSupplementaryCell>(elementKind: UICollectionView.elementKindSectionHeader) { [weak self] supplementaryView, elementKind, indexPath in
       guard let self = self else { return }
@@ -389,7 +379,7 @@ private extension CommentsCollectionView {
         .sink { [weak self] _ in
           guard let self = self else { return }
           
-//          self.textField.staticText = ""
+          //          self.textField.staticText = ""
           self.replyTo = nil
           let _ = self.textField.becomeFirstResponder()
           Fade.shared.present()
@@ -400,8 +390,12 @@ private extension CommentsCollectionView {
     let threadCellRegistration = UICollectionView.SupplementaryRegistration<CommentCell>(elementKind: UICollectionView.elementKindSectionHeader) { [weak self] supplementaryView, elementKind, indexPath in
       guard let self = self else { return }
       
-//      supplementaryView.backgroundColor = .black
+      //      supplementaryView.backgroundColor = .black
       supplementaryView.mode = .Root
+      supplementaryView.clipsToBounds = false
+      supplementaryView.contentView.clipsToBounds = false
+      supplementaryView.layer.masksToBounds = false
+      supplementaryView.contentView.layer.masksToBounds = false
       supplementaryView.item = self.rootComment
       supplementaryView.boundsPublisher
         .delay(for: .seconds(1), scheduler: DispatchQueue.main)
@@ -425,10 +419,11 @@ private extension CommentsCollectionView {
           Fade.shared.present()
         }
         .store(in: &self.subscriptions)
-//      supplementaryView.contentView.layer.zPosition = .greatestFiniteMagnitude
-//      var configuration = UIBackgroundConfiguration.listPlainCell()
-//      configuration.backgroundColor = .red
-//      supplementaryView.backgroundConfiguration = configuration
+      
+      //      supplementaryView.contentView.layer.zPosition = .greatestFiniteMagnitude
+      //      var configuration = UIBackgroundConfiguration.listPlainCell()
+      //      configuration.backgroundColor = .red
+      //      supplementaryView.backgroundConfiguration = configuration
     }
     
     let cellRegistration = UICollectionView.CellRegistration<CommentCell, Comment> { [weak self] cell, indexPath, item in
@@ -441,7 +436,6 @@ private extension CommentsCollectionView {
       cell.automaticallyUpdatesBackgroundConfiguration = false
       if self.mode == .Thread { cell.mode = .Thread }
       cell.item = item
-      
       
       // Reply disclosure
       cell.replyPublisher
@@ -513,7 +507,7 @@ private extension CommentsCollectionView {
       return UICollectionReusableView()
     }
     
-//    reload(animatingDifferences: false)
+    //    reload(animatingDifferences: false)
   }
 }
 
@@ -545,13 +539,22 @@ extension CommentsCollectionView: UICollectionViewDelegate {
   }
   
   func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//    cell.setNeedsLayout()
-//    cell.layoutIfNeeded()
+    //    cell.setNeedsLayout()
+    //    cell.layoutIfNeeded()
     if dataItems.count < 10 {
       paginationPublisher.send(dataItems)
     } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
       paginationPublisher.send(dataItems)
     }
+    
+    // Highlight reply
+    if let cell = cell as? CommentCell, cell.item == reply {
+      cell.highlight()
+    }
+//    if let replyIndexPath = replyIndexPath, indexPath == replyIndexPath, let cell = cell as? CommentCell {
+//      cell.highlight()
+//      self.replyIndexPath = nil
+//    }
   }
 }
 

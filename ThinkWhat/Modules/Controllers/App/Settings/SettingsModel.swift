@@ -16,7 +16,7 @@ class SettingsModel {
 
 // MARK: - Controller Input
 extension SettingsModel: SettingsControllerInput {
-  func updateAppSettings(_ settings: [AppSettings : Any]) {
+  func updateAppSettings(_ settings: [Enums.PushNotificationsLanguagesSettings : Any]) {
     Task {
       do {
         guard let setting = settings.keys.first else { return }

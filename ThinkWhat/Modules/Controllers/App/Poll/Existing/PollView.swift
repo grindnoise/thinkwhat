@@ -135,9 +135,8 @@ class PollView: UIView {
       }
       .store(in: &subscriptions)
     
-    //Comments
     //New comment
-    instance.commentPublisher
+    instance.postCommentPublisher
       .sink { [weak self] in
         guard let self = self else { return }
         
@@ -145,7 +144,7 @@ class PollView: UIView {
       }
       .store(in: &subscriptions)
     //New anon comment
-    instance.anonCommentPublisher
+    instance.postAnonCommentPublisher
       .sink { [weak self] in
         guard let self = self,
               let text = $0.values.first,
@@ -179,7 +178,7 @@ class PollView: UIView {
         self.viewInput?.postComment(body: text, replyTo: replyTo, username: username)
       }
       .store(in: &subscriptions)
-    //Delete
+    // Delete
     instance.deletePublisher
       .sink { [weak self] in
         guard let self = self else { return }
@@ -188,24 +187,32 @@ class PollView: UIView {
       }
       .store(in: &subscriptions)
     
-    //Thread
+    // Open thread
     instance.threadPublisher
       .sink { [weak self] in
         guard let self = self else { return }
         
-        self.viewInput?.openCommentThread($0)
+        self.viewInput?.openCommentThread(root: $0, reply: nil, shouldRequest: true) {}
       }
       .store(in: &subscriptions)
     
-    //Update comments stats (replies)
-    instance.commentsUpdateStatsPublisher
-      .sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.viewInput?.updateCommentsStats($0)
-      }
-      .store(in: &subscriptions)
+//    // Update comments stats (replies)
+//    instance.updateCommentsStatsPublisher
+//      .sink { [weak self] in
+//        guard let self = self else { return }
+//        
+//        self.viewInput?.updateCommentsStats($0)
+//      }
+//      .store(in: &subscriptions)
     
+//    // Update comments
+//    instance.updateCommentsPublisher
+//      .sink { [weak self] in
+//        guard let self = self else { return }
+//        
+//        self.viewInput?.updateComments(excludeList: $0)
+//      }
+//      .store(in: &subscriptions)
     
     isVotingPublisher
       .sink { instance.isVotingSubscriber.send($0) }
@@ -247,7 +254,7 @@ class PollView: UIView {
     
     return instance
   }()
-  private var actionButtonState: ButtonState = .Send
+  private var actionButtonState: Enums.ButtonState = .Send
   public private(set) lazy var actionButton: UIView = {
     let opaque = UIView.opaque()
     opaque.layer.masksToBounds = false
@@ -613,8 +620,15 @@ extension PollView: PollControllerOutput {
 //    }
   }
   
-  func presentView(_ item: Survey) {
+  func presentView(item: Survey, animated: Bool) {
     self.item = item
+    
+    guard animated else {
+      collectionView.alpha = 1
+      
+      return
+    }
+    
     collectionView.alpha = 0
     collectionView.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
     

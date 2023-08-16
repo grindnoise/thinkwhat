@@ -195,7 +195,7 @@ extension ProfileCreationViewController: ProfileCreationViewInput {
     present(imagePicker, animated: true, completion: nil)
   }
   
-  func updateGender(_ gender: Gender) {
+  func updateGender(_ gender: Enums.Gender) {
     let parameters = API.prepareUserData(gender: gender)
     controllerInput?.updateUserprofile(parameters: parameters, image: nil)
   }

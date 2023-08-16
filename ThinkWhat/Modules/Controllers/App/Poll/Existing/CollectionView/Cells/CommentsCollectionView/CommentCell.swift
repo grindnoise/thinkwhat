@@ -15,8 +15,6 @@ class CommentCell: UICollectionViewListCell {
     case Plain, Root, Thread
   }
   
-  
-  
   // MARK: - Public properties
   public var item: Comment! {
     didSet {
@@ -65,10 +63,14 @@ class CommentCell: UICollectionViewListCell {
 //              .store(in: &self.subscriptions)
 //          }
           self.shouldAnimateConstraints = true
-          UIView.transition(with: self.textView, duration: 0.2, options: .transitionCrossDissolve) {
+          UIView.transition(with: self.textView, duration: 0.2, options: .transitionCrossDissolve) { [weak self] in
+            guard let self = self else { return }
+            
             self.textView.text = "comment_is_deleted".localized
             self.textView.font = UIFont.scaledFont(fontName: Fonts.Rubik.Italic, forTextStyle: .footnote)
             self.textView.textColor = .secondaryLabel
+            self.repliesButton.tintColor = .secondaryLabel
+            self.replyButton.alpha = 0
           } completion: { _ in self.shouldAnimateConstraints = false }
         }
         .store(in: &subscriptions)
@@ -81,6 +83,12 @@ class CommentCell: UICollectionViewListCell {
             self.textView.text = "comment_is_banned".localized
             self.textView.textColor = .secondaryLabel
             self.repliesButton.tintColor = UIColor.secondaryLabel
+            self.replyButton.alpha = 0
+            let attrString = NSMutableAttributedString(string: " \(item.replies)", attributes: [
+              .font: UIFont.scaledFont(fontName: !item.replies.isZero ? Fonts.Rubik.SemiBold : Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
+              .foregroundColor: item.replies.isZero || item.isDeleted ? UIColor.secondaryLabel : UIColor.systemBlue
+            ])
+            self.repliesButton.setAttributedTitle(attrString, for: .normal)
           } completion: { _ in self.shouldAnimateConstraints = false }
         }
         .store(in: &subscriptions)
@@ -94,8 +102,6 @@ class CommentCell: UICollectionViewListCell {
   public var threadPublisher = PassthroughSubject<Comment, Never>()
   public let boundsPublisher = PassthroughSubject<Void, Never>()
 
-  
-  
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
@@ -103,6 +109,7 @@ class CommentCell: UICollectionViewListCell {
   ///**UI**
   private var shouldAnimateConstraints = false
   private let padding: CGFloat = 8
+  private lazy var line: Line = { .init() }()
   private lazy var textView: UITextView = {
     let instance = UITextView()
     instance.isUserInteractionEnabled = false
@@ -110,10 +117,7 @@ class CommentCell: UICollectionViewListCell {
     instance.isEditable = false
     instance.isSelectable = false
     instance.backgroundColor = .clear
-    instance.textContainerInset = UIEdgeInsets(top: 0,
-                                               left: 0,
-                                               bottom: 1,
-                                               right: 0)
+    instance.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 1, right: 0)
     instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.reply)))
     
     let constraint = instance.heightAnchor.constraint(equalToConstant: 10)// mode == .Root ? estimatedHeight : 10)
@@ -183,11 +187,11 @@ class CommentCell: UICollectionViewListCell {
     ])
     return instance
   }()
-  //Date & claim
-  private lazy var dateLabel: UITextView = {
+  private lazy var userTextView: UITextView = {
     let instance = UITextView()
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption2)
     instance.textAlignment = .left
+    instance.textContainerInset = UIEdgeInsets(top: instance.textContainerInset.top, left: 0, bottom: 1, right: 0)
     instance.text = "1234"
     instance.isUserInteractionEnabled = false
     instance.isSelectable = false
@@ -200,14 +204,14 @@ class CommentCell: UICollectionViewListCell {
     
     instance.publisher(for: \.contentSize, options: .new)
       .sink { [unowned self] size in
-        guard let constraint = self.dateLabel.getConstraint(identifier: "height") else { return }
+        guard let constraint = self.userTextView.getConstraint(identifier: "height") else { return }
         
         self.setNeedsLayout()
         constraint.constant = abs(size.height)// * 1.5
         self.layoutIfNeeded()
         let space = constraint.constant - size.height//self.textView.contentSize.height
         let inset = max(0, space/2)
-        self.dateLabel.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
+        self.userTextView.contentInset = UIEdgeInsets(top: inset, left: 0, bottom: inset, right: 0)
       }
       .store(in: &subscriptions)
     
@@ -220,19 +224,18 @@ class CommentCell: UICollectionViewListCell {
     //        instance.addTarget(self, action: #selector(self.claim), for: .touchUpInside)
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/1).isActive = true
     //        instance.contentMode = .bottom
-    instance.alpha = item.isOwn && item.isDeleted ? 0 : 1
+    instance.alpha = item.isDeleted ? 0 : 1
     
     return instance
   }()
   private lazy var supplementaryStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [dateLabel, menuButton])
+    let instance = UIStackView(arrangedSubviews: [userTextView, menuButton])
     instance.axis = .horizontal
-//    instance.clipsToBounds = false
-    instance.spacing = 4
+    instance.spacing = padding/2
     instance.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      instance.heightAnchor.constraint(equalTo: dateLabel.heightAnchor)
+      instance.heightAnchor.constraint(equalTo: userTextView.heightAnchor)
     ])
     
     return instance
@@ -275,20 +278,8 @@ class CommentCell: UICollectionViewListCell {
     default:
       stack.addArrangedSubview(repliesButton)
       stack.addArrangedSubview(replyButton)
-//      replyButton.heightAnchor.constraint(equalTo: repliesButton.heightAnchor).isActive = true
     }
     instance.addSubview(stack)
-//    if mode != .Child {
-//      stack.addArrangedSubview(replyLabel)
-//      innerView.addSubview(repliesButton)
-//      repliesButton.translatesAutoresizingMaskIntoConstraints = false
-//    }
-//    innerView.addSubview(replyButton)
-//
-//    instance.addSubview(innerView)
-    
-//    innerView.translatesAutoresizingMaskIntoConstraints = false
-//    replyButton.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
       stack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
@@ -322,8 +313,8 @@ class CommentCell: UICollectionViewListCell {
     instance.tintColor = UIColor.systemGray//item.survey?.topic.tagColor ?? .systemBlue //traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray
     instance.addTarget(self, action: #selector(self.reply), for: .touchUpInside)
     let attrString = NSMutableAttributedString(string: " " + "reply".localized.uppercased(), attributes: [
-      NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
-      NSAttributedString.Key.foregroundColor: UIColor.systemBlue//item.survey?.topic.tagColor ?? UIColor.systemBlue
+      .font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
+      .foregroundColor: UIColor.systemBlue//item.survey?.topic.tagColor ?? UIColor.systemBlue
     ])
     instance.setAttributedTitle(attrString, for: .normal)
 //    instance.contentVerticalAlignment = .fill
@@ -354,7 +345,7 @@ class CommentCell: UICollectionViewListCell {
     instance.axis = .vertical
     instance.alignment = .center
 //    instance.layer.masksToBounds = false
-    instance.spacing = padding/2
+    instance.spacing = padding
     
     supplementaryStack.translatesAutoresizingMaskIntoConstraints = false
     textView.translatesAutoresizingMaskIntoConstraints = false
@@ -390,10 +381,10 @@ class CommentCell: UICollectionViewListCell {
     instance.addSubview(label)
     
     NSLayoutConstraint.activate([
-      label.topAnchor.constraint(equalTo: instance.topAnchor, constant: padding/2),
+      label.topAnchor.constraint(equalTo: instance.topAnchor, constant: padding),
       label.leadingAnchor.constraint(equalTo: instance.leadingAnchor, constant: padding),
       label.trailingAnchor.constraint(equalTo: instance.trailingAnchor, constant: -padding),
-      instance.bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: padding/2),
+      instance.bottomAnchor.constraint(equalTo: label.bottomAnchor, constant: padding),
     ])
     
     instance.publisher(for: \.bounds)
@@ -403,7 +394,14 @@ class CommentCell: UICollectionViewListCell {
     return instance
   }()
   
-  
+  // MARK: - Overridden
+  override var bounds: CGRect {
+    didSet {
+      guard oldValue.size != bounds.size else { return }
+      
+      line.layer.path =  UIBezierPath(rect: CGRect(x: .zero, y: bounds.maxY, width: bounds.width, height: 1)).cgPath
+    }
+  }
   
   // MARK: - Destructor
   deinit {
@@ -416,8 +414,6 @@ class CommentCell: UICollectionViewListCell {
 #endif
   }
   
-  
-  
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -429,20 +425,69 @@ class CommentCell: UICollectionViewListCell {
     fatalError("init(coder:) has not been implemented")
   }
   
-  
-  
   // MARK: - Public methods
-  public func hideDisclosure() {
-    repliesButton.alpha = 0
+  /// Highlights `userTextView` with circle at end
+  public func highlight() {
+    guard contentView.getSubview(type: UIImageView.self, identifier: "highlight").isNil,
+          let endPosition = self.userTextView.position(from: self.userTextView.endOfDocument, offset: 0),
+          let textRange = self.userTextView.textRange(from: endPosition, to: endPosition)
+    else { return }
+    
+    let rect = self.userTextView.firstRect(for: textRange)
+    let test = UIView(frame: CGRect(origin: rect.origin, size: .uniform(size: rect.size.height)))
+    test.frame.origin.x += "t".height(withConstrainedWidth: 100, font: .scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .caption2)!)/4
+    test.alpha = 0
+    self.userTextView.addSubview(test)
+    
+    let convertedOrigin = self.userTextView.convert(test.frame.origin, to: self.contentView)
+    test.removeFromSuperview()
+    
+    let imageView = UIImageView(frame: CGRect(origin: convertedOrigin,
+                                              size: .uniform(size: rect.size.height)))
+    imageView.image = UIImage(systemName: "circle.fill",
+                              withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.size.height * 0.75, weight: .heavy))
+    imageView.accessibilityIdentifier = "highlight"
+    imageView.isUserInteractionEnabled = false
+    imageView.tintColor = .systemBlue
+    imageView.contentMode = .center
+    imageView.transform = .init(scaleX: 0.75, y: 0.75)
+    self.contentView.addSubview(imageView)
+    
+//    delay(seconds: 0.3) { [weak self] in
+//      guard let self = self else { return }
+//
+//      let selection = CALayer()
+//      selection.name  = "selection"
+//      selection.backgroundColor = (self.item.survey?.topic.tagColor ?? .lightGray).withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+//      selection.frame = CGRect(origin: .zero, size: self.contentView.bounds.size)
+//      selection.cornerRadius = self.contentView.bounds.width*0.025
+//      selection.opacity = 0
+//      contentView.layer.insertSublayer(selection, at: 0)
+//
+//      Animations.unmaskLayerCircled(layer: selection,
+//                                    location: CGPoint(x: bounds.minX, y: bounds.minY),
+//                                    duration: 0.3,
+//                                    opacityDurationMultiplier: 0.5,
+//                                    delegate: self) {
+//        delay(seconds: 1) { [weak self] in
+//          guard let self = self else { return }
+//
+//          Animations.unmaskLayerCircled(unmask: false,
+//                                        layer: selection,
+//                                        location: CGPoint(x: self.contentView.bounds.minX, y: self.contentView.bounds.minY),
+//                                        duration: 0.3,
+//                                        animateOpacity: false,
+//                                        delegate: self)
+//        }
+//      }
+//    }
   }
-  
-  
   
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    dateLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
+    userTextView.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
     menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
     setHeader()
     if mode == .Root {
@@ -461,7 +506,7 @@ class CommentCell: UICollectionViewListCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     
-    item = nil
+//    item = nil
     replyPublisher = PassthroughSubject<Comment, Never>()
     claimPublisher = PassthroughSubject<Comment, Never>()
     deletePublisher = PassthroughSubject<Comment, Never>()
@@ -474,6 +519,9 @@ class CommentCell: UICollectionViewListCell {
     repliesView.removeFromSuperview()
     //        tasks.forEach { $0?.cancel() }
     //        setTasks()
+    if let highlight = contentView.getSubview(type: UIImageView.self, identifier: "highlight") {
+      highlight.removeFromSuperview()
+    }
   }
   
   override func updateConstraints() {
@@ -555,6 +603,13 @@ private extension CommentCell {
     
     switch mode {
     case .Plain:
+      repliesButton.tintColor = item.replies.isZero || item.isDeleted ? UIColor.secondaryLabel : UIColor.systemBlue
+      let attrString = NSMutableAttributedString(string: " \(item.replies)",// " + "replies_total".localized.uppercased(),
+                                                 attributes: [
+                                                  .font: UIFont.scaledFont(fontName: !item.replies.isZero ? Fonts.Rubik.SemiBold : Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
+                                                  .foregroundColor: item.replies.isZero || item.isDeleted ? UIColor.secondaryLabel : UIColor.systemBlue
+                                                 ])
+      repliesButton.setAttributedTitle(attrString, for: .normal)
       verticalStack.addArrangedSubview(repliesView)
       repliesView.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
       
@@ -566,8 +621,7 @@ private extension CommentCell {
       bottomAnchor.priority = .defaultHigh
       bottomAnchor.isActive = true
     case .Thread:
-      hideDisclosure()
-      
+      repliesButton.alpha = 0
       verticalStack.addArrangedSubview(repliesView)
       repliesView.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
       
@@ -580,29 +634,53 @@ private extension CommentCell {
       bottomAnchor.priority = .defaultHigh
       bottomAnchor.isActive = true
     case .Root:
-//      backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : Colors.lightTheme
-      guard !item.isOwn else { return }
-      
-      let opaque = UIView.opaque()
-      replyLabel.place(inside: opaque, insets: .init(top: padding, left: 0, bottom: 0, right: 0))
-      
+        line.layer.strokeColor = UIColor.tertiaryLabel.cgColor
+        line.layer.lineWidth = 1
+        contentView.layer.addSublayer(line.layer)
+//      let opaque = UIView.opaque()
+//      replyLabel.place(inside: opaque, insets: .init(top: padding, left: 0, bottom: padding, right: 0))
+//      contentView.layer.masksToBounds = false
+//      contentView.layer.shadowOpacity = 1
+//      contentView.layer.shadowOffset = .zero
+//      contentView.layer.shadowColor = UIColor.black.cgColor
+//
+//      contentView.publisher(for: \.bounds)
+//        .filter { [unowned self] in $0.width != self.line.layer.path?.boundingBox.width }
+//        .sink { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.line.layer.path =  UIBezierPath(rect: CGRect(x: .zero, y: $0.maxY, width: $0.width, height: 1)).cgPath
+//
+////          self.contentView.layer.shadowPath = UIBezierPath(rect: CGRect(x: .zero, y: $0.maxY, width: $0.width, height: 1)).cgPath
+//        }
+//        .store(in: &subscriptions)
       verticalStack.removeArrangedSubview(repliesView)
       repliesView.removeFromSuperview()
-      verticalStack.addArrangedSubview(opaque)
-      opaque.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
       
-      if let constraint = replyLabel.getConstraint(identifier: "bottomAnchor") {
-        replyLabel.removeConstraint(constraint)
+      if item.isOwn || item.isDeleted {
+        let constraint = horizontalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding*2)
+        constraint.identifier = "bottomAnchor"
+        constraint.priority = .defaultHigh
+        constraint.isActive = true
+      } else {
+        verticalStack.addArrangedSubview(replyLabel)
+        replyLabel.widthAnchor.constraint(equalTo: verticalStack.widthAnchor).isActive = true
+        
+        if let constraint = replyLabel.superview?.getConstraint(identifier: "bottomAnchor") {
+          replyLabel.removeConstraint(constraint)
+        }
+        
+        let constraint = replyLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding*2)
+        constraint.identifier = "bottomAnchor"
+        constraint.priority = .defaultHigh
+        constraint.isActive = true
       }
-      
-      let bottomAnchor = replyLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-      bottomAnchor.identifier = "bottomAnchor"
-      bottomAnchor.priority = .defaultHigh
-      bottomAnchor.isActive = true
     }
     
     if item.isOwn {
       replyButton.removeFromSuperview()
+    } else {
+      repliesView.getSubview(type: UIStackView.self)?.addArrangedSubview(replyButton)
     }
     
     setHeader()
@@ -619,17 +697,6 @@ private extension CommentCell {
       }
     } else {
       avatar.userprofile = Userprofile.anonymous
-    }
-    repliesButton.tintColor = item.replies.isZero ? UIColor.secondaryLabel : UIColor.systemBlue
-    let attrString = NSMutableAttributedString(string: " \(item.replies)",// " + "replies_total".localized.uppercased(),
-                                               attributes: [
-                                                .font: UIFont.scaledFont(fontName: !item.replies.isZero ? Fonts.Rubik.SemiBold : Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
-                                                .foregroundColor: item.replies.isZero ? UIColor.secondaryLabel : UIColor.systemBlue//item.survey?.topic.tagColor ?? UIColor.systemBlue
-                                               ])
-    repliesButton.setAttributedTitle(attrString, for: .normal)
-    
-    if mode == .Thread {
-      repliesButton.alpha = 0
     }
     
     setNeedsLayout()
@@ -674,7 +741,7 @@ private extension CommentCell {
                                     .foregroundColor : UIColor.secondaryLabel
                                   ])
     attrString.append(date)
-    dateLabel.attributedText = attrString
+    userTextView.attributedText = attrString
   }
   
   func setBody() {
@@ -723,7 +790,10 @@ private extension CommentCell {
   
   @objc
   func reply() {
-    guard let item = item else { return }
+    guard let item = item,
+          !item.isBanned,
+          !item.isDeleted
+    else { return }
     
     replyPublisher.send(item)
   }
@@ -738,9 +808,18 @@ private extension CommentCell {
   @objc
   func replies() {
     guard let item = item,
-          item.replies != 0
+          item.replies != 0,
+          !item.isDeleted
     else { return }
     
     threadPublisher.send(item)
   }
 }
+
+//extension CommentCell: CAAnimationDelegate {
+//  func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+//    guard flag, let completion = anim.value(forKey: "completion") as? Closure else { return }
+//
+//    completion()
+//  }
+//}

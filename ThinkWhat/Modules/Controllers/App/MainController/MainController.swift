@@ -26,7 +26,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
   
   
   // MARK: - Public properties
-  public private(set) var currentTab: Tab = .Hot {
+  public private(set) var currentTab: Enums.Tab = .Hot {
     didSet {
       guard oldValue != currentTab else { return }
       
@@ -43,8 +43,10 @@ class MainController: UITabBarController {//}, StorageProtocol {
   private var shouldTerminate = false
   //    private var loadingIndicator: LoadingIndicator?
   /// **Logic**
-  private var surveyId: String?  // Used when app was opened from push notification in closed state
-  private var commentId: String? //
+  private var surveyId: Int?  // Used when app was opened from push notification in closed state
+  private var replyId: Int?   // Used when app was opened from push notification in closed state
+  private var threadId: Int?  // Used when app was opened from push notification in closed state
+  private var replyToId: Int? // Used when app was opened from push notification in closed state
   /// **UI**
   private var logoCenterY: CGFloat = .zero
   public private(set) lazy var loadingText: LogoText = { LogoText() }()
@@ -134,11 +136,18 @@ class MainController: UITabBarController {//}, StorageProtocol {
   // MARK: - Initialization
   /// Init from push notification with survey id arrives when app is closed
   /// - Parameter surveyId: id of the survey extracted from push notification
-  /// - Parameter commentId: id of the survey extracted from push notification
-  init(surveyId: String? = nil,
-       commentId: String? = nil) {
+  /// - Parameter replyId: reply id extracted from push notification
+  /// - Parameter threadId: thread id extracted from push notification
+  /// - Parameter replyToId: reply corresponding comment id extracted from push notification
+  init(surveyId: Int? = nil,
+       replyId: Int? = nil,
+       threadId: Int? = nil,
+       replyToId: Int? = nil) {
     self.surveyId = surveyId
-    self.commentId = commentId
+    self.replyId = replyId
+    self.threadId = threadId
+    self.replyToId = replyToId
+    
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -888,7 +897,14 @@ private extension MainController {
 //                                 color: Colors.main))//Colors.Logo.AirBlue.rawValue),
     
     viewControllers = [
-      createNavigationController(for: surveyId.isNil ? HotController(commentId: commentId) : HotController(surveyId: surveyId),
+//      createNavigationController(for: surveyId.isNil ? HotController(surveyId: surveyId,
+//                                                                     replyId: replyId,
+//                                                                     threadId: threadId,
+//                                                                     replyToId: replyToId) : HotController(surveyId: surveyId),
+      createNavigationController(for: HotController(surveyId: surveyId,
+                                                    replyId: replyId,
+                                                    threadId: threadId,
+                                                    replyToId: replyToId),
                                  title: "hot",
                                  image: UIImage(systemName: "flame", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//
                                  selectedImage: UIImage(systemName: "flame.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),

@@ -1864,8 +1864,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1047"
-            endingLineNumber = "1047"
+            startingLineNumber = "1049"
+            endingLineNumber = "1049"
             landmarkName = "onUserSelected(userprofile:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2800,8 +2800,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Hot/HotController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "218"
-            endingLineNumber = "218"
+            startingLineNumber = "223"
+            endingLineNumber = "223"
             landmarkName = "setTasks()"
             landmarkType = "7">
             <Locations>
@@ -3261,8 +3261,8 @@
             filePath = "ThinkWhat/Modules/Models/Comment.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "243"
-            endingLineNumber = "243"
+            startingLineNumber = "247"
+            endingLineNumber = "247"
             landmarkName = "init(from:)"
             landmarkType = "7">
             <Locations>
@@ -3991,8 +3991,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/MainController/MainController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "713"
-            endingLineNumber = "713"
+            startingLineNumber = "722"
+            endingLineNumber = "722"
             landmarkName = "loadData()"
             landmarkType = "7">
             <Locations>
@@ -4558,8 +4558,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "373"
-            endingLineNumber = "373"
+            startingLineNumber = "375"
+            endingLineNumber = "375"
             landmarkName = "feedCollectionView"
             landmarkType = "24">
          </BreakpointContent>
@@ -4590,8 +4590,8 @@
             filePath = "ThinkWhat/Modules/Managers/REST/APIManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1472"
-            endingLineNumber = "1472"
+            startingLineNumber = "1469"
+            endingLineNumber = "1469"
             landmarkName = "surveyReferences(category:ids:period:topic:userprofile:compatibility:fetchResult:)"
             landmarkType = "7">
             <Locations>
@@ -4734,8 +4734,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "176"
             endingLineNumber = "176"
-            landmarkName = "SurveysView"
-            landmarkType = "3">
+            landmarkName = "collectionView"
+            landmarkType = "24">
             <Locations>
                <Location
                   uuid = "2D06992A-226C-498E-8356-2D0059E3ECCA - 55dddc2dd80b45bf"
@@ -5248,38 +5248,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "B373F5A7-1B03-4750-9A74-CF6F350A3F72"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "254"
-            endingLineNumber = "254"
-            landmarkName = "setTasks()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "6AFB716A-BE94-46B7-B1BC-11233C1E5FF9"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "269"
-            endingLineNumber = "269"
-            landmarkName = "setTasks()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "EDC3DD61-3F80-45EE-BB1B-BD0B3C37FADC"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
@@ -5328,118 +5296,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "C6306589-66B7-46D9-875A-CF5877AAB7B1"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentsCollectionView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "316"
-            endingLineNumber = "316"
-            landmarkName = "setupUI()"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "C6306589-66B7-46D9-875A-CF5877AAB7B1 - d722fa675f5b852a"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ThinkWhat__local_.CommentsCollectionView.setupUI() -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentsCollectionView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "321"
-                  endingLineNumber = "321"
-                  offsetFromSymbolStart = "1268">
-               </Location>
-               <Location
-                  uuid = "C6306589-66B7-46D9-875A-CF5877AAB7B1 - e3c3b7d4a5bceeba"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 (Swift.Int, __C.NSCollectionLayoutEnvironment) -&gt; Swift.Optional&lt;__C.NSCollectionLayoutSection&gt; in ThinkWhat__local_.CommentsCollectionView.setupUI() -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentsCollectionView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "321"
-                  endingLineNumber = "321"
-                  offsetFromSymbolStart = "204">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "700617A5-1BED-4898-A783-CB998140649F"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentsCollectionView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "550"
-            endingLineNumber = "550"
-            landmarkName = "collectionView(_:willDisplay:forItemAt:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "CCD9983E-9468-4CFD-9EB0-0F84A11AA7E1"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentsCollectionView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "332"
-            endingLineNumber = "332"
-            landmarkName = "setupUI()"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "CCD9983E-9468-4CFD-9EB0-0F84A11AA7E1 - d722fa675f5b98b6"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ThinkWhat__local_.CommentsCollectionView.setupUI() -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentsCollectionView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "349"
-                  endingLineNumber = "349"
-                  offsetFromSymbolStart = "1376">
-               </Location>
-               <Location
-                  uuid = "CCD9983E-9468-4CFD-9EB0-0F84A11AA7E1 - 88b6a3c6c151dae9"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #3 (Swift.Int, __C.NSCollectionLayoutEnvironment) -&gt; Swift.Optional&lt;__C.NSCollectionLayoutSection&gt; in ThinkWhat__local_.CommentsCollectionView.setupUI() -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentsCollectionView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "349"
-                  endingLineNumber = "349"
-                  offsetFromSymbolStart = "332">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "19BC5B3D-270A-4D1A-8BB5-914AAD9DFC1D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -5447,8 +5303,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "142"
-            endingLineNumber = "142"
+            startingLineNumber = "146"
+            endingLineNumber = "146"
             landmarkName = "textView"
             landmarkType = "24">
          </BreakpointContent>
@@ -5463,26 +5319,10 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "147"
-            endingLineNumber = "147"
+            startingLineNumber = "151"
+            endingLineNumber = "151"
             landmarkName = "textView"
             landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "E267EFE0-BC2B-4BB2-8471-0BC5B3AB6B9D"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/Reusable/Comments/CommentsController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "51"
-            endingLineNumber = "51"
-            landmarkName = "init(_:)"
-            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -5495,58 +5335,10 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentsCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "322"
-            endingLineNumber = "322"
+            startingLineNumber = "362"
+            endingLineNumber = "362"
             landmarkName = "setupUI()"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "277697FA-C9B5-4376-ACC7-8229BFBA6354"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentCell.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "615"
-            endingLineNumber = "615"
-            landmarkName = "setupUI()"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "277697FA-C9B5-4376-ACC7-8229BFBA6354 - 7a63d2f54d046c37"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ThinkWhat.CommentCell.setupUI() -&gt; ()"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentCell.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "615"
-                  endingLineNumber = "615"
-                  offsetFromSymbolStart = "6084">
-               </Location>
-               <Location
-                  uuid = "277697FA-C9B5-4376-ACC7-8229BFBA6354 - 7a63d2f54d046c37"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ThinkWhat.CommentCell.setupUI() -&gt; ()"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentCell.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "615"
-                  endingLineNumber = "615"
-                  offsetFromSymbolStart = "6532">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -5559,13 +5351,13 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "641"
-            endingLineNumber = "641"
+            startingLineNumber = "506"
+            endingLineNumber = "506"
             landmarkName = "setBarButtonItems()"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "84606A67-1AAE-4323-8C2F-AE8B22D399E8 - beaa31fa114d552"
+                  uuid = "84606A67-1AAE-4323-8C2F-AE8B22D399E8 - beaa31fa114c7e8"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -5575,12 +5367,12 @@
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "616"
-                  endingLineNumber = "616"
+                  startingLineNumber = "510"
+                  endingLineNumber = "510"
                   offsetFromSymbolStart = "1112">
                </Location>
                <Location
-                  uuid = "84606A67-1AAE-4323-8C2F-AE8B22D399E8 - beaa31fa114d80b"
+                  uuid = "84606A67-1AAE-4323-8C2F-AE8B22D399E8 - beaa31fa114c76c"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -5590,8 +5382,23 @@
                   urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "641"
-                  endingLineNumber = "641"
+                  startingLineNumber = "506"
+                  endingLineNumber = "506"
+                  offsetFromSymbolStart = "740">
+               </Location>
+               <Location
+                  uuid = "84606A67-1AAE-4323-8C2F-AE8B22D399E8 - 6dbdb8b3ad5350d8"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 (__C.UIAction) -&gt; () in ThinkWhat.PollController.setBarButtonItems() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "506"
+                  endingLineNumber = "506"
                   offsetFromSymbolStart = "740">
                </Location>
             </Locations>
@@ -5648,299 +5455,17 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "3B7BF9F7-53B9-46DC-8731-E43A863DEEE0"
+            uuid = "20E51F22-40F9-4056-AB80-F5ECB6F50787"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Services/Notifications/NotificationCenter.swift"
+            filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/CollectionView/Cells/CommentsCollectionView/CommentsCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "56"
-            endingLineNumber = "56"
-            landmarkName = "userNotificationCenter(_:didReceive:)"
+            startingLineNumber = "343"
+            endingLineNumber = "343"
+            landmarkName = "setupUI()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "3B7BF9F7-53B9-46DC-8731-E43A863DEEE0 - c0c4ff34e04c181e"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for __C.NSNotificationCenter.userNotificationCenter(_: __C.UNUserNotificationCenter, didReceive: __C.UNNotificationResponse) async -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Services/Notifications/NotificationCenter.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "56"
-                  endingLineNumber = "56"
-                  offsetFromSymbolStart = "6036">
-               </Location>
-               <Location
-                  uuid = "3B7BF9F7-53B9-46DC-8731-E43A863DEEE0 - c0c4ff34e04c181e"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for __C.NSNotificationCenter.userNotificationCenter(_: __C.UNUserNotificationCenter, didReceive: __C.UNNotificationResponse) async -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Services/Notifications/NotificationCenter.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "56"
-                  endingLineNumber = "56"
-                  offsetFromSymbolStart = "6912">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "6CC0F243-6605-4583-B7C5-7728F54D1DA9"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "799"
-            endingLineNumber = "799"
-            landmarkName = "loadSurveyAndThreadCallback(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "CB42096A-9AD0-432D-9C1C-1E710900149E"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Managers/REST/APIManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1860"
-            endingLineNumber = "1860"
-            landmarkName = "getCommentsThread(rootId:excludeList:includeSelf:threshold:onlyChildren:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "CB42096A-9AD0-432D-9C1C-1E710900149E - c5310f6d0ebd3096"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for ThinkWhat__local_.API.Polls.getCommentsThread(rootId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeId: Swift.String, threshold: Swift.Int, onlyChildren: Swift.Bool) async throws -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Managers/REST/APIManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1863"
-                  endingLineNumber = "1863"
-                  offsetFromSymbolStart = "248">
-               </Location>
-               <Location
-                  uuid = "CB42096A-9AD0-432D-9C1C-1E710900149E - c5310f6d0ebd3709"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for ThinkWhat__local_.API.Polls.getCommentsThread(rootId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeSelf: Swift.Bool, threshold: Swift.Int, onlyChildren: Swift.Bool) async throws -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Managers/REST/APIManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1860"
-                  endingLineNumber = "1860"
-                  offsetFromSymbolStart = "248">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "5D644161-17B7-4264-A1EE-BDA93A49C02B"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Managers/REST/APIManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1862"
-            endingLineNumber = "1862"
-            landmarkName = "getCommentsThread(rootId:excludeList:includeSelf:threshold:onlyChildren:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "5D644161-17B7-4264-A1EE-BDA93A49C02B - c5310f6d0ebd30d4"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for ThinkWhat__local_.API.Polls.getCommentsThread(rootId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeId: Swift.String, threshold: Swift.Int, onlyChildren: Swift.Bool) async throws -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Managers/REST/APIManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1865"
-                  endingLineNumber = "1865"
-                  offsetFromSymbolStart = "720">
-               </Location>
-               <Location
-                  uuid = "5D644161-17B7-4264-A1EE-BDA93A49C02B - 9207a3c9f2a95ed5"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(4) suspend resume partial function for ThinkWhat__local_.API.Polls.getCommentsThread(rootId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeId: Swift.String, threshold: Swift.Int, onlyChildren: Swift.Bool) async throws -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Managers/REST/APIManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1865"
-                  endingLineNumber = "1865"
-                  offsetFromSymbolStart = "268">
-               </Location>
-               <Location
-                  uuid = "5D644161-17B7-4264-A1EE-BDA93A49C02B - c5310f6d0ebd3777"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for ThinkWhat__local_.API.Polls.getCommentsThread(rootId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeSelf: Swift.Bool, threshold: Swift.Int, onlyChildren: Swift.Bool) async throws -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Managers/REST/APIManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1862"
-                  endingLineNumber = "1862"
-                  offsetFromSymbolStart = "720">
-               </Location>
-               <Location
-                  uuid = "5D644161-17B7-4264-A1EE-BDA93A49C02B - 9207a3c9f2a95976"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(4) suspend resume partial function for ThinkWhat__local_.API.Polls.getCommentsThread(rootId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeSelf: Swift.Bool, threshold: Swift.Int, onlyChildren: Swift.Bool) async throws -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Managers/REST/APIManager.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1862"
-                  endingLineNumber = "1862"
-                  offsetFromSymbolStart = "268">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "7AF65587-4B4F-4879-952D-EC3201EDD468"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/PollModel.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "286"
-            endingLineNumber = "286"
-            landmarkName = "loadSurveyAndThread(surveyId:threadId:excludeList:includeSelf:onlyChildren:threshold:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "7AF65587-4B4F-4879-952D-EC3201EDD468 - 4aa6d1dbf5350b39"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(6) await resume partial function for closure #1 @Sendable () async -&gt; () in ThinkWhat__local_.PollModel.loadSurveyAndThread(surveyId: Swift.String, threadId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeSelf: Swift.Bool, onlyChildren: Swift.Bool, threshold: Swift.Int) -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/PollModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "286"
-                  endingLineNumber = "286"
-                  offsetFromSymbolStart = "324">
-               </Location>
-               <Location
-                  uuid = "7AF65587-4B4F-4879-952D-EC3201EDD468 - f7c9fc9dc058a7cf"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(8) await resume partial function for closure #1 @Sendable () async -&gt; () in ThinkWhat__local_.PollModel.loadSurveyAndThread(surveyId: Swift.String, threadId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeSelf: Swift.Bool, onlyChildren: Swift.Bool, threshold: Swift.Int) -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/PollModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "286"
-                  endingLineNumber = "286"
-                  offsetFromSymbolStart = "44">
-               </Location>
-               <Location
-                  uuid = "7AF65587-4B4F-4879-952D-EC3201EDD468 - 109e682ba2611fc1"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(9) suspend resume partial function for closure #1 @Sendable () async -&gt; () in ThinkWhat__local_.PollModel.loadSurveyAndThread(surveyId: Swift.String, threadId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeSelf: Swift.Bool, onlyChildren: Swift.Bool, threshold: Swift.Int) -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/PollModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "286"
-                  endingLineNumber = "286"
-                  offsetFromSymbolStart = "92">
-               </Location>
-               <Location
-                  uuid = "7AF65587-4B4F-4879-952D-EC3201EDD468 - ebb27b1052d19ff4"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(10) suspend resume partial function for closure #1 @Sendable () async -&gt; () in ThinkWhat__local_.PollModel.loadSurveyAndThread(surveyId: Swift.String, threadId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeSelf: Swift.Bool, onlyChildren: Swift.Bool, threshold: Swift.Int) -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/PollModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "286"
-                  endingLineNumber = "286"
-                  offsetFromSymbolStart = "208">
-               </Location>
-               <Location
-                  uuid = "7AF65587-4B4F-4879-952D-EC3201EDD468 - ef5c5569b7643abb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(11) suspend resume partial function for closure #1 @Sendable () async -&gt; () in ThinkWhat__local_.PollModel.loadSurveyAndThread(surveyId: Swift.String, threadId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeSelf: Swift.Bool, onlyChildren: Swift.Bool, threshold: Swift.Int) -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/PollModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "286"
-                  endingLineNumber = "286"
-                  offsetFromSymbolStart = "236">
-               </Location>
-               <Location
-                  uuid = "7AF65587-4B4F-4879-952D-EC3201EDD468 - 7f8a4199bde50fd1"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 @Swift.MainActor @Sendable () -&gt; Swift.Optional&lt;()&gt; in closure #1 @Sendable () async -&gt; () in ThinkWhat__local_.PollModel.loadSurveyAndThread(surveyId: Swift.String, threadId: Swift.String, excludeList: Swift.Array&lt;Swift.String&gt;, includeSelf: Swift.Bool, onlyChildren: Swift.Bool, threshold: Swift.Int) -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Poll/Existing/PollModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "286"
-                  endingLineNumber = "286"
-                  offsetFromSymbolStart = "52">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

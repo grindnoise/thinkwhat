@@ -31,24 +31,48 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // Check if app was opened by push notification
     // surveyId or surveyId/commentId are passed to MainController to open specific controller
-    var surveyId: String?
-    var commentId: String?
-    if let remoteNotification = launchOptions?[.remoteNotification] as?  [AnyHashable : Any],
-       let _surveyId = remoteNotification["survey_id"] as? String {
+    var surveyId: Int?
+    var threadId: Int?
+    var replyId: Int?
+    var replyToId: Int?
+    if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable : Any],
+       let _surveyIdStr = remoteNotification["survey_id"] as? String,
+       let _surveyId = Int(_surveyIdStr) {
       surveyId = _surveyId
+      
+      if let _threadIdStr = remoteNotification["thread_id"] as? String,
+         let _threadId = Int(_threadIdStr) {
+        threadId = _threadId
+      }
+      if let _replyIdStr = remoteNotification["reply_id"] as? String,
+         let _replyId = Int(_replyIdStr) {
+        replyId = _replyId
+      }
+      if let _replyToIdStr = remoteNotification["reply_to_id"] as? String,
+         let _replyToId = Int(_replyToIdStr) {
+        replyToId = _replyToId
+      }
     }
-    
-//    KeychainService.deleteData()
+
     var rootController: UIViewController!
     if AppData.accessToken.isNil || AppData.accessToken!.isEmpty {
       rootController = UINavigationController(rootViewController: StartViewController())
     } else {
       if !surveyId.isNil {
-        rootController = MainController(surveyId: surveyId)
-      } else if !commentId.isNil {
-        rootController = MainController(commentId: commentId)
+        // Init from push notification (new publication)
+        if !threadId.isNil, !replyId.isNil, !replyToId.isNil {
+          // New reply
+          rootController = MainController(surveyId: surveyId,
+                                          replyId: replyId,
+                                          threadId: threadId,
+                                          replyToId: replyToId)
+        } else {
+          // New publication
+          rootController = MainController(surveyId: surveyId)
+        }
       } else {
-        rootController = MainController(surveyId: nil)
+        // Default init
+        rootController = MainController()
       }
     }
     

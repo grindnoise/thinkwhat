@@ -12,7 +12,7 @@ import UIKit
 @IBDesignable
 class PlusIcon: StateButton, CAAnimationDelegate {
 
-    override var state: State {
+  override var state: Enums.EnabledState {
         didSet {
             if state != oldValue {
                 state == .enabled ? addEnableAnimation() : addDisableAnimation()
@@ -231,7 +231,7 @@ class PlusIcon: StateButton, CAAnimationDelegate {
 @IBDesignable
 class GalleryIcon: StateButton, CAAnimationDelegate {
     
-    override var state: State {
+    override var state: Enums.EnabledState {
         didSet {
             if state != oldValue {
                 state == .enabled ? addEnableAnimation() : addDisableAnimation()
@@ -445,7 +445,7 @@ class GalleryIcon: StateButton, CAAnimationDelegate {
 @IBDesignable
 class CameraIcon: StateButton, CAAnimationDelegate {
     
-    override var state: State {
+    override var state: Enums.EnabledState {
         didSet {
             if state != oldValue {
                 state == .enabled ? addEnableAnimation() : addDisableAnimation()

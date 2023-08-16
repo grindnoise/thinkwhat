@@ -49,9 +49,9 @@ extension UserDefaults {
     @UserDefault(key: "date_joined", defaultValue: nil)
     static var dateJoined: Date?
     
-    static var gender: Gender? {
+    static var gender: Enums.Gender? {
       set { _gender = newValue?.rawValue }
-      get { return Gender(rawValue: _gender ?? "") }
+      get { return Enums.Gender(rawValue: _gender ?? "") }
     }
     @UserDefault(key: "gender", defaultValue: nil)
     private static var _gender: String?
@@ -219,16 +219,16 @@ extension UserDefaults {
 //    @UserDefault(key: "country_by_ip", defaultValue: nil)
 //    static var countryByIP: String?
     
-    static var youtubePlay: SideAppPreference? {
+    static var youtubePlay: Enums.SideAppPreference? {
       set { _youtubePlay = newValue?.rawValue }
-      get { return SideAppPreference(rawValue: _youtubePlay ?? "") }
+      get { return Enums.SideAppPreference(rawValue: _youtubePlay ?? "") }
     }
     @UserDefault(key: "youtube_play", defaultValue: nil)
     private static var _youtubePlay: String?
     
-    static var tiktokPlay: SideAppPreference? {
+    static var tiktokPlay: Enums.SideAppPreference? {
       set { _tiktokPlay = newValue?.rawValue }
-      get { return SideAppPreference(rawValue: _tiktokPlay ?? "") }
+      get { return Enums.SideAppPreference(rawValue: _tiktokPlay ?? "") }
     }
     @UserDefault(key: "tiktok_play", defaultValue: nil)
     private static var _tiktokPlay: String?

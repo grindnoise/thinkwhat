@@ -28,8 +28,10 @@ class HotController: UIViewController, TintColorable {
   public private(set) var tabBarHeight: CGFloat = .zero
   public private(set) var navBarHeight: CGFloat = .zero
   /// **Logic**
-  private var surveyId: String?  // Used when app was opened from push notification in closed state
-  private var commentId: String? //
+  private var surveyId: Int?  // Used when app was opened from push notification in closed state
+  private var replyId: Int?   // Used when app was opened from push notification in closed state
+  private var threadId: Int?  // Used when app was opened from push notification in closed state
+  private var replyToId: Int? // Used when app was opened from push notification in closed state
   public private(set) var queue = QueueArray<Survey>() // Store elements in queue
   public var currentSurvey: Survey? { controllerOutput?.currentSurvey } // Survey on screen
   
@@ -50,16 +52,19 @@ class HotController: UIViewController, TintColorable {
   
   // MARK: - Initialization
   /// Init from push notification with survey id arrives when app is closed
-  /// - Parameter surveyId: key extracted from push notification
-  init(surveyId: String? = nil) {
+  /// - Parameter surveyId: id of the survey extracted from push notification
+  /// - Parameter replyId: reply id extracted from push notification
+  /// - Parameter threadId: thread id extracted from push notification
+  /// - Parameter replyToId: reply corresponding comment id extracted from push notification
+  init(surveyId: Int? = nil,
+       replyId: Int? = nil,
+       threadId: Int? = nil,
+       replyToId: Int? = nil) {
     self.surveyId = surveyId
-    super.init(nibName: nil, bundle: nil)
-  }
-  
-  /// Init from push notification with survey id arrives when app is closed
-  /// - Parameter commentId: key extracted from push notification
-  init(commentId: String? = nil) {
-    self.commentId = commentId
+    self.replyId = replyId
+    self.threadId = threadId
+    self.replyToId = replyToId
+    
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -190,7 +195,7 @@ private extension HotController {
       .store(in: &subscriptions)
     
     // Update survey stats - views, is_banned, rating, etc.
-    Timer.publish(every: 10, on: .main, in: .common)
+    Timer.publish(every: AppSettings.TimeIntervals.updateStats, on: .main, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in
         guard self.isOnScreen,
@@ -204,7 +209,7 @@ private extension HotController {
       .store(in: &subscriptions)
     
     // Request new chunk of surveys if stack is empty
-    Timer.publish(every: 5, on: .main, in: .common)
+    Timer.publish(every: AppSettings.TimeIntervals.requestPublications, on: .main, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in
         guard self.isOnScreen,
@@ -220,7 +225,7 @@ private extension HotController {
     tasks.append(Task { @MainActor [weak self] in
       for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
         guard let self = self,
-              let tab = notification.object as? Tab
+              let tab = notification.object as? Enums.Tab
         else { return }
         
         self.isOnScreen = tab == .Hot
@@ -362,10 +367,14 @@ extension HotController: DataObservable {
     setTasks()
     controllerOutput?.setSurvey(queue.dequeue())
     
-    // If app was opened from notification with survey id
+    // If app was opened from notification
     if let surveyId = surveyId {
       navigationController?.navigationBar.backItem?.title = ""
-      navigationController?.pushViewController(PollController(surveyId: surveyId), animated: true)
+      navigationController?.pushViewController(PollController(surveyId: surveyId,
+                                                              threadId: threadId,
+                                                              replyId: replyId,
+                                                              replyToId: replyToId),
+                                               animated: true)
       tabBarController?.setTabBarVisible(visible: false, animated: true)
       
       guard let main = tabBarController as? MainController else { return }

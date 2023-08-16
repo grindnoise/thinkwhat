@@ -9,5 +9,5 @@
 import UIKit
 
 protocol TabBarTappable: UIViewController {
-  func tabBarTapped(_: TabBarTapMode)
+  func tabBarTapped(_: Enums.TabBarTapMode)
 }

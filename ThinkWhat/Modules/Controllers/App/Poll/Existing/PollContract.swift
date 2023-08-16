@@ -28,9 +28,9 @@ protocol PollViewInput: AnyObject {
   func onExitWithSkip()
   func showVoters(for: Answer)
   func postComment(body: String, replyTo: Comment?, username: String?)
-  func requestComments(_: [Comment])
-  func updateCommentsStats(_: [Comment])
-  func openCommentThread(_: Comment)
+//  func updateComments(excludeList: [Comment])
+//  func updateCommentsStats(_: [Comment])
+  func openCommentThread(root: Comment, reply: Comment?, shouldRequest: Bool, _ completion: Closure?)
   func deleteComment(_: Comment)
 }
 
@@ -41,19 +41,20 @@ protocol PollControllerInput: AnyObject {
   
   func claim(_: [SurveyReference :Claim])
   func load(_: SurveyReference, incrementViewCounter: Bool)
-  func load(_: String)
-  func loadThread(threadId: String, excludeList: [String], includeSelf: Bool, onlyChildren: Bool, threshold: Int)
-  func loadSurveyAndThread(surveyId: String, threadId: String, excludeList: [String], includeSelf: Bool, onlyChildren: Bool, threshold: Int)
+  func loadSurvey(_: Int)
+  func loadThread(root: Comment, includeList: [Int], threshold: Int)
+  func loadThread(threadId: Int, excludeList: [Int], includeList: [Int], includeSelf: Bool, threshold: Int)
+  func loadSurveyAndThread(surveyId: Int, threadId: Int, includeList: [Int], threshold: Int)
   func toggleFavorite(_: Bool)
   func vote(_: Answer)
   func post(_: Survey)
   func incrementViewCounter()
-  func updateResultsStats(_: Survey)
+  func getCommentsSurveyStateCommentsUpdates(_: Survey)
   func postComment(body: String, replyTo: Comment?, username: String?)
-  func updateCommentsStats(_: [Comment])
+//  func updateComments(excludeList: [Comment])
+//  func updateCommentsStats(_: [Comment])
   func updateSurveyStats(_: [SurveyReference])
   func commentClaim(comment: Comment, reason: Claim)
-  func requestComments(_:[Comment])
   func deleteComment(_:Comment)
 }
 
@@ -62,7 +63,7 @@ protocol PollModelOutput: AnyObject {
   
   func postCallback(_: Result<Bool, Error>)
   func loadCallback(_: Result<Survey, Error>)
-  func loadThreadCallback(_: Result<Void, Error>)
+  func loadThreadCallback(_: Result<Comment?, Error>)
   func loadSurveyAndThreadCallback(_: Result<Survey, Error>)
   func voteCallback(_: Result<Bool, Error>)
   func favoriteCallback(_: Result<Bool, Error>)
@@ -75,7 +76,7 @@ protocol PollControllerOutput: AnyObject {
   var item: Survey? { get set }
   
   func showCongratulations()
-  func presentView(_: Survey)
+  func presentView(item: Survey, animated: Bool)
   func postCallback(_ result: Result<Bool, Error>)
   func loadCallback(_: Result<Bool, Error>)
   func voteCallback(_: Result<Bool, Error>)

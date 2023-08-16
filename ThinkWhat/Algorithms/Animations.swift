@@ -284,8 +284,8 @@ struct Animations {
     let fromPath = circlePathLayer.path
     
     let anim = Animations.get(property: .Path,
-                              fromValue: unmask ? fromPath : toPath as Any,
-                              toValue: unmask ? toPath : fromPath,
+                              fromValue: unmask ? fromPath as Any : toPath as Any,
+                              toValue: unmask ? toPath : fromPath as Any,
                               duration: duration,
                               delay: 0,
                               repeatCount: 0,
@@ -294,7 +294,7 @@ struct Animations {
                               delegate: delegate,
                               isRemovedOnCompletion: true,
                               completionBlocks: [])
-    
+    anim.setValue(completion, forKey: "completion")
     circlePathLayer.add(anim, forKey: "path")
     circlePathLayer.path = unmask ? toPath : fromPath
    
