@@ -353,6 +353,7 @@
 		AB98307027B54D43002C5132 /* ContentLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB98306F27B54D43002C5132 /* ContentLoader.swift */; };
 		AB9958B82A24B83C00127DF6 /* BadgeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */; };
 		AB99676123D9AA210037CD6C /* HideKeyboardIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */; };
+		AB996B922A8FA9190094F010 /* Complaintable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB996B912A8FA9190094F010 /* Complaintable.swift */; };
 		AB9998BC280585B9009D0E4F /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9998BB280585B9009D0E4F /* UILabel.swift */; };
 		AB9998BE28058FA5009D0E4F /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9998BD28058FA5009D0E4F /* Double.swift */; };
 		AB99A95424C6CCE800814F96 /* UserLogoHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99A95324C6CCE800814F96 /* UserLogoHeader.swift */; };
@@ -915,6 +916,7 @@
 		AB98306F27B54D43002C5132 /* ContentLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLoader.swift; sourceTree = "<group>"; };
 		AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeExtension.swift; sourceTree = "<group>"; };
 		AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideKeyboardIcon.swift; sourceTree = "<group>"; };
+		AB996B912A8FA9190094F010 /* Complaintable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Complaintable.swift; sourceTree = "<group>"; };
 		AB9998BB280585B9009D0E4F /* UILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabel.swift; sourceTree = "<group>"; };
 		AB9998BD28058FA5009D0E4F /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
 		AB99A95324C6CCE800814F96 /* UserLogoHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLogoHeader.swift; sourceTree = "<group>"; };
@@ -1216,6 +1218,7 @@
 				AB5787F629228AD2009C1DBF /* TintColorable.swift */,
 				AB4054F528783156000F7768 /* UIPropertyListener.swift */,
 				AB96E88B2A7BB26600C42934 /* TabBarTappable.swift */,
+				AB996B912A8FA9190094F010 /* Complaintable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -3525,6 +3528,7 @@
 				ABC5823A29D8C0D2000D4770 /* CostCell.swift in Sources */,
 				AB234F4028D653B600204EC8 /* NSDirectionalEdgeInsets.swift in Sources */,
 				AB51075828F1CDD000CA0BFC /* AppSettingsLanguageCell.swift in Sources */,
+				AB996B922A8FA9190094F010 /* Complaintable.swift in Sources */,
 				AB25E040265FABA300EAA8AE /* NewSurveySelectionTypeController.swift in Sources */,
 				ABF20FB824C994250092B223 /* UserSurveysCell.swift in Sources */,
 				AB238D1E279058A0009E49C2 /* AppData.swift in Sources */,

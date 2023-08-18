@@ -25,8 +25,9 @@
 "reply" = "Reply";
 "add_comment" = "Add comment";
 "add_reply" = "Add reply";
-"comment_is_deleted" = "[Comment has been deleted]";
-"comment_is_banned" = "[Comment has been banned]";
+"comment_is_deleted" = "[Comment deleted]";
+"comment_is_claimed" = "[Comment hidden due to complaint]";
+"comment_is_banned" = "[Comment banned]";
 "pseudonym" = "Anonymous#";
 "pseudonym_placeholder" = "Your pseudonym";
 "add_pseudonym" = "Enter pseudonym";

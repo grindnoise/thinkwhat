@@ -32,36 +32,9 @@ class CommentsView: UIView {
     //                                              survey: rootComment.survey)
     let instance = CommentsCollectionView()
     
-    instance.claimPublisher.sink {
-      print($0)
-    } receiveValue: { [weak self] in
-      guard let self = self,
-            let surveyReference = $0.survey?.reference
-      else { return }
-      
-      let comment = $0
-      //            let banner = Popup(heightScaleFactor: 0.7)
-      //            banner.accessibilityIdentifier = "claim"
-      //            let claimContent = ClaimPopupContent(parent: banner, surveyReference: surveyReference)
-      //
-      //            claimContent.claimPublisher
-      //                .sink { [weak self] in
-      //                    guard let self = self else { return }
-      //
-      //                    self.viewInput?.postClaim(comment: comment, reason: $0)
-      //                }
-      //                .store(in: &self.subscriptions)
-      //
-      //            banner.present(content: claimContent)
-      //
-      //            banner.didDisappearPublisher
-      //                .sink { [weak self] _ in
-      //                    guard let self = self else { return }
-      //                    banner.removeFromSuperview()
-      //                }
-      //                .store(in: &self.subscriptions)
-      
-    }.store(in: &subscriptions)
+    instance.claimPublisher
+      .sink { [unowned self] in self.viewInput?.makeComplaint($0) }
+      .store(in: &subscriptions)
     
     instance.replyPublisher.sink { [weak self] in
       guard let self = self,
@@ -86,10 +59,15 @@ class CommentsView: UIView {
                                   username: username)
     }.store(in: &self.subscriptions)
     
+    instance.emptyPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.getComments(excludeList: [], includeList: [])
+      }
+      .store(in: &subscriptions)
+    
     instance.paginationPublisher
-      .throttle(for: .seconds(2),
-                scheduler: DispatchQueue.main,
-                latest: false)
       .sink { [weak self] in
         guard let self = self else { return }
         
@@ -102,7 +80,9 @@ class CommentsView: UIView {
       .sink { [weak self] in
       guard let self = self else { return }
       
-        self.viewInput?.updateCommentsAndGetNew(mode: .Thread, excludeList: $0.map { $0.id },
+//        print("getThreadCommentsPublisher")
+        self.viewInput?.updateCommentsAndGetNew(mode: .Thread,
+                                                excludeList: $0.map { $0.id },
                                                 updateList: Comments.shared.all.filter{ $0.parent == self.viewInput?.item }.map { $0.id })
 //        self.viewInput?.getComments(excludeList: $0.map { $0.id}, includeList: [])
     }
@@ -170,7 +150,7 @@ private extension CommentsView {
   func setTasks() {
     Comments.shared.instancesPublisher
       .filter { [unowned self] in $0.parent == self.rootComment }
-      .collect(.byTimeOrCount(DispatchQueue.main, .seconds(0.5), 10))
+      .collect(.byTimeOrCount(DispatchQueue.main, .seconds(0.25), 10))
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] instances in self.collectionView.reload() {
         self.isReplying && !instances.filter { $0.isOwn }.isEmpty ? { self.collectionView.scrollToBottom(); self.isReplying = false }() : {}() }
@@ -185,7 +165,27 @@ extension CommentsView: CommentsControllerOutput {
     collectionView.focus(on: reply)
   }
   
-    func commentDeleteError() {
+  func commentDeleteError() {
+    let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                          text: AppError.server.localizedDescription),
+                           contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                           isModal: false,
+                           useContentViewHeight: true,
+                           shouldDismissAfter: 2)
+    banner.didDisappearPublisher
+      .sink { _ in banner.removeFromSuperview() }
+      .store(in: &self.subscriptions)
+  }
+  
+  func commentPostCallback(_ result: Result<Comment, Error>) {
+    isReplying = false
+    switch result {
+    case .success:
+      collectionView.commentPostCallback(result)
+    case .failure(let error):
+#if DEBUG
+      error.printLocalized(class: type(of: self), functionName: #function)
+#endif
       let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
                                                             text: AppError.server.localizedDescription),
                              contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
@@ -196,17 +196,5 @@ extension CommentsView: CommentsControllerOutput {
         .sink { _ in banner.removeFromSuperview() }
         .store(in: &self.subscriptions)
     }
-    
-    func commentPostFailure() {
-      isReplying = false
-      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                            text: AppError.server.localizedDescription),
-                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                             isModal: false,
-                             useContentViewHeight: true,
-                             shouldDismissAfter: 2)
-      banner.didDisappearPublisher
-        .sink { _ in banner.removeFromSuperview() }
-        .store(in: &self.subscriptions)
-    }
+  }
 }

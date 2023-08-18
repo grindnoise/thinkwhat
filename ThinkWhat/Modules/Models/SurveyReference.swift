@@ -10,7 +10,9 @@ import Foundation
 import SwiftyJSON
 import Combine
 
-class SurveyReference: Decodable {// NSObject,
+class SurveyReference: Decodable, Complaintable {
+
+  // NSObject,
   
   //    static let null: SurveyReference = SurveyReference(id: 0)
   
@@ -219,7 +221,7 @@ class SurveyReference: Decodable {// NSObject,
   public let isActivePublisher       = PassthroughSubject<Bool, Never>()
   public let isFavoritePublisher     = PassthroughSubject<Bool, Never>()
   public let isCompletePublisher     = PassthroughSubject<Bool, Never>()
-  public let isClaimedPublisher      = PassthroughSubject<Bool, Error>()
+  public var isClaimedPublisher      = PassthroughSubject<Bool, Error>()
 //  public let isBannedPublisher       = PassthroughSubject<Bool, Never>()
   public let isVisitedPublisher      = PassthroughSubject<Bool, Never>()
   public let isHotPublisher          = PassthroughSubject<Bool, Never>()

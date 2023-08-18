@@ -24,6 +24,7 @@ protocol CommentsViewInput: AnyObject {
   func postComment(body: String, replyTo: Comment?, username: String?)
   func postClaim(comment: Comment, reason: Claim)
   func deleteComment(_:Comment)
+  func makeComplaint(_: Comment)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -40,6 +41,7 @@ protocol CommentsControllerInput: AnyObject {
   func deleteComment(_:Comment)
   func loadThread(root: Comment)
   func getReply(threadId: Int, replyId: Int)
+  func makeComplaint(_: [Comment: Claim])
 }
 
 /// *Model* returns the result to the *Controller*
@@ -47,10 +49,12 @@ protocol CommentsControllerInput: AnyObject {
 /// **Controller** conforms to this protocol
 protocol CommentsModelOutput: AnyObject {
   var survey: Survey? { get }
+  var item: Comment { get }
   
-  func commentPostFailure()
+  func commentPostCallback(_: Result<Comment, Error>)
   func commentDeleteError()
   func getReplyCallback(_: Result<Comment?, Error>)
+  func makeComplaintErrorCallback()
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -60,6 +64,6 @@ protocol CommentsControllerOutput: AnyObject {
   var viewInput: CommentsViewInput? { get set }
   
   func focusOnReply(_: Comment)
-  func commentPostFailure()
+  func commentPostCallback(_: Result<Comment, Error>)
   func commentDeleteError()
 }

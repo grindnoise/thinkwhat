@@ -220,9 +220,11 @@ class ListView: UIView {
         let popup = NewPopup(padding: self.padding,
                               contentPadding: .uniform(size: self.padding*2))
         let content = ClaimPopupContent(parent: popup,
-                                        surveyReference: surveyReference)
+                                        object: surveyReference)
+//                                        surveyReference: surveyReference)
         content.$claim
-          .filter { !$0.isNil }
+          .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is SurveyReference }
+          .map { [$0!.keys.first as! SurveyReference: $0!.values.first!] }
           .sink { [unowned self] in self.viewInput?.claim($0!) }
           .store(in: &popup.subscriptions)
         popup.setContent(content)

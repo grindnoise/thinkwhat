@@ -10,6 +10,8 @@ import Foundation
 import UIKit
 
 struct Enums {
+//  enum ComplaintType {
+  
   enum EditingMode { case ReadOnly, Write }
   
   /// Used to detect primary/repeating tap on tab bar item

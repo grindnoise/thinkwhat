@@ -50,6 +50,8 @@ class CommentCell: UICollectionViewListCell {
 //                let item = self.item
           else { return }
           
+          self.isRevealed = false
+//          self.prepareMenu()
 //          if item.isOwn {
 //            let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "trash.fill")!,
 //                                                                  text: "comment_deleted",
@@ -70,6 +72,7 @@ class CommentCell: UICollectionViewListCell {
             self.textView.font = UIFont.scaledFont(fontName: Fonts.Rubik.Italic, forTextStyle: .footnote)
             self.textView.textColor = .secondaryLabel
             self.repliesButton.tintColor = .secondaryLabel
+            self.menuButton.alpha = 0
             self.replyButton.alpha = 0
           } completion: { _ in self.shouldAnimateConstraints = false }
         }
@@ -79,10 +82,13 @@ class CommentCell: UICollectionViewListCell {
           guard let self = self else { return }
           
           self.shouldAnimateConstraints = true
+          self.isRevealed = false
+          
           UIView.transition(with: self.textView, duration: 0.2, options: .transitionCrossDissolve) {
             self.textView.text = "comment_is_banned".localized
             self.textView.textColor = .secondaryLabel
             self.repliesButton.tintColor = UIColor.secondaryLabel
+            self.menuButton.alpha = 0
             self.replyButton.alpha = 0
             let attrString = NSMutableAttributedString(string: " \(item.replies)", attributes: [
               .font: UIFont.scaledFont(fontName: !item.replies.isZero ? Fonts.Rubik.SemiBold : Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
@@ -92,9 +98,31 @@ class CommentCell: UICollectionViewListCell {
           } completion: { _ in self.shouldAnimateConstraints = false }
         }
         .store(in: &subscriptions)
+//      item.isClaimedPublisher
+//        .sink { [weak self] _ in
+//          guard let self = self else { return }
+//          
+//          self.shouldAnimateConstraints = true
+//          self.isRevealed = false
+//          
+//          UIView.transition(with: self.textView, duration: 0.2, options: .transitionCrossDissolve) {
+//            self.textView.text = "comment_is_claimed".localized
+//            self.textView.textColor = .secondaryLabel
+//            self.repliesButton.tintColor = UIColor.secondaryLabel
+//            self.replyButton.alpha = 0
+//            self.menuButton.alpha = 0
+//            let attrString = NSMutableAttributedString(string: " \(item.replies)", attributes: [
+//              .font: UIFont.scaledFont(fontName: !item.replies.isZero ? Fonts.Rubik.SemiBold : Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
+//              .foregroundColor: item.replies.isZero || item.isDeleted ? UIColor.secondaryLabel : UIColor.systemBlue
+//            ])
+//            self.repliesButton.setAttributedTitle(attrString, for: .normal)
+//          } completion: { _ in self.shouldAnimateConstraints = false }
+//        }
+//        .store(in: &subscriptions)
     }
   }
   public var mode: CommentCell.Mode = .Plain
+  public private(set) var isRevealed: Bool = true // To reveal text if is banned or claimed
   ///**Publishers**
   public var replyPublisher = PassthroughSubject<Comment, Never>()
   public var claimPublisher = PassthroughSubject<Comment, Never>()
@@ -427,7 +455,7 @@ class CommentCell: UICollectionViewListCell {
   
   // MARK: - Public methods
   /// Highlights `userTextView` with circle at end
-  public func highlight() {
+  public func highlight(timeInterval: TimeInterval = .zero) {
     guard contentView.getSubview(type: UIImageView.self, identifier: "highlight").isNil,
           let endPosition = self.userTextView.position(from: self.userTextView.endOfDocument, offset: 0),
           let textRange = self.userTextView.textRange(from: endPosition, to: endPosition)
@@ -445,14 +473,32 @@ class CommentCell: UICollectionViewListCell {
     let imageView = UIImageView(frame: CGRect(origin: convertedOrigin,
                                               size: .uniform(size: rect.size.height)))
     imageView.image = UIImage(systemName: "circle.fill",
-                              withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.size.height * 0.75, weight: .heavy))
+                              withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.size.height * 0.5, weight: .heavy))
     imageView.accessibilityIdentifier = "highlight"
     imageView.isUserInteractionEnabled = false
     imageView.tintColor = .systemBlue
     imageView.contentMode = .center
-    imageView.transform = .init(scaleX: 0.75, y: 0.75)
+    imageView.alpha = 0
+    imageView.transform = .init(scaleX: 0.5, y: 0.55)
     self.contentView.addSubview(imageView)
     
+    // Temporary
+    UIView.animate(withDuration: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      imageView.alpha = 1
+      imageView.transform = .identity
+    } completion: { _ in
+      guard timeInterval != .zero else { return }
+      
+      UIView.animate(withDuration: 0.3, delay: timeInterval, animations: { [weak self] in
+        guard let self = self else { return }
+        
+        imageView.alpha = 0
+        imageView.transform = .init(scaleX: 0.5, y: 0.5)
+      }) { _ in imageView.removeFromSuperview() }
+    }
+
 //    delay(seconds: 0.3) { [weak self] in
 //      guard let self = self else { return }
 //
@@ -481,6 +527,18 @@ class CommentCell: UICollectionViewListCell {
 //        }
 //      }
 //    }
+  }
+  
+  /// Temporary reveal text
+  public func reveal() {
+    isRevealed = true
+    setBody(true)
+    delay(seconds: 3) {[weak self] in
+      guard let self = self else { return }
+      
+      self.setBody()
+      isRevealed = false
+    }
   }
   
   // MARK: - Overriden methods
@@ -536,43 +594,6 @@ class CommentCell: UICollectionViewListCell {
 private extension CommentCell {
   @MainActor
   func setupUI() {
-    func prepareMenu() -> UIMenu {
-      var actions: [UIAction]!
-      if item.isOwn {
-        let deleteAction : UIAction = .init(title: "delete".localized, image: UIImage(systemName: "trash.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
-          guard let self = self,
-                let instance = self.item
-          else { return }
-          
-          self.deletePublisher.send(instance)
-        })
-        actions = [deleteAction]
-      } else {
-        let replyAction : UIAction = .init(title: "reply".localized, image: UIImage(systemName: "arrowshape.turn.up.left.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
-          guard let self = self,
-                let instance = self.item
-          else { return }
-          
-          self.replyPublisher.send(instance)
-        })
-        replyAction.accessibilityIdentifier = "reply"
-        
-        
-        let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
-          guard let self = self,
-                let instance = self.item
-          else { return }
-          
-          self.claimPublisher.send(instance)
-        })
-        actions = [claimAction]
-        if mode != .Root {
-          actions.append(replyAction)
-        }
-      }
-      
-      return UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
-    }
     
     backgroundColor = .clear
     clipsToBounds = true
@@ -598,8 +619,7 @@ private extension CommentCell {
     }()
     constraint.isActive = true
     
-    menuButton.menu = prepareMenu()
-    menuButton.showsMenuAsPrimaryAction = true
+    prepareMenu()
     
     switch mode {
     case .Plain:
@@ -699,6 +719,9 @@ private extension CommentCell {
       avatar.userprofile = Userprofile.anonymous
     }
     
+    // Set revealed state
+    isRevealed = !item.isClaimed || !item.isBanned
+    
     setNeedsLayout()
     layoutIfNeeded()
   }
@@ -744,7 +767,89 @@ private extension CommentCell {
     userTextView.attributedText = attrString
   }
   
-  func setBody() {
+  func prepareMenu() {
+    var actions = [UIAction]()
+    if item.isOwn {
+      let deleteAction : UIAction = .init(title: "delete".localized, image: UIImage(systemName: "trash.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
+        guard let self = self,
+              let instance = self.item
+        else { return }
+        
+        self.deletePublisher.send(instance)
+      })
+      
+      if !item.isBanned, !item.isDeleted {
+        actions.append(deleteAction)
+      }
+    } else {
+      let replyAction : UIAction = .init(title: "reply".localized, image: UIImage(systemName: "arrowshape.turn.up.left.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] action in
+        guard let self = self,
+              let instance = self.item
+        else { return }
+        
+        self.replyPublisher.send(instance)
+      })
+      replyAction.accessibilityIdentifier = "reply"
+      
+      
+      let claimAction : UIAction = .init(title: "make_claim".localized, image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off, handler: { [weak self] action in
+        guard let self = self,
+              let instance = self.item
+        else { return }
+        
+        self.claimPublisher.send(instance)
+      })
+      if !item.isBanned, !item.isDeleted {
+        actions.append(claimAction)
+        if mode != .Root {
+          actions.append(replyAction)
+        }
+      }
+//      actions = [claimAction]
+//      if mode != .Root {
+//        actions.append(replyAction)
+//      }
+    }
+    
+    menuButton.menu = UIMenu(title: "", image: nil, identifier: nil, options: .displayInline, children: actions)
+    menuButton.showsMenuAsPrimaryAction = true
+  }
+  
+  func setBody(_ forceReveal: Bool = false) {
+    guard !forceReveal else {
+      if mode == .Thread {
+        let attrString = NSMutableAttributedString()
+        if let survey = item.survey, survey.isAnonymous, let reply = item.replyTo {
+          let reply = NSAttributedString(string: "@" + reply.anonUsername, attributes: [
+            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
+            NSAttributedString.Key.foregroundColor: UIColor.systemGray
+          ])
+          attrString.append(reply)
+        } else if let replyItem = item.replyTo, let userprofile = replyItem.userprofile {
+          attrString.append(NSAttributedString(string: "@" + userprofile.username, attributes: [
+            .font: UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .footnote) as Any,
+            .foregroundColor: UIColor.systemGray
+          ]))
+        }
+        
+          let body = NSAttributedString(string: " " + item.body, attributes: [
+            NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote) as Any,
+            NSAttributedString.Key.foregroundColor: UIColor.label
+          ])
+          
+          attrString.append(body)
+          textView.attributedText = attrString
+      } else {
+        textView.attributedText = NSAttributedString(string: item.body, attributes: [
+          NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote) as Any,
+          NSAttributedString.Key.foregroundColor: UIColor.label
+        ])
+//        textView.text = item.body
+      }
+      
+      return
+    }
+    
     if mode == .Thread {
       let attrString = NSMutableAttributedString()
       if let survey = item.survey, survey.isAnonymous, let reply = item.replyTo {
@@ -760,8 +865,8 @@ private extension CommentCell {
         ]))
       }
       
-      if item.isBanned || item.isDeleted {
-        textView.attributedText = NSAttributedString(string: item.isBanned ? "comment_is_banned".localized : "comment_is_deleted".localized,
+      if item.isBanned || item.isDeleted || item.isClaimed {
+        textView.attributedText = NSAttributedString(string: item.isBanned ? "comment_is_banned".localized : item.isDeleted ? "comment_is_deleted".localized : "comment_is_claimed".localized,
                                                      attributes: [
                                                       NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.Italic, forTextStyle: .footnote) as Any,
                                                       NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel
@@ -776,8 +881,8 @@ private extension CommentCell {
         textView.attributedText = attrString
       }
     } else {
-      if item.isBanned || item.isDeleted {
-        textView.attributedText = NSAttributedString(string: item.isBanned ? "comment_is_banned".localized : "comment_is_deleted".localized,
+      if item.isBanned || item.isDeleted || item.isClaimed {
+        textView.attributedText = NSAttributedString(string: item.isBanned ? "comment_is_banned".localized : item.isDeleted ? "comment_is_deleted".localized : "comment_is_claimed".localized,
                                                      attributes: [
                                                       NSAttributedString.Key.font: UIFont.scaledFont(fontName: Fonts.Rubik.Italic, forTextStyle: .footnote) as Any,
                                                       NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel

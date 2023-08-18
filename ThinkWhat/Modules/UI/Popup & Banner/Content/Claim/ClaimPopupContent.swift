@@ -14,7 +14,7 @@ class ClaimPopupContent: UIView {
   
   // MARK: - Public properties
   ///**Publishers**
-  @Published public private(set) var claim: [SurveyReference: Claim]?
+  @Published public private(set) var claim: [AnyHashable: Claim]?
   @Published private var item: Claim? {
     didSet {
       guard oldValue.isNil, item != oldValue,
@@ -36,7 +36,7 @@ class ClaimPopupContent: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private let surveyReference: SurveyReference
+  private let object: any Complaintable
   private weak var parent: NewPopup?
   private var state: Enums.ButtonState = .Send
   ///**UI**
@@ -243,10 +243,10 @@ class ClaimPopupContent: UIView {
   
   // MARK: - Initialization
   init(parent: NewPopup,
-       surveyReference: SurveyReference,
+       object: any Complaintable,
        padding: CGFloat = 8) {
     self.padding = padding
-    self.surveyReference = surveyReference
+    self.object = object
     self.parent = parent
     
     super.init(frame: .zero)
@@ -292,7 +292,7 @@ private extension ClaimPopupContent {
 //      }
 //      .store(in: &subscriptions)
     
-    surveyReference.isClaimedPublisher
+    object.isClaimedPublisher
       .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] in
@@ -313,7 +313,7 @@ private extension ClaimPopupContent {
 //      for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.Claim) {
 //        guard let self = self,
 //              let instance = notification.object as? Comment,
-//              instance.survey?.reference == self.surveyReference
+//              instance.survey?.reference == self.object
 //        else { return }
 //
 //        self.onSuccessCallback()
@@ -323,7 +323,7 @@ private extension ClaimPopupContent {
 //      for await notification in NotificationCenter.default.notifications(for: Notifications.Comments.ClaimFailure) {
 //        guard let self = self,
 //              let instance = notification.object as? Comment,
-//              instance.survey?.reference == self.surveyReference
+//              instance.survey?.reference == self.object
 //        else { return }
 //
 //        self.onFailureCallback()
@@ -335,8 +335,8 @@ private extension ClaimPopupContent {
     
     //    guard let buttonsStack = stack.getSubview(type: UIStackView.self, identifier: "buttonsStack"),
     guard let middle = stack.getSubview(type: UIView.self, identifier: "middle"),
-          let button = confirmButton.getSubview(type: UIButton.self),
-          let oldConstraint = middle.getConstraint(identifier: "heightAnchor")
+          let button = confirmButton.getSubview(type: UIButton.self)//,
+//          let oldConstraint = middle.getConstraint(identifier: "heightAnchor")
     else { return }
     
 //    buttonsStack.removeArrangedSubview(cancelButton)
@@ -527,7 +527,15 @@ private extension ClaimPopupContent {
         state = .Sending
         collectionView.isUserInteractionEnabled = false
         confirmButton.isUserInteractionEnabled = false
-        claim = [surveyReference: item]
+        
+        if let comment = object as? Comment {
+          claim = [comment: item]
+        } else if let surveyReference = object as? SurveyReference {
+          claim = [surveyReference: item]
+        }
+        
+//        guard !claim.isNil else { return }
+        
         if #available(iOS 15, *) {
           button.configuration!.attributedTitle = AttributedString("confirm".localized,
                                                                    attributes: AttributeContainer([

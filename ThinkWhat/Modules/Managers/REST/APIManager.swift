@@ -1557,7 +1557,8 @@ class API {
     public func getCommentsSurveyStateCommentsUpdates(surveyId: Int,
                                                       threadId: Int? = nil,
                                                       excludeComments: [Int] = [],
-                                                      commentsToUpdate: [Int] = []) async throws {
+                                                      commentsToUpdate: [Int] = [],
+                                                      threshold: Int = 100) async throws {
       guard let url = API_URLS.Surveys.getCommentsSurveyStateCommentsUpdates,
             let headers = headers
       else { throw APIError.invalidURL }
@@ -1566,11 +1567,12 @@ class API {
         "survey_id": surveyId,
         "comments_ids": commentsToUpdate,
         "exclude_list": excludeComments,
-        "threshold": 100
+        "threshold": threshold
       ]
       
       if !threadId.isNil {
         parameters["thread_id"] = threadId!
+        parameters["include_self"] = false
       }
 
       do {
@@ -1580,9 +1582,7 @@ class API {
                                                  encoding: JSONEncoding.default,
                                                  headers: headers)
         let json = try JSON(data: data, options: .mutableContainers)
-        await MainActor.run {
-          Surveys.shared.updateCommentsAndResultsStats(json)
-        }
+        await MainActor.run { Surveys.shared.updateCommentsAndResultsStats(json) }
       } catch let error {
         throw error
       }
@@ -1708,6 +1708,7 @@ class API {
       }
     }
     
+    @discardableResult
     public func postComment(_ body: String, survey: SurveyReference, replyTo: Comment? = nil, username: String? = nil) async throws -> Comment {
       guard let url = API_URLS.Surveys.postComment,
             let headers = headers
@@ -1873,7 +1874,7 @@ class API {
       }
     }
     
-    /// Get survey and thread comments
+    /// Used for push notification, to open specific thread and focus on reply
     /// - Parameters:
     ///   - threadId: root comment id
     ///   - survey_id: survey id

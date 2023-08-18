@@ -14,8 +14,25 @@ class CommentsModel {
 
 // MARK: - Controller Input
 extension CommentsModel: CommentsControllerInput {
-  func updateCommentsAndGetNew(mode: CommentsCollectionView.Mode, excludeList: [Int], updateList: [Int]) {
+  func makeComplaint(_ complaint: [Comment: Claim]) {
     
+  }
+  
+  func updateCommentsAndGetNew(mode: CommentsCollectionView.Mode, excludeList: [Int], updateList: [Int]) {
+    guard let thread = modelOutput?.item else { return }
+    
+    Task {
+      do {
+        try await API.shared.surveys.getCommentsSurveyStateCommentsUpdates(surveyId: thread.surveyId,
+                                                                           threadId: thread.id,
+                                                                           excludeComments: excludeList,
+                                                                           commentsToUpdate: updateList)
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
   }
   
   func deleteComment(_ comment: Comment) {
@@ -50,11 +67,12 @@ extension CommentsModel: CommentsControllerInput {
     
     Task {
       do {
-        let _ = try await API.shared.surveys.postComment(body, survey: survey, replyTo: replyTo, username: username)
+        let instance = try await API.shared.surveys.postComment(body,
+                                                 survey: survey,
+                                                 replyTo: replyTo, username: username)
+        await MainActor.run { modelOutput?.commentPostCallback(.success(instance)) }
       } catch {
-        await MainActor.run {
-          modelOutput?.commentPostFailure()
-        }
+        await MainActor.run { modelOutput?.commentPostCallback(.failure(error)) }
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif

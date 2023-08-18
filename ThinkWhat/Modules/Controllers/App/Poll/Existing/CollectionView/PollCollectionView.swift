@@ -52,16 +52,17 @@ class PollCollectionView: UICollectionView {
   public let answerDeselectionPublisher = PassthroughSubject<Bool, Never>()
   public let isVotingSubscriber = PassthroughSubject<Bool, Never>()
   public let votersPublisher = PassthroughSubject<Answer, Never>()
-  public var postCommentPublisher = PassthroughSubject<String, Never>()
-  public var postAnonCommentPublisher = PassthroughSubject<[String: String], Never>()
+  public let postCommentPublisher = PassthroughSubject<String, Never>()
+  public let postCommentCallbackPublisher = PassthroughSubject<Result<Comment, Error>, Never>()
+  public let postAnonCommentPublisher = PassthroughSubject<[String: String], Never>()
 //  public var updateCommentsStatsPublisher = PassthroughSubject<[Comment], Never>()
   public let updateCommentsPublisher = PassthroughSubject<[Comment], Never>()
 //  public let commentsCellBoundsPublisher = PassthroughSubject<Bool, Never>()
-  public var replyPublisher = PassthroughSubject<[Comment: String], Never>()
-  public var anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
+  public let replyPublisher = PassthroughSubject<[Comment: String], Never>()
+  public let anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
 //  public var commentClaimPublisher = PassthroughSubject<Comment, Never>()
-  public var deletePublisher = PassthroughSubject<Comment, Never>()
-  public var threadPublisher = PassthroughSubject<Comment, Never>()
+  public let deletePublisher = PassthroughSubject<Comment, Never>()
+  public let threadPublisher = PassthroughSubject<Comment, Never>()
   //  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
   ///**Logic**
   public var viewMode: ViewMode {
@@ -455,6 +456,10 @@ private extension PollCollectionView {
         }
       .store(in: &self.subscriptions)
       
+      // Comment post callback
+      self.postCommentCallbackPublisher
+        .sink { cell.postCommentCallbackPublisher.send($0) }
+        .store(in: &self.subscriptions)
 //
 //      //Subscription for request comments
 //      cell.commentsRequestSubject.sink { [weak self] in

@@ -171,10 +171,30 @@ extension CommentsController: CommentsViewInput {
   func getComments(excludeList: [Int], includeList: [Int]) {
     controllerInput?.getComments(rootComment: item, excludeList: excludeList, includeList: includeList)
   }
+  
+  func makeComplaint(_ comment: Comment) {
+    let popup = NewPopup(padding: self.padding,
+                         contentPadding: .uniform(size: self.padding*2))
+    let content = ClaimPopupContent(parent: popup,
+                                    object: comment)
+    content.$claim
+      .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is Comment }
+      .map { [$0!.keys.first as! Comment: $0!.values.first!] }
+      .sink { [unowned self] in self.controllerInput?.makeComplaint($0!) }
+      .store(in: &popup.subscriptions)
+    popup.setContent(content)
+    popup.didDisappearPublisher
+      .sink { _ in popup.removeFromSuperview() }
+      .store(in: &self.subscriptions)
+  }
 }
 
 // MARK: - Model Output
 extension CommentsController: CommentsModelOutput {
+  func makeComplaintErrorCallback() {
+    
+  }
+  
   func getReplyCallback(_ result: Result<Comment?, Error>) {
     switch result {
     case .success(let reply):
@@ -201,8 +221,8 @@ extension CommentsController: CommentsModelOutput {
     controllerOutput?.commentDeleteError()
   }
   
-  func commentPostFailure() {
-    controllerOutput?.commentPostFailure()
+  func commentPostCallback(_ result: Result<Comment, Error>) {
+    controllerOutput?.commentPostCallback(result)
   }
   
   var survey: Survey? {

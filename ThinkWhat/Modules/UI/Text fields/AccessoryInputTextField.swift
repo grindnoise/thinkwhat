@@ -33,7 +33,7 @@ final class AccessoryInputTextField: UITextField {
   //UI
   public var placeholderText: String
   public var textViewFont: UIFont
-  public var staticText: String = "" {
+  public private(set) var staticText: String = "" {
     didSet {
       textView.staticText = staticText
     }
@@ -272,6 +272,21 @@ final class AccessoryInputTextField: UITextField {
   }
   
   // MARK: - Public methods
+  public func setStaticText(_ text: String) {
+    staticText = text
+  }
+  
+  public func erase() {
+    text = ""
+    textView.text = ""
+    staticText = ""
+    usernameTextView.text = ""
+  }
+  
+  /// Clears static text and leaves existing input
+  public func eraseResponder() {
+    staticText = ""
+  }
   //    public func forceResignFirstResponder() {
   //        textView.resignFirstResponder()
   //    }

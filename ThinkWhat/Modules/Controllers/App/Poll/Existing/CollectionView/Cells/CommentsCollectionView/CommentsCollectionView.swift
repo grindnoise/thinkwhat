@@ -45,7 +45,7 @@ class CommentsCollectionView: UICollectionView {
     }
     return []
   }
-  //Publishers
+  ///**Publishers**
   //  public let updateStatsPublisher = PassthroughSubject<[Comment], Never>()
 //  public let getNewCommentsUpdateExistingPublisher = PassthroughSubject<[Comment], Never>() // Timer based. Array of excluded items
   public let getRootCommentsPublisher = PassthroughSubject<[Comment], Never>() // Timer based. Array of excluded items
@@ -58,9 +58,7 @@ class CommentsCollectionView: UICollectionView {
   public let deletePublisher = PassthroughSubject<Comment, Never>()
   public let threadPublisher = PassthroughSubject<Comment, Never>()
   public let paginationPublisher = PassthroughSubject<[Comment], Never>()
-  //    public var commentsRequestSubject: CurrentValueSubject<[Comment], Never>!
-  
-  
+  public let emptyPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
   private var mode: Mode = .All
@@ -97,10 +95,12 @@ class CommentsCollectionView: UICollectionView {
           guard let item = self.replyTo else { return }
           
           self.replyPublisher.send([item: text])
+          instance.erase()
           
           return
         }
-        instance.staticText = ""
+//        instance.staticText = ""
+        instance.eraseResponder()
         self.postCommentPublisher.send(text)
       }
       .store(in: &subscriptions)
@@ -117,8 +117,8 @@ class CommentsCollectionView: UICollectionView {
         let _ = self.textField.resignFirstResponder()
         Fade.shared.dismiss()
         let replaced = self.textField.staticText.isEmpty ? text : text.replacingOccurrences(of: self.textField.staticText + " ", with: "")
-        instance.staticText = ""
-        
+//        instance.staticText = ""
+        instance.eraseResponder()
         
         guard self.replyTo.isNil else {
           guard let item = self.replyTo else { return }
@@ -145,6 +145,14 @@ class CommentsCollectionView: UICollectionView {
     return instance
   }()
   private var reply: Comment? // Use that to highlight
+  private var isRequesting = false {
+    didSet {
+      guard isRequesting else { return }
+      
+      requestStartTime = Date()
+    }
+  }
+  private var requestStartTime = Date()
   
   // MARK: - Initialization
   init() {
@@ -198,14 +206,19 @@ class CommentsCollectionView: UICollectionView {
   
   public func reload(animatingDifferences: Bool = true, _ completion: Closure? = nil) {
     if !rootComment.isNil, dataItems.count != rootComment?.replies {
-      paginationPublisher.send(dataItems)
+      requestData(emptyDataItems: dataItems.isEmpty)
+      
     }
     
     var snapshot = NSDiffableDataSourceSnapshot<Section, Comment>()
     snapshot.appendSections([.main,])
     snapshot.appendItems(mode == .Thread ? dataItems.sorted { $0.createdAt < $1.createdAt } : dataItems.sorted { $0.createdAt > $1.createdAt },
                          toSection: .main)
-    source.apply(snapshot, animatingDifferences: animatingDifferences) { completion?() }
+    source.apply(snapshot, animatingDifferences: animatingDifferences) { [weak self] in
+      guard let self = self else { return }
+      
+      self.isRequesting = false
+      completion?() }
   }
   
   public func scrollToBottom() {
@@ -217,31 +230,95 @@ class CommentsCollectionView: UICollectionView {
     //    }
   }
   
-  public func focus(on comment: Comment) {
-    guard let item = source.snapshot().itemIdentifiers.enumerated().filter({ index, item in item.id == comment.id }).first else { return }
-    
-    reply = item.element
-    scrollToItem(at: IndexPath(row: item.offset, section: 0), at: .top, animated: true)
-    
-    // Highlight reply if cell is visible
-    if let cells = visibleCells as? [CommentCell],
-       let cell = cells.filter({ $0.item == reply }).first {
-         cell.highlight()
+  public func focus(on comment: Comment){
+    func highlight(comment: Comment, row: Int) {
+      reply = comment
+      scrollToItem(at: IndexPath(row: row, section: 0), at: .top, animated: true)
+      
+      // Highlight reply if cell is visible
+      if let cells = visibleCells as? [CommentCell],
+         let cell = cells.filter({ $0.item == comment }).first {
+        cell.highlight(timeInterval: 3)
+        reply = nil
+      }
     }
+    
+    func getCommentAndRow(for item: Comment) -> EnumeratedSequence<[Comment]>.Element? {
+      source.snapshot().itemIdentifiers.enumerated().filter({ index, item in item.id == comment.id }).first
+    }
+    
+    if let item = source.snapshot().itemIdentifiers.enumerated().filter({ index, item in item.id == comment.id }).first {
+      highlight(comment: item.element, row: item.offset)
+    } else {
+      var snap = source.snapshot()
+      snap.appendItems([comment])
+      source.apply(snap)
+      
+      if let item = self.source.snapshot().itemIdentifiers.enumerated().filter({ index, item in item.id == comment.id }).first {
+        highlight(comment: item.element, row: item.offset)
+      }
+    }
+    
+//    var item: EnumeratedSequence<[Comment]>.Element! = getCommentAndRow(for: comment)
 //
-//    delay(seconds: 0.3) { [weak self] in
-//      guard let self = self,
-//            let cell = self.cellForItem(at: indexPath) as? CommentCell
-//      else { return }
-//
-//      cell.highlight()
+//    if item.isNil {
+//      delay(seconds: 0.5) {
+//        item = getCommentAndRow(for: comment)
+//        if !item.isNil{
+//          highlight(comment: item.element, row: item.offset)
+//        } else {
+//          delay(seconds: 1) {
+//            item = getCommentAndRow(for: comment)
+//            if !item.isNil{
+//              highlight(comment: item.element, row: item.offset)
+//            }
+//          }
+//        }
+//      }
 //    }
+    
+//    } else {
+//      delay(seconds: 1) { [weak self] in
+//        guard let self = self else { return }
+//
+//        if let item = self.source.snapshot().itemIdentifiers.enumerated().filter({ index, item in item.id == comment.id }).first {
+//          highlight(comment: item.element, row: item.offset)
+//        }
+//      }
+//    }
+  }
+  
+  public func commentPostCallback(_ result: Result<Comment, Error>) {
+    switch result {
+    case .success(let comment):
+      textField.erase()
+      focus(on: comment)
+    case .failure(_): break }
   }
 }
 
 private extension CommentsCollectionView {
   // MARK: - UI functions
   func setTasks() {
+    // We need to monitor empty comments publisher to set isRequesting to false
+    Comments.shared.instancesPublisher
+      .collect(.byTimeOrCount(DispatchQueue.main, .seconds(0.25), 1))
+      .filter { $0.isEmpty }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] _ in self.isRequesting = false }
+      .store(in: &subscriptions)
+    
+    // We need to set isRequesting to false on timer
+    Timer.publish(every: 1, on: .main, in: .common)
+      .autoconnect()
+      .filter { [unowned self] _ in self.isRequesting && self.requestStartTime.distance(to: Date()) > 5 }
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+
+        self.isRequesting = false
+      }
+      .store(in: &subscriptions)
+    
     tasks.append(Task {@MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
         guard let self = self else { return }
@@ -318,6 +395,7 @@ private extension CommentsCollectionView {
       .store(in: &self.subscriptions)
   }
   
+  @MainActor
   func setupUI() {
     backgroundColor = .clear
 //    bounces = false
@@ -332,11 +410,14 @@ private extension CommentsCollectionView {
     //      }
     //      .store(in: &subscriptions)
     
+    // Update comments and get new
     Timer
       .publish(every: AppSettings.TimeIntervals.updateStatsComments, on: .current, in: .common)
       .autoconnect()
       .sink { [weak self] seconds in
-        guard let self = self else { return }
+        guard let self = self,
+              !self.isRequesting
+        else { return }
         
         switch self.mode {
         case .All:
@@ -381,6 +462,7 @@ private extension CommentsCollectionView {
           
           //          self.textField.staticText = ""
           self.replyTo = nil
+          self.textField.eraseResponder()
           let _ = self.textField.becomeFirstResponder()
           Fade.shared.present()
         }
@@ -408,11 +490,13 @@ private extension CommentsCollectionView {
           guard let self = self else { return }
           
           if $0.isAnonymous {
-            self.textField.staticText = "@" + $0.anonUsername
+            self.textField.setStaticText("@" + $0.anonUsername)
+//            self.textField.staticText = "@" + $0.anonUsername
           } else {
             guard let userprofile = $0.userprofile else { return }
             
-            self.textField.staticText = "@" + userprofile.username
+            self.textField.setStaticText("@" + userprofile.username)
+//            self.textField.staticText = "@" + userprofile.username
           }
           self.replyTo = $0
           let _ = self.textField.becomeFirstResponder()
@@ -443,11 +527,13 @@ private extension CommentsCollectionView {
           guard let self = self else { return }
           
           if $0.isAnonymous {
-            self.textField.staticText = "@" + $0.anonUsername
+//            self.textField.staticText = "@" + $0.anonUsername
+            self.textField.setStaticText("@" + $0.anonUsername)
           } else {
             guard let userprofile = $0.userprofile else { return }
             
-            self.textField.staticText = "@" + userprofile.username
+            self.textField.setStaticText("@" + userprofile.username)
+//            self.textField.staticText = "@" + userprofile.username
           }
           self.replyTo = $0
           let _ = self.textField.becomeFirstResponder()
@@ -508,29 +594,72 @@ private extension CommentsCollectionView {
     }
     
     //    reload(animatingDifferences: false)
+    // Immediate request for root
+    guard mode == .All else { return }
+    
+    paginationPublisher.send(dataItems)
+  }
+  
+  func requestData(emptyDataItems: Bool = false) {
+    guard !isRequesting else { return }
+    
+    emptyDataItems ? emptyPublisher.send() : paginationPublisher.send(dataItems)
+    isRequesting = true
   }
 }
 
 // MARK: - UICollectionViewDelegate
 extension CommentsCollectionView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    func reply(username: String) {
+      Fade.shared.present()
+      textField.setStaticText(username)
+      let _ = textField.becomeFirstResponder()
+    }
     guard let cell = collectionView.cellForItem(at: indexPath) as? CommentCell else { return }
     
-    if cell.item.replies != 0 {
-      threadPublisher.send(cell.item)
-    } else if !cell.item.isOwn {
-      Fade.shared.present()
-      if cell.item.isAnonymous {
-        textField.staticText = "@" + cell.item.anonUsername
-      } else if let userprofile = cell.item.userprofile {
-        if !userprofile.firstNameSingleWord.isEmpty {
-          textField.staticText = "@" + userprofile.firstNameSingleWord
-        } else if !userprofile.lastNameSingleWord.isEmpty {
-          textField.staticText = "@" + userprofile.lastNameSingleWord
+    if mode == .All {
+      // Reveal hidden text
+      if !cell.isRevealed, cell.item.isClaimed || cell.item.isBanned {
+          cell.reveal()
+      } else if cell.item.replies != 0 {
+        // Open thread
+        threadPublisher.send(cell.item)
+      } else if !cell.item.isOwn, !cell.item.isClaimed, !cell.item.isBanned {
+        var username = ""
+        if cell.item.isAnonymous {
+          username = "@" + cell.item.anonUsername
+        } else if let userprofile = cell.item.userprofile {
+          username = "@" + userprofile.username
+          replyTo = cell.item
+          reply(username: username)
         }
       }
-      replyTo = cell.item
-      let _ = textField.becomeFirstResponder()
+    } else {
+      // Reveal hidden text
+      if !cell.isRevealed, cell.item.isClaimed || cell.item.isBanned {
+        cell.reveal()
+      } else if let replyId = cell.item.replyToId,
+                let item = source.snapshot().itemIdentifiers.enumerated().filter({ $1.id == replyId }).first {
+        // Scroll to reply
+        scrollToItem(at: IndexPath(row: item.offset, section: 0), at: .top, animated: true)
+        self.reply = item.element
+        
+        // Highlight reply if cell is visible
+        if let cells = visibleCells as? [CommentCell],
+           let cell = cells.filter({ $0.item == self.reply }).first {
+          cell.highlight(timeInterval: 3)
+        }
+      } else if !cell.item.isOwn, !cell.item.isClaimed, !cell.item.isBanned {
+        var username = ""
+        if cell.item.isAnonymous {
+          username = "@" + cell.item.anonUsername
+        } else if let userprofile = cell.item.userprofile {
+          username = "@" + userprofile.username
+          replyTo = cell.item
+          reply(username: username)
+        }
+      }
     }
   }
   
@@ -541,15 +670,21 @@ extension CommentsCollectionView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
     //    cell.setNeedsLayout()
     //    cell.layoutIfNeeded()
-    if dataItems.count < 10 {
-      paginationPublisher.send(dataItems)
-    } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row, indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
-      paginationPublisher.send(dataItems)
+    if mode == .Thread {
+      if dataItems.count < 10 {
+        requestData()
+      } else if (source.snapshot().itemIdentifiers.count - AppSettings.Pagination.threshold == indexPath.row) && indexPath.row > 1 && !isRequesting || // Preload data
+                  (source.snapshot().itemIdentifiers.count - 1 == indexPath.row) && !isRequesting { // Last row
+//      } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row,
+//                indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {
+        requestData()
+      }
     }
     
     // Highlight reply
     if let cell = cell as? CommentCell, cell.item == reply {
-      cell.highlight()
+      cell.highlight(timeInterval: 3)
+      reply = nil
     }
 //    if let replyIndexPath = replyIndexPath, indexPath == replyIndexPath, let cell = cell as? CommentCell {
 //      cell.highlight()

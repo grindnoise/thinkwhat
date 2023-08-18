@@ -97,23 +97,20 @@ extension PollModel: PollControllerInput {
     Task {
       do {
         let instance = try await API.shared.surveys.postComment(body,
-                                                                survey: survey,
-                                                                replyTo: replyTo,
-                                                                username: username)
-        guard replyTo.isNil else { return }
-        await MainActor.run {
-          modelOutput?.commentPostCallback(.success(instance))
-        }
+                                                 survey: survey,
+                                                 replyTo: replyTo,
+                                                 username: username)
+        await MainActor.run { modelOutput?.commentPostCallback(.success(instance)) }
       } catch {
-        await MainActor.run {
-          modelOutput?.commentPostCallback(.failure(error))
-        }
+        await MainActor.run { modelOutput?.commentPostCallback(.failure(error)) }
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif
       }
     }
   }
+  
+  
   
   func incrementViewCounter() {
     guard let survey = item else { return }
@@ -287,6 +284,7 @@ extension PollModel: PollControllerInput {
     }
   }
   
+  
   func loadSurveyAndThread(surveyId: Int,
                            threadId: Int,
                            includeList: [Int],
@@ -320,7 +318,8 @@ extension PollModel: PollControllerInput {
         let comments = Comments.shared.all.filter { $0.isParentNode && $0.survey == instance }.map { $0.id }
         try await API.shared.surveys.getCommentsSurveyStateCommentsUpdates(surveyId: instance.id,
                                                                            excludeComments: comments,
-                                                                           commentsToUpdate: comments)
+                                                                           commentsToUpdate: comments,
+        threshold: 40)
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)

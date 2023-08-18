@@ -68,6 +68,7 @@ class CommentsSectionCell: UICollectionViewCell {
   public var threadPublisher = PassthroughSubject<Comment, Never>()
   public var paginationPublisher = PassthroughSubject<[Comment], Never>()
   public var boundsPublisher = PassthroughSubject<Bool, Never>()
+  public var postCommentCallbackPublisher = PassthroughSubject<Result<Comment, Error>, Never>()
   //Publishers
 //  public let commentSubject = CurrentValueSubject<String?, Never>(nil)
 //  public let anonCommentSubject = CurrentValueSubject<[String: String]?, Never>(nil)
@@ -170,7 +171,7 @@ class CommentsSectionCell: UICollectionViewCell {
         else { return }
         
         self.setNeedsLayout()
-        constraint.constant = $0.height
+        constraint.constant = $0.height // min($0.height, UIScreen.main.bounds.height*0.75)
         self.layoutIfNeeded()
         self.boundsPublisher.send(true)
       }
@@ -278,6 +279,10 @@ class CommentsSectionCell: UICollectionViewCell {
 //      }
 //      .store(in: &subscriptions)
     
+    postCommentCallbackPublisher
+      .sink { instance.commentPostCallback($0) }
+      .store(in: &subscriptions)
+    
     instance.setDataSource(survey: item, animatingDifferences: false)
     
     return instance
@@ -336,6 +341,7 @@ class CommentsSectionCell: UICollectionViewCell {
     deletePublisher = PassthroughSubject<Comment, Never>()
     paginationPublisher = PassthroughSubject<[Comment], Never>()
     boundsPublisher = PassthroughSubject<Bool, Never>()
+    postCommentCallbackPublisher = PassthroughSubject<Result<Comment, Error>, Never>()
   }
   
   // MARK: - Private methods

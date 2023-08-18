@@ -533,9 +533,11 @@ private extension PollController {
           let popup = NewPopup(padding: self.padding,
                                contentPadding: .uniform(size: self.padding*2))
           let content = ClaimPopupContent(parent: popup,
-                                          surveyReference: self.item)
+                                          object: self.item)
+//                                          surveyReference: self.item)
           content.$claim
-            .filter { !$0.isNil }
+            .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is SurveyReference }
+            .map { [$0!.keys.first as! SurveyReference: $0!.values.first!] }
             .sink { [unowned self] in self.controllerInput?.claim($0!) }
             .store(in: &popup.subscriptions)
           popup.setContent(content)
@@ -809,25 +811,7 @@ extension PollController: PollModelOutput {
   }
   
   func commentPostCallback(_ result: Result<Comment, Error>) {
-    switch result {
-    case .failure(let error):
-#if DEBUG
-      error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                            text: AppError.server.localizedDescription),
-                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                             isModal: true,
-                             useContentViewHeight: true,
-                             shouldDismissAfter: 2)
-      banner.didDisappearPublisher
-        .sink { _ in banner.removeFromSuperview() }
-        .store(in: &self.subscriptions)
-    default:
-#if DEBUG
-      print("")
-#endif
-    }
+    controllerOutput?.commentPostCallback(result)
   }
   
   func commentDeleteError() {

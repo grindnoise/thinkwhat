@@ -667,8 +667,24 @@ extension PollView: PollControllerOutput {
     }
   }
   
-  func commentPostCallback(_: Result<Comment, Error>) {
-    
+  func commentPostCallback(_ result: Result<Comment, Error>) {
+    switch result {
+    case .success:
+      collectionView.postCommentCallbackPublisher.send(result)
+    case .failure(let error):
+#if DEBUG
+      error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                            text: AppError.server.localizedDescription),
+                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                             isModal: false,
+                             useContentViewHeight: true,
+                             shouldDismissAfter: 2)
+      banner.didDisappearPublisher
+        .sink { _ in banner.removeFromSuperview() }
+        .store(in: &self.subscriptions)
+    }
   }
   
   func commentDeleteError() {

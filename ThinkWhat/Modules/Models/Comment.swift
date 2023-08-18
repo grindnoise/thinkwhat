@@ -114,7 +114,7 @@ class Comments {
   subscript(id: Int) -> Comment? { Comments.shared.all.filter({ $0.id == id }).first }
 }
 
-class Comment: Decodable {
+class Comment: Decodable, Complaintable {
   private enum CodingKeys: String, CodingKey {
     case id, survey, parent, children, body, replies, choice
     case userprofile        = "user"
@@ -124,6 +124,7 @@ class Comment: Decodable {
     case replyTo            = "reply_to"
     case isBanned           = "is_banned"
     case isDeleted          = "is_deleted"
+    case isClaimed          = "is_claimed"
   }
   
   let id: Int
@@ -143,11 +144,9 @@ class Comment: Decodable {
   let createdAt: Date
   let replyToId: Int?
   let answerId: Int?
-  //    let parentId: Int?
   var replyTo: Comment? { Comments.shared.all.filter { $0.id == replyToId }.first }
   var isAnonymous: Bool { userprofile.isNil && !anonUsername.isEmpty }
   var parent: Comment? { Comments.shared.all.filter({ $0.id == parentId }).first }
-  @Published var children: [Comment] = []
   var isParentNode: Bool { parentId.isNil }
   var isOwn: Bool {
     guard let userprofile = userprofile,
@@ -184,15 +183,6 @@ class Comment: Decodable {
       survey?.commentClaimedPublisher.send(self)
     }
   }
-  var isRejected: Bool = false {
-    didSet {
-      guard isClaimed else { return }
-      
-      isClaimedPublisher.send(true)
-      isClaimedPublisher.send(completion: .finished)
-      survey?.commentClaimedPublisher.send(self)
-    }
-  }
   var choice: Answer? {
     didSet {
       guard let choice = choice else { return }
@@ -202,7 +192,7 @@ class Comment: Decodable {
   }
   //Publishers
   var isDeletedPublisher      = PassthroughSubject<Bool, Never>()
-  var isClaimedPublisher      = PassthroughSubject<Bool, Never>()
+  var isClaimedPublisher      = PassthroughSubject<Bool, Error>()
   var isBannedPublisher       = PassthroughSubject<Bool, Never>()
   var repliesPublisher        = PassthroughSubject<Int, Never>()
   var choicePublisher         = PassthroughSubject<Answer, Never>()
@@ -219,11 +209,11 @@ class Comment: Decodable {
       }
       surveyId        = try container.decode(Int.self, forKey: .survey)
       createdAt       = try container.decode(Date.self, forKey: .createdAt)
-      children        = (try? container.decode([Comment].self, forKey: .children)) ?? []
       replies         = try container.decode(Int.self, forKey: .replies)
       replyToId       = try container.decodeIfPresent(Int.self, forKey: .replyTo)
       parentId        = try container.decodeIfPresent(Int.self, forKey: .parent)
       isBanned        = try container.decode(Bool.self, forKey: .isBanned)
+      isClaimed       = try container.decode(Bool.self, forKey: .isClaimed)
       isDeleted       = try container.decode(Bool.self, forKey: .isDeleted)
       answerId        = try container.decodeIfPresent(Int.self, forKey: .choice)
       

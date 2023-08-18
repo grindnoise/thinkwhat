@@ -14,4 +14,8 @@ struct AppSettings {
     static let updateStats = 10.0
     static let requestPublications = 5.0
   }
+  
+  struct Pagination {
+    static let threshold = 10 // To request new chunk of data when sroll near list end
+  }
 }

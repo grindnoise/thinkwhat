@@ -74,8 +74,6 @@ extension NotificationCenter: UNUserNotificationCenterDelegate {
         return false
       }).first as? CommentsController {
         foundController.setReply(replyId)
-//        foundController.getComments(excludeList: Comments.shared.all.filter({ $0.isParentNode }).filter({ $0.parentId == threadId}).map { $0.id },
-//                                    includeList: [replyToId, replyId])
       } else if let foundController = navigationController.viewControllers.filter({
         // We need to check if current PollController controller is un navigation stack
         if let controller = $0 as? PollController, controller.item.id == surveyId {
@@ -91,7 +89,8 @@ extension NotificationCenter: UNUserNotificationCenterDelegate {
         // Init and open new PollController
         navigationController.pushViewController(PollController(surveyId: surveyId,
                                                                threadId: threadId,
-                                                               replyId: replyId),
+                                                               replyId: replyId,
+                                                              replyToId: replyToId),
                                                 animated: true)
       }
       mainController.setTabBarVisible(visible: false, animated: true)
