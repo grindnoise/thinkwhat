@@ -152,6 +152,22 @@ private extension CommentsController {
 
 // MARK: - View Input
 extension CommentsController: CommentsViewInput {
+  func reportComment(_ comment: Comment) {
+    let popup = NewPopup(padding: self.padding,
+                         contentPadding: .uniform(size: self.padding*2))
+    let content = ClaimPopupContent(parent: popup,
+                                    object: comment)
+    content.$claim
+      .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is Comment }
+      .map { [$0!.keys.first as! Comment: $0!.values.first!] as! [Comment: Claim]}
+      .sink { [unowned self] in self.controllerInput?.reportComment(comment: $0.keys.first!, reason: $0.values.first!) }
+      .store(in: &popup.subscriptions)
+    popup.setContent(content)
+    popup.didDisappearPublisher
+      .sink { _ in popup.removeFromSuperview() }
+      .store(in: &self.subscriptions)
+  }
+  
   func updateCommentsAndGetNew(mode: CommentsCollectionView.Mode, excludeList: [Int], updateList: [Int]) {
     controllerInput?.updateCommentsAndGetNew(mode: mode, excludeList: excludeList, updateList: updateList)
   }
@@ -171,28 +187,12 @@ extension CommentsController: CommentsViewInput {
   func getComments(excludeList: [Int], includeList: [Int]) {
     controllerInput?.getComments(rootComment: item, excludeList: excludeList, includeList: includeList)
   }
-  
-  func makeComplaint(_ comment: Comment) {
-    let popup = NewPopup(padding: self.padding,
-                         contentPadding: .uniform(size: self.padding*2))
-    let content = ClaimPopupContent(parent: popup,
-                                    object: comment)
-    content.$claim
-      .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is Comment }
-      .map { [$0!.keys.first as! Comment: $0!.values.first!] }
-      .sink { [unowned self] in self.controllerInput?.makeComplaint($0!) }
-      .store(in: &popup.subscriptions)
-    popup.setContent(content)
-    popup.didDisappearPublisher
-      .sink { _ in popup.removeFromSuperview() }
-      .store(in: &self.subscriptions)
-  }
 }
 
 // MARK: - Model Output
 extension CommentsController: CommentsModelOutput {
-  func makeComplaintErrorCallback() {
-    
+  func commentReportError() {
+    Banners.error(container: &subscriptions)
   }
   
   func getReplyCallback(_ result: Result<Comment?, Error>) {
@@ -205,15 +205,7 @@ extension CommentsController: CommentsModelOutput {
 #if DEBUG
       error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                            text: AppError.server.localizedDescription),
-                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                             isModal: false,
-                             useContentViewHeight: true,
-                             shouldDismissAfter: 2)
-      banner.didDisappearPublisher
-        .sink { _ in banner.removeFromSuperview() }
-        .store(in: &self.subscriptions)
+      Banners.error(container: &subscriptions)
     }
   }
   

@@ -1484,7 +1484,7 @@ class API {
         parameters = ["exclude_ids": category.dataItems().map { $0.id }]
       }
       
-      if let period = period, period != .AllTime, let dateFrom = period.date() {
+      if let period = period, period != .unlimited, let dateFrom = period.date {
         parameters["date_from"] = dateFrom.toDateString()
       }
       

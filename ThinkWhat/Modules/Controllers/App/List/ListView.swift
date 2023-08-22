@@ -113,7 +113,7 @@ class ListView: UIView {
   private lazy var collectionView: SurveysCollectionView = {
     let instance = SurveysCollectionView(category: .New,
                                          color: viewInput?.tintColor ?? Colors.System.Red.rawValue,
-                                         period: .PerMonth)
+                                         period: .month)
     
     //Pagination #1
     let paginationPublisher = instance.paginationPublisher
@@ -356,7 +356,7 @@ class ListView: UIView {
   }()
   private lazy var filterViewHeight: CGFloat = .zero
   ///**Logic**
-  private var period: Enums.Period = .PerMonth {
+  private var period: Enums.Period = .month {
     didSet {
       guard oldValue != period else { return }
       
@@ -487,52 +487,52 @@ private extension ListView {
   @MainActor
   func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
     var items = [UIAction]()
-    let perDay: UIAction = .init(title: "per_\(Enums.Period.PerDay.rawValue)".localized.lowercased(),
+    let perDay: UIAction = .init(title: "filter_per_\(Enums.Period.day.description)".localized.lowercased(),
                                  image: nil,
                                  identifier: nil,
                                  discoverabilityTitle: nil,
                                  attributes: .init(),
-                                 state: period == .PerDay ? .on : .off,
+                                 state: period == .day ? .on : .off,
                                  handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .PerDay
+      self.period = .day
     })
     
-    let perWeek: UIAction = .init(title: "per_\(Enums.Period.PerWeek.rawValue)".localized.lowercased(),
+    let perWeek: UIAction = .init(title: "filter_per_\(Enums.Period.week.description)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,
                                   attributes: .init(),
-                                  state: period == .PerWeek ? .on : .off,
+                                  state: period == .week ? .on : .off,
                                   handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .PerWeek
+      self.period = .week
     })
     
-    let perMonth: UIAction = .init(title: "per_\(Enums.Period.PerMonth.rawValue)".localized.lowercased(),
+    let perMonth: UIAction = .init(title: "filter_per_\(Enums.Period.month.description)".localized.lowercased(),
                                    image: nil,
                                    identifier: nil,
                                    discoverabilityTitle: nil,
                                    attributes: .init(),
-                                   state: period == .PerMonth ? .on : .off,
+                                   state: period == .month ? .on : .off,
                                    handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .PerMonth
+      self.period = .month
     })
     
-    let allTime: UIAction = .init(title: "per_\(Enums.Period.AllTime.rawValue)".localized.lowercased(),
+    let allTime: UIAction = .init(title: "filter_per_\(Enums.Period.unlimited.description)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,
                                   attributes: .init(),
-                                  state: period == .AllTime ? .on : .off,
+                                  state: period == .unlimited ? .on : .off,
                                   handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .AllTime
+      self.period = .unlimited
     })
     
     items.append(perDay)
@@ -582,7 +582,7 @@ private extension ListView {
     default: print("")
     }
     
-    let buttonText = text + ": " + "per_\(period.rawValue.lowercased())".localized.uppercased()
+    let buttonText = text + ": " + "filter_per_\(period.description.lowercased())".localized.uppercased()
     let attrString = NSMutableAttributedString(string: buttonText,
                                                attributes: [
                                                 .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
@@ -702,8 +702,8 @@ extension ListView: ListControllerOutput {
     guard let category = viewInput?.category else { return }
     
 //    emptyPublicationsView.mode = category
-    if category == .New, period == .AllTime {
-      period = .PerMonth
+    if category == .New, period == .unlimited {
+      period = .month
     }
     
     updatePeriodButton()

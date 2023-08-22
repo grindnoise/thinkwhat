@@ -178,14 +178,24 @@ class PollView: UIView {
         self.viewInput?.postComment(body: text, replyTo: replyTo, username: username)
       }
       .store(in: &subscriptions)
-    // Delete
-    instance.deletePublisher
+    // Delete comment
+    instance.deleteCommentPublisher
       .sink { [weak self] in
         guard let self = self else { return }
         
         self.viewInput?.deleteComment($0)
       }
       .store(in: &subscriptions)
+    
+    // Complaint on comment
+    instance.commentComplaintPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.reportComment($0)
+      }
+      .store(in: &subscriptions)
+    
     
     // Open thread
     instance.threadPublisher

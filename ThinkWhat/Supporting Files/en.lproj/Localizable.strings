@@ -185,14 +185,6 @@
 //Subscriptions VC
 "subscriptions" = "Subscriptions";
 "publications_per" = "Publications per:";
-"per_day" = "per day";
-"day" = "day";
-"per_week" = "per week";
-"week" = "week";
-"per_month" = "per month";
-"month" = "month";
-"all_time" = "all time";
-"per_all_time" = "of all time";
 "cancel_subscription" = "Cancel subscription";
 
 //List VC
@@ -510,3 +502,17 @@
 "empty_pub_view_own" = "No own posts\nfor the specified period";
 "empty_pub_view_watching" = "No tracked posts\nfor the specified period";
 "empty_pub_view_default" = "No posts\nfor the specified period";
+
+// Survey filters
+"filter_per_day" = "per day";
+"day" = "day";
+"filter_per_week" = "per week";
+"week" = "week";
+"filter_per_month" = "per month";
+"month" = "month";
+"all_time" = "all time";
+"filter_per_all_time" = "of all time";
+"filter_discussed" = "discussed";
+"filter_completed" = "completed";
+"filter_not_completed" = "not completed";
+"filter_anonymous" = "anonymous";

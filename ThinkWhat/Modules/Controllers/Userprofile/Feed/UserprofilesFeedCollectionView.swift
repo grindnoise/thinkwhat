@@ -21,14 +21,10 @@ class UserprofilesFeedCollectionView: UICollectionView {
   
   // MARK: - Overridden properties
   
-  
-  
   // MARK: - Public properties
   public let userPublisher = PassthroughSubject<[Userprofile: IndexPath], Never>()
   public let footerPublisher = CurrentValueSubject<Enums.UserprofilesViewMode?, Never>(nil)
   public let zeroSubscriptions = CurrentValueSubject<Bool?, Never>(nil)
-  
-  
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -154,22 +150,6 @@ private extension UserprofilesFeedCollectionView {
       
       return section
     }
-    
-    //        let footerRegistraition = UICollectionView.SupplementaryRegistration<UICollectionViewListCell>(elementKind: UICollectionView.elementKindSectionFooter) { supplementaryView, elementKind, indexPath in
-    //
-    //            var configuration = supplementaryView.defaultContentConfiguration()
-    //            configuration.text = "All"
-    //            configuration.textProperties.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .subheadline)!
-    //            configuration.textProperties.color = .white
-    //            configuration.textProperties.alignment = .center
-    //            configuration.directionalLayoutMargins = .init(top: 0.0, leading: 0.0, bottom: 0.0, trailing: 0.0)
-    //
-    //            var config = UIBackgroundConfiguration.listPlainCell()
-    //            config.backgroundColor = .systemRed
-    //            supplementaryView.backgroundConfiguration = config
-    //            supplementaryView.contentConfiguration = configuration
-    //            supplementaryView.automaticallyUpdatesContentConfiguration = false
-    //        }
     
     let cellRegistration = UICollectionView.CellRegistration<UserprofileCell, Userprofile> { [unowned self] cell, indexPath, userprofile in
       cell.userprofile = userprofile

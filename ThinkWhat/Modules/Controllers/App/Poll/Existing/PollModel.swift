@@ -19,6 +19,19 @@ class PollModel {
 
 // MARK: - Controller Input
 extension PollModel: PollControllerInput {
+  func reportComment(comment: Comment, reason: Claim) {
+    Task {
+      do {
+        try await API.shared.surveys.claimComment(comment: comment, reason: reason)
+      } catch {
+        modelOutput?.commentReportError()
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
+  
   func post(_ instance: Survey) {
     Task {
       do {

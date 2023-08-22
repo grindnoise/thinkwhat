@@ -142,6 +142,9 @@ class SurveyCell: UICollectionViewCell {
 
       return instance
     }()
+    
+    let opaque = UIView.opaque()
+    avatar.place(inside: opaque, insets: .uniform(size: padding/2))
         
     let instance = UIStackView(arrangedSubviews: [
       UIView.horizontalSpacer(padding),
@@ -149,7 +152,8 @@ class SurveyCell: UICollectionViewCell {
       UIView.opaque(),
       usernameLabel,
       UIView.horizontalSpacer(padding),
-      avatar,
+      opaque,
+//      avatar,
       UIView.horizontalSpacer(padding),
     ])
     instance.axis = .horizontal

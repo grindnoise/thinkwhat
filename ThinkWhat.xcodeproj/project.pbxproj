@@ -354,6 +354,11 @@
 		AB9958B82A24B83C00127DF6 /* BadgeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */; };
 		AB99676123D9AA210037CD6C /* HideKeyboardIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */; };
 		AB996B922A8FA9190094F010 /* Complaintable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB996B912A8FA9190094F010 /* Complaintable.swift */; };
+		AB996B942A936A0A0094F010 /* SurveyFiltersCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB996B932A936A0A0094F010 /* SurveyFiltersCollectionView.swift */; };
+		AB996B9F2A9384650094F010 /* DebuggingIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB996B9E2A9384650094F010 /* DebuggingIdentifiers.swift */; };
+		AB996BA12A938D3C0094F010 /* SurveyFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB996BA02A938D3C0094F010 /* SurveyFilterCell.swift */; };
+		AB996BA42A938F8B0094F010 /* TinyConstraints in Frameworks */ = {isa = PBXBuildFile; productRef = AB996BA32A938F8B0094F010 /* TinyConstraints */; };
+		AB996BA62A93B2080094F010 /* SurveyFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB996BA52A93B2080094F010 /* SurveyFilter.swift */; };
 		AB9998BC280585B9009D0E4F /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9998BB280585B9009D0E4F /* UILabel.swift */; };
 		AB9998BE28058FA5009D0E4F /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9998BD28058FA5009D0E4F /* Double.swift */; };
 		AB99A95424C6CCE800814F96 /* UserLogoHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB99A95324C6CCE800814F96 /* UserLogoHeader.swift */; };
@@ -917,6 +922,10 @@
 		AB9958B72A24B83C00127DF6 /* BadgeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeExtension.swift; sourceTree = "<group>"; };
 		AB99676023D9AA210037CD6C /* HideKeyboardIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideKeyboardIcon.swift; sourceTree = "<group>"; };
 		AB996B912A8FA9190094F010 /* Complaintable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Complaintable.swift; sourceTree = "<group>"; };
+		AB996B932A936A0A0094F010 /* SurveyFiltersCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SurveyFiltersCollectionView.swift; path = ThinkWhat/Modules/Protocols/SurveyFiltersCollectionView.swift; sourceTree = SOURCE_ROOT; };
+		AB996B9E2A9384650094F010 /* DebuggingIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebuggingIdentifiers.swift; sourceTree = "<group>"; };
+		AB996BA02A938D3C0094F010 /* SurveyFilterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SurveyFilterCell.swift; path = ThinkWhat/Modules/Constants/SurveyFilterCell.swift; sourceTree = SOURCE_ROOT; };
+		AB996BA52A93B2080094F010 /* SurveyFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyFilter.swift; sourceTree = "<group>"; };
 		AB9998BB280585B9009D0E4F /* UILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabel.swift; sourceTree = "<group>"; };
 		AB9998BD28058FA5009D0E4F /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
 		AB99A95324C6CCE800814F96 /* UserLogoHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLogoHeader.swift; sourceTree = "<group>"; };
@@ -1086,6 +1095,7 @@
 				AB04D4FF2A2482D0009FF46D /* Agrume in Frameworks */,
 				AB04D5052A248317009FF46D /* Alamofire in Frameworks */,
 				AB04D5022A2482FB009FF46D /* L10n-swift in Frameworks */,
+				AB996BA42A938F8B0094F010 /* TinyConstraints in Frameworks */,
 				AB04D4F92A24822F009FF46D /* SwiftyJSON in Frameworks */,
 				AB04D4FC2A248263009FF46D /* FlagKit in Frameworks */,
 				AB371FF62A21075B00864654 /* GoogleSignInSwift in Frameworks */,
@@ -1207,6 +1217,7 @@
 				AB511C1029F14D1000AF7830 /* AnyOptional.swift */,
 				ABADF5A127F7097F00A26474 /* BannerObservable.swift */,
 				ABB46F362344B1F900AF212B /* CallbackObservable.swift */,
+				AB996B912A8FA9190094F010 /* Complaintable.swift */,
 				AB913F742806C3C200609D51 /* DataCleanOnTerminateObservable.swift */,
 				ABE000B127E0855300B6B4CB /* DataObservable.swift */,
 				AB463FAF27C1378D007D7240 /* KeyboardObservable.swift */,
@@ -1214,11 +1225,10 @@
 				AB913F762806C8DF00609D51 /* ProtocolSubscriptions.swift */,
 				AB156F6529AF88BE00F5397E /* Queue.swift */,
 				AB46B3412A14B47F00D64EA3 /* ScreenVisible.swift */,
+				AB96E88B2A7BB26600C42934 /* TabBarTappable.swift */,
 				AB4054F72878375F000F7768 /* ThinkWhatProtocols.swift */,
 				AB5787F629228AD2009C1DBF /* TintColorable.swift */,
 				AB4054F528783156000F7768 /* UIPropertyListener.swift */,
-				AB96E88B2A7BB26600C42934 /* TabBarTappable.swift */,
-				AB996B912A8FA9190094F010 /* Complaintable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -1460,6 +1470,7 @@
 			isa = PBXGroup;
 			children = (
 				AB38DD6A2819411A00FFEB3F /* AppNotifications.swift */,
+				AB996B9E2A9384650094F010 /* DebuggingIdentifiers.swift */,
 			);
 			path = Constants;
 			sourceTree = "<group>";
@@ -1541,7 +1552,6 @@
 			isa = PBXGroup;
 			children = (
 				AB3C6810223FC6F500B57580 /* Algorithms */,
-				AB96E88E2A86410800C42934 /* App control */,
 				ABDB8EB92A2487F10005D6D0 /* Delete */,
 				AB3C67ED223FBB6600B57580 /* Info.plist */,
 				ABB9E86B279E9E420018BB2E /* Modules */,
@@ -2325,6 +2335,7 @@
 				AB48E2B5287DA68B0020F81B /* SurveyResult.swift */,
 				AB649E2728A15A9C00978520 /* Comment.swift */,
 				ABE884A32987B46800ACEFC7 /* UserCompatibility.swift */,
+				AB996BA52A93B2080094F010 /* SurveyFilter.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -2504,6 +2515,7 @@
 		ABB9E86B279E9E420018BB2E /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				AB96E88E2A86410800C42934 /* App control */,
 				AB309C7827ADB4E1005BBCB4 /* UserDefaults.swift */,
 				AB38DD692819410700FFEB3F /* Constants */,
 				ABB9E88B279FD55D0018BB2E /* Controllers */,
@@ -2579,11 +2591,13 @@
 			path = "Cost collection";
 			sourceTree = "<group>";
 		};
-		ABCDC71D28DC6302003B24F2 /* UserprofilesCollectionView */ = {
+		ABCDC71D28DC6302003B24F2 /* SurveyFiltersCollectionView */ = {
 			isa = PBXGroup;
 			children = (
+				AB996B932A936A0A0094F010 /* SurveyFiltersCollectionView.swift */,
+				AB996BA02A938D3C0094F010 /* SurveyFilterCell.swift */,
 			);
-			path = UserprofilesCollectionView;
+			path = SurveyFiltersCollectionView;
 			sourceTree = "<group>";
 		};
 		ABCDC72228DC76D9003B24F2 /* Labels */ = {
@@ -2646,7 +2660,7 @@
 			isa = PBXGroup;
 			children = (
 				ABC5823829D8BE3F000D4770 /* Cost collection */,
-				ABCDC71D28DC6302003B24F2 /* UserprofilesCollectionView */,
+				ABCDC71D28DC6302003B24F2 /* SurveyFiltersCollectionView */,
 				ABD2A2B12883DD6F00591568 /* SurveysCollectionView */,
 			);
 			path = "Collection views";
@@ -2854,6 +2868,7 @@
 				AB04D4FE2A2482D0009FF46D /* Agrume */,
 				AB04D5012A2482FB009FF46D /* L10n-swift */,
 				AB04D5042A248317009FF46D /* Alamofire */,
+				AB996BA32A938F8B0094F010 /* TinyConstraints */,
 			);
 			productName = ThinkWhat;
 			productReference = AB3C67DB223FBB6400B57580 /* ThinkWhat.app */;
@@ -2961,6 +2976,7 @@
 				AB04D4FD2A2482CF009FF46D /* XCRemoteSwiftPackageReference "Agrume" */,
 				AB04D5002A2482FB009FF46D /* XCRemoteSwiftPackageReference "L10n-swift" */,
 				AB04D5032A248317009FF46D /* XCRemoteSwiftPackageReference "Alamofire" */,
+				AB996BA22A938F8B0094F010 /* XCRemoteSwiftPackageReference "TinyConstraints" */,
 			);
 			productRefGroup = AB3C67DC223FBB6400B57580 /* Products */;
 			projectDirPath = "";
@@ -3275,6 +3291,7 @@
 				AB8F28B027C0DEEB008E4ED0 /* NSLayoutConstraint.swift in Sources */,
 				AB30A4FD272AAEAD00A7DCC0 /* Answer.swift in Sources */,
 				AB0B7FDD294788DE00941FA1 /* PassthroughView.swift in Sources */,
+				AB996BA12A938D3C0094F010 /* SurveyFilterCell.swift in Sources */,
 				AB4054FA28783E81000F7768 /* VoteCell.swift in Sources */,
 				ABDEB65A29C9AE540099C8A4 /* NewPollChoicesCell.swift in Sources */,
 				AB3211AE288E810A00C736DE /* TopicHeaderCell.swift in Sources */,
@@ -3426,6 +3443,7 @@
 				AB0BFDF1252DBCD500BD5EFF /* HeartIcon.swift in Sources */,
 				ABFB4222287320DE0066CFA0 /* YoutubeCell.swift in Sources */,
 				ABA448F327EE031D00F8E00D /* PollModel.swift in Sources */,
+				AB996B9F2A9384650094F010 /* DebuggingIdentifiers.swift in Sources */,
 				ABE4928228AD2DBF00637A8B /* ClaimCollectionView.swift in Sources */,
 				AB6AFFCF289D514B00D260F4 /* Combine.swift in Sources */,
 				AB72961027DA2F0F00D45B54 /* HotModel.swift in Sources */,
@@ -3490,6 +3508,7 @@
 				AB43A56025E63BB800BF8749 /* PaddingLabel.swift in Sources */,
 				AB49EBC42A20E69A0036584E /* UserDefaults.swift in Sources */,
 				ABA16E9029D2DB36002D63B6 /* NewPollHotCell.swift in Sources */,
+				AB996BA62A93B2080094F010 /* SurveyFilter.swift in Sources */,
 				AB3C681D223FD04500B57580 /* KeychainService.swift in Sources */,
 				ABCDC73C28DC7814003B24F2 /* UserprofileView.swift in Sources */,
 				AB96E8902A86413200C42934 /* AppSettings.swift in Sources */,
@@ -3521,6 +3540,7 @@
 				ABDA425123B0D7BF00BAC3A5 /* WebIcon.swift in Sources */,
 				AB7478BF2428951F00317EB6 /* CircularIndicatorImageView.swift in Sources */,
 				ABB7D049295A02CF00DF00B4 /* Publisher.swift in Sources */,
+				AB996B942A936A0A0094F010 /* SurveyFiltersCollectionView.swift in Sources */,
 				AB7CB3C629FAC47A0098A62F /* ProfileCreationModel.swift in Sources */,
 				ABDE82C128B38F18004E07BD /* CommentsController.swift in Sources */,
 				ABA16E9229D2E22D002D63B6 /* UIImage.swift in Sources */,
@@ -4481,6 +4501,14 @@
 				minimumVersion = 7.0.0;
 			};
 		};
+		AB996BA22A938F8B0094F010 /* XCRemoteSwiftPackageReference "TinyConstraints" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/roberthein/TinyConstraints/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -4513,6 +4541,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AB371FF42A21075B00864654 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		AB996BA32A938F8B0094F010 /* TinyConstraints */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AB996BA22A938F8B0094F010 /* XCRemoteSwiftPackageReference "TinyConstraints" */;
+			productName = TinyConstraints;
 		};
 /* End XCSwiftPackageProductDependency section */
 

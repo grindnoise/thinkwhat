@@ -33,7 +33,7 @@ class CommentsView: UIView {
     let instance = CommentsCollectionView()
     
     instance.claimPublisher
-      .sink { [unowned self] in self.viewInput?.makeComplaint($0) }
+      .sink { [unowned self] in self.viewInput?.reportComment($0) }
       .store(in: &subscriptions)
     
     instance.replyPublisher.sink { [weak self] in
@@ -166,15 +166,7 @@ extension CommentsView: CommentsControllerOutput {
   }
   
   func commentDeleteError() {
-    let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                          text: AppError.server.localizedDescription),
-                           contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                           isModal: false,
-                           useContentViewHeight: true,
-                           shouldDismissAfter: 2)
-    banner.didDisappearPublisher
-      .sink { _ in banner.removeFromSuperview() }
-      .store(in: &self.subscriptions)
+    Banners.error(container: &subscriptions)
   }
   
   func commentPostCallback(_ result: Result<Comment, Error>) {
@@ -186,15 +178,7 @@ extension CommentsView: CommentsControllerOutput {
 #if DEBUG
       error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                            text: AppError.server.localizedDescription),
-                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                             isModal: false,
-                             useContentViewHeight: true,
-                             shouldDismissAfter: 2)
-      banner.didDisappearPublisher
-        .sink { _ in banner.removeFromSuperview() }
-        .store(in: &self.subscriptions)
+      Banners.error(container: &subscriptions)
     }
   }
 }

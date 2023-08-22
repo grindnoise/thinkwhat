@@ -32,6 +32,7 @@ protocol PollViewInput: AnyObject {
 //  func updateCommentsStats(_: [Comment])
   func openCommentThread(root: Comment, reply: Comment?, shouldRequest: Bool, _ completion: Closure?)
   func deleteComment(_: Comment)
+  func reportComment(_:Comment)
 }
 
 protocol PollControllerInput: AnyObject {
@@ -51,11 +52,9 @@ protocol PollControllerInput: AnyObject {
   func incrementViewCounter()
   func getCommentsSurveyStateCommentsUpdates(_: Survey)
   func postComment(body: String, replyTo: Comment?, username: String?)
-//  func updateComments(excludeList: [Comment])
-//  func updateCommentsStats(_: [Comment])
   func updateSurveyStats(_: [SurveyReference])
-  func commentClaim(comment: Comment, reason: Claim)
   func deleteComment(_:Comment)
+  func reportComment(comment: Comment, reason: Claim)
 }
 
 protocol PollModelOutput: AnyObject {
@@ -69,6 +68,7 @@ protocol PollModelOutput: AnyObject {
   func favoriteCallback(_: Result<Bool, Error>)
   func commentPostCallback(_: Result<Comment, Error>)
   func commentDeleteError()
+  func commentReportError()
 }
 
 protocol PollControllerOutput: AnyObject {

@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import TinyConstraints
 
 class SubscriptionsView: UIView {
   
@@ -16,6 +17,7 @@ class SubscriptionsView: UIView {
   }
   
   // MARK: - Public properties
+  @IBOutlet var contentView: UIView!
   weak var viewInput: (SubscriptionsViewInput & TintColorable)? {
     didSet {
       guard let viewInput = viewInput else { return }
@@ -74,7 +76,7 @@ class SubscriptionsView: UIView {
       mode = .User
     }
   }
-  private var period: Enums.Period = .AllTime {
+  private var period: Enums.Period = .unlimited {
     didSet {
       guard oldValue != period else { return }
       
@@ -87,47 +89,55 @@ class SubscriptionsView: UIView {
     didSet {
       guard oldValue != isDateFilterHidden else { return }
       
-      toggleDateFilter(on: !isDateFilterHidden)
+//      toggleDateFilter(on: !isDateFilterHidden)
+      viewInput?.setNavigationBarHidden(true)
     }
   }
   private var isCollectionViewSetupCompleted = false
   private var needsAnimation = true
   private var isRevealed = false
-  private var isEmpty = false //{
-//    didSet {
-//      guard isEmpty != oldValue else { return }
-//
-//      switchEmptyLabel(isEmpty: isEmpty)
-//    }
-//  }
+  private var isEmpty = false
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var filterView: UIView = {
     let instance = UIView()
     instance.backgroundColor = .clear
+    instance.layer.masksToBounds = false
+    instance.addSubview(filtersCollectionView)
+    filtersCollectionView.edgesToSuperview()
+    filtersCollectionView.layer.masksToBounds = false
+    
 //    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!)).isActive = true
 
-    let shadowView = UIView.opaque()
-    shadowView.layer.masksToBounds = false
-    shadowView.accessibilityIdentifier = "shadow"
-    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-    shadowView.layer.shadowOffset = .zero
-    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    shadowView.publisher(for: \.bounds)
-      .sink {
-        shadowView.layer.shadowRadius = $0.height/8
-        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
-      }
+//    let shadowView = UIView.opaque()
+//    shadowView.layer.masksToBounds = false
+//    shadowView.accessibilityIdentifier = "shadow"
+//    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+//    shadowView.layer.shadowOffset = .zero
+//    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+//    shadowView.publisher(for: \.bounds)
+//      .sink {
+//        shadowView.layer.shadowRadius = $0.height/8
+//        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+//      }
+//      .store(in: &subscriptions)
+//
+//    periodButton.placeInCenter(of: instance)
+//    instance.insertSubview(shadowView, belowSubview: periodButton)
+//    shadowView.translatesAutoresizingMaskIntoConstraints = false
+//    shadowView.heightAnchor.constraint(equalTo: periodButton.heightAnchor).isActive = true
+//    shadowView.widthAnchor.constraint(equalTo: periodButton.widthAnchor).isActive = true
+//    shadowView.centerXAnchor.constraint(equalTo: periodButton.centerXAnchor).isActive = true
+//    shadowView.centerYAnchor.constraint(equalTo: periodButton.centerYAnchor).isActive = true
+
+    return instance
+  }()
+  private lazy var filtersCollectionView: SurveyFiltersCollectionView = {
+    let instance = SurveyFiltersCollectionView(anonymityEnabled: false)
+    instance.filterPublisher
+      .sink { debugPrint($0.mode) }
       .store(in: &subscriptions)
     
-    periodButton.placeInCenter(of: instance)
-    instance.insertSubview(shadowView, belowSubview: periodButton)
-    shadowView.translatesAutoresizingMaskIntoConstraints = false
-    shadowView.heightAnchor.constraint(equalTo: periodButton.heightAnchor).isActive = true
-    shadowView.widthAnchor.constraint(equalTo: periodButton.widthAnchor).isActive = true
-    shadowView.centerXAnchor.constraint(equalTo: periodButton.centerXAnchor).isActive = true
-    shadowView.centerYAnchor.constraint(equalTo: periodButton.centerYAnchor).isActive = true
-
     return instance
   }()
   private lazy var periodButton: UIButton = {
@@ -713,11 +723,7 @@ class SubscriptionsView: UIView {
   }()
   private lazy var filterViewHeight: CGFloat = .zero
   private lazy var topViewHeight: CGFloat = 100
-  
-  @IBOutlet var contentView: UIView!
-  
-  
-  
+
   // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -828,7 +834,8 @@ private extension SubscriptionsView {
               !viewInput.isOnScreen
         else { return }
 
-        self.toggleDateFilter(on: true)
+        viewInput.setNavigationBarHidden(false)
+//        self.toggleDateFilter(on: true)
       })
       .store(in: &subscriptions)
 //    tasks.append( Task {@MainActor [weak self] in
@@ -924,6 +931,7 @@ private extension SubscriptionsView {
     guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
     
     addSubview(contentView)
+    contentView.edgesToSuperview(usingSafeArea: true)
     
     let views = [
       topView,
@@ -935,23 +943,17 @@ private extension SubscriptionsView {
     views.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     
     NSLayoutConstraint.activate([
-      contentView.topAnchor.constraint(equalTo: topAnchor),
-      contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      contentView.bottomAnchor.constraint(equalTo: bottomAnchor),
+//      contentView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+//      contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+//      contentView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+//      contentView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
       topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: padding),
       topView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
       topView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-      //            filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: 10),
       filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding),
       filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding),
-      //            shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: 10),
-      //            shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
-      //            shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -10),
-      //            shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -10),
     ])
     
-//    periodButton.backgroundColor = viewInput!.tintColor
     userView.alpha = 0
     
     let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding)
@@ -977,11 +979,11 @@ private extension SubscriptionsView {
     
     setNeedsLayout()
     layoutIfNeeded()
-    filterViewHeight = periodButton.bounds.height
-    let constraint = filterView.heightAnchor.constraint(equalToConstant: filterViewHeight)
+    
+    filterViewHeight = padding*2 + "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!)
+    
+    let constraint = filtersCollectionView.height(filterViewHeight)
     constraint.identifier = "height"
-    constraint.isActive = true
-    constraint.priority = .defaultLow
   }
   
   @MainActor
@@ -1038,7 +1040,8 @@ private extension SubscriptionsView {
     
     userView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
     stack.arrangedSubviews.forEach { $0.alpha = 0; $0.transform = CGAffineTransform(scaleX: 0.75, y: 0.75) }
-    toggleDateFilter(on: true)
+//    toggleDateFilter(on: true)
+    viewInput?.setNavigationBarHidden(false)
     setNeedsLayout()
     UIView.animate(
       withDuration: 0.2,
@@ -1096,52 +1099,52 @@ private extension SubscriptionsView {
   
   @MainActor
   func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
-    let perDay: UIAction = .init(title: "per_\(Enums.Period.PerDay.rawValue)".localized.lowercased(),
+    let perDay: UIAction = .init(title: "filter_per_\(Enums.Period.day.description)".localized.lowercased(),
                                  image: nil,
                                  identifier: nil,
                                  discoverabilityTitle: nil,
                                  attributes: .init(),
-                                 state: period == .PerDay ? .on : .off,
+                                 state: period == .day ? .on : .off,
                                  handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .PerDay
+      self.period = .day
     })
     
-    let perWeek: UIAction = .init(title: "per_\(Enums.Period.PerWeek.rawValue)".localized.lowercased(),
+    let perWeek: UIAction = .init(title: "filter_per_\(Enums.Period.week.description)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,
                                   attributes: .init(),
-                                  state: period == .PerWeek ? .on : .off,
+                                  state: period == .week ? .on : .off,
                                   handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .PerWeek
+      self.period = .week
     })
     
-    let perMonth: UIAction = .init(title: "per_\(Enums.Period.PerMonth.rawValue)".localized.lowercased(),
+    let perMonth: UIAction = .init(title: "filter_per_\(Enums.Period.month.description)".localized.lowercased(),
                                    image: nil,
                                    identifier: nil,
                                    discoverabilityTitle: nil,
                                    attributes: .init(),
-                                   state: period == .PerMonth ? .on : .off,
+                                   state: period == .month ? .on : .off,
                                    handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .PerMonth
+      self.period = .month
     })
     
-    let allTime: UIAction = .init(title: "per_\(Enums.Period.AllTime.rawValue)".localized.lowercased(),
+    let allTime: UIAction = .init(title: "filter_per_\(Enums.Period.unlimited.description)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,
                                   attributes: .init(),
-                                  state: period == .AllTime ? .on : .off,
+                                  state: period == .unlimited ? .on : .off,
                                   handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .AllTime
+      self.period = .unlimited
     })
     
     return UIMenu(title: "",//"publications_per".localized,
@@ -1159,7 +1162,7 @@ private extension SubscriptionsView {
   @MainActor
   func updatePeriodButton() {
     periodButton.menu = prepareMenu()
-    let buttonText = "publications".localized.uppercased() + ": " + "per_\(period.rawValue.lowercased())".localized.uppercased()
+    let buttonText = "publications".localized.uppercased() + ": " + "filter_per_\(period.description.lowercased())".localized.uppercased()
     let attrString = NSMutableAttributedString(string: buttonText,
                                                attributes: [
                                                 .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
@@ -1174,51 +1177,52 @@ private extension SubscriptionsView {
     periodButton.setAttributedTitle(attrString1, for: .highlighted)
   }
   
-  @MainActor
-  func toggleDateFilter(on: Bool, animated: Bool = true) {
-    guard let heightConstraint = filterView.getConstraint(identifier: "height"),
-          let constraint1 = filterView.getConstraint(identifier: "top_1"),
-          let constraint2 = shadowView.getConstraint(identifier: "top"),
-                          let constraint3 = topView.getConstraint(identifier: "height")
-            //              let constraint4 = shadowView.getConstraint(identifier: "trailing")
-            //              let constraint5 = shadowView.getConstraint(identifier: "bottom")
-    else { return }
-    
-    setNeedsLayout()
-    
-    guard animated else {
-      filterView.alpha = on ? 1 : 0
-      filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
-      constraint1.constant = on ? 16 : mode == .Default ? 0 : 10
-      constraint2.constant = on ? 16 : 0
-      heightConstraint.constant = on ? filterViewHeight : 0
-      layoutIfNeeded()
-      
-      return
-    }
-    UIView.animate(withDuration: 0.15, delay: 0, options: .curveLinear) { [weak self] in
-      guard let self = self else { return }
-      
-      //            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
-      //            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
-      self.filterView.alpha = on ? 1 : 0
-      self.filterView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
-      constraint1.constant = on ? 16 : self.mode == .Default ? 0 : 10
-      constraint2.constant = on ? 16 : 0
-      
-//      if self.mode == .Default {
-//        constraint3.constant = 0
-//        self.topView.alpha = on ? 1 : 0
-//        self.topView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
-//      }
-      
-      //            constraint3.constant = on ? 8 : 4
-      //            constraint4.constant = on ? -8 : -4
-      //            constraint5.constant = on ? -8 : -4
-      heightConstraint.constant = on ? self.filterViewHeight : 0
-      self.layoutIfNeeded()
-    }
-  }
+//  @MainActor
+//  func toggleDateFilter(on: Bool, animated: Bool = true) {
+//    return
+//    guard let heightConstraint = filtersCollectionView.getConstraint(identifier: "height"),
+//          let constraint1 = filterView.getConstraint(identifier: "top_1"),
+//          let constraint2 = shadowView.getConstraint(identifier: "top"),
+//                          let constraint3 = topView.getConstraint(identifier: "height")
+//            //              let constraint4 = shadowView.getConstraint(identifier: "trailing")
+//            //              let constraint5 = shadowView.getConstraint(identifier: "bottom")
+//    else { return }
+//
+//    setNeedsLayout()
+//
+//    guard animated else {
+//      filtersCollectionView.alpha = on ? 1 : 0
+//      filtersCollectionView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
+//      constraint1.constant = on ? 16 : mode == .Default ? 0 : 10
+//      constraint2.constant = on ? 16 : 0
+//      heightConstraint.constant = on ? filterViewHeight : 0
+//      layoutIfNeeded()
+//
+//      return
+//    }
+//    UIView.animate(withDuration: 0.15, delay: 0, options: .curveLinear) { [weak self] in
+//      guard let self = self else { return }
+//
+//      //            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
+//      //            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
+//      self.filtersCollectionView.alpha = on ? 1 : 0
+//      self.filtersCollectionView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
+//      constraint1.constant = on ? 16 : self.mode == .Default ? 0 : 10
+//      constraint2.constant = on ? 16 : 0
+//
+////      if self.mode == .Default {
+////        constraint3.constant = 0
+////        self.topView.alpha = on ? 1 : 0
+////        self.topView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
+////      }
+//
+//      //            constraint3.constant = on ? 8 : 4
+//      //            constraint4.constant = on ? -8 : -4
+//      //            constraint5.constant = on ? -8 : -4
+//      heightConstraint.constant = on ? self.filterViewHeight : 0
+//      self.layoutIfNeeded()
+//    }
+//  }
   
 //  func switchEmptyLabel(isEmpty: Bool) {
 //    func emptyLabel() -> UILabel {
@@ -1310,7 +1314,8 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
     
 //    mode = .Default
 //    surveysCollectionView.category = .Subscriptions
-    toggleDateFilter(on: true)
+//    toggleDateFilter(on: true)
+    viewInput.setNavigationBarHidden(false)
     
     let temp = UIImageView(image: userprofile.image ?? UIImage(named: "person"))
     if userprofile.image.isNil {

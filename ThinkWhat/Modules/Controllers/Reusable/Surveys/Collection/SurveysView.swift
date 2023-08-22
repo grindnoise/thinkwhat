@@ -151,7 +151,7 @@ class SurveysView: UIView {
         else { return }
         
         self.viewInput?.onDataSourceRequest(source: .Search,
-                                            dateFilter: .AllTime,
+                                            dateFilter: .unlimited,
                                             topic: nil,
                                             userprofile: nil,
                                             compatibility: nil,
@@ -174,7 +174,7 @@ class SurveysView: UIView {
         else { return }
         
         self.viewInput?.onDataSourceRequest(source: .Search,
-                                            dateFilter: .AllTime,
+                                            dateFilter: .unlimited,
                                             topic: nil,
                                             userprofile: nil,
                                             compatibility: nil,
@@ -194,7 +194,7 @@ class SurveysView: UIView {
         guard let self = self else { return }
         
         self.viewInput?.onDataSourceRequest(source: .Compatibility,
-                                            dateFilter: .AllTime,
+                                            dateFilter: .unlimited,
                                             topic: nil,
                                             userprofile: nil,
                                             compatibility: $0,
@@ -214,7 +214,7 @@ class SurveysView: UIView {
         guard let self = self else { return }
         
         self.viewInput?.onDataSourceRequest(source: .Compatibility,
-                                            dateFilter: .AllTime,
+                                            dateFilter: .unlimited,
                                             topic: nil,
                                             userprofile: nil,
                                             compatibility: nil,
@@ -275,7 +275,7 @@ class SurveysView: UIView {
         guard let self = self else { return }
         
         self.viewInput?.onDataSourceRequest(source: .Compatibility,
-                                            dateFilter: .AllTime,
+                                            dateFilter: .unlimited,
                                             topic: nil,
                                             userprofile: nil,
                                             compatibility: $0,

@@ -393,7 +393,7 @@ class SurveyReference: Decodable, Complaintable {
   
   //MARK: - Public methods
   public func isValid(byBeriod period: Enums.Period) -> Bool {
-    guard let dateBound = period.date() else { return false }
+    guard let dateBound = period.date else { return false }
     
     return startDate >= dateBound
   }

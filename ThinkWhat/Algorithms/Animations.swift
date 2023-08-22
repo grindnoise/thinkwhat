@@ -300,7 +300,7 @@ struct Animations {
    
     guard animateOpacity else { return }
 
-    animatedlayer.opacity = 1//unmask ? 1 : 0//0
+    animatedlayer.opacity = Float(1)//unmask ? 1 : 0//0
     let opacityAnim = Animations.get(property: .Opacity,
                                      fromValue: unmask ? 0 : 1,
                                      toValue: unmask ? 1 : 0,

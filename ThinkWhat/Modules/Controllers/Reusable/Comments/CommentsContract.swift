@@ -24,7 +24,7 @@ protocol CommentsViewInput: AnyObject {
   func postComment(body: String, replyTo: Comment?, username: String?)
   func postClaim(comment: Comment, reason: Claim)
   func deleteComment(_:Comment)
-  func makeComplaint(_: Comment)
+  func reportComment(_: Comment)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -41,7 +41,7 @@ protocol CommentsControllerInput: AnyObject {
   func deleteComment(_:Comment)
   func loadThread(root: Comment)
   func getReply(threadId: Int, replyId: Int)
-  func makeComplaint(_: [Comment: Claim])
+  func reportComment(comment: Comment, reason: Claim)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -54,7 +54,7 @@ protocol CommentsModelOutput: AnyObject {
   func commentPostCallback(_: Result<Comment, Error>)
   func commentDeleteError()
   func getReplyCallback(_: Result<Comment?, Error>)
-  func makeComplaintErrorCallback()
+  func commentReportError()
 }
 
 /// *Controller* returns a UI-representable result to the *View*

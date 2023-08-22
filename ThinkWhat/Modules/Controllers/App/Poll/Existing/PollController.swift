@@ -152,20 +152,7 @@ class PollController: UIViewController {
       setTasks()
       return
     }
-    let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                          text: "survey_banned_notification"),
-                           contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                           isModal: true,
-                           useContentViewHeight: true,
-                           shouldDismissAfter: 2)
-    banner.didDisappearPublisher
-      .sink { [weak self] _ in
-        guard let self = self else { return }
-        
-        self.navigationController?.popViewController(animated: true)
-        banner.removeFromSuperview()
-      }
-      .store(in: &self.subscriptions)
+    Banners.error(container: &self.subscriptions, text: "survey_banned_notification")
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -578,6 +565,22 @@ private extension PollController {
 
 // MARK: - Input
 extension PollController: PollViewInput {
+  func reportComment(_ comment: Comment) {
+    let popup = NewPopup(padding: self.padding,
+                         contentPadding: .uniform(size: self.padding*2))
+    let content = ClaimPopupContent(parent: popup,
+                                    object: comment)
+    content.$claim
+      .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is Comment }
+      .map { [$0!.keys.first as! Comment: $0!.values.first!] as! [Comment: Claim] }
+      .sink { [unowned self] in self.controllerInput?.reportComment(comment: $0.keys.first!, reason: $0.values.first!) }
+      .store(in: &popup.subscriptions)
+    popup.setContent(content)
+    popup.didDisappearPublisher
+      .sink { _ in popup.removeFromSuperview() }
+      .store(in: &self.subscriptions)
+  }
+  
   func post() {
     guard let survey = item.survey else { return }
     
@@ -661,6 +664,10 @@ extension PollController: PollViewInput {
 
 // MARK: - Output
 extension PollController: PollModelOutput {
+  func commentReportError() {
+    Banners.error(container: &subscriptions)
+  }
+  
   func loadThreadCallback(_ result: Result<Comment?, Error>) {
     switch result {
     case .success(let root):
@@ -670,16 +677,7 @@ extension PollController: PollModelOutput {
                         reply: replyId.isNil ? nil : Comments.shared.all.filter({ [unowned self] in $0.id == Int(self.replyId!) }).first,
                         shouldRequest: false) {}
     case .failure(_):
-      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                            text: AppError.server.localizedDescription),
-                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                             isModal: false,
-                             useContentViewHeight: true,
-                             shouldDismissAfter: 1)
-      
-      banner.didDisappearPublisher
-        .sink { _ in banner.removeFromSuperview() }
-        .store(in: &self.subscriptions)
+      Banners.error(container: &subscriptions)
     }
   }
   
@@ -746,16 +744,7 @@ extension PollController: PollModelOutput {
         }
       }
     case .failure:
-      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                            text: AppError.server.localizedDescription),
-                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                             isModal: false,
-                             useContentViewHeight: true,
-                             shouldDismissAfter: 1)
-      
-      banner.didDisappearPublisher
-        .sink { _ in banner.removeFromSuperview() }
-        .store(in: &self.subscriptions)
+      Banners.error(container: &subscriptions)
       
       return
     }
@@ -841,20 +830,7 @@ extension PollController: PollModelOutput {
         }
         .store(in: &self.subscriptions)
     case .failure(let error):
-      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                            text: error.localizedDescription),
-                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                             isModal: true,
-                             useContentViewHeight: true,
-                             shouldDismissAfter: 2)
-
-      banner.didDisappearPublisher
-        .sink { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.navigationController?.popViewController(animated: true)
-          banner.removeFromSuperview() }
-        .store(in: &self.subscriptions)
+      Banners.error(container: &self.subscriptions, text: error.localizedDescription)
     }
   }
 }

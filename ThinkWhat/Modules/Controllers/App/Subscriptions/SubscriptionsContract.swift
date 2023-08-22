@@ -32,6 +32,7 @@ protocol SubscriptionsViewInput: AnyObject {
   func onAllUsersTapped(mode: Enums.UserprofilesViewMode)
   func onSubcriptionsCountEvent(zeroSubscriptions: Bool)
   func setDefaultMode()
+  func setNavigationBarHidden(_: Bool)
 }
 
 /// *Controller* tells the *Model* what to do based on the input

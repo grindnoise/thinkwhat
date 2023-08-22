@@ -357,7 +357,7 @@ class TopicsView: UIView {
   private lazy var filterViewHeight: CGFloat = .zero
   ///**Logic**
   private var touchLocation: CGPoint = .zero
-  private var period: Enums.Period = .AllTime {
+  private var period: Enums.Period = .unlimited {
     didSet {
       guard oldValue != period else { return }
       
@@ -619,52 +619,52 @@ private extension TopicsView {
   
   @MainActor
   func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
-    let perDay: UIAction = .init(title: "per_\(Enums.Period.PerDay.rawValue)".localized.lowercased(),
+    let perDay: UIAction = .init(title: "filter_per_\(Enums.Period.day.description)".localized.lowercased(),
                                  image: nil,
                                  identifier: nil,
                                  discoverabilityTitle: nil,
                                  attributes: .init(),
-                                 state: period == .PerDay ? .on : .off,
+                                 state: period == .day ? .on : .off,
                                  handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .PerDay
+      self.period = .day
     })
     
-    let perWeek: UIAction = .init(title: "per_\(Enums.Period.PerWeek.rawValue)".localized.lowercased(),
+    let perWeek: UIAction = .init(title: "filter_per_\(Enums.Period.week.description)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,
                                   attributes: .init(),
-                                  state: period == .PerWeek ? .on : .off,
+                                  state: period == .week ? .on : .off,
                                   handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .PerWeek
+      self.period = .week
     })
     
-    let perMonth: UIAction = .init(title: "per_\(Enums.Period.PerMonth.rawValue)".localized.lowercased(),
+    let perMonth: UIAction = .init(title: "filter_per_\(Enums.Period.month.description)".localized.lowercased(),
                                    image: nil,
                                    identifier: nil,
                                    discoverabilityTitle: nil,
                                    attributes: .init(),
-                                   state: period == .PerMonth ? .on : .off,
+                                   state: period == .month ? .on : .off,
                                    handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .PerMonth
+      self.period = .month
     })
     
-    let allTime: UIAction = .init(title: "per_\(Enums.Period.AllTime.rawValue)".localized.lowercased(),
+    let allTime: UIAction = .init(title: "filter_per_\(Enums.Period.unlimited.description)".localized.lowercased(),
                                   image: nil,
                                   identifier: nil,
                                   discoverabilityTitle: nil,
                                   attributes: .init(),
-                                  state: period == .AllTime ? .on : .off,
+                                  state: period == .unlimited ? .on : .off,
                                   handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.period = .AllTime
+      self.period = .unlimited
     })
     
     return UIMenu(title: "",//"publications_per".localized,
@@ -682,7 +682,7 @@ private extension TopicsView {
   @MainActor
   func updatePeriodButton() {
     periodButton.menu = prepareMenu()
-    let buttonText = "publications".localized.uppercased() + ": " +  "per_\(period.rawValue.lowercased())".localized.uppercased()
+    let buttonText = "publications".localized.uppercased() + ": " +  "filter_per_\(period.description.lowercased())".localized.uppercased()
     let attrString = NSMutableAttributedString(string: buttonText,
                                                attributes: [
                                                 .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,

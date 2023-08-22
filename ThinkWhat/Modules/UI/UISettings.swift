@@ -412,6 +412,8 @@ enum Colors {
   static var surveyCollectionDark: UIColor { .secondarySystemBackground }
   static var surveyCellLight: UIColor { .white }
   static var surveyCellDark: UIColor { UIColor(hexString: "#262626") }
+  static let filterEnabled = UIColor(hexString: "#21A038")
+  static let filterDisabled = UIColor.systemGray4
   
   struct Poll {
     static let choiceBackgroundLight = UIColor.systemBackground
@@ -431,11 +433,8 @@ enum Colors {
 struct UISettings {
   struct Shadows {
     static func radius(padding: CGFloat) -> CGFloat { padding*0.65 }
-    
-//    struct Cards {
       static let color = UIColor.lightGray.withAlphaComponent(0.35).cgColor
       static let offset = CGSize.zero
-//    }
   }
 }
 

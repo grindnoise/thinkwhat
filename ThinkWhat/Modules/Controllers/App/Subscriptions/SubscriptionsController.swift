@@ -595,6 +595,14 @@ private extension SubscriptionsController {
 }
 
 extension SubscriptionsController: SubscriptionsViewInput {
+  func setNavigationBarHidden(_ flag: Bool) {
+//    navigationController?.setNavigationBarHidden(flag, animated: true)
+//
+//    guard let mainController = tabBarController as? MainController else { return }
+//    
+//    mainController.toggleLogo(on: !flag)
+  }
+  
   func toggleUserSelected(_ selected: Bool) { isUserSelected = selected }
   
   func setDefaultMode() {

@@ -345,3 +345,18 @@ private extension NewBanner {
     }
   }
 }
+
+struct Banners {
+  @MainActor
+  static func error(container: inout Set<AnyCancellable>, text: String = AppError.server.localizedDescription) {
+    let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                          text: text),
+                           contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                           isModal: false,
+                           useContentViewHeight: true,
+                           shouldDismissAfter: 2)
+    banner.didDisappearPublisher
+      .sink { _ in banner.removeFromSuperview() }
+      .store(in: &container)
+  }
+}

@@ -61,8 +61,9 @@ class PollCollectionView: UICollectionView {
   public let replyPublisher = PassthroughSubject<[Comment: String], Never>()
   public let anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
 //  public var commentClaimPublisher = PassthroughSubject<Comment, Never>()
-  public let deletePublisher = PassthroughSubject<Comment, Never>()
+  public let deleteCommentPublisher = PassthroughSubject<Comment, Never>()
   public let threadPublisher = PassthroughSubject<Comment, Never>()
+  public let commentComplaintPublisher = PassthroughSubject<Comment, Never>()
   //  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
   ///**Logic**
   public var viewMode: ViewMode {
@@ -425,7 +426,7 @@ private extension PollCollectionView {
         .sink { [weak self] in
           guard let self = self else { return }
           
-          self.deletePublisher.send($0)
+          self.deleteCommentPublisher.send($0)
         }
         .store(in: &self.subscriptions)
       
@@ -460,6 +461,12 @@ private extension PollCollectionView {
       self.postCommentCallbackPublisher
         .sink { cell.postCommentCallbackPublisher.send($0) }
         .store(in: &self.subscriptions)
+      
+      // Complaint
+      cell.claimPublisher
+        .sink { [unowned self] in self.commentComplaintPublisher.send($0) }
+        .store(in: &self.subscriptions)
+      
 //
 //      //Subscription for request comments
 //      cell.commentsRequestSubject.sink { [weak self] in
@@ -643,3 +650,9 @@ extension PollCollectionView: UICollectionViewDelegate {
     return false
   }
 }
+
+//extension PollCollectionView: UIScrollViewDelegate {
+//  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//    <#code#>
+//  }
+//}

@@ -49,7 +49,7 @@ class SurveysCollectionView: UICollectionView {
       scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: category == .Topic ? false : true)
     }
   }
-  public var period: Enums.Period = .AllTime {
+  public var period: Enums.Period = .unlimited {
     didSet {
       setDataSource()
     }
@@ -272,7 +272,7 @@ class SurveysCollectionView: UICollectionView {
   
   init(category: Survey.SurveyCategory,
        color: UIColor? = nil,
-       period: Enums.Period = .AllTime) {
+       period: Enums.Period = .unlimited) {
     self.category = category
     self.color = color ?? .secondaryLabel
     self.period = period

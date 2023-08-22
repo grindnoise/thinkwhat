@@ -185,14 +185,6 @@
 //Subscriptions VC
 "subscriptions" = "Подписки";
 "publications_per" = "Публикации за:";
-"per_day" = "за день";
-"day" = "сутки";
-"per_week" = "за неделю";
-"week" = "неделя";
-"per_month" = "за месяц";
-"month" = "месяц";
-"all_time" = "все время";
-"per_all_time" = "за все время";
 "cancel_subscription" = "Отказаться от подписки";
 
 //List VC
@@ -510,3 +502,17 @@
 "empty_pub_view_own" = "Нет своих публикаций\nза указанный период";
 "empty_pub_view_watching" = "Нет отслеживаемых публикаций\nза указанный период";
 "empty_pub_view_default" = "Нет публикаций\nза указанный период";
+
+// Survey filters
+"filter_per_day" = "за день";
+"day" = "сутки";
+"filter_per_week" = "за неделю";
+"week" = "неделя";
+"filter_per_month" = "за месяц";
+"month" = "месяц";
+"all_time" = "все время";
+"filter_per_all_time" = "за все время";
+"filter_discussed" = "обсуждаемые";
+"filter_completed" = "пройденные";
+"filter_not_completed" = "не пройденные";
+"filter_anonymous" = "анонимные";

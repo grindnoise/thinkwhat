@@ -616,7 +616,11 @@ extension CommentsCollectionView: UICollectionViewDelegate {
       textField.setStaticText(username)
       let _ = textField.becomeFirstResponder()
     }
-    guard let cell = collectionView.cellForItem(at: indexPath) as? CommentCell else { return }
+    
+    // Skip deleted
+    guard let cell = collectionView.cellForItem(at: indexPath) as? CommentCell,
+          !cell.item.isDeleted
+    else { return }
     
     if mode == .All {
       // Reveal hidden text

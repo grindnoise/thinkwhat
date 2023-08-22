@@ -14,8 +14,17 @@ class CommentsModel {
 
 // MARK: - Controller Input
 extension CommentsModel: CommentsControllerInput {
-  func makeComplaint(_ complaint: [Comment: Claim]) {
-    
+  func reportComment(comment: Comment, reason: Claim) {
+    Task {
+      do {
+        try await API.shared.surveys.claimComment(comment: comment, reason: reason)
+      } catch {
+        modelOutput?.commentReportError()
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
   }
   
   func updateCommentsAndGetNew(mode: CommentsCollectionView.Mode, excludeList: [Int], updateList: [Int]) {

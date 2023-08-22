@@ -178,27 +178,31 @@ struct Enums {
     case Subscribers, Subscriptions, Voters
   }
   
-  enum Period: String {
-    //    case PerDay     = "per_day"
-    //    case PerWeek    = "per_week"
-    //    case PerMonth   = "per_month"
-    //    case AllTime    = "all_time"
-    case PerDay     = "day"
-    case PerWeek    = "week"
-    case PerMonth   = "month"
-    case AllTime    = "all_time"
+  enum Period: Int, CaseIterable {
+    case day, week, month, unlimited
     
-    func date() -> Date? {
+    var description: String {
       switch self {
-      case .PerDay:
+      case .day: return "filter_per_day"
+      case .week: return "filter_per_week"
+      case .month: return "filter_per_month"
+      case .unlimited: return "filter_per_all_time"
+      }
+    }
+    
+    var date: Date? {
+      switch self {
+      case .day:
         return Calendar.current.date(byAdding: .day, value: -1, to: Date())
-      case .PerWeek:
+      case .week:
         return Calendar.current.date(byAdding: .day, value: -7, to: Date())
-      case .PerMonth:
+      case .month:
         return Calendar.current.date(byAdding: .month, value: -1, to: Date())
-      case .AllTime:
+      case .unlimited:
         return Calendar.current.date(byAdding: .year, value: -999, to: Date())
       }
     }
   }
+  
+  enum SurveyFilterMode { case all, period, anonymous, discussed, completed, notCompleted }
 }
