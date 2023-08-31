@@ -285,7 +285,7 @@ class Avatar: UIView {
     instance.showsMenuAsPrimaryAction = true
     instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
-    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     //        instance.isContextMenuInteractionEnabled = true
     //        instance.addInteraction(UIContextMenuInteraction(delegate: self))

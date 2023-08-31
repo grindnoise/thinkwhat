@@ -20,20 +20,9 @@ class SubscriptionsView: UIView {
   @IBOutlet var contentView: UIView!
   weak var viewInput: (SubscriptionsViewInput & TintColorable)? {
     didSet {
-      guard let viewInput = viewInput else { return }
+      guard !viewInput.isNil else { return }
       
       setupUI()
-      updatePeriodButton()
-      surveysCollectionView.color = viewInput.tintColor
-      
-      if #available(iOS 15, *) {
-        if !periodButton.configuration.isNil {
-          periodButton.configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in return viewInput.tintColor }
-        }
-      } else {
-        periodButton.imageView?.tintColor = viewInput.tintColor
-        periodButton.tintColor = viewInput.tintColor
-      }
     }
   }
   public private(set) var isCardOnScreen = false
@@ -44,310 +33,191 @@ class SubscriptionsView: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private var mode: Mode = .Default {
+  private var mode: Mode = .Default
+  private let filter = SurveyFilter(main: .subscriptions, additional: .disabled, period: .unlimited)
+  private var indexPath: IndexPath = IndexPath(row: 0, section: 0)
+  private var isEmpty = false {
     didSet {
-      //            guard let constraint = filterView.getConstraint(identifier: "top_1") else { return }
+      guard isEmpty != oldValue else { return }
       
-      //            setNeedsLayout()
-      //            UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseInOut) { [weak self] in
-      //                guard let self = self else { return }
-      //
-      //                constraint.constant = self.mode == .User ? 20 : 0
-      //                self.layoutIfNeeded()
-      //            }
-    }
-  }
-  private var indexPath: IndexPath = IndexPath(row: 0, section: 0) {
-    didSet {
-      print(indexPath)
+      onEmptyList(isEmpty: isEmpty)
     }
   }
   private var userprofile: Userprofile! {
     didSet {
       guard let userprofile = userprofile else { return }
       
-//      assert(userprofile == Userprofiles.shared.current)
-//      setTasks()
       viewInput?.toggleUserSelected(true)
       viewInput?.setUserprofileFilter(userprofile)
-      surveysCollectionView.userprofile = userprofile
+      // Set userprofile filter
+      filter.setMain(filter: .user, userprofile: userprofile)
+      //        surveysCollectionView.userprofile = userprofile
       onUserSelected(userprofile: userprofile)
-      usernameLabel.text = userprofile.username//userprofile.firstNameSingleWord + (userprofile.lastNameSingleWord.isEmpty ? "" : " \(userprofile.lastNameSingleWord)")
+      usernameLabel.text = userprofile.username
       mode = .User
     }
   }
-  private var period: Enums.Period = .unlimited {
+  private var isScrolledDown = false { // Use to show/hide arrow button
     didSet {
-      guard oldValue != period else { return }
+      guard oldValue != isScrolledDown,
+            !scrollToTopButtonAnimates,
+            let constraint = scrollToTopButton.getConstraint(identifier: "top")
+      else { return }
       
-      surveysCollectionView.period = period
-      
-      updatePeriodButton()
+      //      if scrollToTopButtonX == .zero {
+      //        scrollToTopButtonX = padding + scrollToTopButton.bounds.width
+      //      }
+      scrollToTopButtonAnimates = true
+      UIView.animate(withDuration: isScrolledDown ? 0.25 : 0.15,
+                     delay: 0,
+                     options: .curveEaseInOut,
+                     animations: { [weak self] in
+        guard let self = self else { return }
+        
+        self.background.setNeedsLayout()
+        constraint.constant = self.isScrolledDown ? -(self.scrollToTopButton.bounds.width + self.padding) : 0
+        self.background.layoutIfNeeded()
+      }) { [unowned self] _ in self.scrollToTopButtonAnimates = false }
     }
   }
-  private var isDateFilterHidden = false {
-    didSet {
-      guard oldValue != isDateFilterHidden else { return }
-      
-//      toggleDateFilter(on: !isDateFilterHidden)
-      viewInput?.setNavigationBarHidden(true)
-    }
-  }
-  private var isCollectionViewSetupCompleted = false
-  private var needsAnimation = true
-  private var isRevealed = false
-  private var isEmpty = false
   ///**UI**
   private let padding: CGFloat = 8
-  private lazy var filterView: UIView = {
-    let instance = UIView()
-    instance.backgroundColor = .clear
-    instance.layer.masksToBounds = false
-    instance.addSubview(filtersCollectionView)
-    filtersCollectionView.edgesToSuperview()
-    filtersCollectionView.layer.masksToBounds = false
-    
-//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!)).isActive = true
-
-//    let shadowView = UIView.opaque()
-//    shadowView.layer.masksToBounds = false
-//    shadowView.accessibilityIdentifier = "shadow"
-//    shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-//    shadowView.layer.shadowOffset = .zero
-//    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-//    shadowView.publisher(for: \.bounds)
-//      .sink {
-//        shadowView.layer.shadowRadius = $0.height/8
-//        shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
-//      }
-//      .store(in: &subscriptions)
-//
-//    periodButton.placeInCenter(of: instance)
-//    instance.insertSubview(shadowView, belowSubview: periodButton)
-//    shadowView.translatesAutoresizingMaskIntoConstraints = false
-//    shadowView.heightAnchor.constraint(equalTo: periodButton.heightAnchor).isActive = true
-//    shadowView.widthAnchor.constraint(equalTo: periodButton.widthAnchor).isActive = true
-//    shadowView.centerXAnchor.constraint(equalTo: periodButton.centerXAnchor).isActive = true
-//    shadowView.centerYAnchor.constraint(equalTo: periodButton.centerYAnchor).isActive = true
-
-    return instance
-  }()
   private lazy var filtersCollectionView: SurveyFiltersCollectionView = {
-    let instance = SurveyFiltersCollectionView(anonymityEnabled: false)
+    let instance = SurveyFiltersCollectionView(items: [
+      SurveyFilterItem(main: .subscriptions, additional: .disabled, isFilterEnabled: true, text: "all"),
+      SurveyFilterItem(main: .subscriptions,
+                       additional:  .period,
+                       text: Enums.Period.unlimited.description,
+                       image: UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
+                       periodThreshold: .unlimited),
+      SurveyFilterItem(main: .subscriptions, additional: .discussed, text: "filter_discussed"),
+      SurveyFilterItem(main: .subscriptions, additional: .completed, text: "filter_completed"),
+      SurveyFilterItem(main: .subscriptions, additional: .notCompleted, text: "filter_not_completed")
+    ])
+    instance.layer.masksToBounds = false
+    // Filtering
     instance.filterPublisher
-      .sink { debugPrint($0.mode) }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
-  private lazy var periodButton: UIButton = {
-    let instance = UIButton()
-    instance.titleLabel?.numberOfLines = 1
-    instance.showsMenuAsPrimaryAction = true
-    instance.menu = prepareMenu()
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
-    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
-//    instance.setTitleColor(traitCollection.userInterfaceStyle == .dark ? .white : viewInput?.tintColor, for: .normal)
-    instance.adjustsImageWhenHighlighted = false
-    instance.imageEdgeInsets.left = padding
-    instance.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding*2, bottom: padding, right: padding*2)
-    instance.semanticContentAttribute = .forceRightToLeft
-    instance.setImage(UIImage(systemName: ("slider.horizontal.3"), withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
-    instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.height/2 }
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in
+        self.filter.setAdditional(filter: $0.additional, period: $0.period)
+        self.isScrolledDown = false
+        self.scrollToTop()
+      }
       .store(in: &subscriptions)
     
     return instance
   }()
   private var emptyPublicationsView: EmptyPublicationsView?
+  private lazy var collectionEmptyPublicationsView: EmptyPublicationsView = {
+    let instance = EmptyPublicationsView(showsButton: false,
+                                         buttonText: "create_post",
+                                         buttonColor: viewInput?.tintColor ?? Colors.main,
+                                         backgroundLightColor: .systemBackground,
+                                         backgroundDarkColor: Colors.darkTheme,
+                                         spiralLightColor: Colors.spiralLight,
+                                         spiralDarkColor: Colors.spiralDark)
+    instance.alpha = 0
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.width * 0.05 }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
   private lazy var surveysCollectionView: SurveysCollectionView = {
-    let instance = SurveysCollectionView(category: .Subscriptions)
+    let instance = SurveysCollectionView(filter: filter, color: viewInput?.tintColor)
     
-    //Pagination #1
+    // Pagination
     instance.paginationPublisher
-      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-      .sink { [unowned self] in
-        guard let source = $0.keys.first,
-              let period = $0.values.first
-        else { return }
-        
-        self.viewInput?.onDataSourceRequest(source: source, dateFilter: period, topic: nil, userprofile: nil)
-      }
+      .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: false)
+      .eraseToAnyPublisher()
+      .sink { [unowned self] in self.viewInput?.getDataItems(filter: self.filter, excludeList: $0) }
       .store(in: &subscriptions)
     
-    //Pagination #2
-    instance.paginationByTopicPublisher
-      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-      .sink { [unowned self] in
-        guard let topic = $0.keys.first,
-              let period = $0.values.first
-        else { return }
-        
-        self.viewInput?.onDataSourceRequest(source: .Topic,
-                                            dateFilter: period,
-                                            topic: topic,
-                                            userprofile: nil)
-      }
-      .store(in: &subscriptions)
-    
-    //Pagination #3
-    instance.paginationByOwnerPublisher
-      .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
-      .sink { [unowned self] in
-        guard let userprofile = $0.keys.first,
-              let period = $0.values.first
-        else { return }
-        
-        self.viewInput?.onDataSourceRequest(source: .ByOwner,
-                                            dateFilter: period,
-                                            topic: nil,
-                                            userprofile: userprofile)
-      }
-      .store(in: &subscriptions)
-    
-    //Refresh #1
+    // Refresh
     instance.refreshPublisher
-      .sink { [unowned self] in
-        guard let category = $0.keys.first,
-              let period = $0.values.first
-        else { return }
-        
-        self.viewInput?.onDataSourceRequest(source: category, dateFilter: period, topic: nil, userprofile: nil)
-      }
+      .sink { [unowned self] in self.viewInput?.getDataItems(filter: self.filter, excludeList: []) }
+      .store(in: &subscriptions)
+
+    // Publication selected
+    instance.selectionPublisher
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.viewInput?.onSurveyTapped($0!) }
       .store(in: &subscriptions)
     
-    //Refresh #2
-    instance.refreshByTopicPublisher
-      .sink { [unowned self] in
-        guard let topic = $0.keys.first,
-              let period = $0.values.first
-        else { return }
-        
-        self.viewInput?.onDataSourceRequest(source: .Topic, dateFilter: period, topic: topic, userprofile: nil)
-      }
-      .store(in: &subscriptions)
-    
-    //Refresh #3
-    instance.refreshByOwnerPublisher
-      .sink { [unowned self] in
-        guard let userprofile = $0.keys.first,
-              let period = $0.values.first
-        else { return }
-        
-        self.viewInput?.onDataSourceRequest(source: .ByOwner,
-                                            dateFilter: period,
-                                            topic: nil,
-                                            userprofile: userprofile)
-      }
-      .store(in: &subscriptions)
-    
-    //Row selected
-    instance.rowPublisher
-      .sink { [unowned self] in
-        guard let instance = $0
-        else { return }
-        
-        self.viewInput?.onSurveyTapped(instance)
-      }
-      .store(in: &subscriptions)
-    
-    //Update stats (exclude refs)
+    // Update stats (exclude refs)
     instance.updateStatsPublisher
-      .sink { [weak self] in
-        guard let self = self,
-              let instances = $0,
-              let viewInput = self.viewInput,
-              viewInput.isOnScreen
-        else { return }
-        
-        viewInput.updateSurveyStats(instances)
-      }
+      .filter { !$0.isNil && $0!.isEmpty }
+      .sink { [unowned self] in self.viewInput?.updateSurveyStats($0!) }
       .store(in: &subscriptions)
     
-    //Add to watch list
-    instance.watchSubject.sink {
-      print($0)
-    } receiveValue: { [weak self] in
+    // Add to watch list
+    instance.watchSubject
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.viewInput?.addFavorite($0!) }
+      .store(in: &self.subscriptions)
+    
+    // Share
+    instance.shareSubject
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.viewInput?.share($0!) }
+      .store(in: &self.subscriptions)
+    
+    // Complain
+    instance.claimSubject
+      .filter { !$0.isNil }
+      .sink { [weak self] in
       guard let self = self,
-            let value = $0
+            let surveyReference = $0
       else { return }
       
-      self.viewInput?.addFavorite(value)
-    }.store(in: &self.subscriptions)
+        let popup = NewPopup(padding: self.padding, contentPadding: .uniform(size: self.padding*2))
+        let content = ClaimPopupContent(parent: popup, object: surveyReference)
+        content.$claim
+          .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is SurveyReference }
+          .map { [$0!.keys.first as! SurveyReference: $0!.values.first!] }
+          .sink { [unowned self] in self.viewInput?.claim($0!) }
+          .store(in: &popup.subscriptions)
+        popup.setContent(content)
+        popup.didDisappearPublisher
+          .sink { _ in popup.removeFromSuperview() }
+          .store(in: &self.subscriptions)
+      }
+      .store(in: &self.subscriptions)
     
-    instance.shareSubject.sink {
-      print($0)
-    } receiveValue: { [weak self] in
-      guard let self = self,
-            let value = $0
-      else { return }
-      
-      self.viewInput?.share(value)
-    }.store(in: &self.subscriptions)
-      
-      instance.claimSubject
-        .sink { [weak self] in
-          guard let self = self,
-                let surveyReference = $0
-          else { return }
-          
-          let popup = NewPopup(padding: self.padding,
-                                contentPadding: .uniform(size: self.padding*2))
-          let content = ClaimPopupContent(parent: popup,
-                                          object: surveyReference)
-//                                          surveyReference: surveyReference)
-          
-          content.$claim
-            .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is SurveyReference }
-            .map { [$0!.keys.first as! SurveyReference: $0!.values.first!] }
-            .sink { [unowned self] in self.viewInput?.claim($0!) }
-            .store(in: &popup.subscriptions)
-          
-//          content.$claim
-//            .filter { !$0.isNil }
-//            .sink { [unowned self] in self.viewInput?.claim($0!) }
-//            .store(in: &popup.subscriptions)
-          popup.setContent(content)
-          popup.didDisappearPublisher
-            .sink { _ in popup.removeFromSuperview() }
-            .store(in: &self.subscriptions)
-        }
-        .store(in: &self.subscriptions)
-    
+    // Open userprofile
     instance.userprofilePublisher
-      .sink { [weak self] in
-        guard let self = self,
-              let userprofile = $0
-        else { return }
-        
-        self.viewInput?.openUserprofile(userprofile)
-      }
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.viewInput?.openUserprofile($0!) }
       .store(in: &self.subscriptions)
     
+    // Subscribe to user
     instance.unsubscribePublisher
-      .sink { [weak self] in
-        guard let self = self,
-              let userprofile = $0
-        else { return }
-        
-        self.viewInput?.unsubscribe(from: userprofile)
-      }
+      .filter { !$0.isNil }
+      .sink { [unowned self] in self.viewInput?.unsubscribe(from: $0!) }
       .store(in: &self.subscriptions)
-    
-    instance.scrollPublisher
-      .sink { [weak self] in
-        guard let self = self else { return }
+
+    instance.scrolledDownPublisher
+      .filter { $0 }
+      .sink { [weak self] _ in
+        guard let self = self, !self.isScrolledDown else { return }
         
-        self.isDateFilterHidden = $0
-        //                self.toggleDateFilter(on: !$0)
+        self.isScrolledDown = true
       }
       .store(in: &subscriptions)
     
+    instance.scrolledToTopPublisher
+      .sink { [weak self] _ in
+        guard let self = self, self.isScrolledDown else { return }
+        
+        self.isScrolledDown = false
+      }
+      .store(in: &subscriptions)
+
     instance.emptyPublicationsPublisher
       .filter { !$0.isNil }
       .sink { [weak self] in
         guard let self = self else { return }
-        
+
         self.isEmpty = $0!
       }
       .store(in: &subscriptions)
@@ -369,6 +239,7 @@ class SubscriptionsView: UIView {
         
         self.indexPath = indexPath
         self.userprofile = userprofile
+        self.filter.userprofile = userprofile
       }
       .store(in: &subscriptions)
     
@@ -391,7 +262,7 @@ class SubscriptionsView: UIView {
         else { return }
         
         if zero {
-          self.emptyPublicationsView = EmptyPublicationsView(mode: .Subscriptions,
+          self.emptyPublicationsView = EmptyPublicationsView(mode: .subscriptions,
                                                              backgroundLightColor: .systemBackground,
                                                              backgroundDarkColor: .systemBackground,
                                                              spiralLightColor: Colors.spiralLight,
@@ -418,7 +289,7 @@ class SubscriptionsView: UIView {
           self.emptyPublicationsView?.alpha =  zero ? 1 : 0
           self.emptyPublicationsView?.transform = zero ? .identity : .init(scaleX: 0.75, y: 0.75)
           self.shadowView.alpha = zero ? 0 : 1
-          self.filterView.alpha = zero ? 0 : 1
+          self.filtersCollectionView.alpha = zero ? 0 : 1
         }) { _ in
 //          delay(seconds: 3) { [weak self] in
 //            guard let self = self else { return }
@@ -668,9 +539,9 @@ class SubscriptionsView: UIView {
     instance.backgroundColor = .clear
     instance.accessibilityIdentifier = "shadow"
     instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-    instance.layer.shadowRadius = 5
-    instance.layer.shadowOffset = .zero
+    instance.layer.shadowColor = UISettings.Shadows.color//UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    instance.layer.shadowRadius = UISettings.Shadows.radius(padding: padding)
+    instance.layer.shadowOffset = UISettings.Shadows.offset
     instance.publisher(for: \.bounds)
       .sink { [unowned self] rect in
         instance.layer.shadowPath = UIBezierPath(roundedRect: rect, cornerRadius: rect.width*0.05).cgPath
@@ -689,9 +560,7 @@ class SubscriptionsView: UIView {
     //        instance.addEquallyTo(to: shadowView)
     surveysCollectionView.place(inside: instance)
     instance.publisher(for: \.bounds)
-      .sink { rect in
-        instance.cornerRadius = rect.width * 0.05
-      }
+      .sink { instance.cornerRadius = $0.width * 0.05 }
       .store(in: &subscriptions)
     
     return instance
@@ -723,6 +592,22 @@ class SubscriptionsView: UIView {
   }()
   private lazy var filterViewHeight: CGFloat = .zero
   private lazy var topViewHeight: CGFloat = 100
+  private lazy var scrollToTopButton: UIButton = {
+    let instance = UIButton()
+    instance.backgroundColor = viewInput?.tintColor ?? Colors.main
+    instance.setImage(UIImage(systemName: "arrow.up", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
+    instance.size(.uniform(size: 40))
+    instance.tintColor = .white
+    instance.addTarget(self, action: #selector(self.scrollToTop), for: .touchUpInside)
+    instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePan(_:))))
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.width/2 }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private var scrollToTopButtonX = CGFloat.zero
+  private var scrollToTopButtonAnimates = false
 
   // MARK: - Initialization
   override init(frame: CGRect) {
@@ -739,7 +624,16 @@ class SubscriptionsView: UIView {
 //    setupUI()
   }
   
-  
+  // MARK: - Destructor
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
+#if DEBUG
+    print("\(String(describing: type(of: self))).\(#function)")
+#endif
+  }
   
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -749,10 +643,6 @@ class SubscriptionsView: UIView {
     userView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
-    periodButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
-    periodButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
-    updatePeriodButton()
-    
     profileButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     if let profileBtn = profileButton.getSubview(type: UIButton.self)  {
       profileBtn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
@@ -766,7 +656,6 @@ class SubscriptionsView: UIView {
     }
     subscriptionButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     subscriptionButton.getSubview(type: UIButton.self)?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
-    filterView.getSubview(type: UIView.self, identifier: "shadow")?.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     userView.getSubview(type: UIView.self, identifier: "background")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
   }
 }
@@ -819,25 +708,26 @@ private extension SubscriptionsView {
       })
       .store(in: &subscriptions)
     
-    // We need to show filterView on new subscription when view is not on screen
-    userprofile.subscriptionsPublisher
-      .receive(on: DispatchQueue.main)
-      .sink(receiveCompletion: {
-        if case .failure(let error) = $0 {
-#if DEBUG
-          print(error)
-#endif
-        }
-      }, receiveValue: { [weak self] subscribers in
-        guard let self = self,
-              let viewInput = self.viewInput,
-              !viewInput.isOnScreen
-        else { return }
-
-        viewInput.setNavigationBarHidden(false)
-//        self.toggleDateFilter(on: true)
-      })
-      .store(in: &subscriptions)
+//    // We need to show filterView on new subscription when view is not on screen
+//    userprofile.subscriptionsPublisher
+//      .receive(on: DispatchQueue.main)
+//      .sink(receiveCompletion: {
+//        if case .failure(let error) = $0 {
+//#if DEBUG
+//          print(error)
+//#endif
+//        }
+//      }, receiveValue: { [weak self] subscribers in
+//        guard let self = self,
+//              let viewInput = self.viewInput,
+//              !viewInput.isOnScreen
+//        else { return }
+//
+//        viewInput.setNavigationBarHidden(false)
+////        self.toggleDateFilter(on: true)
+//      })
+//      .store(in: &subscriptions)
+    
 //    tasks.append( Task {@MainActor [weak self] in
 //      for await notification in NotificationCenter.default.notifications(for: Notifications.Userprofiles.SubscriptionsRemove) {
 //        guard let self = self,
@@ -930,18 +820,37 @@ private extension SubscriptionsView {
   func setupUI() {
     guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
     
+    surveysCollectionView.color = viewInput!.tintColor
+    
     addSubview(contentView)
     contentView.edgesToSuperview(usingSafeArea: true)
     
     let views = [
       topView,
-      filterView,
+      filtersCollectionView,
       shadowView,
     ]
   
     contentView.addSubviews(views)
-    views.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
     
+//    topView.leadingToSuperview(usingSafeArea: true)
+//    topView.trailingToSuperview(usingSafeArea: true)
+//    topView.topToSuperview(usingSafeArea: true)
+//
+//    filtersCollectionView.leadingToSuperview(offset: padding)
+//    filtersCollectionView.trailingToSuperview(offset: -padding)
+//    filtersCollectionView.topToBottom(of: topView, offset: padding)
+//    filterViewHeight = padding*2 + "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!)
+//    filtersCollectionView.height(filterViewHeight)
+//
+//    shadowView.topToBottom(of: filtersCollectionView, offset: padding)
+//    shadowView.leadingToSuperview(offset: padding)
+//    shadowView.trailingToSuperview(offset: padding)
+//    shadowView.bottomToSuperview(offset: -padding)
+    
+    
+    views.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+
     NSLayoutConstraint.activate([
 //      contentView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
 //      contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
@@ -950,40 +859,45 @@ private extension SubscriptionsView {
       topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: padding),
       topView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
       topView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-      filterView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding),
-      filterView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding),
+      filtersCollectionView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding),
+      filtersCollectionView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding),
     ])
-    
+
     userView.alpha = 0
-    
     let shadowLeading = shadowView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding)
     shadowLeading.identifier = "leading"
     shadowLeading.isActive = true
-    
+
     let shadowTrailing = shadowView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding)
     shadowTrailing.identifier = "trailing"
     shadowTrailing.isActive = true
-    
+
     let shadowBottom = shadowView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -padding)
     shadowBottom.identifier = "bottom"
     shadowBottom.isActive = true
-    
-    let topConstraint_1 = filterView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: padding)
+
+    let topConstraint_1 = filtersCollectionView.topAnchor.constraint(equalTo: topView.bottomAnchor, constant: padding)
     topConstraint_1.identifier = "top_1"
     topConstraint_1.isActive = true
-    
-    let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filterView.bottomAnchor, constant: padding*2)
+
+    let topConstraint_2 = shadowView.topAnchor.constraint(equalTo: filtersCollectionView.bottomAnchor, constant: padding*2)
     topConstraint_2.identifier = "top"
     topConstraint_2.isActive = true
-    
-    
-    setNeedsLayout()
-    layoutIfNeeded()
-    
+
+
     filterViewHeight = padding*2 + "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!)
-    
+
     let constraint = filtersCollectionView.height(filterViewHeight)
     constraint.identifier = "height"
+    
+    contentView.addSubview(collectionEmptyPublicationsView)
+    collectionEmptyPublicationsView.edges(to: background)
+    
+    background.addSubview(scrollToTopButton)
+    let leading = scrollToTopButton.leading(to: background, offset: padding)
+    leading.identifier = "leading"
+    let constraint_2 = scrollToTopButton.topToBottom(of: background)
+    constraint_2.identifier = "top"
   }
   
   @MainActor
@@ -1010,7 +924,7 @@ private extension SubscriptionsView {
     
     guard let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
           let constraint = shadowView.getConstraint(identifier: "top"),
-          let constraint1 = filterView.getConstraint(identifier: "top_1"),
+          let constraint1 = filtersCollectionView.getConstraint(identifier: "top_1"),
           let topViewConstraint = topView.getConstraint(identifier: "height"),
           let stack = userStack.arrangedSubviews.filter({ $0 is UIStackView }).first as? UIStackView
     else { return }
@@ -1041,7 +955,7 @@ private extension SubscriptionsView {
     userView.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
     stack.arrangedSubviews.forEach { $0.alpha = 0; $0.transform = CGAffineTransform(scaleX: 0.75, y: 0.75) }
 //    toggleDateFilter(on: true)
-    viewInput?.setNavigationBarHidden(false)
+//    viewInput?.setNavigationBarHidden(false)
     setNeedsLayout()
     UIView.animate(
       withDuration: 0.2,
@@ -1057,9 +971,9 @@ private extension SubscriptionsView {
         self.feedCollectionView.alpha = 0
         self.userView.alpha = 1
         self.userView.transform = .identity
-        constraint.constant = self.filterView.alpha == 1 ? 16 : 8
-        constraint1.constant = self.filterView.alpha == 1 ? 16 : 8//8
-        topViewConstraint.constant = topViewHeight * 1.5
+        constraint.constant = self.filtersCollectionView.alpha == 1 ? 16 : 8
+        constraint1.constant = self.filtersCollectionView.alpha == 1 ? 16 : 8//8
+        topViewConstraint.constant = self.topViewHeight * 1.5
         self.layoutIfNeeded()
         animateStackView(stack)
       }) { [weak self] _ in
@@ -1074,7 +988,9 @@ private extension SubscriptionsView {
   
   @objc
   func handleTap(_ button: UIButton) {
-    guard let userprofile = userprofile else { return }
+//    guard let userprofile = userprofile else { return }
+    guard let userprofile = filter.userprofile else { return }
+    
     if button.accessibilityIdentifier == "profileButton" {
       viewInput?.openUserprofile(userprofile)
     } else if button.accessibilityIdentifier == "subscriptionButton" {
@@ -1097,86 +1013,60 @@ private extension SubscriptionsView {
     }
   }
   
-  @MainActor
-  func prepareMenu(zeroSubscriptions: Bool = false) -> UIMenu {
-    let perDay: UIAction = .init(title: "filter_per_\(Enums.Period.day.description)".localized.lowercased(),
-                                 image: nil,
-                                 identifier: nil,
-                                 discoverabilityTitle: nil,
-                                 attributes: .init(),
-                                 state: period == .day ? .on : .off,
-                                 handler: { [weak self] _ in
-      guard let self = self else { return }
-      
-      self.period = .day
-    })
+  @objc
+  func handlePan(_ recognizer: UIPanGestureRecognizer) {
+    guard let constraint = scrollToTopButton.getConstraint(identifier: "leading") else { return }
     
-    let perWeek: UIAction = .init(title: "filter_per_\(Enums.Period.week.description)".localized.lowercased(),
-                                  image: nil,
-                                  identifier: nil,
-                                  discoverabilityTitle: nil,
-                                  attributes: .init(),
-                                  state: period == .week ? .on : .off,
-                                  handler: { [weak self] _ in
-      guard let self = self else { return }
-      
-      self.period = .week
-    })
+    let xTranslation = recognizer.translation(in: background).x + scrollToTopButtonX
+    constraint.constant = max(padding, min(xTranslation, background.bounds.width - scrollToTopButton.bounds.width - padding)) // scrollToTopButtonX
     
-    let perMonth: UIAction = .init(title: "filter_per_\(Enums.Period.month.description)".localized.lowercased(),
-                                   image: nil,
-                                   identifier: nil,
-                                   discoverabilityTitle: nil,
-                                   attributes: .init(),
-                                   state: period == .month ? .on : .off,
-                                   handler: { [weak self] _ in
-      guard let self = self else { return }
-      
-      self.period = .month
-    })
+    let velocity = recognizer.velocity(in: background).x
     
-    let allTime: UIAction = .init(title: "filter_per_\(Enums.Period.unlimited.description)".localized.lowercased(),
-                                  image: nil,
-                                  identifier: nil,
-                                  discoverabilityTitle: nil,
-                                  attributes: .init(),
-                                  state: period == .unlimited ? .on : .off,
-                                  handler: { [weak self] _ in
-      guard let self = self else { return }
+    if recognizer.state == .ended || recognizer.state == .cancelled || recognizer.state == .failed {
+      scrollToTopButtonX = constraint.constant
       
-      self.period = .unlimited
-    })
-    
-    return UIMenu(title: "",//"publications_per".localized,
-                  image: nil,
-                  identifier: nil,
-                  options: .init(),
-                  children: [
-                    perDay,
-                    perWeek,
-                    perMonth,
-                    allTime
-                  ])
+      guard abs(velocity) > 200 else { return }
+      
+      let maxDistance = background.bounds.width - scrollToTopButton.bounds.width - padding
+      let estimatedDistance = scrollToTopButtonX - abs(velocity*0.05)
+      var distance = CGFloat.zero
+      if velocity < 0 {
+        distance = estimatedDistance < padding ? scrollToTopButtonX - padding : estimatedDistance
+        if distance > 0 {
+          distance = distance * -1
+        }
+        distance = max(-maxDistance/4, distance)
+      } else {
+        distance = estimatedDistance + scrollToTopButtonX > maxDistance ? maxDistance - scrollToTopButtonX : estimatedDistance
+        if distance < 0 {
+          distance = distance * -1
+        }
+        distance = min(maxDistance/4, distance)
+      }
+      
+      UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: { [weak self] in
+        guard let self = self else { return }
+        
+        self.setNeedsLayout()
+//        constraint.constant = max(padding, min(velocity*0.05, background.bounds.width - scrollToTopButton.bounds.width - padding))
+        constraint.constant += distance
+        self.layoutIfNeeded()
+      }) { [weak self] _ in
+        guard let self = self else { return }
+       
+        self.scrollToTopButtonX = constraint.constant
+      }
+    }
+    //
+    //    if yTranslation > 0 {
+    //      constraint.constant = min(constraint.constant, statusBarFrame.height)
+    //    }
+    //    constraint.constant = constraint.constant < minConstant ? minConstant : constraint.constant
+//
+//    recognizer.setTranslation(.zero, in: background)
+//    var point = convert(scrollToTopButton.frame.origin, to: background).x
+//    print(point)
   }
-  
-  @MainActor
-  func updatePeriodButton() {
-    periodButton.menu = prepareMenu()
-    let buttonText = "publications".localized.uppercased() + ": " + "filter_per_\(period.description.lowercased())".localized.uppercased()
-    let attrString = NSMutableAttributedString(string: buttonText,
-                                               attributes: [
-                                                .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
-                                                .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : viewInput?.tintColor as Any,
-                                               ])
-    periodButton.setAttributedTitle(attrString, for: .normal)
-    let attrString1 = NSMutableAttributedString(string: buttonText,
-                                                attributes: [
-                                                  .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
-                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.secondaryLabel : viewInput?.tintColor as Any,
-                                                ])
-    periodButton.setAttributedTitle(attrString1, for: .highlighted)
-  }
-  
 //  @MainActor
 //  func toggleDateFilter(on: Bool, animated: Bool = true) {
 //    return
@@ -1272,10 +1162,38 @@ private extension SubscriptionsView {
 //          self.surveysCollectionView.backgroundColor = .clear
 //        }) { _ in label.removeFromSuperview() }
 //    }
-//  }
+  //  }
+  func onEmptyList(isEmpty: Bool) {
+    if isEmpty {
+      collectionEmptyPublicationsView.alpha = 0
+      collectionEmptyPublicationsView.setAnimationsEnabled(true)
+    }
+    
+    UIView.animate(
+      withDuration: 0.2,
+      delay: 0,
+      options: [.curveEaseInOut],
+      animations: { [weak self] in
+        guard let self = self else { return }
+        
+        self.collectionEmptyPublicationsView.alpha =  isEmpty ? 1 : 0
+      }) { [weak self] _ in
+        guard let self = self,
+              !isEmpty
+        else { return }
+        
+        self.collectionEmptyPublicationsView.setAnimationsEnabled(false)
+      }
+  }
 }
 
 extension SubscriptionsView: SubsciptionsControllerOutput {
+  @objc
+  func scrollToTop() {
+    isScrolledDown = false
+    surveysCollectionView.scrollToTop()
+  }
+  
   func didAppear() {
     guard let current = Userprofiles.shared.current, current.subscriptions.isEmpty else { return }
     
@@ -1283,25 +1201,24 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
   }
   
   func didDisappear() {
-//    guard let current = Userprofiles.shared.current, !current.subscriptions.isEmpty else { return }
-    
     emptyPublicationsView?.setAnimationsEnabled(false)
   }
   
   func hideUserCard(_ completion: Closure? = nil) {
     mode = .Default
-    surveysCollectionView.category = .Subscriptions
+//    surveysCollectionView. = .Subscriptions
     guard let viewInput = viewInput,
           viewInput.isOnScreen,
           let cell = self.feedCollectionView.cellForItem(at: self.indexPath) as? UserprofileCell,
 //          let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
           let constraint = topView.getConstraint(identifier: "height"),
-          let userprofile = userprofile
+          let userprofile = filter.userprofile
     else {
 //      guard let subview = userView.getSubview(type: UIView.self, identifier: "opaque"),
 //            let constraint = subview.getConstraint(identifier: "trailing")
 //      else { return }
       
+      filter.setMain(filter: .disabled, userprofile: nil)
       avatar.alpha = 0
       isCardOnScreen = false
 //      constraint.constant = 16
@@ -1311,11 +1228,6 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
       
       return
     }
-    
-//    mode = .Default
-//    surveysCollectionView.category = .Subscriptions
-//    toggleDateFilter(on: true)
-    viewInput.setNavigationBarHidden(false)
     
     let temp = UIImageView(image: userprofile.image ?? UIImage(named: "person"))
     if userprofile.image.isNil {
@@ -1328,6 +1240,7 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
     avatar.alpha = 0
     topView.addSubview(temp)
     cell.avatar.alpha = 0
+    filter.setMain(filter: .disabled, userprofile: nil)
     
     let destinationFrame = CGRect(origin: cell.avatar.convert(cell.avatar.imageView.frame.origin, to: topView),
                                   size: cell.avatar.imageView.bounds.size)
@@ -1370,7 +1283,7 @@ extension SubscriptionsView: SubsciptionsControllerOutput {
   //    }
   
   func onRequestCompleted(_ result: Result<Bool, Error>) {
-    surveysCollectionView.endRefreshing()
+    surveysCollectionView.refreshControl?.endRefreshing()
   }
   
   func onWillAppear() {

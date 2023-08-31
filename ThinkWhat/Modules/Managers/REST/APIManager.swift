@@ -1337,15 +1337,13 @@ class API {
             !headers.isNil
       else { throw APIError.invalidURL }
       
-      var parameters: Parameters = [
-        "survey_id": referenceId,
-        "add_view_count": true
-      ]
-      
       do {
         let data = try await parent.requestAsync(url: url,
                                                  httpMethod: .post,
-                                                 parameters: parameters,
+                                                 parameters: [
+                                                  "survey_id": referenceId,
+                                                  "add_view_count": true
+                                                 ],
                                                  encoding: JSONEncoding.default,
                                                  headers: parent.headers())
         
@@ -1445,7 +1443,38 @@ class API {
       }
     }
     
-    public func surveyReferences(category: Survey.SurveyCategory,
+    public func getSurveyReferences(filter: SurveyFilter,
+                                    excludeList: [SurveyReference] = [],
+                                    includeList: [SurveyReference] = [],
+                                    substring: String = "",
+                                    owners: [Userprofile] = [],
+                                    topics: [Topic] = []) async throws {
+      guard let url = API_URLS.Surveys.getPublications,
+            let headers = headers
+      else { throw APIError.invalidURL }
+      
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: filter.getRequestArgs(excludeList: excludeList,
+                                                                                   includeList: includeList,
+                                                                                   substring: substring,
+                                                                                   owners: owners,
+                                                                                   topics: topics),
+                                                 encoding: JSONEncoding.default,
+                                                 headers: headers)
+        try await MainActor.run {
+          try Surveys.shared.load(try JSON(data: data, options: .mutableContainers))
+        }
+      } catch let error {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        throw error
+      }
+    }
+    
+    public func surveyReferences(category: Enums.SurveyFilterMode,
                                  ids: [Int]? = nil,
                                  period: Enums.Period? = nil,
                                  topic: Topic? = nil,
@@ -1457,19 +1486,19 @@ class API {
       else { throw APIError.invalidURL }
       
       var parameters: Parameters!
-      if category == .Topic, !topic.isNil {
+      if category == .topic, !topic.isNil {
         parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.topic == topic }).map { $0.id }]
         parameters["category_id"] = topic?.id
-      } else if category == .ByOwner, let userprofile = userprofile {
+      } else if category == .user, let userprofile = userprofile {
         parameters = ["exclude_ids": SurveyReferences.shared.all.filter({ $0.owner == userprofile }).map { $0.id }]
         parameters["userprofile_id"] = userprofile.id
-      } else if category == .Compatibility, let compatibility = compatibility {
+      } else if category == .compatible, let compatibility = compatibility {
         var list = [Int]()
         if let ids = ids, !ids.isEmpty {
           list = ids
         } else {
           let fullSet = Set(compatibility.surveys)
-          let existingSet = Set(Set(category.dataItems(compatibility: compatibility).map { $0.id }))
+          let existingSet = Set(Set(category.getDataItems(compatibility: compatibility).map { $0.id }))
           list = Array(fullSet.symmetricDifference(existingSet))
         }
         guard !list.isEmpty else { return }
@@ -1478,10 +1507,10 @@ class API {
         print("APIManager.Polls.surveyReferences() by compatibility", list)
 #endif
         parameters = ["ids": list]
-      } else if category == .Search {
+      } else if category == .search {
         parameters = ["exclude_ids": fetchResult.map { $0.id }]
       } else {
-        parameters = ["exclude_ids": category.dataItems().map { $0.id }]
+        parameters = ["exclude_ids": category.getDataItems().map { $0.id }]
       }
       
       if let period = period, period != .unlimited, let dateFrom = period.date {

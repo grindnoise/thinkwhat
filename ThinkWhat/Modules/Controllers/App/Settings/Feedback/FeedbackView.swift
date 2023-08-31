@@ -100,7 +100,7 @@ class FeedbackView: UIView {
       //            instance.imageEdgeInsets.right = 8
       instance.setAttributedTitle(attrString, for: .normal)
       instance.semanticContentAttribute = .forceRightToLeft
-      instance.backgroundColor = K_COLOR_RED//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
+      instance.backgroundColor = Colors.main//traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
       
       let constraint = instance.widthAnchor.constraint(equalToConstant: state.rawValue.localized.uppercased().width(withConstrainedHeight: instance.bounds.height, font: UIFont.scaledFont(fontName: Fonts.OpenSans.Semibold.rawValue, forTextStyle: .title2)!))
       constraint.identifier = "width"
@@ -179,11 +179,11 @@ class FeedbackView: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    textView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+    textView.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
     
     if #available(iOS 15, *) {
       guard !actionButton.configuration.isNil else { return }
-      actionButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+      actionButton.configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
     } else {
       actionButton.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : .systemRed
     }

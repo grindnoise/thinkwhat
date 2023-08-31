@@ -732,7 +732,7 @@ extension UIView {
 //}
 
 extension UIView {
-  func startRotating(duration: CFTimeInterval = 3, repeatCount: Float = Float.infinity, clockwise: Bool = true) {
+  func startRotating(duration: CFTimeInterval = 3, repeatCount: Float = Float.greatestFiniteMagnitude, clockwise: Bool = true) {
     
     if self.layer.animation(forKey: "transform.rotation.z") != nil {
       return

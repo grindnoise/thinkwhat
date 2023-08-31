@@ -338,7 +338,7 @@ class Icon: UIView {
     if let _frame = aDecoder.decodeCGRect(forKey: "frame") as? CGRect,  let colorData = aDecoder.decodeObject(forKey: "backgroundColor") as? Data, let categoryID = aDecoder.decodeInteger(forKey: "categoryID") as? Int, let text = aDecoder.decodeObject(forKey: "text") as? String {
       
       super.init(frame: _frame)
-      self.backgroundColor = NSKeyedUnarchiver.unarchiveObject(with: colorData) as? UIColor ?? K_COLOR_RED
+      self.backgroundColor = NSKeyedUnarchiver.unarchiveObject(with: colorData) as? UIColor ?? Colors.main
       self.text = text
       self.category = Icon.Category(rawValue: categoryID) ?? .Null
       self.icon = getLayer()
@@ -6431,7 +6431,7 @@ class Icon: UIView {
             textLayer.isWrapped  = true
             textLayer.frame = bounds
             textLayer.string = text
-            textLayer.font = StringAttributes.font(name: StringAttributes.Fonts.Style.Bold, size: 2)
+      textLayer.font = UIFont(name: Fonts.Rubik.Bold, size: 2)
             textLayer.fontSize = 18
             textLayer.foregroundColor = UIColor.white.cgColor
             textLayer.alignmentMode = .center

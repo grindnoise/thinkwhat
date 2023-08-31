@@ -39,7 +39,7 @@ public final class SpiralSpinner: UIView {
   }
   
   public func start(duration: TimeInterval) {
-    startRotating(duration: duration, repeatCount: .infinity, clockwise: true)
+    startRotating(duration: duration, clockwise: true)
   }
   
   public func stop() {

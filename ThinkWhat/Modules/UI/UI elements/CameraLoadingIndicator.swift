@@ -54,7 +54,7 @@ class CameraLoadingIndicator: UIView {
     let circlePathLayer = CAShapeLayer()
     let cameraPathLayer = CAShapeLayer()
     let circleRadius: CGFloat = 25.0
-    public var color = K_COLOR_RED {
+  public var color = Colors.main {
         didSet {
             configure()
         }

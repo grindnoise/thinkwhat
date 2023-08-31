@@ -251,15 +251,21 @@ private extension SettingsController {
   }
   
   func setTasks() {
-    tasks.append(Task { @MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
-        guard let self = self,
-              let tab = notification.object as? Enums.Tab
-        else { return }
-        
-        self.isOnScreen = tab == .Settings
-      }
-    })
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
+//        guard let self = self,
+//              let tab = notification.object as? Enums.Tab
+//        else { return }
+//
+//        self.isOnScreen = tab == .Settings
+//      }
+//    })
+    
+    Notifications.UIEvents.tabItemPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in self.isOnScreen = $0.keys.first == .Settings  }
+      .store(in: &subscriptions)
+    
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
         guard let self = self,
@@ -500,7 +506,7 @@ extension SettingsController: SettingsViewInput {
     backItem.title = ""
     
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(SurveysController(.Favorite), animated: true)
+    navigationController?.pushViewController(SurveysController(.favorite), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let main = tabBarController as? MainController else { return }
@@ -555,7 +561,7 @@ extension SettingsController: SettingsViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(SurveysController(.Own, color: tintColor), animated: true)
+    navigationController?.pushViewController(SurveysController(.own, color: tintColor), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let main = tabBarController as? MainController else { return }

@@ -101,7 +101,7 @@ class AppSettingsLanguageCell: UICollectionViewListCell {
         instance.menu = prepareMenu()
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         instance.imageView?.contentMode = .center
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
                 instance.setImage(UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5)), for: .normal)

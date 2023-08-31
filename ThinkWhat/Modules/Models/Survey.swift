@@ -13,95 +13,6 @@ import UIKit
 
 class Survey: Decodable {
   // MARK: - Enums
-  enum SurveyCategory: String, CaseIterable {
-    case Hot, New, Top, Own, Favorite, Subscriptions, All, Topic, Search, ByOwner, Compatibility
-    
-    func dataItems(topic: Topic? = nil,
-                   userprofile: Userprofile? = nil,
-                   compatibility: TopicCompatibility? = nil) -> [SurveyReference] {
-      switch self {
-      case .Hot:
-        let referencesFromSurveys = Surveys.shared.hot.map { $0.reference }
-        return (SurveyReferences.shared.all.filter { $0.isHot && !$0.isClaimed && !$0.isBanned && !$0.isRejected } + referencesFromSurveys).uniqued()
-      case .New:
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned }.map { $0.reference }// && $0.isRejected
-        return (SurveyReferences.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
-      case .Top:
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.isTop && !$0.isClaimed && !$0.isBanned && !$0.isRejected }.map { $0.reference }//&& !$0.isRejected
-        return (SurveyReferences.shared.all.filter { $0.isTop && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
-      case .Own:
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.isOwn && !$0.isBanned }.map { $0.reference }
-        return (SurveyReferences.shared.all.filter { $0.isOwn && !$0.isBanned } + referencesFromSurveys).uniqued()
-      case .Favorite:
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.isFavorite && !$0.isBanned }.map { $0.reference }
-        return (SurveyReferences.shared.all.filter { $0.isFavorite && !$0.isBanned } + referencesFromSurveys).uniqued()
-      case .Subscriptions:
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous }.map { $0.reference }
-        return (SurveyReferences.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous } + referencesFromSurveys).uniqued()
-      case .All:
-        let referencesFromSurveys = Surveys.shared.all.filter { !$0.isClaimed && !$0.isBanned }.map { $0.reference }//&& !$0.isRejected
-        return (SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
-      case .Topic:
-        guard let topic = topic else { return [] }
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.topic == topic && !$0.isClaimed && !$0.isBanned }.map { $0.reference }//&& !$0.isRejected
-        return (SurveyReferences.shared.all.filter { $0.topic == topic && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
-      case .ByOwner:
-        guard let userprofile = userprofile else { return [] }
-        
-        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous }.map { $0.reference }//&& !$0.isRejected
-        return (SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous } + referencesFromSurveys).uniqued()//&& !$0.isRejected
-      case .Search:
-        fatalError()
-      case .Compatibility:
-        guard let compatibility = compatibility else { return [] }
-        
-        return SurveyReferences.shared[compatibility.surveys]
-      }
-    }
-    
-    var url: URL? {
-      switch self {
-      case .Hot:
-        return API_URLS.Surveys.hot
-      case .New:
-        return API_URLS.Surveys.new
-      case .Top:
-        return API_URLS.Surveys.top
-      case .Own:
-        return API_URLS.Surveys.own
-      case .Favorite:
-        return API_URLS.Surveys.favorite
-      case .Subscriptions:
-        return API_URLS.Surveys.subscriptions
-      case .All:
-        return API_URLS.Surveys.all
-      case .Topic:
-        return API_URLS.Surveys.byTopic
-      case .Search:
-        return API_URLS.Surveys.search
-      case .ByOwner:
-        return API_URLS.Surveys.byUserprofile
-      case .Compatibility:
-        return API_URLS.Surveys.listByIds
-      }
-    }
-    var localizedDescription: String {
-      switch self {
-      case .Subscriptions:
-        return "empty_pub_view_subscriptions".localized
-      case .New:
-        return "empty_pub_view_new".localized
-      case .Top:
-        return "empty_pub_view_top".localized
-      case .Own:
-        return "empty_pub_view_own".localized
-      case .Favorite:
-        return "empty_pub_view_watching".localized
-      default:
-        return "empty_pub_view_default".localized
-      }
-    }
-  }
   
   enum SurveyType: String, CaseIterable {
     case Poll = "Poll"
@@ -560,19 +471,6 @@ extension Survey: CustomStringConvertible {
 }
 
 class Surveys {
-  enum SurveyContainerType {
-    case TopLinks, NewLinks, Categorized, OwnLinks, Favorite, Downloaded, Completed, Stack, Claim, AllLinks
-  }
-  private enum Category: String {
-    case Top            = "top"
-    case Own            = "own"
-    case New            = "new"
-    case Favorite       = "favorite"
-    case Hot            = "hot"
-    case Subscriptions  = "subscriptions"
-    case Topic          = "by_category"
-    case Userprofile    = "by_owner"
-  }
   static let shared = Surveys()
   private init() {}
   private var timer:  Timer?
@@ -678,7 +576,7 @@ class Surveys {
     let decoder = JSONDecoder.withDateTimeDecodingStrategyFormatters()
     do {
       for (key, value) in json {
-        if key == Category.Hot.rawValue {
+        if key == "hot" {
           append(try decoder.decode([Survey].self, from: value.rawData()))
         } else {
           SurveyReferences.shared.append(try decoder.decode([SurveyReference].self, from: value.rawData()))

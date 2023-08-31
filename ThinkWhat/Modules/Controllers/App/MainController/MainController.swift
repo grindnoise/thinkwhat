@@ -28,9 +28,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
   // MARK: - Public properties
   public private(set) var currentTab: Enums.Tab = .Hot {
     didSet {
-      guard oldValue != currentTab else { return }
-      
-      NotificationCenter.default.post(name: Notifications.System.Tab, object: currentTab)
+      Notifications.UIEvents.tabItemPublisher.send([currentTab: oldValue])
+//      NotificationCenter.default.post(name: Notifications.System.Tab, object: [currentTab: oldValue])
     }
   }
   
@@ -63,7 +62,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
 
     return instance
   }()
-  public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: "#1E1E1E".hexColor!.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.7 : 0.03)) }()
+  public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: traitCollection.userInterfaceStyle == .dark ? Colors.spiralDark : Colors.spiralLight) }()
   private lazy var logoIcon: Logo = { Logo() }()
   private lazy var logoText: LogoText = { LogoText() }()
   private lazy var passthroughView: PassthroughView = {
@@ -951,7 +950,7 @@ private extension MainController {
       tabBar.standardAppearance = tabBarAppearance
       tabBar.scrollEdgeAppearance = tabBarAppearance
     } else {
-      UITabBarItem.appearance().setTitleTextAttributes([.font: StringAttributes.font(name: Fonts.Rubik.Regular, size: 11)],
+      UITabBarItem.appearance().setTitleTextAttributes([.font: UIFont(name: Fonts.Rubik.Regular, size: 11) as Any],
                                                        for: .normal)
 //      UITabBarItem.appearance().setTitleTextAttributes([.font: StringAttributes.font(name: Fonts.Rubik.SemiBold, size: 11)],
 //                                                       for: .selected)
@@ -1182,7 +1181,7 @@ extension MainController: UITabBarControllerDelegate {
   func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
     func setActiveScreen(_ controller: UIViewController) {
       tabBarController.viewControllers?.forEach {
-        guard var contr = $0 as? (ScreenVisible & UIViewController) else { return }
+        guard let contr = $0 as? (ScreenVisible & UIViewController) else { return }
         
         contr.setActive(contr === controller ? true : false)
       }
@@ -1238,9 +1237,7 @@ extension MainController: UITabBarControllerDelegate {
       case is ListController:
         if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Feed ? .Repeat : .Primary ) }
         currentTab = .Feed
-//        setColors(Colors.main)
-//setColors(Colors.Logo.GreenMunshell.rawValue)
-        setLogoLeading(constant: 10, animated: true)
+        setLogoCentered(animated: true)
         toggleLogo(on: true)
       case is TopicsController:
         if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Topics ? .Repeat : .Primary ) }

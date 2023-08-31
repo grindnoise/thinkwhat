@@ -171,7 +171,7 @@ class AppSettingsCollectionView: UICollectionView {
             
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .clear
-            cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+          cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
             cell.backgroundConfiguration = backgroundConfig
             cell.mode = indexPath.row == 0 ? .languages(.App) : .languages(.Content)
         }
@@ -200,7 +200,7 @@ class AppSettingsCollectionView: UICollectionView {
             
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .clear
-            cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+            cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
             cell.backgroundConfiguration = backgroundConfig
         }
         

@@ -648,7 +648,7 @@ extension UITextField {
     
     let toolbar: UIToolbar = UIToolbar()
     toolbar.barStyle = .default
-    toolbar.tintColor = K_COLOR_RED
+    toolbar.tintColor = Colors.main
     toolbar.items = [
       UIBarButtonItem(title: "Cancel", style: .plain, target: onCancel.target, action: onCancel.action),
       UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil),
@@ -811,19 +811,19 @@ extension UIApplication {
 //        return topViewController?.preferredStatusBarStyle ?? .default
 //    }
 //}
-public extension CollectionCellAutoLayout where Self: UICollectionViewCell {
-  func preferredLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
-    setNeedsLayout()
-    layoutIfNeeded()
-    let size = contentView.systemLayoutSizeFitting(layoutAttributes.size)
-    var newFrame = layoutAttributes.frame
-    newFrame.size.width = CGFloat(ceilf(Float(size.width)))
-    newFrame.size.height = size.height
-    layoutAttributes.frame = newFrame
-    cachedSize = newFrame.size
-    return layoutAttributes
-  }
-}
+//public extension CollectionCellAutoLayout where Self: UICollectionViewCell {
+//  func preferredLayoutAttributes(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+//    setNeedsLayout()
+//    layoutIfNeeded()
+//    let size = contentView.systemLayoutSizeFitting(layoutAttributes.size)
+//    var newFrame = layoutAttributes.frame
+//    newFrame.size.width = CGFloat(ceilf(Float(size.width)))
+//    newFrame.size.height = size.height
+//    layoutAttributes.frame = newFrame
+//    cachedSize = newFrame.size
+//    return layoutAttributes
+//  }
+//}
 
 extension Sequence where Element: Hashable {
   func uniqued() -> [Element] {

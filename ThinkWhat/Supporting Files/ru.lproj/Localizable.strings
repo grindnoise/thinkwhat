@@ -516,3 +516,6 @@
 "filter_completed" = "пройденные";
 "filter_not_completed" = "не пройденные";
 "filter_anonymous" = "анонимные";
+"filter_rated" = "топовые";
+"filter_own" = "свои";
+"filter_watchlist" = "отслеживаемые";

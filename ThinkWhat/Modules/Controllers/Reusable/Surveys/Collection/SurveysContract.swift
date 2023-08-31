@@ -15,22 +15,13 @@ protocol SurveysViewInput: AnyObject {
   
   var controllerOutput: SurveysControllerOutput? { get set }
   var controllerInput: SurveysControllerInput? { get set }
-  var mode: Survey.SurveyCategory { get }
+  var mode: Enums.SurveyFilterMode { get }
   var topic: Topic? { get }
   var userprofile: Userprofile? { get }
   var compatibility: TopicCompatibility? { get }
   
   func onSurveyTapped(_: SurveyReference)
-  func onDataSourceRequest(source: Survey.SurveyCategory,
-                           dateFilter: Enums.Period?,
-                           topic: Topic?,
-                           userprofile: Userprofile?,
-                           compatibility: TopicCompatibility?,
-                           substring: String,
-                           except: [SurveyReference],
-                           ownersIds: [Int],
-                           topicsIds: [Int],
-                           ids: [Int])
+  func getDataItems(excludeList: [SurveyReference])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -44,12 +35,7 @@ protocol SurveysControllerInput: AnyObject {
   
   var modelOutput: SurveysModelOutput? { get set }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory,
-                           dateFilter: Enums.Period?,
-                           topic: Topic?, 
-                           userprofile: Userprofile?,
-                           compatibility: TopicCompatibility?,
-                           ids: [Int]?)
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(_: [SurveyReference: Claim])
@@ -74,6 +60,6 @@ protocol SurveysControllerOutput: AnyObject {
   func viewDidDisappear()
   func beginSearchRefreshing()
 //  func toggleSearchMode(_: Bool)
-  func setMode(_: Survey.SurveyCategory)
+  func setMode(_: Enums.SurveyFilterMode)
   func onSearchCompleted(_: [SurveyReference])
 }

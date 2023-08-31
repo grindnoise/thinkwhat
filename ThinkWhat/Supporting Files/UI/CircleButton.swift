@@ -51,7 +51,7 @@ class CircleButton: UIView, CAAnimationDelegate {
             icon.category = category
         }
     }
-    var color: UIColor = K_COLOR_RED {
+    var color: UIColor = Colors.main {
         didSet {
 //            icon.backgroundColor = color
 //            oval.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : color.cgColor
@@ -354,8 +354,8 @@ class CircleButton: UIView, CAAnimationDelegate {
       
         if scaleColorAnim == nil {
             let colorA = CABasicAnimation(keyPath: "backgroundColor")
-            colorA.fromValue = K_COLOR_RED.cgColor
-            colorA.toValue = K_COLOR_RED.darker(0.15).cgColor
+            colorA.fromValue = Colors.main.cgColor
+            colorA.toValue = Colors.main.darker(0.15).cgColor
             let scaleA = CABasicAnimation(keyPath: "transform.scale")
             scaleA.fromValue = 1
             scaleA.toValue = CATransform3DMakeScale(1.1, 1.1, 1)

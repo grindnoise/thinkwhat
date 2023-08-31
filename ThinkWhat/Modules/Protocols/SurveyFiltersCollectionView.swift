@@ -18,6 +18,13 @@ class SurveyFiltersCollectionView: UICollectionView {
   
   // MARK: - Public properties
   public let filterPublisher = PassthroughSubject<SurveyFilterItem, Never>()
+  public var color: UIColor = Colors.main {
+    didSet {
+      guard oldValue != color else { return }
+      
+//      colorPublisher.send(color)
+    }
+  }
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -26,17 +33,21 @@ class SurveyFiltersCollectionView: UICollectionView {
   ///**UI**
   private let padding: CGFloat = 8
   ///**Logic**
-  private var period = Enums.Period.unlimited {
-    didSet {
-      
-    }
-  }
-  private let anonymityEnabled: Bool
+  private let dataItems: [SurveyFilterItem]
   private var source: Source!
  
+  // MARK: - Destructor
+  deinit {
+    observers.forEach { $0.invalidate() }
+    tasks.forEach { $0?.cancel() }
+    subscriptions.forEach { $0.cancel() }
+    NotificationCenter.default.removeObserver(self)
+    debugPrint("\(String(describing: type(of: self))).\(#function) \(DebuggingIdentifiers.actionOrEventFailed)")
+  }
+  
   // MARK: - Initialization
-  init(anonymityEnabled: Bool) {
-    self.anonymityEnabled = anonymityEnabled
+  init(items: [SurveyFilterItem]) {
+    self.dataItems = items
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
@@ -97,20 +108,33 @@ private extension SurveyFiltersCollectionView {
 //    collectionViewLayout = layout
     
     let cellRegistration = UICollectionView.CellRegistration<SurveyFilterCell, SurveyFilterItem> { [unowned self] cell, indexPath, item in
-      cell.setupUI(item: item)
-      item.$isFilterEnabled
-        .filter { $0 }
-        .sink { [weak self] _ in
+      if cell.item.isNil {
+        cell.setupUI(item: item)
+      }
+      
+      cell.filterPublisher
+        .throttle(for: .seconds(0.2), scheduler: DispatchQueue.main, latest: false)
+        .sink { [weak self] in
           guard let self = self else { return }
           
+          self.filterPublisher.send($0)
           self.source.snapshot().itemIdentifiers
             .filter { $0 != item }
             .forEach { $0.setDisabled() }
+          
+          if item.isFilterEnabled {
+//          if !indexPath.row.isZero {
+            self.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+          }
         }
         .store(in: &self.subscriptions)
-      
-      cell.filterPublisher
-        .sink { [unowned self] in self.filterPublisher.send($0) }
+      cell.boundsPublisher
+        .throttle(for: .seconds(0.2), scheduler: DispatchQueue.main, latest: false)
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.collectionViewLayout.invalidateLayout()
+        }
         .store(in: &self.subscriptions)
     }
     
@@ -122,13 +146,7 @@ private extension SurveyFiltersCollectionView {
     
     var snapshot = Snapshot()
     snapshot.appendSections([.main,])
-    snapshot.appendItems([
-      SurveyFilterItem(mode: .all, isFilterEnabled: true, text: "all"),
-      SurveyFilterItem(mode: .period, text: "filter_per_\(Enums.Period.unlimited.description)", image: UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
-      SurveyFilterItem(mode: .discussed, text: "filter_discussed"),
-      SurveyFilterItem(mode: .completed, text: "filter_completed"),
-      SurveyFilterItem(mode: .notCompleted, text: "filter_not_completed")
-    ], toSection: .main)
+    snapshot.appendItems(dataItems, toSection: .main)
     source.apply(snapshot, animatingDifferences: false)
     
     collectionViewLayout.invalidateLayout()

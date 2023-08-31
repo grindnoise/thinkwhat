@@ -9,37 +9,36 @@
 import UIKit
 import Combine
 
-struct SurveyFilter {
-  var all: Bool?
-  var period: Enums.Period?
-  var anonymous: Bool?
-  var discussed: Bool?
-  var completed: Bool?
-  var notCompleted: Bool?
-}
-
-
-/// Use as an item identifier in `SurveyFiltersCollectionView`
-class SurveyFilterItem: Hashable {
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(text)
-    hasher.combine(image)
+class SurveyFilter: Hashable {
+  static func == (lhs: SurveyFilter, rhs: SurveyFilter) -> Bool {
+    lhs.main == rhs.main &&
+    lhs.additional == rhs.additional &&
+    lhs.period == rhs.period &&
+    lhs.topic == rhs.topic &&
+    lhs.userprofile == rhs.userprofile &&
+    lhs.compatibility == rhs.compatibility
   }
   
-  static func == (lhs: SurveyFilterItem, rhs: SurveyFilterItem) -> Bool {
-    lhs.text == rhs.text &&
-    lhs.image == rhs.image
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(main.rawValue)
+    hasher.combine(additional.rawValue)
+    hasher.combine(period.rawValue)
+    hasher.combine(topic)
+    hasher.combine(userprofile)
+    hasher.combine(compatibility)
   }
   
   // MARK: - Public properties
-  @Published public private(set) var isFilterEnabled: Bool
-  @Published public private(set) var mode: Enums.SurveyFilterMode
-  @Published public private(set) var menu: UIMenu?
-  @Published public private(set) var period: Enums.Period? {
+  public let changePublisher = PassthroughSubject<[SurveyReference], Never>() // Notify subscribers on change
+  // Optional
+  public var topic: Topic?
+  public var compatibility: TopicCompatibility?
+  public var userprofile: Userprofile?
+  public var period: Enums.Period = .unlimited {
     didSet {
       guard oldValue != period else { return }
       
-      menu = updateMenu()
+      changePublisher.send(getDataItems())
     }
   }
   
@@ -47,96 +46,160 @@ class SurveyFilterItem: Hashable {
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  /// **Logic**
-  private var text = ""
-  private var image: UIImage?
-  private var periodThreshold: Enums.Period?// = .unlimited
+  // Necessary
+  private var main: Enums.SurveyFilterMode = .disabled
+  private var additional: Enums.SurveyAdditionalFilterMode = .disabled
   
-  // MARK: - Destructor
-  deinit {
-    observers.forEach { $0.invalidate() }
-    tasks.forEach { $0?.cancel() }
-    subscriptions.forEach { $0.cancel() }
-    NotificationCenter.default.removeObserver(self)
-#if DEBUG
-    print("\(String(describing: type(of: self))).\(#function)")
-#endif
-  }
-  
-  // MARK: - Initialization
-  init(mode: Enums.SurveyFilterMode,
-       isFilterEnabled: Bool = false,
-       text: String,
-       image: UIImage? = nil,
-       periodThreshold: Enums.Period = .unlimited) {
-    self.mode = mode
-    self.isFilterEnabled = isFilterEnabled
-    self.text = text
-    self.image = image
-    self.periodThreshold = periodThreshold
-    self.period = periodThreshold
+  init(main: Enums.SurveyFilterMode,
+       additional: Enums.SurveyAdditionalFilterMode = .disabled,
+       period: Enums.Period = .unlimited,
+       topic: Topic? = nil,
+       userprofile: Userprofile? = nil,
+       compatibility: TopicCompatibility? = nil) {
+    self.main = main
+    self.additional = additional
+    self.period = period
+    self.topic = topic
+    self.userprofile = userprofile
+    self.compatibility = compatibility
   }
   
   // MARK: - Public methods
-  public func getText() -> String { text }
-  public func getImage() -> UIImage? { image }
-  public func getMenu() -> UIMenu? {
-    guard mode == .period, let periodThreshold = periodThreshold else { return nil }
-    guard menu.isNil else { return menu! }
-    
-    var actions: [UIAction] = []
-    
-    for element in Enums.Period.allCases {
-      guard element.rawValue <= periodThreshold.rawValue else { continue }
-      
-      actions.append(.init(title: "filter_per_\(element.description)".localized.lowercased(),
-                           image: nil,
-                           identifier: nil,
-                           discoverabilityTitle: nil,
-                           attributes: .init(),
-                           state: period == periodThreshold ? .on : .off,
-                           handler: { [weak self] _ in
-        guard let self = self else { return }
-        
-        self.period = element
-      }))
+  @discardableResult
+  public func getDataItems() -> [SurveyReference] {
+    var items = additional.getDataItems(main.getDataItems(topic: topic,
+                                                          userprofile: userprofile,
+                                                          compatibility: compatibility),
+                                        period: period)
+    if main == .rated {
+      items.sort { $0.rating > $1.rating }
     }
+    changePublisher.send(items)
     
-    return UIMenu(title: "",
-                  image: nil,
-                  identifier: nil,
-                  options: .init(),
-                  children: actions)
+    return items
   }
-  public func setDisabled() { isFilterEnabled = false }
-  public func setEnabled() { isFilterEnabled = true }
   
-  // MARK: - Private methods
-  public func updateMenu() -> UIMenu? {
-    guard let periodThreshold = periodThreshold else { return nil }
+  @discardableResult
+  public func setMain(filter: Enums.SurveyFilterMode,
+                      topic: Topic? = nil,
+                      userprofile: Userprofile? = nil,
+                      compatibility: TopicCompatibility? = nil) -> [SurveyReference] {
+    self.topic = topic
+    self.userprofile = userprofile
+    self.compatibility = compatibility
+    main = filter
     
-    var actions: [UIAction] = []
+    return getDataItems()
+  }
+  
+  @discardableResult
+  public func setAdditional(filter: Enums.SurveyAdditionalFilterMode,
+                            period: Enums.Period? = nil) -> [SurveyReference] {
+    if !period.isNil { self.period = period! }
+    additional = filter
     
-    for element in Enums.Period.allCases {
-      guard element.rawValue <= periodThreshold.rawValue else { continue }
-      
-      actions.append(.init(title: element.description.localized.lowercased(),
-                           image: nil,
-                           identifier: nil,
-                           discoverabilityTitle: nil,
-                           attributes: .init(),
-                           state: period == element ? .on : .off,
-                           handler: { [weak self] _ in
-        guard let self = self else { return }
-        
-        self.period = element
-      }))
+    return getDataItems()
+  }
+  
+  @discardableResult
+  public func setBoth(main: Enums.SurveyFilterMode,
+                      topic: Topic? = nil,
+                      userprofile: Userprofile? = nil,
+                      compatibility: TopicCompatibility? = nil,
+                      additional: Enums.SurveyAdditionalFilterMode,
+                      period: Enums.Period? = nil) -> [SurveyReference] {
+    self.topic = topic
+    self.userprofile = userprofile
+    self.compatibility = compatibility
+    self.main = main
+    self.additional = additional
+    if !period.isNil { self.period = period! }
+    
+    return getDataItems()
+  }
+  
+  public func getPeriod() -> Enums.Period { period }
+  
+  public func setPeriod(_ period: Enums.Period) {
+    self.period = period
+  }
+  
+  public func getMain() -> Enums.SurveyFilterMode { main }
+  
+  public func getAdditional() -> Enums.SurveyAdditionalFilterMode { additional }
+  
+  public func getRequestArgs(excludeList: [SurveyReference] = [],
+                             includeList: [SurveyReference] = [],
+                             substring: String = "",
+                             owners: [Userprofile],
+                             topics: [Topic]) -> [String: Any] {
+    var args = [String: Any]()
+    
+    if !excludeList.isEmpty {
+      args["exclude_ids"] = excludeList.map { $0.id }
+    }
+    if !includeList.isEmpty {
+      args["include_ids"] = includeList.map { $0.id }
+    }
+    if !topics.isEmpty {
+      args["topics_ids"] = topics.map { $0.id }
+    }
+    if !substring.isEmpty {
+      args["substring"] = substring
     }
     
-    return UIMenu(title: "",
-                  image: nil,
-                  identifier: nil,
-                  options: .init(),
-                  children: actions)
+    // Get args from main
+    switch main {
+    case .rated:
+      args["rated"] = true
+    case .favorite:
+      args["watchlist"] = true
+    case .own:
+      if !owners.isEmpty {
+        args["owners_ids"] = owners.map { $0.id }
+      }
+    case .topic:
+      guard let topic = topic else { return args }
+      
+      args["topic_ids"] = [topic.id]
+    case .user:
+      guard let userprofile = userprofile else { return args }
+      
+      args["userprofile_id"] = userprofile.id
+    case .compatible:
+      guard let compatibility = compatibility else { return args }
+      
+      var list = [Int]()
+      if !excludeList.isEmpty {
+        list += excludeList.map { $0.id }
+      } else {
+        let fullSet = Set(compatibility.surveys)
+        let existingSet = Set(Set(main.getDataItems(compatibility: compatibility).map { $0.id }))
+        list = Array(fullSet.symmetricDifference(existingSet))
+      }
+      guard !list.isEmpty else { return args }
+      
+      args["include_ids"] = list
+      default: debugPrint("") }
+    
+    // Get args from additional
+    switch additional {
+    case .period:
+      guard let date = period.date else { return args }
+      
+      args["date_from"] = date.toDateString()
+    case .anonymous:
+      args["anonymous"] = true
+    case .discussed:
+      args["discussed"] = true
+    case .completed:
+      args["completed"] = true
+    case .notCompleted:
+      args["completed"] = false
+    default:
+      return args
+    }
+    
+    return args
   }
 }

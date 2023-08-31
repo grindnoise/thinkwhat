@@ -329,15 +329,20 @@ private extension TopicsController {
       }
       .store(in: &subscriptions)
     
-    tasks.append(Task { @MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
-        guard let self = self,
-              let tab = notification.object as? Enums.Tab
-        else { return }
-        
-        self.isOnScreen = tab == .Feed
-      }
-    })
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
+//        guard let self = self,
+//              let tab = notification.object as? Enums.Tab
+//        else { return }
+//
+//        self.isOnScreen = tab == .Feed
+//      }
+//    })
+    Notifications.UIEvents.tabItemPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in self.isOnScreen = $0.keys.first == .Topics  }
+      .store(in: &subscriptions)
+    
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
         guard let self = self,
@@ -408,9 +413,9 @@ private extension TopicsController {
   
   func getGradientColors() -> [CGColor] {
     return [
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : Colors.main.lighter(0.2).cgColor,
     ]
   }
   

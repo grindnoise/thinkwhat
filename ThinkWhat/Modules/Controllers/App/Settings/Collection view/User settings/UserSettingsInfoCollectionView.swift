@@ -256,7 +256,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
       
       var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
       backgroundConfig.backgroundColor = .clear
-      cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
+      cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
       cell.backgroundConfiguration = backgroundConfig
       
       self.colorPublisher

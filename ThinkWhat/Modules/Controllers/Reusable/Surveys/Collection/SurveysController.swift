@@ -27,7 +27,7 @@ class SurveysController: UIViewController, TintColorable {
   public private(set) var topic: Topic?
   public private(set) var userprofile: Userprofile?
   public private(set) var compatibility: TopicCompatibility?
-  public private(set) var mode: Survey.SurveyCategory {
+  public private(set) var mode: Enums.SurveyFilterMode {
     didSet {
       controllerOutput?.setMode(mode)
     }
@@ -44,7 +44,7 @@ class SurveysController: UIViewController, TintColorable {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   //Logic
-  private let initialMode: Survey.SurveyCategory
+  private let initialMode: Enums.SurveyFilterMode
   private var isSearching = false
   private var searchString = ""
   private var barMode = BarMode.Default {
@@ -55,7 +55,7 @@ class SurveysController: UIViewController, TintColorable {
       
       guard barMode == .Search else { return }
       
-      if initialMode == .Topic, let topic = topic {
+      if initialMode == .topic, let topic = topic {
         searchField.placeholder = "search_topic".localized + " \"\(topic.title)" + "\(topic.isOther ? "/" + topic.parent!.title : "")\""
       } else {
         searchField.placeholder = "search".localized
@@ -72,7 +72,7 @@ class SurveysController: UIViewController, TintColorable {
     var text: String = ""
     
     switch mode {
-    case .Compatibility:
+    case .compatible:
       if let compatibility = compatibility,
          let userprofile = compatibility.userprofile
       {
@@ -80,15 +80,15 @@ class SurveysController: UIViewController, TintColorable {
         user = userprofile
 //        image = UIImage(systemName: "person.2.fill")
       }
-    case .ByOwner:
+    case .user:
       if let userprofile = userprofile {
         user = userprofile
         text = "publications".localized.uppercased()
       }
-    case .Own:
+    case .own:
       image = Userprofiles.shared.current?.image
       text = "my_publications".localized.uppercased()
-    case .Favorite:
+    case .favorite:
       text = "watching".localized.uppercased()
       image = UIImage(systemName: "binoculars.fill")
     default:
@@ -157,7 +157,7 @@ class SurveysController: UIViewController, TintColorable {
   
   // MARK: - Initialization
   init(_ topic: Topic, color: UIColor = .clear) {
-    self.mode = .Topic
+    self.mode = .topic
     self.initialMode = self.mode
     self.topic = topic
     self.tintColor = color
@@ -165,7 +165,7 @@ class SurveysController: UIViewController, TintColorable {
     super.init(nibName: nil, bundle: nil)
   }
   
-  init(_ mode: Survey.SurveyCategory, color: UIColor = .clear) {
+  init(_ mode: Enums.SurveyFilterMode, color: UIColor = .clear) {
     self.mode = mode
     self.initialMode = self.mode
     self.tintColor = color
@@ -175,7 +175,7 @@ class SurveysController: UIViewController, TintColorable {
   
   init(_ userprofile: Userprofile, color: UIColor = .clear) {
     self.userprofile = userprofile
-    self.mode = .ByOwner
+    self.mode = .user
     self.initialMode = self.mode
     self.tintColor = color
     
@@ -184,7 +184,7 @@ class SurveysController: UIViewController, TintColorable {
   
   init(_ compatibility: TopicCompatibility, color: UIColor = .clear) {
     self.compatibility = compatibility
-    self.mode = .Compatibility
+    self.mode = .compatible
     self.initialMode = self.mode
     self.tintColor = color
     
@@ -306,8 +306,12 @@ class SurveysController: UIViewController, TintColorable {
 }
 
 extension SurveysController: SurveysViewInput {
+  func getDataItems(excludeList: [SurveyReference]) {
+    fatalError()
+  }
+  
   func openUserprofile(_ userprofile: Userprofile) {
-    guard mode != .ByOwner else { return }
+    guard mode != .user else { return }
     
     let backItem = UIBarButtonItem()
     backItem.title = ""
@@ -391,31 +395,31 @@ extension SurveysController: SurveysViewInput {
     //        tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory,
-                           dateFilter: Enums.Period?,
-                           topic: Topic?,
-                           userprofile: Userprofile?,
-                           compatibility: TopicCompatibility?,
-                           substring: String,
-                           except: [SurveyReference],
-                           ownersIds: [Int],
-                           topicsIds: [Int],
-                           ids: [Int]) {
-    if source == .Search {
-      controllerInput?.search(substring: searchString,
-                              localized: false,
-                              except: except,
-                              ownersIds: ownersIds,
-                              topicsIds: topicsIds)
-    } else {
-      controllerInput?.onDataSourceRequest(source: source,
-                                           dateFilter: dateFilter,
-                                           topic: topic,
-                                           userprofile: userprofile,
-                                           compatibility: compatibility,
-                                           ids: ids)
-    }
-  }
+//  func onDataSourceRequest(source: Enums.SurveyFilterMode,
+//                           dateFilter: Enums.Period?,
+//                           topic: Topic?,
+//                           userprofile: Userprofile?,
+//                           compatibility: TopicCompatibility?,
+//                           substring: String,
+//                           except: [SurveyReference],
+//                           ownersIds: [Int],
+//                           topicsIds: [Int],
+//                           ids: [Int]) {
+//    if source == .search {
+//      controllerInput?.search(substring: searchString,
+//                              localized: false,
+//                              except: except,
+//                              ownersIds: ownersIds,
+//                              topicsIds: topicsIds)
+//    } else {
+//      controllerInput?.onDataSourceRequest(source: source,
+//                                           dateFilter: dateFilter,
+//                                           topic: topic,
+//                                           userprofile: userprofile,
+//                                           compatibility: compatibility,
+//                                           ids: ids)
+//    }
+//  }
 }
 
 extension SurveysController: SurveysModelOutput {
@@ -452,11 +456,11 @@ private extension SurveysController {
     var color: UIColor = .secondaryLabel
 
     switch mode {
-    case .Topic:
+    case .topic:
       guard let topic = topic else { return }
 
       color = topic.tagColor
-    case .Compatibility:
+    case .compatible:
       guard let compatibility = compatibility else { return }
 
       color = compatibility.topic.tagColor
@@ -608,7 +612,7 @@ private extension SurveysController {
     case .Default:
       let action = UIAction { [unowned self] _ in
 //        self.controllerOutput?.toggleSearchMode(true)
-        self.mode = .Search
+        self.mode = .search
         self.barMode = .Search
       }
       
@@ -627,7 +631,7 @@ private extension SurveysController {
     if let recognizer = view.gestureRecognizers?.first {
       view.removeGestureRecognizer(recognizer)
     }
-    if mode == .Search {
+    if mode == .search {
       searchField.resignFirstResponder()
     }
   }
@@ -654,7 +658,7 @@ extension SurveysController: UITextFieldDelegate {
     searchString = text
     
     let ownerPredicate: [Int] = {
-      guard initialMode == .ByOwner,
+      guard initialMode == .user,
             let userprofile = userprofile
       else { return [] }
       
@@ -662,7 +666,7 @@ extension SurveysController: UITextFieldDelegate {
     }()
     
     let topicPredicate: [Int] = {
-      guard initialMode == .Topic,
+      guard initialMode == .topic,
             let topic = topic
       else { return [] }
       

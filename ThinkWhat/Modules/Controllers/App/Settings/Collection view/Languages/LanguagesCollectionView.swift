@@ -84,7 +84,7 @@ class LanguagesCollectionView: UICollectionView {
         cells.forEach {
             $0.accessories = [UICellAccessory.checkmark(displayed: .always,
                                                           options: .init(isHidden: !$0.isSelected,
-                                                                         tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED))]
+                                                                         tintColor: self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main))]
         }
     }
 }

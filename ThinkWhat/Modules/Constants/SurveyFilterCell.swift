@@ -13,21 +13,14 @@ import TinyConstraints
 class SurveyFilterCell: UICollectionViewListCell {
   // MARK: - Public properties
   public let filterPublisher = PassthroughSubject<SurveyFilterItem, Never>()
+  public let boundsPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private var item: SurveyFilterItem! {
-    didSet {
-      guard !item.isNil else { return }
-      
-//      item.$isFilterEnabled
-//        .sink { [unowned self] in button.backgroundColor = $0 ? Colors.filterEnabled : Colors.filterDisabled }
-//        .store(in: &subscriptions)
-    }
-  }
+  public private(set) var item: SurveyFilterItem!
   ///**UI**
   private let padding: CGFloat = 8
   private lazy var button: UIButton = {
@@ -59,7 +52,7 @@ class SurveyFilterCell: UICollectionViewListCell {
       .store(in: &subscriptions)
     instance.setAttributedTitle(NSAttributedString(string: item.getText().localized.firstCapitalized,
                                                        attributes: [
-                                                        .font: UIFont(name: Fonts.Rubik.Medium, size: 11) as Any,
+                                                        .font: UIFont(name: Fonts.Rubik.Regular, size: 12) as Any,
                                                         .foregroundColor: UIColor.white as Any,
                                                        ]), for: .normal)
     
@@ -106,7 +99,7 @@ class SurveyFilterCell: UICollectionViewListCell {
     
     // Update button menu behaviour for period mode
     item.$isFilterEnabled
-      .filter { [unowned self] _ in self.item.mode == .period }
+      .filter { [unowned self] _ in self.item.additional == .period }
       .sink { [unowned self] in
         self.button.showsMenuAsPrimaryAction = $0
         self.button.menu = item.getMenu()
@@ -117,11 +110,12 @@ class SurveyFilterCell: UICollectionViewListCell {
     item.$isFilterEnabled
       .filter { [unowned self] in self.fgLayer.opacity.isZero && $0 }
       .sink { [unowned self] _ in
-        self.filterPublisher.send(item)
+//        self.filterPublisher.send(item)
 //        self.fgLayer.setAffineTransform(.identity)
         Animations.unmaskLayerCircled(layer: self.fgLayer,
                                       location: self.touchLocation,
-                                      duration: 0.275,
+                                      duration: 0.25,
+                                      timingFunction: .easeInEaseOut,
                                       opacityDurationMultiplier: 0.5,
                                       delegate: self) {  }
       }
@@ -134,15 +128,18 @@ class SurveyFilterCell: UICollectionViewListCell {
       .store(in: &subscriptions)
     
     // Set title for selected period
-    item.$period
-      .filter { [unowned self] in self.item.mode == .period && !$0.isNil }
+    item.periodPublisher
+      .filter { [unowned self] _ in self.item.additional == .period }
       .sink { [unowned self] in
         self.filterPublisher.send(item)
-        self.button.setAttributedTitle(NSAttributedString(string: $0!.description.localized.firstCapitalized,
+        self.button.setAttributedTitle(NSAttributedString(string: $0.description.localized.firstCapitalized,
                                                           attributes: [
                                                            .font: UIFont(name: Fonts.Rubik.Medium, size: 11) as Any,
                                                            .foregroundColor: UIColor.white as Any,
                                                           ]), for: .normal)
+        self.setNeedsLayout()
+        self.layoutIfNeeded()
+        self.boundsPublisher.send()
       }
       .store(in: &subscriptions)
     
@@ -173,12 +170,13 @@ private extension SurveyFilterCell {
   @objc
   func handleTap() {
     // Show menu only after highlighting
-    if item.mode == .period {
+    if item.additional == .period {
       button.showsMenuAsPrimaryAction = item.isFilterEnabled
       button.menu = item.getMenu()
     }
-    
+
     item.setEnabled()
+    filterPublisher.send(item)
   }
   
   @MainActor
@@ -193,24 +191,9 @@ private extension SurveyFilterCell {
 //                               completionBlocks: [{ [unowned self] in self.fgLayer.opacity = 0 }]),
                 forKey: nil)
     fgLayer.opacity = 0
-    fgLayer.add(Animations.get(property: .Scale,
-                               fromValue: fgLayer.affineTransform(),
-                               toValue: fgLayer.setAffineTransform(CGAffineTransform(scaleX: 0.5, y: 0.5)),//0.1,
-                               duration: 0.25,
-                               timingFunction: .linear,
-                               delegate: self,
-                               isRemovedOnCompletion: true),
-//                               completionBlocks: [{ [unowned self] in self.fgLayer.setAffineTransform(CGAffineTransform.identity) }]),
-                forKey: nil)
-    fgLayer.setAffineTransform(CGAffineTransform(scaleX: 0.5, y: 0.5))
-    delay(seconds: 0.3) {[weak self] in
-      guard let self = self else { return }
-      
-      self.fgLayer.setAffineTransform(.identity)
-    }
   }
 }
-
+     
 extension SurveyFilterCell: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
@@ -218,4 +201,3 @@ extension SurveyFilterCell: CAAnimationDelegate {
         }
     }
 }
-// 0504071 2.1 гр 5

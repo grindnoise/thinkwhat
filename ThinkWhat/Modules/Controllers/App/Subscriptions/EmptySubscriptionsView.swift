@@ -59,7 +59,7 @@ class EmptyPublicationsView: UIView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private let mode: Survey.SurveyCategory
+  private let mode: Enums.SurveyFilterMode
   private let showsButton: Bool
   private let showsLogo: Bool
   ///**UI**
@@ -78,7 +78,7 @@ class EmptyPublicationsView: UIView {
   private lazy var label: UILabel = {
     let instance = UILabel()
     instance.numberOfLines = 0
-    instance.attributedText = NSAttributedString(string: !labelText.isEmpty ? labelText.localized : mode == .Subscriptions ? mode.localizedDescription : Survey.SurveyCategory.All.localizedDescription,
+    instance.attributedText = NSAttributedString(string: !labelText.isEmpty ? labelText.localized : mode == .subscriptions ? mode.localizedDescription : Enums.SurveyFilterMode.disabled.localizedDescription,
                                                  attributes: [
                                                   .font: UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .headline) as Any,
                                                   .foregroundColor: UIColor.secondaryLabel,
@@ -185,7 +185,7 @@ class EmptyPublicationsView: UIView {
   
   
   // MARK: - Initialization
-  init(mode: Survey.SurveyCategory = .All,
+  init(mode: Enums.SurveyFilterMode = .disabled,
        labelText: String = "",
        showsButton: Bool = false,
        showsLogo: Bool = false,
@@ -321,7 +321,7 @@ private extension EmptyPublicationsView {
   func generateItems(_ count: Int) {
     func getRandomCategory() -> Icon.Category {
       switch self.mode {
-      case.Subscriptions:
+      case.subscriptions:
         let all = [
           10038,
           10039,
@@ -344,7 +344,7 @@ private extension EmptyPublicationsView {
     }
     
     func getAssociatedColor(_ category: Icon.Category) -> UIColor {
-      return mode == .Subscriptions ? UIColor.random() : Topics.shared.all.filter { $0.iconCategory == category }.first?.tagColor ?? UIColor.random()
+      return mode == .subscriptions ? UIColor.random() : Topics.shared.all.filter { $0.iconCategory == category }.first?.tagColor ?? UIColor.random()
     }
     
     delay(seconds: items.count < maxItems/2 ? 0 : Double.random(in: 0.2...2)) {[weak self] in

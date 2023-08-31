@@ -223,6 +223,7 @@ struct Animations {
                                  layer animatedlayer: CALayer,
                                  location: CGPoint,
                                  duration: TimeInterval,
+                                 timingFunction: CAMediaTimingFunctionName = .linear,
                                  animateOpacity: Bool = true,
                                  opacityDurationMultiplier: Double = 1,
                                  delegate: CAAnimationDelegate,
@@ -290,7 +291,7 @@ struct Animations {
                               delay: 0,
                               repeatCount: 0,
                               autoreverses: false,
-                              timingFunction: unmask ? .easeOut : .easeIn,
+                              timingFunction: timingFunction,
                               delegate: delegate,
                               isRemovedOnCompletion: true,
                               completionBlocks: [])
@@ -305,7 +306,7 @@ struct Animations {
                                      fromValue: unmask ? 0 : 1,
                                      toValue: unmask ? 1 : 0,
                                      duration: unmask ? duration*opacityDurationMultiplier : duration/opacityDurationMultiplier,
-                                     timingFunction: unmask ? .easeOut : .easeIn,
+                                     timingFunction: timingFunction,
                                      delegate: nil)
     
     animatedlayer.add(opacityAnim, forKey: nil)

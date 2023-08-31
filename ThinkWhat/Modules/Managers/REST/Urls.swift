@@ -64,6 +64,7 @@ struct API_URLS {
   }
   
   struct Surveys {
+    static let getPublications:     URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_publications/")}()
     static let surveyById:          URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_id/")}()
     static let listByIds:           URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/list_by_ids/")}()
     static let subscriptions:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/subscriptions/")}()

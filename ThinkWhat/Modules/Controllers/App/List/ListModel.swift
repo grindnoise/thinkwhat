@@ -57,14 +57,12 @@ extension ListModel: ListControllerInput {
     }
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory,
-                           dateFilter: Enums.Period?,
-                           topic: Topic?) {
+  func getDataItems(filter: SurveyFilter,
+                    excludeList: [SurveyReference]) {
     Task {
       do {
-        try await API.shared.surveys.surveyReferences(category: source,
-                                                      period: dateFilter,
-                                                      topic: topic)
+        try await API.shared.surveys.getSurveyReferences(filter: filter, excludeList: excludeList, owners: [Userprofiles.shared.current!])
+        
         await MainActor.run {
           modelOutput?.onRequestCompleted(.success(true))
         }

@@ -516,3 +516,6 @@
 "filter_completed" = "completed";
 "filter_not_completed" = "not completed";
 "filter_anonymous" = "anonymous";
+"filter_rated" = "most rated";
+"filter_own" = "own";
+"filter_watchlist" = "watchlist";

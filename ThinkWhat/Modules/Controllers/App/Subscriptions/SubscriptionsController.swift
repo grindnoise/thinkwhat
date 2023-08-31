@@ -208,73 +208,32 @@ class SubscriptionsController: UIViewController, TintColorable {
 
 private extension SubscriptionsController {
   func setTasks() {
-    tasks.append(Task { @MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
-        guard let self = self,
-              let tab = notification.object as? Enums.Tab
-        else { return }
+    Notifications.UIEvents.tabItemPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] in
+        guard let self = self else { return }
         
-        self.isOnScreen = tab == .Subscriptions
+        self.isOnScreen = $0.keys.first == .Subscriptions
+        
+        if $0.values.first == .Subscriptions && $0.keys.first == .Subscriptions {
+          self.controllerOutput?.scrollToTop()
+        }
       }
-    })
-    
-    
-    
-//    tasks.append(Task { @MainActor [weak self] in
-//      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublications) {
-//        guard let self = self,
-//              self.mode == .Userprofile
-//        else { return }
-//
-//        self.isRightButtonSpinning = false
-//        self.setBarItems()
-//      }
-//    })
-//
-//    //On notifications switch server failure callback
-//    tasks.append(Task { @MainActor [weak self] in
-//      for await _ in NotificationCenter.default.notifications(for: Notifications.Userprofiles.NotifyOnPublicationsFailure) {
-//        guard let self = self else { return }
-//
-//        showBanner(bannerDelegate: self,
-//                   text: AppError.server.localizedDescription,
-//                   content: UIImageView(
-//                    image: UIImage(systemName: "exclamationmark.triangle.fill",
-//                                   withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
-//                   color: UIColor.white,
-//                   textColor: .white,
-//                   dismissAfter: 0.75,
-//                   backgroundColor: UIColor.systemOrange.withAlphaComponent(1))
-//        self.isRightButtonSpinning = false
-//        self.setBarItems()
-//      }
-//    })
+      .store(in: &subscriptions)
+
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
-        guard let self = self,
-              self.isOnScreen
-        else { return }
+        guard let self = self else { return }
         
-        self.isOnScreen = false
         self.controllerOutput?.didDisappear()
       }
     })
-    tasks.append(Task { @MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-        guard let self = self,
-              let main = self.tabBarController as? MainController,
-              main.selectedIndex == 1
-        else { return }
-        
-        self.isOnScreen = true
-        self.controllerOutput?.didAppear()
-      }
-    })
+
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
-        guard let self = self, self.isOnScreen else { return }
+        guard let self = self else { return }
         
-        self.navigationController?.setBarShadow(on: self.traitCollection.userInterfaceStyle != .dark, animated: true)
+        self.navigationController?.setBarShadow(on: false, animated: true)
       }
     })
   }
@@ -578,29 +537,24 @@ private extension SubscriptionsController {
   func onModeChanged() {
     if mode == .Default {//, isOnScreen {
       toggleUserSelected(false)
-      controllerOutput?.hideUserCard(nil)
+      controllerOutput?.hideUserCard() {}
     }
     
     setBarItems()
-    //        setTitle()
   }
   
   func getGradientColors() -> [CGColor] {
     return [
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor,
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : K_COLOR_RED.lighter(0.2).cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : Colors.main.lighter(0.2).cgColor,
     ]
   }
 }
 
 extension SubscriptionsController: SubscriptionsViewInput {
-  func setNavigationBarHidden(_ flag: Bool) {
-//    navigationController?.setNavigationBarHidden(flag, animated: true)
-//
-//    guard let mainController = tabBarController as? MainController else { return }
-//    
-//    mainController.toggleLogo(on: !flag)
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference]) {
+    controllerInput?.getDataItems(filter: filter, excludeList: excludeList)
   }
   
   func toggleUserSelected(_ selected: Bool) { isUserSelected = selected }
@@ -709,12 +663,6 @@ extension SubscriptionsController: SubscriptionsViewInput {
     guard let controller = tabBarController as? MainController else { return }
     
     controller.toggleLogo(on: false)
-  }
-  
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?, userprofile: Userprofile?) {
-    guard isOnScreen else { return }
-    
-    controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic, userprofile: userprofile)
   }
   
   @objc

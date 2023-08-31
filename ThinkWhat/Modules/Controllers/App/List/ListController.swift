@@ -15,18 +15,8 @@ class ListController: UIViewController, TintColorable {
   var controllerOutput: ListControllerOutput?
   var controllerInput: ListControllerInput?
   ///**Logic**
-  var isDataReady: Bool = false
-  public private(set) var category: Survey.SurveyCategory = .New {
-    didSet {
-      controllerOutput?.onDataSourceChanged()
-      //            setTitle()
-    }
-  }
-  public var tintColor: UIColor = .clear {
-    didSet {
-      listSwitch.color = tintColor
-    }
-  }
+  public var isDataReady: Bool = false
+  public var tintColor: UIColor = Colors.main
   ///**UI**
   public private(set) var isOnScreen = false {
     didSet {
@@ -34,61 +24,10 @@ class ListController: UIViewController, TintColorable {
     }
   }
   
-  
-  
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  //UI
-  private lazy var titleStack: UIStackView = {
-    let opaque = UIView()
-    opaque.backgroundColor = .clear
-    
-    let instance = UIStackView(arrangedSubviews: [
-      opaque,
-      listSwitch
-    ])
-    instance.axis = .horizontal
-    instance.spacing = 0
-    
-    return instance
-  }()
-  private lazy var listSwitch: ListSwitch = {
-    let instance = ListSwitch()
-    instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4).isActive = true
-    instance.statePublisher
-      .sink { [weak self] in
-        guard let self = self,
-              let state = $0
-        else { return }
-        
-        switch state {
-        case .New:
-          self.category = .New
-        case .Top:
-          self.category = .Top
-        case .Watching:
-          self.category = .Favorite
-        case .Own:
-          self.category = .Own
-        }
-      }
-      .store(in: &subscriptions)
-    
-    return instance
-  }()
-  //    private lazy var titleLabel: UILabel = {
-  //       let instance = UILabel()
-  //        instance.font = UIFont(name: Fonts.Bold,
-  //                               size: 32)
-  //        instance.textAlignment = .left
-  //        instance.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-  //
-  //        return instance
-  //    }()
-  
-  
   
   // MARK: - Destructor
   deinit {
@@ -129,7 +68,6 @@ class ListController: UIViewController, TintColorable {
     navigationController?.setNavigationBarHidden(false, animated: true)
     navigationController?.setBarShadow(on: false)
     navigationController?.setBarTintColor(tintColor)
-    titleStack.alpha = 1
     tabBarController?.setTabBarVisible(visible: true, animated: true)
     
     //        guard let main = tabBarController as? MainController else { return }
@@ -143,7 +81,6 @@ class ListController: UIViewController, TintColorable {
     
     isOnScreen = true
     controllerOutput?.didAppear()
-    setSwitchHidden(false)
     
     guard let main = tabBarController as? MainController else { return }
     
@@ -154,7 +91,6 @@ class ListController: UIViewController, TintColorable {
     super.viewWillDisappear(animated)
     
     controllerOutput?.didDisappear()
-    setSwitchHidden(true)
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -168,37 +104,7 @@ class ListController: UIViewController, TintColorable {
   //
   //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
   //    }
-  
-  // MARK: - Public methods
-  public func setSwitchHidden(_ hidden: Bool, animated: Bool = true) {
-    guard let navigationBar = navigationController?.navigationBar,
-          let constraint = titleStack.getConstraint(identifier: "centerY")
-    else { return }
-    
-    navigationBar.setNeedsLayout()
-    
-    titleStack.alpha = hidden ? 1 : 0
-    
-    guard animated else {
-      titleStack.alpha = !hidden ? 1 : 0
-      constraint.constant = hidden ? -100 : 0
-      navigationBar.layoutIfNeeded()
-      return
-    }
-    UIView.animate(
-      withDuration: 0.5,
-      delay: 0,
-      usingSpringWithDamping: 0.8,
-      initialSpringVelocity: 0.3,
-      options: [.curveEaseInOut]) { [unowned self] in
-        self.titleStack.alpha = !hidden ? 1 : 0
-        constraint.constant = hidden ? -100 : 0
-        navigationBar.layoutIfNeeded()
-      }
-  }
 }
-
-
 
 // MARK: - View Input
 extension ListController: ListViewInput {
@@ -301,41 +207,37 @@ extension ListController: ListViewInput {
     controller.toggleLogo(on: false)
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?) {
-    guard isOnScreen else { return }
-    
-    controllerInput?.onDataSourceRequest(source: source, dateFilter: dateFilter, topic: topic)
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference]) {
+    controllerInput?.getDataItems(filter: filter, excludeList: excludeList)
   }
 }
 
 private extension ListController {
   func setTasks() {
-    tasks.append(Task { @MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
-        guard let self = self,
-              let tab = notification.object as? Enums.Tab
-        else { return }
+    Notifications.UIEvents.tabItemPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in
+        self.isOnScreen = $0.keys.first == .Feed
         
-        self.isOnScreen = tab == .Feed
+        if $0.values.first == .Feed && $0.keys.first == .Feed {
+          self.controllerOutput?.scrollToTop()
+        }
       }
-    })
+      .store(in: &subscriptions)
+    
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
-        guard let self = self,
-              self.isOnScreen
-        else { return }
+        guard let self = self else { return }
         
-        self.isOnScreen = false
+        self.controllerOutput?.didDisappear()
       }
     })
+
     tasks.append(Task { @MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-        guard let self = self,
-              let main = self.tabBarController as? MainController,
-              main.selectedIndex == 2
-        else { return }
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
+        guard let self = self else { return }
         
-        self.isOnScreen = true
+        self.navigationController?.setBarShadow(on: false, animated: true)
       }
     })
   }
@@ -345,20 +247,6 @@ private extension ListController {
   func setupUI() {
     navigationItem.title = ""
     navigationController?.navigationBar.prefersLargeTitles = false//deviceType == .iPhoneSE ? false : true
-    
-    guard let navigationBar = self.navigationController?.navigationBar else { return }
-    
-    navigationBar.addSubview(titleStack)
-    titleStack.translatesAutoresizingMaskIntoConstraints = false
-    NSLayoutConstraint.activate([
-      titleStack.heightAnchor.constraint(equalToConstant: 40),
-      titleStack.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
-      titleStack.trailingAnchor.constraint(equalTo: navigationBar.trailingAnchor, constant: -20)
-    ])
-    
-    let constraint = titleStack.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor, constant: -100)
-    constraint.identifier = "centerY"
-    constraint.isActive = true
   }
   
   //    @MainActor

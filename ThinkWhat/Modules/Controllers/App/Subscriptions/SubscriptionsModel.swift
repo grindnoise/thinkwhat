@@ -16,6 +16,24 @@ class SubscriptionsModel {
 
 // MARK: - Controller Input
 extension SubscriptionsModel: SubsciptionsControllerInput {
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference]) {
+    Task {
+      do {
+        try await API.shared.surveys.getSurveyReferences(filter: filter,
+                                                         excludeList: excludeList,
+                                                         owners: Userprofiles.shared.all.filter { $0.subscribedAt })
+        
+        await MainActor.run {
+          modelOutput?.onRequestCompleted(.success(true))
+        }
+      } catch {
+        await MainActor.run {
+          modelOutput?.onRequestCompleted(.failure(error))
+        }
+      }
+    }
+  }
+  
   func unsubscribe(from userprofile: Userprofile) {
     Task {
       try await API.shared.profiles.unsubscribe(from: [userprofile])
@@ -50,24 +68,24 @@ extension SubscriptionsModel: SubsciptionsControllerInput {
     }
   }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?, userprofile: Userprofile?) {
-    Task {
-      do {
-        try await API.shared.surveys.surveyReferences(category: source,
-                                                      period: dateFilter,
-                                                      topic: topic,
-                                                      userprofile: userprofile)
-        
-        await MainActor.run {
-          modelOutput?.onRequestCompleted(.success(true))
-        }
-      } catch {
-        await MainActor.run {
-          modelOutput?.onRequestCompleted(.failure(error))
-        }
-      }
-    }
-  }
+//  func onDataSourceRequest(source: Enums.SurveyFilterMode, dateFilter: Enums.Period?, topic: Topic?, userprofile: Userprofile?) {
+//    Task {
+//      do {
+//        try await API.shared.surveys.surveyReferences(category: source,
+//                                                      period: dateFilter,
+//                                                      topic: topic,
+//                                                      userprofile: userprofile)
+//
+//        await MainActor.run {
+//          modelOutput?.onRequestCompleted(.success(true))
+//        }
+//      } catch {
+//        await MainActor.run {
+//          modelOutput?.onRequestCompleted(.failure(error))
+//        }
+//      }
+//    }
+//  }
   
   func switchNotifications(userprofile: Userprofile, notify: Bool) {
     Task {

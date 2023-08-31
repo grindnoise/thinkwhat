@@ -83,7 +83,7 @@ class UnderlinedSignTextField: UnderlinedTextField {
             height: signSize.height)
     }
 
-    var color: UIColor = K_COLOR_RED {
+    var color: UIColor = Colors.main {
         didSet {
             guard warningSign != nil, checkSign != nil, lowerTextView != nil else { return }
             UIView.animate(withDuration: 0.3) {

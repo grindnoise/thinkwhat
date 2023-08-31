@@ -15,11 +15,9 @@ protocol ListViewInput: AnyObject {
   
   var controllerOutput: ListControllerOutput? { get set }
   var controllerInput: ListControllerInput? { get set }
-  //    var surveyCategory: Survey.SurveyCategory { get }
-  var category: Survey.SurveyCategory { get }
   
   func onSurveyTapped(_: SurveyReference)
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?)
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -37,7 +35,7 @@ protocol ListControllerInput: AnyObject {
   
   var modelOutput: ListModelOutput? { get set }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?)
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(_: [SurveyReference: Claim])
@@ -49,11 +47,7 @@ protocol ListControllerInput: AnyObject {
 ///
 /// **Controller** conforms to this protocol
 protocol ListModelOutput: AnyObject {
-  // Model output methods here
-  var category: Survey.SurveyCategory { get }
-  
   func onRequestCompleted(_: Result<Bool, Error>)
-  //    func onAddFavoriteCallback(_: Result<Bool,Error>)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -63,9 +57,8 @@ protocol ListControllerOutput: AnyObject {
   var viewInput: (ListViewInput & TintColorable)? { get set }
   var isOnScreen: Bool { get set }
   
-  func onDataSourceChanged()
   func onRequestCompleted(_: Result<Bool, Error>)
   func didAppear()
   func didDisappear()
-  //    func onAddFavoriteCallback(_: Result<Bool,Error>)
+  func scrollToTop()
 }

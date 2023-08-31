@@ -123,20 +123,20 @@ class SurveyReference: Decodable, Complaintable {
       survey?.progress = progress
     }
   }
-  var media: Mediafile? {
-    didSet {
-      guard let media = media,
-            let survey = survey
-      else { return }
-      
-      if survey.media.isEmpty {
-        survey.media.append(media)
-      } else if let firstMedia = survey.media.first, firstMedia.image.isNil {
-        //Set image to prevent download
-        firstMedia.image = media.image
-      }
-    }
-  }
+  var media: Mediafile? { Mediafiles.shared.all.filter({ $0.surveyID == id }).first }
+//    didSet {
+//      guard let media = media,
+//            let survey = survey
+//      else { return }
+//
+//      if survey.media.isEmpty {
+//        survey.media.append(media)
+//      } else if let firstMedia = survey.media.first, firstMedia.image.isNil {
+//        //Set image to prevent download
+//        firstMedia.image = media.image
+//      }
+//    }
+//  }
   var shareHash:              String = ""
   var shareEncryptedString:   String = ""
   ///**Filtering properties
@@ -237,7 +237,7 @@ class SurveyReference: Decodable, Complaintable {
   required init(from decoder: Decoder) throws {
     do {
       let container = try decoder.container(keyedBy: CodingKeys.self)
-      guard let topicId = try container.decode(Int.self, forKey: .category) as? Int,
+      guard let topicId = try? container.decode(Int.self, forKey: .category),
             let _topic = Topics.shared.all.filter({ $0.id == topicId }).first else {
         throw "Topic not found"
       }
@@ -276,18 +276,19 @@ class SurveyReference: Decodable, Complaintable {
       let shareData           = try container.decode([String].self, forKey: .share_link)
       shareHash               = shareData.first ?? ""
       shareEncryptedString    = shareData.last ?? ""
-      
-      if let _media       = try container.decodeIfPresent([Mediafile].self, forKey: .media)?.first {
-        media = _media
-      }
+      _ = try container.decodeIfPresent([Mediafile].self, forKey: .media)
+//      if let _media       = try container.decodeIfPresent([Mediafile].self, forKey: .media)?.first {
+//        media = _media
+//      }
       rating      = Double(try container.decode(String.self, forKey: .rating)) ?? 0
-      //Check for existing instance by hashValue
+      
+      // Check for existing instance by hashValue
       if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {
         SurveyReferences.shared.all.append(self)
       }
       //NS
       //            super.init()
-      //            if SurveyReferences.shared.all.filter({ $0.isEqual(self) }).isEmpty {
+      //            if SurveyReferences.shared.allfilter({ $0.isEqual(self) }).isEmpty {
       //                SurveyReferences.shared.all.append(self)
       //            }
     } catch {

@@ -20,7 +20,7 @@ protocol SubscriptionsViewInput: AnyObject {
   func onSubscpitionsTapped()
   //    func toggleBarButton()
   func onSurveyTapped(_: SurveyReference)
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?, userprofile: Userprofile?)
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -32,7 +32,6 @@ protocol SubscriptionsViewInput: AnyObject {
   func onAllUsersTapped(mode: Enums.UserprofilesViewMode)
   func onSubcriptionsCountEvent(zeroSubscriptions: Bool)
   func setDefaultMode()
-  func setNavigationBarHidden(_: Bool)
 }
 
 /// *Controller* tells the *Model* what to do based on the input
@@ -41,7 +40,7 @@ protocol SubscriptionsViewInput: AnyObject {
 protocol SubsciptionsControllerInput: AnyObject {
   var modelOutput: SubsciptionsModelOutput? { get set }
   
-  func onDataSourceRequest(source: Survey.SurveyCategory, dateFilter: Enums.Period?, topic: Topic?, userprofile: Userprofile?)
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(_: [SurveyReference: Claim])
@@ -67,4 +66,5 @@ protocol SubsciptionsControllerOutput: AnyObject {
   func hideUserCard(_: Closure?)
   func didAppear()
   func didDisappear()
+  func scrollToTop()
 }

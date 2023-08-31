@@ -222,15 +222,20 @@ private extension HotController {
       .sink { [unowned self] _ in self.controllerInput?.getSurveys([])}
       .store(in: &subscriptions)
     
-    tasks.append(Task { @MainActor [weak self] in
-      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
-        guard let self = self,
-              let tab = notification.object as? Enums.Tab
-        else { return }
-        
-        self.isOnScreen = tab == .Hot
-      }
-    })
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
+//        guard let self = self,
+//              let tab = notification.object as? Enums.Tab
+//        else { return }
+//
+//        self.isOnScreen = tab == .Hot
+//      }
+//    })
+    Notifications.UIEvents.tabItemPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [unowned self] in self.isOnScreen = $0.keys.first == .Hot  }
+      .store(in: &subscriptions)
+    
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
         guard let self = self else { return }

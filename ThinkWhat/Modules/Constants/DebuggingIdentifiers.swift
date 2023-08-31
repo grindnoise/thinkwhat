@@ -14,4 +14,8 @@ struct DebuggingIdentifiers {
   static let actionOrEventFailed: String = "❌"
   static let notificationSent: String = "📤"
   static let notificationRecieved: String = "📥"
+  static let processingBegan: String = "▶️"
+  static let processingEnded: String = "⏹️"
+  static let constructing: String = "🟢"
+  static let destructing: String = "❌"
 }
