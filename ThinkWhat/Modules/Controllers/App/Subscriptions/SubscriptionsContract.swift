@@ -60,6 +60,7 @@ protocol SubsciptionsModelOutput: AnyObject {
 /// **View** conforms to this protocol
 protocol SubsciptionsControllerOutput: AnyObject {
   var viewInput: (SubscriptionsViewInput & TintColorable)? { get set }
+  var isOnScreen: Bool { get set }
   
   func onWillAppear()
   func onRequestCompleted(_: Result<Bool, Error>)

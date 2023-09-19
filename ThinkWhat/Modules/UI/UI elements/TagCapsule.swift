@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import TinyConstraints
 
 class TagCapsule: UIView {
   
@@ -183,6 +184,7 @@ class TagCapsule: UIView {
     instance.textAlignment = .center
     instance.text = text
     instance.textColor = .white
+//    instance.height("T".height(withConstrainedWidth: 100, font: font))
     
 //    let constraint = instance.widthAnchor.constraint(equalToConstant: text.width(withConstrainedHeight: 100, font: font))
 //    constraint.identifier = "widthAnchor"
@@ -275,7 +277,7 @@ private extension TagCapsule {
       shadowView.place(inside: self, bottomPriority: .required)
     }
     stack.place(inside: self, bottomPriority: .required)
-    
+    label.height("T".height(withConstrainedWidth: 100, font: font))
     if !iconCategory.isNil {
       icon?.heightAnchor.constraint(equalTo: label.heightAnchor).isActive = true
     }
@@ -283,6 +285,7 @@ private extension TagCapsule {
       imageView?.heightAnchor.constraint(equalTo: label.heightAnchor).isActive = true
       
       if !userprofile.isNil {
+//        label.height("T".height(withConstrainedWidth: 100, font: font))
         if userprofile!.image.isNil {
           imageView?.contentMode = .center
           imageView?.backgroundColor = .clear
@@ -296,6 +299,9 @@ private extension TagCapsule {
           .store(in: &subscriptions)
       }
     }
+//    label.translatesAutoresizingMaskIntoConstraints = false
+//    label.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: font)).isActive = true
+//    label.height("T".height(withConstrainedWidth: 1000, font: font), priority: .required)
   }
 }
 

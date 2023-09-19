@@ -75,13 +75,13 @@ class PollTitleCell: UICollectionViewCell {
   private lazy var tagCapsule: TagCapsule = {
     let instance = TagCapsule(text: item.topic.isOther ? item.topic.parent!.title.uppercased() + item.topic.title.uppercased() : item.topic.title.uppercased(),
                               padding: padding,
-                              textPadding: .init(top: padding/3, left: 0, bottom: padding/3, right: 0),
+                              textPadding: .init(top: padding/1.5, left: 0, bottom: padding/1.5, right: 0),
                               color: item.topic.tagColor,
-                              font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!,
+                              font: UIFont(name: Fonts.Rubik.Medium, size: 11)!,
                               isShadowed: false,
                               iconCategory: item.topic.isOther ? item.topic.parent!.iconCategory : item.topic.iconCategory,
                               image: nil)
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding/2).isActive = true
+//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding/2).isActive = true
     
     return instance
   }()

@@ -15,10 +15,7 @@ protocol SurveysViewInput: AnyObject {
   
   var controllerOutput: SurveysControllerOutput? { get set }
   var controllerInput: SurveysControllerInput? { get set }
-  var mode: Enums.SurveyFilterMode { get }
-  var topic: Topic? { get }
-  var userprofile: Userprofile? { get }
-  var compatibility: TopicCompatibility? { get }
+  var filter: SurveyFilter { get }
   
   func onSurveyTapped(_: SurveyReference)
   func getDataItems(excludeList: [SurveyReference])
@@ -35,7 +32,7 @@ protocol SurveysControllerInput: AnyObject {
   
   var modelOutput: SurveysModelOutput? { get set }
   
-  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference])
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference], substring: String)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(_: [SurveyReference: Claim])

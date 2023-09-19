@@ -88,9 +88,9 @@ class TopicsView: UIView {
   private lazy var surveysCollectionView: SurveysCollectionView = {
     let instance = SurveysCollectionView(filter: SurveyFilter(main: .disabled))
 //    let instance = SurveysCollectionView(category: .search)
-//    instance.backgroundColor = .clear
-//    instance.alpha = 0
-//    instance.isOnScreen = false
+    instance.backgroundColor = .clear
+    instance.alpha = 0
+    instance.isOnScreen = false
 //
 //    //Pagination #2
 //    let paginationByTopicPublisher = instance.paginationByTopicPublisher

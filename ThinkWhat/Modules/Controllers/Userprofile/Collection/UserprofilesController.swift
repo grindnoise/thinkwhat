@@ -61,7 +61,7 @@ class UserprofilesController: UIViewController, TintColorable {
     case .Subscribers, .Subscriptions:
       if let userprofile = userprofile {
         if userprofile.isCurrent {
-          image = UIImage(systemName: "person.fill.checkmark")
+          image = UIImage(systemName: "person.2.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small))
           text = (mode == .Subscribers ? "my_subscribers" : "my_subscriptions").localized.uppercased()
         } else {
           user = userprofile
@@ -80,14 +80,21 @@ class UserprofilesController: UIViewController, TintColorable {
     
     let instance = TagCapsule(text: text,
                               padding: padding/2,
-                              textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding),
+                              textPadding: .init(top: padding/1.5, left: 0, bottom: padding/1.5, right: padding),
                               color: tintColor,
-                              font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
+                              font: UIFont(name: Fonts.Rubik.Medium, size: 14)!,
                               isShadowed: false,
                               iconCategory: iconCategory,
                               image: image,
                               userprofile: user)
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding).isActive = true
+//    let instance = TagCapsule(text: "profile".localized.uppercased(),
+//               padding: padding/2,
+//               textPadding: .init(top: padding/1.5, left: 0, bottom: padding/1.5, right: padding),
+//               color: tintColor,
+//               font: UIFont(name: Fonts.Rubik.Medium, size: 14)!,
+//               isShadowed: false,
+//               image: UIImage(systemName: "person.fill"))
+//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding).isActive = true
     
     return instance
   }()

@@ -264,7 +264,12 @@ struct Colors {
   static let surveyCellLight = UIColor.white
   static let surveyCellDark = UIColor(hexString: "#262626")
   static let filterEnabled = UIColor(hexString: "#21A038")
-  static let filterDisabled = UIColor.systemGray4
+  static let filterDisabledLight = UIColor.systemGray4
+  static let filterDisabledDark = UIColor.systemGray4
+  
+  struct SubscriptionsController {
+    static let subscribersButton = UIColor(red: 0.416, green: 0.400, blue: 0.639, alpha: 1.000)
+  }
   
   struct Poll {
     static let choiceBackgroundLight = UIColor.systemBackground

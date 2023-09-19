@@ -123,6 +123,10 @@ struct Enums {
     case Reminder, Language
   }
   
+  enum SearchMode {
+    case on, off
+  }
+  
   //Tab bar items
   enum Tab {
     case Hot, Subscriptions, Feed, Topics, Settings
@@ -232,16 +236,11 @@ struct Enums {
     case favorite
     case subscriptions
     case topic
-    case search
     case user
     case compatible
     case disabled // Filter is off
-//    case period // Filter
-//    case anonymous // Only anonymois publications
-//    case discussed // Most discussed,
-//    case completed // Only completed
-//    case notCompleted // Only completed
-    case rated // Only completed
+    case rated
+    case search
     
     func getDataItems(topic: Topic? = nil,
                       userprofile: Userprofile? = nil,
@@ -258,6 +257,12 @@ struct Enums {
 //        let referencesFromSurveys = Surveys.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned }.map { $0.reference }// && $0.isRejected
 //        return (SurveyReferences.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
       case .rated:
+        allowed.sort {
+//          if $0.rating == $0.rating {
+//            return $0.startDate > $1.startDate
+//          }
+          return $0.rating > $1.rating
+        }
         return allowed
 //        let referencesFromSurveys = Surveys.shared.all.filter { $0.isTop && !$0.isClaimed && !$0.isBanned && !$0.isRejected }.map { $0.reference }//&& !$0.isRejected
 //        return (SurveyReferences.shared.all.filter { $0.isTop && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()
@@ -267,35 +272,26 @@ struct Enums {
 //        return (SurveyReferences.shared.all.filter { $0.isOwn && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .favorite:
         return allowed.filter { $0.isFavorite }
-//        let referencesFromSurveys = Surveys.shared.all.filter { $0.isFavorite && !$0.isBanned }.map { $0.reference }
-//        return (SurveyReferences.shared.all.filter { $0.isFavorite && !$0.isBanned } + referencesFromSurveys).uniqued()
       case .subscriptions:
-        return allowed.filter { $0.owner.subscribedAt && !$0.isAnonymous }
-//        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous }.map { $0.reference }
-//        return (SurveyReferences.shared.all.filter { $0.owner.subscribedAt && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous } + referencesFromSurveys).uniqued()
-      case .disabled:
         return allowed
-//        let referencesFromSurveys = Surveys.shared.all.filter { !$0.isClaimed && !$0.isBanned }.map { $0.reference }//&& !$0.isRejected
-//        return (SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
+          .filter { $0.owner.subscribedAt && !$0.isAnonymous }
+          .sorted { $0.startDate > $1.startDate }
+
       case .topic:
         guard let topic = topic else { return [] }
         
         return allowed.filter { $0.topic == topic }
-//        let referencesFromSurveys = Surveys.shared.all.filter { $0.topic == topic && !$0.isClaimed && !$0.isBanned }.map { $0.reference }//&& !$0.isRejected
-//        return (SurveyReferences.shared.all.filter { $0.topic == topic && !$0.isClaimed && !$0.isBanned } + referencesFromSurveys).uniqued()//&& !$0.isRejected
       case .user:
         guard let userprofile = userprofile else { return [] }
         
-        return allowed.filter { $0.owner == userprofile && !$0.isAnonymous }
-//        let referencesFromSurveys = Surveys.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous }.map { $0.reference }//&& !$0.isRejected
-//        return (SurveyReferences.shared.all.filter { $0.owner == userprofile && !$0.isClaimed && !$0.isBanned && !$0.isAnonymous } + referencesFromSurveys).uniqued()//&& !$0.isRejected
-      case .search:
-        fatalError()
+        return allowed
+          .filter { $0.owner == userprofile && !$0.isAnonymous }
+          .sorted { $0.startDate > $1.startDate }
       case .compatible:
         guard let compatibility = compatibility else { return [] }
         
         return SurveyReferences.shared[compatibility.surveys]
-//      default: return allowed
+      default: return allowed
       }
     }
     
@@ -317,13 +313,11 @@ struct Enums {
         return API_URLS.Surveys.all
       case .topic:
         return API_URLS.Surveys.byTopic
-      case .search:
-        return API_URLS.Surveys.search
       case .user:
         return API_URLS.Surveys.byUserprofile
       case .compatible:
         return API_URLS.Surveys.listByIds
-      default:
+      case .search:
         return API_URLS.Surveys.all
       }
     }
@@ -352,7 +346,6 @@ struct Enums {
     case discussed // Most discussed,
     case completed // Only completed
     case notCompleted // Only completed
-    case rated // Only completed
     
     func getDataItems(_ items: [SurveyReference], period: Period? = nil) -> [SurveyReference] {
       switch self {
@@ -360,12 +353,11 @@ struct Enums {
       case .completed: return items.filter { $0.isComplete }.sorted { $0.startDate > $1.startDate }
       case .notCompleted: return items.filter { !$0.isComplete }.sorted { $0.startDate > $1.startDate }
       case .discussed: return items.sorted { $0.commentsTotal > $1.commentsTotal }
-      case .disabled: return items.sorted { $0.startDate > $1.startDate }
-      case .rated: return items.sorted { $0.rating > $1.rating }
       case .period:
         guard let period = period else { return items }
         
         return items.filter({ $0.isValid(byBeriod: period) }).sorted { $0.startDate > $1.startDate }
+      default: return items
       }
     }
   }

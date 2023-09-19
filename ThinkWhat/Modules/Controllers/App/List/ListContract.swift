@@ -55,7 +55,7 @@ protocol ListModelOutput: AnyObject {
 /// **View** conforms to this protocol
 protocol ListControllerOutput: AnyObject {
   var viewInput: (ListViewInput & TintColorable)? { get set }
-  var isOnScreen: Bool { get set }
+//  var isOnScreen: Bool { get set }
   
   func onRequestCompleted(_: Result<Bool, Error>)
   func didAppear()

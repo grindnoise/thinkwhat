@@ -80,8 +80,8 @@ class EmptyPublicationsView: UIView {
     instance.numberOfLines = 0
     instance.attributedText = NSAttributedString(string: !labelText.isEmpty ? labelText.localized : mode == .subscriptions ? mode.localizedDescription : Enums.SurveyFilterMode.disabled.localizedDescription,
                                                  attributes: [
-                                                  .font: UIFont.scaledFont(fontName: Fonts.Rubik.Medium, forTextStyle: .headline) as Any,
-                                                  .foregroundColor: UIColor.secondaryLabel,
+                                                  .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .headline) as Any,
+                                                  .foregroundColor: UIColor.label,
                                                   .paragraphStyle: { let paragraphStyle = NSMutableParagraphStyle(); paragraphStyle.lineSpacing = padding/2; return paragraphStyle }(),
                                                  ])
     instance.textAlignment = .center
@@ -220,11 +220,13 @@ class EmptyPublicationsView: UIView {
   // MARK: - Public methods
   public func setAnimationsEnabled(_ flag: Bool) {
     if flag {
+//      spiral.layer.removeAllAnimations()
       spiral.startRotating(duration: 15)
       shouldTerminate = false
       generateItems(maxItems)
     } else {
       spiral.stopRotating()
+      spiral.layer.removeAllAnimations()
       shouldTerminate = true
       items.forEach { $0.removeFromSuperview() }
     }

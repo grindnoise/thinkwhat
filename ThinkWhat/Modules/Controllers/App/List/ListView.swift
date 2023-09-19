@@ -23,13 +23,18 @@ class ListView: UIView {
       setupUI()
     }
   }
-  public var isOnScreen: Bool = true {
-    didSet {
-      guard oldValue != isOnScreen else { return }
-      
-      collectionView.isOnScreen = isOnScreen
-    }
-  }
+//  public var isOnScreen: Bool = true {
+//    didSet {
+//      guard oldValue != isOnScreen else { return }
+//
+//      collectionView.isOnScreen = isOnScreen
+//
+//      // Animate empty view
+//      guard !emptyPublicationsView.alpha.isZero else { return }
+//
+//      emptyPublicationsView.setAnimationsEnabled(isOnScreen)
+//    }
+//  }
   
   // MARK: - IB outlets
   @IBOutlet var contentView: UIView!
@@ -163,9 +168,9 @@ class ListView: UIView {
                        image: UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
                        period: .month,
                        periodThreshold: .unlimited),
-      SurveyFilterItem(main: .rated, additional: .rated, text: "filter_rated"),
-      SurveyFilterItem(main: .own, additional: .rated, text: "filter_own"),
-      SurveyFilterItem(main: .favorite, additional: .rated, text: "filter_watchlist"),
+      SurveyFilterItem(main: .rated, additional: .disabled, text: "filter_rated"),
+      SurveyFilterItem(main: .own, additional: .disabled, text: "filter_own"),
+      SurveyFilterItem(main: .favorite, additional: .disabled, text: "filter_watchlist"),
       SurveyFilterItem(main: .disabled, additional: .discussed, text: "filter_discussed"),
       SurveyFilterItem(main: .disabled, additional: .completed, text: "filter_completed"),
       SurveyFilterItem(main: .disabled, additional: .notCompleted, text: "filter_not_completed"),
@@ -187,7 +192,11 @@ class ListView: UIView {
         
 //        self.filter.setAdditional(filter: $0.additional, period: $0.period)
         self.isScrolledDown = false
-        self.scrollToTop()
+        delay(seconds: 0.3) { [weak self] in
+          guard let self = self else { return }
+          
+          self.scrollToTop()
+        }
       }
       .store(in: &subscriptions)
     
@@ -252,15 +261,34 @@ class ListView: UIView {
   private lazy var filterViewHeight: CGFloat = .zero
   private lazy var scrollToTopButton: UIButton = {
     let instance = UIButton()
-    instance.backgroundColor = viewInput?.tintColor ?? Colors.main
-    instance.setImage(UIImage(systemName: "arrow.up", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-    instance.size(.uniform(size: 40))
+    instance.backgroundColor = .clear
     instance.tintColor = .white
     instance.addTarget(self, action: #selector(self.scrollToTop), for: .touchUpInside)
     instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePan(_:))))
+//    instance.size(.uniform(size: 40))
+    let bgLayer = CAShapeLayer()
+    bgLayer.name = "background"
+    bgLayer.fillColor = Colors.main.cgColor
+    bgLayer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    bgLayer.shadowColor = UISettings.Shadows.color//UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    bgLayer.shadowRadius = UISettings.Shadows.radius(padding: padding*1.5)
+    bgLayer.shadowOffset = UISettings.Shadows.offset
+    instance.setImage(UIImage(systemName: "arrow.up", withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
+    instance.adjustsImageWhenHighlighted = false
+    instance.imageView?.layer.masksToBounds = false
+    instance.layer.insertSublayer(bgLayer, at: 0)
     instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.width/2 }
+      .filter { [unowned self] in $0.size != bgLayer.bounds.size }
+      .sink {
+        bgLayer.frame = $0
+        bgLayer.path = UIBezierPath(ovalIn: $0).cgPath
+        bgLayer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
+      }
       .store(in: &subscriptions)
+    instance.imageView?.layer.zPosition = 1
+//    instance.publisher(for: \.bounds)
+//      .sink { instance.cornerRadius = $0.width/2 }
+//      .store(in: &subscriptions)
     
     return instance
   }()
@@ -269,24 +297,10 @@ class ListView: UIView {
   private var isScrolledDown = false { // Use to show/hide arrow button
     didSet {
       guard oldValue != isScrolledDown,
-            !scrollToTopButtonAnimates,
-            let constraint = scrollToTopButton.getConstraint(identifier: "top")
+            !scrollToTopButtonAnimates
       else { return }
 
-//      if scrollToTopButtonX == .zero {
-//        scrollToTopButtonX = padding + scrollToTopButton.bounds.width
-//      }
-      scrollToTopButtonAnimates = true
-      UIView.animate(withDuration: isScrolledDown ? 0.25 : 0.15,
-                     delay: 0,
-                     options: .curveEaseInOut,
-                     animations: { [weak self] in
-        guard let self = self else { return }
-        
-        self.background.setNeedsLayout()
-        constraint.constant = self.isScrolledDown ? -(self.scrollToTopButton.bounds.width + self.padding) : 0
-        self.background.layoutIfNeeded()
-      }) { [unowned self] _ in self.scrollToTopButtonAnimates = false }
+      toggleScrollButton(on: isScrolledDown) { [unowned self] in self.scrollToTopButtonAnimates = false }
     }
   }
   ///**Logic**
@@ -308,28 +322,16 @@ class ListView: UIView {
     print("\(String(describing: type(of: self))).\(#function)")
 #endif
   }
-  
-  // MARK: - Initialization
-  override init(frame: CGRect) {
-    super.init(frame: frame)
     
-//    setupUI()
-  }
-  
-  required init?(coder: NSCoder) {
-    super.init(coder: coder)
-    
-//    setupUI()
-  }
-  
-  
-  
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
+    if let bgLayer = scrollToTopButton.getLayer(identifier: "background") as? CAShapeLayer {
+      bgLayer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    }
   }
 }
 
@@ -338,7 +340,7 @@ private extension ListView {
   func setupUI() {
     guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
     
-    filtersCollectionView.color = viewInput!.tintColor
+    filtersCollectionView.setColor(viewInput?.tintColor ?? Colors.filterEnabled)
     collectionView.color = viewInput!.tintColor
     
     addSubview(contentView)
@@ -352,7 +354,7 @@ private extension ListView {
     contentView.addSubviews(views)
     filtersCollectionView.leadingToSuperview(offset: padding)
     filtersCollectionView.trailingToSuperview(offset: -padding)
-    filtersCollectionView.topToSuperview(offset: padding*2)
+    filtersCollectionView.topToSuperview(offset: padding*1)
     filterViewHeight = padding*2 + "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!)
     filtersCollectionView.height(filterViewHeight)
     
@@ -366,6 +368,8 @@ private extension ListView {
     leading.identifier = "leading"
     let constraint_2 = scrollToTopButton.topToBottom(of: background)
     constraint_2.identifier = "top"
+    scrollToTopButton.size(.uniform(size: 40))
+
     
     background.addSubview(emptyPublicationsView)
     emptyPublicationsView.edgesToSuperview()
@@ -495,19 +499,35 @@ private extension ListView {
 //        }) { _ in label.removeFromSuperview() }
 //    }
 //  }
+  
+  func toggleScrollButton(on: Bool, completion: Closure? = nil) {
+    guard let constraint = scrollToTopButton.getConstraint(identifier: "top") else { return }
+    
+    scrollToTopButtonAnimates = true
+    UIView.animate(withDuration: on ? 0.25 : 0.15,
+                   delay: 0,
+                   options: .curveEaseInOut,
+                   animations: { [weak self] in
+      guard let self = self else { return }
+      
+      self.background.setNeedsLayout()
+      constraint.constant = on ? -(self.scrollToTopButton.bounds.width + self.padding) : 0
+      self.background.layoutIfNeeded()
+    }) { _ in completion?() }
+  }
 }
 
 // MARK: - Controller Output
 extension ListView: ListControllerOutput {
   func didAppear() {
-//    guard isEmpty else { return }
-//
-//    emptyPublicationsView.setAnimationsEnabled(true)
+    guard isEmpty else { return }
+
+    emptyPublicationsView.setAnimationsEnabled(true)
 //    collectionView.didAppear()
   }
   
   func didDisappear() {
-//    emptyPublicationsView.setAnimationsEnabled(false)
+    emptyPublicationsView.setAnimationsEnabled(false)
     
 //    collectionView.didDisappear()
   }
@@ -518,8 +538,18 @@ extension ListView: ListControllerOutput {
   
   @objc
   func scrollToTop() {
-    isScrolledDown = false
     collectionView.scrollToTop()
+    toggleScrollButton(on: false) { delay(seconds: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      self.scrollToTopButtonAnimates = false
+    }}
+    isScrolledDown = false
+//    delay(seconds: 0.3) { [weak self] in
+//      guard let self = self else { return }
+//      
+//      self.isScrolledDown = false
+//    }
   }
 }
 

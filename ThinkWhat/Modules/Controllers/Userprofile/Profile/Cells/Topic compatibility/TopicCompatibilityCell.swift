@@ -43,11 +43,11 @@ class TopicCompatibilityCell: UICollectionViewListCell {
     return instance
   }()
   private lazy var tagCapsule: TagCapsule = {
-    TagCapsule(text: "\(compatibility.topic.title.uppercased()) (\(compatibility.percent)%)",
+    TagCapsule(text: "\(compatibility.topic.title.uppercased()): \(compatibility.percent)%",
                               padding: padding,
                               textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: 0),
                               color: compatibility.topic.tagColor,
-                              font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!,
+                              font: UIFont(name: Fonts.Rubik.Medium, size: 11)!,
                               isShadowed: false,
                               iconCategory: compatibility.topic.iconCategory,
                               image: nil)

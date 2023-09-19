@@ -42,14 +42,14 @@ class UserprofileController: UIViewController, TintColorable {
     }
   }
   private let padding: CGFloat = 8
-  private lazy var titleView: TagCapsule = { TagCapsule(text: "profile".localized.uppercased(),
-                                                        padding: padding/2,
-                                                        textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding),
-                                                        color: tintColor,
-                                                        font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
-                                                        isShadowed: false,
-                                                        iconCategory: nil,
-                                                        image: UIImage(systemName: "person.fill"))
+  private lazy var titleView: TagCapsule = {
+    TagCapsule(text: "profile".localized.uppercased(),
+               padding: padding/2,
+               textPadding: .init(top: padding/1.5, left: 0, bottom: padding/1.5, right: padding),
+               color: tintColor,
+               font: UIFont(name: Fonts.Rubik.Medium, size: 14)!,
+               isShadowed: false,
+               image: UIImage(systemName: "person.fill"))
   }()
   
   
@@ -305,7 +305,8 @@ extension UserprofileController: UserprofileViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(SurveysController(compatibility,
+//    navigationController?.pushViewController(SurveysController(compatibility, color: compatibility.topic.tagColor), animated: true)
+    navigationController?.pushViewController(SurveysController(filter: SurveyFilter(main: .compatible, compatibility: compatibility),
                                                                color: compatibility.topic.tagColor),
                                              animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
@@ -323,7 +324,10 @@ extension UserprofileController: UserprofileViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(SurveysController(userprofile, color: tintColor), animated: true)
+//    navigationController?.pushViewController(SurveysController(userprofile, color: tintColor), animated: true)
+    navigationController?.pushViewController(SurveysController(filter: SurveyFilter(main: .user, userprofile: userprofile),
+                                                               color: tintColor),
+                                             animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let controller = tabBarController as? MainController else { return }
@@ -360,7 +364,10 @@ extension UserprofileController: UserprofileViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(SurveysController(topic), animated: true)
+//    navigationController?.pushViewController(SurveysController(topic), animated: true)
+    navigationController?.pushViewController(SurveysController(filter: SurveyFilter(main: .user, topic: topic),
+                                                               color: topic.tagColor),
+                                             animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
     
     guard let controller = tabBarController as? MainController else { return }

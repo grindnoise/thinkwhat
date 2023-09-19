@@ -18,13 +18,6 @@ class SurveyFiltersCollectionView: UICollectionView {
   
   // MARK: - Public properties
   public let filterPublisher = PassthroughSubject<SurveyFilterItem, Never>()
-  public var color: UIColor = Colors.main {
-    didSet {
-      guard oldValue != color else { return }
-      
-//      colorPublisher.send(color)
-    }
-  }
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -32,6 +25,8 @@ class SurveyFiltersCollectionView: UICollectionView {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
+  private var color: UIColor
+  private let contentInsets: UIEdgeInsets
   ///**Logic**
   private let dataItems: [SurveyFilterItem]
   private var source: Source!
@@ -46,8 +41,10 @@ class SurveyFiltersCollectionView: UICollectionView {
   }
   
   // MARK: - Initialization
-  init(items: [SurveyFilterItem]) {
+  init(items: [SurveyFilterItem], color: UIColor = Colors.filterEnabled, contentInsets: UIEdgeInsets = .zero) {
     self.dataItems = items
+    self.color = color
+    self.contentInsets = contentInsets
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
@@ -57,6 +54,11 @@ class SurveyFiltersCollectionView: UICollectionView {
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  // MARK: - Public methods
+  public func setColor(_ color: UIColor) {
+    self.color = color
   }
 }
 
@@ -83,7 +85,8 @@ private extension SurveyFiltersCollectionView {
       
       let section = NSCollectionLayoutSection(group: group)
       section.interGroupSpacing = self.padding/2
-      section.contentInsets.trailing = self.padding
+      section.contentInsets.leading = self.contentInsets.left
+      section.contentInsets.trailing = self.contentInsets.right
       section.orthogonalScrollingBehavior = .continuous
 
       return section
@@ -108,22 +111,29 @@ private extension SurveyFiltersCollectionView {
 //    collectionViewLayout = layout
     
     let cellRegistration = UICollectionView.CellRegistration<SurveyFilterCell, SurveyFilterItem> { [unowned self] cell, indexPath, item in
-      if cell.item.isNil {
-        cell.setupUI(item: item)
-      }
+//      if cell.item.isNil {
+//        cell.setupUI(item: item)
+//      }
+      
+//      if cell.item != item {
+        cell.item = item
+//      }
+      
+      cell.color = self.color
+      cell.backgroundConfiguration = UIBackgroundConfiguration.clear()
+      cell.automaticallyUpdatesBackgroundConfiguration = false
       
       cell.filterPublisher
         .throttle(for: .seconds(0.2), scheduler: DispatchQueue.main, latest: false)
+        .receive(on: DispatchQueue.main)
         .sink { [weak self] in
           guard let self = self else { return }
-          
-          self.filterPublisher.send($0)
+
           self.source.snapshot().itemIdentifiers
             .filter { $0 != item }
             .forEach { $0.setDisabled() }
-          
+          self.filterPublisher.send($0)
           if item.isFilterEnabled {
-//          if !indexPath.row.isZero {
             self.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
           }
         }

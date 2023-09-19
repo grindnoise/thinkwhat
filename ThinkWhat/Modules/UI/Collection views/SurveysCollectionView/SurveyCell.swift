@@ -102,11 +102,11 @@ class SurveyCell: UICollectionViewCell {
                               padding: padding,
                               textPadding: .init(top: padding/3, left: 0, bottom: padding/3, right: 0),
                               color: .clear,//item.topic.tagColor,
-                              font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!,
+                              font: UIFont(name: Fonts.Rubik.Medium, size: 11)!,
                               isShadowed: false,
                               iconCategory: .Null,//item.topic.isOther ? item.topic.parent!.iconCategory : item.topic.iconCategory,
                               image: nil)
-    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding/2).isActive = true
+//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding/2).isActive = true
     
     return instance
   }()
@@ -206,8 +206,7 @@ class SurveyCell: UICollectionViewCell {
   private lazy var titleLabel: UILabel = {
     let instance = UILabel()
     instance.textAlignment = .left
-    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold,
-                                      forTextStyle: .title1)
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title1)
     instance.numberOfLines = 0
     instance.lineBreakMode = .byTruncatingTail
     instance.textColor = .label
@@ -501,7 +500,7 @@ private extension SurveyCell {
       bottomView
     ])
     stackView.axis = .vertical
-    stackView.spacing = padding*2
+    stackView.spacing = padding//*2
     
     stackView.place(inside: contentView,
                     insets: .init(top: padding, left: 0, bottom: padding, right: 0),

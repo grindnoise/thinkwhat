@@ -33,7 +33,7 @@ class InterestCell: UICollectionViewCell {
                padding: padding,
                textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: 0),
                color: item.tagColor,
-               font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!,
+               font: UIFont(name: Fonts.Rubik.Medium, size: 11)!,
                isShadowed: false,
                iconCategory: item.iconCategory,
                image: nil)

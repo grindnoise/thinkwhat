@@ -1857,22 +1857,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A0615BB4-3F47-4CC2-B663-5EBF1435918F"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "974"
-            endingLineNumber = "974"
-            landmarkName = "onUserSelected(userprofile:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "ABE48771-346D-4C41-8655-7EDC8C0AE6AA"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -3927,8 +3911,8 @@
             filePath = "ThinkWhat/Modules/UI/Collection views/SurveysCollectionView/SurveysCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "491"
-            endingLineNumber = "491"
+            startingLineNumber = "497"
+            endingLineNumber = "497"
             landmarkName = "setTasks()"
             landmarkType = "7">
          </BreakpointContent>
@@ -3975,8 +3959,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/MainController/MainController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "721"
-            endingLineNumber = "721"
+            startingLineNumber = "723"
+            endingLineNumber = "723"
             landmarkName = "loadData()"
             landmarkType = "7">
             <Locations>
@@ -4535,22 +4519,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "44F20A6B-55A5-458A-9080-62524B55812E"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "264"
-            endingLineNumber = "264"
-            landmarkName = "feedCollectionView"
-            landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "7BEF8727-216A-4E91-B7E5-A1A2D78ACAB9"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -4607,8 +4575,8 @@
             filePath = "ThinkWhat/Modules/UI/Collection views/SurveysCollectionView/SurveysCollectionView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "605"
-            endingLineNumber = "605"
+            startingLineNumber = "611"
+            endingLineNumber = "611"
             landmarkName = "setTasks()"
             landmarkType = "7">
             <Locations>
@@ -4686,54 +4654,6 @@
                   startingLineNumber = "771"
                   endingLineNumber = "771"
                   offsetFromSymbolStart = "348">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "BBF9F5DD-6627-4B87-AD9A-8174D59C7A65"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/Reusable/Surveys/Collection/SurveysModel.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "120"
-            endingLineNumber = "120"
-            landmarkName = "search(substring:localized:except:ownersIds:topicsIds:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "BBF9F5DD-6627-4B87-AD9A-8174D59C7A65 - e43365dc7e771086"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #3 @Swift.MainActor @Sendable () -&gt; Swift.Optional&lt;()&gt; in closure #1 @Sendable () async -&gt; () in ThinkWhat__local_.SurveysModel.search(substring: Swift.String, localized: Swift.Bool, except: Swift.Array&lt;ThinkWhat__local_.SurveyReference&gt;, ownersIds: Swift.Array&lt;Swift.Int&gt;, topicsIds: Swift.Array&lt;Swift.Int&gt;) -&gt; ()"
-                  moduleName = "ThinkWhat (local)"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/Reusable/Surveys/Collection/SurveysModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "116"
-                  endingLineNumber = "116"
-                  offsetFromSymbolStart = "112">
-               </Location>
-               <Location
-                  uuid = "BBF9F5DD-6627-4B87-AD9A-8174D59C7A65 - cb538d91bcaade52"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #3 @Swift.MainActor @Sendable () -&gt; Swift.Optional&lt;()&gt; in closure #1 @Sendable () async -&gt; () in ThinkWhat.SurveysModel.search(substring: Swift.String, localized: Swift.Bool, except: Swift.Array&lt;ThinkWhat.SurveyReference&gt;, ownersIds: Swift.Array&lt;Swift.Int&gt;, topicsIds: Swift.Array&lt;Swift.Int&gt;) -&gt; ()"
-                  moduleName = "ThinkWhat"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/Reusable/Surveys/Collection/SurveysModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "116"
-                  endingLineNumber = "116"
-                  offsetFromSymbolStart = "112">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -5345,48 +5265,111 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "08A13E70-87E3-4654-9E45-E0208C2B54E9"
+            uuid = "70F7F058-4A8A-440F-B4EA-05D8CF5E1B7C"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/UI/Collection views/SurveysCollectionView/SurveysCollectionView.swift"
+            filePath = "ThinkWhat/Modules/Constants/SurveyFilterCell.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "713"
-            endingLineNumber = "713"
-            landmarkName = "setDataSource(animatingDifferences:)"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
+            landmarkName = "button"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "683C7721-AE0F-4704-BBF6-995AA7876EF7"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Constants/SurveyFilterCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "197"
+            endingLineNumber = "197"
+            landmarkName = "deselect()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "F226593B-1E41-4ECC-BDB4-D2011538390D"
+            uuid = "5D4F6263-594E-48A0-A752-1041CC9223A7"
             shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/Subscriptions/SubscriptionsView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1051"
-            endingLineNumber = "1051"
-            landmarkName = "handlePan(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "7C6A4A05-EDFD-4B8A-AA17-01301CA511C2"
-            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ThinkWhat/Algorithms/Animations.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "234"
-            endingLineNumber = "234"
+            startingLineNumber = "304"
+            endingLineNumber = "304"
             landmarkName = "unmaskLayerCircled(unmask:layer:location:duration:timingFunction:animateOpacity:opacityDurationMultiplier:delegate:completion:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "5D4F6263-594E-48A0-A752-1041CC9223A7 - cd43b0bdcc64906a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static ThinkWhat.Animations.unmaskLayerCircled(unmask: Swift.Bool, layer: __C.CALayer, location: __C.CGPoint, duration: Swift.Double, timingFunction: __C.CAMediaTimingFunctionName, animateOpacity: Swift.Bool, opacityDurationMultiplier: Swift.Double, delegate: __C.CAAnimationDelegate, completion: Swift.Optional&lt;() -&gt; ()&gt;) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Algorithms/Animations.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "304"
+                  endingLineNumber = "304"
+                  offsetFromSymbolStart = "1848">
+               </Location>
+               <Location
+                  uuid = "5D4F6263-594E-48A0-A752-1041CC9223A7 - cd43b0bdcc64906a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static ThinkWhat.Animations.unmaskLayerCircled(unmask: Swift.Bool, layer: __C.CALayer, location: __C.CGPoint, duration: Swift.Double, timingFunction: __C.CAMediaTimingFunctionName, animateOpacity: Swift.Bool, opacityDurationMultiplier: Swift.Double, delegate: __C.CAAnimationDelegate, completion: Swift.Optional&lt;() -&gt; ()&gt;) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Algorithms/Animations.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "304"
+                  endingLineNumber = "304"
+                  offsetFromSymbolStart = "1028">
+               </Location>
+               <Location
+                  uuid = "5D4F6263-594E-48A0-A752-1041CC9223A7 - cd43b0bdcc64906a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static ThinkWhat.Animations.unmaskLayerCircled(unmask: Swift.Bool, layer: __C.CALayer, location: __C.CGPoint, duration: Swift.Double, timingFunction: __C.CAMediaTimingFunctionName, animateOpacity: Swift.Bool, opacityDurationMultiplier: Swift.Double, delegate: __C.CAAnimationDelegate, completion: Swift.Optional&lt;() -&gt; ()&gt;) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Algorithms/Animations.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "304"
+                  endingLineNumber = "304"
+                  offsetFromSymbolStart = "996">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "96117D86-9297-4C11-89E2-1318639E9626"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/Reusable/Surveys/Collection/SurveysController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "143"
+            endingLineNumber = "143"
+            landmarkName = "init(filter:color:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

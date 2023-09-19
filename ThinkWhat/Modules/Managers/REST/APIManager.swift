@@ -1507,8 +1507,8 @@ class API {
         print("APIManager.Polls.surveyReferences() by compatibility", list)
 #endif
         parameters = ["ids": list]
-      } else if category == .search {
-        parameters = ["exclude_ids": fetchResult.map { $0.id }]
+//      } else if category == .search {
+//        parameters = ["exclude_ids": fetchResult.map { $0.id }]
       } else {
         parameters = ["exclude_ids": category.getDataItems().map { $0.id }]
       }

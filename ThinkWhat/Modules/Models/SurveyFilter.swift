@@ -26,6 +26,7 @@ class SurveyFilter: Hashable {
     hasher.combine(topic)
     hasher.combine(userprofile)
     hasher.combine(compatibility)
+//    hasher.combine(substring)
   }
   
   // MARK: - Public properties
@@ -34,13 +35,8 @@ class SurveyFilter: Hashable {
   public var topic: Topic?
   public var compatibility: TopicCompatibility?
   public var userprofile: Userprofile?
-  public var period: Enums.Period = .unlimited {
-    didSet {
-      guard oldValue != period else { return }
-      
-      changePublisher.send(getDataItems())
-    }
-  }
+  public var period: Enums.Period = .unlimited
+//  public var substring = ""
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -67,13 +63,18 @@ class SurveyFilter: Hashable {
   // MARK: - Public methods
   @discardableResult
   public func getDataItems() -> [SurveyReference] {
-    var items = additional.getDataItems(main.getDataItems(topic: topic,
+    let items = additional.getDataItems(main.getDataItems(topic: topic,
                                                           userprofile: userprofile,
                                                           compatibility: compatibility),
                                         period: period)
-    if main == .rated {
-      items.sort { $0.rating > $1.rating }
-    }
+//    if main == .rated {
+//      items.sort {
+//        if $0.rating == $0.rating {
+//          return $0.startDate > $1.startDate
+//        }
+//        return $0.rating > $1.rating
+//      }
+//    }
     changePublisher.send(items)
     
     return items

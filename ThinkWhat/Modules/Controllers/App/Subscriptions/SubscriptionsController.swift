@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import TinyConstraints
 
 class SubscriptionsController: UIViewController, TintColorable {
   
@@ -21,7 +22,11 @@ class SubscriptionsController: UIViewController, TintColorable {
   public var controllerInput: SubsciptionsControllerInput?
   ///**Logic**
   var isDataReady = false
-  public private(set) var isOnScreen = false
+  public private(set) var isOnScreen = false {
+    didSet {
+      controllerOutput?.isOnScreen = isOnScreen
+    }
+  }
   public private(set) var isUserSelected = false {
     didSet {
       guard oldValue != isUserSelected,
@@ -269,100 +274,75 @@ private extension SubscriptionsController {
     var rightButton: UIBarButtonItem!
     switch mode {
     case .Default:
-      let button: UIView = { let shadowView = UIView.opaque()
-        shadowView.layer.masksToBounds = false
-        shadowView.accessibilityIdentifier = "subscribers"
-        shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
-        shadowView.layer.shadowOffset = .zero
-        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-        shadowView.publisher(for: \.bounds)
-          .sink {
-            shadowView.layer.shadowRadius = $0.height/8
-            shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
-          }
-          .store(in: &subscriptions)
-        let button = UIButton()
-        button.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
-                                                     attributes: [
-                                                      .font: UIFont(name: Fonts.Rubik.Medium, size: 14) as Any,
-                                                      .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
-                                                     ]),
-                                  for: .normal)
-        button.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
-        button.accessibilityIdentifier = "profileButton"
-        button.imageEdgeInsets.left = padding/2
-        button.imageEdgeInsets.right = padding/2
-        button.semanticContentAttribute = .forceRightToLeft
-        button.adjustsImageWhenHighlighted = false
-        button.setImage(UIImage(systemName: ("arrow.right"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
-        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
-        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
-        button.addTarget(self, action: #selector(self.onSubscribersTapped), for: .touchUpInside)
-        button.publisher(for: \.bounds)
-          .sink { button.cornerRadius = $0.height/2 }
-          .store(in: &subscriptions)
-        button.place(inside: shadowView)
+//      let button: UIView = { let shadowView = UIView.opaque()
+//        shadowView.layer.masksToBounds = false
+//        shadowView.accessibilityIdentifier = "subscribers"
+//        shadowView.layer.shadowColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
+//        shadowView.layer.shadowOffset = .zero
+//        shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+//        shadowView.publisher(for: \.bounds)
+//          .sink {
+//            shadowView.layer.shadowRadius = $0.height/8
+//            shadowView.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2.25).cgPath
+//          }
+//          .store(in: &subscriptions)
+//        let button = UIButton()
+//        button.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
+//                                                     attributes: [
+//                                                      .font: UIFont(name: Fonts.Rubik.Medium, size: 14) as Any,
+//                                                      .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+//                                                     ]),
+//                                  for: .normal)
+//        button.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
+//        button.accessibilityIdentifier = "profileButton"
+//        button.imageEdgeInsets.left = padding/2
+//        button.imageEdgeInsets.right = padding/2
+//        button.semanticContentAttribute = .forceRightToLeft
+//        button.adjustsImageWhenHighlighted = false
+//        button.setImage(UIImage(systemName: ("arrow.right"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+//        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+//        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+//        button.addTarget(self, action: #selector(self.onSubscribersTapped), for: .touchUpInside)
+//        button.publisher(for: \.bounds)
+//          .sink { button.cornerRadius = $0.height/2 }
+//          .store(in: &subscriptions)
+//        button.place(inside: shadowView)
+//
+//        return shadowView
+//      }()
+      
+      let button: UIView = {
+        let opaque = UIView.opaque()
         
-        return shadowView
+        let instance = UIButton()
+        instance.titleLabel?.numberOfLines = 1
+        instance.addTarget(self, action: #selector(self.onSubscribersTapped), for: .touchUpInside)
+        instance.tintColor = .white
+        instance.backgroundColor = Colors.SubscriptionsController.subscribersButton
+        instance.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding*2, bottom: padding, right: padding*2)
+        instance.semanticContentAttribute = .forceRightToLeft
+        instance.setImage(.init(systemName: "person.2.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+        instance.adjustsImageWhenHighlighted = false
+        instance.imageView?.layer.masksToBounds = false
+        instance.imageEdgeInsets.left = padding/2
+        instance.publisher(for: \.bounds)
+          .sink { instance.cornerRadius = $0.height/2 }
+          .store(in: &subscriptions)
+        instance.setAttributedTitle(NSAttributedString(string: "subscribers".localized.capitalized,
+                                                       attributes: [
+                                                        .font: UIFont(name: Fonts.Rubik.Regular, size: 12) as Any,
+                                                        .foregroundColor: UIColor.white as Any,
+                                                       ]), for: .normal)
+        opaque.addSubview(instance)
+        instance.edgesToSuperview()
+        
+        return opaque
       }()
-      
-//      let button = UIButton()
-//      button.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
-//                                                   attributes: [
-//                                                    .font: UIFont(name: Fonts.Rubik.SemiBold, size: 16) as Any,
-//                                                    .foregroundColor: tintColor as Any
-//                                                   ]),
-//                                for: .normal)
-//      button.addTarget(self,
-//                       action: #selector(self.onSubscribersTapped),
-//                       for: .touchUpInside)
-      
-      //      rightButton = UIBarButtonItem(title: "subscribers".localized.capitalized,
-//                                    image: UIImage(systemName: "person.3.sequence.fill",
-//                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-//                                    primaryAction: {
-//        let action = UIAction { [weak self] _ in
-//          guard let self = self else { return }
-//
-//          self.onSubscribersTapped()
-//        }
-//
-//        return action
-//      }(),
-//                                    menu: nil)
-      navigationItem.setRightBarButton(UIBarButtonItem(customView: button),
-                                       animated: true)
-      navigationItem.setLeftBarButton(nil,
-                                      animated: true)
-      
-      //            guard let leading = titleLabel.getConstraint(identifier: "leading") else { return }
-      //
-      //            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
-      //                                                                   delay: 0) { [weak self] in
-      //                guard let self = self,
-      //                      let navigationBar = self.navigationController?.navigationBar
-      //                else { return }
-      //
-      //                navigationBar.setNeedsLayout()
-      //                leading.constant = 10
-      //                navigationBar.layoutIfNeeded()
-      //            }
+      navigationItem.setRightBarButton(UIBarButtonItem(customView: button), animated: true)
+      navigationItem.setLeftBarButton(nil, animated: true)
     case .Userprofile:
-      guard let userprofile = userprofile//,
-              //                  let leading = titleLabel.getConstraint(identifier: "leading")
-      else { return }
-      
-      //            let _ = UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15,
-      //                                                                   delay: 0) { [weak self] in
-      //                guard let self = self,
-      //                      let navigationBar = self.navigationController?.navigationBar
-      //                else { return }
-      //
-      //                navigationBar.setNeedsLayout()
-      //                leading.constant = 44+10
-      //                navigationBar.layoutIfNeeded()
-      //            }
-      
+      guard let userprofile = userprofile else { return }
+
       let notify = userprofile.notifyOnPublication
       let notifyAction = UIAction { [weak self] _ in
         guard let self = self else { return }

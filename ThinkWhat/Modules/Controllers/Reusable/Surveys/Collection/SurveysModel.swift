@@ -23,8 +23,24 @@ class SurveysModel {
 
 // MARK: - Controller Input
 extension SurveysModel: SurveysControllerInput {
-  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference]) {
-    print(filter)
+  func getDataItems(filter: SurveyFilter,
+                    excludeList: [SurveyReference],
+                    substring: String) {
+    Task {
+      do {
+        try await API.shared.surveys.getSurveyReferences(filter: filter,
+                                                         excludeList: excludeList,
+                                                         substring: substring)
+        
+        await MainActor.run {
+          modelOutput?.onRequestCompleted(.success(true))
+        }
+      } catch {
+        await MainActor.run {
+          modelOutput?.onRequestCompleted(.failure(error))
+        }
+      }
+    }
   }
   
   func unsubscribe(from userprofile: Userprofile) {
@@ -66,31 +82,6 @@ extension SurveysModel: SurveysControllerInput {
       }
     }
   }
-  
-//  func onDataSourceRequest(source: Enums.SurveyFilterMode,
-//                           dateFilter: Enums.Period?,
-//                           topic: Topic?,
-//                           userprofile: Userprofile?,
-//                           compatibility: TopicCompatibility?,
-//                           ids: [Int]?) {
-//    Task {
-//      do {
-//        try await API.shared.surveys.surveyReferences(category: source,
-//                                                      ids: ids,
-//                                                      period: dateFilter,
-//                                                      topic: topic,
-//                                                      userprofile: userprofile,
-//                                                      compatibility: compatibility)
-//        await MainActor.run {
-//          modelOutput?.onRequestCompleted(.success(true))
-//        }
-//      } catch {
-//        await MainActor.run {
-//          modelOutput?.onRequestCompleted(.failure(error))
-//        }
-//      }
-//    }
-//  }
   
   func search(substring: String,
               localized: Bool = false,

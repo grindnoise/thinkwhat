@@ -18,11 +18,11 @@ class ListController: UIViewController, TintColorable {
   public var isDataReady: Bool = false
   public var tintColor: UIColor = Colors.main
   ///**UI**
-  public private(set) var isOnScreen = false {
-    didSet {
-      controllerOutput?.isOnScreen = isOnScreen
-    }
-  }
+  public private(set) var isOnScreen = false // {
+//    didSet {
+//      controllerOutput?.isOnScreen = isOnScreen
+//    }
+//  }
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []

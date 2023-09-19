@@ -94,6 +94,7 @@ class SurveysCollectionView: UICollectionView {
   private var source: Source!
   private let isRequestingPublisher = CurrentValueSubject<Bool, Never>(false)
   ///**UI**
+  private var showSeparators: Bool = false
   private let padding: CGFloat = 8
   private lazy var spinner: SpiralSpinner = { SpiralSpinner() }()
   private let colorPublisher = PassthroughSubject<UIColor, Never>()
@@ -116,7 +117,7 @@ class SurveysCollectionView: UICollectionView {
       guard lastContentOffsetY > 0 else { scrolledToTopPublisher.send(); return }
       
       let distance = lastStopYPoint - lastContentOffsetY
-      let threshold: CGFloat = 30
+      let threshold: CGFloat = 50
       
       guard abs(distance) > threshold  else { return }
       
@@ -145,8 +146,9 @@ class SurveysCollectionView: UICollectionView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  init(filter: SurveyFilter, color: UIColor? = nil) {
+  init(filter: SurveyFilter, color: UIColor? = nil, showSeparators: Bool = false) {
     self.filter = filter
+    self.showSeparators = showSeparators
     self.color = color ?? .secondaryLabel
     
     super.init(frame: .zero, collectionViewLayout: .init())
@@ -193,7 +195,7 @@ class SurveysCollectionView: UICollectionView {
   
   @MainActor
   public func scrollToTop() {
-    guard !dataItems.isEmpty else { return }
+    guard !source.snapshot().itemIdentifiers.isEmpty else { return }
     
     scrollToItem(at: .init(row: 0, section: 0), at: .top, animated: true)
   }
@@ -286,25 +288,24 @@ private extension SurveysCollectionView {
     collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
       var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
       configuration.backgroundColor = .clear
-      configuration.showsSeparators = false//true
+      configuration.showsSeparators = showSeparators
       configuration.footerMode = section == 0 ? .none : .supplementary
-//      configuration.showsSeparators = true
-//      if #available(iOS 14.5, *) {
-//        configuration.itemSeparatorHandler = { indexPath, config -> UIListSeparatorConfiguration in
-//          var config = UIListSeparatorConfiguration(listAppearance: .plain)
-//          config.topSeparatorVisibility = .hidden
-//          if indexPath.row != self.dataItems.count - 1 {
-//            config.bottomSeparatorVisibility = .visible
-//          } else {
-//            config.bottomSeparatorVisibility = .hidden
-//          }
-//          return config
-//        }
-//      }
+      if #available(iOS 14.5, *) {
+        configuration.itemSeparatorHandler = { indexPath, config -> UIListSeparatorConfiguration in
+          var config = UIListSeparatorConfiguration(listAppearance: .plain)
+          config.topSeparatorVisibility = .hidden
+          if indexPath.row != self.source.snapshot().itemIdentifiers.count - 1 {
+            config.bottomSeparatorVisibility = .visible
+          } else {
+            config.bottomSeparatorVisibility = .hidden
+          }
+          return config
+        }
+      }
       
       let sectionLayout = NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: env)
       sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-      sectionLayout.interGroupSpacing = self.padding
+      sectionLayout.interGroupSpacing = showSeparators ? 0 : self.padding
       
       return sectionLayout
     }
@@ -455,7 +456,12 @@ private extension SurveysCollectionView {
   func setTasks() {
     ///Update data items when filter changes
     filter.changePublisher
-      .sink { [unowned self] in self.dataItems = $0; self.setDataSource(animatingDifferences: false) }
+      .receive(on: DispatchQueue.main)
+//      .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
+      .sink { [unowned self] in
+        self.dataItems = $0
+        self.setDataSource(animatingDifferences: true)
+      }
       .store(in: &subscriptions)
     
     ///**Updaters**
@@ -712,17 +718,21 @@ private extension SurveysCollectionView {
     ///Reset loading state
     self.isRequesting = false
     
-    var snapshot: Snapshot!
-    let existingSet = Set(source.snapshot().itemIdentifiers)
-    if existingSet.isEmpty {
-      snapshot = Snapshot()
-      snapshot.appendSections([.main])
-      snapshot.appendItems(dataItems, toSection: .main)
-    } else {
-      snapshot = source.snapshot()
-      snapshot.deleteItems(source.snapshot().itemIdentifiers)
-      snapshot.appendItems(dataItems)
-    }
+//    var snapshot: Snapshot!
+//    let existingSet = Set(source.snapshot().itemIdentifiers)
+//    if existingSet.isEmpty {
+//      snapshot = Snapshot()
+//      snapshot.appendSections([.main])
+//      snapshot.appendItems(dataItems, toSection: .main)
+//    } else {
+//      snapshot = source.snapshot()
+//      snapshot.deleteAllItems()
+////      snapshot.deleteItems(source.snapshot().itemIdentifiers)
+//      snapshot.appendItems(dataItems)
+//    }
+    var snapshot = Snapshot()
+    snapshot.appendSections([.main])
+    snapshot.appendItems(dataItems, toSection: .main)
     
     var closure: Closure? = nil
     ///Immediatly request more items
@@ -757,19 +767,21 @@ private extension SurveysCollectionView {
       self.isApplyingSnapshot = true
       self.emptyPublicationsPublisher.send(snapshot.itemIdentifiers.isEmpty)
       
-      source.apply(snapshot, animatingDifferences: animatingDifferences) { [weak self] in
-        guard let self = self else { return }
-
-        self.isApplyingSnapshot = false
-        self.lock.unlock()
-        completion?()
+      DispatchQueue.main.async {
+        source.apply(snapshot, animatingDifferences: animatingDifferences) { [weak self] in
+          guard let self = self else { return }
+          
+          self.isApplyingSnapshot = false
+          self.lock.unlock()
+          completion?()
+        }
       }
 
       return
     }
     
 //    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+      DispatchQueue.main.async() { [weak self] in
       guard let self = self else { return }
       
       self.isApplyingSnapshot = true

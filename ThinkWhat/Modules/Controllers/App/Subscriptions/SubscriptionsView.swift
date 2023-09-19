@@ -26,6 +26,18 @@ class SubscriptionsView: UIView {
     }
   }
   public private(set) var isCardOnScreen = false
+  public var isOnScreen: Bool = true {
+    didSet {
+      guard oldValue != isOnScreen else { return }
+      
+      surveysCollectionView.isOnScreen = isOnScreen
+
+      // Animate empty view
+      guard !collectionEmptyPublicationsView.alpha.isZero else { return }
+      
+      collectionEmptyPublicationsView.setAnimationsEnabled(isOnScreen)
+    }
+  }
   
   
   // MARK: - Private properties
@@ -60,24 +72,10 @@ class SubscriptionsView: UIView {
   private var isScrolledDown = false { // Use to show/hide arrow button
     didSet {
       guard oldValue != isScrolledDown,
-            !scrollToTopButtonAnimates,
-            let constraint = scrollToTopButton.getConstraint(identifier: "top")
+            !scrollToTopButtonAnimates
       else { return }
       
-      //      if scrollToTopButtonX == .zero {
-      //        scrollToTopButtonX = padding + scrollToTopButton.bounds.width
-      //      }
-      scrollToTopButtonAnimates = true
-      UIView.animate(withDuration: isScrolledDown ? 0.25 : 0.15,
-                     delay: 0,
-                     options: .curveEaseInOut,
-                     animations: { [weak self] in
-        guard let self = self else { return }
-        
-        self.background.setNeedsLayout()
-        constraint.constant = self.isScrolledDown ? -(self.scrollToTopButton.bounds.width + self.padding) : 0
-        self.background.layoutIfNeeded()
-      }) { [unowned self] _ in self.scrollToTopButtonAnimates = false }
+      toggleScrollButton(on: isScrolledDown) { [unowned self] in self.scrollToTopButtonAnimates = false }
     }
   }
   ///**UI**
@@ -101,7 +99,11 @@ class SubscriptionsView: UIView {
       .sink { [unowned self] in
         self.filter.setAdditional(filter: $0.additional, period: $0.period)
         self.isScrolledDown = false
-        self.scrollToTop()
+        delay(seconds: 0.4) { [weak self] in
+          guard let self = self else { return }
+          
+          self.scrollToTop()
+        }
       }
       .store(in: &subscriptions)
     
@@ -594,15 +596,34 @@ class SubscriptionsView: UIView {
   private lazy var topViewHeight: CGFloat = 100
   private lazy var scrollToTopButton: UIButton = {
     let instance = UIButton()
-    instance.backgroundColor = viewInput?.tintColor ?? Colors.main
-    instance.setImage(UIImage(systemName: "arrow.up", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), for: .normal)
-    instance.size(.uniform(size: 40))
+    instance.backgroundColor = .clear
     instance.tintColor = .white
     instance.addTarget(self, action: #selector(self.scrollToTop), for: .touchUpInside)
     instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePan(_:))))
+//    instance.size(.uniform(size: 40))
+    let bgLayer = CAShapeLayer()
+    bgLayer.name = "background"
+    bgLayer.fillColor = Colors.main.cgColor
+    bgLayer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    bgLayer.shadowColor = UISettings.Shadows.color//UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    bgLayer.shadowRadius = UISettings.Shadows.radius(padding: padding*1.5)
+    bgLayer.shadowOffset = UISettings.Shadows.offset
+    instance.setImage(UIImage(systemName: "arrow.up", withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
+    instance.adjustsImageWhenHighlighted = false
+    instance.imageView?.layer.masksToBounds = false
+    instance.layer.insertSublayer(bgLayer, at: 0)
     instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.width/2 }
+      .filter { [unowned self] in $0.size != bgLayer.bounds.size }
+      .sink {
+        bgLayer.frame = $0
+        bgLayer.path = UIBezierPath(ovalIn: $0).cgPath
+        bgLayer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
+      }
       .store(in: &subscriptions)
+    instance.imageView?.layer.zPosition = 1
+//    instance.publisher(for: \.bounds)
+//      .sink { instance.cornerRadius = $0.width/2 }
+//      .store(in: &subscriptions)
     
     return instance
   }()
@@ -653,6 +674,9 @@ class SubscriptionsView: UIView {
                                                        ]),
                                     for: .normal)
       profileBtn.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main
+    }
+    if let bgLayer = scrollToTopButton.getLayer(identifier: "background") as? CAShapeLayer {
+      bgLayer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     }
     subscriptionButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     subscriptionButton.getSubview(type: UIButton.self)?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
@@ -860,7 +884,7 @@ private extension SubscriptionsView {
       topView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
       topView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
       filtersCollectionView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding),
-      filtersCollectionView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding),
+      filtersCollectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
     ])
 
     userView.alpha = 0
@@ -898,6 +922,7 @@ private extension SubscriptionsView {
     leading.identifier = "leading"
     let constraint_2 = scrollToTopButton.topToBottom(of: background)
     constraint_2.identifier = "top"
+    scrollToTopButton.size(.uniform(size: 40))
   }
   
   @MainActor
@@ -1048,7 +1073,6 @@ private extension SubscriptionsView {
         guard let self = self else { return }
         
         self.setNeedsLayout()
-//        constraint.constant = max(padding, min(velocity*0.05, background.bounds.width - scrollToTopButton.bounds.width - padding))
         constraint.constant += distance
         self.layoutIfNeeded()
       }) { [weak self] _ in
@@ -1057,112 +1081,8 @@ private extension SubscriptionsView {
         self.scrollToTopButtonX = constraint.constant
       }
     }
-    //
-    //    if yTranslation > 0 {
-    //      constraint.constant = min(constraint.constant, statusBarFrame.height)
-    //    }
-    //    constraint.constant = constraint.constant < minConstant ? minConstant : constraint.constant
-//
-//    recognizer.setTranslation(.zero, in: background)
-//    var point = convert(scrollToTopButton.frame.origin, to: background).x
-//    print(point)
   }
-//  @MainActor
-//  func toggleDateFilter(on: Bool, animated: Bool = true) {
-//    return
-//    guard let heightConstraint = filtersCollectionView.getConstraint(identifier: "height"),
-//          let constraint1 = filterView.getConstraint(identifier: "top_1"),
-//          let constraint2 = shadowView.getConstraint(identifier: "top"),
-//                          let constraint3 = topView.getConstraint(identifier: "height")
-//            //              let constraint4 = shadowView.getConstraint(identifier: "trailing")
-//            //              let constraint5 = shadowView.getConstraint(identifier: "bottom")
-//    else { return }
-//
-//    setNeedsLayout()
-//
-//    guard animated else {
-//      filtersCollectionView.alpha = on ? 1 : 0
-//      filtersCollectionView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
-//      constraint1.constant = on ? 16 : mode == .Default ? 0 : 10
-//      constraint2.constant = on ? 16 : 0
-//      heightConstraint.constant = on ? filterViewHeight : 0
-//      layoutIfNeeded()
-//
-//      return
-//    }
-//    UIView.animate(withDuration: 0.15, delay: 0, options: .curveLinear) { [weak self] in
-//      guard let self = self else { return }
-//
-//      //            self.shadowView.layer.shadowRadius = on ? 5 : self.mode == .Default ? 5 : 2.5
-//      //            self.background.cornerRadius = self.background.bounds.width*(on ? 0.05 : 0.035)
-//      self.filtersCollectionView.alpha = on ? 1 : 0
-//      self.filtersCollectionView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
-//      constraint1.constant = on ? 16 : self.mode == .Default ? 0 : 10
-//      constraint2.constant = on ? 16 : 0
-//
-////      if self.mode == .Default {
-////        constraint3.constant = 0
-////        self.topView.alpha = on ? 1 : 0
-////        self.topView.transform = on ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
-////      }
-//
-//      //            constraint3.constant = on ? 8 : 4
-//      //            constraint4.constant = on ? -8 : -4
-//      //            constraint5.constant = on ? -8 : -4
-//      heightConstraint.constant = on ? self.filterViewHeight : 0
-//      self.layoutIfNeeded()
-//    }
-//  }
   
-//  func switchEmptyLabel(isEmpty: Bool) {
-//    func emptyLabel() -> UILabel {
-//      let label = UILabel()
-//      label.accessibilityIdentifier = "emptyLabel"
-//      label.backgroundColor = .clear
-//      label.alpha = 0
-//      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title3)
-//      label.text = "publications_not_found".localized// + "\n⚠︎"
-//      label.textColor = .secondaryLabel
-//      label.numberOfLines = 0
-//      label.textAlignment = .center
-//      
-//      return label
-//    }
-//    
-//    if isEmpty {
-//      let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") ?? emptyLabel()
-//      label.place(inside: shadowView,
-//                  insets: .uniform(size: self.padding*2))
-//      label.transform = .init(scaleX: 0.75, y: 0.75)
-//      UIView.animate(
-//        withDuration: 0.4,
-//        delay: 0,
-//        usingSpringWithDamping: 0.8,
-//        initialSpringVelocity: 0.3,
-//        options: [.curveEaseInOut],
-//        animations: { [weak self] in
-//          guard let self = self else { return }
-//          
-//          label.transform = .identity
-//          label.alpha = 1
-//          self.surveysCollectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .clear
-//        }) { _ in }
-//    } else if let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") {
-//      UIView.animate(
-//        withDuration: 0.4,
-//        delay: 0,
-//        usingSpringWithDamping: 0.8,
-//        initialSpringVelocity: 0.3,
-//        options: [.curveEaseInOut],
-//        animations: { [weak self] in
-//          guard let self = self else { return }
-//          
-//          label.transform = .init(scaleX: 0.75, y: 0.75)
-//          label.alpha = 0
-//          self.surveysCollectionView.backgroundColor = .clear
-//        }) { _ in label.removeFromSuperview() }
-//    }
-  //  }
   func onEmptyList(isEmpty: Bool) {
     if isEmpty {
       collectionEmptyPublicationsView.alpha = 0
@@ -1170,7 +1090,7 @@ private extension SubscriptionsView {
     }
     
     UIView.animate(
-      withDuration: 0.2,
+      withDuration: 0.15,
       delay: 0,
       options: [.curveEaseInOut],
       animations: { [weak self] in
@@ -1185,13 +1105,35 @@ private extension SubscriptionsView {
         self.collectionEmptyPublicationsView.setAnimationsEnabled(false)
       }
   }
+  
+  func toggleScrollButton(on: Bool, completion: Closure? = nil) {
+    guard let constraint = scrollToTopButton.getConstraint(identifier: "top") else { return }
+    
+    scrollToTopButtonAnimates = true
+    UIView.animate(withDuration: on ? 0.25 : 0.15,
+                   delay: 0,
+                   options: .curveEaseInOut,
+                   animations: { [weak self] in
+      guard let self = self else { return }
+      
+      self.background.setNeedsLayout()
+      constraint.constant = on ? -(self.scrollToTopButton.bounds.width + self.padding) : 0
+      self.background.layoutIfNeeded()
+    }) { _ in completion?() }
+  }
+
 }
 
 extension SubscriptionsView: SubsciptionsControllerOutput {
   @objc
   func scrollToTop() {
-    isScrolledDown = false
     surveysCollectionView.scrollToTop()
+    toggleScrollButton(on: false) { delay(seconds: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      self.scrollToTopButtonAnimates = false
+    }}
+    isScrolledDown = false
   }
   
   func didAppear() {

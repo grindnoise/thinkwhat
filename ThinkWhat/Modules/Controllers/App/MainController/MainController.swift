@@ -32,7 +32,28 @@ class MainController: UITabBarController {//}, StorageProtocol {
 //      NotificationCenter.default.post(name: Notifications.System.Tab, object: [currentTab: oldValue])
     }
   }
-  
+  public private(set) lazy var logoStack: UIStackView = {
+    let opaque = UIView.opaque()
+    logoIcon.translatesAutoresizingMaskIntoConstraints = false
+    opaque.translatesAutoresizingMaskIntoConstraints = false
+    logoText.place(inside: opaque, insets: UIEdgeInsets(top: NavigationController.Constants.NavBarHeightSmallState * 0.175, left: 0, bottom: NavigationController.Constants.NavBarHeightSmallState * 0.175, right: 0))
+    
+    let opaque2 = UIView.opaque()
+    logoIcon.translatesAutoresizingMaskIntoConstraints = false
+    opaque2.translatesAutoresizingMaskIntoConstraints = false
+    logoIcon.place(inside: opaque2, insets: .uniform(size: NavigationController.Constants.NavBarHeightSmallState * 0.1))
+    
+    let instance = UIStackView(arrangedSubviews: [
+      opaque2,
+      opaque
+    ])
+    passthroughView.addSubview(instance)
+    instance.axis = .horizontal
+    instance.spacing = 0
+    instance.alpha = 0
+    
+    return instance
+  }()
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -72,28 +93,6 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     return instance
   }()
-  public private(set) lazy var logoStack: UIStackView = {
-    let opaque = UIView.opaque()
-    logoIcon.translatesAutoresizingMaskIntoConstraints = false
-    opaque.translatesAutoresizingMaskIntoConstraints = false
-    logoText.place(inside: opaque, insets: UIEdgeInsets(top: NavigationController.Constants.NavBarHeightSmallState * 0.175, left: 0, bottom: NavigationController.Constants.NavBarHeightSmallState * 0.175, right: 0))
-    
-    let opaque2 = UIView.opaque()
-    logoIcon.translatesAutoresizingMaskIntoConstraints = false
-    opaque2.translatesAutoresizingMaskIntoConstraints = false
-    logoIcon.place(inside: opaque2, insets: .uniform(size: NavigationController.Constants.NavBarHeightSmallState * 0.1))
-    
-    let instance = UIStackView(arrangedSubviews: [
-      opaque2,
-      opaque
-    ])
-    passthroughView.addSubview(instance)
-    instance.axis = .horizontal
-    instance.spacing = 0
-    instance.alpha = 0
-    
-    return instance
-  }()
   private var isDataLoaded = false {
     didSet {
       guard isDataLoaded else { return }
@@ -101,6 +100,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
       launch()
     }
   }
+  private var isBannerOnScreen = false // Prevent banner overlay
   //    private lazy var logo: AppLogoWithText = {
   //        let instance = AppLogoWithText(color: Colors.Logo.Flame.main,
   //                                       minusToneColor: Colors.Logo.Flame.minusTone)
@@ -494,7 +494,7 @@ private extension MainController {
                                useContentViewHeight: true,
                                shouldDismissAfter: 1)
         banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
+          .sink {[unowned self] _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
           .store(in: &self.subscriptions)
       }
       .store(in: &subscriptions)
@@ -583,9 +583,11 @@ private extension MainController {
     
     ///Notify when survey is marked favorite
     SurveyReferences.shared.markedFavoritePublisher
+      .filter { [unowned self] _ in !self.isBannerOnScreen }
       .receive(on: DispatchQueue.main)
       .sink { _ in
         
+        self.isBannerOnScreen = true
         let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
                                                               text: "watch_survey_notification",
                                                               tintColor: .label),
@@ -594,7 +596,7 @@ private extension MainController {
                                useContentViewHeight: true,
                                shouldDismissAfter: 2)
         banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
+          .sink {[unowned self] _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
           .store(in: &self.subscriptions)
       }
       .store(in: &subscriptions)
@@ -800,6 +802,9 @@ private extension MainController {
 #if DEBUG
                       error.printLocalized(class: type(of: self), functionName: #function)
 #endif
+                      guard !self.isBannerOnScreen else { return }
+                      
+                      self.isBannerOnScreen = true
                       let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
                                                                             text: AppError.server.localizedDescription),
                                              contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
@@ -807,7 +812,7 @@ private extension MainController {
                                              useContentViewHeight: true,
                                              shouldDismissAfter: 2)
                       banner.didDisappearPublisher
-                        .sink { _ in banner.removeFromSuperview() }
+                        .sink {[unowned self] _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
                         .store(in: &self.subscriptions)
                     }
                   }}

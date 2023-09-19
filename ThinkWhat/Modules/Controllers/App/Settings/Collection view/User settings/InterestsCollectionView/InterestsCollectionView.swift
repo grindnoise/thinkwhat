@@ -160,11 +160,11 @@ extension InterestsCollectionView: TagCellLayoutDelegate {
     else { return .zero }
     
     // We need to calculated estimated size 
-    let height: CGFloat = "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!) + padding*2//30
+    let height: CGFloat = "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.Medium, size: 11)!) + padding*2//30
 //    items[index].title.uppercased().height(withConstrainedWidth: 100,
 //                                                        font: UIFont(name: Fonts.Bold, size: 14)!)
     let width = items[index].title.uppercased().width(withConstrainedHeight: 1000,
-                                                      font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!) + height + padding//+ 8 + 8 + 4
+                                                      font: UIFont(name: Fonts.Rubik.Medium, size: 11)!) + height + padding//+ 8 + 8 + 4
     
     return CGSize(width: width, height: height)
     
