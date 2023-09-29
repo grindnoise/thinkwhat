@@ -25,11 +25,18 @@ class SurveyFiltersCollectionView: UICollectionView {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
-  private var color: UIColor
+  private var color: UIColor {
+    didSet {
+      guard oldValue != color else { return }
+      
+      colorPublisher.send(color)
+    }
+  }
   private let contentInsets: UIEdgeInsets
   ///**Logic**
   private let dataItems: [SurveyFilterItem]
   private var source: Source!
+  private let colorPublisher = PassthroughSubject<UIColor, Never>()
  
   // MARK: - Destructor
   deinit {
@@ -68,6 +75,8 @@ private extension SurveyFiltersCollectionView {
     backgroundColor = .clear
     alwaysBounceVertical = false
     alwaysBounceHorizontal = true
+    showsHorizontalScrollIndicator = false
+    showsHorizontalScrollIndicator = false
 //    bounces = true
     
     collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
@@ -145,6 +154,10 @@ private extension SurveyFiltersCollectionView {
           
           self.collectionViewLayout.invalidateLayout()
         }
+        .store(in: &self.subscriptions)
+      
+      self.colorPublisher
+        .sink { cell.color = $0 }
         .store(in: &self.subscriptions)
     }
     

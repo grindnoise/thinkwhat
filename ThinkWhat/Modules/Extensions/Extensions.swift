@@ -88,7 +88,9 @@ extension UIView {
   
   
   
-  func animateMaskLayer(duration: TimeInterval, completionBlocks: [Closure], completionDelegate: CAAnimationDelegate?) {
+  func animateMaskLayer(duration: TimeInterval,
+                        delegate: CAAnimationDelegate?,
+                        completion: Closure? = nil) {
     
     let circlePathLayer = CAShapeLayer()
     
@@ -136,17 +138,14 @@ extension UIView {
     maskLayerAnimation.duration = duration
     maskLayerAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
     maskLayerAnimation.isRemovedOnCompletion = true
-    if completionDelegate != nil {
-      maskLayerAnimation.delegate = completionDelegate
-      //Remove mask
-      var blocks: [Closure] = []
-      blocks += completionBlocks
-      blocks.append {
+    if delegate != nil {
+      maskLayerAnimation.delegate = delegate!
+      maskLayerAnimation.setValue({ completion?()
+        //Remove mask
         DispatchQueue.main.async {
           circlePathLayer.removeFromSuperlayer()
         }
-      }
-      maskLayerAnimation.setValue(blocks, forKey: "maskCompletionBlocks")
+      }, forKey: "completion")
     }
     circlePathLayer.add(maskLayerAnimation, forKey: "path")
     circlePathLayer.path = toPath

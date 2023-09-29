@@ -13,9 +13,12 @@ import TinyConstraints
 class ListView: UIView {
   
   // MARK: - Public properties
+  ///**Publishers**
+  public private(set) var searchPublisher = PassthroughSubject<String, Never>()
   public let subscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
   public let unsubscribePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
   public let userprofilePublisher = CurrentValueSubject<[Userprofile]?, Never>(nil)
+  
   public weak var viewInput: (ListViewInput & TintColorable)? {
     didSet {
       guard !viewInput.isNil else { return }
@@ -57,20 +60,19 @@ class ListView: UIView {
     
     return instance
   }()
-  private let filter = SurveyFilter(main: .new, additional: .period, period: .month)
   private lazy var collectionView: SurveysCollectionView = {
-    let instance = SurveysCollectionView(filter: filter, color: viewInput?.tintColor)
+    let instance = SurveysCollectionView(filter: viewInput!.filter, color: viewInput?.tintColor)
     
     // Pagination
     instance.paginationPublisher
       .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: false)
       .eraseToAnyPublisher()
-      .sink { [unowned self] in self.viewInput?.getDataItems(filter: self.filter, excludeList: $0) }
+      .sink { [unowned self] in self.viewInput?.getDataItems(excludeList: $0) }
       .store(in: &subscriptions)
     
     // Refresh
     instance.refreshPublisher
-      .sink { [unowned self] in self.viewInput?.getDataItems(filter: self.filter, excludeList: []) }
+      .sink { [unowned self] in self.viewInput?.getDataItems(excludeList: []) }
       .store(in: &subscriptions)
 
     // Publication selected
@@ -170,25 +172,25 @@ class ListView: UIView {
                        periodThreshold: .unlimited),
       SurveyFilterItem(main: .rated, additional: .disabled, text: "filter_rated"),
       SurveyFilterItem(main: .own, additional: .disabled, text: "filter_own"),
-      SurveyFilterItem(main: .favorite, additional: .disabled, text: "filter_watchlist"),
+      SurveyFilterItem(main: .disabled, additional: .watchlist, text: "filter_watchlist"),
       SurveyFilterItem(main: .disabled, additional: .discussed, text: "filter_discussed"),
       SurveyFilterItem(main: .disabled, additional: .completed, text: "filter_completed"),
       SurveyFilterItem(main: .disabled, additional: .notCompleted, text: "filter_not_completed"),
       SurveyFilterItem(main: .disabled, additional: .anonymous, text: "filter_anonymous")
-      ])
-    instance.layer.masksToBounds = false
+    ], contentInsets: .uniform(padding)
+    )
     
     // Filtering
     instance.filterPublisher
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] in
         
-        self.filter.setBoth(main: $0.main,
-                            topic: $0.topic,
-                            userprofile: $0.userprofile,
-                            compatibility: $0.compatibility,
-                            additional: $0.additional,
-                            period: $0.period)
+        self.viewInput?.filter.setBoth(main: $0.main,
+                                       topic: $0.topic,
+                                       userprofile: $0.userprofile,
+                                       compatibility: $0.compatibility,
+                                       additional: $0.additional,
+                                       period: $0.period)
         
 //        self.filter.setAdditional(filter: $0.additional, period: $0.period)
         self.isScrolledDown = false
@@ -209,31 +211,9 @@ class ListView: UIView {
     instance.backgroundColor = .clear
     instance.accessibilityIdentifier = "shadow"
     instance.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    instance.layer.shadowColor = UISettings.Shadows.color // UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    instance.layer.shadowColor = UISettings.Shadows.color
     instance.layer.shadowRadius = UISettings.Shadows.radius(padding: padding)
     instance.layer.shadowOffset = .zero
-//    instance.publisher(for: \.bounds)
-//      .receive(on: DispatchQueue.main)
-//      .throttle(for: .seconds(0.3), scheduler: DispatchQueue.main, latest: false)
-//      .filter { $0 != .zero }
-//      .sink {
-//        let path = UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath
-//        instance.layer.add(Animations.get(property: .ShadowPath,
-//                                          fromValue: instance.layer.shadowPath as Any,
-//                                          toValue: path,
-//                                          duration: 0.2,
-//                                          delay: 0,
-//                                          repeatCount: 0,
-//                                          autoreverses: false,
-//                                          timingFunction: .linear,
-//                                          delegate: nil,
-//                                          isRemovedOnCompletion: false,
-//                                          completionBlocks: nil),
-//                           forKey: nil)
-//
-////        instance.layer.shadowPath = path//UIBezierPath(roundedRect: $0, cornerRadius: $0.width*0.05).cgPath
-//      }
-//      .store(in: &subscriptions)
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
       .filter { $0 != .zero }
@@ -266,9 +246,17 @@ class ListView: UIView {
     instance.addTarget(self, action: #selector(self.scrollToTop), for: .touchUpInside)
     instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePan(_:))))
 //    instance.size(.uniform(size: 40))
-    let bgLayer = CAShapeLayer()
+    let bgLayer = CAGradientLayer()
+    bgLayer.type = .radial
+    bgLayer.colors = CAGradientLayer.getGradientColors(color: Colors.main)
+    bgLayer.locations = [0, 0.5, 1.15]
+    bgLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
+    bgLayer.endPoint = CGPoint(x: 1, y: 1)
+    bgLayer.publisher(for: \.bounds)
+      .filter { $0 != .zero }
+      .sink { bgLayer.cornerRadius = $0.height/2 }
+      .store(in: &subscriptions)
     bgLayer.name = "background"
-    bgLayer.fillColor = Colors.main.cgColor
     bgLayer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     bgLayer.shadowColor = UISettings.Shadows.color//UIColor.lightGray.withAlphaComponent(0.5).cgColor
     bgLayer.shadowRadius = UISettings.Shadows.radius(padding: padding*1.5)
@@ -281,14 +269,10 @@ class ListView: UIView {
       .filter { [unowned self] in $0.size != bgLayer.bounds.size }
       .sink {
         bgLayer.frame = $0
-        bgLayer.path = UIBezierPath(ovalIn: $0).cgPath
         bgLayer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
       }
       .store(in: &subscriptions)
     instance.imageView?.layer.zPosition = 1
-//    instance.publisher(for: \.bounds)
-//      .sink { instance.cornerRadius = $0.width/2 }
-//      .store(in: &subscriptions)
     
     return instance
   }()
@@ -311,7 +295,62 @@ class ListView: UIView {
       onEmptyList(isEmpty: isEmpty)
     }
   }
+//  private var isSearching = false
 
+  private lazy var searchStack: UIStackView = {
+    let instance = UIStackView(arrangedSubviews: [
+      searchField,
+      searchCancelButton
+    ])
+    instance.spacing = padding
+  
+    return instance
+  }()
+  private lazy var searchField: InsetTextField = {
+    let instance = InsetTextField(rightViewVerticalScaleFactor: 1.25)
+    instance.autocorrectionType = .no
+    let v = UIActivityIndicatorView()
+    v.color = Colors.main
+    v.alpha = 0
+    instance.rightView = v
+    instance.rightViewMode = .always
+    instance.attributedPlaceholder = NSAttributedString(string: "search".localized, attributes: [
+      .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .footnote) as Any,
+      .foregroundColor: UIColor.secondaryLabel,
+    ])
+    instance.delegate = self
+    instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
+    instance.backgroundColor = .secondarySystemBackground//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
+    instance.tintColor = Colors.main
+    instance.addTarget(self, action: #selector(ListView.textFieldDidChange(_:)), for: .editingChanged)
+    instance.returnKeyType = .done
+    instance.publisher(for: \.bounds)
+      .sink { rect in
+        instance.cornerRadius = rect.width*0.025
+        
+        guard instance.insets == .zero else { return }
+        
+        instance.insets = UIEdgeInsets(top: instance.insets.top,
+                                       left: rect.height/2.25,
+                                       bottom: instance.insets.top,
+                                       right: rect.height/2.25)
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
+  private lazy var searchCancelButton: UIButton = {
+    let instance = UIButton()
+    instance.addTarget(self, action: #selector(self.cancelSearch), for: .touchUpInside)
+    instance.width("cancel".localized.capitalized.width(withConstrainedHeight: 100, font: UIFont(name: Fonts.Rubik.Regular, size: 16)!))
+    instance.setAttributedTitle(NSAttributedString(string: "cancel".localized.capitalized,
+                                                  attributes: [
+                                                    .font: UIFont(name: Fonts.Rubik.Regular, size: 16) as Any,
+                                                    .foregroundColor: Colors.main
+                                                  ]), for: .normal)
+    return instance
+  }()
+  
   // MARK: - Destructor
   deinit {
     observers.forEach { $0.invalidate() }
@@ -352,11 +391,18 @@ private extension ListView {
     ]
   
     contentView.addSubviews(views)
-    filtersCollectionView.leadingToSuperview(offset: padding)
-    filtersCollectionView.trailingToSuperview(offset: -padding)
+    let leadingConstraint = filtersCollectionView.leadingToSuperview()
+    leadingConstraint.identifier = "leading"
+    filtersCollectionView.trailingToSuperview()
     filtersCollectionView.topToSuperview(offset: padding*1)
     filterViewHeight = padding*2 + "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!)
     filtersCollectionView.height(filterViewHeight)
+    
+    addSubview(searchStack)
+    searchStack.height(UINavigationController.Constants.NavBarHeightSmallState - padding)
+    searchStack.trailingToLeading(of: filtersCollectionView, offset: -padding)
+    searchStack.centerY(to: filtersCollectionView)
+    searchStack.width(to: self, offset: -16)
     
     shadowView.topToBottom(of: filtersCollectionView, offset: padding*2)
     shadowView.leadingToSuperview(offset: padding)
@@ -376,6 +422,8 @@ private extension ListView {
   }
 
   func onEmptyList(isEmpty: Bool) {
+    guard viewInput?.searchMode == .off else { return }
+    
     if isEmpty {
       emptyPublicationsView.alpha = 0
       emptyPublicationsView.setAnimationsEnabled(true)
@@ -451,55 +499,7 @@ private extension ListView {
 //    var point = convert(scrollToTopButton.frame.origin, to: background).x
 //    print(point)
   }
-//    func emptyLabel() -> UILabel {
-//      let label = UILabel()
-//      label.accessibilityIdentifier = "emptyLabel"
-//      label.backgroundColor = .clear
-//      label.alpha = 0
-//      label.font = UIFont.scaledFont(fontName: Fonts.Rubik.SemiBold, forTextStyle: .title3)
-//      label.text = "publications_not_found".localized// + "\n⚠︎"
-//      label.textColor = .secondaryLabel
-//      label.numberOfLines = 0
-//      label.textAlignment = .center
-//
-//      return label
-//    }
-//
-//    if isEmpty {
-//      let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") ?? emptyLabel()
-//      label.place(inside: shadowView,
-//                  insets: .uniform(size: self.padding*2))
-//      label.transform = .init(scaleX: 0.75, y: 0.75)
-//      UIView.animate(
-//        withDuration: 0.4,
-//        delay: 0,
-//        usingSpringWithDamping: 0.8,
-//        initialSpringVelocity: 0.3,
-//        options: [.curveEaseInOut],
-//        animations: { [weak self] in
-//          guard let self = self else { return }
-//
-//          label.transform = .identity
-//          label.alpha = 1
-//          self.collectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .clear
-//        }) { _ in }
-//    } else if let label = shadowView.getSubview(type: UILabel.self, identifier: "emptyLabel") {
-//      UIView.animate(
-//        withDuration: 0.4,
-//        delay: 0,
-//        usingSpringWithDamping: 0.8,
-//        initialSpringVelocity: 0.3,
-//        options: [.curveEaseInOut],
-//        animations: { [weak self] in
-//          guard let self = self else { return }
-//
-//          label.transform = .init(scaleX: 0.75, y: 0.75)
-//          label.alpha = 0
-//          self.collectionView.backgroundColor = .clear
-//        }) { _ in label.removeFromSuperview() }
-//    }
-//  }
-  
+
   func toggleScrollButton(on: Bool, completion: Closure? = nil) {
     guard let constraint = scrollToTopButton.getConstraint(identifier: "top") else { return }
     
@@ -515,10 +515,108 @@ private extension ListView {
       self.background.layoutIfNeeded()
     }) { _ in completion?() }
   }
+  
+  @objc
+  func hideKeyboard() {
+    if let recognizer = gestureRecognizers?.first {
+      removeGestureRecognizer(recognizer)
+    }
+    endEditing(true)
+  }
+  
+  @objc
+  func cancelSearch() {
+    viewInput?.searchMode = .off
+    hideKeyboard()
+    searchField.text = ""
+  }
+  
+  func setSearchSpinnerEnabled(enabled: Bool, animated: Bool) {
+    guard let spinner = searchField.rightView as? UIActivityIndicatorView else { return }
+    
+    if enabled && !spinner.alpha.isZero || !enabled && spinner.alpha.isZero {
+      return
+    }
+    
+    if enabled {
+      spinner.startAnimating()
+    }
+    
+    switch animated {
+    case true:
+      spinner.alpha = !enabled ? 1 : 0
+      spinner.transform = enabled ? .init(scaleX: 0.5, y: 0.5) : .identity
+      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: enabled ? 0 : 0.25, options: .curveEaseInOut, animations: {
+        spinner.alpha = enabled ? 1 : 0
+        spinner.transform = enabled ? .identity : .init(scaleX: 0.5, y: 0.5)
+      }) { _ in
+        if !enabled {
+          spinner.stopAnimating()
+        }
+      }
+    case false:
+      spinner.alpha = enabled ? 1 : 0
+      if !enabled {
+        spinner.stopAnimating()
+      }
+    }
+  }
 }
 
 // MARK: - Controller Output
 extension ListView: ListControllerOutput {
+  func beginSearchRefreshing() {
+    collectionView.beginSearchRefreshing()
+  }
+  
+  func setSearchModeEnabled(_ enabled: Bool) {
+    isScrolledDown = false
+    collectionView.setSearchModeEnabled(enabled)
+    
+    guard let leading = filtersCollectionView.getConstraint(identifier: "leading") else { return }
+    
+    if enabled {
+      searchCancelButton.alpha = 0
+      searchCancelButton.transform = .init(scaleX: 0.5, y: 0.5)
+      searchField.becomeFirstResponder()
+      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) { [weak self] in
+        guard let self = self else { return }
+        
+        self.setNeedsLayout()
+        leading.constant = self.filtersCollectionView.bounds.width
+        self.layoutIfNeeded()
+        self.emptyPublicationsView.alpha = 0
+      } completion: {  _ in }
+      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0.15, options: .curveEaseInOut) { [weak self] in
+        guard let self = self else { return }
+        
+        self.searchCancelButton.alpha = 1
+        self.searchCancelButton.transform = .identity
+      } completion: {  _ in }
+    } else {
+      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) { [weak self] in
+        guard let self = self else { return }
+        
+        self.setNeedsLayout()
+        leading.constant = 0
+        self.layoutIfNeeded()
+        self.searchCancelButton.alpha = 0
+        self.searchCancelButton.transform = .init(scaleX: 0.5, y: 0.5)
+        if self.isEmpty {
+          self.emptyPublicationsView.alpha = 1
+        }
+      }
+    }
+  }
+  
+  func onSearchCompleted(_ instances: [SurveyReference], localSearch: Bool) {
+    collectionView.endSearchRefreshing()
+    collectionView.setSearchResult(instances)
+    if !localSearch {
+      setSearchSpinnerEnabled(enabled: false, animated: true)
+    }
+  }
+
   func didAppear() {
     guard isEmpty else { return }
 
@@ -553,24 +651,34 @@ extension ListView: ListControllerOutput {
   }
 }
 
-//extension ListView: CallbackObservable {
-//    func callbackReceived(_ sender: Any) {
-//
-//    }
-//}
-
-//extension ListView: BannerObservable {
-//  func onBannerWillAppear(_ sender: Any) {}
-//
-//  func onBannerWillDisappear(_ sender: Any) {}
-//
-//  func onBannerDidAppear(_ sender: Any) {}
-//
-//  func onBannerDidDisappear(_ sender: Any) {
-//    if let banner = sender as? Banner {
-//      banner.removeFromSuperview()
-//    } else if let popup = sender as? Popup {
-//      popup.removeFromSuperview()
-//    }
-//  }
-//}
+extension ListView: UITextFieldDelegate {
+  func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+    gestureRecognizers = []
+    let touch = UITapGestureRecognizer(target:self, action:#selector(ListView.hideKeyboard))
+    addGestureRecognizer(touch)
+    
+    return true
+  }
+  
+  @objc
+  func textFieldDidChange(_ textField: UITextField) {
+    guard let text = textField.text else { return }
+    
+    if text.isEmpty {
+      onSearchCompleted([], localSearch: false)
+      setSearchSpinnerEnabled(enabled: false, animated: true)
+    } else if text.count > 2 {
+      collectionView.beginSearchRefreshing()
+      setSearchSpinnerEnabled(enabled: true, animated: true)
+      searchPublisher.send(text)
+    }
+  }
+  
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    if let recognizer = gestureRecognizers?.first {
+      removeGestureRecognizer(recognizer)
+    }
+    textField.resignFirstResponder()
+    return true
+  }
+}

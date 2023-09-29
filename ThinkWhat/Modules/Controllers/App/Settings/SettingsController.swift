@@ -163,6 +163,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
     navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationItem.largeTitleDisplayMode = .never
+    navigationController?.setBarColor(.systemBackground)
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -507,7 +508,7 @@ extension SettingsController: SettingsViewInput {
     
     navigationItem.backBarButtonItem = backItem
 //    navigationController?.pushViewController(SurveysController(.favorite), animated: true)
-    navigationController?.pushViewController(SurveysController(filter: SurveyFilter(main: .favorite),
+    navigationController?.pushViewController(SurveysController(filter: SurveyFilter(main: .disabled, additional: .watchlist),
                                                                color: tintColor),
                                              animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
@@ -565,7 +566,7 @@ extension SettingsController: SettingsViewInput {
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
 //    navigationController?.pushViewController(SurveysController(.own, color: tintColor), animated: true)
-    navigationController?.pushViewController(SurveysController(filter: SurveyFilter(main: .own),
+    navigationController?.pushViewController(SurveysController(filter: SurveyFilter(main: .own, userprofile: Userprofiles.shared.current),
                                                                color: tintColor),
                                              animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)

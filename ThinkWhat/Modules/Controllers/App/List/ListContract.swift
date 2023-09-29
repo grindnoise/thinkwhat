@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 /// *View* sends user actions to the *Controller*.
 ///
@@ -15,9 +16,11 @@ protocol ListViewInput: AnyObject {
   
   var controllerOutput: ListControllerOutput? { get set }
   var controllerInput: ListControllerInput? { get set }
+  var searchMode: Enums.SearchMode { get set }
+  var filter: SurveyFilter { get }
   
   func onSurveyTapped(_: SurveyReference)
-  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference])
+  func getDataItems(excludeList: [SurveyReference])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -41,6 +44,9 @@ protocol ListControllerInput: AnyObject {
   func claim(_: [SurveyReference: Claim])
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
+  func search(substring: String,
+              localized: Bool,
+              filter: SurveyFilter)
 }
 
 /// *Model* returns the result to the *Controller*
@@ -48,6 +54,7 @@ protocol ListControllerInput: AnyObject {
 /// **Controller** conforms to this protocol
 protocol ListModelOutput: AnyObject {
   func onRequestCompleted(_: Result<Bool, Error>)
+  func onSearchCompleted(_: [SurveyReference], localSearch: Bool)
 }
 
 /// *Controller* returns a UI-representable result to the *View*
@@ -55,10 +62,14 @@ protocol ListModelOutput: AnyObject {
 /// **View** conforms to this protocol
 protocol ListControllerOutput: AnyObject {
   var viewInput: (ListViewInput & TintColorable)? { get set }
+  var searchPublisher: PassthroughSubject<String, Never> { get }
 //  var isOnScreen: Bool { get set }
   
   func onRequestCompleted(_: Result<Bool, Error>)
   func didAppear()
   func didDisappear()
   func scrollToTop()
+  func beginSearchRefreshing()
+  func setSearchModeEnabled(_: Bool)
+  func onSearchCompleted(_: [SurveyReference], localSearch: Bool)
 }

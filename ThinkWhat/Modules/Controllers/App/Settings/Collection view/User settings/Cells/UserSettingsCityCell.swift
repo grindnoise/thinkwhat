@@ -477,10 +477,10 @@ private extension UserSettingsCityCell {
 
 extension UserSettingsCityCell: UITextFieldDelegate {
   func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-    if let recognizers = gestureRecognizers, recognizers.isEmpty {
-      let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
-      addGestureRecognizer(touch)
-    }
+//    if let recognizers = gestureRecognizers, recognizers.isEmpty {
+//      let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
+//      addGestureRecognizer(touch)
+//    }
     
     scrollPublisher = headerLabel.convert(headerLabel.frame.origin, to: self)
     

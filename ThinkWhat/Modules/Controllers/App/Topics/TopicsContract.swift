@@ -7,17 +7,20 @@
 //
 
 import UIKit
+import Combine
 
 protocol TopicsViewInput: AnyObject {
   
   var controllerOutput: TopicsControllerOutput? { get set }
   var controllerInput: TopicsControllerInput? { get set }
   var mode: TopicsController.Mode { get set }
+  var filter: SurveyFilter { get }
+  var searchMode: Enums.SearchMode { get set }
   
   func openSettings()
+  func getDataItems(excludeList: [SurveyReference])
   func onSurveyTapped(_: SurveyReference)
-  func onDataSourceRequest(dateFilter: Enums.Period, topic: Topic)
-  func onTopicSelected(_: Topic)
+//  func onTopicSelected(_: Topic)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -31,34 +34,36 @@ protocol TopicsControllerInput: AnyObject {
   
   var modelOutput: TopicsModelOutput? { get set }
   
-  func onDataSourceRequest(dateFilter: Enums.Period, topic: Topic)
-  func search(substring: String,
-              localized: Bool,
-              topic: Topic?)
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference])
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(surveyReference: SurveyReference)
   func claim(_: [SurveyReference: Claim])
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
+  func search(substring: String,
+              localized: Bool,
+              filter: SurveyFilter)
   func updateTopicsStats()
 }
 
 protocol TopicsModelOutput: AnyObject {
-  //    func onError(_: Error)
-  func onSearchCompleted(_: [SurveyReference])
-  //    func onRequestCompleted(_: Result<Bool, Error>)
+  func onRequestCompleted(_: Result<Bool, Error>)
+  func onSearchCompleted(_: [SurveyReference], localSearch: Bool)
 }
 
 protocol TopicsControllerOutput: AnyObject {
   var viewInput: (TopicsViewInput & TintColorable)? { get set }
-  var topic: Topic? { get }
+  var searchPublisher: PassthroughSubject<String, Never> { get }
   
-  func setTopicMode(_: Topic)
-  func onDefaultMode(color: UIColor?)
-  func onSearchMode()
-  func onSearchCompleted(_: [SurveyReference])
-  //    func onRequestCompleted(_: Result<Bool, Error>)
-  //    func onTopicMode(_: Topic)
+  func onRequestCompleted(_: Result<Bool, Error>)
+  func didAppear()
+  func didDisappear()
+  func scrollToTop()
+  func showTopics()
+//  func setTopicModeEnabled(_: Topic)
+  func setFiltersHidden(_: Bool)
+  func setSearchModeEnabled(enabled: Bool, delay: TimeInterval)
+  func onSearchCompleted(_: [SurveyReference], localSearch: Bool)
   func beginSearchRefreshing()
   //    var topic: Topic? { get }
   

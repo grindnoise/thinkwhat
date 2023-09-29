@@ -155,15 +155,10 @@ class Shimmer: UIView {
 
 extension Shimmer: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
-    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
+    if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+      completionBlocks()
     } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
       initialLayer.path = path as! CGPath
-      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
-        completionBlock()
-      }
     }
   }
 }

@@ -15,17 +15,49 @@ class SurveysModel {
   
   // MARK: - Destructor
   deinit {
-#if DEBUG
-    print("\(String(describing: type(of: self))).\(#function)")
-#endif
+    debugPrint("\(String(describing: type(of: self))).\(#function) \(DebuggingIdentifiers.destructing)")
   }
 }
 
 // MARK: - Controller Input
 extension SurveysModel: SurveysControllerInput {
+  func search(substring: String,
+              localized: Bool,
+              filter: SurveyFilter) {
+    var existing: [SurveyReference] {
+      var instances =  SurveyReferences.shared.all
+        .filter({ $0.title.lowercased().contains(substring.lowercased()) })
+      
+      if !filter.userprofile.isNil { instances = instances.filter({ $0.owner == filter.userprofile! }) }
+      if !filter.topic.isNil { instances = instances.filter({ $0.topic == filter.topic! }) }
+      
+      modelOutput?.onSearchCompleted(Array(Set(instances)).sorted { $0.startDate > $1.startDate }, localSearch: true)
+      
+      return instances
+    }
+    
+    Task {
+      do {
+        let received = try await API.shared.surveys.search(substring: substring,
+                                                           localized: localized,
+                                                           excludedIds: existing.map { $0.id },
+                                                           ownersIds: filter.userprofile.isNil ? [] : [filter.userprofile!.id],
+                                                           topicsIds: filter.topic.isNil ? [] : [filter.topic!.id])
+        await MainActor.run {
+          modelOutput?.onSearchCompleted(Array(Set(existing + received)).sorted { $0.startDate > $1.startDate }, localSearch: false)
+        }
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
+  
   func getDataItems(filter: SurveyFilter,
                     excludeList: [SurveyReference],
                     substring: String) {
+    
     Task {
       do {
         try await API.shared.surveys.getSurveyReferences(filter: filter,
@@ -75,41 +107,6 @@ extension SurveysModel: SurveysControllerInput {
     Task {
       do {
         try await API.shared.surveys.updateSurveyStats(instances)
-      } catch {
-#if DEBUG
-        error.printLocalized(class: type(of: self), functionName: #function)
-#endif
-      }
-    }
-  }
-  
-  func search(substring: String,
-              localized: Bool = false,
-              except surveys: [SurveyReference] = [],
-              ownersIds: [Int] = [],
-              topicsIds: [Int] = []) {
-    
-    var existing: [SurveyReference] {
-      var instances =  SurveyReferences.shared.all
-        .filter({ $0.title.lowercased().contains(substring) })
-        .filter({ !surveys.map({ $0.id }).contains($0.id) })
-      
-      if !ownersIds.isEmpty { instances = instances.filter({ ownersIds.contains($0.owner.id) }) }
-      if !topicsIds.isEmpty { instances = instances.filter({ topicsIds.contains($0.topic.id) }) }
-      
-      return instances
-    }
-    
-    Task {
-      do {
-        let received = try await API.shared.surveys.search(substring: substring,
-                                                            localized: localized,
-                                                            excludedIds: surveys.map { $0.id } + existing.map { $0.id },
-                                                            ownersIds: ownersIds,
-                                                            topicsIds: topicsIds)
-        await MainActor.run {
-          modelOutput?.onSearchCompleted(surveys + existing + received)
-        }
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)

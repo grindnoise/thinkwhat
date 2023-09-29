@@ -396,11 +396,11 @@ class CompatibilityView: UIView {
                                    timingFunction: .easeInEaseOut,
                                    delegate: self,
                                    isRemovedOnCompletion: false,
-                                   completionBlocks: [{ [weak self] in
+                                   completionBlocks: { [weak self] in
            guard let self = self else { return }
 
       self.foregroundCircle.strokeColor = color.cgColor
-         }])
+         })
     foregroundCircle.add(colorAnim, forKey: nil)
     
     let anim = Animations.get(property: .StrokeEnd,
@@ -411,13 +411,13 @@ class CompatibilityView: UIView {
                               timingFunction: .easeInEaseOut,
                               delegate: self,
                               isRemovedOnCompletion: false,
-                              completionBlocks: [{ [weak self] in
+                              completionBlocks: { [weak self] in
       guard let self = self else { return }
 
       self.isAnimating = false
       self.foregroundCircle.strokeEnd = 1
       self.foregroundCircle.removeAllAnimations()
-    }])
+    })
     foregroundCircle.add(anim, forKey: nil)
   }
   
@@ -504,15 +504,10 @@ private extension CompatibilityView {
 
 extension CompatibilityView: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
-    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
+    if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+      completionBlocks()
     } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
       initialLayer.path = path as! CGPath
-      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
-        completionBlock()
-      }
     }
   }
 }

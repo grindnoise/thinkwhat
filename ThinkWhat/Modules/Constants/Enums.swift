@@ -233,7 +233,7 @@ struct Enums {
     case hot
     case new
     case own
-    case favorite
+//    case favorite
     case subscriptions
     case topic
     case user
@@ -246,7 +246,9 @@ struct Enums {
                       userprofile: Userprofile? = nil,
                       compatibility: TopicCompatibility? = nil) -> [SurveyReference] {
       var allowed = Array(Set(SurveyReferences.shared.all.filter { !$0.isClaimed && !$0.isBanned && !$0.isRejected } + Surveys.shared.all.filter { $0.isNew && !$0.isClaimed && !$0.isBanned }.map { $0.reference }))
-      
+      if let topic = topic {
+        allowed = allowed.filter { $0.topic  == topic }
+      }
       switch self {
       case .hot:
         return allowed.filter { $0.isHot }
@@ -270,8 +272,8 @@ struct Enums {
         return allowed.filter { $0.isOwn }
 //        let referencesFromSurveys = Surveys.shared.all.filter { $0.isOwn && !$0.isBanned }.map { $0.reference }
 //        return (SurveyReferences.shared.all.filter { $0.isOwn && !$0.isBanned } + referencesFromSurveys).uniqued()
-      case .favorite:
-        return allowed.filter { $0.isFavorite }
+//      case .favorite:
+//        return allowed.filter { $0.isFavorite }
       case .subscriptions:
         return allowed
           .filter { $0.owner.subscribedAt && !$0.isAnonymous }
@@ -305,8 +307,8 @@ struct Enums {
         return API_URLS.Surveys.top
       case .own:
         return API_URLS.Surveys.own
-      case .favorite:
-        return API_URLS.Surveys.favorite
+//      case .favorite:
+//        return API_URLS.Surveys.favorite
       case .subscriptions:
         return API_URLS.Surveys.subscriptions
       case .disabled:
@@ -331,8 +333,8 @@ struct Enums {
         return "empty_pub_view_top".localized
       case .own:
         return "empty_pub_view_own".localized
-      case .favorite:
-        return "empty_pub_view_watching".localized
+//      case .favorite:
+//        return "empty_pub_view_watching".localized
       default:
         return "empty_pub_view_default".localized
       }
@@ -343,6 +345,7 @@ struct Enums {
     case disabled // Filter is off
     case period // Filter
     case anonymous // Only anonymois publications
+    case watchlist
     case discussed // Most discussed,
     case completed // Only completed
     case notCompleted // Only completed
@@ -350,6 +353,7 @@ struct Enums {
     func getDataItems(_ items: [SurveyReference], period: Period? = nil) -> [SurveyReference] {
       switch self {
       case .anonymous: return items.filter { $0.isAnonymous }.sorted { $0.startDate > $1.startDate }
+      case .watchlist: return items.filter { $0.isFavorite }.sorted { $0.startDate > $1.startDate }
       case .completed: return items.filter { $0.isComplete }.sorted { $0.startDate > $1.startDate }
       case .notCompleted: return items.filter { !$0.isComplete }.sorted { $0.startDate > $1.startDate }
       case .discussed: return items.sorted { $0.commentsTotal > $1.commentsTotal }

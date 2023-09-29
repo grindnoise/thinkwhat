@@ -25,7 +25,8 @@ class SurveyFilterCell: UICollectionViewListCell {
     didSet {
       guard oldValue != color else { return }
       
-      fgLayer.fillColor = color.cgColor
+      fgLayer.colors = CAGradientLayer.getGradientColors(color: color)
+      fgLayer.locations = [0, 0.5, 1.15]
     }
   }
   
@@ -61,14 +62,15 @@ class SurveyFilterCell: UICollectionViewListCell {
       //      instance.imageEdgeInsets.right = padding/4
     }
     instance.layer.insertSublayer(bgLayer, at: 0)
-    instance.layer.insertSublayer(fgLayer, above: bgLayer)
+    bgLayer.addSublayer(fgLayer)
     instance.publisher(for: \.bounds)
-      .filter { [unowned self] in $0.size != bgLayer.bounds.size && $0.size != fgLayer.bounds.size }
+      .filter { [unowned self] in $0.size != self.bgLayer.bounds.size && $0.size != self.fgLayer.bounds.size }
       .sink { [unowned self] in
+        self.bgLayer.cornerRadius = $0.height/2
         self.bgLayer.frame = $0
         self.fgLayer.frame = $0
         self.bgLayer.path = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
-        self.fgLayer.path = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+//        self.fgLayer.path = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
       }
       .store(in: &subscriptions)
     instance.setAttributedTitle(NSAttributedString(string: item.getText().localized.firstCapitalized,
@@ -82,13 +84,25 @@ class SurveyFilterCell: UICollectionViewListCell {
   private lazy var bgLayer: CAShapeLayer = {
     let instance = CAShapeLayer()
     instance.fillColor = traitCollection.userInterfaceStyle == .dark ? Colors.filterDisabledDark.cgColor : Colors.filterDisabledLight.cgColor
+    instance.masksToBounds = true
     
     return instance
   }()
-  private lazy var fgLayer: CAShapeLayer = {
-    let instance = CAShapeLayer()
-    instance.opacity = item.isFilterEnabled ? 1 : 0
-    instance.fillColor = color.cgColor
+  private lazy var fgLayer: CAGradientLayer = {
+    let instance = CAGradientLayer()
+    instance.type = .radial
+    instance.colors = CAGradientLayer.getGradientColors(color: color)
+    instance.locations = [0, 0.5, 1.15]
+    instance.setIdentifier("radialGradient")
+    instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+    instance.endPoint = CGPoint(x: 1, y: 1)
+    instance.masksToBounds = true
+    instance.publisher(for: \.bounds)
+      .filter { $0 != .zero }
+      .sink { rect in
+        instance.cornerRadius = rect.height/2.25
+      }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -182,6 +196,8 @@ private extension SurveyFilterCell {
   
   @objc
   func handleTap() {
+    guard !item.isFilterEnabled else { return }
+    
     // Show menu only after highlighting
     if item.additional == .period {
       button.showsMenuAsPrimaryAction = item.isFilterEnabled
@@ -271,7 +287,7 @@ private extension SurveyFilterCell {
     
     if fgLayer.bounds.size != bounds.size {
       self.fgLayer.frame = bounds
-      self.fgLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: bounds.height/2).cgPath
+//      self.fgLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: bounds.height/2).cgPath
     }
     if bgLayer.bounds.size != bounds.size {
       self.bgLayer.frame = bounds
@@ -282,8 +298,8 @@ private extension SurveyFilterCell {
      
 extension SurveyFilterCell: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-            completionBlocks.forEach{ $0() }
+        if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+          completionBlocks()
         }
     }
 }

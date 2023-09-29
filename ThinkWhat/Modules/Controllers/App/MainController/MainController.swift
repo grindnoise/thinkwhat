@@ -54,21 +54,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     return instance
   }()
-  
-  // MARK: - Private properties
-  private var observers: [NSKeyValueObservation] = []
-  private var subscriptions = Set<AnyCancellable>()
-  private var tasks: [Task<Void, Never>?] = []
-  private let profileUpdater = PassthroughSubject<Date, Never>()
-  private var shouldTerminate = false
-  //    private var loadingIndicator: LoadingIndicator?
-  /// **Logic**
-  private var surveyId: Int?  // Used when app was opened from push notification in closed state
-  private var replyId: Int?   // Used when app was opened from push notification in closed state
-  private var threadId: Int?  // Used when app was opened from push notification in closed state
-  private var replyToId: Int? // Used when app was opened from push notification in closed state
-  /// **UI**
-  private var logoCenterY: CGFloat = .zero
+  public private(set) var logoIsOnScreen = true
   public private(set) lazy var loadingText: LogoText = { LogoText() }()
   public private(set) lazy var loadingIcon: Logo = { Logo() }()
   public private(set) lazy var loadingStack: UIStackView = {
@@ -84,6 +70,21 @@ class MainController: UITabBarController {//}, StorageProtocol {
     return instance
   }()
   public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: traitCollection.userInterfaceStyle == .dark ? Colors.spiralDark : Colors.spiralLight) }()
+  
+  // MARK: - Private properties
+  private var observers: [NSKeyValueObservation] = []
+  private var subscriptions = Set<AnyCancellable>()
+  private var tasks: [Task<Void, Never>?] = []
+  private let profileUpdater = PassthroughSubject<Date, Never>()
+  private var shouldTerminate = false
+  //    private var loadingIndicator: LoadingIndicator?
+  /// **Logic**
+  private var surveyId: Int?  // Used when app was opened from push notification in closed state
+  private var replyId: Int?   // Used when app was opened from push notification in closed state
+  private var threadId: Int?  // Used when app was opened from push notification in closed state
+  private var replyToId: Int? // Used when app was opened from push notification in closed state
+  /// **UI**
+  private var logoCenterY: CGFloat = .zero
   private lazy var logoIcon: Logo = { Logo() }()
   private lazy var logoText: LogoText = { LogoText() }()
   private lazy var passthroughView: PassthroughView = {
@@ -219,11 +220,13 @@ class MainController: UITabBarController {//}, StorageProtocol {
     //        }
   }
   
-  func toggleLogo(on: Bool, animated: Bool = true) {
+  func toggleLogo(on: Bool, animated: Bool = true, completion: Closure? = nil) {
     guard let constraint = logoStack.getConstraint(identifier: "top") else { return }
     
     if on, constraint.constant > 0 { return }
     if !on, constraint.constant < 0 { return }
+    
+    logoIsOnScreen = on
     
     passthroughView.setNeedsLayout()
     
@@ -244,12 +247,17 @@ class MainController: UITabBarController {//}, StorageProtocol {
       delay: 0.0,
       usingSpringWithDamping: 2.0,
       initialSpringVelocity: 0.5,
-      options: [.curveEaseInOut]) { [weak self] in
+      options: [.curveEaseInOut],
+      animations: { [weak self] in
         guard let self = self else { return }
         
         self.logoStack.alpha = on ? 1 : 0
         constraint.constant = on ? self.logoCenterY : -self.logoStack.bounds.height
         self.passthroughView.layoutIfNeeded()
+      }) { [weak self] _ in
+        guard let self = self else { return }
+        
+        completion?()
       }
   }
   
@@ -1285,15 +1293,10 @@ extension MainController: UITabBarControllerDelegate {
 
 extension MainController: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
-    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
+    if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+      completionBlocks()
     } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
       initialLayer.path = path as! CGPath
-      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
-        completionBlock()
-      }
     }
   }
 }

@@ -109,6 +109,7 @@ class HotController: UIViewController, TintColorable {
     navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.setBarTintColor(initialColor)
     navigationController?.setBarShadow(on: false)
+    navigationController?.setBarColor(.systemBackground)
     
 //    controllerOutput?.willAppear()
     

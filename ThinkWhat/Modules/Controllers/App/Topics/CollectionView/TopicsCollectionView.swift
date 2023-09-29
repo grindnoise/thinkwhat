@@ -106,7 +106,7 @@ private extension TopicsCollectionView {
       
       let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
       //            sectionLayout.interGroupSpacing = 20
-      sectionLayout.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+      sectionLayout.contentInsets = .init(top: 0, leading: 8, bottom: 0, trailing: 8)
       return sectionLayout
     }
     
@@ -131,28 +131,8 @@ private extension TopicsCollectionView {
         .store(in: &self.subscriptions)
       
       if self.mode == .Default {
-        cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: item.topic.tagColor))]
-//      } else {
-//        cell.accessories = [.checkmark(displayed: .always,
-//                                       options: UICellAccessory.CheckmarkOptions(isHidden: false,
-//                                                                                 reservedLayoutWidth: nil,
-//                                                                                 tintColor: item.topic.tagColor))]
+        cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: item.topic.activeCount.isZero ? .clear : item.topic.tagColor))]
       }
-      //            let headerDisclosureOption = UICellAccessory.DisclosureIndicatorOptions()// OutlineDisclosureOptions(style: .header)
-//      cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: item.topic.tagColor))]//.outlineDisclosure(options:headerDisclosureOption)]
-      //            let accessoryConfig = UICellAccessory.CustomViewConfiguration(customView: UIImageView(image: UIImage(systemName: "arrow.right",
-      //                                                                                                                 withConfiguration: UIImage.SymbolConfiguration(scale: .small))),
-      //                                                                          placement: .trailing(displayed: .always, at: { _ in 0 }),
-      //                                                                          isHidden: false,
-      //                                                                          reservedLayoutWidth: nil,
-      //                                                                          tintColor: item.topic.tagColor,
-      //                                                                          maintainsFixedSize: true)
-      //            cell.accessories = [UICellAccessory.customView(configuration: accessoryConfig)]
-      //            cell.accessories = [.outlineDisclosure(displayed: .always, options: .init(style: .cell, isHidden: false, reservedLayoutWidth: nil, tintColor: item.topic.tagColor), actionHandler: nil)]//[.outlineDisclosure(options:headerDisclosureOption)
-      
-      //            cell.callback = {
-      //                self.callbackDelegate?.callbackReceived(cell.item.topic as Any)
-      //            }
     }
     
     //        let footerRegistration = UICollectionView.SupplementaryRegistration
@@ -173,8 +153,8 @@ private extension TopicsCollectionView {
       
       cell.mode = self.mode
       cell.item = headerItem
-      let headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header)
-      var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
+      let headerDisclosureOption = UICellAccessory.OutlineDisclosureOptions(style: .header, tintColor: headerItem.topic.tagColor)
+      var backgroundConfig = UIBackgroundConfiguration.listPlainHeaderFooter()
       backgroundConfig.backgroundColor = .clear
       cell.backgroundConfiguration = backgroundConfig
       cell.accessories = [.outlineDisclosure(options:headerDisclosureOption) { [unowned self] in

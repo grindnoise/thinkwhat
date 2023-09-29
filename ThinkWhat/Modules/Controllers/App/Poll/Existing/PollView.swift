@@ -9,6 +9,7 @@
 import UIKit
 import Agrume
 import Combine
+import TinyConstraints
 
 class PollView: UIView {
   
@@ -43,7 +44,7 @@ class PollView: UIView {
   //Logic
   private var selectedAnswer: Answer? {
     didSet {
-      guard let constraint = actionButton.getConstraint(identifier: "top") else { return }
+//      guard let constraint = actionButton.getConstraint(identifier: "top") else { return }
       
       if oldValue.isNil, !selectedAnswer.isNil {
         showButton(delay: 0, flag: true)
@@ -223,6 +224,22 @@ class PollView: UIView {
 //        self.viewInput?.updateComments(excludeList: $0)
 //      }
 //      .store(in: &subscriptions)
+    instance.scrolledDownPublisher
+      .filter { $0 }
+      .sink { [weak self] _ in
+        guard let self = self, !self.isScrolledDown else { return }
+        
+        self.isScrolledDown = true
+      }
+      .store(in: &subscriptions)
+    
+    instance.scrolledToTopPublisher
+      .sink { [weak self] _ in
+        guard let self = self, self.isScrolledDown else { return }
+        
+        self.isScrolledDown = false
+      }
+      .store(in: &subscriptions)
     
     isVotingPublisher
       .sink { instance.isVotingSubscriber.send($0) }
@@ -312,7 +329,7 @@ class PollView: UIView {
   }()
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
-    let clear = UIColor.systemBackground.withAlphaComponent(0).cgColor
+    let clear = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0).cgColor : UIColor.systemBackground.withAlphaComponent(0).cgColor
     instance.colors = [clear, clear, clear]
     instance.locations = [0.0, 1, 1]
     instance.frame = frame
@@ -337,8 +354,55 @@ class PollView: UIView {
     }
   }
   private var shouldTerminate = false
-  
-  
+  private lazy var scrollToTopButton: UIButton = {
+    let instance = UIButton()
+    instance.alpha = 0
+    instance.backgroundColor = .clear
+    instance.tintColor = .white
+    instance.addTarget(self, action: #selector(self.scrollToTop), for: .touchUpInside)
+    instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePan(_:))))
+//    instance.size(.uniform(size: 40))
+    let bgLayer = CAGradientLayer()
+    bgLayer.type = .radial
+    bgLayer.colors = CAGradientLayer.getGradientColors(color: item?.topic.tagColor ?? Colors.main)
+    bgLayer.locations = [0, 0.5, 1.15]
+    bgLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
+    bgLayer.endPoint = CGPoint(x: 1, y: 1)
+    bgLayer.publisher(for: \.bounds)
+      .filter { $0 != .zero }
+      .sink { bgLayer.cornerRadius = $0.height/2}
+      .store(in: &subscriptions)
+    bgLayer.name = "background"
+    bgLayer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    bgLayer.shadowColor = UISettings.Shadows.color//UIColor.lightGray.withAlphaComponent(0.5).cgColor
+    bgLayer.shadowRadius = UISettings.Shadows.radius(padding: padding*1.5)
+    bgLayer.shadowOffset = UISettings.Shadows.offset
+    instance.setImage(UIImage(systemName: "arrow.up", withConfiguration: UIImage.SymbolConfiguration(weight: .bold)), for: .normal)
+    instance.adjustsImageWhenHighlighted = false
+    instance.imageView?.layer.masksToBounds = false
+    instance.layer.insertSublayer(bgLayer, at: 0)
+    instance.publisher(for: \.bounds)
+      .filter { [unowned self] in $0.size != bgLayer.bounds.size }
+      .sink {
+        bgLayer.frame = $0
+        bgLayer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
+      }
+      .store(in: &subscriptions)
+    instance.imageView?.layer.zPosition = 1
+    
+    return instance
+  }()
+  private var scrollToTopButtonX = CGFloat.zero
+  private var scrollToTopButtonAnimates = false
+  private var isScrolledDown = false { // Use to show/hide arrow button
+    didSet {
+      guard oldValue != isScrolledDown,
+            !scrollToTopButtonAnimates
+      else { return }
+
+      toggleScrollButton(on: isScrolledDown) { [unowned self] in self.scrollToTopButtonAnimates = false }
+    }
+  }
   
   // MARK: - Destructor
   deinit {
@@ -350,8 +414,6 @@ class PollView: UIView {
     print("\(String(describing: type(of: self))).\(#function)")
 #endif
   }
-  
-  
   
   // MARK: - Initialization
   override init(frame: CGRect) {
@@ -365,34 +427,36 @@ class PollView: UIView {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
- 
-  
-  
+
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    let clear = UIColor.systemBackground.withAlphaComponent(0).cgColor
-    let feathered = UIColor.systemBackground.withAlphaComponent(0.975).cgColor
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    let clear = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0).cgColor : UIColor.systemBackground.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0.975).cgColor : UIColor.systemBackground.withAlphaComponent(0.975).cgColor
+//    let feathered = UIColor.systemBackground.withAlphaComponent(0.975).cgColor
     gradient.colors = [clear, clear, feathered]
   }
 }
-
-
 
 // MARK: - Private
 private extension PollView {
   @MainActor
   func setupUI() {
-//    backgroundColor = .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
     
-    collectionView.place(inside: self)
-//    addSubview(collectionView)
-//    collectionView.translatesAutoresizingMaskIntoConstraints = false
-//    collectionView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
-//    collectionView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor).isActive = true
-//    collectionView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor).isActive = true
-//    collectionView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
+    addSubviews([
+      collectionView,
+      scrollToTopButton
+    ])
+    collectionView.edgesToSuperview(usingSafeArea: true)
+    let leading = scrollToTopButton.leading(to: self, offset: padding*2)
+    leading.identifier = "leading"
+    let constraint_2 = scrollToTopButton.bottom(to: collectionView)//scrollToTopButton.topToBottom(of: self)
+    constraint_2.identifier = "top"
+    scrollToTopButton.size(.uniform(size: 40))
+    scrollToTopButton.layer.zPosition = 10
     
     guard !item!.isComplete else { return }
     
@@ -422,33 +486,6 @@ private extension PollView {
 //        actionButton.backgroundColor = item.topic.tagColor
 //      }
     actionButton.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
-    
-//    guard viewInput!.mode == .Preview,
-//          let constraint = actionButton.getConstraint(identifier: "top")
-//    else { return }
-//
-//    delay(seconds: 0.5) {[weak self] in
-//      guard let self = self else { return }
-//
-//      self.toggleFade(true)
-//      setNeedsLayout()
-//      //      layoutIfNeeded()
-//      //      setNeedsLayout()
-//      UIView.animate(
-//        withDuration: 0.35,
-//        delay: 0,
-//        usingSpringWithDamping: 0.8,
-//        initialSpringVelocity: 0.3,
-//        options: [.curveEaseInOut],
-//        animations: { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.actionButton.transform = .identity
-//          self.actionButton.alpha = 1
-//          constraint.constant = -(self.actionButton.bounds.height + tabBarHeight)
-//          self.layoutIfNeeded()
-//        }) { _ in }
-//    }
   }
   
   func setTasks() {
@@ -508,8 +545,8 @@ private extension PollView {
   
   func showButton(delay: Double, flag: Bool) {
     // Animate gradient
-    let clear = UIColor.systemBackground.withAlphaComponent(0).cgColor
-    let feathered = UIColor.systemBackground.withAlphaComponent(0.975).cgColor
+    let clear = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0).cgColor : UIColor.systemBackground.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0.975).cgColor : UIColor.systemBackground.withAlphaComponent(0.975).cgColor
     
     let colorAnimation = Animations.get(property: .Colors,
                                         fromValue: gradient.colors as Any,
@@ -519,13 +556,13 @@ private extension PollView {
                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                         delegate: self,
                                         isRemovedOnCompletion: false,
-                                        completionBlocks: [
+                                        completionBlocks:
                                           { [weak self] in
                                             guard let self = self else { return }
                                             
                                             self.gradient.colors = flag ? [clear, clear, feathered] : [clear, clear, clear]
                                           }
-                                        ])
+                                        )
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: gradient.locations as Any,
                                            toValue: flag ? [0.0, 0.785, 0.81] : [0.0, 1, 1] as Any,
@@ -534,14 +571,14 @@ private extension PollView {
                                            timingFunction: CAMediaTimingFunctionName.easeOut,
                                            delegate: self,
                                            isRemovedOnCompletion: false,
-                                           completionBlocks: [
+                                           completionBlocks:
                                             { [weak self] in
                                               guard let self = self else { return }
                                               
                                               self.gradient.locations = flag ? [0.0, 0.785, 0.81] : [0.0, 1, 1]
                                               self.gradient.removeAllAnimations()
                                             }
-                                           ])
+                                           )
     gradient.add(locationAnimation, forKey: nil)
     gradient.add(colorAnimation, forKey: nil)
     
@@ -602,6 +639,87 @@ private extension PollView {
       random.transform = .identity
     }
     }
+  
+  /// Fast scroll to top of publication on button tap
+  @objc
+  func scrollToTop() {
+    collectionView.scrollToTop()
+    toggleScrollButton(on: false) { delay(seconds: 0.3) { [weak self] in
+      guard let self = self else { return }
+      
+      self.scrollToTopButtonAnimates = false
+    }}
+    isScrolledDown = false
+//    delay(seconds: 0.3) { [weak self] in
+//      guard let self = self else { return }
+//
+//      self.isScrolledDown = false
+//    }
+  }
+  
+  @objc
+  func handlePan(_ recognizer: UIPanGestureRecognizer) {
+    guard let constraint = scrollToTopButton.getConstraint(identifier: "leading") else { return }
+    
+    let xTranslation = recognizer.translation(in: self).x + scrollToTopButtonX
+    constraint.constant = max(padding*2, min(xTranslation, bounds.width - scrollToTopButton.bounds.width - padding*2)) // scrollToTopButtonX
+    
+    let velocity = recognizer.velocity(in: self).x
+    
+    if recognizer.state == .ended || recognizer.state == .cancelled || recognizer.state == .failed {
+      scrollToTopButtonX = constraint.constant
+      
+      guard abs(velocity) > 200 else { return }
+      
+      let maxDistance = bounds.width - scrollToTopButton.bounds.width - padding*2
+      let estimatedDistance = scrollToTopButtonX - abs(velocity*0.05)
+      var distance = CGFloat.zero
+      if velocity < 0 {
+        distance = estimatedDistance < padding*2 ? scrollToTopButtonX - padding*2 : estimatedDistance
+        if distance > 0 {
+          distance = distance * -1
+        }
+        distance = max(-maxDistance/4, distance)
+      } else {
+        distance = estimatedDistance + scrollToTopButtonX > maxDistance ? maxDistance - scrollToTopButtonX : estimatedDistance
+        if distance < 0 {
+          distance = distance * -1
+        }
+        distance = min(maxDistance/4, distance)
+      }
+      
+      UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: { [weak self] in
+        guard let self = self else { return }
+        
+        self.setNeedsLayout()
+//        constraint.constant = max(padding, min(velocity*0.05, background.bounds.width - scrollToTopButton.bounds.width - padding))
+        constraint.constant += distance
+        self.layoutIfNeeded()
+      }) { [weak self] _ in
+        guard let self = self else { return }
+       
+        self.scrollToTopButtonX = constraint.constant
+      }
+    }
+  }
+  
+  func toggleScrollButton(on: Bool, completion: Closure? = nil) {
+    guard let constraint = scrollToTopButton.getConstraint(identifier: "top") else { return }
+    
+    if scrollToTopButton.alpha.isZero { scrollToTopButton.alpha = 1 }
+    
+    scrollToTopButtonAnimates = true
+    UIView.animate(withDuration: on ? 0.25 : 0.15,
+                   delay: 0,
+                   options: .curveEaseInOut,
+                   animations: { [weak self] in
+      guard let self = self else { return }
+      
+      self.setNeedsLayout()
+      constraint.constant = on ? -(self.scrollToTopButton.bounds.width + self.padding + self.safeAreaInsets.bottom) : 0
+      self.layoutIfNeeded()
+    }) { _ in completion?() }
+  }
 }
   
   // MARK: - Controller Output
@@ -808,7 +926,7 @@ extension PollView: PollControllerOutput {
                                         timingFunction: CAMediaTimingFunctionName.easeIn,
                                         delegate: self,
                                         isRemovedOnCompletion: false,
-                                        completionBlocks: [
+                                        completionBlocks:
                                           {[weak self] in
                                             guard let self = self else { return }
                                             
@@ -817,7 +935,7 @@ extension PollView: PollControllerOutput {
                                                 self.gradient.removeAllAnimations()
                                                 completion()
                                               }
-                                          }])
+                                          })
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: [0.0, 0.5, 0.9] as Any,
                                            toValue: [-1.0, 0, 1] as Any,
@@ -825,12 +943,12 @@ extension PollView: PollControllerOutput {
                                            timingFunction: CAMediaTimingFunctionName.easeIn,
                                            delegate: self,
                                            isRemovedOnCompletion: false,
-                                           completionBlocks: [
+                                           completionBlocks:
                                             {[weak self] in
                                               guard let self = self else { return }
                                               
                                               self.gradient.locations = [-1.0, 0, 1]
-                                            }])
+                                            })
     
     gradient.add(locationAnimation, forKey: nil)
     gradient.add(colorAnimation, forKey: nil)
@@ -839,15 +957,10 @@ extension PollView: PollControllerOutput {
 
 extension PollView: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
-    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
+    if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+      completionBlocks()
     } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
       initialLayer.path = path as! CGPath
-      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
-        completionBlock()
-      }
     }
   }
 }

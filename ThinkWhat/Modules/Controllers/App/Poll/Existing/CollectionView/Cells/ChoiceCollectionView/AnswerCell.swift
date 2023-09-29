@@ -685,8 +685,10 @@ private extension AnswerCell {
                                  timingFunction: .easeOut,
                                  delegate: self,
                                  isRemovedOnCompletion: false,
-                                 completionBlocks: [{
-      selection.removeFromSuperlayer(); completion?()}]),
+                                 completionBlocks: {
+      selection.removeFromSuperlayer()
+      completion?()
+    }),
                   forKey: nil)
     selection.add(Animations.get(property: .Scale,
                                  fromValue: selection.affineTransform(),
@@ -695,16 +697,18 @@ private extension AnswerCell {
                                  timingFunction: .easeOut,
                                  delegate: self,
                                  isRemovedOnCompletion: false,
-                                 completionBlocks: [{
-      selection.removeFromSuperlayer(); completion?()}]),
+                                 completionBlocks: {
+      selection.removeFromSuperlayer()
+      completion?()
+    }),
                   forKey: nil)
   }
 }
 
 extension AnswerCell: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-            completionBlocks.forEach{ $0() }
+        if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+          completionBlocks()
         }
     }
 }

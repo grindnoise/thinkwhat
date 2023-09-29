@@ -22,7 +22,7 @@ class Line {
                              duration: 0.4,
                              timingFunction: .easeOut,
                              delegate: delegate,
-                             completionBlocks: completion.isNil ? [] : [completion!]),
+                             completionBlocks: completion),
               forKey: nil)
   }
 }

@@ -8,11 +8,12 @@
 
 import UIKit
 import Combine
+import TinyConstraints
 
 class TopicsController: UIViewController, TintColorable {
   
   enum Mode {
-    case GlobalSearch, TopicSearch, Default, Topic//Parent, Child, List, Search
+    case Default, Topic//Parent, Child, List, Search
   }
   
   // MARK: - Public properties
@@ -22,26 +23,41 @@ class TopicsController: UIViewController, TintColorable {
     didSet {
       guard oldValue != mode else { return }
       
-      onModeChanged()
+      setBarItems()
+      toggleTopicView()
       
-      guard mode == .Default else { return }
-      
-      var color = UIColor.systemGray
-      
-      switch oldValue {
-      case .Topic:
-        if let topic = topic  {
-          color = topic.tagColor
-        }
-      default:
-        color = tintColor//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+      // Go back to topic selection
+      if oldValue == .Topic, mode == .Default {
+        controllerOutput?.showTopics()
       }
+//      
+//      onModeChanged()
+//      
+//      guard mode == .Default else { return }
+//      
+//      var color = UIColor.systemGray
+//      
+//      switch oldValue {
+//      case .Topic:
+//        if let topic = topic  {
+//          color = topic.tagColor
+//        }
+//      default:
+//        color = tintColor//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
+//      }
+//      
+//      controllerOutput?.onDefaultMode(color: color)
+    }
+  }
+  public var searchMode = Enums.SearchMode.off {
+    didSet {
+      guard oldValue != searchMode else { return }
       
-      controllerOutput?.onDefaultMode(color: color)
+      onBarModeChanged(searchMode == .on ? true : false)
     }
   }
   ///**Logic**
-  var isDataReady = false
+  public var isDataReady = false
   public var tintColor: UIColor = .clear {
     didSet {
 //      setNavigationBarTintColor(tintColor)
@@ -50,117 +66,23 @@ class TopicsController: UIViewController, TintColorable {
   }
   ///**UI**
   public var isOnScreen = false
-  
+  public var filter = SurveyFilter(main: .disabled, additional: .period, period: .unlimited)
   
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
-  ///**Logic**
-  private var topic: Topic? {
-    didSet {
-      guard !topic.isNil else { return }
-      
-      mode = .Topic
-    }
-  }
-  ///**Publishers**
-  private var searchGlobalPublisher = CurrentValueSubject<String?, Never>(nil)
-  private var searchTopicPublisher = CurrentValueSubject<[String: Topic]?, Never>(nil)
-  
-  //    private lazy var gradient: CAGradientLayer = {
-  //        let instance = CAGradientLayer()
-  //        instance.type = .radial
-  //        instance.colors = getGradientColors()
-  //        instance.locations = [0, 0.5, 1.15]
-  //        instance.setIdentifier("radialGradient")
-  //        instance.startPoint = CGPoint(x: 0.5, y: 0.5)
-  //        instance.endPoint = CGPoint(x: 1, y: 1)
-  //        instance.publisher(for: \.bounds)
-  //            .sink { rect in
-  //                instance.cornerRadius = rect.height/2
-  //            }
-  //            .store(in: &subscriptions)
-  //
-  //        return instance
-  //    }()
-  private lazy var searchField: InsetTextField = {
-    let instance = InsetTextField()
-    instance.placeholder = "search".localized
-    instance.alpha = 0
-    instance.delegate = self
-    instance.backgroundColor = .secondarySystemBackground//traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    instance.tintColor = tintColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
-    instance.addTarget(self, action: #selector(TopicsController.textFieldDidChange(_:)), for: .editingChanged)
-    instance.returnKeyType = .done
-    instance.publisher(for: \.bounds, options: .new)
-      .sink { rect in
-        instance.cornerRadius = rect.height/2.25
-        
-        guard instance.insets == .zero else { return }
-        
-        instance.insets = UIEdgeInsets(top: instance.insets.top,
-                                       left: rect.height/2.25,
-                                       bottom: instance.insets.top,
-                                       right: rect.height/2.25)
-      }
-      .store(in: &subscriptions)
-    
-    return instance
+  private lazy var titleView: TagCapsule = {
+    TagCapsule(text: "T",
+               padding: padding/2,
+               textPadding: .init(top: padding/1.5, left: 0, bottom: padding/1.5, right: padding),
+               color: .systemGray,
+               font: UIFont(name: Fonts.Rubik.Medium, size: 14)!,
+               isShadowed: false,
+               iconCategory: .Null)
   }()
-  private lazy var topicIcon: Icon = {
-    let instance = Icon(category: Icon.Category.Logo)
-    instance.iconColor = .white//Colors.Logo.Flame.rawValue
-    instance.isRounded = false
-    instance.clipsToBounds = false
-    instance.scaleMultiplicator = 1.65
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    
-    return instance
-  }()
-  private lazy var topicTitle: InsetLabel = {
-    let instance = InsetLabel()
-    instance.font = UIFont(name: Fonts.Bold, size: 20)//.scaledFont(fontName: Fonts.Semibold, forTextStyle: .title2)
-    instance.text = "Test"
-    instance.textColor = .white
-    instance.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
-    
-    return instance
-  }()
-  private lazy var topicView: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [
-      topicIcon,
-      topicTitle
-    ])
-    instance.axis = .horizontal
-    instance.spacing = 2
-    instance.alpha = 0
-    
-    instance.publisher(for: \.bounds)
-      .receive(on: DispatchQueue.main)
-      .filter { $0 != .zero}
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    //        instance.addSubview(stack)
-    //        stack.translatesAutoresizingMaskIntoConstraints = false
-    //
-    //        NSLayoutConstraint.activate([
-    //            stack.topAnchor.constraint(equalTo: instance.topAnchor),
-    //            stack.leadingAnchor.constraint(equalTo: instance.leadingAnchor),
-    //            stack.bottomAnchor.constraint(equalTo: instance.bottomAnchor)
-    //        ])
-    
-    return instance
-  }()
-  private var textFieldIsSetup = false
-  private var isSearching = false //{
-//    didSet {
-//      searchField.isShowingSpinner = isSearching
-//    }
-//  }
-  
-  
+  private let padding: CGFloat = 8
   
   // MARK: - Destructor
   deinit {
@@ -201,6 +123,7 @@ class TopicsController: UIViewController, TintColorable {
     navigationController?.navigationBar.alpha = 1
     navigationController?.setNavigationBarHidden(false, animated: false)
     navigationController?.navigationBar.prefersLargeTitles = false//true
+    navigationController?.setBarColor()
     navigationItem.largeTitleDisplayMode = .never//.always
     
 //    if mode == .GlobalSearch || mode == .TopicSearch {
@@ -212,42 +135,50 @@ class TopicsController: UIViewController, TintColorable {
     super.viewDidAppear(animated)
     
     isOnScreen = true
-    switch mode {
-    case .Topic:
-      toggleTopicView(on: true)
-    case .GlobalSearch, .TopicSearch:
-      toggleSearchField(on: true)
-    default:
-#if DEBUG
-      print("")
-#endif
+    if mode == .Topic {
+//      toggleTopicView()
     }
+//    switch mode {
+//    case .Topic:
+//      toggleTopicView(on: true)
+//    case .GlobalSearch, .TopicSearch:
+//      toggleSearchField(on: true)
+//    default:
+//#if DEBUG
+//      print("")
+//#endif
+//    }
   }
   
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     
-    switch mode {
-    case .Topic:
-      toggleTopicView(on: false)
-    case .GlobalSearch, .TopicSearch:
-      toggleSearchField(on: false)
-    default:
-#if DEBUG
-      print("")
-#endif
+    // If topic mode, than hide topic tag
+    if searchMode == .off, mode == .Topic {
+      guard let constraint = titleView.getConstraint(identifier: "centerY") else { return }
+      
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut]) { [weak self] in
+          guard let self = self else { return }
+          
+          self.navigationController?.navigationBar.setNeedsLayout()
+          constraint.constant = -100
+          self.navigationController?.navigationBar.layoutIfNeeded()
+        }
+      
+      
+      UIView.animate(withDuration: 0.1) { [weak self] in
+        guard let self = self else { return }
+        
+        self.navigationController?.navigationBar.setNeedsLayout()
+        constraint.constant = -100
+        self.navigationController?.navigationBar.layoutIfNeeded()
+      }
     }
-//    //        barButton.alpha = 0
-//
-//    UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0) { [weak self] in
-//      guard let self = self else { return }
-//
-//      self.navigationController?.navigationBar.alpha = 0
-//    }
-//    if mode == .Search {
-//      searchField.alpha = 0
-//      searchField.resignFirstResponder()
-//    }
   }
   
   override func viewDidDisappear(_ animated: Bool) {
@@ -272,50 +203,25 @@ private extension TopicsController {
   @MainActor
   func setupUI() {
     navigationItem.title = ""
-    guard let navigationBar = self.navigationController?.navigationBar else { return }
+    setBarItems(animated: false)
     
-    navigationBar.addSubview(searchField)
-    navigationBar.addSubview(topicView)
-    searchField.translatesAutoresizingMaskIntoConstraints = false
-    topicView.translatesAutoresizingMaskIntoConstraints = false
+    // Add topic tag view
+    guard let navigationBar = navigationController?.navigationBar, navigationBar.getSubview(type: TagCapsule.self).isNil else { return }
     
-    NSLayoutConstraint.activate([
-      searchField.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor),
-      searchField.heightAnchor.constraint(equalToConstant: 40),
-//      searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10),
-//      topicView.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)),//searchField.heightAnchor),
-//      topicView.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
-      topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor)
-    ])
-    
-    let leading = searchField.leadingAnchor.constraint(equalTo: navigationBar.leadingAnchor, constant: 10)
-    leading.identifier = "leading"
-    leading.isActive = true
-    
-    let constraint = searchField.widthAnchor.constraint(equalToConstant: 20)
-    constraint.identifier = "width"
-    constraint.isActive = true
-    
-    navigationBar.setNeedsLayout()
-    navigationBar.layoutIfNeeded()
-    
-    //        let leading = topicView.leadingAnchor.constraint(equalTo: searchField.leadingAnchor, constant: -(10 + topicView.bounds.width))
-    //        leading.identifier = "leading"
-    //        leading.isActive = true
-    
-//    let centerX = topicView.centerXAnchor.constraint(equalTo: navigationBar.centerXAnchor, constant: -(navigationBar.bounds.width - topicView.bounds.width)/2)
-//    centerX.identifier = "centerX"
-//    centerX.isActive = true
-    
-    let centerY = topicView.centerYAnchor.constraint(equalTo: navigationBar.centerYAnchor,
-                                                     constant: -50)
-    centerY.identifier = "centerY"
-    centerY.isActive = true
-    
-    setBarItems()
+    navigationBar.addSubview(titleView)
+    titleView.centerXToSuperview()
+    let constraint = titleView.centerYToSuperview(offset: -100)
+    constraint.identifier = "centerY"
   }
   
   func setTasks() {
+    filter.changePublisher
+      .receive(on: DispatchQueue.main)
+      .filter { [unowned self] _ in self.filter.getMain() == .topic}
+//      .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
+      .sink { [unowned self] _ in self.mode = .Topic }
+      .store(in: &subscriptions)
+    
     //Filter bug fix
     Timer.publish(every: 10, on: .main, in: .common)
       .autoconnect()
@@ -329,15 +235,6 @@ private extension TopicsController {
       }
       .store(in: &subscriptions)
     
-//    tasks.append(Task { @MainActor [weak self] in
-//      for await notification in NotificationCenter.default.notifications(for: Notifications.System.Tab) {
-//        guard let self = self,
-//              let tab = notification.object as? Enums.Tab
-//        else { return }
-//
-//        self.isOnScreen = tab == .Feed
-//      }
-//    })
     Notifications.UIEvents.tabItemPublisher
       .receive(on: DispatchQueue.main)
       .sink { [unowned self] in self.isOnScreen = $0.keys.first == .Topics  }
@@ -363,52 +260,19 @@ private extension TopicsController {
       }
     })
     
-    let debouncedGlobal = searchGlobalPublisher
-      .throttle(for: .seconds(1),
-                scheduler: DispatchQueue.main,
-                latest: true)
-    
-    debouncedGlobal
-      .filter { !$0.isNil }
-      .sink { [unowned self] in
+    controllerOutput?.searchPublisher
+      .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: true)
+      .eraseToAnyPublisher()
+      .sink { [weak self] in
+        guard let self = self else { return }
         
-        self.controllerOutput?.beginSearchRefreshing()
-        self.controllerInput?.search(substring: $0!,
+        self.controllerInput?.search(substring: $0,
                                      localized: false,
-                                     topic: nil)
+                                     filter: self.filter)
       }
       .store(in: &subscriptions)
     
-    let debouncedTopic = searchTopicPublisher
-      .throttle(for: .seconds(1),
-                scheduler: DispatchQueue.main,
-                latest: true)
     
-    debouncedTopic
-      .filter { !$0.isNil }
-      .sink { [unowned self] in
-        guard let substring = $0?.keys.first,
-              let topic = $0?.values.first
-        else { return }
-        
-        self.controllerOutput?.beginSearchRefreshing()
-        self.controllerInput?.search(substring: substring,
-                                     localized: false,
-                                     topic: topic)
-      }
-      .store(in: &subscriptions)
-  }
-  
-  @objc
-  func handleTap() {
-    switch mode {
-    case .Topic:
-      mode = .Default
-    case .GlobalSearch://, .TopicSearch:
-      mode = .Default
-    case .Default:
-      mode = .GlobalSearch
-    default: print("") }
   }
   
   func getGradientColors() -> [CGColor] {
@@ -420,231 +284,119 @@ private extension TopicsController {
   }
   
   @MainActor
-  func setBarItems(zeroSubscriptions: Bool = false) {
-    var rightButton: UIBarButtonItem!
+  func setBarItems(animated: Bool = true) {
+    // Set right button
+    navigationItem.setRightBarButton(searchMode == .on ? nil : UIBarButtonItem(title: "",
+                                                     image: UIImage(systemName: "magnifyingglass",
+                                                                    withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                                     primaryAction: UIAction { [unowned self] _ in
+      self.searchMode = .on
+    },
+                                                     menu: nil), animated: animated)
     
-    switch mode {
-    case .Default:
-      rightButton = UIBarButtonItem(title: nil,
-                                    image: UIImage(systemName: "magnifyingglass",
-                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                    primaryAction: {
-        let action = UIAction { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.mode = .GlobalSearch
-        }
-        
-        return action
-      }(),
-                                    menu: nil)
-      navigationItem.setRightBarButton(rightButton, animated: false)
-      navigationItem.setLeftBarButton(nil, animated: true)
+    // Set left button
+    guard mode == .Topic else { return }
+
+    navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
+                                                    image: UIImage(systemName: "chevron.left",
+                                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                                    primaryAction: UIAction { [weak self] _ in
+      guard let self = self else { return }
       
-    case .GlobalSearch:
-      rightButton = UIBarButtonItem(title: nil,
-                                    image: UIImage(systemName: "xmark",
-                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                    primaryAction: {
-        let action = UIAction { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.mode = .Default
-        }
-        
-        return action
-      }(),
-                                    menu: nil)
-      navigationItem.setRightBarButton(rightButton, animated: false)
-//      navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
-//                                                      image: UIImage(systemName: "chevron.left",
-//                                                                     withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-//                                                      primaryAction: {
-//        let action = UIAction { [weak self] _ in
-//          guard let self = self else { return }
-//
-//          self.mode = .Default
-//        }
-//
-//        return action
-//      }())
-//                                      , animated: true)
-      
-      
-    case .Topic:
-      rightButton = UIBarButtonItem(title: nil,
-                                    image: UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                    primaryAction: {
-        let action = UIAction { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.mode = .TopicSearch
-        }
-        
-        return action
-      }(),
-                                    menu: nil)
-      navigationItem.setRightBarButton(rightButton, animated: false)
-      navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
-                                                      image: UIImage(systemName: "chevron.left",
-                                                                     withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                                      primaryAction: {
-        let action = UIAction { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.mode = .Default
-        }
-        
-        return action
-      }())
-                                      , animated: true)
-//      navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
-//                                                      image: UIImage(systemName: "xmark",
-//                                                                     withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-//                                                      primaryAction: {
-//        let action = UIAction { [weak self] _ in
-//          guard let self = self else { return }
-//
-//          self.mode = .Topic
-//        }
-//        return action
-//      }(),
-//                                                      menu: nil)
-//                                      , animated: true)
-    case .TopicSearch:
-      rightButton = UIBarButtonItem(title: nil,
-                                    image: UIImage(systemName: "xmark",
-                                                   withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                    primaryAction: {
-        let action = UIAction { [weak self] _ in
-          guard let self = self,
-                let topic = self.topic
-          else { return }
-          
-          self.mode = .Topic
-          self.toggleTopicView(on: true)
-          self.toggleSearchField(on: false)
-          self.controllerOutput?.setTopicMode(topic)
-          self.isSearching = false
-        }
-        
-        return action
-      }(),
-                                    menu: nil)
-      navigationItem.setRightBarButton(rightButton, animated: false)
-    }
+      self.mode = .Default
+      self.navigationItem.setLeftBarButton(nil, animated: true)
+    },
+                                                    menu: nil), animated: animated)
   }
-  
+
   @MainActor
   func onModeChanged() {
     setBarItems()
     
-    guard let mainController = tabBarController as? MainController else { return }
     
-    switch mode {
-    case .GlobalSearch, .TopicSearch:
-      mainController.toggleLogo(on: false)
-      toggleSearchField(on: true)
-      toggleTopicView(on: false)
-    case .Topic:
-      mainController.toggleLogo(on: false)
-      toggleTopicView(on: true)
-      
-    default:
-//      setNavigationBarTintColor(tintColor)
-      navigationController?.setBarTintColor(tintColor)
-      mainController.toggleLogo(on: true)
-      toggleSearchField(on: false)
-      toggleTopicView(on: false)
-    }
+//    guard let mainController = tabBarController as? MainController else { return }
+//    
+//    switch mode {
+//    case .GlobalSearch, .TopicSearch:
+////      mainController.toggleLogo(on: false)
+//      toggleTopicView(on: false)
+//    case .Topic:
+////      mainController.toggleLogo(on: false)
+//      toggleTopicView(on: true)
+//      
+//    default:
+////      setNavigationBarTintColor(tintColor)
+//      navigationController?.setBarTintColor(tintColor)
+////      mainController.toggleLogo(on: true)
+//      toggleTopicView(on: false)
+//    }
   }
   
-  func toggleSearchField(on: Bool) {
-    guard let navigationBar = navigationController?.navigationBar,
-          let widthConstraint = searchField.getConstraint(identifier: "width"),
-          let leadingConstraint = searchField.getConstraint(identifier: "leading")
-    else { return }
-    
-    navigationBar.setNeedsLayout()
-    searchField.text = ""
-    var widthConstant = CGFloat.zero
-    
-    if on {
-      leadingConstraint.constant = mode == .GlobalSearch ? 10 : 44 + 4
-      var inset = CGFloat.zero
-      switch mode {
-      case .GlobalSearch:
-        searchField.placeholder = "search".localized
-        inset = 10*2 + (44 + 4)
-      default:
-        inset = 10 + (44 + 4)*2
-        guard let topic = topic else { return }
-        
-        searchField.placeholder = "search_topic".localized + " \"\(topic.title)" + "\(topic.isOther ? "/" + topic.parent!.title : "")\""
-      }
-      widthConstant = navigationBar.frame.width - inset
-      let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
-      view.addGestureRecognizer(touch)
-      
-      searchField.tintColor = (mode == .Topic || mode == .TopicSearch) ? topic.isNil ? tintColor : topic!.tagColor : tintColor
-      let _ = searchField.becomeFirstResponder()
-      controllerOutput?.onSearchMode()
-      
-      //Clear previous fetch request
-      controllerOutput?.onSearchCompleted([])
-      
-    } else {
-      if let recognizer = view.gestureRecognizers?.first {
-        view.removeGestureRecognizer(recognizer)
-      }
-      
-      let _ = searchField.resignFirstResponder()
-    }
-    navigationItem.title = ""
-    
-    UIView.animate(
-      withDuration: 0.3,
-      delay: 0,
-      usingSpringWithDamping: 0.9,
-      initialSpringVelocity: 0.2,
-      options: [.curveEaseInOut],
-      animations: { [weak self] in
-        guard let self = self else { return }
-        
-        self.searchField.alpha = on ? 1 : 0
-        widthConstraint.constant = widthConstant
-        navigationBar.layoutIfNeeded()
-      }) { _ in }
-  }
-  
-  func toggleTopicView(on: Bool) {
-    guard let topic = topic,
+  func toggleTopicView() {
+    guard searchMode == .off,
+          let topic = filter.topic,
           let navigationBar = navigationController?.navigationBar,
-          let constraint = topicView.getConstraint(identifier: "centerY")
+          let constraint = titleView.getConstraint(identifier: "centerY"),
+          let main = tabBarController as? MainController
     else { return }
     
-    topicView.backgroundColor = topic.tagColor
-    topicTitle.text = topic.title.uppercased()
-    topicIcon.category = topic.iconCategory
-    navigationBar.setNeedsLayout()
-    navigationBar.layoutIfNeeded()
-    
-    UIView.animate(
-      withDuration: 0.3,
-      delay: on ? 0.2 : 0,
-      usingSpringWithDamping: 0.8,
-      initialSpringVelocity: 0.3,
-      options: [.curveEaseInOut]) { [weak self] in
-        guard let self = self else { return }
-        
-        self.topicView.alpha = on ? 1 : 0
-        constraint.constant = on ? 0 : -50
-        navigationBar.layoutIfNeeded()
+    func toggle(on: Bool, completion: Closure? = nil) {
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0.2,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.3,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
+          
+          self.titleView.alpha = on ? 1 : 0
+          navigationBar.setNeedsLayout()
+          constraint.constant = on ? 0 : -100
+          navigationBar.layoutIfNeeded()
+        }) { _ in completion?() }
+    }
+
+    // If topic mode
+    if mode == .Topic, filter.getMain() == .topic {
+      // Show filters
+      controllerOutput?.setFiltersHidden(false)
+      
+      // Update topic tag
+      titleView.color = topic.tagColor
+      titleView.text = topic.title.uppercased()
+      titleView.iconCategory = topic.iconCategory
+      
+      // If app logo is not on screen (back from survey transition)
+      if !main.logoIsOnScreen {
+        toggle(on: true)
+      } else {
+        // Hide app logo and after that show topic tag
+        main.toggleLogo(on: false) { toggle(on: true) }
       }
+    } else if mode == .Default {
+      // Hide topic tag and after that show app logo
+      toggle(on: false) { main.toggleLogo(on: true) }
+      // Hide filters
+      controllerOutput?.setFiltersHidden(true)
+    }
+  }
+  
+  @MainActor
+  func onBarModeChanged(_ searchMode: Bool) {
+    setBarItems()
+    if mode == .Default {
+      controllerOutput?.setFiltersHidden(true)
+    }
+    controllerOutput?.setSearchModeEnabled(enabled: searchMode, delay: 0.1)
   }
 }
 
 extension TopicsController: TopicsViewInput {
+  func getDataItems(excludeList: [SurveyReference]) {
+    controllerInput?.getDataItems(filter: filter, excludeList: excludeList)
+  }
+  
   func unsubscribe(from userprofile: Userprofile) {
     controllerInput?.unsubscribe(from: userprofile)
   }
@@ -657,10 +409,13 @@ extension TopicsController: TopicsViewInput {
     let backItem = UIBarButtonItem()
     backItem.title = ""
     navigationItem.backBarButtonItem = backItem
-    navigationController?.pushViewController(UserprofileController(userprofile: userprofile,
-                                                                   color: (mode == .Topic || mode == .TopicSearch) ? topic.isNil ? tintColor : topic!.tagColor : tintColor),
-                                             animated: true)
+    
+    navigationController?.pushViewController(UserprofileController(userprofile: userprofile, color: tintColor), animated: true)
     tabBarController?.setTabBarVisible(visible: false, animated: true)
+    
+    guard let controller = tabBarController as? MainController else { return }
+    
+    controller.toggleLogo(on: false)
   }
   
   func share(_ surveyReference: SurveyReference) {
@@ -728,10 +483,6 @@ extension TopicsController: TopicsViewInput {
     tabBarController?.selectedIndex = 4
   }
   
-  func onTopicSelected(_ instance: Topic) {
-    topic = instance
-  }
-  
   func onSurveyTapped(_ instance: SurveyReference) {
     //        if let nav = navigationController as? CustomNavigationController {
     //            nav.transitionStyle = .Default
@@ -749,40 +500,16 @@ extension TopicsController: TopicsViewInput {
     
     main.toggleLogo(on: false)
   }
-  
-  func onDataSourceRequest(dateFilter: Enums.Period, topic: Topic) {
-    guard isOnScreen else { return }
-    
-    controllerInput?.onDataSourceRequest(dateFilter: dateFilter, topic: topic)
-  }
-  
-  @objc
-  func hideKeyboard() {
-    if let recognizer = view.gestureRecognizers?.first {
-      view.removeGestureRecognizer(recognizer)
-    }
-    if mode == .GlobalSearch || mode == .TopicSearch {
-      searchField.resignFirstResponder()
-    }
-  }
 }
 
 // MARK: - Model Output
 extension TopicsController: TopicsModelOutput {
-  //    func onRequestCompleted(_ result: Result<Bool, Error>) {
-  //        switch result {
-  //        case .success:
-  //            controllerOutput?.onRequestCompleted(result)
-  //        case .failure(let error):
-  //#if DEBUG
-  //            error.printLocalized(class: type(of: self), functionName: #function)
-  //#endif
-  //        }
-  //    }
+  func onRequestCompleted(_ result: Result<Bool, Error>) {
+    controllerOutput?.onRequestCompleted(result)
+  }
   
-  func onSearchCompleted(_ instances: [SurveyReference]) {
-    controllerOutput?.onSearchCompleted(instances)
-    isSearching = false
+  func onSearchCompleted(_ instances: [SurveyReference], localSearch: Bool) {
+    controllerOutput?.onSearchCompleted(instances, localSearch: localSearch)
   }
 }
 
@@ -791,62 +518,6 @@ extension TopicsController: DataObservable {
     isDataReady = true
     navigationController?.setNavigationBarHidden(false, animated: true)
   }
-}
-
-extension TopicsController: UITextFieldDelegate {
-  func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-    if let recognizers = view.gestureRecognizers, recognizers.isEmpty {
-      let touch = UITapGestureRecognizer(target:self, action:#selector(TopicsController.hideKeyboard))
-      view.addGestureRecognizer(touch)
-    }
-    return !isSearching
-  }
-  
-  @objc
-  func textFieldDidChange(_ textField: UITextField) {
-    guard !isSearching, let text = textField.text, text.count > 3 else {
-      delay(seconds: 0.5) {[weak self] in
-        guard let self = self else { return }
-        
-        self.onSearchCompleted([])
-      }
-      
-      return
-    }
-    
-//    controllerOutput?.beginSearchRefreshing()
-    isSearching = true
-    
-    switch mode {
-    case .GlobalSearch:
-      searchGlobalPublisher.send(text)
-    default:
-      guard let topic = controllerOutput?.topic else { return }
-      searchTopicPublisher.send([text : topic])
-    }
-      
-    
-//    controllerInput?.search(substring: text, excludedIds: [])
-  }
-  
-  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    if let recognizer = view.gestureRecognizers?.first {
-      view.removeGestureRecognizer(recognizer)
-    }
-    textField.resignFirstResponder()
-    return true
-  }
-  
-  //    private func setupTextField(textField: UnderlinedSignTextField) {
-  //        guard !textFieldIsSetup else { return }
-  //        textFieldIsSetup = true
-  //        textField.delegate = self
-  //        textField.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
-  //        textField.activeLineColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
-  //        textField.line.layer.strokeColor = UIColor.systemGray.cgColor
-  //        textField.color = traitCollection.userInterfaceStyle == .dark ? .white : K_COLOR_RED
-  //        textField.addTarget(self, action: #selector(TopicsController.textFieldDidChange(_:)), for: .editingChanged)
-  //    }
 }
 
 extension TopicsController: ScreenVisible {

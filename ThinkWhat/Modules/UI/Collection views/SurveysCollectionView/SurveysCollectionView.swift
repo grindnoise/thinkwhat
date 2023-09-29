@@ -19,11 +19,6 @@ class SurveysCollectionView: UICollectionView {
   }
 
   // MARK: - Public properties
-  public var fetchResult: [SurveyReference] = [] {
-    didSet {
-      setDataSource()
-    }
-  }
   public var isOnScreen = true
   
   ///**Publishers**
@@ -158,10 +153,6 @@ class SurveysCollectionView: UICollectionView {
   }
   
   // MARK: - Public methods
-  public func setFilter() {
-    
-  }
-  
   /// On `didAppear` event
   public func didAppear() {
 //    guard category != .Subscriptions, source.snapshot().itemIdentifiers.isEmpty else { return }
@@ -198,6 +189,27 @@ class SurveysCollectionView: UICollectionView {
     guard !source.snapshot().itemIdentifiers.isEmpty else { return }
     
     scrollToItem(at: .init(row: 0, section: 0), at: .top, animated: true)
+  }
+  
+  public func setSearchResult(_ fetchResult: [SurveyReference]) {
+    var snapshot = Snapshot()
+    snapshot.appendSections([.main])
+    snapshot.appendItems(fetchResult, toSection: .main)
+    
+    apply(source: source,
+          snapshot: snapshot,
+          animatingDifferences: true)
+  }
+  
+  public func setSearchModeEnabled(_ enabled: Bool) {
+    enabled ? { refreshControl = nil }() : setRefreshControl()
+    var snapshot = Snapshot()
+    snapshot.appendSections([.main])
+    snapshot.appendItems(enabled ? [] : dataItems, toSection: .main)
+    
+    apply(source: source,
+          snapshot: snapshot,
+          animatingDifferences: true)
   }
   
   // MARK: - Overridden methods
@@ -450,6 +462,21 @@ private extension SurveysCollectionView {
 ////      emptyPublicationsView.place(inside: self)
 //    }
     
+    // If empty, then request with small delay
+    if dataItems.isEmpty {
+      delay(seconds: 0.1) { [weak self] in
+        guard let self = self else { return }
+       
+        self.requestData()
+      }
+    } else if self.filter.getMain() == .topic, let topic = self.filter.topic {
+      // If topic active publications count is not equal to data items count
+      // than request data
+      if topic.activeCount != dataItems.count {
+        requestData()
+      }
+    }
+    
     setDataSource(animatingDifferences: false)
   }
   
@@ -459,30 +486,43 @@ private extension SurveysCollectionView {
       .receive(on: DispatchQueue.main)
 //      .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
       .sink { [unowned self] in
+        // If topic case
+        if self.filter.getMain() == .topic, let topic = self.filter.topic {
+          // Set color for loader
+          self.color = topic.tagColor
+          
+          // If topic active publications count is not equal to data items count
+          // than request data
+          if topic.activeCount != $0.count {
+            self.requestData()
+          }
+        }
+        
+        // Update data source
         self.dataItems = $0
         self.setDataSource(animatingDifferences: true)
       }
       .store(in: &subscriptions)
     
     ///**Updaters**
-    ///Load data if zero items
-    Timer
-      .publish(every: 10, on: .current, in: .common)
-      .autoconnect()
-      .filter { [weak self] seconds in
-        guard let self = self,
-              !self.isRequesting,
-              self.filter.getMain() != .search,
-              let cells = self.visibleCells as? [SurveyCell],
-              cells.isEmpty
-        else { return false }
-
-        return true
-      }
-      .sink { [unowned self] _ in self.paginationPublisher.send([]); self.emptyPublicationsPublisher.send(true) }
-      .store(in: &subscriptions)
+//    ///Load data if zero items
+//    Timer
+//      .publish(every: 10, on: .current, in: .common)
+//      .autoconnect()
+//      .filter { [weak self] seconds in
+//        guard let self = self,
+//              !self.isRequesting,
+//              self.filter.getMain() != .search,
+//              let cells = self.visibleCells as? [SurveyCell],
+//              cells.isEmpty
+//        else { return false }
+//
+//        return true
+//      }
+//      .sink { [unowned self] _ in self.paginationPublisher.send([]); self.emptyPublicationsPublisher.send(true) }
+//      .store(in: &subscriptions)
     
-    ///Update stats for visible cells
+    // Update stats for visible cells
     Timer
       .publish(every: 10, on: .current, in: .common)
       .autoconnect()
@@ -498,7 +538,7 @@ private extension SurveysCollectionView {
       }
       .store(in: &subscriptions)
     
-    ///Check if survey became old
+    // Check if survey became old
     Timer.publish(every: 5, on: .main, in: .common)
       .autoconnect()
       .filter {[weak self] _ in
@@ -574,7 +614,7 @@ private extension SurveysCollectionView {
     ///Survey removed from watchlist
     SurveyReferences.shared.unmarkedFavoritePublisher
       .receive(on: DispatchQueue.main)
-      .filter { [unowned self] _ in self.filter.getMain() == .favorite }
+      .filter { [unowned self] _ in self.filter.getAdditional() == .watchlist }
       .sink { [unowned self] in
         guard self.source.snapshot().itemIdentifiers.contains($0) else { return }
         
@@ -626,7 +666,7 @@ private extension SurveysCollectionView {
         case .new:            appendingSet = Set(instances.filter { $0.isNew && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })//!$0.isRejected &&
         case .rated:          appendingSet = Set(instances.filter { $0.isTop && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })//!$0.isRejected &&
         case .own:            appendingSet = Set(instances.filter { $0.isOwn && !$0.isBanned && $0.id != Survey.fakeId })
-        case .favorite:       appendingSet = Set(instances.filter { $0.isFavorite && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })
+//        case .favorite:       appendingSet = Set(instances.filter { $0.isFavorite && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })
         case .compatible:     appendingSet = Set(instances.filter { $0.id != Survey.fakeId && !$0.isBanned })
         case .subscriptions:  appendingSet = Set(instances.filter { $0.owner.subscribedAt && !$0.isBanned && !$0.isClaimed && !$0.isAnonymous && $0.id != Survey.fakeId })
         case .topic:
@@ -638,6 +678,12 @@ private extension SurveysCollectionView {
           
           appendingSet = Set(instances.filter { $0.owner == userprofile && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })
           default: print("") }
+        
+        switch self.filter.getAdditional() {
+        case .watchlist:
+          appendingSet = Set(instances.filter { $0.isFavorite && !$0.isBanned && !$0.isClaimed && $0.id != Survey.fakeId })
+        default: debugPrint("")
+        }
         
         let filteredByPeriod = appendingSet.filter({ $0.isValid(byBeriod: self.filter.getPeriod()) })
         
@@ -683,14 +729,9 @@ private extension SurveysCollectionView {
   
   @MainActor
   func setRefreshControl() {
-    if filter.getMain() == .search {
-      refreshControl = nil
-      //      loadingIndicator.stopAnimating()
-    } else {
-      refreshControl = UIRefreshControl()
-      refreshControl?.tintColor = color
-      refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
-    }
+    refreshControl = UIRefreshControl()
+    refreshControl?.tintColor = color
+    refreshControl?.addTarget(self, action: #selector(self.refresh), for: .valueChanged)
   }
   
   @objc
@@ -704,7 +745,7 @@ private extension SurveysCollectionView {
     guard !isRequesting else { return }
     
     isRequesting = true
-    paginationPublisher.send(dataItems)
+    paginationPublisher.send(source.snapshot().itemIdentifiers)
   }
   
 //  func filterByPeriod(_ items: [SurveyReference]) -> [SurveyReference] {

@@ -317,8 +317,8 @@ private extension PasswordResetView {
 
 extension PasswordResetView: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
+    if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+      completionBlocks()
     }
   }
 }

@@ -11,11 +11,6 @@ import Combine
 import TinyConstraints
 
 class TagCapsule: UIView {
-  
-  // MARK: - Overridden properties
-  
-  
-  
   // MARK: - Public properties
   ///**Logic**
   public var text: String = "" {
@@ -85,11 +80,7 @@ class TagCapsule: UIView {
     didSet {
       guard oldValue != color else { return }
       
-      UIView.animate(withDuration: 0.3) { [weak self] in
-        guard let self = self else { return }
-        
-        self.stack.backgroundColor = self.color
-      }
+      bgLayer.colors = CAGradientLayer.getGradientColors(color: color)
     }
   }
   public var userprofile: Userprofile? {
@@ -117,8 +108,6 @@ class TagCapsule: UIView {
   ///**UI**
   public let font: UIFont
   
-  
-  
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
@@ -127,6 +116,24 @@ class TagCapsule: UIView {
   private let padding: CGFloat
   private let textPadding: UIEdgeInsets
   private let isShadowed: Bool
+  private let useGradient: Bool
+  private lazy var bgLayer: CAGradientLayer = {
+    let instance = CAGradientLayer()
+    instance.type = .radial
+    instance.colors = CAGradientLayer.getGradientColors(color: color)
+    instance.locations = [0, 0.5, 1.15]
+    instance.setIdentifier("radialGradient")
+    instance.startPoint = CGPoint(x: 0.5, y: 0.5)
+    instance.endPoint = CGPoint(x: 1, y: 1)
+    instance.publisher(for: \.bounds)
+      .filter { $0 != .zero }
+      .sink { rect in
+        instance.cornerRadius = rect.height/2.25
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
   private lazy var stack: UIStackView = {
     let opaque = UIView.opaque()
     opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor).isActive = true
@@ -150,12 +157,18 @@ class TagCapsule: UIView {
       opaque2,
       UIView.horizontalSpacer(padding),
     ])
-    instance.publisher(for: \.bounds, options: .new)
-      .filter { $0 != .zero }
-      .sink { instance.cornerRadius = $0.height/2.25 }
-      .store(in: &subscriptions)
-    instance.backgroundColor = color
+//    instance.publisher(for: \.bounds, options: .new)
+//      .filter { $0 != .zero }
+//      .sink { instance.cornerRadius = $0.height/2.25 }
+//      .store(in: &subscriptions)
+//    instance.backgroundColor = color
     instance.spacing = 0//padding
+    // Add background layer
+    instance.layer.insertSublayer(bgLayer, at: 0)
+    instance.publisher(for: \.bounds)
+      .filter { [unowned self] in $0.size != self.bgLayer.bounds.size }
+      .sink { [unowned self] in self.bgLayer.frame = $0 }
+      .store(in: &subscriptions)
 
     
     return instance
@@ -172,9 +185,14 @@ class TagCapsule: UIView {
   }()
   private lazy var imageView: UIImageView? = {
     let instance = UIImageView(image: image ?? userprofile?.image)
-    instance.contentMode = !image.isNil ? .center : .scaleAspectFill
+//    instance.contentMode = !image.isNil ? .center : .scaleAspectFill
+    instance.contentMode = .scaleAspectFill
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+    instance.layer.masksToBounds = true
     instance.tintColor = .white
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.height / 2 }
+      .store(in: &subscriptions)
 
     return instance
   }()
@@ -210,8 +228,6 @@ class TagCapsule: UIView {
     return instance
   }()
   
-  
-  
   // MARK: - Deinitialization
   deinit {
     if !iconCategory.isNil {
@@ -226,14 +242,13 @@ class TagCapsule: UIView {
 #endif
   }
   
-  
-  
   // MARK: - Initialization
   init(text: String,
        padding: CGFloat = 4,
        textPadding: UIEdgeInsets = .zero,
        color: UIColor = Colors.Logo.Flame.rawValue,
        font: UIFont,
+       useGradient: Bool = true,
        isShadowed: Bool = false,
        iconCategory: Icon.Category? = nil,
        image: UIImage? = nil,
@@ -248,6 +263,7 @@ class TagCapsule: UIView {
     self.isShadowed = isShadowed
     self.font = font
     self.iconCategory = iconCategory
+    self.useGradient = useGradient
     
     super.init(frame: .zero)
     
@@ -255,8 +271,6 @@ class TagCapsule: UIView {
   }
   
   required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-  
-  
   
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -294,9 +308,6 @@ private extension TagCapsule {
         } else {
           imageView?.backgroundColor = .white
         }
-        imageView?.publisher(for: \.bounds)
-          .sink { [unowned self] in self.imageView?.cornerRadius = $0.height / 2 }
-          .store(in: &subscriptions)
       }
     }
 //    label.translatesAutoresizingMaskIntoConstraints = false

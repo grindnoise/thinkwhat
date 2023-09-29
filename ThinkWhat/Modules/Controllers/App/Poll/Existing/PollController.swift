@@ -9,6 +9,7 @@
 import UIKit
 import SafariServices
 import Combine
+import TinyConstraints
 
 class PollController: UIViewController {
   
@@ -46,7 +47,7 @@ class PollController: UIViewController {
                iconCategory: item.topic.iconCategory)
   }()
   private var spinner: SpiralSpinner!
-
+  public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: traitCollection.userInterfaceStyle == .dark ? Colors.spiralDark : Colors.spiralLight) }()
   
   
   // MARK: - Destructor
@@ -59,8 +60,6 @@ class PollController: UIViewController {
     print("\(String(describing: type(of: self))).\(#function)")
 #endif
   }
-  
-  
   
   // MARK: - Initialization
   // Init from lists/hot view
@@ -95,8 +94,6 @@ class PollController: UIViewController {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
-  
   
   // MARK: - Overriden methods
   override func viewDidLoad() {
@@ -173,6 +170,7 @@ class PollController: UIViewController {
     super.viewWillAppear(animated)
     
     navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
     
     guard !item.isNil else { return }
     
@@ -196,6 +194,7 @@ class PollController: UIViewController {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
     navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
   }
   
@@ -227,41 +226,9 @@ private extension PollController {
     navigationController?.interactivePopGestureRecognizer?.delegate = self
 //    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
     navigationController?.setBarTintColor(item.topic.tagColor)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
     navigationItem.titleView = titleView
     setBarButtonItems()
-    
-//    guard let navigationBar = navigationController?.navigationBar else { return }
-//
-//    let appearance = UINavigationBarAppearance()
-//    appearance.configureWithOpaqueBackground()
-//    appearance.largeTitleTextAttributes = [
-//      .foregroundColor: tintColor,
-//      .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .largeTitle) as Any
-//    ]
-//    appearance.titleTextAttributes = [
-//      .foregroundColor: tintColor,
-//      .font: UIFont.scaledFont(fontName: Fonts.Bold, forTextStyle: .title3) as Any
-//    ]
-//    appearance.shadowColor = nil
-//
-//    navigationBar.standardAppearance = appearance
-//    navigationBar.scrollEdgeAppearance = appearance
-//    navigationBar.prefersLargeTitles = false
-//
-//    if #available(iOS 15.0, *) {
-//      navigationBar.compactScrollEdgeAppearance = appearance
-//    }
-    guard let navigationBar = self.navigationController?.navigationBar else { return }
-
-    let appearance = UINavigationBarAppearance()
-    appearance.configureWithDefaultBackground()
-    appearance.backgroundColor = .systemBackground
-    appearance.shadowColor = nil
-    navigationBar.standardAppearance = appearance
-    navigationBar.scrollEdgeAppearance = appearance
-    navigationBar.prefersLargeTitles = false
-
-    if #available(iOS 15.0, *) { navigationBar.compactScrollEdgeAppearance = appearance }
   }
   
   func setTasks() {
@@ -359,18 +326,32 @@ private extension PollController {
     }
     
     navigationController?.setNavigationBarHidden(true, animated: false)
-    spinner.placeInCenter(of: view,
-                          widthMultiplier: 0.25,
-                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
     controllerInput?.load(item, incrementViewCounter: true)
+    
+    view.addSubview(spiral)
+    view.addSubview(spinner)
+    
+    spiral.aspectRatio(1)
+    spiral.widthToHeight(of: view, multiplier: 1.5)
+    spiral.centerInSuperview()
+    spinner.centerXToSuperview()
+    spinner.centerYToSuperview()
+    spinner.widthToSuperview(multiplier: 0.25)
+//    spinner.placeInCenter(of: view,
+//                          widthMultiplier: 0.25,
+//                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
     spinner.start(duration: 1)
+    spiral.startRotating(duration: 5)
   }
   
   /// Loads survey by id from push notification
   /// - Parameter surveyID: survey id extracted from push notification
   func loadData(surveyID: Int) {
     spinner = SpiralSpinner(color: Colors.main)
+    spiral.startRotating(duration: 5)
     navigationController?.setNavigationBarHidden(true, animated: false)
+    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
     spinner.placeInCenter(of: view,
                           widthMultiplier: 0.25,
                           yOffset: -NavigationController.Constants.NavBarHeightSmallState)
@@ -384,7 +365,9 @@ private extension PollController {
   /// - Parameter replyId: reply comment id
   func loadData(surveyId: Int, threadId: Int, replyId: Int) {
     spinner = SpiralSpinner(color: Colors.main)
+    spiral.startRotating(duration: 5)
     navigationController?.setNavigationBarHidden(true, animated: false)
+    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
     spinner.placeInCenter(of: view,
                           widthMultiplier: 0.25,
                           yOffset: -NavigationController.Constants.NavBarHeightSmallState)
@@ -401,7 +384,9 @@ private extension PollController {
   /// - Parameter replyId: reply comment id
   func loadData(threadId: Int, replyId: Int) {
     spinner = SpiralSpinner(color: Colors.main)
+    spiral.startRotating(duration: 5)
     navigationController?.setNavigationBarHidden(true, animated: false)
+    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
     spinner.placeInCenter(of: view,
                           widthMultiplier: 0.25,
                           yOffset: -NavigationController.Constants.NavBarHeightSmallState)
@@ -724,12 +709,14 @@ extension PollController: PollModelOutput {
         setupUI()
       }
 //      navigationController?.setNavigationBarHidden(false, animated: true)
-      delay(seconds: 0.5) { [weak self] in
+      delay(seconds: 0.75) { [weak self] in
         guard let self = self else { return }
         
-        UIView.animate(withDuration: 0.4, animations: { [weak self] in
+        UIView.animate(withDuration: 0.3, animations: { [weak self] in
           guard let self = self else { return }
           
+          self.spiral.transform = .init(scaleX: 1.25, y: 1.25)
+          self.spiral.alpha = 0
           self.spinner.alpha = 0
           self.spinner.transform =  CGAffineTransform(scaleX: 0.25, y: 0.25)
         }) { [weak self] _ in
@@ -741,6 +728,8 @@ extension PollController: PollModelOutput {
           self.controllerOutput?.presentView(item: survey, animated: true)
           self.spinner.stop()
           self.spinner.removeFromSuperview()
+          self.spiral.stopRotating()
+          self.spiral.removeFromSuperview()
         }
       }
     case .failure:
@@ -854,15 +843,10 @@ extension PollController: UIGestureRecognizerDelegate {
 
 extension PollController: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
-    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
+    if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+      completionBlocks()
     } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
       initialLayer.path = path as! CGPath
-      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
-        completionBlock()
-      }
     }
   }
 }

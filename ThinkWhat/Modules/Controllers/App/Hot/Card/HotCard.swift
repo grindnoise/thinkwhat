@@ -359,7 +359,7 @@ class HotCard: UIView, Card {
                                         timingFunction: CAMediaTimingFunctionName.easeIn,
                                         delegate: self,
                                         isRemovedOnCompletion: false,
-                                        completionBlocks: [
+                                        completionBlocks:
                                           {[weak self] in
                                             guard let self = self else { return }
                                             
@@ -368,7 +368,7 @@ class HotCard: UIView, Card {
                                                 self.fadeGradient.removeAllAnimations()
                                                 completion()
                                               }
-                                          }])
+                                          })
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: [0.0, 0.5, 0.9] as Any,
                                            toValue: [-1.0, 0, 1] as Any,
@@ -376,12 +376,12 @@ class HotCard: UIView, Card {
                                            timingFunction: CAMediaTimingFunctionName.easeIn,
                                            delegate: self,
                                            isRemovedOnCompletion: false,
-                                           completionBlocks: [
+                                           completionBlocks:
                                             {[weak self] in
                                               guard let self = self else { return }
                                               
                                               self.fadeGradient.locations = [-1.0, 0, 1]
-                                            }])
+                                            })
     
     fadeGradient.add(locationAnimation, forKey: nil)
     fadeGradient.add(colorAnimation, forKey: nil)
@@ -432,7 +432,7 @@ class HotCard: UIView, Card {
                                         timingFunction: CAMediaTimingFunctionName.easeIn,
                                         delegate: self,
                                         isRemovedOnCompletion: false,
-                                        completionBlocks: [
+                                        completionBlocks:
                                           {[weak self] in
                                             guard let self = self else { return }
                                             
@@ -454,7 +454,7 @@ class HotCard: UIView, Card {
                                                 completion()
                                               }
                                               }
-                                          }])
+                                          })
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: [0.0, 0.5, 0.9] as Any,
                                            toValue: [-1.0, 0, 1] as Any,
@@ -462,12 +462,12 @@ class HotCard: UIView, Card {
                                            timingFunction: CAMediaTimingFunctionName.easeIn,
                                            delegate: self,
                                            isRemovedOnCompletion: false,
-                                           completionBlocks: [
-                                            {[weak self] in
+                                           completionBlocks:
+                                            { [weak self] in
                                               guard let self = self else { return }
                                               
                                               self.fadeGradient.locations = [-1.0, 0, 1]
-                                            }])
+                                            })
     
     fadeGradient.add(locationAnimation, forKey: nil)
     fadeGradient.add(colorAnimation, forKey: nil)
@@ -483,12 +483,12 @@ class HotCard: UIView, Card {
                                 timingFunction: .easeInEaseOut,
                                 delegate: self,
                                 isRemovedOnCompletion: false,
-                                completionBlocks: [
+                                completionBlocks:
                                   {[weak self] in
                                     guard let self = self else { return }
                                     
                                     self.gradient.colors = [clear, clear, clear]
-                                  }]),
+                                  }),
                  forKey: nil)
     gradient.add(Animations.get(property: .Locations,
                                 fromValue: gradient.locations as Any,
@@ -497,13 +497,13 @@ class HotCard: UIView, Card {
                                 timingFunction: .easeInEaseOut,
                                 delegate: self,
                                 isRemovedOnCompletion: false,
-                                completionBlocks: [
+                                completionBlocks:
                                   {[weak self] in
                                     guard let self = self else { return }
                                     
                                     self.gradient.locations = [0, 1, 1]
                                     self.gradient.removeAllAnimations()
-                                  }]),
+                                  }),
                  forKey: nil)
     
     fadeGradient.add(Animations.get(property: .Colors,
@@ -513,12 +513,12 @@ class HotCard: UIView, Card {
                                     timingFunction: .easeInEaseOut,
                                     delegate: self,
                                     isRemovedOnCompletion: false,
-                                    completionBlocks: [
+                                    completionBlocks:
                                       {[weak self] in
                                         guard let self = self else { return }
                                         
                                         self.fadeGradient.colors = [clear, clear, clear]
-                                      }]),
+                                      }),
                      forKey: nil)
     fadeGradient.add(Animations.get(property: .Locations,
                                     fromValue: fadeGradient.locations as Any,
@@ -527,13 +527,13 @@ class HotCard: UIView, Card {
                                     timingFunction: .easeInEaseOut,
                                     delegate: self,
                                     isRemovedOnCompletion: false,
-                                    completionBlocks: [
+                                    completionBlocks:
                                       {[weak self] in
                                         guard let self = self else { return }
                                         
                                         self.fadeGradient.locations = [0, 1, 1]
                                         self.fadeGradient.removeAllAnimations()
-                                      }]),
+                                      }),
                      forKey: nil)
     
       UIView.animate(withDuration: duration) {[weak self] in
@@ -787,15 +787,10 @@ private extension HotCard {
 
 extension HotCard: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
-    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
+    if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+      completionBlocks()
     } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
       initialLayer.path = path as! CGPath
-      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
-        completionBlock()
-      }
     }
   }
 }

@@ -16,6 +16,39 @@ class ListModel {
 
 // MARK: - Controller Input
 extension ListModel: ListControllerInput {
+  func search(substring: String,
+              localized: Bool,
+              filter: SurveyFilter) {
+    var existing: [SurveyReference] {
+      var instances =  SurveyReferences.shared.all
+        .filter({ $0.title.lowercased().contains(substring.lowercased()) })
+      
+      if !filter.userprofile.isNil { instances = instances.filter({ $0.owner == filter.userprofile! }) }
+      if !filter.topic.isNil { instances = instances.filter({ $0.topic == filter.topic! }) }
+      
+      modelOutput?.onSearchCompleted(Array(Set(instances)).sorted { $0.startDate > $1.startDate }, localSearch: true)
+      
+      return instances
+    }
+    
+    Task {
+      do {
+        let received = try await API.shared.surveys.search(substring: substring,
+                                                           localized: localized,
+                                                           excludedIds: existing.map { $0.id },
+                                                           ownersIds: filter.userprofile.isNil ? [] : [filter.userprofile!.id],
+                                                           topicsIds: filter.topic.isNil ? [] : [filter.topic!.id])
+        await MainActor.run {
+          modelOutput?.onSearchCompleted(Array(Set(existing + received)).sorted { $0.startDate > $1.startDate }, localSearch: false)
+        }
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+      }
+    }
+  }
+  
   func unsubscribe(from userprofile: Userprofile) {
     Task {
       try await API.shared.profiles.unsubscribe(from: [userprofile])
@@ -57,11 +90,10 @@ extension ListModel: ListControllerInput {
     }
   }
   
-  func getDataItems(filter: SurveyFilter,
-                    excludeList: [SurveyReference]) {
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference]) {
     Task {
       do {
-        try await API.shared.surveys.getSurveyReferences(filter: filter, excludeList: excludeList, owners: [Userprofiles.shared.current!])
+        try await API.shared.surveys.getSurveyReferences(filter: filter, excludeList: excludeList)
         
         await MainActor.run {
           modelOutput?.onRequestCompleted(.success(true))

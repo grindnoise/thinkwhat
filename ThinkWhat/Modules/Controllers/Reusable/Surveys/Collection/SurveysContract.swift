@@ -40,14 +40,12 @@ protocol SurveysControllerInput: AnyObject {
   func subscribe(to: Userprofile)
   func search(substring: String,
               localized: Bool,
-              except: [SurveyReference],
-              ownersIds: [Int],
-              topicsIds: [Int])
+              filter: SurveyFilter)
 }
 
 protocol SurveysModelOutput: AnyObject {
   func onRequestCompleted(_: Result<Bool, Error>)
-  func onSearchCompleted(_: [SurveyReference])
+  func onSearchCompleted(_: [SurveyReference], localSearch: Bool)
 }
 
 protocol SurveysControllerOutput: AnyObject {
@@ -56,7 +54,6 @@ protocol SurveysControllerOutput: AnyObject {
   func onRequestCompleted(_: Result<Bool, Error>)
   func viewDidDisappear()
   func beginSearchRefreshing()
-//  func toggleSearchMode(_: Bool)
-  func setMode(_: Enums.SurveyFilterMode)
+  func setSearchModeEnabled(_: Bool)
   func onSearchCompleted(_: [SurveyReference])
 }

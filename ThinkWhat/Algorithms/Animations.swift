@@ -61,7 +61,7 @@ struct Animations {
                   timingFunction: CAMediaTimingFunctionName = CAMediaTimingFunctionName.default,
                   delegate: CAAnimationDelegate? = nil,
                   isRemovedOnCompletion: Bool = true,
-                  completionBlocks: [Closure]? = nil,
+                  completionBlocks: Closure? = nil,
                   delay: CFTimeInterval = 0.0) -> CAAnimation {
     
     let anim = CABasicAnimation(keyPath: property.rawValue)
@@ -76,7 +76,7 @@ struct Animations {
     anim.isRemovedOnCompletion = isRemovedOnCompletion
     if delegate != nil {
       anim.delegate = delegate!
-      anim.setValue(completionBlocks, forKey: "completionBlocks")
+      anim.setValue(completionBlocks, forKey: "completion")
     }
     anim.timingFunction = CAMediaTimingFunction(name: timingFunction)
     
@@ -133,7 +133,7 @@ struct Animations {
                             animateOpacity: Bool = true,
                             opacityDurationMultiplier: Double = 1,
                             delegate: CAAnimationDelegate,
-                            completionBlocks: [Closure] = []) {
+                            completionBlocks: Closure? = nil) {
     
     let circlePathLayer = CAShapeLayer()
     var _completionBlocks = completionBlocks
@@ -200,7 +200,7 @@ struct Animations {
                               timingFunction: .easeOut,
                               delegate: delegate,
                               isRemovedOnCompletion: true,
-                              completionBlocks: [])
+                              completionBlocks: completionBlocks)
     
     circlePathLayer.add(anim, forKey: "path")
     circlePathLayer.path = toPath
@@ -220,7 +220,7 @@ struct Animations {
   }
   
   static func unmaskLayerCircled(unmask: Bool = true,
-                                 layer animatedlayer: CALayer,
+                                 layer animatedLayer: CALayer,
                                  location: CGPoint,
                                  duration: TimeInterval,
                                  timingFunction: CAMediaTimingFunctionName = .linear,
@@ -267,20 +267,28 @@ struct Animations {
       return UIBezierPath(ovalIn: rect)
     }
     
-    circlePathLayer.frame = animatedlayer.bounds
+    circlePathLayer.frame = animatedLayer.bounds
     circlePathLayer.path = circlePath(circleFrameTouchPosition).cgPath
-    animatedlayer.mask = circlePathLayer
+    animatedLayer.mask = circlePathLayer
     
     //        let center = lastPoint//(x: animatedView.bounds.midX, y: animatedView.bounds.midY)
     
-    let finalRadius = max(abs(animatedlayer.bounds.width - location.x),
-                          abs(animatedlayer.bounds.width - (animatedlayer.bounds.width - location.x)))//sqrt((center.x*center.x) + (center.y*center.y))
+    let maxEdge = max(animatedLayer.bounds.width, animatedLayer.bounds.height)
+    let finalRadius = maxEdge*sqrt(2)/2 + maxEdge/2
+
+    let outerRect = circleFrameTouchPosition.insetBy(dx: -finalRadius, dy: -finalRadius)
     
-    let radiusInset = finalRadius * 1.5
+    let toPath = UIBezierPath(ovalIn: outerRect).cgPath // UIBezierPath(roundedRect: animatedLayer.bounds, cornerRadius: animatedLayer.cornerRadius).cgPath//
     
-    let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
+//    let finalRadius = max(abs(maxEdge - location.x),
+//                          abs(maxEdge - (maxEdge - location.x)))//sqrt((center.x*center.x) + (center.y*center.y))
     
-    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
+    
+//    let radiusInset = finalRadius * 1.5
+//
+//    let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
+//
+//    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
     
     let fromPath = circlePathLayer.path
     
@@ -293,15 +301,17 @@ struct Animations {
                               autoreverses: false,
                               timingFunction: timingFunction,
                               delegate: delegate,
-                              isRemovedOnCompletion: true,
-                              completionBlocks: [])
-    anim.setValue(completion, forKey: "completion")
+                              isRemovedOnCompletion: true) {
+      animatedLayer.mask = nil
+      completion?()
+    }
+//    anim.setValue(completion, forKey: "completion")
     circlePathLayer.add(anim, forKey: "path")
     circlePathLayer.path = unmask ? toPath : fromPath
    
     guard animateOpacity else { return }
 
-    animatedlayer.opacity = Float(1)//unmask ? 1 : 0//0
+    animatedLayer.opacity = Float(1)//unmask ? 1 : 0//0
     let opacityAnim = Animations.get(property: .Opacity,
                                      fromValue: unmask ? 0 : 1,
                                      toValue: unmask ? 1 : 0,
@@ -309,8 +319,8 @@ struct Animations {
                                      timingFunction: timingFunction,
                                      delegate: nil)
     
-    animatedlayer.add(opacityAnim, forKey: nil)
-    animatedlayer.opacity = 1//unmask ? 1 : 0
+    animatedLayer.add(opacityAnim, forKey: nil)
+    animatedLayer.opacity = 1//unmask ? 1 : 0
   }
   
   static func reveal(present: Bool,
@@ -323,78 +333,123 @@ struct Animations {
                      completion: Closure? = nil,
                      animateOpacity: Bool = true) {
     
-           let circlePathLayer = CAShapeLayer()
-           
-           var circleFrameTouchPosition: CGRect {
-             return CGRect(origin: location, size: .zero)
-           }
-           
-           var circleFrameTopLeft: CGRect {
-             return CGRect.zero
-           }
-           
-           func circlePath(_ rect: CGRect) -> UIBezierPath {
-             return UIBezierPath(ovalIn: rect)
-           }
-           
-           circlePathLayer.frame = revealView.bounds
-           circlePathLayer.path = circlePath(location == .zero ? circleFrameTopLeft : circleFrameTouchPosition).cgPath
-           revealView.layer.mask = circlePathLayer
-           
-           let radiusInset =  sqrt(revealView.bounds.height*revealView.bounds.height + revealView.bounds.width*revealView.bounds.width + location.x*location.x + location.y*location.y)
-           
-           let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
-           
-           let toPath = UIBezierPath(ovalIn: outerRect).cgPath
-           
-           let fromPath = circlePathLayer.path
-           
-           let anim = Animations.get(property: .Path,
-                                     fromValue: present ? fromPath as Any : toPath,
-                                     toValue: !present ? fromPath as Any : toPath,
-                                     duration: duration,
-                                     delay: 0,
-                                     repeatCount: 0,
-                                     autoreverses: false,
-                                     timingFunction: present ? .easeInEaseOut : .easeOut,
-                                     delegate: delegate,
-                                     isRemovedOnCompletion: true,
-                                     completionBlocks: [{
-             revealView.layer.mask = nil
-             if !present {
-               //                circlePathLayer.path = CGPath(rect: .zero, transform: nil)
-               revealView.layer.opacity = 0
-               //////                animatedView.alpha = 0
-               ////                            animatedView.layer.mask = nil
-             }
-             completion?()
-           }])
+    let circlePathLayer = CAShapeLayer()
     
-           circlePathLayer.add(anim, forKey: "path")
-           circlePathLayer.path = !present ? fromPath : toPath
-           
-           let colorLayer = CALayer()
-           if let collectionView = fadeView as? UICollectionView {
-             colorLayer.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 3000))
-           } else {
-             colorLayer.frame = fadeView.layer.bounds
-           }
-           colorLayer.backgroundColor = color.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.systemGray.cgColor
-           colorLayer.opacity = present ? 0 : 1
-           
-           fadeView.layer.addSublayer(colorLayer)
-           
-           let opacityAnim = Animations.get(property: .Opacity,
-                                            fromValue: present ? 0 : 1,
-                                            toValue: present ? 1 : 0,
-                                            duration: duration/2,
-                                            timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-                                            delegate: delegate, completionBlocks: [{
-             colorLayer.removeFromSuperlayer()
-           }])
-           colorLayer.add(opacityAnim, forKey: nil)
-           colorLayer.opacity = !present ? 0 : 1
-         }
+    var circleFrameTouchPosition: CGRect {
+      return CGRect(origin: location, size: .zero)
+    }
+    
+    var circleFrameTopLeft: CGRect {
+      return CGRect.zero
+    }
+    
+    func circlePath(_ rect: CGRect) -> UIBezierPath {
+      return UIBezierPath(ovalIn: rect)
+    }
+    
+    circlePathLayer.frame = revealView.bounds
+    circlePathLayer.path = circlePath(location == .zero ? circleFrameTopLeft : circleFrameTouchPosition).cgPath
+    revealView.layer.mask = circlePathLayer
+    
+    let radiusInset =  sqrt(revealView.bounds.height*revealView.bounds.height + revealView.bounds.width*revealView.bounds.width + location.x*location.x + location.y*location.y)
+    
+    let outerRect = circleFrameTouchPosition.insetBy(dx: -radiusInset, dy: -radiusInset)
+    
+    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
+    
+    let fromPath = circlePathLayer.path
+    
+    let anim = Animations.get(property: .Path,
+                              fromValue: present ? fromPath as Any : toPath,
+                              toValue: !present ? fromPath as Any : toPath,
+                              duration: duration,
+                              delay: 0,
+                              repeatCount: 0,
+                              autoreverses: false,
+                              timingFunction: present ? .easeInEaseOut : .easeOut,
+                              delegate: delegate,
+                              isRemovedOnCompletion: true,
+                              completionBlocks: {
+      revealView.layer.mask = nil
+      if !present {
+        //                circlePathLayer.path = CGPath(rect: .zero, transform: nil)
+        revealView.layer.opacity = 0
+        //////                animatedView.alpha = 0
+        ////                            animatedView.layer.mask = nil
+      }
+      completion?()
+    })
+    
+    circlePathLayer.add(anim, forKey: "path")
+    circlePathLayer.path = !present ? fromPath : toPath
+    
+    let colorLayer = CALayer()
+    if let collectionView = fadeView as? UICollectionView {
+      colorLayer.frame = CGRect(origin: .zero, size: CGSize(width: collectionView.bounds.width, height: 3000))
+    } else {
+      colorLayer.frame = fadeView.layer.bounds
+    }
+    colorLayer.backgroundColor = color.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.black.cgColor : UIColor.systemGray.cgColor
+    colorLayer.opacity = present ? 0 : 1
+    
+    fadeView.layer.addSublayer(colorLayer)
+    
+    let opacityAnim = Animations.get(property: .Opacity,
+                                     fromValue: present ? 0 : 1,
+                                     toValue: present ? 1 : 0,
+                                     duration: duration/2,
+                                     timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
+                                     delegate: delegate, completionBlocks: {
+      colorLayer.removeFromSuperlayer()
+    })
+    colorLayer.add(opacityAnim, forKey: nil)
+    colorLayer.opacity = !present ? 0 : 1
+  }
+  
+  static func tapCircled(layer animatedlayer: CALayer,
+                         fillColor: CGColor,
+                         location: CGPoint,
+                         duration: TimeInterval,
+                         timingFunction: CAMediaTimingFunctionName = .easeOut) {
+    
+    var touchRect: CGRect { CGRect(origin: location, size: .zero) }
+    
+    let tempLayer = CAShapeLayer()
+    tempLayer.frame = animatedlayer.bounds
+    tempLayer.path = UIBezierPath(ovalIn: touchRect).cgPath
+    tempLayer.fillColor = fillColor
+    animatedlayer.addSublayer(tempLayer)
+    
+    let finalRadius = max(abs(animatedlayer.bounds.width - location.x),
+                          abs(animatedlayer.bounds.width - (animatedlayer.bounds.width - location.x)))
+    
+    let radiusInset = finalRadius// * 1.5
+    
+    let outerRect = touchRect.insetBy(dx: -radiusInset, dy: -radiusInset)
+    
+    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
+    
+    let fromPath = tempLayer.path
+    
+    let anim = Animations.get(property: .Path,
+                              fromValue: fromPath as Any,
+                              toValue: toPath,
+                              duration: duration,
+                              timingFunction: .linear)
+    tempLayer.add(anim, forKey: nil)
+    tempLayer.path = toPath
+    
+    let opacityAnim = Animations.get(property: .Opacity,
+                                     fromValue: 1,
+                                     toValue: 0,
+                                     duration: duration*1.1,
+                                     timingFunction: .easeInEaseOut)
+    
+    tempLayer.add(opacityAnim, forKey: nil)
+    tempLayer.opacity = 0
+    
+    delay(seconds: duration*1.1) { tempLayer.removeFromSuperlayer() }
+  }
 }
 
 func animateImageChange(imageView: UIImageView, fromImage: UIImage, toImage: UIImage, duration: CFTimeInterval) {

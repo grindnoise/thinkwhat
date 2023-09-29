@@ -12,11 +12,6 @@ import UIKit
 import Combine
 
 class HotView: UIView {
-  
-  // MARK: - Overridden properties
-  
-  
-  
   // MARK: - Public properties
   public weak var viewInput: (HotViewInput & UIViewController)? {
     didSet {
@@ -33,8 +28,6 @@ class HotView: UIView {
     return hotCard.item
   }
   
-  
-  
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
@@ -44,65 +37,63 @@ class HotView: UIView {
   private var incoming: Card? {
     didSet {
       guard let hotCard = incoming as? HotCard else { return }
-//      guard let incoming = incoming else { return }
-//
-//      if let hotCard = incoming as? HotCard {
-        hotCard.$action
-          .filter { !$0.isNil }
-//          .throttle(for: .seconds(0.75), scheduler: DispatchQueue.main, latest: false)
-          .sink { [unowned self] action in
-            switch action {
-            case .Vote:
-              self.viewInput?.vote(hotCard.item)
-            case .Next:
-              self.viewInput?.reject(hotCard.item)
-              self.next(self.viewInput?.deque())
-            case .Claim:
-              let popup = NewPopup(contentPadding: .uniform(size: self.padding*2))
-              let content = ClaimPopupContent(parent: popup,
-                                              object: hotCard.item.reference)
-//                                              surveyReference: hotCard.item.reference)
-              content.$claim
-                .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is SurveyReference }
-                .map { [$0!.keys.first as! SurveyReference: $0!.values.first!] }
-                .sink { [unowned self] in self.viewInput?.claim($0!) }
-                .store(in: &hotCard.subscriptions)
-
-              
-//              content.$claim
-//                .filter { !$0.isNil }
-//                .sink { [unowned self] in self.viewInput?.claim($0!) }
-//                .store(in: &hotCard.subscriptions)
-              popup.setContent(content)
-              popup.didDisappearPublisher
-                .sink { [unowned self] _ in
-                  popup.removeFromSuperview()
-                  
-                  ///Next if claimed
-                  guard hotCard.item.isClaimed else { return }
-                  
-                  delayAsync(delay: 0.25) { [unowned self] in
-                    self.next(self.viewInput?.deque())
-                  }
+      //      guard let incoming = incoming else { return }
+      //
+      //      if let hotCard = incoming as? HotCard {
+      hotCard.$action
+        .filter { !$0.isNil }
+      //          .throttle(for: .seconds(0.75), scheduler: DispatchQueue.main, latest: false)
+        .sink { [unowned self] action in
+          switch action {
+          case .Vote:
+            self.viewInput?.vote(hotCard.item)
+          case .Next:
+            self.viewInput?.reject(hotCard.item)
+            self.next(self.viewInput?.deque())
+          case .Claim:
+            let popup = NewPopup(contentPadding: .uniform(size: self.padding*2))
+            let content = ClaimPopupContent(parent: popup,
+                                            object: hotCard.item.reference)
+            //                                              surveyReference: hotCard.item.reference)
+            content.$claim
+              .filter { !$0.isNil && !$0!.isEmpty && $0!.keys.first is SurveyReference }
+              .map { [$0!.keys.first as! SurveyReference: $0!.values.first!] }
+              .sink { [unowned self] in self.viewInput?.claim($0!) }
+              .store(in: &hotCard.subscriptions)
+            
+            
+            //              content.$claim
+            //                .filter { !$0.isNil }
+            //                .sink { [unowned self] in self.viewInput?.claim($0!) }
+            //                .store(in: &hotCard.subscriptions)
+            popup.setContent(content)
+            popup.didDisappearPublisher
+              .sink { [unowned self] _ in
+                popup.removeFromSuperview()
+                
+                ///Next if claimed
+                guard hotCard.item.isClaimed else { return }
+                
+                delayAsync(delay: 0.25) { [unowned self] in
+                  self.next(self.viewInput?.deque())
                 }
-                .store(in: &self.subscriptions)
-            case .none:
-              fatalError()
-            }
+              }
+              .store(in: &self.subscriptions)
+          case .none:
+            fatalError()
           }
-          .store(in: &hotCard.subscriptions)
-//          .store(in: &incoming.subscriptions)
-//      } else {
-//        fatalError()
-//      }
+        }
+        .store(in: &hotCard.subscriptions)
+      //          .store(in: &incoming.subscriptions)
+      //      } else {
+      //        fatalError()
+      //      }
     }
   }
   private var outgoing: Card?
   ///**UI**
   @IBOutlet var contentView: HotView!
   private let padding: CGFloat = 8
-  
-  
   
   // MARK: - Deinitialization
   deinit {
@@ -115,14 +106,10 @@ class HotView: UIView {
 #endif
   }
   
-  
-  
   // MARK: - Initialization
   override init(frame: CGRect) { super.init(frame: frame) }
   
   required init?(coder: NSCoder) { super.init(coder: coder) }
-  
-  
   
   // MARK: - Public methods
   func next(_ survey: Survey?) {
@@ -137,21 +124,21 @@ class HotView: UIView {
         
         return empty
       }()
-//      guard let instance = instance else {
-//        self.current = nil
-//
-//        return
-//      }
-//
-//      incoming = HotCard(item: instance, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance.topic.tagColor)
+      //      guard let instance = instance else {
+      //        self.current = nil
+      //
+      //        return
+      //      }
+      //
+      //      incoming = HotCard(item: instance, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance.topic.tagColor)
       current = self.incoming
       addSubview(incoming!)
       incoming?.translatesAutoresizingMaskIntoConstraints = false
       incoming?.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: padding).isActive = true
-//      incoming?.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -padding).isActive = true
-//      incoming?.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -(padding + tabBarHeight)).isActive = true
-//      incoming?.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding).isActive = true
-//      incoming?.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding).isActive = true
+      //      incoming?.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -padding).isActive = true
+      //      incoming?.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -(padding + tabBarHeight)).isActive = true
+      //      incoming?.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding).isActive = true
+      //      incoming?.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -padding).isActive = true
       incoming?.widthAnchor.constraint(equalToConstant: appDelegate.window!.bounds.width - padding*2).isActive = true
       incoming?.heightAnchor.constraint(equalToConstant: bounds.height - (viewInput.navBarHeight + statusBarFrame.height + viewInput.tabBarHeight + padding*2)).isActive = true
       
@@ -163,14 +150,14 @@ class HotView: UIView {
       //                               size: CGSize(width: bounds.width - padding*2,
       //                                            height: bounds.height - (viewInput.navBarHeight + statusBarFrame.height + viewInput.tabBarHeight + padding*2)))
       
-//      guard let constraint = incoming?.getConstraint(identifier: "centerXAnchor" ) else { return }
+      //      guard let constraint = incoming?.getConstraint(identifier: "centerXAnchor" ) else { return }
       
       setNeedsLayout()
       layoutIfNeeded()
       
-//      setNeedsLayout()
-//      constraint.constant += incoming!.bounds.width + padding*2
-//      layoutIfNeeded()
+      //      setNeedsLayout()
+      //      constraint.constant += incoming!.bounds.width + padding*2
+      //      layoutIfNeeded()
       
       incoming?.transform = .init(scaleX: 0.75, y: 0.75)
       
@@ -186,12 +173,12 @@ class HotView: UIView {
           self.layoutIfNeeded()
           self.incoming?.transform = .identity
         }) { [unowned self] _ in
-//          self.current = self.incoming
+          //          self.current = self.incoming
           self.incoming = nil
-//          delayAsync(delay: 3) { [unowned self] in
-//            self.outgoing = current
-//            pop(self.outgoing!)
-//          }
+          //          delayAsync(delay: 3) { [unowned self] in
+          //            self.outgoing = current
+          //            pop(self.outgoing!)
+          //          }
         }
     }
     
@@ -228,8 +215,6 @@ class HotView: UIView {
     }
     push(survey)
   }
-  
-  
   
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

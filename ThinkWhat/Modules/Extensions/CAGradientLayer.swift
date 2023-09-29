@@ -7,11 +7,20 @@
 //
 
 import QuartzCore
+import UIKit
 
 extension CAGradientLayer {
   func setGradient(colors: [CGColor],
                    locations: [NSNumber]) {
     self.colors = colors
     self.locations = locations
+  }
+  
+  class func getGradientColors(color: UIColor, lightFactor: CGFloat = 0.1) -> [CGColor] {
+    return [
+      color.cgColor,
+      color.cgColor,
+      color.lighter(lightFactor).cgColor,
+    ]
   }
 }

@@ -89,10 +89,12 @@ class SubscriptionsView: UIView {
                        image: UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
                        periodThreshold: .unlimited),
       SurveyFilterItem(main: .subscriptions, additional: .discussed, text: "filter_discussed"),
+      SurveyFilterItem(main: .subscriptions, additional: .watchlist, text: "filter_watchlist"),
       SurveyFilterItem(main: .subscriptions, additional: .completed, text: "filter_completed"),
       SurveyFilterItem(main: .subscriptions, additional: .notCompleted, text: "filter_not_completed")
-    ])
-    instance.layer.masksToBounds = false
+    ],
+                                               contentInsets: .uniform(padding))
+
     // Filtering
     instance.filterPublisher
       .receive(on: DispatchQueue.main)
@@ -601,9 +603,17 @@ class SubscriptionsView: UIView {
     instance.addTarget(self, action: #selector(self.scrollToTop), for: .touchUpInside)
     instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePan(_:))))
 //    instance.size(.uniform(size: 40))
-    let bgLayer = CAShapeLayer()
+    let bgLayer = CAGradientLayer()
+    bgLayer.type = .radial
+    bgLayer.colors = CAGradientLayer.getGradientColors(color: Colors.main)
+    bgLayer.locations = [0, 0.5, 1.15]
+    bgLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
+    bgLayer.endPoint = CGPoint(x: 1, y: 1)
+    bgLayer.publisher(for: \.bounds)
+      .filter { $0 != .zero }
+      .sink { bgLayer.cornerRadius = $0.height/2}
+      .store(in: &subscriptions)
     bgLayer.name = "background"
-    bgLayer.fillColor = Colors.main.cgColor
     bgLayer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     bgLayer.shadowColor = UISettings.Shadows.color//UIColor.lightGray.withAlphaComponent(0.5).cgColor
     bgLayer.shadowRadius = UISettings.Shadows.radius(padding: padding*1.5)
@@ -616,14 +626,10 @@ class SubscriptionsView: UIView {
       .filter { [unowned self] in $0.size != bgLayer.bounds.size }
       .sink {
         bgLayer.frame = $0
-        bgLayer.path = UIBezierPath(ovalIn: $0).cgPath
         bgLayer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
       }
       .store(in: &subscriptions)
     instance.imageView?.layer.zPosition = 1
-//    instance.publisher(for: \.bounds)
-//      .sink { instance.cornerRadius = $0.width/2 }
-//      .store(in: &subscriptions)
     
     return instance
   }()
@@ -883,7 +889,7 @@ private extension SubscriptionsView {
       topView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: padding),
       topView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
       topView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-      filtersCollectionView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: padding),
+      filtersCollectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
       filtersCollectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
     ])
 

@@ -32,7 +32,12 @@ class SurveyFilter: Hashable {
   // MARK: - Public properties
   public let changePublisher = PassthroughSubject<[SurveyReference], Never>() // Notify subscribers on change
   // Optional
-  public var topic: Topic?
+  public var topic: Topic? {
+    didSet {
+//      debugPrint("oldValue", oldValue)
+//      debugPrint("topic", topic)
+    }
+  }
   public var compatibility: TopicCompatibility?
   public var userprofile: Userprofile?
   public var period: Enums.Period = .unlimited
@@ -132,8 +137,8 @@ class SurveyFilter: Hashable {
   public func getRequestArgs(excludeList: [SurveyReference] = [],
                              includeList: [SurveyReference] = [],
                              substring: String = "",
-                             owners: [Userprofile],
-                             topics: [Topic]) -> [String: Any] {
+                             owners: [Userprofile]) -> [String: Any] {
+//                             topics: [Topic]) -> [String: Any] {
     var args = [String: Any]()
     
     if !excludeList.isEmpty {
@@ -142,27 +147,34 @@ class SurveyFilter: Hashable {
     if !includeList.isEmpty {
       args["include_ids"] = includeList.map { $0.id }
     }
-    if !topics.isEmpty {
-      args["topics_ids"] = topics.map { $0.id }
-    }
+//    if !topics.isEmpty {
+//      args["topics_ids"] = topics.map { $0.id }
+//    }
     if !substring.isEmpty {
       args["substring"] = substring
+    }
+    
+    if !owners.isEmpty {
+      args["owners_ids"] = owners.map { $0.id }
+    } else if let userprofile = userprofile {
+      args["owners_ids"] = [userprofile.id]
+    }
+    if let topic = topic {
+      args["topic_ids"] = [topic.id]
     }
     
     // Get args from main
     switch main {
     case .rated:
       args["rated"] = true
-    case .favorite:
-      args["watchlist"] = true
-    case .own:
-      if !owners.isEmpty {
-        args["owners_ids"] = owners.map { $0.id }
-      }
-    case .topic:
-      guard let topic = topic else { return args }
-      
-      args["topic_ids"] = [topic.id]
+//    case .own:
+//      if !owners.isEmpty {
+//        args["owners_ids"] = owners.map { $0.id }
+//      }
+//    case .topic:
+//      guard let topic = topic else { return args }
+//
+//      args["topic_ids"] = [topic.id]
     case .user:
       guard let userprofile = userprofile else { return args }
       
@@ -197,6 +209,8 @@ class SurveyFilter: Hashable {
       args["completed"] = true
     case .notCompleted:
       args["completed"] = false
+    case .watchlist:
+      args["watchlist"] = true
     default:
       return args
     }

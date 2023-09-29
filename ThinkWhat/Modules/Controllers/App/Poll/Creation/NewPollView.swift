@@ -231,13 +231,12 @@ private extension NewPollView {
                                         timingFunction: CAMediaTimingFunctionName.easeOut,
                                         delegate: self,
                                         isRemovedOnCompletion: false,
-                                        completionBlocks: [
+                                        completionBlocks:
                                           { [weak self] in
                                             guard let self = self else { return }
                                             
                                             self.gradient.colors = [clear, clear, feathered]
-                                          }
-                                        ])
+                                          })
     let locationAnimation = Animations.get(property: .Locations,
                                            fromValue: gradient.locations as Any,
                                            toValue: [0.0, 0.795, 0.875] as Any,
@@ -245,14 +244,14 @@ private extension NewPollView {
                                            timingFunction: CAMediaTimingFunctionName.easeOut,
                                            delegate: self,
                                            isRemovedOnCompletion: false,
-                                           completionBlocks: [
+                                           completionBlocks:
                                             { [weak self] in
                                               guard let self = self else { return }
                                               
                                               self.gradient.locations = [0.0, 0.795, 0.875]
                                               self.gradient.removeAllAnimations()
                                             }
-                                           ])
+                                           )
     
     gradient.add(locationAnimation, forKey: nil)
     gradient.add(colorAnimation, forKey: nil)
@@ -327,15 +326,10 @@ private extension NewPollView {
 
 extension NewPollView: CAAnimationDelegate {
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    if flag, let completionBlocks = anim.value(forKey: "completionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
-    } else if let completionBlocks = anim.value(forKey: "maskCompletionBlocks") as? [Closure] {
-      completionBlocks.forEach{ $0() }
+    if flag, let completionBlocks = anim.value(forKey: "completion") as? Closure {
+      completionBlocks()
     } else if let initialLayer = anim.value(forKey: "layer") as? CAShapeLayer, let path = anim.value(forKey: "destinationPath") {
       initialLayer.path = path as! CGPath
-      if let completionBlock = anim.value(forKey: "completionBlock") as? Closure {
-        completionBlock()
-      }
     }
   }
 }

@@ -297,8 +297,7 @@ extension TermsView: TermsControllerOutput {
                                      autoreverses: false,
                                      timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                      delegate: self,
-                                     isRemovedOnCompletion: false,
-                                     completionBlocks: []),
+                                     isRemovedOnCompletion: false),
                       forKey: nil)
     fakeLogoText.icon.add(Animations.get(property: .Path,
                                      fromValue: (fakeLogoText.icon as! CAShapeLayer).path as Any,
@@ -309,8 +308,7 @@ extension TermsView: TermsControllerOutput {
                                      autoreverses: false,
                                      timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                      delegate: self,
-                                     isRemovedOnCompletion: false,
-                                     completionBlocks: []),
+                                     isRemovedOnCompletion: false),
                       forKey: nil)
 
     

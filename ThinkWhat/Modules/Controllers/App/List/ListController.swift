@@ -15,14 +15,18 @@ class ListController: UIViewController, TintColorable {
   var controllerOutput: ListControllerOutput?
   var controllerInput: ListControllerInput?
   ///**Logic**
+  public var filter = SurveyFilter(main: .new, additional: .period, period: .month)
   public var isDataReady: Bool = false
   public var tintColor: UIColor = Colors.main
+  public var searchMode = Enums.SearchMode.off {
+    didSet {
+      guard oldValue != searchMode else { return }
+      
+      onBarModeChanged(searchMode == .on ? true : false)
+    }
+  }
   ///**UI**
   public private(set) var isOnScreen = false // {
-//    didSet {
-//      controllerOutput?.isOnScreen = isOnScreen
-//    }
-//  }
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -68,6 +72,7 @@ class ListController: UIViewController, TintColorable {
     navigationController?.setNavigationBarHidden(false, animated: true)
     navigationController?.setBarShadow(on: false)
     navigationController?.setBarTintColor(tintColor)
+    navigationController?.setBarColor(.systemBackground)
     tabBarController?.setTabBarVisible(visible: true, animated: true)
     
     //        guard let main = tabBarController as? MainController else { return }
@@ -207,7 +212,7 @@ extension ListController: ListViewInput {
     controller.toggleLogo(on: false)
   }
   
-  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference]) {
+  func getDataItems(excludeList: [SurveyReference]) {
     controllerInput?.getDataItems(filter: filter, excludeList: excludeList)
   }
 }
@@ -240,67 +245,66 @@ private extension ListController {
         self.navigationController?.setBarShadow(on: false, animated: true)
       }
     })
+    controllerOutput?.searchPublisher
+      .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: true)
+//      .filter { $0.count > 2 }
+      .eraseToAnyPublisher()
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.controllerInput?.search(substring: $0,
+                                     localized: false,
+                                     filter: self.filter)
+      }
+      .store(in: &subscriptions)
   }
-  
   
   @MainActor
   func setupUI() {
     navigationItem.title = ""
     navigationController?.navigationBar.prefersLargeTitles = false//deviceType == .iPhoneSE ? false : true
+    setBarItems()
   }
   
-  //    @MainActor
-  //    func setTitle(animated: Bool = true) {
-  //        var text = ""
-  //
-  //        switch category {
-  //        case .New:
-  //            text =  "new".localized
-  //        case .Top:
-  //            text = "top".localized
-  //        case .Favorite:
-  //            text = "watching".localized
-  //        case .Own:
-  //            text = "own".localized
-  //        default:
-  //#if DEBUG
-  //            print("")
-  //#endif
-  //        }
-  //
-  //        guard animated else {
-  //            titleLabel.text = text
-  //            return
-  //        }
-  //
-  //
-  //        UIView.transition(with: titleLabel,
-  //                          duration: 0.15,
-  //                          options: .transitionCrossDissolve) { [weak self] in
-  //            guard let self = self else { return }
-  //
-  //            self.titleLabel.text = text
-  //        }
-  //
-  //    }
+  func setBarItems() {
+    var button: UIBarButtonItem!
+    
+    if searchMode == .off {
+      let action = UIAction { [unowned self] _ in
+        self.searchMode = .on
+      }
+      
+      button = UIBarButtonItem(title: "",
+                               image: UIImage(systemName: "magnifyingglass",
+                                              withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                               primaryAction: action,
+                               menu: nil)
+    }
+    
+    navigationItem.setRightBarButton(button, animated: false)
+  }
+  
+  @MainActor
+  func onBarModeChanged(_ searchMode: Bool) {
+    setBarItems()
+    controllerOutput?.setSearchModeEnabled(searchMode)
+  }
+  
+  @objc
+  func hideKeyboard() {
+    if let recognizer = view.gestureRecognizers?.first {
+      view.removeGestureRecognizer(recognizer)
+    }
+  }
 }
 
 extension ListController: ListModelOutput {
-  //    func onAddFavoriteCallback(_ result: Result<Bool, Error>) {
-  //        controllerOutput?.onAddFavoriteCallback(result)
-  //    }
-  
+  func onSearchCompleted(_ instances: [SurveyReference], localSearch: Bool) {
+    controllerOutput?.onSearchCompleted(instances, localSearch: localSearch)
+  }
+
   func onRequestCompleted(_ result: Result<Bool, Error>) {
     controllerOutput?.onRequestCompleted(result)
-    //        switch result {
-    //
-    //        case .success:
-    //            controllerOutput?.onRequestCompleted(result)
-    //        case .failure(let error):
-    //#if DEBUG
-    //            error.printLocalized(class: type(of: self), functionName: #function)
-    //#endif
-    //        }
   }
 }
 
@@ -316,3 +320,4 @@ extension ListController: ScreenVisible {
     isOnScreen = flag
   }
 }
+

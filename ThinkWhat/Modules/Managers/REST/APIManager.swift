@@ -1447,8 +1447,8 @@ class API {
                                     excludeList: [SurveyReference] = [],
                                     includeList: [SurveyReference] = [],
                                     substring: String = "",
-                                    owners: [Userprofile] = [],
-                                    topics: [Topic] = []) async throws {
+                                    owners: [Userprofile] = []) async throws {
+//                                    topics: [Topic] = []) async throws {
       guard let url = API_URLS.Surveys.getPublications,
             let headers = headers
       else { throw APIError.invalidURL }
@@ -1459,8 +1459,8 @@ class API {
                                                  parameters: filter.getRequestArgs(excludeList: excludeList,
                                                                                    includeList: includeList,
                                                                                    substring: substring,
-                                                                                   owners: owners,
-                                                                                   topics: topics),
+                                                                                   owners: filter.userprofile.isNil ? [] : [filter.userprofile!]),
+//                                                                                   topics: filter.topic.isNil ? [] : [filter.topic!.id]),
                                                  encoding: JSONEncoding.default,
                                                  headers: headers)
         try await MainActor.run {
@@ -1691,6 +1691,51 @@ class API {
 //        throw error
 //      }
 //    }
+    
+    func searchForSurveys(substring: String,
+                localized: Bool = false,
+                excludedIds: [Int] = [],
+                ownersIds: [Int] = [],
+                topicsIds: [Int] = []) async throws -> [SurveyReference] {
+      guard let url = API_URLS.Surveys.getPublications,
+            let headers = headers
+      else { throw APIError.invalidURL }
+      
+      let parameters: Parameters = [
+        "localized": localized,
+        "substring": substring,
+        "owner_ids": ownersIds,
+        "category_ids": topicsIds,
+        "exclude_ids": excludedIds,
+      ]
+    
+#if DEBUG
+      print(parameters)
+#endif
+
+      do {
+        let data = try await parent.requestAsync(url: url, httpMethod: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
+                                                   DateFormatter.dateTimeFormatter,
+                                                   DateFormatter.dateFormatter ]
+        
+        let instances = try decoder.decode([SurveyReference].self, from: data)
+        guard !instances.isEmpty else {
+          return []
+        }
+        return {
+          var array: [SurveyReference] = []
+          instances.forEach { instance in array.append(SurveyReferences.shared.all.filter({ $0 == instance }).first ?? instance) }
+          return array
+        }()
+      } catch let error {
+#if DEBUG
+        print(error)
+#endif
+        throw error
+      }
+    }
     
     func search(substring: String,
                 localized: Bool = false,

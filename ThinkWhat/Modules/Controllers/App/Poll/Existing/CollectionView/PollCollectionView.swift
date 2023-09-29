@@ -55,15 +55,14 @@ class PollCollectionView: UICollectionView {
   public let postCommentPublisher = PassthroughSubject<String, Never>()
   public let postCommentCallbackPublisher = PassthroughSubject<Result<Comment, Error>, Never>()
   public let postAnonCommentPublisher = PassthroughSubject<[String: String], Never>()
-//  public var updateCommentsStatsPublisher = PassthroughSubject<[Comment], Never>()
   public let updateCommentsPublisher = PassthroughSubject<[Comment], Never>()
-//  public let commentsCellBoundsPublisher = PassthroughSubject<Bool, Never>()
   public let replyPublisher = PassthroughSubject<[Comment: String], Never>()
   public let anonReplyPublisher = PassthroughSubject<[Comment: [String: String]], Never>()
-//  public var commentClaimPublisher = PassthroughSubject<Comment, Never>()
   public let deleteCommentPublisher = PassthroughSubject<Comment, Never>()
   public let threadPublisher = PassthroughSubject<Comment, Never>()
   public let commentComplaintPublisher = PassthroughSubject<Comment, Never>()
+  public let scrolledDownPublisher = PassthroughSubject<Bool, Never>()
+  public let scrolledToTopPublisher = PassthroughSubject<Void, Never>()
   //  public var paginationPublisher = PassthroughSubject<[Comment], Never>()
   ///**Logic**
   public var viewMode: ViewMode {
@@ -89,6 +88,25 @@ class PollCollectionView: UICollectionView {
   private var isBannerOnScreen = false
   ///**UI**
   private let padding: CGFloat = 8
+  ///Scroll direction
+  private var lastStopYPoint: CGFloat = .zero
+  private var lastContentOffsetY: CGFloat = 0 {
+    didSet {
+      guard !source.snapshot().itemIdentifiers.isEmpty else { return }
+      
+      isScrollingDown = lastContentOffsetY > oldValue
+      
+      guard lastContentOffsetY > 0 else { scrolledToTopPublisher.send(); return }
+      
+      let distance = lastStopYPoint - lastContentOffsetY
+      let threshold: CGFloat = 50
+      
+      guard abs(distance) > threshold  else { return }
+
+      scrolledDownPublisher.send(isScrollingDown)
+    }
+  }
+  private var isScrollingDown = true // Indicates scrolling direction
   
   
   
@@ -147,6 +165,13 @@ class PollCollectionView: UICollectionView {
     guard let cell = cellForItem(at: IndexPath(row: 0, section: 2)) as? ImageCell else { return }
     
     cell.scrollToImage(at: index)
+  }
+  
+  @MainActor
+  public func scrollToTop() {
+    guard !source.snapshot().itemIdentifiers.isEmpty else { return }
+    
+    scrollToItem(at: .init(row: 0, section: 0), at: .top, animated: true)
   }
 }
 
@@ -651,8 +676,12 @@ extension PollCollectionView: UICollectionViewDelegate {
   }
 }
 
-//extension PollCollectionView: UIScrollViewDelegate {
-//  func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//    <#code#>
-//  }
-//}
+extension PollCollectionView: UIScrollViewDelegate {
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    lastContentOffsetY = scrollView.contentOffset.y
+  }
+  
+  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    lastStopYPoint = scrollView.contentOffset.y
+  }
+}

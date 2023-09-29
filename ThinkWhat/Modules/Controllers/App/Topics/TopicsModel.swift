@@ -17,12 +17,17 @@ class TopicsModel {
 extension TopicsModel: TopicsControllerInput {
   func search(substring: String,
               localized: Bool,
-              topic: Topic?) {
-    
+              filter: SurveyFilter) {
     var existing: [SurveyReference] {
-      return SurveyReferences.shared.all
-        .filter({ $0.title.contains(substring) })
-        .filter({ $0.topic == topic })
+      var instances =  SurveyReferences.shared.all
+        .filter({ $0.title.lowercased().contains(substring.lowercased()) })
+      
+      if !filter.userprofile.isNil { instances = instances.filter({ $0.owner == filter.userprofile! }) }
+      if !filter.topic.isNil { instances = instances.filter({ $0.topic == filter.topic! }) }
+      
+      modelOutput?.onSearchCompleted(Array(Set(instances)).sorted { $0.startDate > $1.startDate }, localSearch: true)
+      
+      return instances
     }
     
     Task {
@@ -30,39 +35,16 @@ extension TopicsModel: TopicsControllerInput {
         let received = try await API.shared.surveys.search(substring: substring,
                                                            localized: localized,
                                                            excludedIds: existing.map { $0.id },
-                                                           ownersIds: [],
-                                                           topicsIds: topic.isNil ? [] : [topic!.id])
+                                                           ownersIds: filter.userprofile.isNil ? [] : [filter.userprofile!.id],
+                                                           topicsIds: filter.topic.isNil ? [] : [filter.topic!.id])
         await MainActor.run {
-          modelOutput?.onSearchCompleted(existing + received)
+          modelOutput?.onSearchCompleted(Array(Set(existing + received)).sorted { $0.startDate > $1.startDate }, localSearch: false)
         }
       } catch {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif
       }
-    }
-  }
-  
-//  func search(substring: String, excludedIds: [Int] = []) {
-//    Task {
-//      do {
-//        let instances = try await API.shared.surveys.search(substring: substring, excludedIds: excludedIds)
-//        await MainActor.run {
-//          modelOutput?.onSearchCompleted(instances)
-//        }
-//      } catch {
-//#if DEBUG
-//        error.printLocalized(class: type(of: self), functionName: #function)
-//#endif
-//      }
-//    }
-//  }
-  
-  func onDataSourceRequest(dateFilter: Enums.Period, topic: Topic) {
-    Task {
-      try await API.shared.surveys.surveyReferences(category: .topic,
-                                                    period: dateFilter,
-                                                    topic: topic)
     }
   }
   
@@ -90,7 +72,8 @@ extension TopicsModel: TopicsControllerInput {
   
   func addFavorite(surveyReference: SurveyReference) {
     Task {
-      await API.shared.surveys.markFavorite(mark: !surveyReference.isFavorite, surveyReference: surveyReference)
+      await API.shared.surveys.markFavorite(mark: !surveyReference.isFavorite,
+                                            surveyReference: surveyReference)
     }
   }
   
@@ -102,6 +85,22 @@ extension TopicsModel: TopicsControllerInput {
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif
+      }
+    }
+  }
+  
+  func getDataItems(filter: SurveyFilter, excludeList: [SurveyReference]) {
+    Task {
+      do {
+        try await API.shared.surveys.getSurveyReferences(filter: filter, excludeList: excludeList)
+        
+        await MainActor.run {
+          modelOutput?.onRequestCompleted(.success(true))
+        }
+      } catch {
+        await MainActor.run {
+          modelOutput?.onRequestCompleted(.failure(error))
+        }
       }
     }
   }

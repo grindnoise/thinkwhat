@@ -27,13 +27,7 @@ class SurveysView: UIView {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private let padding: CGFloat = 8
-  private let containerView: UIView = {
-    let instance = UIView()
-    instance.backgroundColor = Colors.darkTheme
-//    instance.layer.masksToBounds = false
-    
-    return instance
-  }()
+  private lazy var containerView = UIView.opaque()
   private lazy var collectionView: SurveysCollectionView = {
     guard let viewInput = viewInput else { return SurveysCollectionView() }
       
@@ -148,7 +142,7 @@ class SurveysView: UIView {
                        period: .unlimited,
                        periodThreshold: .unlimited),
       SurveyFilterItem(main: .rated, additional: .disabled, text: "filter_rated"),
-      SurveyFilterItem(main: .favorite, additional: .disabled, text: "filter_watchlist"),
+      SurveyFilterItem(main: .disabled, additional: .watchlist, text: "filter_watchlist"),
       SurveyFilterItem(main: .disabled, additional: .discussed, text: "filter_discussed"),
       SurveyFilterItem(main: .disabled, additional: .completed, text: "filter_completed"),
       SurveyFilterItem(main: .disabled, additional: .notCompleted, text: "filter_not_completed"),
@@ -195,9 +189,17 @@ class SurveysView: UIView {
     instance.addTarget(self, action: #selector(self.scrollToTop), for: .touchUpInside)
     instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePan(_:))))
 //    instance.size(.uniform(size: 40))
-    let bgLayer = CAShapeLayer()
+    let bgLayer = CAGradientLayer()
+    bgLayer.type = .radial
+    bgLayer.colors = CAGradientLayer.getGradientColors(color: Colors.main)
+    bgLayer.locations = [0, 0.5, 1.15]
+    bgLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
+    bgLayer.endPoint = CGPoint(x: 1, y: 1)
+    bgLayer.publisher(for: \.bounds)
+      .filter { $0 != .zero }
+      .sink { bgLayer.cornerRadius = $0.height/2}
+      .store(in: &subscriptions)
     bgLayer.name = "background"
-    bgLayer.fillColor = Colors.main.cgColor
     bgLayer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     bgLayer.shadowColor = UISettings.Shadows.color//UIColor.lightGray.withAlphaComponent(0.5).cgColor
     bgLayer.shadowRadius = UISettings.Shadows.radius(padding: padding*1.5)
@@ -210,14 +212,10 @@ class SurveysView: UIView {
       .filter { [unowned self] in $0.size != bgLayer.bounds.size }
       .sink {
         bgLayer.frame = $0
-        bgLayer.path = UIBezierPath(ovalIn: $0).cgPath
         bgLayer.shadowPath = UIBezierPath(ovalIn: $0).cgPath
       }
       .store(in: &subscriptions)
     instance.imageView?.layer.zPosition = 1
-//    instance.publisher(for: \.bounds)
-//      .sink { instance.cornerRadius = $0.width/2 }
-//      .store(in: &subscriptions)
     
     return instance
   }()
@@ -241,39 +239,73 @@ class SurveysView: UIView {
     }
   }
   
+  
   // MARK: - Deinitialization
   deinit {
     observers.forEach { $0.invalidate() }
     tasks.forEach { $0?.cancel() }
     subscriptions.forEach { $0.cancel() }
     NotificationCenter.default.removeObserver(self)
-#if DEBUG
-    print("\(String(describing: type(of: self))).\(#function)")
-#endif
+    debugPrint("\(String(describing: type(of: self))).\(#function) \(DebuggingIdentifiers.destructing)")
   }
   
   // MARK: - Overridden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-    
+   
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
   }
 }
 
 // MARK: - Controller Output
 extension SurveysView: SurveysControllerOutput {
   func onSearchCompleted(_ instances: [SurveyReference]) {
-      collectionView.endSearchRefreshing()
-      collectionView.fetchResult = instances
+    collectionView.endSearchRefreshing()
+    collectionView.setSearchResult(instances)
   }
   
-  func setMode(_ mode: Enums.SurveyFilterMode) {
-//    collectionView.category = mode
+  func setSearchModeEnabled(_ enabled: Bool) {
+    isScrolledDown = false
+    collectionView.setSearchModeEnabled(enabled)
+    
+    guard let constraint = filtersCollectionView.getConstraint(identifier: "height"),
+          let leading = filtersCollectionView.getConstraint(identifier: "leading")
+    else { return }
+    
+    if enabled {
+      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseIn) { [weak self] in
+        guard let self = self else { return }
+        
+        self.setNeedsLayout()
+        leading.constant = self.filtersCollectionView.bounds.width
+        self.layoutIfNeeded()
+      } completion: {  _ in
+        delay(seconds: 0.15) { [weak self] in
+          guard let self = self else { return }
+          
+          self.setNeedsLayout()
+          constraint.constant = 0
+          self.layoutIfNeeded()
+        }
+      }
+    } else {
+      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.3, delay: 0, options: .curveEaseOut) { [weak self] in
+        guard let self = self else { return }
+        
+        self.setNeedsLayout()
+        constraint.constant = self.filterViewHeight
+        self.layoutIfNeeded()
+      } completion: { _ in
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.15, delay: 0, options: .curveEaseOut) { [weak self] in
+          guard let self = self else { return }
+          
+          self.setNeedsLayout()
+          leading.constant = 0
+          self.layoutIfNeeded()
+        }
+      }
+    }
   }
-//  func toggleSearchMode(_ on: Bool) {
-//    guard let mode = viewInput?.mode else { return }
-//
-//
-//  }
   
   func beginSearchRefreshing() {
     collectionView.beginSearchRefreshing()
@@ -291,7 +323,7 @@ extension SurveysView: SurveysControllerOutput {
 private extension SurveysView {
   @MainActor
   func setupUI() {
-    backgroundColor = .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
 //    collectionView.place(inside: self)
     
     filtersCollectionView.setColor(viewInput?.tintColor ?? Colors.filterEnabled)
@@ -303,11 +335,13 @@ private extension SurveysView {
     ]
   
     addSubviews(views)
-    filtersCollectionView.leadingToSuperview()
-    filtersCollectionView.trailingToSuperview()
+    let leadingConstraint = filtersCollectionView.leadingToSuperview()
+    leadingConstraint.identifier = "leading"
+    filtersCollectionView.widthToSuperview()
     filtersCollectionView.topToSuperview(offset: padding, usingSafeArea: true)
     filterViewHeight = padding*2 + "T".height(withConstrainedWidth: 100, font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!)
-    filtersCollectionView.height(filterViewHeight)
+    let constraint = filtersCollectionView.height(filterViewHeight)
+    constraint.identifier = "height"
     
     containerView.topToBottom(of: filtersCollectionView, offset: padding)
     containerView.leadingToSuperview()
