@@ -61,7 +61,7 @@ class ListView: UIView {
     return instance
   }()
   private lazy var collectionView: SurveysCollectionView = {
-    let instance = SurveysCollectionView(filter: viewInput!.filter, color: viewInput?.tintColor)
+    let instance = SurveysCollectionView(filter: viewInput!.filter, color: viewInput?.tintColor, showSeparators: true)
     
     // Pagination
     instance.paginationPublisher
@@ -168,7 +168,7 @@ class ListView: UIView {
                        isFilterEnabled: true,
                        text: Enums.Period.month.description,
                        image: UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
-                       period: .month,
+                       period: viewInput?.filter.period ?? .unlimited,
                        periodThreshold: .unlimited),
       SurveyFilterItem(main: .rated, additional: .disabled, text: "filter_rated"),
       SurveyFilterItem(main: .own, additional: .disabled, text: "filter_own"),
@@ -415,7 +415,6 @@ private extension ListView {
     let constraint_2 = scrollToTopButton.topToBottom(of: background)
     constraint_2.identifier = "top"
     scrollToTopButton.size(.uniform(size: 40))
-
     
     background.addSubview(emptyPublicationsView)
     emptyPublicationsView.edgesToSuperview()
@@ -423,12 +422,11 @@ private extension ListView {
 
   func onEmptyList(isEmpty: Bool) {
     guard viewInput?.searchMode == .off else { return }
-    
+  
     if isEmpty {
       emptyPublicationsView.alpha = 0
       emptyPublicationsView.setAnimationsEnabled(true)
     }
-
 
     UIView.animate(
       withDuration: 0.2,

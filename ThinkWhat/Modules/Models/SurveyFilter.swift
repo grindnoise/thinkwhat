@@ -30,12 +30,14 @@ class SurveyFilter: Hashable {
   }
   
   // MARK: - Public properties
-  public let changePublisher = PassthroughSubject<[SurveyReference], Never>() // Notify subscribers on change
+  public let changePublisher = PassthroughSubject<[SurveyReference], Never>() // Notify subscribers on data change
+  public let topicPublisher = PassthroughSubject<Topic?, Never>() // Notify subscribers on topic change
   // Optional
   public var topic: Topic? {
     didSet {
-//      debugPrint("oldValue", oldValue)
-//      debugPrint("topic", topic)
+      guard oldValue != topic else { return }
+
+      topicPublisher.send(topic)
     }
   }
   public var compatibility: TopicCompatibility?
@@ -67,7 +69,7 @@ class SurveyFilter: Hashable {
   
   // MARK: - Public methods
   @discardableResult
-  public func getDataItems() -> [SurveyReference] {
+  public func getDataItems(publish: Bool = true) -> [SurveyReference] {
     let items = additional.getDataItems(main.getDataItems(topic: topic,
                                                           userprofile: userprofile,
                                                           compatibility: compatibility),
@@ -80,7 +82,10 @@ class SurveyFilter: Hashable {
 //        return $0.rating > $1.rating
 //      }
 //    }
-    changePublisher.send(items)
+    
+    if publish {
+      changePublisher.send(items)
+    }
     
     return items
   }

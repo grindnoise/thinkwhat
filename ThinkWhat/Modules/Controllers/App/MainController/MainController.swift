@@ -26,7 +26,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
   
   
   // MARK: - Public properties
-  public private(set) var currentTab: Enums.Tab = .Hot {
+  @Published public private(set) var currentTab: Enums.Tab = .Hot {
     didSet {
       Notifications.UIEvents.tabItemPublisher.send([currentTab: oldValue])
 //      NotificationCenter.default.post(name: Notifications.System.Tab, object: [currentTab: oldValue])
@@ -79,6 +79,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
   private var shouldTerminate = false
   //    private var loadingIndicator: LoadingIndicator?
   /// **Logic**
+  private var tasksReady = false // Tasks setup flag
   private var surveyId: Int?  // Used when app was opened from push notification in closed state
   private var replyId: Int?   // Used when app was opened from push notification in closed state
   private var threadId: Int?  // Used when app was opened from push notification in closed state
@@ -272,62 +273,25 @@ class MainController: UITabBarController {//}, StorageProtocol {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    
-//    var logger = TimeLogger(sinceOrigin: true)
-//    let subject = PassthroughSubject<Int,Never>()
-//    // 43
-//    let publisher = subject
-//      .print("shareReplay")
-//      .shareReplay(capacity: 2)
-//    // 44
-//    subject.send(0)
-//
-//    let subscription1 = publisher.sink(
-//      receiveCompletion: {
-//        print("subscription1 completed: \($0)", to: &logger)
-//      },
-//      receiveValue: {
-//        print("subscription1 received \($0)", to: &logger)
-//      }
-//    )
-//
-//    subject.send(1)
-//    subject.send(2)
-//    subject.send(3)
-//
-//    let subscription2 = publisher.sink(
-//      receiveCompletion: {
-//        print("subscription2 completed: \($0)", to: &logger)
-//      },
-//      receiveValue: {
-//        print("subscription2 received \($0)", to: &logger)
-//      }
-//    )
-//
-//    subject.send(4)
-//    subject.send(5)
-//    subject.send(completion: .finished)
-//
-//    var subscription3: Cancellable? = nil
-//
-//    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//      print("Subscribing to shareReplay after upstream completed")
-//      subscription3 = publisher.sink(
-//        receiveCompletion: {
-//          print("subscription3 completed: \($0)", to: &logger)
-//        },
-//        receiveValue: {
-//          print("subscription3 received \($0)", to: &logger)
-//        }
-//      )
-//    }
-    
-    
     setSubscriptions()
     setViewControllers()
     setTasks()
     setupUI()
     loadData()
+    
+    // Clear tmp directory if file is incomplete AF download/upload
+    do {
+      let tmpDirURL = FileManager.default.temporaryDirectory
+      let tmpDirectory = try FileManager.default.contentsOfDirectory(atPath: tmpDirURL.path)
+      try tmpDirectory.forEach { file in
+        let fileUrl = tmpDirURL.appendingPathComponent(file)
+        if file.contains("Alamofire_CFNetwork") {
+          try FileManager.default.removeItem(atPath: fileUrl.path)
+        }
+      }
+    } catch {
+      debugPrint(error.localizedDescription)
+    }
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -341,41 +305,6 @@ class MainController: UITabBarController {//}, StorageProtocol {
     }
     
     appDelegate.window?.addSubview(self.passthroughView)
-    
-//    delay(seconds: 3) { [weak self] in
-//      guard let self = self else { return }
-//
-//      self.launch()
-////      self.logout()
-//    }
-    
-//    delay(seconds: 7) { [weak self] in
-//      guard let self = self else { return }
-//
-//      self.logout()
-//    }
-//    var test = LoadingIndicator(color: Colors.System.Red.rawValue)
-//    test.didDisappearPublisher
-//      .sink { _ in
-//        test.removeFromSuperview()
-//      }
-//      .store(in: &subscriptions)
-//
-//    delayAsync(delay: 4) {[weak self] in
-//      guard let self = self else { return }
-//
-//      test.placeInCenter(of: self.view,
-//                         widthMultiplier: 0.33)
-//      test.start()
-//
-//
-//
-//    }
-//
-//    delayAsync(delay: 8) {[weak self] in
-//      guard let self = self else { return }
-//      test.stop()
-//    }
   }
   
   
@@ -476,6 +405,18 @@ class MainController: UITabBarController {//}, StorageProtocol {
 
 private extension MainController {
   func setTasks() {
+    guard !tasksReady else { return }
+    
+    tasksReady = true
+    
+    Notifications.UIEvents.tabItemPublisher
+      .receive(on: DispatchQueue.main)
+      .throttle(for: .seconds(0.5), scheduler: DispatchQueue.main, latest: false)
+      .sink { [unowned self] in 
+        self.animateTab($0.keys.first!)
+      }
+      .store(in: &subscriptions)
+    
     tasks.append(Task {@MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
         guard let self = self, !self.isDataLoaded else { return }
@@ -1143,47 +1084,23 @@ private extension MainController {
 //      }
   }
   
-//  func animateLoaderColor(from: Colors.Logo, to: Colors.Logo) {
-//    let anim_1 = Animations.get(property: .FillColor,
-//                                fromValue: from.rawValue.cgColor as Any,
-//                                toValue: to.rawValue.cgColor as Any,
-//                                duration: 1,
-//                                delay: 0,
-//                                repeatCount: 0,
-//                                autoreverses: false,
-//                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-//                                delegate: self,
-//                                isRemovedOnCompletion: false,
-//                                completionBlocks: [
-//                                  {[weak self] in
-//                                    guard let self = self else { return }
-//
-//                                    guard self.isDataLoaded else {
-//                                      delayAsync(delay: 0.75) {
-//                                        self.animateLoaderColor(from: to, to: to.next())
-//                                      }
-//                                      return
-//                                    }
-//
-//                                    self.launch()
-//                                  }])
-//    let anim_2 = Animations.get(property: .FillColor,
-//                                fromValue: from.rawValue.cgColor as Any,
-//                                toValue: to.rawValue.cgColor as Any,
-//                                duration: 1,
-//                                delay: 0,
-//                                repeatCount: 0,
-//                                autoreverses: false,
-//                                timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-//                                delegate: nil,
-//                                isRemovedOnCompletion: false)
-//    loadingIcon.icon.add(anim_1, forKey: nil)
-//    loadingText.icon.add(anim_2, forKey: nil)
-////    (loadingIcon.icon as! CAShapeLayer).fillColor = to.rawValue.cgColor
-////    (loadingText.icon as! CAShapeLayer).fillColor = to.rawValue.cgColor
-//    loadingIcon.iconColor = to.rawValue
-//        loadingText.iconColor = to.rawValue
-//  }
+  @MainActor
+  func animateTab(_ tab: Enums.Tab) {
+    let buttons = tabBar.subviews.filter { $0.isKind(of: NSClassFromString("UITabBarButton")!) }
+    guard tab.rawValue <= buttons.count-1 else { return }
+    
+    let color = tab.getColor(traitCollection: traitCollection).withAlphaComponent(0.5)
+    
+    buttons[tab.rawValue].layer.masksToBounds = false
+    
+    Animations.tapCircled(layer: tabBar.layer,
+                          fillColor: color.cgColor,
+                          location: buttons[tab.rawValue].center,
+                          size: .uniform(size: tabBar.bounds.height*0.4),
+                          duration: 0.2,
+                          timingFunction: .easeInEaseOut)
+    
+  }
 }
 
 extension MainController: UITabBarControllerDelegate {
@@ -1199,35 +1116,7 @@ extension MainController: UITabBarControllerDelegate {
         contr.setActive(contr === controller ? true : false)
       }
     }
-    
-//    func setColors(_ color: UIColor) {
-//      tabBar.tintColor = color
-//      let logoColorAnim = Animations.get(property: .FillColor,
-//                                         fromValue: logoIcon.iconColor.cgColor as Any,
-//                                         toValue: color.cgColor as Any,
-//                                         duration: tabAnimationDuration,
-//                                         delay: 0,
-//                                         repeatCount: 0,
-//                                         autoreverses: false,
-//                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-//                                         delegate: nil,
-//                                         isRemovedOnCompletion: false)
-//      self.logoIcon.icon.add(logoColorAnim, forKey: nil)
-//      self.logoIcon.iconColor = color
-//
-//      let textColorAnim = Animations.get(property: .FillColor,
-//                                         fromValue: logoText.iconColor.cgColor as Any,
-//                                         toValue: color.cgColor as Any,
-//                                         duration: tabAnimationDuration,
-//                                         delay: 0,
-//                                         repeatCount: 0,
-//                                         autoreverses: false,
-//                                         timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-//                                         delegate: nil,
-//                                         isRemovedOnCompletion: false)
-//      self.logoText.icon.add(textColorAnim, forKey: nil)
-//      self.logoText.iconColor = color
-//    }
+  
     tabBar.tintColor = traitCollection.userInterfaceStyle == .dark ? Colors.tabBarDark : Colors.tabBarLight//Colors.bannerDark
     if let nav = viewController as? UINavigationController,
        let controller = nav.viewControllers.first {
@@ -1272,12 +1161,7 @@ extension MainController: UITabBarControllerDelegate {
         setLogoCentered(animated: true)
         //                setLogoLeading(constant: 10, animated: true)
         toggleLogo(on: true)
-      default:
-        print("")
-#if DEBUG
-        fatalError()
-#endif
-      }
+      default: return }
     }
     
     guard let vc = navigationController?.viewControllers.first else { return }

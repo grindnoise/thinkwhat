@@ -93,7 +93,7 @@ private extension TopicsCollectionView {
   @MainActor
   func setupUI() {
     delegate = self.mode == .Selection ? self : nil
-    collectionViewLayout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+    collectionViewLayout = UICollectionViewCompositionalLayout { [unowned self] section, env -> NSCollectionLayoutSection? in
       var layoutConfig = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
       layoutConfig.headerMode = .firstItemInSection
       layoutConfig.backgroundColor = .clear
@@ -102,11 +102,11 @@ private extension TopicsCollectionView {
       //                layoutConfig.separatorConfiguration.color = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .systemBackground
       //            }
       ////            layoutConfig.showsSeparators = true
-      ////            layoutConfig.footerMode = .supplementary
+//      layoutConfig.headerMode = .supplementary
       
       let sectionLayout = NSCollectionLayoutSection.list(using: layoutConfig, layoutEnvironment: env)
-      //            sectionLayout.interGroupSpacing = 20
-      sectionLayout.contentInsets = .init(top: 0, leading: 8, bottom: 0, trailing: 8)
+      sectionLayout.contentInsets = .init(top: section == 0 ? 8 : 0, leading: 8, bottom: section == self.modelObjects.count-1 ? 8 : 0, trailing: 8)
+      
       return sectionLayout
     }
     

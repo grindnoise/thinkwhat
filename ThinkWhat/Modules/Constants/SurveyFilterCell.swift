@@ -140,6 +140,7 @@ class SurveyFilterCell: UICollectionViewListCell {
 //    boundsPublisher = PassthroughSubject<Void, Never>()
     button.showsMenuAsPrimaryAction = false
     subscriptions.forEach { $0.cancel() }
+    fgLayer.opacity = 0
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -285,13 +286,11 @@ private extension SurveyFilterCell {
   func updateLayers() {
     guard !item.isNil else { return }
     
-    if fgLayer.bounds.size != bounds.size {
-      self.fgLayer.frame = bounds
-//      self.fgLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: bounds.height/2).cgPath
-    }
     if bgLayer.bounds.size != bounds.size {
-      self.bgLayer.frame = bounds
-      self.bgLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: bounds.height/2).cgPath
+      bgLayer.frame = bounds
+      bgLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: bounds.height/2).cgPath
+      fgLayer.frame = bgLayer.frame
+      fgLayer.cornerRadius = bounds.height/2
     }
   }
 }

@@ -128,7 +128,7 @@ class SubscriptionsView: UIView {
     return instance
   }()
   private lazy var surveysCollectionView: SurveysCollectionView = {
-    let instance = SurveysCollectionView(filter: filter, color: viewInput?.tintColor)
+    let instance = SurveysCollectionView(filter: filter, color: viewInput?.tintColor, showSeparators: true)
     
     // Pagination
     instance.paginationPublisher

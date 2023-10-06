@@ -61,7 +61,7 @@ class TopicsView: UIView {
     }
   }
   private lazy var surveysCollectionView: SurveysCollectionView = {
-    let instance = SurveysCollectionView(filter: viewInput!.filter)
+    let instance = SurveysCollectionView(filter: viewInput!.filter, showSeparators: true, topicMode: true)
     instance.backgroundColor = .clear
     instance.alpha = 0
     instance.isOnScreen = false
@@ -142,6 +142,8 @@ class TopicsView: UIView {
         guard let self = self, !self.isScrolledDown else { return }
         
         self.isScrolledDown = true
+        // Hide keyboard for convenience
+        self.searchField.resignFirstResponder()
       }
       .store(in: &subscriptions)
     
@@ -187,8 +189,10 @@ class TopicsView: UIView {
     // Filtering
     instance.filterPublisher
       .receive(on: DispatchQueue.main)
-      .sink { [unowned self] in
+      .sink { [weak self] in
+        guard let self = self else { return }
         
+        self.isScrolledDown = false
         self.viewInput?.filter.setBoth(main: $0.main,
                                        topic: self.viewInput!.filter.topic,
                                        userprofile: $0.userprofile,
@@ -196,8 +200,6 @@ class TopicsView: UIView {
                                        additional: $0.additional,
                                        period: $0.period)
         
-//        self.filter.setAdditional(filter: $0.additional, period: $0.period)
-        self.isScrolledDown = false
         delay(seconds: 0.3) { [weak self] in
           guard let self = self else { return }
           
@@ -222,32 +224,29 @@ class TopicsView: UIView {
               !topic.activeCount.isZero
         else { return }
 
-//        self.viewInput?.onTopicSelected(topic)
-        self.viewInput?.tintColor = topic.tagColor
         self.viewInput?.filter.setMain(filter: .topic, topic: topic)
         self.touchLocation = point
-//        self.surveysCollectionView.topic = topic
         self.surveysCollectionView.isOnScreen = true
         self.setBackgroundColor()
         self.surveysCollectionView.alpha = 1
         self.topicsCollectionView.isUserInteractionEnabled = false
         Animations.unmaskLayerCircled(layer: surveysCollectionView.layer,
                                       location: point,
-                                      duration: 0.5,
+                                      duration: 0.6,
                                       timingFunction: .easeInEaseOut,
                                       animateOpacity: false,
                                       delegate: self)
-        let opaque = UIView.opaque()
-        self.background.insertSubview(opaque, belowSubview: self.surveysCollectionView)
-        self.tempColor = topic.tagColor
-        opaque.edgesToSuperview()
-        UIView.animate(withDuration: 0.5,
+        let blurEffect = UIVisualEffectView(effect: nil)
+        self.background.insertSubview(blurEffect, belowSubview: self.surveysCollectionView)
+        blurEffect.edgesToSuperview()
+        UIView.animate(withDuration: 0.6,
                        delay: 0,
-                       options: .curveEaseIn,
+                       options: .curveLinear,
                        animations: { [weak self] in
           guard let self = self else { return }
-          opaque.backgroundColor = self.tempColor.withAlphaComponent(0.75)
-        }) { _ in opaque.removeFromSuperview() }
+          
+          blurEffect.effect = UIBlurEffect(style: .prominent)
+        }) { _ in blurEffect.removeFromSuperview() }
       }
       .store(in: &subscriptions)
     
@@ -338,9 +337,9 @@ class TopicsView: UIView {
         guard instance.insets == .zero else { return }
         
         instance.insets = UIEdgeInsets(top: instance.insets.top,
-                                       left: rect.height/2.25,
+                                       left: rect.height/3,
                                        bottom: instance.insets.top,
-                                       right: rect.height/2.25)
+                                       right: rect.height/3)
       }
       .store(in: &subscriptions)
     
@@ -433,13 +432,8 @@ class TopicsView: UIView {
   required init?(coder: NSCoder) {
     super.init(coder: coder)
     
-//    setupUI()
     guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
-    
-    //        let zeroSized = UIView()
-    //        zeroSized.backgroundColor = .clear
-    //        zeroSized.heightAnchor.constraint(equalToConstant: 0).isActive = true
-    
+
     addSubview(contentView)
   }
 
@@ -480,7 +474,7 @@ private extension TopicsView {
     searchStack.height(UINavigationController.Constants.NavBarHeightSmallState - padding)
     searchStack.trailingToLeading(of: filtersCollectionView, offset: -padding)
     searchStack.centerY(to: filtersCollectionView)
-    searchStack.width(to: self, offset: -16)
+    searchStack.width(to: self, offset: -padding*2)
     
     let constraint = shadowView.topToBottom(of: filtersCollectionView, offset: 0)//padding*2)
     constraint.identifier = "top"
@@ -491,7 +485,7 @@ private extension TopicsView {
     background.addSubview(scrollToTopButton)
     let leading = scrollToTopButton.leading(to: background, offset: padding)
     leading.identifier = "leading"
-    let constraint_2 = scrollToTopButton.topToBottom(of: background)
+    let constraint_2 = scrollToTopButton.topToBottom(of: background, offset: padding)
     constraint_2.identifier = "top"
     scrollToTopButton.size(.uniform(size: 40))
   }
@@ -562,7 +556,7 @@ private extension TopicsView {
       guard let self = self else { return }
       
       self.background.setNeedsLayout()
-      constraint.constant = on ? -(self.scrollToTopButton.bounds.width + self.padding) : 0
+      constraint.constant = on ? -(self.scrollToTopButton.bounds.width + self.padding) : self.padding
       self.background.layoutIfNeeded()
     }) { _ in completion?() }
   }
@@ -618,28 +612,8 @@ private extension TopicsView {
       guard let self = self else { return }
       
       self.background.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
-      self.surveysCollectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .black : .secondarySystemBackground
+      self.surveysCollectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
     }
-  }
-}
-
-// MARK: - Controller Output
-extension TopicsView: TopicsControllerOutput {
-  func didAppear() {
-//    guard isEmpty else { return }
-
-//    emptyPublicationsView.setAnimationsEnabled(true)
-//    collectionView.didAppear()
-  }
-  
-  func didDisappear() {
-//    emptyPublicationsView.setAnimationsEnabled(false)
-    
-//    collectionView.didDisappear()
-  }
-
-  func onRequestCompleted(_ result: Result<Bool, Error>) {
-    surveysCollectionView.refreshControl?.endRefreshing()
   }
   
   func toggleTopView(on: Bool, delay: TimeInterval = 0, animationClosure: Closure? = nil, completionClosure: Closure? = nil) {
@@ -665,11 +639,35 @@ extension TopicsView: TopicsControllerOutput {
       heightConstraint.constant = on ? self.filterViewHeight : 0
       self.layoutIfNeeded()
       animationClosure?()
-    } completion: { [weak self] _ in
-      guard let self = self else { return }
-      
-      completionClosure?()
-    }
+    } completion: { _ in completionClosure?() }
+  }
+}
+
+// MARK: - Controller Output
+extension TopicsView: TopicsControllerOutput {
+  func setColor(_ color: UIColor) {
+    tempColor = color
+  }
+  
+  func resetFilters() {
+    filtersCollectionView.resetFilters()
+  }
+  
+  func didAppear() {
+//    guard isEmpty else { return }
+
+//    emptyPublicationsView.setAnimationsEnabled(true)
+//    collectionView.didAppear()
+  }
+  
+  func didDisappear() {
+//    emptyPublicationsView.setAnimationsEnabled(false)
+    
+//    collectionView.didDisappear()
+  }
+
+  func onRequestCompleted(_ result: Result<Bool, Error>) {
+    surveysCollectionView.refreshControl?.endRefreshing()
   }
   
   func setFiltersHidden(_ hidden: Bool) {
@@ -677,20 +675,25 @@ extension TopicsView: TopicsControllerOutput {
     
     leading.constant = -filtersCollectionView.bounds.width
     if !hidden {
+//      // If filters are visible, than skip (came from other app tab)
+      guard let heightConstraint = filtersCollectionView.getConstraint(identifier: "height"), heightConstraint.constant.isZero else { return }
+      
       filtersCollectionView.alpha = 0
       toggleTopView(on: true, completionClosure:  { [weak self] in
         guard let self = self, !hidden else { return }
         
-        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25,
-                                                       delay: 0,
-                                                       options: .curveEaseInOut) { [weak self] in
+        UIView.animate(
+          withDuration: 0.3,
+          delay: 0,
+          usingSpringWithDamping: 0.8,
+          initialSpringVelocity: 0.2,
+          options: [.curveEaseInOut]) { [weak self] in
           guard let self = self else { return }
           
           self.setNeedsLayout()
           // Set offset
-          leading.constant = 0 // -self.filtersCollectionView.bounds.width
+          leading.constant = 0
           self.layoutIfNeeded()
-          //        self.emptyPublicationsView.alpha = 0
           self.filtersCollectionView.alpha = 1
         } completion: {  _ in }
       })
@@ -710,6 +713,7 @@ extension TopicsView: TopicsControllerOutput {
         guard let self = self else { return }
         
         self.toggleTopView(on: false)
+        self.filtersCollectionView.alpha = 0
       }
     }
   }
@@ -732,20 +736,22 @@ extension TopicsView: TopicsControllerOutput {
     isScrolledDown = false
     
     // Clear surveys collection
-    if enabled {
+//    if enabled {
       surveysCollectionView.setSearchModeEnabled(enabled)
-    }
+//    }
     
     guard let leading = filtersCollectionView.getConstraint(identifier: "leading") else { return }
     
     if enabled {
-      searchStack.alpha = 0
-//      searchCancelButton.alpha = 0
-//      searchCancelButton.transform = .init(scaleX: 0.5, y: 0.5)
+      filtersCollectionView.alpha = viewInput?.mode == .Topic ? 1 : 0
+      searchStack.alpha = viewInput?.mode == .Topic ? 1 : 0
       searchField.becomeFirstResponder()
-      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25,
-                                                     delay:  viewInput?.mode == .Default ? 0.15 : 0,
-                                                     options: .curveEaseInOut) { [weak self] in
+      UIView.animate(
+        withDuration: 0.3,
+        delay: viewInput?.mode == .Default ? 0.15 : 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.2,
+        options: [.curveEaseInOut]) { [weak self] in
         guard let self = self else { return }
         
         self.setNeedsLayout()
@@ -755,17 +761,24 @@ extension TopicsView: TopicsControllerOutput {
           self.filtersCollectionView.alpha = 0
         }
         self.layoutIfNeeded()
-//        self.emptyPublicationsView.alpha = 0
       } completion: {  _ in }
-      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0.15, options: .curveEaseInOut) { [weak self] in
-        guard let self = self else { return }
-        
-        self.searchStack.alpha = 1
-//        self.searchCancelButton.alpha = 1
-//        self.searchCancelButton.transform = .identity
-      } completion: {  _ in }
+      if viewInput?.mode != .Topic {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0.15, options: .curveEaseInOut) { [weak self] in
+          guard let self = self else { return }
+          
+          self.searchStack.alpha = 1
+          //        self.searchCancelButton.alpha = 1
+          //        self.searchCancelButton.transform = .identity
+        } completion: {  _ in }
+      }
     } else {
-      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut, animations: { [weak self] in
+      searchField.resignFirstResponder()
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.2,
+        options: [.curveEaseInOut]) { [weak self] in
         guard let self = self else { return }
         
         self.setNeedsLayout()
@@ -775,16 +788,12 @@ extension TopicsView: TopicsControllerOutput {
         if self.viewInput?.mode == .Topic {
           self.filtersCollectionView.alpha = 1
         }
-//        self.searchCancelButton.alpha = 0
-//        self.searchCancelButton.transform = .init(scaleX: 0.5, y: 0.5)
-//        if self.isEmpty {
-//          self.emptyPublicationsView.alpha = 1
-//        }
-      }) { [weak self] _ in
-        guard let self = self else { return }
-        
-        self.surveysCollectionView.setSearchModeEnabled(false)
       }
+//      { [weak self] _ in
+//        guard let self = self else { return }
+//        
+//        self.surveysCollectionView.setSearchModeEnabled(false)
+//      }
     }
   }
   
@@ -827,13 +836,11 @@ extension TopicsView: TopicsControllerOutput {
   }
   
   func showTopics() {
-    debugPrint("showTopics")
-    self.surveysCollectionView.alpha = 1
     Animations.unmaskLayerCircled(unmask: false,
                                   layer: surveysCollectionView.layer,
-                                  location: .zero,
-                                  duration: 0.35,
-                                  timingFunction: .easeOut,
+                                  location: surveysCollectionView.convert(touchLocation, to: surveysCollectionView),
+                                  duration: 0.45,
+                                  timingFunction: .easeInEaseOut,
                                   animateOpacity: false,
                                   delegate: self) { [weak self] in
       guard let self = self else { return }
@@ -842,20 +849,16 @@ extension TopicsView: TopicsControllerOutput {
       self.topicsCollectionView.isUserInteractionEnabled = true
     }
     
-    // Color reversed animation
-    let opaque = UIView.opaque()
-    opaque.backgroundColor = tempColor.withAlphaComponent(0.75)
-    self.background.insertSubview(opaque, belowSubview: self.surveysCollectionView)
-    opaque.edgesToSuperview()
-    UIView.animate(withDuration: 0.5,
+    // Blur reversed animation
+    let blurEffect = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
+    background.insertSubview(blurEffect, belowSubview: surveysCollectionView)
+    blurEffect.edgesToSuperview()
+    UIView.animate(withDuration: 0.45,
                    delay: 0,
-                   options: .curveEaseIn,
+                   options: .curveEaseInOut,
                    animations: {
-      opaque.backgroundColor = .clear
-    }) { _ in opaque.removeFromSuperview() }
-    
-    // Reset navbar tint color
-    viewInput?.tintColor = Colors.main
+      blurEffect.effect = nil
+    }) { _ in blurEffect.removeFromSuperview() }
   }
 }
 

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -452,6 +452,7 @@
 		ABF4D14F29D5D1BC00BCBFD8 /* NewPollCostCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF4D14E29D5D1BC00BCBFD8 /* NewPollCostCell.swift */; };
 		ABF4D15129D5D28300BCBFD8 /* NewPollCost.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF4D15029D5D28300BCBFD8 /* NewPollCost.swift */; };
 		ABF4D15429D5D61200BCBFD8 /* NewPollCostCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF4D15329D5D61200BCBFD8 /* NewPollCostCollectionView.swift */; };
+		ABF786062ACFE32A00652D3C /* URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF786052ACFE32A00652D3C /* URL.swift */; };
 		ABF888AB29BB38B900A37212 /* EmptySubscriptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF888AA29BB38B900A37212 /* EmptySubscriptionsView.swift */; };
 		ABF9952529C77734007D7578 /* TopicSelectionPopupContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF9952429C77734007D7578 /* TopicSelectionPopupContent.swift */; };
 		ABFB4222287320DE0066CFA0 /* YoutubeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */; };
@@ -961,6 +962,7 @@
 		ABF4D14E29D5D1BC00BCBFD8 /* NewPollCostCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollCostCell.swift; sourceTree = "<group>"; };
 		ABF4D15029D5D28300BCBFD8 /* NewPollCost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollCost.swift; sourceTree = "<group>"; };
 		ABF4D15329D5D61200BCBFD8 /* NewPollCostCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPollCostCollectionView.swift; sourceTree = "<group>"; };
+		ABF786052ACFE32A00652D3C /* URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
 		ABF888AA29BB38B900A37212 /* EmptySubscriptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptySubscriptionsView.swift; sourceTree = "<group>"; };
 		ABF9952429C77734007D7578 /* TopicSelectionPopupContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelectionPopupContent.swift; sourceTree = "<group>"; };
 		ABFB4221287320DE0066CFA0 /* YoutubeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeCell.swift; sourceTree = "<group>"; };
@@ -1128,6 +1130,7 @@
 				ABF2756B280D62710023CD1F /* UITableView.swift */,
 				ABA448D327E331B000F8E00D /* UIView.swift */,
 				AB913F782806FADF00609D51 /* UIViewController.swift */,
+				ABF786052ACFE32A00652D3C /* URL.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2957,6 +2960,7 @@
 				AB40550128785AAB000F7768 /* CommentCell.swift in Sources */,
 				AB8A9BCC2A4C76B70020A7CA /* UIColor.swift in Sources */,
 				ABA448F227EE031D00F8E00D /* PollView.swift in Sources */,
+				ABF786062ACFE32A00652D3C /* URL.swift in Sources */,
 				ABE912C329CB4AE900EABDFD /* NewPollImagesCell.swift in Sources */,
 				AB4054F82878375F000F7768 /* ThinkWhatProtocols.swift in Sources */,
 				AB2306392A1606F30034993A /* QueueArray.swift in Sources */,
@@ -3356,7 +3360,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatDebug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -3393,7 +3397,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -3584,7 +3588,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhatAlpha.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;
@@ -3890,7 +3894,7 @@
 				CODE_SIGN_ENTITLEMENTS = ThinkWhat/ThinkWhat.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = YR8888VBGA;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_BITCODE = NO;

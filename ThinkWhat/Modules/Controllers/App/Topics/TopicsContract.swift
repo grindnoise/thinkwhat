@@ -61,6 +61,8 @@ protocol TopicsControllerOutput: AnyObject {
   func scrollToTop()
   func showTopics()
 //  func setTopicModeEnabled(_: Topic)
+  func setColor(_: UIColor)
+  func resetFilters()
   func setFiltersHidden(_: Bool)
   func setSearchModeEnabled(enabled: Bool, delay: TimeInterval)
   func onSearchCompleted(_: [SurveyReference], localSearch: Bool)

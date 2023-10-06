@@ -11,7 +11,7 @@ import Combine
 import TinyConstraints
 
 class TopicsController: UIViewController, TintColorable {
-  
+  var counter = 0
   enum Mode {
     case Default, Topic//Parent, Child, List, Search
   }
@@ -23,45 +23,53 @@ class TopicsController: UIViewController, TintColorable {
     didSet {
       guard oldValue != mode else { return }
       
-      setBarItems()
-      toggleTopicView()
+      // Update back button
+      setLeftBarItems()
+      // Toggle nav bar title view
+      DispatchQueue.main.async { [weak self] in
+        guard let self = self else { return }
+        
+        self.toggleTopicView()
+      }
+      
+      // Toggle filters
+      DispatchQueue.main.async { [weak self] in
+        guard let self = self else { return }
+        
+        self.controllerOutput?.setFiltersHidden(mode == .Topic ? false : true)
+      }
       
       // Go back to topic selection
       if oldValue == .Topic, mode == .Default {
-        controllerOutput?.showTopics()
+        DispatchQueue.main.async { [weak self] in
+          guard let self = self else { return }
+          
+          self.controllerOutput?.showTopics()
+        }
       }
-//      
-//      onModeChanged()
-//      
-//      guard mode == .Default else { return }
-//      
-//      var color = UIColor.systemGray
-//      
-//      switch oldValue {
-//      case .Topic:
-//        if let topic = topic  {
-//          color = topic.tagColor
-//        }
-//      default:
-//        color = tintColor//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .white
-//      }
-//      
-//      controllerOutput?.onDefaultMode(color: color)
+      
+      // If search mode was on then show search search button in nav bar again
+      if searchMode == .on {
+        searchMode = .off
+      }
     }
   }
   public var searchMode = Enums.SearchMode.off {
     didSet {
       guard oldValue != searchMode else { return }
       
-      onBarModeChanged(searchMode == .on ? true : false)
+      setRightBarItems()
+      controllerOutput?.setSearchModeEnabled(enabled: searchMode == .on ? true : false, delay: 0.05)
     }
   }
   ///**Logic**
   public var isDataReady = false
   public var tintColor: UIColor = .clear {
     didSet {
-//      setNavigationBarTintColor(tintColor)
+      guard oldValue != tintColor else { return }
+      
       navigationController?.setBarTintColor(tintColor)
+      controllerOutput?.setColor(tintColor)
     }
   }
   ///**UI**
@@ -109,7 +117,6 @@ class TopicsController: UIViewController, TintColorable {
     self.controllerInput?
       .modelOutput = self
     
-    //        title = "topics".localized
     ProtocolSubscriptions.subscribe(self)
     setTasks()
     setupUI()
@@ -136,18 +143,8 @@ class TopicsController: UIViewController, TintColorable {
     
     isOnScreen = true
     if mode == .Topic {
-//      toggleTopicView()
+      toggleTopicView()
     }
-//    switch mode {
-//    case .Topic:
-//      toggleTopicView(on: true)
-//    case .GlobalSearch, .TopicSearch:
-//      toggleSearchField(on: true)
-//    default:
-//#if DEBUG
-//      print("")
-//#endif
-//    }
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -203,7 +200,8 @@ private extension TopicsController {
   @MainActor
   func setupUI() {
     navigationItem.title = ""
-    setBarItems(animated: false)
+    setRightBarItems(animated: false)
+    setLeftBarItems(animated: false)
     
     // Add topic tag view
     guard let navigationBar = navigationController?.navigationBar, navigationBar.getSubview(type: TagCapsule.self).isNil else { return }
@@ -215,12 +213,33 @@ private extension TopicsController {
   }
   
   func setTasks() {
-    filter.changePublisher
-      .receive(on: DispatchQueue.main)
-      .filter { [unowned self] _ in self.filter.getMain() == .topic}
-//      .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
-      .sink { [unowned self] _ in self.mode = .Topic }
+    filter.topicPublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        // Set nav bar tint color
+        self.tintColor = $0?.tagColor ?? Colors.main
+        
+        // Update mode
+        self.mode = $0.isNil ? .Default : .Topic
+      }
       .store(in: &subscriptions)
+    
+    
+//    filter.changePublisher
+//      .receive(on: DispatchQueue.main)
+////      .filter { [unowned self] _ in !self.filter.topic.isNil}
+////      .throttle(for: .seconds(0.5), scheduler: DispatchQueue.main, latest: false)
+//      .sink { [weak self] _ in
+//        guard let self = self else { return }
+//        
+//        // Set nav bar tint color
+//        self.tintColor = self.filter.topic?.tagColor ?? Colors.main
+//        
+//        // Update mode
+//        self.mode = self.filter.topic.isNil ? .Default : .Topic
+//      }
+//      .store(in: &subscriptions)
     
     //Filter bug fix
     Timer.publish(every: 10, on: .main, in: .common)
@@ -237,26 +256,55 @@ private extension TopicsController {
     
     Notifications.UIEvents.tabItemPublisher
       .receive(on: DispatchQueue.main)
-      .sink { [unowned self] in self.isOnScreen = $0.keys.first == .Topics  }
+      .sink { [unowned self] in
+        self.isOnScreen = $0.keys.first == .Topics
+        
+        // Back to topics list
+        if $0.values.first == .Topics && $0.keys.first == .Topics, self.mode == .Topic {
+          self.mode = .Default
+        }
+        
+        // Switch off search mode
+        if self.searchMode == .on {
+          self.searchMode = .off
+        }
+      }
       .store(in: &subscriptions)
     
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
+//        guard let self = self,
+//              self.isOnScreen
+//        else { return }
+//        
+//        self.isOnScreen = false
+//      }
+//    })
+//    tasks.append(Task { @MainActor [weak self] in
+//      for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
+//        guard let self = self,
+//              let main = self.tabBarController as? MainController,
+//              main.selectedIndex == 3
+//        else { return }
+//        
+//        self.isOnScreen = true
+//      }
+//    })
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didEnterBackgroundNotification) {
-        guard let self = self,
-              self.isOnScreen
-        else { return }
+        guard let self = self else { return }
         
         self.isOnScreen = false
       }
     })
     tasks.append(Task { @MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-        guard let self = self,
-              let main = self.tabBarController as? MainController,
-              main.selectedIndex == 3
-        else { return }
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
+        guard let self = self else { return }
         
-        self.isOnScreen = true
+        self.navigationController?.setBarShadow(on: false)
+        if let main = self.tabBarController as? MainController, main.selectedIndex == 3 {
+          self.isOnScreen = true
+        }
       }
     })
     
@@ -276,7 +324,7 @@ private extension TopicsController {
   }
   
   func getGradientColors() -> [CGColor] {
-    return [
+    [
       traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
       traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
       traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : Colors.main.lighter(0.2).cgColor,
@@ -284,66 +332,63 @@ private extension TopicsController {
   }
   
   @MainActor
-  func setBarItems(animated: Bool = true) {
-    // Set right button
-    navigationItem.setRightBarButton(searchMode == .on ? nil : UIBarButtonItem(title: "",
-                                                     image: UIImage(systemName: "magnifyingglass",
-                                                                    withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
-                                                     primaryAction: UIAction { [unowned self] _ in
-      self.searchMode = .on
-    },
-                                                     menu: nil), animated: animated)
-    
-    // Set left button
+  func setRightBarItems(animated: Bool = true) {
+    // Set right button if search  is off
+//    if searchMode == .off && navigationItem.rightBarButtonItem.isNil || searchMode == .on {
+      navigationItem.setRightBarButton(searchMode == .on ? nil : UIBarButtonItem(title: "",
+                                                                                 image: UIImage(systemName: "magnifyingglass",
+                                                                                                withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
+                                                                                 primaryAction: UIAction { [unowned self] _ in
+        self.searchMode = .on
+      }, menu: nil), animated: animated)
+//    }
+  }
+  
+  func setLeftBarItems(animated: Bool = true) {
     guard mode == .Topic else { return }
-
+    
     navigationItem.setLeftBarButton(UIBarButtonItem(title: nil,
                                                     image: UIImage(systemName: "chevron.left",
                                                                    withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)),
                                                     primaryAction: UIAction { [weak self] _ in
       guard let self = self else { return }
       
+      // Set default mode
       self.mode = .Default
-      self.navigationItem.setLeftBarButton(nil, animated: true)
-    },
-                                                    menu: nil), animated: animated)
+      
+      // Delay a bit
+      delay(seconds: 0.5) {
+        // Reset filter
+        self.resetFilter()
+//        self.filter.setBoth(main: .disabled, topic: nil, additional: .disabled, period: .unlimited)
+        
+        // Hide scroll to top button
+        self.controllerOutput?.scrollToTop()
+      }
+      
+      // Reset filters cells
+      self.controllerOutput?.resetFilters()
+      
+      // Clear button
+      self.navigationItem.setLeftBarButton(nil, animated: animated)
+    }, menu: nil), animated: animated)
   }
 
-  @MainActor
-  func onModeChanged() {
-    setBarItems()
-    
-    
-//    guard let mainController = tabBarController as? MainController else { return }
-//    
-//    switch mode {
-//    case .GlobalSearch, .TopicSearch:
-////      mainController.toggleLogo(on: false)
-//      toggleTopicView(on: false)
-//    case .Topic:
-////      mainController.toggleLogo(on: false)
-//      toggleTopicView(on: true)
-//      
-//    default:
-////      setNavigationBarTintColor(tintColor)
-//      navigationController?.setBarTintColor(tintColor)
-////      mainController.toggleLogo(on: true)
-//      toggleTopicView(on: false)
-//    }
-  }
-  
   func toggleTopicView() {
-    guard searchMode == .off,
-          let topic = filter.topic,
+//    guard searchMode == .off,
+    guard let topic = filter.topic,
           let navigationBar = navigationController?.navigationBar,
           let constraint = titleView.getConstraint(identifier: "centerY"),
           let main = tabBarController as? MainController
     else { return }
     
+    counter += 1
+    
+//    debugPrint("toggleTopicView", to: &logger)
     func toggle(on: Bool, completion: Closure? = nil) {
       UIView.animate(
         withDuration: 0.3,
-        delay: 0.2,
+        delay: 0.1,
         usingSpringWithDamping: 0.8,
         initialSpringVelocity: 0.3,
         options: [.curveEaseInOut],
@@ -356,16 +401,10 @@ private extension TopicsController {
           navigationBar.layoutIfNeeded()
         }) { _ in completion?() }
     }
-
+    
     // If topic mode
-    if mode == .Topic, filter.getMain() == .topic {
-      // Show filters
-      controllerOutput?.setFiltersHidden(false)
-      
-      // Update topic tag
-      titleView.color = topic.tagColor
-      titleView.text = topic.title.uppercased()
-      titleView.iconCategory = topic.iconCategory
+    if mode == .Topic {
+      updateTitleView(topic)
       
       // If app logo is not on screen (back from survey transition)
       if !main.logoIsOnScreen {
@@ -377,18 +416,34 @@ private extension TopicsController {
     } else if mode == .Default {
       // Hide topic tag and after that show app logo
       toggle(on: false) { main.toggleLogo(on: true) }
-      // Hide filters
-      controllerOutput?.setFiltersHidden(true)
     }
   }
   
-  @MainActor
-  func onBarModeChanged(_ searchMode: Bool) {
-    setBarItems()
-    if mode == .Default {
-      controllerOutput?.setFiltersHidden(true)
+  /// Resets filters
+  func resetFilter() {
+    filter.setBoth(main: .disabled, topic: nil, additional: .disabled, period: .unlimited)
+  }
+  
+  /// Update title view UI
+  /// - Parameter topic: specific topic
+  func updateTitleView(_ topic: Topic) {
+    func getAttributedString() -> NSAttributedString {
+      let attrString = NSMutableAttributedString(string: topic.isOther ? "\(topic.parent!.title.uppercased()) (\(topic.title.uppercased())):" : "\(topic.title.uppercased()):",
+                                                 attributes: [
+                                                  .font: UIFont(name: Fonts.Rubik.Medium, size: 14)!,
+                                                  .foregroundColor: UIColor.white
+                                                ])
+      attrString.append(NSAttributedString(string: " " + String(describing: topic.activeCount), attributes: [
+        .font: UIFont(name: Fonts.Rubik.Regular, size: 14)!,
+        .foregroundColor: UIColor.white
+      ]))
+      
+      return attrString
     }
-    controllerOutput?.setSearchModeEnabled(enabled: searchMode, delay: 0.1)
+    
+    titleView.color = topic.tagColor
+    titleView.setAttributedText(getAttributedString())
+    titleView.iconCategory = topic.isOther ? topic.parent?.iconCategory : topic.iconCategory
   }
 }
 

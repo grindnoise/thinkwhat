@@ -47,6 +47,9 @@ class SurveysCollectionView: UICollectionView {
   }
   
   // MARK: - Private properties
+  ///**Publishers**
+  private let applyDataSnapshotPublisher = PassthroughSubject<[String: Any], Never>()
+  private let applyLoaderSnapshotPublisher = PassthroughSubject<[Bool: Closure], Never>()
   ///**Logic**
   private let lock = NSRecursiveLock() // Lock
   private var loaderStartedAt = Date() // Timestamp to stop loader footer after threshold
@@ -61,22 +64,40 @@ class SurveysCollectionView: UICollectionView {
 //      isRequestingPublisher.send(isRequesting)
       lock.lock()
       
-      var snap = source.snapshot()
+      let snap = source.snapshot()
       if isRequesting, snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
         loaderStartedAt = Date()
-        snap.appendSections([.loader])
-        apply(source: self.source, snapshot: snap) { [weak self] in
-          guard let self = self else { return }
+//        snap.appendSections([.loader])
+        applyLoaderSnapshotPublisher.send([true : { [weak self] in
+            guard let self = self else { return }
 
-          self.isRequestingPublisher.send(self.isRequesting)
-        }
+            self.isRequestingPublisher.send(self.isRequesting)
+          }])
+//        apply(source: self.source, snapshot: snap) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.isRequestingPublisher.send(self.isRequesting)
+//        }
       } else if !isRequesting, !snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
-        snap.deleteSections([.loader])
-        apply(source: self.source, snapshot: snap) { [weak self] in
-          guard let self = self else { return }
+        applyLoaderSnapshotPublisher.send([false : { [weak self] in
+            guard let self = self else { return }
 
-          self.isRequestingPublisher.send(self.isRequesting)
-        }
+            self.isRequestingPublisher.send(self.isRequesting)
+          }])
+//        snap.deleteSections([.loader])
+//        applyDataSourcePublisher.send([
+//          "snapshot": snap,
+//          "completion" : { [weak self] in
+//            guard let self = self else { return }
+//
+//            self.isRequestingPublisher.send(self.isRequesting)
+//          }
+//        ])
+//        apply(source: self.source, snapshot: snap) { [weak self] in
+//          guard let self = self else { return }
+//
+//          self.isRequestingPublisher.send(self.isRequesting)
+//        }
       }
     }
   }
@@ -84,10 +105,13 @@ class SurveysCollectionView: UICollectionView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private lazy var dataItems = filter.getDataItems()  // { filter.getDataItems() }
+  private lazy var dataItems = filter.getDataItems()
   private let filter: SurveyFilter // Use to filter dataItems
   private var source: Source!
   private let isRequestingPublisher = CurrentValueSubject<Bool, Never>(false)
+  private var searchMode = Enums.SearchMode.off
+  private let topicMode: Bool // Use in topics controller only
+  private var reloadAnimationsEnabled = true // Flag to control animatingDifference
   ///**UI**
   private var showSeparators: Bool = false
   private let padding: CGFloat = 8
@@ -141,15 +165,19 @@ class SurveysCollectionView: UICollectionView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  init(filter: SurveyFilter, color: UIColor? = nil, showSeparators: Bool = false) {
+  init(filter: SurveyFilter, 
+       color: UIColor? = nil,
+       showSeparators: Bool = false,
+       topicMode: Bool = false) {
     self.filter = filter
     self.showSeparators = showSeparators
     self.color = color ?? .secondaryLabel
+    self.topicMode = topicMode
     
     super.init(frame: .zero, collectionViewLayout: .init())
     
-    setupUI()
     setTasks()
+    setupUI()
   }
   
   // MARK: - Public methods
@@ -191,14 +219,20 @@ class SurveysCollectionView: UICollectionView {
     scrollToItem(at: .init(row: 0, section: 0), at: .top, animated: true)
   }
   
+  /// Sets fetch result as data source
+  /// - Parameter fetchResult: array of fetched objects
   public func setSearchResult(_ fetchResult: [SurveyReference]) {
     var snapshot = Snapshot()
     snapshot.appendSections([.main])
     snapshot.appendItems(fetchResult, toSection: .main)
     
-    apply(source: source,
-          snapshot: snapshot,
-          animatingDifferences: true)
+    
+    applyDataSnapshotPublisher.send([
+      "snapshot": snapshot,
+    ])
+//    apply(source: source,
+//          snapshot: snapshot,
+//          animatingDifferences: true)
   }
   
   public func setSearchModeEnabled(_ enabled: Bool) {
@@ -207,9 +241,16 @@ class SurveysCollectionView: UICollectionView {
     snapshot.appendSections([.main])
     snapshot.appendItems(enabled ? [] : dataItems, toSection: .main)
     
-    apply(source: source,
-          snapshot: snapshot,
-          animatingDifferences: true)
+    // Set search mode flag
+    searchMode = enabled ? .on : .off
+    
+    // Apply new snapshot
+    applyDataSnapshotPublisher.send([
+      "snapshot": snapshot,
+    ])
+//    apply(source: source,
+//          snapshot: snapshot,
+//          animatingDifferences: true)
   }
   
   // MARK: - Overridden methods
@@ -306,6 +347,7 @@ private extension SurveysCollectionView {
         configuration.itemSeparatorHandler = { indexPath, config -> UIListSeparatorConfiguration in
           var config = UIListSeparatorConfiguration(listAppearance: .plain)
           config.topSeparatorVisibility = .hidden
+//          config.bottomSeparatorInsets = .init(top: 0, leading: 0, bottom: 2, trailing: 0)
           if indexPath.row != self.source.snapshot().itemIdentifiers.count - 1 {
             config.bottomSeparatorVisibility = .visible
           } else {
@@ -328,7 +370,6 @@ private extension SurveysCollectionView {
     
     let cellRegistration = UICollectionView.CellRegistration<SurveyCell, SurveyReference> { [unowned self] cell, indexPath, item in
       cell.item = item
-      
       cell.subscribePublisher
         .sink { [weak self] in
           guard let self = self else { return }
@@ -415,10 +456,10 @@ private extension SurveysCollectionView {
         }
         .store(in: &self.subscriptions)
       
-//      var config = UIBackgroundConfiguration.listPlainCell()
-//      config.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.surveyCellDark : Colors.surveyCellLight
-//      cell.backgroundConfiguration = config
-//      cell.automaticallyUpdatesBackgroundConfiguration = true
+      var config = UIBackgroundConfiguration.listPlainCell()
+      config.backgroundColor = .clear//self.traitCollection.userInterfaceStyle == .dark ? Colors.surveyCellDark : Colors.surveyCellLight
+      cell.backgroundConfiguration = config
+      cell.automaticallyUpdatesBackgroundConfiguration = false
     }
     
     let loaderRegistration = UICollectionView.SupplementaryRegistration<LoaderCell>(elementKind: UICollectionView.elementKindSectionFooter) { [unowned self] supplementaryView,_,_ in
@@ -481,26 +522,83 @@ private extension SurveysCollectionView {
   }
   
   func setTasks() {
+    // Toggle loader throttled
+    applyLoaderSnapshotPublisher
+      .throttle(for: .seconds(1), scheduler: DispatchQueue.main, latest: false)
+      .filter { !$0.isEmpty }
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        var snap = self.source.snapshot()
+        let append = $0.keys.first!
+        // Check if loader isn't presented
+        if append && snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
+          snap.appendSections([.loader])
+        } else if !append && !snap.sectionIdentifiers.filter({ $0 == .loader }).isEmpty {
+          snap.deleteSections([.loader])
+        } else { return }
+        
+        let completion = $0.values.first
+        self.apply(snapshot: snap, animatingDifferences: true) { completion?() }
+      }
+      .store(in: &subscriptions)
+    
+    // Apply snapshot throttled
+    applyDataSnapshotPublisher
+      .throttle(for: .seconds(0.25), scheduler: DispatchQueue.main, latest: true)
+      .filter { !$0.isEmpty }
+      .sink { [weak self] in
+        guard let self = self,
+              let snapshot = $0["snapshot"] as? Snapshot
+        else { return }
+        
+        let completion = $0["completion"] as? Closure
+        let animatingDifferences = $0["animatingDifferences"] as? Bool ?? true
+        self.apply(snapshot: snapshot, animatingDifferences: animatingDifferences) { completion?() }
+      }
+      .store(in: &subscriptions)
+    
+    // This case is used in TopicsView when user taps topic,
+    // then we need to temporary turn off reload animations
+    filter.topicPublisher
+      .filter { !$0.isNil}
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.reloadAnimationsEnabled = false
+        delay(seconds: 0.2) { [weak self] in
+          guard let self = self else { return }
+          
+          self.reloadAnimationsEnabled = true
+        }
+      }
+      .store(in: &subscriptions)
+    
     ///Update data items when filter changes
     filter.changePublisher
+      .filter { [unowned self] _ in self.searchMode == .off }
       .receive(on: DispatchQueue.main)
 //      .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
       .sink { [unowned self] in
+        
         // If topic case
         if self.filter.getMain() == .topic, let topic = self.filter.topic {
+          
           // Set color for loader
           self.color = topic.tagColor
           
-          // If topic active publications count is not equal to data items count
-          // than request data
-          if topic.activeCount != $0.count {
+          // If topic active publications count is not equal to 
+          // data items count then request data
+          if topic.totalCount != $0.count {
             self.requestData()
           }
         }
         
         // Update data source
         self.dataItems = $0
-        self.setDataSource(animatingDifferences: true)
+        
+        // Disable animations in topic mode
+        self.setDataSource(animatingDifferences: reloadAnimationsEnabled/*self.filter.topic.isNil*/)
       }
       .store(in: &subscriptions)
     
@@ -578,7 +676,11 @@ private extension SurveysCollectionView {
         
         var snap = self.source.snapshot()
         snap.deleteItems([$0])
-        self.apply(source: self.source, snapshot: snap)
+        
+        self.applyDataSnapshotPublisher.send([
+          "snapshot": snap,
+        ])
+//        self.apply(source: self.source, snapshot: snap)
       }
       .store(in: &subscriptions)
     
@@ -595,7 +697,10 @@ private extension SurveysCollectionView {
         guard !crossingSet.isEmpty else { return }
         
         snap.deleteItems(Array(deletingSet))
-        self.apply(source: self.source, snapshot: snap)
+        self.applyDataSnapshotPublisher.send([
+          "snapshot": snap,
+        ])
+//        self.apply(source: self.source, snapshot: snap)
       }
       .store(in: &subscriptions)
 
@@ -607,7 +712,10 @@ private extension SurveysCollectionView {
         
         var snap = self.source.snapshot()
         snap.deleteItems([$0])
-        self.apply(source: self.source, snapshot: snap)
+        self.applyDataSnapshotPublisher.send([
+          "snapshot": snap,
+        ])
+//        self.apply(source: self.source, snapshot: snap)
       }
       .store(in: &subscriptions)
     
@@ -620,7 +728,10 @@ private extension SurveysCollectionView {
         
         var snap = self.source.snapshot()
         snap.deleteItems([$0])
-        self.apply(source: self.source, snapshot: snap)
+        self.applyDataSnapshotPublisher.send([
+          "snapshot": snap,
+        ])
+//        self.apply(source: self.source, snapshot: snap)
       }
       .store(in: &subscriptions)
     
@@ -638,7 +749,10 @@ private extension SurveysCollectionView {
         var snap = self.source.snapshot()
         let itemsToDelete = snap.itemIdentifiers.filter { $0.owner == unsubscribed }
         snap.deleteItems(itemsToDelete)
-        self.apply(source: self.source, snapshot: snap)
+        self.applyDataSnapshotPublisher.send([
+          "snapshot": snap,
+        ])
+//        self.apply(source: self.source, snapshot: snap)
       }
       .store(in: &subscriptions)
     
@@ -659,6 +773,9 @@ private extension SurveysCollectionView {
         }
         
         var snap = self.source.snapshot()
+        if snap.numberOfSections.isZero {
+          snap.appendSections([.main])
+        }
         let existingSet = Set(snap.itemIdentifiers)
         var appendingSet = Set<SurveyReference>()
         
@@ -688,14 +805,17 @@ private extension SurveysCollectionView {
         let filteredByPeriod = appendingSet.filter({ $0.isValid(byBeriod: self.filter.getPeriod()) })
         
         if existingSet.isEmpty {
-          snap.appendItems(Array(filteredByPeriod).sorted { $0.startDate > $1.startDate },
-                           toSection: .main)
+          snap.appendItems(Array(filteredByPeriod.sorted { $0.startDate > $1.startDate }))
         } else {
-          snap.appendItems(Array(filteredByPeriod.subtracting(existingSet)).sorted { $0.startDate > $1.startDate },
-                           toSection: .main)
+          snap.appendItems(Array(filteredByPeriod.subtracting(existingSet)).sorted { $0.startDate > $1.startDate })
         }
         
-        self.apply(source: self.source, snapshot: snap)
+        self.applyDataSnapshotPublisher.send([
+          "snapshot": snap,
+        ])
+        
+        // Update data items
+        self.dataItems = self.filter.getDataItems(publish: true)
       }
       .store(in: &subscriptions)
     
@@ -722,7 +842,10 @@ private extension SurveysCollectionView {
           .sorted { $0.startDate > $1.startDate },
                          toSection: .main)
         
-        self.apply(source: self.source, snapshot: snap)
+        self.applyDataSnapshotPublisher.send([
+          "snapshot": snap,
+        ])
+//        self.apply(source: self.source, snapshot: snap)
       }
       .store(in: &subscriptions)
   }
@@ -755,26 +878,15 @@ private extension SurveysCollectionView {
 //    }
 //  }
   
-  func setDataSource(animatingDifferences: Bool = true) {
+  func setDataSource(animatingDifferences: Bool?) {
     ///Reset loading state
-    self.isRequesting = false
+    isRequesting = false
     
-//    var snapshot: Snapshot!
-//    let existingSet = Set(source.snapshot().itemIdentifiers)
-//    if existingSet.isEmpty {
-//      snapshot = Snapshot()
-//      snapshot.appendSections([.main])
-//      snapshot.appendItems(dataItems, toSection: .main)
-//    } else {
-//      snapshot = source.snapshot()
-//      snapshot.deleteAllItems()
-////      snapshot.deleteItems(source.snapshot().itemIdentifiers)
-//      snapshot.appendItems(dataItems)
-//    }
     var snapshot = Snapshot()
     snapshot.appendSections([.main])
-    snapshot.appendItems(dataItems, toSection: .main)
-    
+    // In topic mode we don't need to populate data if topic isn't selected
+    snapshot.appendItems(topicMode && filter.topic.isNil ? [] : dataItems, toSection: .main)
+
     var closure: Closure? = nil
     ///Immediatly request more items
     if filter.getMain() == .user,
@@ -788,10 +900,15 @@ private extension SurveysCollectionView {
       }
     }
     
-    apply(source: source,
-          snapshot: snapshot,
-          animatingDifferences: animatingDifferences,
-          completion: closure)
+    applyDataSnapshotPublisher.send([
+      "snapshot": snapshot,
+      "animatingDifferences": animatingDifferences ?? filter.topic.isNil,
+      "completion": closure as Any])
+    
+//    apply(source: source,
+//          snapshot: snapshot,
+//          animatingDifferences: !filter.topic.isNil,
+//          completion: closure)
   }
   
   /// Refreshes collection view
@@ -800,15 +917,18 @@ private extension SurveysCollectionView {
   ///   - snapshot: snapshot to apply
   ///   - completion: completion closure
   @MainActor
-  func apply(source: Source,
-             snapshot: Snapshot,
+  func apply(snapshot: Snapshot,
              animatingDifferences: Bool = true,
              completion: Closure? = nil) {
     guard isApplyingSnapshot else {
       self.isApplyingSnapshot = true
       self.emptyPublicationsPublisher.send(snapshot.itemIdentifiers.isEmpty)
       
-      DispatchQueue.main.async {
+      DispatchQueue.main.async { [weak self] in
+        guard let self = self,
+              let source = self.source
+        else { return }
+        
         source.apply(snapshot, animatingDifferences: animatingDifferences) { [weak self] in
           guard let self = self else { return }
           
@@ -817,12 +937,12 @@ private extension SurveysCollectionView {
           completion?()
         }
       }
-
+      
       return
     }
     
-//    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
-      DispatchQueue.main.async() { [weak self] in
+    //    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+    DispatchQueue.main.async() { [weak self] in
       guard let self = self else { return }
       
       self.isApplyingSnapshot = true

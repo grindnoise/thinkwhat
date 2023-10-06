@@ -128,8 +128,15 @@ struct Enums {
   }
   
   //Tab bar items
-  enum Tab {
+  enum Tab: Int, CaseIterable {
     case Hot, Subscriptions, Feed, Topics, Settings
+    
+    func getColor(traitCollection: UITraitCollection) -> UIColor {
+      switch self {
+      case .Hot: return Colors.Logo.Flame.rawValue
+      default: return traitCollection.userInterfaceStyle == .dark ? Colors.tabBarDark : Colors.tabBarLight
+      }
+    }
   }
   
   enum PushNotificationsLanguagesSettings: Hashable {

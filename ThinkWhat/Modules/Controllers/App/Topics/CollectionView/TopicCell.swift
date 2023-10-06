@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import TinyConstraints
 
 struct TopicCellConfiguration: UIContentConfiguration, Hashable {
   
@@ -152,16 +153,32 @@ class TopicCellContent: UIView, UIContentView {
       guard !currentConfiguration.isNil else { return }
       
       tempSubscriptions.forEach { $0.cancel() }
-      currentConfiguration.topicItem.topic.activeCountPublisher
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] in self.totalCountLabel.text = String(describing: $0) }
-        .store(in: &tempSubscriptions)
+      if currentConfiguration.mode == .Default {
+        currentConfiguration.topicItem.topic.activeCountPublisher
+          .receive(on: DispatchQueue.main)
+          .sink { [weak self] in
+            guard let self = self else { return }
+            
+            self.discloseButton.alpha = CGFloat($0)
+            self.tagCapsule.setAttributedText(self.getAttributedString(topic: self.currentConfiguration.topicItem.topic))
+          }
+          .store(in: &tempSubscriptions)
+      }
     }
   }
   private lazy var horizontalStack: UIStackView = {
-    let instance = UIStackView(arrangedSubviews: [verticalStack, totalCountLabel])
+//    let opaque = UIView.opaque()
+//    opaque.addSubview(discloseButton)
+//    discloseButton.centerY(to: opaque)
+//    discloseButton.leadingToSuperview()
+//    discloseButton.trailingToSuperview()
+    
+    let instance = UIStackView(arrangedSubviews: [verticalStack,
+//                                                  UIView.opaque(),
+                                                  /*opaque*/])
     instance.axis = .horizontal
     instance.spacing = padding
+    
     return instance
   }()
   private lazy var verticalStack: UIStackView = {
@@ -176,16 +193,24 @@ class TopicCellContent: UIView, UIContentView {
     return instance
   }()
   private lazy var tagCapsule: TagCapsule = {
-//    let title = item.topic.isOther ? "\(item.topic.parent!.title.localized)/\(item.topic.title.localized)" : { item.topic.title.localized }()
-    let instance = TagCapsule(text: "",//title.uppercased(),
-                              padding: padding,
-                              textPadding: .init(top: padding/3, left: 0, bottom: padding/3, right: 0),
-                              color: .clear,//item.topic.tagColor,
-                              font: UIFont(name: Fonts.Rubik.Medium, size: 12)!,
-                              isShadowed: false,
-                              iconCategory: .Null,//item.topic.isOther ? item.topic.parent!.iconCategory : item.topic.iconCategory,
-                              image: nil)
-//    instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: instance.font) + padding/2).isActive = true
+    TagCapsule(text: "",
+               padding: padding,
+               textPadding: .init(top: padding/3, left: 0, bottom: padding/3, right: 0),
+               color: .clear,
+               font: UIFont(name: Fonts.Rubik.Medium, size: 12)!,
+               isShadowed: false,
+               iconCategory: .Null,
+               image: nil)
+  }()
+  private lazy var discloseButton: UIButton = {
+    let instance = UIButton()
+    instance.widthToHeight(of: instance)
+    instance.setImage(UIImage(systemName: ("chevron.right"), withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)), for: .normal)
+    instance.tintColor = .white
+    instance.isUserInteractionEnabled = false
+    instance.publisher(for: \.bounds)
+      .sink { instance.cornerRadius = $0.width/2 }
+      .store(in: &subscriptions)
     
     return instance
   }()
@@ -214,19 +239,9 @@ class TopicCellContent: UIView, UIContentView {
     
     return instance
   }()
-  @MainActor private lazy var totalCountLabel: UILabel = {
-    let instance = UILabel()
-    instance.font = UIFont(name: Fonts.Rubik.Regular, size: 14)
-    instance.textAlignment = .right
-    instance.textColor = .label
-    instance.alpha = 0
-    
-    return instance
-  }()
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
     instance.type = .radial
-    instance.colors = getGradientColors(color: .systemGray)
     instance.locations = [0, 0.5, 1.15]
     instance.setIdentifier("radialGradient")
     instance.startPoint = CGPoint(x: 0.5, y: 0.5)
@@ -295,74 +310,51 @@ class TopicCellContent: UIView, UIContentView {
 // MARK: - Private
 private extension TopicCellContent {
   func apply(configuration new: TopicCellConfiguration) {
-//    guard currentConfiguration != new else { return }
     
-//    if let constraint = topicDescription.getConstraint(identifier: "height"), topicDescription.bounds.width.isZero { //}!bounds.width.isZero {
-//      // Force update bounds if it is zero
-////      if topicDescription.bounds.width.isZero {
-//        setNeedsLayout()
-//        layoutIfNeeded()
-////      }
-//      constraint.constant = new.topicItem.description.height(withConstrainedWidth: topicDescription.bounds.width, font: topicDescription.font)
-//    }
+    // Clear temp subscriptions
+    tempSubscriptions.forEach { $0.cancel() }
     
+    // Set new configuration
     currentConfiguration = new
     
     let color = currentConfiguration.topicItem.topic.tagColor
-    gradient.colors = getGradientColors(color: color)
-    //        topicIcon.iconColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : currentConfiguration.topicItem.topic.tagColor
+    
+    // Update colors
+    gradient.colors = CAGradientLayer.getGradientColors(color: color)
+//    discloseButton.backgroundColor = color
+//    discloseButton.alpha = currentConfiguration.topicItem.topic.activeCount.isZero ? 0 : 1
+  
+    // Update tag
     tagCapsule.color = color
-    tagCapsule.text = currentConfiguration.topicItem.topic.title
+    tagCapsule.setAttributedText(getAttributedString(topic: currentConfiguration.topicItem.topic))
     tagCapsule.iconCategory = currentConfiguration.topicItem.topic.iconCategory
-//    topicTitle.text = currentConfiguration.topicItem.title.uppercased()
+
+    // Update description
     topicDescription.text = currentConfiguration.topicItem.description
-    //        topicDescription.textColor = traitCollection.userInterfaceStyle == .dark ? .darkGray : .label
-    if currentConfiguration.mode == .Default {
-      totalCountLabel.alpha = 1
-      totalCountLabel.text = String(describing: currentConfiguration.topicItem.topic.activeCount.roundedWithAbbreviations)
-      totalCountLabel.textColor = new.topicItem.topic.activeCount > 0 ? color : .secondaryLabel
-      currentConfiguration.topicItem.topic.activeCountPublisher
-        .receive(on: DispatchQueue.main)
-        .sink { [unowned self] in self.totalCountLabel.text = $0.roundedWithAbbreviations }
-        .store(in: &subscriptions)
-    }
+  }
+  
+  func getAttributedString(topic: Topic) -> NSAttributedString {
+    let attrString = NSMutableAttributedString(string: "\(topic.title.uppercased()):",
+                                               attributes: [
+                                                .font: UIFont(name: Fonts.Rubik.Medium, size: 14)!,
+                                                .foregroundColor: UIColor.white
+                                              ])
+    attrString.append(NSAttributedString(string: " " + String(describing: topic.activeCount), attributes: [
+      .font: UIFont(name: Fonts.Rubik.Regular, size: 14)!,
+      .foregroundColor: UIColor.white
+    ]))
+    
+    return attrString
   }
   
   @MainActor
   func setupUI() {
     addSubview(horizontalStack)
-    horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-    //        iconContainer.translatesAutoresizingMaskIntoConstraints = false
-    //        icon.translatesAutoresizingMaskIntoConstraints = false
-
-    NSLayoutConstraint.activate([
-      horizontalStack.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor, constant: padding/2),
-      horizontalStack.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor, constant: 0),
-//      topicLabel.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: 100, font: topicTitle.font)),
-      //            iconContainer.widthAnchor.constraint(equalTo: horizontalStack.widthAnchor, multiplier: 0.15)
-      //            horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
-      //            icon.widthAnchor.constraint(equalTo: icon.heightAnchor, multiplier: 1/1),
-      //            icon.heightAnchor.constraint(equalTo: horizontalStack.heightAnchor),
-      //            horizontalStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding)
-      //            horizontalStack.widthAnchor.constraint(equalTo: widthAnchor),
-      //            horizontalStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor, constant: padding)
-    ])
-
-    let constr = horizontalStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0)
-    constr.priority = .defaultHigh
-    constr.isActive = true
-
-    let constraint = topicDescription.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor, constant: -padding/2)
-    constraint.priority = .defaultLow
-    constraint.isActive = true
-//    horizontalStack.edgesToSuperview(insets: .init(top: padding*2, left: 0, bottom: padding, right: padding))
-  }
-  
-  func getGradientColors(color: UIColor) -> [CGColor] {
-    return [
-      color.cgColor,
-      color.cgColor,
-      color.lighter(0.05).cgColor,
-    ]
+    horizontalStack.leadingToSuperview(offset: padding)
+    horizontalStack.trailingToSuperview(offset: padding)
+    horizontalStack.topToSuperview(offset: padding)
+    horizontalStack.bottomToSuperview(offset: -padding, priority: .defaultLow)
+//    horizontalStack.edgesToSuperview(insets: .uniform(padding))
+//    discloseButton.height(to: tagCapsule)
   }
 }

@@ -247,13 +247,14 @@ private extension HotController {
     })
     tasks.append(Task { @MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
-        guard let self = self,
-              let main = self.tabBarController as? MainController,
-              main.selectedIndex == 0
-        else { return }
+        guard let self = self else { return }
         
-        self.isOnScreen = true
-        self.controllerOutput?.willAppear()
+        self.navigationController?.setBarShadow(on: false)
+        
+        if let main = self.tabBarController as? MainController, main.selectedIndex == 0 {
+          self.isOnScreen = true
+          self.controllerOutput?.willAppear()
+        }
       }
     })
     

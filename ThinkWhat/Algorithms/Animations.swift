@@ -230,37 +230,8 @@ struct Animations {
                                  completion: Closure? = nil) {
     
     let circlePathLayer = CAShapeLayer()
-//    var _completionBlocks = completionBlocks
-    var circleFrameTopCenter: CGRect {
-      var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
-      let circlePathBounds = circlePathLayer.bounds
-      circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
-      circleFrame.origin.y = circlePathBounds.minY - circleFrame.minY
-      return circleFrame
-    }
-    
-    var circleFrameTop: CGRect {
-      var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
-      let circlePathBounds = circlePathLayer.bounds
-      circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
-      circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
-      return circleFrame
-    }
-    
-    var circleFrameTopLeft: CGRect {
-      return CGRect.zero
-    }
-    
     var circleFrameTouchPosition: CGRect {
       return CGRect(origin: location, size: .zero)
-    }
-    
-    var circleFrameCenter: CGRect {
-      var circleFrame = CGRect(x: 0, y: 0, width: 0, height: 0)
-      let circlePathBounds = circlePathLayer.bounds
-      circleFrame.origin.x = circlePathBounds.midX - circleFrame.midX
-      circleFrame.origin.y = circlePathBounds.midY - circleFrame.midY
-      return circleFrame
     }
     
     func circlePath(_ rect: CGRect) -> UIBezierPath {
@@ -274,7 +245,8 @@ struct Animations {
     //        let center = lastPoint//(x: animatedView.bounds.midX, y: animatedView.bounds.midY)
     
     let maxEdge = max(animatedLayer.bounds.width, animatedLayer.bounds.height)
-    let finalRadius = maxEdge*sqrt(2)/2 + maxEdge/2
+    let additionalRadius = min(animatedLayer.bounds.width, animatedLayer.bounds.height)//(max(location.x, location.y)*1.25)*sqrt(2)/2
+    let finalRadius = maxEdge*sqrt(2)/2 + additionalRadius //+ maxEdge/2
 
     let outerRect = circleFrameTouchPosition.insetBy(dx: -finalRadius, dy: -finalRadius)
     
@@ -291,7 +263,7 @@ struct Animations {
 //    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
     
     let fromPath = circlePathLayer.path
-    
+
     let anim = Animations.get(property: .Path,
                               fromValue: unmask ? fromPath as Any : toPath as Any,
                               toValue: unmask ? toPath : fromPath as Any,
@@ -409,6 +381,7 @@ struct Animations {
   static func tapCircled(layer animatedlayer: CALayer,
                          fillColor: CGColor,
                          location: CGPoint,
+                         size: CGSize = .zero,
                          duration: TimeInterval,
                          timingFunction: CAMediaTimingFunctionName = .easeOut) {
     
@@ -419,18 +392,23 @@ struct Animations {
     tempLayer.path = UIBezierPath(ovalIn: touchRect).cgPath
     tempLayer.fillColor = fillColor
     animatedlayer.addSublayer(tempLayer)
-    
-    let finalRadius = max(abs(animatedlayer.bounds.width - location.x),
-                          abs(animatedlayer.bounds.width - (animatedlayer.bounds.width - location.x)))
-    
-    let radiusInset = finalRadius// * 1.5
-    
-    let outerRect = touchRect.insetBy(dx: -radiusInset, dy: -radiusInset)
-    
-    let toPath = UIBezierPath(ovalIn: outerRect).cgPath
-    
     let fromPath = tempLayer.path
     
+    var toPath: CGPath = UIBezierPath(rect: .zero).cgPath
+    
+    if size != .zero {
+      // Fixed size
+      toPath = UIBezierPath(ovalIn: touchRect.insetBy(dx: -size.width, dy: -size.height)).cgPath
+    } else {
+      // Calculated size
+      let finalRadius = max(abs(animatedlayer.bounds.width - location.x),
+                            abs(animatedlayer.bounds.width - (animatedlayer.bounds.width - location.x)))
+      
+      let radiusInset = finalRadius// * 1.5
+      
+      let outerRect = touchRect.insetBy(dx: -radiusInset, dy: -radiusInset)
+      toPath = UIBezierPath(ovalIn: outerRect).cgPath
+    }
     let anim = Animations.get(property: .Path,
                               fromValue: fromPath as Any,
                               toValue: toPath,

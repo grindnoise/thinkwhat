@@ -37,7 +37,7 @@ class SurveyFiltersCollectionView: UICollectionView {
   private let dataItems: [SurveyFilterItem]
   private var source: Source!
   private let colorPublisher = PassthroughSubject<UIColor, Never>()
- 
+  
   // MARK: - Destructor
   deinit {
     observers.forEach { $0.invalidate() }
@@ -66,6 +66,30 @@ class SurveyFiltersCollectionView: UICollectionView {
   // MARK: - Public methods
   public func setColor(_ color: UIColor) {
     self.color = color
+  }
+  
+  /// Resets all filters and scrolls to the first and selects it
+  public func resetFilters() {
+    // Capture data items
+    let items = source.snapshot().itemIdentifiers
+    
+    // Check if data source is not empty to scroll to the first row
+    guard !items.count.isZero else { return }
+    
+    // Disable filters for all data items
+    items.forEach { $0.setDisabled() }
+    
+    // Scroll to the first row
+    scrollToItem(at: .init(row: 0, section: 0), at: .centeredHorizontally, animated: true)
+    
+    // Select first row and set filter enabled with light delay
+    delay(seconds: 0.5) { [weak self] in
+      guard let self = self,
+            let cell = self.cellForItem(at: .init(row: 0, section: 0)) as? SurveyFilterCell
+      else { return }
+      
+      cell.item.setEnabled()
+    }
   }
 }
 

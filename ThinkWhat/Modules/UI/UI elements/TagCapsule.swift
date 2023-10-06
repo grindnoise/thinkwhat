@@ -15,9 +15,7 @@ class TagCapsule: UIView {
   ///**Logic**
   public var text: String = "" {
     didSet {
-      guard oldValue != text//,
-//            let constraint = label.getConstraint(identifier: "widthAnchor")
-      else { return }
+      guard oldValue != text else { return }
       
       let constraint = label.getConstraint(identifier: "widthAnchor") ?? {
             let instance = label.widthAnchor.constraint(equalToConstant: text.width(withConstrainedHeight: 100, font: font))
@@ -117,6 +115,23 @@ class TagCapsule: UIView {
   private let textPadding: UIEdgeInsets
   private let isShadowed: Bool
   private let useGradient: Bool
+  private var attributedString: NSAttributedString? {
+    didSet {
+      guard let attributedString = attributedString else { return }
+      
+      let constraint = label.getConstraint(identifier: "widthAnchor") ?? {
+        let instance = label.widthAnchor.constraint(equalToConstant: attributedString.size().width)
+        instance.identifier = "widthAnchor"
+        instance.isActive = true
+        
+        return instance
+      }()
+      
+      label.attributedText = attributedString
+      setNeedsLayout()
+      constraint.constant = attributedString.size().width + padding
+    }
+  }
   private lazy var bgLayer: CAGradientLayer = {
     let instance = CAGradientLayer()
     instance.type = .radial
@@ -279,6 +294,11 @@ class TagCapsule: UIView {
     if isShadowed {
       shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     }
+  }
+  
+  // MARK: - Public methods
+  public func setAttributedText(_ attrString: NSAttributedString) {
+    attributedString = attrString
   }
 }
 

@@ -15,7 +15,7 @@ class ListController: UIViewController, TintColorable {
   var controllerOutput: ListControllerOutput?
   var controllerInput: ListControllerInput?
   ///**Logic**
-  public var filter = SurveyFilter(main: .new, additional: .period, period: .month)
+  public var filter = SurveyFilter(main: .new, additional: .period, period: .unlimited)
   public var isDataReady: Bool = false
   public var tintColor: UIColor = Colors.main
   public var searchMode = Enums.SearchMode.off {
@@ -242,7 +242,7 @@ private extension ListController {
       for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
         guard let self = self else { return }
         
-        self.navigationController?.setBarShadow(on: false, animated: true)
+        self.navigationController?.setBarShadow(on: false)
       }
     })
     controllerOutput?.searchPublisher

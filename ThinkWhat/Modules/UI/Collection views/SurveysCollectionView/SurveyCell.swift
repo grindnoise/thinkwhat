@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-class SurveyCell: UICollectionViewCell {
+class SurveyCell: UICollectionViewListCell {
   
   // MARK: - Public properties
   public weak var item: SurveyReference! {
@@ -29,6 +29,7 @@ class SurveyCell: UICollectionViewCell {
           
           self.comleteButton.tintColor = self.item.isComplete ? self.item.topic.tagColor : .systemGray4
           self.buttonsStack.insertArrangedSubview(self.watchButton, at: 0)
+          self.buttonsStack.insertArrangedSubview(self.comleteButton, at: 1)
           self.buttonsStack.insertArrangedSubview(self.comleteButton, at: 1)
           self.buttonsStack.removeArrangedSubview(self.claimButton)
           self.claimButton.removeFromSuperview()
@@ -478,10 +479,19 @@ class SurveyCell: UICollectionViewCell {
 //    progressView.alpha = 0
     avatar.removeInteraction(contextInteraction)
     avatar.clearImage()
+    middleView.removeArrangedSubview(imageContainer)
+    imageContainer.removeFromSuperview()
     
     if let constraint = imageContainer.getConstraint(identifier: "imageContainer") {
       imageContainer.removeConstraint(constraint)
     }
+  }
+  
+  override func updateConstraints() {
+    super.updateConstraints()
+    
+    separatorLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+    separatorLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
   }
 }
 
@@ -630,16 +640,13 @@ private extension SurveyCell {
       constraint2.constant = item.truncatedDescription.height(withConstrainedWidth: bounds.width, font: descriptionLabel.font)
       
       //Media
-      guard let media = item.media else {
-        middleView.removeArrangedSubview(imageContainer)
-        imageContainer.removeFromSuperview()
-//        let zeroHeight = imageContainer.heightAnchor.constraint(equalToConstant: 0)
-//        zeroHeight.identifier = "imageContainer"
-//        zeroHeight.isActive = true
-        
-        return
-      }
-      
+      guard let media = item.media else { return }
+//        middleView.removeArrangedSubview(imageContainer)
+//        imageContainer.removeFromSuperview()
+//        
+//        return
+//      }
+//      
       middleView.addArrangedSubview(imageContainer)
       
       let aspectRatio = imageContainer.heightAnchor.constraint(equalTo: imageContainer.widthAnchor, multiplier: 9/16)
@@ -652,11 +659,6 @@ private extension SurveyCell {
         shimmer.translatesAutoresizingMaskIntoConstraints = false
         shimmer.clipsToBounds = true
         shimmer.place(inside: imageContainer)
-//        shimmer.publisher(for: \.bounds)
-//          .filter { $0 != .zero }
-//          .sink { shimmer.cornerRadius = $0.width*0.025 }
-//          .store(in: &subscriptions)
-        
         shimmer.startShimmering()
         media.imagePublisher
           .receive(on: DispatchQueue.main)

@@ -558,6 +558,7 @@ private extension AnswerCell {
       Animations.unmaskLayerCircled(layer: selection,
                                     location: touchLocation,
                                     duration: 0.3,
+                                    timingFunction: .easeInEaseOut,
                                     opacityDurationMultiplier: 0.5,
                                     delegate: self) { completion?() }
     case false:
