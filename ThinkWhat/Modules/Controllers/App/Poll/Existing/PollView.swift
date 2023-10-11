@@ -76,7 +76,7 @@ class PollView: UIView {
     
     let instance = PollCollectionView(item: item!, mode: viewInput!.mode)
 //    instance.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0.0)
-    instance.layer.masksToBounds = false
+//    instance.layer.masksToBounds = false
     instance.contentInset = UIEdgeInsets(top: instance.contentInset.top, left: instance.contentInset.left, bottom: item.isNil ? appDelegate.window!.bounds.height * 0.1 : item!.isComplete ? appDelegate.window!.bounds.height * 0.1 : appDelegate.window!.bounds.height * 0.15, right: instance.contentInset.right)
     instance.imagePublisher
       .sink {[weak self] in
@@ -445,7 +445,7 @@ private extension PollView {
   @MainActor
   func setupUI() {
     backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
-    
+    layer.masksToBounds = true
     addSubviews([
       collectionView,
       scrollToTopButton

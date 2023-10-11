@@ -46,7 +46,7 @@ class PollController: UIViewController {
                isShadowed: false,
                iconCategory: item.topic.iconCategory)
   }()
-  private var spinner: SpiralSpinner!
+  private lazy var spinner: Logo = { Logo() }() // SpiralSpinner!
   public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: traitCollection.userInterfaceStyle == .dark ? Colors.spiralDark : Colors.spiralLight) }()
   
   
@@ -310,10 +310,19 @@ private extension PollController {
         self.setBarButtonItems()
       }
       .store(in: &subscriptions)
+    
+    // Nav bar shadow control
+    tasks.append(Task { @MainActor [weak self] in
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
+        guard let self = self else { return }
+        
+        self.navigationController?.setBarShadow(on: self.traitCollection.userInterfaceStyle != .dark, animated: true)
+      }
+    })
   }
   
   func loadData() {
-    spinner = SpiralSpinner(color: item.topic.tagColor)
+//    spinner = SpiralSpinner(color: item.topic.tagColor)
     
     guard item.survey.isNil else {
       controllerOutput?.item = item.survey
@@ -329,34 +338,15 @@ private extension PollController {
     view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
     controllerInput?.load(item, incrementViewCounter: true)
     
-    view.addSubview(spiral)
-    view.addSubview(spinner)
-    
-    spiral.aspectRatio(1)
-    spiral.widthToHeight(of: view, multiplier: 1.5)
-    spiral.centerInSuperview()
-    spinner.centerXToSuperview()
-    spinner.centerYToSuperview()
-    spinner.widthToSuperview(multiplier: 0.25)
-//    spinner.placeInCenter(of: view,
-//                          widthMultiplier: 0.25,
-//                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-    spinner.start(duration: 1)
-    spiral.startRotating(duration: 5)
+    // Show spinner
+    setLoading()
   }
   
   /// Loads survey by id from push notification
   /// - Parameter surveyID: survey id extracted from push notification
   func loadData(surveyID: Int) {
-    spinner = SpiralSpinner(color: Colors.main)
-    spiral.startRotating(duration: 5)
-    navigationController?.setNavigationBarHidden(true, animated: false)
-    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
-    spinner.placeInCenter(of: view,
-                          widthMultiplier: 0.25,
-                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+    setLoading()
     controllerInput?.loadSurvey(surveyID)
-    spinner.start(duration: 1)
   }
   
   /// Loads survey by id and comments thread by root comment id from push notification
@@ -364,38 +354,23 @@ private extension PollController {
   /// - Parameter threadId: root comment id
   /// - Parameter replyId: reply comment id
   func loadData(surveyId: Int, threadId: Int, replyId: Int) {
-    spinner = SpiralSpinner(color: Colors.main)
-    spiral.startRotating(duration: 5)
-    navigationController?.setNavigationBarHidden(true, animated: false)
-    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
-    spinner.placeInCenter(of: view,
-                          widthMultiplier: 0.25,
-                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+    setLoading()
     controllerInput?.loadSurveyAndThread(surveyId: surveyId,
                                          threadId: threadId,
                                          includeList: [replyId],
                                          threshold: 100)
-    spinner.start(duration: 1)
   }
   
   /// Loads survey by id and comments thread by root comment id from push notification
-  /// - Parameter surveyId: survey id
   /// - Parameter threadId: root comment id
   /// - Parameter replyId: reply comment id
   func loadData(threadId: Int, replyId: Int) {
-    spinner = SpiralSpinner(color: Colors.main)
-    spiral.startRotating(duration: 5)
-    navigationController?.setNavigationBarHidden(true, animated: false)
-    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
-    spinner.placeInCenter(of: view,
-                          widthMultiplier: 0.25,
-                          yOffset: -NavigationController.Constants.NavBarHeightSmallState)
+    setLoading()
     controllerInput?.loadThread(threadId: threadId,
                                 excludeList: [],
                                 includeList: [replyId],
                                 includeSelf: true,
                                 threshold: 100)
-    spinner.start(duration: 1)
   }
   
   
@@ -417,21 +392,34 @@ private extension PollController {
                                       attributes: .init(),
                                       state: .off,
                                       handler: { [unowned self] _ in
-      // Setting description
-      let firstActivityItem = self.item.title
       
-      // Setting url
-      let queryItems = [URLQueryItem(name: "hash", value: self.item.shareHash),
-                        URLQueryItem(name: "enc", value: self.item.shareEncryptedString)]
-      var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString)!
-      urlComps.queryItems = queryItems
+      guard (!self.item.shareHash.isEmpty && !self.item.shareEncryptedString.isEmpty),
+            let baseUrl = API_URLS.Surveys.share,
+            let url = URL(string: baseUrl.absoluteString + "\(self.item.shareHash)/\(self.item.shareEncryptedString)/")
+      else {
+#if DEBUG
+        fatalError("shareHash and shareEncryptedString are empty")
+#else
+        return
+#endif
+      }
       
-      let secondActivityItem: URL = urlComps.url!
+//      // Setting description
+////      let firstActivityItem = self.item.title
+//
+//      // Setting url
+////      let queryItems = [URLQueryItem(name: "hash", value: self.item.shareHash),
+////                        URLQueryItem(name: "enc", value: self.item.shareEncryptedString)]
+//      var urlComps = URLComponents(string: API_URLS.Surveys.share!.absoluteString + "\(self.item.shareHash)/\(self.item.shareEncryptedString)/")!
+////      urlComps.queryItems = queryItems
+//
+//      let secondActivityItem: URL = urlComps.url!
+//
+//      // If you want to use an image
+//      let image : UIImage = UIImage(named: "AppIcon")!
+//      let activityViewController : UIActivityViewController = UIActivityViewController(activityItems: [/*firstActivityItem, */secondActivityItem, image], applicationActivities: nil)
       
-      // If you want to use an image
-      let image : UIImage = UIImage(named: "anon")!
-      let activityViewController : UIActivityViewController = UIActivityViewController(
-        activityItems: [firstActivityItem, secondActivityItem, image], applicationActivities: nil)
+      let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
       
       // This lines is for the popover you need to show in iPad
       activityViewController.popoverPresentationController?.sourceView = self.view
@@ -459,9 +447,8 @@ private extension PollController {
       ]
       
       activityViewController.isModalInPresentation = false
-      self.present(activityViewController,
-                   animated: true,
-                   completion: nil)
+      self.navigationController?.setBarShadow(on: false, animated: false)
+      self.present(activityViewController, animated: true) { [unowned self] in self.navigationController?.setBarShadow(on: true, animated: true) }
     })
     
     var actionButton: UIBarButtonItem!
@@ -544,6 +531,33 @@ private extension PollController {
                                    primaryAction: shareAction,
                                    menu: nil)
     navigationItem.rightBarButtonItem = actionButton
+  }
+  
+  /// Sets up loading view
+  func setLoading() {
+    navigationController?.setNavigationBarHidden(true, animated: false)
+    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    
+    view.addSubview(spiral)
+    view.addSubview(spinner)
+    view.layer.masksToBounds = true
+    
+    spiral.aspectRatio(1)
+    spiral.widthToHeight(of: view, multiplier: 1.5)
+    spiral.centerInSuperview()
+    spinner.centerXToSuperview()
+    spinner.centerYToSuperview()
+    spinner.widthToSuperview(multiplier: 0.25)
+    
+    // Animations
+    spiral.startRotating(duration: 5)
+    UIView.animate(withDuration: 1,
+                   delay: 0,
+                   options: [.autoreverse, .repeat, .curveEaseInOut]) { [weak self] in
+      guard let self = self else { return }
+      
+      self.spinner.transform = .init(scaleX: 0.95, y: 0.95)
+    }
   }
 }
 
@@ -687,7 +701,8 @@ extension PollController: PollModelOutput {
         guard let self = self else { return }
         
         self.controllerOutput?.presentView(item: survey, animated: false)
-        self.spinner.stop()
+//        self.spinner.stop()
+        self.spinner.layer.removeAllAnimations()
         self.spinner.removeFromSuperview()
       }
     case .failure(let error):
@@ -712,24 +727,41 @@ extension PollController: PollModelOutput {
       delay(seconds: 0.75) { [weak self] in
         guard let self = self else { return }
         
-        UIView.animate(withDuration: 0.3, animations: { [weak self] in
+        UIView.animate(withDuration: 0.4, animations: { [weak self] in
           guard let self = self else { return }
           
-          self.spiral.transform = .init(scaleX: 1.25, y: 1.25)
-          self.spiral.alpha = 0
-          self.spinner.alpha = 0
-          self.spinner.transform =  CGAffineTransform(scaleX: 0.25, y: 0.25)
-        }) { [weak self] _ in
-          guard let self = self,
-                let survey = self.item.survey
-          else { return }
-          
-          self.navigationController?.setNavigationBarHidden(false, animated: true)
-          self.controllerOutput?.presentView(item: survey, animated: true)
-          self.spinner.stop()
-          self.spinner.removeFromSuperview()
-          self.spiral.stopRotating()
-          self.spiral.removeFromSuperview()
+          self.spinner.transform = .identity
+        }) { _ in
+          UIView.animate(withDuration: 0.25,
+                         delay: 0,
+                         options: .curveEaseInOut) { [weak self] in
+            guard let self = self else { return }
+            
+            self.spinner.alpha = 0
+          }
+          UIView.animate(withDuration: 0.3,
+                         delay: 0,
+                         options: .curveEaseInOut,
+                         animations: { [weak self] in
+            guard let self = self else { return }
+            
+            self.spiral.transform = .init(scaleX: 1.25, y: 1.25)
+            self.spiral.alpha = 0
+            //          self.spinner.alpha = 0
+            self.spinner.transform =  CGAffineTransform(scaleX: 0.25, y: 0.25)
+          }) { [weak self] _ in
+            guard let self = self,
+                  let survey = self.item.survey
+            else { return }
+            
+            self.navigationController?.setNavigationBarHidden(false, animated: true)
+            self.controllerOutput?.presentView(item: survey, animated: true)
+            //          self.spinner.stop()
+            self.spinner.layer.removeAllAnimations()
+            self.spinner.removeFromSuperview()
+            self.spiral.stopRotating()
+            self.spiral.removeFromSuperview()
+          }
         }
       }
     case .failure:

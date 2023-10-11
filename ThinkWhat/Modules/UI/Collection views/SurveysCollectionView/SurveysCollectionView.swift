@@ -105,7 +105,7 @@ class SurveysCollectionView: UICollectionView {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private lazy var dataItems = filter.getDataItems()
+  private lazy var dataItems = filter.getDataItems(publish: false)
   private let filter: SurveyFilter // Use to filter dataItems
   private var source: Source!
   private let isRequestingPublisher = CurrentValueSubject<Bool, Never>(false)

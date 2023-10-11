@@ -147,6 +147,12 @@ class HotController: UIViewController, TintColorable {
     controllerOutput?.didDisappear()
 //    tabBarController?.setTabBarVisible(visible: false, animated: true)
   }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    navigationController?.setBarShadow(on: false)
+  }
 }
 
 private extension HotController {

@@ -29,9 +29,9 @@ class CommentsController: UIViewController {
   private let padding: CGFloat = 8
   private lazy var titleView: TagCapsule = { TagCapsule(text: "replies".localized.uppercased() + ": \(item.replies)",
                                                         padding: padding/2,
-                                                        textPadding: .init(top: padding/2, left: 0, bottom: padding/2, right: padding),
+                                                        textPadding: .init(top: padding/1.5, left: 0, bottom: padding/1.5, right: padding),
                                                         color: item.survey?.topic.tagColor ?? .lightGray,
-                                                        font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
+                                                        font: UIFont(name: Fonts.Rubik.Medium, size: 14)!,
                                                         isShadowed: false,
                                                         iconCategory: nil,
                                                         image: UIImage(systemName: "bubble.right.fill"))

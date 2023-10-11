@@ -187,12 +187,7 @@ class TopicsController: UIViewController, TintColorable {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    //        barButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
-    //        searchField.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue : K_COLOR_RED
-    //        searchField.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    //        barButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    //        gradient.colors = getGradientColors()
-    //        setNavigationBarTintColor(traitCollection.userInterfaceStyle == .dark ? .systemBlue : .darkGray)
+    navigationController?.setBarShadow(on: false)
   }
 }
 

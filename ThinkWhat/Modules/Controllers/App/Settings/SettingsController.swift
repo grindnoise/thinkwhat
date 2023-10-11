@@ -192,7 +192,7 @@ class SettingsController: UIViewController, UINavigationControllerDelegate, Tint
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
+    navigationController?.setBarShadow(on: false)
   }
 }
 
@@ -276,33 +276,18 @@ private extension SettingsController {
         self.isOnScreen = false
       }
     })
+    
     tasks.append(Task { @MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-        guard let self = self,
-              let main = self.tabBarController as? MainController,
-              main.selectedIndex == 4
-        else { return }
+      for await _ in NotificationCenter.default.notifications(for: UIApplication.willEnterForegroundNotification) {
+        guard let self = self else { return }
         
-        self.isOnScreen = true
+        self.navigationController?.setBarShadow(on: false)
+        if let main = self.tabBarController as? MainController, main.selectedIndex == 4 {
+          self.isOnScreen = true
+        }
       }
     })
   }
-  
-  //    @MainActor
-  //    func setTitle(animated: Bool = true) {
-  //        guard animated else {
-  //            titleLabel.text = mode.rawValue.localized
-  //            return
-  //        }
-  //
-  //        UIView.transition(with: titleLabel,
-  //                          duration: 0.15,
-  //                          options: .transitionCrossDissolve) { [weak self] in
-  //            guard let self = self else { return }
-  //
-  //            self.titleLabel.text = self.mode.rawValue.localized
-  //        }
-  //    }
 }
 
 // MARK: - View Input

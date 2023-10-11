@@ -132,6 +132,14 @@ private extension TopicsCollectionView {
       
       if self.mode == .Default {
         cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: item.topic.activeCount.isZero ? .clear : item.topic.tagColor))]
+        item.topic.activeCountPublisher
+          .receive(on: DispatchQueue.main)
+          .sink { [weak self] in
+            guard !self.isNil else { return }
+            
+            cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: $0.isZero ? .clear : item.topic.tagColor))]
+          }
+          .store(in: &cell.tempSubscriptions)
       }
     }
     

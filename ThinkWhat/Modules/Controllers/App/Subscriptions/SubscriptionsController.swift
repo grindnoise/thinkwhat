@@ -189,6 +189,7 @@ class SubscriptionsController: UIViewController, TintColorable {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    navigationController?.setBarShadow(on: false)
     if let shadow = navigationItem.rightBarButtonItems?.filter({ $0.customView?.accessibilityIdentifier == "subscribers" }).first?.customView,
        let btn = shadow.getSubview(type: UIButton.self) {
       shadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1

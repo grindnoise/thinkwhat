@@ -181,8 +181,14 @@ class TagCapsule: UIView {
     // Add background layer
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.publisher(for: \.bounds)
+      .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: true)
       .filter { [unowned self] in $0.size != self.bgLayer.bounds.size }
-      .sink { [unowned self] in self.bgLayer.frame = $0 }
+      .sink { [unowned self] in
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        self.bgLayer.frame = $0
+        CATransaction.commit()
+      }
       .store(in: &subscriptions)
 
     

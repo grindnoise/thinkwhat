@@ -82,8 +82,20 @@ class Survey: Decodable {
   var answers:                [Answer] = []
   var answersSortedByVotes:   [Answer] { answers.sorted { $0.totalVotes > $1.totalVotes }}
   var answersSortedByOrder:   [Answer] { answers.sorted { $0.order < $1.order }}
-  var shareHash:              String = ""
-  var shareEncryptedString:   String = ""
+  var shareHash: String {
+    didSet {
+      guard !shareHash.isEmpty, oldValue != shareHash else { return }
+      
+      reference.shareHash = shareHash
+    }
+  }
+  var shareEncryptedString: String {
+    didSet {
+      guard !shareEncryptedString.isEmpty, oldValue != shareEncryptedString else { return }
+      
+      reference.shareEncryptedString = shareEncryptedString
+    }
+  }
   var url:                    URL? = nil///hlink
   var votesLimit:             Int {
     didSet {
@@ -310,9 +322,17 @@ class Survey: Decodable {
       isVisited               = try container.decode(Bool.self, forKey: .isVisited)
       isTop       = try container.decode(Bool.self, forKey: .isTop)
       isNew       = try container.decode(Bool.self, forKey: .isNew)
+      
       let shareData           = try container.decode([String].self, forKey: .shareLink)
-      shareHash               = shareData.first ?? ""
-      shareEncryptedString    = shareData.last ?? ""
+      guard !shareData.isEmpty else {
+#if DEBUG
+      fatalError()
+#endif
+        throw "shareData is empty"
+      }
+      
+      shareHash               = shareData.first! // ?? ""
+      shareEncryptedString    = shareData.last! // ?? ""
       
       if let dict = try container.decodeIfPresent([String: Date].self, forKey: .result), !dict.isEmpty {
         result = [Int(dict.keys.first!)!: dict.values.first!]
@@ -392,6 +412,8 @@ class Survey: Decodable {
     self.rating              = 0
     self.commentsTotal       = commentsTotal
     self.startDate           = Date()
+    self.shareHash = ""
+    self.shareEncryptedString = ""
     //    self.media = []
     //    self.answers = []
     self.media               = media.enumerated().map { order, item in Mediafile(title: item.text, order: order, survey: self, image: item.image) }
@@ -427,7 +449,9 @@ class Survey: Decodable {
                                      owner: owner,
                                      isAnonymous: isAnonymous,
                                      progress: progress,
-                                     rating: rating)
+                                     rating: rating,
+                                     shareHash: shareHash,
+                                     shareEncryptedString: shareEncryptedString)
       //            SurveyReferences.shared.all.append(instance)
       return instance
     }

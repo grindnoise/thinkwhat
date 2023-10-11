@@ -9,6 +9,7 @@
 
 import UIKit
 import Combine
+import TinyConstraints
 
 class AnswerCell: UICollectionViewCell {
   
@@ -211,13 +212,31 @@ class AnswerCell: UICollectionViewCell {
     
     return instance
   }()
+  private lazy var answerCountLabel: UIView = {
+    let instance = UIView.opaque()
+    instance.widthToHeight(of: instance)
+    
+    // Add white background layer
+    let bgLayer = CAShapeLayer()
+    bgLayer.fillColor = UIColor.white.cgColor
+    instance.layer.insertSublayer(bgLayer, at: 0)
+    instance.height(UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)!.pointSize + lineSpacing/2)
+    instance.addSubview(imageView)
+    imageView.edgesToSuperview()
+    instance.publisher(for: \.bounds)
+      .sink {
+        bgLayer.frame = $0
+        bgLayer.path = UIBezierPath(ovalIn: $0.inset(by: .uniform($0.width*0.9))).cgPath
+      }
+      .store(in: &subscriptions)
+    
+    return instance
+  }()
   private lazy var imageView: UIImageView = {
     let instance = UIImageView()
     instance.contentMode = .center
     instance.tintColor = .systemGray
-    instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-    instance.heightAnchor.constraint(equalToConstant: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)!.pointSize + lineSpacing/2).isActive = true
-    //    instance.publisher(for: \.bounds)
+    
     return instance
   }()
   ///Bottom part
@@ -342,24 +361,6 @@ class AnswerCell: UICollectionViewCell {
     
     return instance
   }()
-  //  private lazy var disclosureIndicator: UIImageView = {
-  //    let instance = UIImageView(image: UIImage(systemName: "chevron.right"))
-  //    instance.accessibilityIdentifier = "chevron"
-  //    instance.clipsToBounds = true
-  //    instance.tintColor = .label
-  //    instance.contentMode = .center
-  //    instance.preferredSymbolConfiguration = .init(textStyle: .headline, scale: .small)
-  //    instance.isUserInteractionEnabled = true
-  //    instance.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.handleGesture(sender:))))
-  //    instance.alpha = item.totalVotes == 0 ? 0 : 1
-  //    instance.tintColor = color
-  //
-  //    let constraint = instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 1/3)
-  //    constraint.identifier = "widthAnchor"
-  //    constraint.isActive = true
-  //
-  //    return instance
-  //  }()
   private lazy var checkmark: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "checkmark.seal.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
@@ -477,7 +478,7 @@ private extension AnswerCell {
     let inset = padding/2 + lineSpacing
     let views = [
       stackView,
-      imageView,
+      answerCountLabel,
     ]
     addSubviews(views)
     views.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
@@ -485,8 +486,8 @@ private extension AnswerCell {
       stackView.topAnchor.constraint(equalTo: topAnchor),
       stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
       stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      imageView.topAnchor.constraint(equalTo: stackView.topAnchor, constant: inset),
-      imageView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: inset),
+      answerCountLabel.topAnchor.constraint(equalTo: stackView.topAnchor, constant: inset),
+      answerCountLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: inset),
     ])
     
     openConstraint = stackView.bottomAnchor.constraint(equalTo: bottomAnchor)

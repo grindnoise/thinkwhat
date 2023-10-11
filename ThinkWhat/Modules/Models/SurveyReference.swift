@@ -137,8 +137,20 @@ class SurveyReference: Decodable, Complaintable {
 //      }
 //    }
 //  }
-  var shareHash:              String = ""
-  var shareEncryptedString:   String = ""
+  var shareHash: String {
+    didSet {
+      guard !shareHash.isEmpty, oldValue != shareHash else { return }
+      
+      survey?.shareHash = shareHash
+    }
+  }
+  var shareEncryptedString: String {
+    didSet {
+      guard !shareEncryptedString.isEmpty, oldValue != shareEncryptedString else { return }
+      
+      survey?.shareEncryptedString = shareEncryptedString
+    }
+  }
   ///**Filtering properties
   var isComplete: Bool {
     didSet {
@@ -273,14 +285,20 @@ class SurveyReference: Decodable, Complaintable {
       isVisited   = try container.decode(Bool.self, forKey: .isVisited)
       isTop       = try container.decode(Bool.self, forKey: .isTop)
       isNew       = try container.decode(Bool.self, forKey: .isNew)
-      let shareData           = try container.decode([String].self, forKey: .share_link)
-      shareHash               = shareData.first ?? ""
-      shareEncryptedString    = shareData.last ?? ""
-      _ = try container.decodeIfPresent([Mediafile].self, forKey: .media)
-//      if let _media       = try container.decodeIfPresent([Mediafile].self, forKey: .media)?.first {
-//        media = _media
-//      }
       rating      = Double(try container.decode(String.self, forKey: .rating)) ?? 0
+      let shareData = try container.decode([String].self, forKey: .share_link)
+      
+      guard !shareData.isEmpty else {
+#if DEBUG
+      fatalError()
+#endif
+        throw "shareData is empty"
+      }
+      
+      shareHash               = shareData.first! // ?? ""
+      shareEncryptedString    = shareData.last! // ?? ""
+      
+      _ = try container.decodeIfPresent([Mediafile].self, forKey: .media)
       
 //      // Check for existing instance by hashValue
 //      if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {
@@ -321,6 +339,8 @@ class SurveyReference: Decodable, Complaintable {
     self.rating                  = 0
     self.isNew                   = true
     self.isTop                   = false
+    self.shareHash = ""
+    self.shareEncryptedString = ""
   }
   
   init(id: Int,
@@ -347,7 +367,10 @@ class SurveyReference: Decodable, Complaintable {
        isAnonymous: Bool,
        progress: Int = 0,
        rating: Double = 0,
-       commentsTotal: Int = 0) {
+       commentsTotal: Int = 0,
+       shareHash: String,
+       shareEncryptedString: String
+  ) {
     
     self.id                      = id
     self.title                   = title
@@ -374,7 +397,9 @@ class SurveyReference: Decodable, Complaintable {
     self.isBanned                = isBanned
     self.isNew                   = isNew
     self.isTop                   = isTop
-    
+    // Avoid compiler error
+    self.shareHash = shareHash
+    self.shareEncryptedString = shareEncryptedString
     //Swift
     if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {
       SurveyReferences.shared.all.append(self)

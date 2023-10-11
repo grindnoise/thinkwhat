@@ -9,7 +9,7 @@
 import Foundation
 
 struct API_URLS {
-  static let BASE                     = localhost ? "http://127.0.0.1:8000/" : "https://damp-oasis-64585.herokuapp.com/"////
+  static let BASE                     = localhost ? "http://127.0.0.1:8000/" : "https://www.thinkwhat.app/" //"https://damp-oasis-64585.herokuapp.com/"////
   static let CLIENT_ID                = localhost ? "o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS" : "bdOS2la5RAgkZNq4uSq0esOIa0kZmlL05nt2OjSw"//"o1Flzw2j8yaRVhSnLJr0JY5Hd6hcA8C0aiv2EUAS"//
   static let CLIENT_SECRET            = localhost ? "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH" : "Swx6TUPhgYpGqOe2k1B0UGxjeX19aRhb5RkkVzpPzYEluzPlHse5OaB5NSV3Ttj0n0sWBFOvZvAGef1qdcNOfJ56t15QDIvNftqdUB8WXukLJsowfuVtrcj415t28nCO" // "IQnHcT6s6RqPJhws0mi3e8zWc9uXiTugkclkY9l2xd0FGFnUqmgr27q6d9kEvXhj64uWOlvrQTJCE4bI6PWPYS9mduml9z57glPqSOPgLBnqx8ucyYhew50CkzaUnWNH"
   static let CURRENT_TIME             = "api/current_time/"
@@ -81,7 +81,8 @@ struct API_URLS {
     static let search:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/search/")}()
     static let root:                URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/")}()
     static let media:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/media/")}()
-    static let share:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/share/")}()
+    static let share:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("share_preview/")}()
+//    static let share:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/share/")}()
     static let claim:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/claim/")}()
     static let reject:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/reject/")}()
     static let addFavorite:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/add_favorite/")}()

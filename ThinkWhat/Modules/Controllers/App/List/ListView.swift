@@ -574,32 +574,42 @@ extension ListView: ListControllerOutput {
     guard let leading = filtersCollectionView.getConstraint(identifier: "leading") else { return }
     
     if enabled {
-      searchCancelButton.alpha = 0
-      searchCancelButton.transform = .init(scaleX: 0.5, y: 0.5)
       searchField.becomeFirstResponder()
-      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) { [weak self] in
-        guard let self = self else { return }
-        
-        self.setNeedsLayout()
-        leading.constant = self.filtersCollectionView.bounds.width
-        self.layoutIfNeeded()
-        self.emptyPublicationsView.alpha = 0
-      } completion: {  _ in }
-      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.2, delay: 0.15, options: .curveEaseInOut) { [weak self] in
-        guard let self = self else { return }
-        
-        self.searchCancelButton.alpha = 1
-        self.searchCancelButton.transform = .identity
-      } completion: {  _ in }
+      searchStack.alpha = 0
+      
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.2,
+        options: [.curveEaseInOut]) { [weak self] in
+          guard let self = self else { return }
+          
+          self.setNeedsLayout()
+          leading.constant = self.filtersCollectionView.bounds.width
+          self.layoutIfNeeded()
+          self.emptyPublicationsView.alpha = 0
+          self.filtersCollectionView.alpha = 0
+          self.searchStack.alpha = 1
+        } completion: {  _ in }
     } else {
-      UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: .curveEaseInOut) { [weak self] in
-        guard let self = self else { return }
+      UIView.animate(
+        withDuration: 0.3,
+        delay: 0,
+        usingSpringWithDamping: 0.8,
+        initialSpringVelocity: 0.2,
+        options: [.curveEaseInOut],
+        animations: { [weak self] in
+          guard let self = self else { return }
         
         self.setNeedsLayout()
         leading.constant = 0
         self.layoutIfNeeded()
-        self.searchCancelButton.alpha = 0
-        self.searchCancelButton.transform = .init(scaleX: 0.5, y: 0.5)
+        self.searchStack.alpha = 0
+        self.filtersCollectionView.alpha = 1
+      }) { [weak self] _ in
+        guard let self = self else { return }
+        
         if self.isEmpty {
           self.emptyPublicationsView.alpha = 1
         }

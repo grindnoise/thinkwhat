@@ -2158,14 +2158,10 @@ class API {
           
           let data = try await parent.uploadMultipartFormDataAsync(url: url, method: .post, multipartDataForm: multipartFormData, headers: headers, uploadProgress: {_ in})
           let json = try JSON(data: data, options: .mutableContainers)
-          let decoder = JSONDecoder()
-          decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                     DateFormatter.dateTimeFormatter,
-                                                     DateFormatter.dateFormatter ]
-          
+
           do {
             try await MainActor.run {
-              let instance = try decoder.decode(Survey.self, from: json["survey"].rawData())
+              let instance = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Survey.self, from: json["survey"].rawData())
               Surveys.shared.append([instance])
               
               if let userprofile = Userprofiles.shared.current {
@@ -2189,14 +2185,10 @@ class API {
                                                    headers: headers,
                                                    accessControl: true)
           let json = try JSON(data: data, options: .mutableContainers)
-          let decoder = JSONDecoder()
-          decoder.dateDecodingStrategyFormatters = [ DateFormatter.ddMMyyyy,
-                                                     DateFormatter.dateTimeFormatter,
-                                                     DateFormatter.dateFormatter ]
           
           do {
             try await MainActor.run {
-              Surveys.shared.append([try decoder.decode(Survey.self, from: json["survey"].rawData())])
+              Surveys.shared.append([try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Survey.self, from: json["survey"].rawData())])
               
               guard let currentUser = Userprofiles.shared.current,
                     let balance = json["balance"].int

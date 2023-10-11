@@ -45,12 +45,14 @@ class TopicCell: UICollectionViewListCell {
   public var item: TopicItem!
   public var callback: Closure?
   public var touchSubject = PassthroughSubject<[Topic: CGPoint], Never>()
+  public var tempSubscriptions = Set<AnyCancellable>()
   
   // MARK: - Destructor
   deinit {
     observers.forEach { $0.invalidate() }
     tasks.forEach { $0?.cancel() }
     subscriptions.forEach { $0.cancel() }
+    tempSubscriptions.forEach { $0.cancel() }
     NotificationCenter.default.removeObserver(self)
 #if DEBUG
     print("\(String(describing: type(of: self))).\(#function)")
@@ -118,6 +120,8 @@ class TopicCell: UICollectionViewListCell {
   override func prepareForReuse() {
     //        touchSubject = .init(nil)
     super.prepareForReuse()
+    
+    tempSubscriptions.forEach { $0.cancel() }
   }
   
   @objc
@@ -156,10 +160,10 @@ class TopicCellContent: UIView, UIContentView {
       if currentConfiguration.mode == .Default {
         currentConfiguration.topicItem.topic.activeCountPublisher
           .receive(on: DispatchQueue.main)
-          .sink { [weak self] in
+          .sink { [weak self] _ in
             guard let self = self else { return }
             
-            self.discloseButton.alpha = CGFloat($0)
+//            self.discloseButton.alpha = CGFloat($0)
             self.tagCapsule.setAttributedText(self.getAttributedString(topic: self.currentConfiguration.topicItem.topic))
           }
           .store(in: &tempSubscriptions)

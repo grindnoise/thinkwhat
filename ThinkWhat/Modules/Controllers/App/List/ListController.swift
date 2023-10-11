@@ -103,12 +103,12 @@ class ListController: UIViewController, TintColorable {
     
     isOnScreen = false
   }
-  //
-  //    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-  //        super.traitCollectionDidChange(previousTraitCollection)
-  //
-  //        titleLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .label
-  //    }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    navigationController?.setBarShadow(on: false)
+  }
 }
 
 // MARK: - View Input

@@ -1098,7 +1098,7 @@ private extension MainController {
                           location: buttons[tab.rawValue].center,
                           size: .uniform(size: tabBar.bounds.height*0.4),
                           duration: 0.2,
-                          timingFunction: .easeInEaseOut)
+                          timingFunction: .easeOut)
     
   }
 }

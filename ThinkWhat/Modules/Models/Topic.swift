@@ -110,11 +110,10 @@ class Topic: Decodable {
   }
   var activeCount: Int = 0 {
     didSet {
-      guard oldValue != activeCount else { return }
+//      guard oldValue != activeCount else { return }
       
       activeCountPublisher.send(activeCount)
-      let diff = oldValue - activeCount
-      parent?.activeCount += diff > 0 ? -diff : diff
+      parent?.updateActiveCount()
     }
   }
   var favorite: Int = 0
@@ -158,6 +157,13 @@ class Topic: Decodable {
     } catch {
       throw error
     }
+  }
+  
+  // MARK: - Public methods
+  public func updateActiveCount() {
+    activeCount = Topics.shared.all
+      .filter { $0.parent == self }
+      .reduce(into: 0) { $0 += $1.activeCount }
   }
 }
 

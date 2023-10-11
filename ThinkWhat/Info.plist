@@ -70,6 +70,13 @@
 		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>https://thinkwhat.app</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
 			<key>api.geonames.org</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
