@@ -53,6 +53,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         replyToId = _replyToId
       }
     }
+    
+//    // Universal link check
+//    if let launchOptions = launchOptions, (launchOptions[UIApplication.LaunchOptionsKey.userActivityDictionary] != nil) {
+//      let activityDictionary = launchOptions[UIApplication.LaunchOptionsKey.userActivityDictionary] as? [AnyHashable: Any] ?? [AnyHashable: Any]()
+//      let activity = activityDictionary["UIApplicationLaunchOptionsUserActivityKey"] as? NSUserActivity
+//      if activity != nil {
+//        fatalError()
+////        isUniversalLinkClick = true
+//      }
+//    }
 
     var rootController: UIViewController!
     if AppData.accessToken.isNil || AppData.accessToken!.isEmpty {
@@ -86,15 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ app: UIApplication,
                    open url: URL,
                    options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-#if DEBUG
-    print(url)
-#endif
-    //    ApplicationDelegate.shared.application(
-    //      app,
-    //      open: url,
-    //      sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
-    //      annotation: options[UIApplication.OpenURLOptionsKey.annotation]
-    //    )
+    
     VK.handle(url: url, sourceApplication: options[.sourceApplication] as? String)
     return GIDSignIn.sharedInstance.handle(url)
   }
@@ -127,7 +129,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   
   func application(_ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-      print(deviceToken.reduce("") { $0 + String(format: "%02x", $1) })
+//      print(deviceToken.reduce("") { $0 + String(format: "%02x", $1) })
       PushNotifications.saveToken(token: deviceToken)
 //      PushNotifications.registerCustomActions()
   }
@@ -140,33 +142,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, 
                    continue userActivity: NSUserActivity,
                    restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-    // Get URL components from the incoming user activity.
-        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-            let incomingURL = userActivity.webpageURL,
-            let components = NSURLComponents(url: incomingURL, resolvingAgainstBaseURL: true) else {
-            return false
-        }
-
-
-        // Check for specific URL components that you need.
-        guard let path = components.path,
-        let params = components.queryItems else {
-            return false
-        }
-        print("path = \(path)")
-
-
-        if let albumName = params.first(where: { $0.name == "albumname" } )?.value,
-            let photoIndex = params.first(where: { $0.name == "index" })?.value {
-            print("album = \(albumName)")
-            print("photoIndex = \(photoIndex)")
-            return true
-
-
-        } else {
-            print("Either album name or photo index missing")
-            return false
-        }
+    // Get URL from the incoming user activity (web)
+    // https://developer.apple.com/documentation/xcode/supporting-universal-links-in-your-app
+    guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+          let url = userActivity.webpageURL,
+          checkShareURL(url)
+    else {
+      return false
+    }
+    
+    
+      handleShareLink(url)
+      return true
+    
+//    // Get URL components from the incoming user activity.
+//        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+//            let incomingURL = userActivity.webpageURL,
+//            let components = NSURLComponents(url: incomingURL, resolvingAgainstBaseURL: true) else {
+//            return false
+//        }
+//
+//
+//        // Check for specific URL components that you need.
+//        guard let path = components.path,
+//        let params = components.queryItems else {
+//            return false
+//        }
+//        print("path = \(path)")
+//
+//
+//        if let albumName = params.first(where: { $0.name == "albumname" } )?.value,
+//            let photoIndex = params.first(where: { $0.name == "index" })?.value {
+//            print("album = \(albumName)")
+//            print("photoIndex = \(photoIndex)")
+//            return true
+//
+//
+//        } else {
+//            print("Either album name or photo index missing")
+//            return false
+//        }
   }
   
   // MARK: - Core Data stack
@@ -210,5 +225,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
       }
     }
+  }
+}
+
+private extension AppDelegate {
+  /// Checks whether it's a share URL
+  /// - Parameter url: share url
+  /// - Returns: flag it's a share url or not
+  func checkShareURL(_ url: URL) -> Bool {
+    guard let shareUrl = API_URLS.Surveys.share,
+          url.absoluteString.contains(shareUrl.absoluteString)
+    else {
+      return false
+    }
+    
+    return true
+  }
+  
+  /// Prepares parsed parameters (hash, enc) and request publication with main controller
+  /// - Parameter url: share url
+  func handleShareLink(_ url: URL) {
+    // Get share url string
+    guard let shareURLString = API_URLS.Surveys.share?.absoluteString else { return }
+    
+    // Prepare array
+    let arr = String(url.absoluteString
+      .dropFirst(shareURLString.count))
+      .split(separator: "/")
+    
+    // Check that we have exact params in array: hash & enc
+    // and user is authenticated by detecting MainController as root controller
+    guard arr.count == Constants.DataControl.shareLinkArraySize,
+          let mainController = self.window?.rootViewController as? MainController
+    else { return }
+    
+    // Pass hash & enc to root controller
+    mainController.requestPublication(shareLink: ShareLink(hash: String(arr.first!), enc: String(arr.last!)))
   }
 }

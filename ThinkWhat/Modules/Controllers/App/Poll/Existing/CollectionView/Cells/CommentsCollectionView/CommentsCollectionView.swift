@@ -412,7 +412,7 @@ private extension CommentsCollectionView {
     
     // Update comments and get new
     Timer
-      .publish(every: AppSettings.TimeIntervals.updateStatsComments, on: .current, in: .common)
+      .publish(every: Constants.TimeIntervals.updateStatsComments, on: .current, in: .common)
       .autoconnect()
       .sink { [weak self] seconds in
         guard let self = self,
@@ -677,7 +677,7 @@ extension CommentsCollectionView: UICollectionViewDelegate {
     if mode == .Thread {
       if dataItems.count < 10 {
         requestData()
-      } else if (source.snapshot().itemIdentifiers.count - AppSettings.Pagination.threshold == indexPath.row) && indexPath.row > 1 && !isRequesting || // Preload data
+      } else if (source.snapshot().itemIdentifiers.count - Constants.Pagination.threshold == indexPath.row) && indexPath.row > 1 && !isRequesting || // Preload data
                   (source.snapshot().itemIdentifiers.count - 1 == indexPath.row) && !isRequesting { // Last row
 //      } else if let biggestRow = collectionView.indexPathsForVisibleItems.sorted(by: { $1.row < $0.row }).first?.row,
 //                indexPath.row == biggestRow + 1 && indexPath.row == dataItems.count - 1 {

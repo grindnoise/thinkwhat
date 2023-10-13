@@ -233,7 +233,7 @@ private extension PollController {
   
   func setTasks() {
     // Update stats and state in vote/preview mode
-    Timer.publish(every: AppSettings.TimeIntervals.updateStatsComments, on: .current, in: .common)
+    Timer.publish(every: Constants.TimeIntervals.updateStatsComments, on: .current, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in self.isOnScreen && self.mode != .Read }
       .sink { [weak self] seconds in
@@ -547,7 +547,7 @@ private extension PollController {
     spiral.centerInSuperview()
     spinner.centerXToSuperview()
     spinner.centerYToSuperview()
-    spinner.widthToSuperview(multiplier: 0.25)
+    spinner.widthToSuperview(multiplier: 0.31)
     
     // Animations
     spiral.startRotating(duration: 5)

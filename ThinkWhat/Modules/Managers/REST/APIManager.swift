@@ -1359,6 +1359,37 @@ class API {
       }
     }
     
+    
+    /// Loads `Survey` by shared link data
+    /// - Parameters:
+    ///   - shareLink: ShareLink struct
+    func getSurvey(_ shareLink: ShareLink) async throws -> Survey {
+      guard let url = API_URLS.Surveys.surveyBySharedLink,
+            !headers.isNil
+      else { throw APIError.invalidURL }
+      
+      do {
+        let data = try await parent.requestAsync(url: url,
+                                                 httpMethod: .post,
+                                                 parameters: [
+                                                  "hash": shareLink.hash,
+                                                  "enc": shareLink.enc
+                                                 ],
+                                                 encoding: JSONEncoding.default,
+                                                 headers: parent.headers())
+        
+        let json = try JSON(data: data, options: .mutableContainers)
+        let instance = try JSONDecoder.withDateTimeDecodingStrategyFormatters().decode(Survey.self, from: json.rawData())
+        instance.isVisited = true
+        Surveys.shared.append([instance])
+        SurveyReferences.shared.append([instance.reference])
+        
+        return Surveys.shared.all.filter { $0.id == instance.id }.first ?? instance
+      } catch let error {
+        throw error
+      }
+    }
+    
     public func reject(survey: Survey,
                        requestHotExcept: [Survey] = []) async throws {
       

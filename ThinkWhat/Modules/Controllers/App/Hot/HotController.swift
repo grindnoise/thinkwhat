@@ -16,7 +16,7 @@ class HotController: UIViewController, TintColorable {
   // MARK: - Public properties
   var controllerOutput: HotControllerOutput?
   var controllerInput: HotControllerInput?
-  var shouldSkipCurrentCard = false
+  var shouldSkipCurrentCard = false // Flag to skip card which is on screen
   var tintColor: UIColor = .clear {
     didSet {
       initialColor = tintColor
@@ -178,6 +178,22 @@ private extension HotController {
   }
   
   func setTasks() {
+//    // Loaded instance by share link
+//    Notifications.System.shareLinkResponsePublisher
+//      .sink(receiveCompletion: { result in
+//        debugPrint(result)
+//      }, receiveValue: { [weak self] in
+//        guard let self = self,
+//              self.isOnScreen,
+//              let main = tabBarController as? MainController
+//        else { return }
+//        
+//        main.setTabBarVisible(visible: false, animated: true)
+//        self.navigationController?.pushViewController(PollController(surveyReference: $0), animated: true)
+//        main.toggleLogo(on: false)
+//      })
+//      .store(in: &subscriptions)
+    
     Surveys.shared.instancesPublisher
       .filter { !$0.isEmpty }
       .receive(on: DispatchQueue.main)
@@ -202,7 +218,7 @@ private extension HotController {
       .store(in: &subscriptions)
     
     // Update survey stats - views, is_banned, rating, etc.
-    Timer.publish(every: AppSettings.TimeIntervals.updateStats, on: .main, in: .common)
+    Timer.publish(every: Constants.TimeIntervals.updateStats, on: .main, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in
         guard self.isOnScreen,
@@ -216,7 +232,7 @@ private extension HotController {
       .store(in: &subscriptions)
     
     // Request new chunk of surveys if stack is empty
-    Timer.publish(every: AppSettings.TimeIntervals.requestPublications, on: .main, in: .common)
+    Timer.publish(every: Constants.TimeIntervals.requestPublications, on: .main, in: .common)
       .autoconnect()
       .filter { [unowned self] _ in
         guard self.isOnScreen,

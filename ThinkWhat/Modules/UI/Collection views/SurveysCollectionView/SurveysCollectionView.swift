@@ -325,7 +325,7 @@ extension SurveysCollectionView: UICollectionViewDelegate {
     
 //    if dataItems.count < 10 {
 //      requestData()
-    /*/} else*/ if (source.snapshot().itemIdentifiers.count - AppSettings.Pagination.threshold == indexPath.row) && indexPath.row > 1 || // Preload data
+    /*/} else*/ if (source.snapshot().itemIdentifiers.count - Constants.Pagination.threshold == indexPath.row) && indexPath.row > 1 || // Preload data
                 (source.snapshot().itemIdentifiers.count - 1 == indexPath.row) {
       requestData()
     }

@@ -66,6 +66,7 @@ struct API_URLS {
   struct Surveys {
     static let getPublications:     URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/get_publications/")}()
     static let surveyById:          URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_id/")}()
+    static let surveyBySharedLink:  URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/by_share_link/")}()
     static let listByIds:           URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/list_by_ids/")}()
     static let subscriptions:       URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/subscriptions/")}()
     static let new:                 URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/new/")}()
@@ -81,7 +82,7 @@ struct API_URLS {
     static let search:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/search/")}()
     static let root:                URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/")}()
     static let media:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/media/")}()
-    static let share:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("share_preview/")}()
+    static let share:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("share/")}()
 //    static let share:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/share/")}()
     static let claim:               URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/claim/")}()
     static let reject:              URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/surveys/reject/")}()

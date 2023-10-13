@@ -77,14 +77,24 @@ class MainController: UITabBarController {//}, StorageProtocol {
   private var tasks: [Task<Void, Never>?] = []
   private let profileUpdater = PassthroughSubject<Date, Never>()
   private var shouldTerminate = false
-  //    private var loadingIndicator: LoadingIndicator?
   /// **Logic**
   private var tasksReady = false // Tasks setup flag
+  private var dataLoaded = false {
+    didSet {
+      guard dataLoaded else { return }
+      
+      // Shared link or default launch
+      shareLink.isNil ? launch() : loadSharedLink()
+    }
+  }
+  private var appLaunched = false
+  
   private var surveyId: Int?  // Used when app was opened from push notification in closed state
   private var replyId: Int?   // Used when app was opened from push notification in closed state
   private var threadId: Int?  // Used when app was opened from push notification in closed state
   private var replyToId: Int? // Used when app was opened from push notification in closed state
   /// **UI**
+  private var currentController: UIViewController? { UIApplication.topViewController() }
   private var logoCenterY: CGFloat = .zero
   private lazy var logoIcon: Logo = { Logo() }()
   private lazy var logoText: LogoText = { LogoText() }()
@@ -95,13 +105,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
     
     return instance
   }()
-  private var isDataLoaded = false {
-    didSet {
-      guard isDataLoaded else { return }
-      
-      launch()
-    }
-  }
+  private var shareLink: ShareLink?
   private var isBannerOnScreen = false // Prevent banner overlay
   //    private lazy var logo: AppLogoWithText = {
   //        let instance = AppLogoWithText(color: Colors.Logo.Flame.main,
@@ -221,6 +225,11 @@ class MainController: UITabBarController {//}, StorageProtocol {
     //        }
   }
   
+  /// Changes vertical position of logo
+  /// - Parameters:
+  ///   - on: visible flag
+  ///   - animated: animations flag
+  ///   - completion: block of code to run after completion
   func toggleLogo(on: Bool, animated: Bool = true, completion: Closure? = nil) {
     guard let constraint = logoStack.getConstraint(identifier: "top") else { return }
     
@@ -401,6 +410,17 @@ class MainController: UITabBarController {//}, StorageProtocol {
     Userprofiles.clear()
     appDelegate.window?.rootViewController = UINavigationController(rootViewController: StartViewController())
   }
+  
+  /// Request publication with share link data
+  /// - Parameters:
+  ///   - shareLink: base64 hash
+  public func requestPublication(shareLink: ShareLink) {
+    self.shareLink = shareLink
+    
+    guard dataLoaded else { return }
+    
+    loadSharedLink()
+  }
 }
 
 private extension MainController {
@@ -419,7 +439,7 @@ private extension MainController {
     
     tasks.append(Task {@MainActor [weak self] in
       for await _ in NotificationCenter.default.notifications(for: UIApplication.didBecomeActiveNotification) {
-        guard let self = self, !self.isDataLoaded else { return }
+        guard let self = self, !self.dataLoaded else { return }
         
         self.spiral.startRotating(duration: 5)
       }
@@ -769,7 +789,7 @@ private extension MainController {
               banner.setContent(content)
               banner.didDisappearPublisher
                 .sink { [unowned self] _ in
-                  self.isDataLoaded = true
+                  self.dataLoaded = true
                   banner.removeFromSuperview()
                 }
                 .store(in: &self.subscriptions)
@@ -777,7 +797,7 @@ private extension MainController {
               return
             }
 
-            self.isDataLoaded = true
+            self.dataLoaded = true
             self.setTasks()
           } catch {
             self.loadData()
@@ -788,6 +808,60 @@ private extension MainController {
         }
       } catch {
         self.loadData()
+      }
+    }
+  }
+  
+  func pushController(_ controller: UIViewController) {
+    guard let currentController = currentController else { return }
+    
+    setTabBarVisible(visible: false, animated: true)
+    toggleLogo(on: false)
+    if currentController is NavigationController {
+      (currentController as! UINavigationController).pushViewController(controller, animated: true)
+    } else {
+      currentController.navigationController?.pushViewController(controller, animated: true)
+    }
+  }
+  
+  func setLoadingScreen(on: Bool, animated: Bool) {
+    guard let currentController = currentController else { return }
+    
+//    currentController.navigationController?.setNavigationBarHidden(true, animated: animated)
+  }
+  
+  /// Request publication by share link
+  func loadSharedLink() {
+    guard let shareLink = shareLink else { return }
+    
+    Task { [weak self] in
+      guard let self = self else { return }
+      
+      do {
+        // Freeze screen and show loader if app was launched
+        if self.appLaunched {
+          setLoadingScreen(on: true, animated: true)
+        }
+        let instance = try await API.shared.surveys.getSurvey(shareLink)
+        // Reset share link
+        self.shareLink = nil
+        if !self.appLaunched {
+          self.launch() { [weak self] in
+            guard let self = self else { return }
+//
+            self.pushController(PollController(surveyReference: instance.reference))
+//            Notifications.System.shareLinkResponsePublisher.send(instance.reference)
+          }
+        } else {
+          self.pushController(PollController(surveyReference: instance.reference))
+//          Notifications.System.shareLinkResponsePublisher.send(instance.reference)
+        }
+      } catch {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        // Reset share link
+        self.shareLink = nil
       }
     }
   }
@@ -962,7 +1036,8 @@ private extension MainController {
   }
   
   @MainActor
-  func launch() {
+  func launch(_ completion: Closure? = nil) {
+    appLaunched = true
     // Add temp logo
     let fakeLogoIcon = Logo(frame: CGRect(origin: loadingIcon.superview!.convert(loadingIcon.frame.origin,
                                                                             to: passthroughView),
@@ -1051,6 +1126,7 @@ private extension MainController {
         self.logoStack.alpha = 1
         fakeLogoIcon.removeFromSuperview()
         fakeLogoText.removeFromSuperview()
+        completion?()
       }
     
 //

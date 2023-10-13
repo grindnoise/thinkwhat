@@ -73,6 +73,8 @@ class Notifications {
   //    }
   
   struct System {
+    static let shareLinkRequestPublisher        = PassthroughSubject<Void, Never>() // When user tapped share link
+//    static let shareLinkResponsePublisher       = PassthroughSubject<SurveyReference, Error>() // When
     static let UpdateStats                      = Notification.Name("NotificationUpdateStats")
     static let HideKeyboard                     = Notification.Name("NotificationHideKeyboard")
     static let ImageUploadStart                 = Notification.Name("NotificationImageUploadStart")

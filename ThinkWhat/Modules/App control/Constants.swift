@@ -1,10 +1,28 @@
 //
-//  Main.swift
-//  Burb
+//  AppSettings.swift
+//  ThinkWhat
 //
-//  Created by Pavel Bukharov on 24.03.2018.
-//  Copyright © 2018 Pavel Bukharov. All rights reserved.
+//  Created by Pavel Bukharov on 11.08.2023.
+//  Copyright © 2023 Pavel Bukharov. All rights reserved.
 //
+
+import Foundation
+
+struct Constants {
+  struct TimeIntervals {
+    static let updateStatsComments = 10.0
+    static let updateStats = 10.0
+    static let requestPublications = 5.0
+  }
+  
+  struct Pagination {
+    static let threshold = 10 // To request new chunk of data when sroll near list end
+  }
+  
+  struct DataControl{
+    static let shareLinkArraySize = 2 // It should be hash and enc - last two params in deeplink https://www.thinkwhat.app/share/04bc64dd3146/eJzTyCkw4PI0NDPmSgwzNNIzNNAzMjAyVjA0sAIiUyOuAkOuRD0AmUAHyw==/ 
+  }
+}
 
 import Foundation
 import UIKit
@@ -63,7 +81,7 @@ func delayAsync(delay: Double, completion:@escaping ()->()) {
 //        else {
 //            return false
 //    }
-//    
+//
 //    return UIApplication.shared.isRegisteredForRemoteNotifications
 //        && !settings.types.isEmpty
 //}
@@ -320,6 +338,7 @@ func withAllClasses<R>(
     return try body(classListBuffer)
 }
 //                               .flatMap in Swift < 4.1
+
 
 
 
