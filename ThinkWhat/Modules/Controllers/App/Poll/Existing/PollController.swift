@@ -393,9 +393,9 @@ private extension PollController {
                                       state: .off,
                                       handler: { [unowned self] _ in
       
-      guard (!self.item.shareHash.isEmpty && !self.item.shareEncryptedString.isEmpty),
+      guard (!self.item.shareLink.corrupted),
             let baseUrl = API_URLS.Surveys.share,
-            let url = URL(string: baseUrl.absoluteString + "\(self.item.shareHash)/\(self.item.shareEncryptedString)/")
+            let url = URL(string: baseUrl.absoluteString + self.item.shareLink.urlEncoding)
       else {
 #if DEBUG
         fatalError("shareHash and shareEncryptedString are empty")

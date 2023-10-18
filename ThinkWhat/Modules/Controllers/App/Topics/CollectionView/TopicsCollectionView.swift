@@ -47,6 +47,7 @@ class TopicsCollectionView: UICollectionView {
   // MARK: - Public properties
   ///**Publishers**
   public let topicSelected = PassthroughSubject<Topic, Never>()
+  public let topicSubscriptionPublisher = PassthroughSubject<[Topic: Bool], Never>() // When user (un)subscribes
   public let touchSubject = CurrentValueSubject<[Topic: CGPoint]?, Never>(nil)
   
   // MARK: - Private properties
@@ -114,10 +115,7 @@ private extension TopicsCollectionView {
       guard let self = self else { return }
       
       cell.mode = self.mode
-      cell.item = item
-      var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
-      backgroundConfig.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : item.topic.tagColor.withAlphaComponent(0.1)
-      cell.backgroundConfiguration = backgroundConfig
+      cell.item = item.topic
       
       cell.touchSubject
         .sink { [weak self] in
@@ -130,8 +128,22 @@ private extension TopicsCollectionView {
         }
         .store(in: &self.subscriptions)
       
-      if self.mode == .Default {
+        // Set arrow
         cell.accessories = [.disclosureIndicator(options: UICellAccessory.DisclosureIndicatorOptions(tintColor: item.topic.activeCount.isZero ? .clear : item.topic.tagColor))]
+        
+        // (Un) subscribe listener
+        cell.subscribePublisher
+          .receive(on: DispatchQueue.main)
+//          .throttle(for: .seconds(0.3), scheduler: DispatchQueue.main, latest: false)
+          .sink { [weak self] in
+            guard let self = self else { return }
+            
+            self.topicSubscriptionPublisher.send([cell.item: $0])
+          }
+          .store(in: &self.subscriptions)
+      
+      if self.mode == .Default {
+        // Count listener to show arrow
         item.topic.activeCountPublisher
           .receive(on: DispatchQueue.main)
           .sink { [weak self] in
@@ -142,20 +154,6 @@ private extension TopicsCollectionView {
           .store(in: &cell.tempSubscriptions)
       }
     }
-    
-    //        let footerRegistration = UICollectionView.SupplementaryRegistration
-    //        <SeparatorCell>(elementKind: UICollectionView.elementKindSectionFooter) {
-    //            [unowned self] (footerView, elementKind, indexPath) in
-    //
-    ////            let headerItem = self.source.snapshot().sectionIdentifiers[indexPath.section]
-    ////            let symbolCount = headerItem.topics.count
-    ////
-    ////            // Configure footer view content
-    ////            var configuration = footerView.defaultContentConfiguration()
-    ////            configuration.text = "Topics count: \(symbolCount)"
-    ////            footerView.contentConfiguration = configuration
-    ////            footerView
-    //        }
     
     let headerCellRegistration = UICollectionView.CellRegistration<TopicCellHeader, TopicHeaderItem> { [unowned self] cell, indexPath, headerItem in
       
@@ -243,7 +241,7 @@ private extension TopicsCollectionView {
 extension TopicsCollectionView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     guard let cell = cellForItem(at: indexPath) as? TopicCell,
-          let topic = cell.item?.topic
+          let topic = cell.item
     else { return }
     
     topicSelected.send(topic)

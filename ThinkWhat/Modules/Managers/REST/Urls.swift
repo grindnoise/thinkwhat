@@ -43,6 +43,7 @@ struct API_URLS {
   struct Profiles {
     static let baseString = "api/profiles/"
     static let base:                URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent(baseString)}()
+    static let subscribeToTopic:    URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/subscribe_to_topic/")}()
     static let subscribe:           URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/subscribe/")}()
     static let unsubscribe:         URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/unsubscribe/")}()
     static let removeSubscribers:   URL? = {return URL(string: API_URLS.BASE)?.appendingPathComponent("api/profiles/remove_subscribers/")}()

@@ -92,15 +92,8 @@ class ImageCell: UICollectionViewCell {
     return instance
   }()
   private lazy var verticalStack: UIStackView = {
-//    let opaque = UIView()
-//    opaque.backgroundColor = .clear
-//    opaque.addSubview(horizontalStack)
-//    horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-//    horizontalStack.leadingAnchor.constraint(equalTo: opaque.leadingAnchor, constant: padding).isActive = true
-//    horizontalStack.topAnchor.constraint(equalTo: opaque.topAnchor).isActive = true
-//    horizontalStack.bottomAnchor.constraint(equalTo: opaque.bottomAnchor).isActive = true
     
-    let verticalStack = UIStackView()//arrangedSubviews: [horizontalStack, imageContainer])
+    let verticalStack = UIStackView()
     if mode == .Default {
       verticalStack.addArrangedSubview(horizontalStack)
     }

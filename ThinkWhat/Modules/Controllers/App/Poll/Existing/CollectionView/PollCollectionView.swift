@@ -403,6 +403,7 @@ private extension PollCollectionView {
       
       cell.boundsPublisher
         .receive(on: DispatchQueue.main)
+        .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
         .sink { [weak self] _ in
           guard let self = self else { return }
           

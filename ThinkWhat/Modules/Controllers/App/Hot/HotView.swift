@@ -115,6 +115,11 @@ class HotView: UIView {
   func next(_ survey: Survey?) {
     guard let viewInput = viewInput else { return }
     
+    // No need to continue if incoming is empty and current card is also empty
+    if survey.isNil && current is EmptyHotCard {
+      return
+    }
+    
     func push(_ instance: Survey?) {
       incoming = !instance.isNil ? {  HotCard(item: instance!, nextColor: viewInput.queue.peek?.topic.tagColor ?? instance!.topic.tagColor) }() : {
         let empty = EmptyHotCard()

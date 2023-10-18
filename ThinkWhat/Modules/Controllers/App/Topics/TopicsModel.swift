@@ -15,6 +15,16 @@ class TopicsModel {
 
 // MARK: - Controller Input
 extension TopicsModel: TopicsControllerInput {
+  func subscribe(topic: Topic, subscribe: Bool) {
+    Task {
+      do {
+        try await API.shared.profiles.subscribe(topic: topic, subscribe: subscribe)
+      } catch {
+        topic.watchingPublisher.send(completion: .failure(error))
+      }
+    }
+  }
+  
   func search(substring: String,
               localized: Bool,
               filter: SurveyFilter) {

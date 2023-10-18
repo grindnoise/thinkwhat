@@ -88,6 +88,7 @@ class Topic: Decodable {
     case hotTotal           = "hot_total"
     case imageId            = "image_id"
     case isOther            = "is_other"
+    case watching           = "watching"
   }
   
   let id: Int
@@ -130,10 +131,21 @@ class Topic: Decodable {
     return !children.isEmpty
   }
   var isOther: Bool
+  var watching: Bool {
+    didSet {
+      watchingPublisher.send(watching)
+      
+      guard watching else { return }
+      
+      Notifications.UIEvents.topicSubscriptionPublisher.send(self)
+    }
+  }
   var iconCategory: Icon.Category { Icon.Category(rawValue: imageId) ?? .Null }
   //Publishers
   public let totalCountPublisher = PassthroughSubject<Int, Never>()
   public let activeCountPublisher = PassthroughSubject<Int, Never>()
+//  public let subscribePublisher = PassthroughSubject<Bool, Never>() // When user (un)subscribes
+  public let watchingPublisher = PassthroughSubject<Bool, Error>()
   
   required init(from decoder: Decoder) throws {
     do {
@@ -151,6 +163,7 @@ class Topic: Decodable {
       viewsTotal      = try container.decodeIfPresent(Int.self, forKey: .viewsTotal) ?? 0
       hotTotal        = try container.decode(Int.self, forKey: .hotTotal)
       isOther         = try container.decode(Bool.self, forKey: .isOther)
+      watching        = try container.decode(Bool.self, forKey: .watching)
       if Topics.shared.all.filter({ $0.hashValue == hashValue }).isEmpty {
         Topics.shared.all.append(self)
       }

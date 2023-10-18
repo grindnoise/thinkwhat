@@ -41,8 +41,17 @@ class SurveyCell: UICollectionViewListCell {
         .sink { [weak self] _ in
           guard let self = self else { return }
           
-          self.titleLabel.textColor = self.item.isOwn ? .label : self.item.isVisited ? .secondaryLabel : .label
-          self.descriptionLabel.textColor = self.item.isOwn ? .label : self.item.isVisited ? .secondaryLabel : .label
+          let textColor: UIColor = self.item.isOwn ? .label : self.item.isVisited ? .secondaryLabel : .label
+          
+          self.viewsLabel.textColor = textColor
+          self.viewsImage.tintColor = textColor
+          self.ratingLabel.textColor = textColor
+          self.commentsLabel.textColor = textColor
+          self.commentsImage.tintColor = textColor
+          self.claimButton.tintColor = textColor
+          self.comleteButton.tintColor = textColor
+          self.titleLabel.textColor = textColor
+          self.descriptionLabel.textColor = textColor
         }
         .store(in: &subscriptions)
       
@@ -611,6 +620,8 @@ private extension SurveyCell {
 //        progressView.alpha = 1
 //      }
       dateLabel.text = item.startDate.timeAgoDisplay()
+      dateLabel.textColor = self.item.isOwn ? .label : self.item.isVisited ? .secondaryLabel : .label
+      usernameLabel.textColor = self.item.isOwn ? .label : self.item.isVisited ? .secondaryLabel : .label
       avatar.setProgressColor(item.topic.tagColor)
       
       if item.isAnonymous {
@@ -634,7 +645,7 @@ private extension SurveyCell {
       titleLabel.text = item.title
       titleLabel.textColor = item.isOwn ? .label : item.isVisited ? .secondaryLabel : .label
       descriptionLabel.text = item.truncatedDescription
-      descriptionLabel.textColor = item.isVisited ? .secondaryLabel : .label
+      descriptionLabel.textColor = self.item.isOwn ? .label : self.item.isVisited ? .secondaryLabel : .label
       
       constraint.constant = item.title.height(withConstrainedWidth: bounds.width, font: titleLabel.font)
       constraint2.constant = item.truncatedDescription.height(withConstrainedWidth: bounds.width, font: descriptionLabel.font)
@@ -696,9 +707,16 @@ private extension SurveyCell {
     }
     
     func updateBottom() {
+      let textColor: UIColor = item.isOwn ? .label : item.isVisited ? .secondaryLabel : .label
+      
       ratingLabel.text = String(describing: String(describing: item.rating))
+      ratingLabel.textColor = textColor
       commentsLabel.text = String(describing: item.commentsTotal.roundedWithAbbreviations)
+      commentsLabel.textColor = textColor
+      commentsImage.tintColor = textColor
       viewsLabel.text = String(describing: item.views.roundedWithAbbreviations)
+      viewsLabel.textColor = textColor
+      viewsImage.tintColor = textColor
       comleteButton.tintColor = item.isComplete ? item.topic.tagColor : .systemGray4
       watchButton.tintColor = item.isFavorite ? .label : .systemGray4
       

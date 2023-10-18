@@ -137,20 +137,29 @@ class SurveyReference: Decodable, Complaintable {
 //      }
 //    }
 //  }
-  var shareHash: String {
+  var shareLink: ShareLink {
     didSet {
-      guard !shareHash.isEmpty, oldValue != shareHash else { return }
+      guard oldValue != shareLink else { return }
       
-      survey?.shareHash = shareHash
+      survey?.shareLink = shareLink
     }
   }
-  var shareEncryptedString: String {
-    didSet {
-      guard !shareEncryptedString.isEmpty, oldValue != shareEncryptedString else { return }
-      
-      survey?.shareEncryptedString = shareEncryptedString
-    }
-  }
+  var tempShareLinks: [ShareLink] = []
+//  var shareHash: String {
+//    didSet {
+//      guard !shareHash.isEmpty, oldValue != shareHash else { return }
+//      
+//      survey?.shareHash = shareHash
+//    }
+//  }
+//  var shareEncryptedString: String {
+//    didSet {
+//      guard !shareEncryptedString.isEmpty, oldValue != shareEncryptedString else { return }
+//      
+//      survey?.shareEncryptedString = shareEncryptedString
+//    }
+//  }
+//  var tempShareHashes: [String: String] = [:]
   ///**Filtering properties
   var isComplete: Bool {
     didSet {
@@ -286,6 +295,8 @@ class SurveyReference: Decodable, Complaintable {
       isTop       = try container.decode(Bool.self, forKey: .isTop)
       isNew       = try container.decode(Bool.self, forKey: .isNew)
       rating      = Double(try container.decode(String.self, forKey: .rating)) ?? 0
+      
+      // Prepare share link
       let shareData = try container.decode([String].self, forKey: .share_link)
       
       guard !shareData.isEmpty else {
@@ -295,8 +306,7 @@ class SurveyReference: Decodable, Complaintable {
         throw "shareData is empty"
       }
       
-      shareHash               = shareData.first! // ?? ""
-      shareEncryptedString    = shareData.last! // ?? ""
+      shareLink = ShareLink(hash: shareData.first!, enc: shareData.last!)
       
       _ = try container.decodeIfPresent([Mediafile].self, forKey: .media)
       
@@ -314,34 +324,34 @@ class SurveyReference: Decodable, Complaintable {
     }
   }
   
-  init(id: Int) {
-    self.id                      = id
-    self.title                   = ""
-    self.topic                   = Topics.shared.all.first!
-    self.startDate               = Date()
-    self.likes                   = 0
-    self.views                   = 0
-    self.type                    = .Poll
-    self.isActive                = true
-    self.isOwn                   = true
-    self.isHot                   = true
-    self.isComplete              = true
-    self.isFavorite              = true
-    self.isVisited               = true
-    self.isBanned                = false
-    self.votesTotal              = 0
-    self.commentsTotal           = 0
-    self.votesLimit              = 0
-    self.owner                   = Userprofile.anonymous
-    self.isAnonymous             = true
-    self.truncatedDescription    = ""
-    self.progress                = 0
-    self.rating                  = 0
-    self.isNew                   = true
-    self.isTop                   = false
-    self.shareHash = ""
-    self.shareEncryptedString = ""
-  }
+//  init(id: Int) {
+//    self.id                      = id
+//    self.title                   = ""
+//    self.topic                   = Topics.shared.all.first!
+//    self.startDate               = Date()
+//    self.likes                   = 0
+//    self.views                   = 0
+//    self.type                    = .Poll
+//    self.isActive                = true
+//    self.isOwn                   = true
+//    self.isHot                   = true
+//    self.isComplete              = true
+//    self.isFavorite              = true
+//    self.isVisited               = true
+//    self.isBanned                = false
+//    self.votesTotal              = 0
+//    self.commentsTotal           = 0
+//    self.votesLimit              = 0
+//    self.owner                   = Userprofile.anonymous
+//    self.isAnonymous             = true
+//    self.truncatedDescription    = ""
+//    self.progress                = 0
+//    self.rating                  = 0
+//    self.isNew                   = true
+//    self.isTop                   = false
+//    self.shareHash = ""
+//    self.shareEncryptedString = ""
+//  }
   
   init(id: Int,
        title: String,
@@ -368,8 +378,9 @@ class SurveyReference: Decodable, Complaintable {
        progress: Int = 0,
        rating: Double = 0,
        commentsTotal: Int = 0,
-       shareHash: String,
-       shareEncryptedString: String
+       shareLink: ShareLink
+//       shareHash: String,
+//       shareEncryptedString: String
   ) {
     
     self.id                      = id
@@ -398,8 +409,9 @@ class SurveyReference: Decodable, Complaintable {
     self.isNew                   = isNew
     self.isTop                   = isTop
     // Avoid compiler error
-    self.shareHash = shareHash
-    self.shareEncryptedString = shareEncryptedString
+    self.shareLink = shareLink
+//    self.shareHash = shareHash
+//    self.shareEncryptedString = shareEncryptedString
     //Swift
     if SurveyReferences.shared.all.filter({ $0 == self }).isEmpty {
       SurveyReferences.shared.all.append(self)
@@ -450,46 +462,6 @@ class SurveyReferences {
       instancesPublisher.send(Array(appendingSet.subtracting(existingSet)))
     }
   }
-//  var all: [SurveyReference] = [] {
-//    didSet {
-//      //Remove
-//      if oldValue.count > all.count {
-//        let oldSet = Set(oldValue)
-//        let newSet = Set(all)
-//
-//        let difference = oldSet.symmetricDifference(newSet)
-//        difference.forEach {
-//          NotificationCenter.default.post(name: Notifications.Surveys.RemoveReference, object: $0)
-//        }
-//      } else {
-//        //Append
-//        let oldSet = Set(oldValue)
-//        let newSet = Set(all)
-//
-//        let difference = newSet.symmetricDifference(oldSet)
-//        difference.forEach { item in
-//          guard !oldValue.filter({ $0 == item }).isEmpty, let index = all.lastIndex(of: item) else {
-//            //Notify
-//            NotificationCenter.default.post(name: Notifications.Surveys.AppendReference, object: item)
-//            return
-//          }
-//          //Duplicate removal
-//          all.remove(at: index)
-//          SurveyReferences.shared.instancesPublisher.send([])
-////          NotificationCenter.default.post(name: Notifications.Surveys.EmptyReceived, object: nil)
-//        }
-//      }
-//
-//      ////            Check for duplicates
-//      //            guard let lastInstance = all.last else { return }
-//      //            if !oldValue.filter({ $0 == lastInstance }).isEmpty {
-//      //                all.remove(object: lastInstance)
-//      //            }
-//      //            NotificationCenter.default.post(name: Notifications.Surveys.Append, object: instance)
-//      ////            guard oldValue.count != all.count else { return }
-//      //            Notification.send(names: [Notifications.Surveys.UpdateAll])
-//    }
-//  }
   ///**Publishers**
   public let instancesPublisher = PassthroughSubject<[SurveyReference], Never>()
   public let instancesByTopicPublisher = PassthroughSubject<[SurveyReference], Never>()
@@ -515,6 +487,11 @@ class SurveyReferences {
     guard !difference.isEmpty else { return }
     
     all.append(contentsOf: difference)
+  }
+  
+  public func findInstanceByShareLink(_ shareLink: ShareLink) -> SurveyReference? {
+    // Search by Current share link or by temp share LINK
+    all.filter { $0.shareLink == shareLink }.first ?? all.filter { !$0.tempShareLinks.filter { temp in temp == shareLink }.isEmpty }.first
   }
   
   subscript(ids: [Int]) -> [SurveyReference] {

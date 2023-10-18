@@ -66,11 +66,14 @@ class SurveyFilterCell: UICollectionViewListCell {
     instance.publisher(for: \.bounds)
       .filter { [unowned self] in $0.size != self.bgLayer.bounds.size && $0.size != self.fgLayer.bounds.size }
       .sink { [unowned self] in
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         self.bgLayer.cornerRadius = $0.height/2
         self.bgLayer.frame = $0
         self.fgLayer.frame = $0
         self.bgLayer.path = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
 //        self.fgLayer.path = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
+        CATransaction.commit()
       }
       .store(in: &subscriptions)
     instance.setAttributedTitle(NSAttributedString(string: item.getText().localized.firstCapitalized,
@@ -177,6 +180,7 @@ private extension SurveyFilterCell {
       button.imageView?.alpha = 1
       button.imageView?.layer.opacity = 1
       button.imageView?.tintColor = .white
+      button.imageView?.layer.zPosition = 1
     } else {
       button.setImage(nil, for: .normal)
       button.imageEdgeInsets.left = 0
@@ -287,10 +291,13 @@ private extension SurveyFilterCell {
     guard !item.isNil else { return }
     
     if bgLayer.bounds.size != bounds.size {
+      CATransaction.begin()
+      CATransaction.setDisableActions(true)
       bgLayer.frame = bounds
       bgLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: bounds.height/2).cgPath
       fgLayer.frame = bgLayer.frame
       fgLayer.cornerRadius = bounds.height/2
+      CATransaction.commit()
     }
   }
 }

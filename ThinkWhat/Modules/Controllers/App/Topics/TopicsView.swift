@@ -214,6 +214,20 @@ class TopicsView: UIView {
     let instance = TopicsCollectionView()
     instance.backgroundColor = .clear
     
+    // Subscription listener
+    instance.topicSubscriptionPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] in
+        guard let self = self,
+              let topic = $0.keys.first,
+              let val = $0.values.first
+        else { return }
+          
+        self.viewInput?.subscribe(topic: topic, subscribe: val)
+      }
+      .store(in: &subscriptions)
+    
+    // Tap listener
     instance.touchSubject
       .throttle(for: .seconds(0.5), scheduler: DispatchQueue.main, latest: false)
       .sink { [weak self] in

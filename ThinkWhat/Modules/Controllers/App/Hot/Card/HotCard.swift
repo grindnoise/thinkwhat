@@ -729,7 +729,7 @@ private extension HotCard {
 //    random.icon.shadowOpacity = Float.random(in: 0.5...0.8)
 //    random.icon.shadowColor = color.cgColor
 //    random.icon.shadowRadius = random.bounds.width * 0.3
-    
+    self.layer.masksToBounds = true
     self.insertSubview(random, belowSubview: self.getSubview(type: UIVisualEffectView.self) ?? collectionView)
     self.items.append(random)
     let duration = TimeInterval.random(in: 6...8)

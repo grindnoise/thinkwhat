@@ -99,7 +99,7 @@ extension UIView {
         return
       }
       
-      UIView.animate(withDuration: 0.3) {
+      UIView.animate(withDuration: 0.15) {
         spinner.alpha = 1
         spinner.transform = .identity
       } completion: { _ in
@@ -115,7 +115,7 @@ extension UIView {
         return
       }
       
-      UIView.animate(withDuration: 0.3) {
+      UIView.animate(withDuration: 0.15) {
         spinner.alpha = 0
         spinner.transform = .init(scaleX: 0.5, y: 0.5)
       } completion: { _ in

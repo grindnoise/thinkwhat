@@ -196,6 +196,8 @@
 
 //Topics VC
 "topics" = "Topics";
+"topics_subscription_added_start" = "You will receive notifications about new publications in the ";
+"topics_subscription_added_end" = " topic";
 
 //Settings VC
 "settings" = "Settings";
@@ -326,6 +328,7 @@
 "votes_total" = "Votes";
 "voters" = "Voters";
 "publications_not_found" = "Publications not found";
+"poll_view_voting" = "Voting";
 
 //Settings VC
 "location" = "Location";

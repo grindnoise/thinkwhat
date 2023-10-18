@@ -14,6 +14,7 @@ class Notifications {
   
   struct UIEvents {
     static let tabItemPublisher = PassthroughSubject<[Enums.Tab: Enums.Tab], Never>() // [newValue: oldValue]
+    static let topicSubscriptionPublisher = PassthroughSubject<Topic, Error>()
   }
   
   struct Network {
@@ -73,7 +74,7 @@ class Notifications {
   //    }
   
   struct System {
-    static let shareLinkRequestPublisher        = PassthroughSubject<Void, Never>() // When user tapped share link
+//    static let shareLinkRequestPublisher        = PassthroughSubject<Void, Never>() // When user tapped share link
 //    static let shareLinkResponsePublisher       = PassthroughSubject<SurveyReference, Error>() // When
     static let UpdateStats                      = Notification.Name("NotificationUpdateStats")
     static let HideKeyboard                     = Notification.Name("NotificationHideKeyboard")

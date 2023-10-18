@@ -163,7 +163,7 @@ class CommentsSectionCell: UICollectionViewCell {
     constraint.isActive = true
     
     instance.publisher(for: \.contentSize)
-      .filter { $0 != .zero }
+//      .filter { $0 != .zero }
       .receive(on: DispatchQueue.main)
       .sink { [weak self] in
         guard let self = self,
@@ -370,15 +370,18 @@ class CommentsSectionCell: UICollectionViewCell {
     closedConstraint.priority = .defaultLow
     
     openConstraint = collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding)
-    openConstraint.priority = .defaultLow
+//    openConstraint.priority = .defaultLow
     
     updateAppearance(animated: false)
   }
   
   /// Updates the views to reflect changes in selection
   private func updateAppearance(animated: Bool = true) {
+    self.setNeedsLayout()
     closedConstraint.isActive = !isSelected
     openConstraint.isActive = isSelected
+    self.layoutIfNeeded()
+//    self.boundsPublisher.send(true)
     
     guard animated else {
       let upsideDown = CGAffineTransform(rotationAngle: -.pi/2 )

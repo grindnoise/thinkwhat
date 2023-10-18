@@ -1105,6 +1105,28 @@ class API {
       }
     }
     
+    public func subscribe(topic: Topic, subscribe: Bool) async throws {
+      guard let url = API_URLS.Profiles.subscribeToTopic else { throw APIError.invalidURL }
+      
+      let parameters: Parameters = [
+        "id": topic.id,
+        "subscribe": subscribe
+      ]
+      
+      do {
+        let _ = try await parent.requestAsync(url: url,
+                                              httpMethod: .post,
+                                              parameters: parameters,
+                                              encoding: JSONEncoding.default,
+                                              headers: parent.headers())
+        topic.watching = subscribe
+      } catch let error {
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        throw error
+      }
+    }
     
     public func subscribe(at userprofiles: [Userprofile]) async throws {
       guard let url = API_URLS.Profiles.subscribe else { throw APIError.invalidURL }

@@ -82,20 +82,29 @@ class Survey: Decodable {
   var answers:                [Answer] = []
   var answersSortedByVotes:   [Answer] { answers.sorted { $0.totalVotes > $1.totalVotes }}
   var answersSortedByOrder:   [Answer] { answers.sorted { $0.order < $1.order }}
-  var shareHash: String {
+  // Sharing
+  var shareLink: ShareLink {
     didSet {
-      guard !shareHash.isEmpty, oldValue != shareHash else { return }
+      guard oldValue != shareLink else { return }
       
-      reference.shareHash = shareHash
+      reference.shareLink = shareLink
     }
   }
-  var shareEncryptedString: String {
-    didSet {
-      guard !shareEncryptedString.isEmpty, oldValue != shareEncryptedString else { return }
-      
-      reference.shareEncryptedString = shareEncryptedString
-    }
-  }
+
+//  var shareHash: String {
+//    didSet {
+//      guard !shareHash.isEmpty, oldValue != shareHash else { return }
+//      
+//      reference.shareHash = shareHash
+//    }
+//  }
+//  var shareEncryptedString: String {
+//    didSet {
+//      guard !shareEncryptedString.isEmpty, oldValue != shareEncryptedString else { return }
+//      
+//      reference.shareEncryptedString = shareEncryptedString
+//    }
+//  }
   var url:                    URL? = nil///hlink
   var votesLimit:             Int {
     didSet {
@@ -323,6 +332,7 @@ class Survey: Decodable {
       isTop       = try container.decode(Bool.self, forKey: .isTop)
       isNew       = try container.decode(Bool.self, forKey: .isNew)
       
+      // Share link
       let shareData           = try container.decode([String].self, forKey: .shareLink)
       guard !shareData.isEmpty else {
 #if DEBUG
@@ -331,8 +341,9 @@ class Survey: Decodable {
         throw "shareData is empty"
       }
       
-      shareHash               = shareData.first! // ?? ""
-      shareEncryptedString    = shareData.last! // ?? ""
+      shareLink = ShareLink(hash: shareData.first!, enc: shareData.last!)
+//      shareHash               = shareData.first! // ?? ""
+//      shareEncryptedString    = shareData.last! // ?? ""
       
       if let dict = try container.decodeIfPresent([String: Date].self, forKey: .result), !dict.isEmpty {
         result = [Int(dict.keys.first!)!: dict.values.first!]
@@ -384,7 +395,9 @@ class Survey: Decodable {
        isNew: Bool,
        isTop: Bool,
        isBanned: Bool,
-       commentsTotal: Int) {
+       commentsTotal: Int,
+       shareLink: ShareLink
+  ) {
     self.rating              = 0
     self.owner               = Userprofiles.shared.current!
     self.topic               = topic
@@ -412,8 +425,9 @@ class Survey: Decodable {
     self.rating              = 0
     self.commentsTotal       = commentsTotal
     self.startDate           = Date()
-    self.shareHash = ""
-    self.shareEncryptedString = ""
+    self.shareLink = shareLink
+//    self.shareHash = ""
+//    self.shareEncryptedString = ""
     //    self.media = []
     //    self.answers = []
     self.media               = media.enumerated().map { order, item in Mediafile(title: item.text, order: order, survey: self, image: item.image) }
@@ -450,8 +464,9 @@ class Survey: Decodable {
                                      isAnonymous: isAnonymous,
                                      progress: progress,
                                      rating: rating,
-                                     shareHash: shareHash,
-                                     shareEncryptedString: shareEncryptedString)
+                                     shareLink: shareLink)
+//                                     shareHash: shareHash,
+//                                     shareEncryptedString: shareEncryptedString)
       //            SurveyReferences.shared.all.append(instance)
       return instance
     }

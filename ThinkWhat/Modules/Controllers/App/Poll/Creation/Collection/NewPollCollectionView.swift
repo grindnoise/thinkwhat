@@ -302,7 +302,8 @@ class NewPollCollectionView: UICollectionView {
                           isNew: true,
                           isTop: true,
                           isBanned: false,
-                          commentsTotal: 0)
+                          commentsTotal: 0,
+                          shareLink: .init(hash: "", enc: ""))
     Surveys.shared.append([instance])
     _preview = instance
     

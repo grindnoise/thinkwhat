@@ -20,7 +20,7 @@ protocol TopicsViewInput: AnyObject {
   func openSettings()
   func getDataItems(excludeList: [SurveyReference])
   func onSurveyTapped(_: SurveyReference)
-//  func onTopicSelected(_: Topic)
+  //  func onTopicSelected(_: Topic)
   func updateSurveyStats(_: [SurveyReference])
   func addFavorite(_: SurveyReference)
   func share(_: SurveyReference)
@@ -28,6 +28,7 @@ protocol TopicsViewInput: AnyObject {
   func openUserprofile(_: Userprofile)
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
+  func subscribe(topic: Topic, subscribe: Bool)
 }
 
 protocol TopicsControllerInput: AnyObject {
@@ -40,6 +41,7 @@ protocol TopicsControllerInput: AnyObject {
   func claim(_: [SurveyReference: Claim])
   func unsubscribe(from: Userprofile)
   func subscribe(to: Userprofile)
+  func subscribe(topic: Topic, subscribe: Bool)
   func search(substring: String,
               localized: Bool,
               filter: SurveyFilter)

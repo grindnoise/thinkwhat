@@ -7,10 +7,11 @@
 //
 
 import Foundation
+import Combine
 
 public struct QueueArray<T: Hashable>: Queue {
+  
   private var array: [T] = []
-  public init() {}
   
   public var elements: [T] { array }
   
@@ -20,19 +21,20 @@ public struct QueueArray<T: Hashable>: Queue {
   
   public var peek: T? { array.first }
   
+  @discardableResult
   public mutating func enqueue(_ element: T) -> Bool {
     guard array.filter({ $0 == element }).isEmpty else {
       return false
     }
     
     array.append(element)
+//    sizeChangePublisher.send()
     
     return true
   }
   
   @discardableResult
   public mutating func enqueue(_ elements: [T]) -> Bool {
-    print(elements)
     guard !array.isEmpty else { array.append(contentsOf: elements); return true }
     
     let existingSet = Set(array)
@@ -52,7 +54,7 @@ public struct QueueArray<T: Hashable>: Queue {
   }
   
   public mutating func remove(_ elements: [T]) {
-    elements.forEach { print($0); array.remove(object: $0) }
+    elements.forEach { array.remove(object: $0) }
   }
   
   public mutating func remove(_ element: T) {

@@ -404,7 +404,10 @@ private extension ProfileCreationView {
     logoIcon.alpha = 0
     logoText.alpha = 0
     
-    let spiral = Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: "#1E1E1E".hexColor!.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.7 : 0.03))
+    let spiral = Icon(frame: .zero, 
+                      category: .Spiral,
+                      scaleMultiplicator: 1,
+                      iconColor: traitCollection.userInterfaceStyle == .dark ? Colors.spiralDark : Colors.spiralLight)
     opaque.insertSubview(spiral, belowSubview: loadingStack)
     spiral.translatesAutoresizingMaskIntoConstraints = false
     spiral.heightAnchor.constraint(equalTo: spiral.widthAnchor).isActive = true

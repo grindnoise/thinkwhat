@@ -166,7 +166,7 @@ class ListView: UIView {
       SurveyFilterItem(main: .new,
                        additional: .period,
                        isFilterEnabled: true,
-                       text: Enums.Period.month.description,
+                       text: Enums.Period.unlimited.description,
                        image: UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
                        period: viewInput?.filter.period ?? .unlimited,
                        periodThreshold: .unlimited),

@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import TinyConstraints
 
 class AnswersCell: UICollectionViewCell {
   
@@ -32,6 +33,57 @@ class AnswersCell: UICollectionViewCell {
   private var tasks: [Task<Void, Never>?] = []
   //UI
   private let padding: CGFloat = 8
+  private lazy var horizontalStack: UIStackView = {
+    let headerLabel: UILabel = {
+      let instance = UILabel()
+      instance.textColor = Colors.cellHeader
+      instance.text = "poll_view_voting".localized.uppercased()
+      instance.font = Fonts.cellHeader
+
+      let heightConstraint = instance.heightAnchor.constraint(equalToConstant: instance.text!.height(withConstrainedWidth: 1000, font: instance.font))
+      heightConstraint.identifier = "height"
+      heightConstraint.priority = .defaultHigh
+      heightConstraint.isActive = true
+
+      instance.publisher(for: \.bounds, options: .new)
+        .sink { [weak self] rect in
+          guard let self = self,
+                let constraint = instance.getConstraint(identifier: "height")
+          else { return }
+
+          self.setNeedsLayout()
+          constraint.constant = instance.text!.height(withConstrainedWidth: 1000, font: instance.font)
+          self.layoutIfNeeded()
+        }
+        .store(in: &subscriptions)
+
+      return instance
+    }()
+    
+    let headerImage: UIImageView = {
+      let instance = UIImageView(image: UIImage(systemName: "hand.point.right.fill",
+                                                withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
+      instance.tintColor = Colors.cellHeader
+      instance.contentMode = .scaleAspectFit
+  //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
+      instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
+      
+      return instance
+    }()
+    
+    
+    let instance = UIStackView(arrangedSubviews: [headerImage,
+                                                  headerLabel,
+                                                  UIView.opaque()])
+    instance.alignment = .center
+    let constraint = instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font))
+    constraint.identifier = "height"
+    constraint.isActive = true
+    instance.spacing = 4
+    instance.axis = .horizontal
+    instance.alignment = .center
+    return instance
+  }()
   private lazy var collectionView: AnswersCollectionView = {
     let instance = AnswersCollectionView()
     let constraint = instance.heightAnchor.constraint(equalToConstant: 100)
@@ -82,8 +134,6 @@ class AnswersCell: UICollectionViewCell {
     return instance
   }()
   
-  
-  
   // MARK: - Deinitialization
   deinit {
     observers.forEach { $0.invalidate() }
@@ -121,9 +171,21 @@ private extension AnswersCell {
   @MainActor
   func setupUI() {
     backgroundColor = .systemBackground
-    collectionView.place(inside: contentView,
-                         insets: .uniform(size: padding),//UIEdgeInsets(top: 0, left: padding, bottom: 0, right: padding),
-                         bottomPriority: .defaultLow)
+    contentView.addSubview(collectionView)
+    collectionView.edgesToSuperview(insets: .uniform(Constants.UI.padding), priority: .defaultLow)
+//    contentView.addSubviews([horizontalStack, collectionView])
+//    
+//    horizontalStack.topToSuperview(offset: Constants.UI.padding)
+//    horizontalStack.leadingToSuperview(offset: Constants.UI.padding)
+//    horizontalStack.trailingToSuperview(offset: Constants.UI.padding)
+//    
+//    collectionView.topToBottom(of: horizontalStack, offset: Constants.UI.padding)
+//    collectionView.leadingToSuperview(offset: Constants.UI.padding)
+//    collectionView.trailingToSuperview(offset: Constants.UI.padding)
+//    collectionView.bottomToSuperview(offset: Constants.UI.padding, priority: .defaultLow)
+//    collectionView.place(inside: contentView,
+//                         insets: .uniform(size: padding),//UIEdgeInsets(top: 0, left: padding, bottom: 0, right: padding),
+//                         bottomPriority: .defaultLow)
   }
   
   func setTasks() {

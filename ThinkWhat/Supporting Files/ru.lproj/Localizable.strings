@@ -196,6 +196,8 @@
 
 //Topics VC
 "topics" = "Темы";
+"topics_subscription_added_start" = "Вы будете получать уведомления о новых публикациях в теме ";
+"topics_subscription_added_end" = " ";
 
 //Settings VC
 "settings" = "Настройки";
@@ -326,6 +328,7 @@
 "votes_total" = "Голосов";
 "voters" = "Проголосовашие";
 "publications_not_found" = "Публикаций не найдено";
+"poll_view_voting" = "Голосование";
 
 //Settings VC
 "location" = "Местонахождение";

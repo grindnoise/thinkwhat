@@ -23,8 +23,6 @@ class MainController: UITabBarController {//}, StorageProtocol {
     return selectedViewController
   }
   
-  
-  
   // MARK: - Public properties
   @Published public private(set) var currentTab: Enums.Tab = .Hot {
     didSet {
@@ -88,7 +86,8 @@ class MainController: UITabBarController {//}, StorageProtocol {
     }
   }
   private var appLaunched = false
-  
+  private lazy var bannersQueue: QueueArray<NewBanner> = QueueArray()  // Store banners in queue
+  // These properties are received from push notifications
   private var surveyId: Int?  // Used when app was opened from push notification in closed state
   private var replyId: Int?   // Used when app was opened from push notification in closed state
   private var threadId: Int?  // Used when app was opened from push notification in closed state
@@ -429,12 +428,76 @@ private extension MainController {
     
     tasksReady = true
     
+    Timer
+      .publish(every: 0.5, on: .main, in: .common)
+      .autoconnect()
+      .filter { [unowned self] _ in !self.isBannerOnScreen}
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        if let banner = self.bannersQueue.dequeue() {
+          self.isBannerOnScreen = true
+          banner.present()
+//          if !banner.isModal {
+//            banner.dismiss()
+//          }
+          banner.didDisappearPublisher
+            .sink { [unowned self] _ in
+              banner.removeFromSuperview()
+              self.isBannerOnScreen = false
+//              self.bannersQueue.dequeue()
+            }
+            .store(in: &self.subscriptions)
+        }
+      }
+      .store(in: &subscriptions)
+    
+    // Tab item listener to animate tab
     Notifications.UIEvents.tabItemPublisher
       .receive(on: DispatchQueue.main)
       .throttle(for: .seconds(0.5), scheduler: DispatchQueue.main, latest: false)
       .sink { [unowned self] in 
         self.animateTab($0.keys.first!)
       }
+      .store(in: &subscriptions)
+    
+    // Show banner on topic subscription/error
+    Notifications.UIEvents.topicSubscriptionPublisher
+      .receive(on: DispatchQueue.main)
+      .throttle(for: .seconds(0.5), scheduler: DispatchQueue.main, latest: false)
+      .sink(receiveCompletion: { [weak self] in
+        guard let self = self,
+              case .failure(let error) = $0
+        else { return }
+        
+#if DEBUG
+        error.printLocalized(class: type(of: self), functionName: #function)
+#endif
+        self.bannersQueue.enqueue(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                                           text: AppError.server.localizedDescription),
+                                            contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                            isModal: false,
+                                            useContentViewHeight: true,
+                                            shouldPresent: false,
+                                            shouldDismissAfter: 2))
+        //        banner.didDisappearPublisher
+        //          .sink { /*[unowned self]*/ _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
+        //          .store(in: &self.subscriptions)
+      }, receiveValue: { [weak self] in
+        guard let self = self else { return }
+        
+        self.bannersQueue.enqueue(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: $0.iconCategory, scaleMultiplicator: 1.5, iconColor: self.traitCollection.userInterfaceStyle == .dark ? .white : $0.tagColor),
+                                                                           text: "topics_subscription_added_start".localized + "\"\($0.title.capitalized)\"" + "topics_subscription_added_end".localized,
+                                                                           textAlignment: .natural),
+                                            contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                            isModal: false,
+                                            useContentViewHeight: true,
+                                            shouldPresent: false,
+                                            shouldDismissAfter: 2))
+        //        banner.didDisappearPublisher
+        //          .sink { _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
+//          .store(in: &self.subscriptions)
+      })
       .store(in: &subscriptions)
     
     tasks.append(Task {@MainActor [weak self] in
@@ -463,7 +526,7 @@ private extension MainController {
                                useContentViewHeight: true,
                                shouldDismissAfter: 1)
         banner.didDisappearPublisher
-          .sink {[unowned self] _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
+          .sink {[unowned self] _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
           .store(in: &self.subscriptions)
       }
       .store(in: &subscriptions)
@@ -552,11 +615,11 @@ private extension MainController {
     
     ///Notify when survey is marked favorite
     SurveyReferences.shared.markedFavoritePublisher
-      .filter { [unowned self] _ in !self.isBannerOnScreen }
+//      .filter { [unowned self] _ in !self.isBannerOnScreen }
       .receive(on: DispatchQueue.main)
       .sink { _ in
         
-        self.isBannerOnScreen = true
+//        self.isBannerOnScreen = true
         let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
                                                               text: "watch_survey_notification",
                                                               tintColor: .label),
@@ -565,7 +628,7 @@ private extension MainController {
                                useContentViewHeight: true,
                                shouldDismissAfter: 2)
         banner.didDisappearPublisher
-          .sink {[unowned self] _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
+          .sink {[unowned self] _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
           .store(in: &self.subscriptions)
       }
       .store(in: &subscriptions)
@@ -771,9 +834,9 @@ private extension MainController {
 #if DEBUG
                       error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-                      guard !self.isBannerOnScreen else { return }
+//                      guard !self.isBannerOnScreen else { return }
                       
-                      self.isBannerOnScreen = true
+//                      self.isBannerOnScreen = true
                       let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
                                                                             text: AppError.server.localizedDescription),
                                              contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
@@ -781,7 +844,7 @@ private extension MainController {
                                              useContentViewHeight: true,
                                              shouldDismissAfter: 2)
                       banner.didDisappearPublisher
-                        .sink {[unowned self] _ in banner.removeFromSuperview(); self.isBannerOnScreen = false }
+                        .sink {[unowned self] _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
                         .store(in: &self.subscriptions)
                     }
                   }}
@@ -812,49 +875,166 @@ private extension MainController {
     }
   }
   
-  func pushController(_ controller: UIViewController) {
+  func pushController(_ controller: UIViewController, animated: Bool = true) {
     guard let currentController = currentController else { return }
     
     setTabBarVisible(visible: false, animated: true)
     toggleLogo(on: false)
     if currentController is NavigationController {
-      (currentController as! UINavigationController).pushViewController(controller, animated: true)
+      (currentController as! UINavigationController).pushViewController(controller, animated: animated)
     } else {
-      currentController.navigationController?.pushViewController(controller, animated: true)
+      currentController.navigationController?.pushViewController(controller, animated: animated)
     }
   }
   
-  func setLoadingScreen(on: Bool, animated: Bool) {
-    guard let currentController = currentController else { return }
-    
-//    currentController.navigationController?.setNavigationBarHidden(true, animated: animated)
+  func setLoadingSpinner(on: Bool) {
+    if on {
+      let bgView = UIView()
+      let spinner = Logo()
+      let spiral = Icon(frame: .zero, category: .Spiral,
+                        scaleMultiplicator: 1,
+                        iconColor: traitCollection.userInterfaceStyle == .dark ? Colors.spiralDark : Colors.spiralLight)
+      
+      bgView.alpha = 0
+      bgView.layer.zPosition = 2000
+      bgView.accessibilityIdentifier = "loadingSpinner"
+      bgView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+      bgView.addSubview(spiral)
+      bgView.addSubview(spinner)
+      bgView.layer.masksToBounds = true
+      appDelegate.window?.addSubview(bgView)
+      bgView.edgesToSuperview()
+      
+      spiral.aspectRatio(1)
+      spiral.widthToHeight(of: bgView, multiplier: 1.5)
+      spiral.centerInSuperview()
+      spiral.transform = .init(scaleX: 0.75, y: 0.75)
+      spiral.alpha = 0
+      spinner.centerXToSuperview()
+      spinner.centerYToSuperview()
+      spinner.widthToSuperview(multiplier: 0.31)
+      spinner.transform = .init(scaleX: 0.75, y: 0.75)
+      spinner.alpha = 0
+      
+      // Animations
+      UIView.animate(withDuration: 0.3,
+                     delay: 0,
+                     options: .curveEaseInOut) {
+        bgView.alpha = 1
+      } completion: { _ in
+        // Spiral presentation anim
+        UIView.animate(withDuration: 0.2,
+                       delay: 0,
+                       options: .curveEaseInOut) {
+          spiral.alpha = 1
+          spiral.transform = .identity
+        } completion: { _ in spiral.startRotating(duration: 5) }
+        
+        // Spinner presentation anim
+        UIView.animate(withDuration: 0.15,
+                       delay: 0.15,
+                       options: .curveEaseInOut) {
+          spinner.alpha = 1
+          spinner.transform = .identity
+        } completion: { _ in
+          UIView.animate(withDuration: 1,
+                         delay: 0,
+                         options: [.autoreverse, .repeat, .curveEaseInOut]) { spinner.transform = .init(scaleX: 0.95, y: 0.95) }
+        }
+      }
+    } else {
+      guard let bgView = appDelegate.window?.getSubview(type: UIView.self, identifier: "loadingSpinner"),
+            let spiral = bgView.getSubview(type: Icon.self),
+            let spinner = bgView.getSubview(type: Logo.self)
+      else { return }
+      
+      // Animations
+      UIView.animate(withDuration: 0.3, delay: 0.3, animations: {
+        bgView.alpha = 0
+      }) { _ in bgView.removeFromSuperview() }
+      
+      UIView.animate(withDuration: 0.3,
+                     delay: 0,
+                     options: .curveEaseInOut,
+                     animations: {
+//        bgView.alpha = 0
+        spiral.transform = .init(scaleX: 1.25, y: 1.25)
+        spiral.alpha = 0
+        spinner.alpha = 0
+        spinner.transform =  CGAffineTransform(scaleX: 0.25, y: 0.25)
+      }) { _ in
+        spinner.layer.removeAllAnimations()
+        spinner.removeFromSuperview()
+        spiral.stopRotating()
+        spiral.removeFromSuperview()
+      }
+    }
   }
   
   /// Request publication by share link
   func loadSharedLink() {
+    
     guard let shareLink = shareLink else { return }
     
+    // Try to find existing publication to prevent api request
+    if let instance = SurveyReferences.shared.findInstanceByShareLink(shareLink) {
+      // Check if current controller is not the same controller we want to show
+      if let pollController = currentController as? PollController,
+         pollController.item == instance {
+        return
+      }
+      
+      // Reset share link
+      self.shareLink = nil
+      // Launch app if not started
+      if !appLaunched {
+        launch() { [weak self] in
+          guard let self = self else { return }
+
+          self.pushController(PollController(surveyReference: instance))
+        }
+      } else {
+        pushController(PollController(surveyReference: instance))
+      }
+      
+      return
+    }
+    
+    // Api request
     Task { [weak self] in
       guard let self = self else { return }
       
       do {
-        // Freeze screen and show loader if app was launched
-        if self.appLaunched {
-          setLoadingScreen(on: true, animated: true)
-        }
+        // Show loading spinner if app was launched
+        if self.appLaunched { self.setLoadingSpinner(on: true) }
+        
+        // Request data
         let instance = try await API.shared.surveys.getSurvey(shareLink)
+        instance.reference.tempShareLinks.append(shareLink)
+        
+        // Check if current controller is not the same controller we want to show
+        if let pollController = currentController as? PollController,
+           pollController.item == instance.reference {
+          return
+        }
+        
         // Reset share link
         self.shareLink = nil
         if !self.appLaunched {
           self.launch() { [weak self] in
             guard let self = self else { return }
-//
+            
+            // After launch animation present controller
             self.pushController(PollController(surveyReference: instance.reference))
-//            Notifications.System.shareLinkResponsePublisher.send(instance.reference)
           }
         } else {
-          self.pushController(PollController(surveyReference: instance.reference))
-//          Notifications.System.shareLinkResponsePublisher.send(instance.reference)
+          // Push controller in background
+          self.pushController(PollController(surveyReference: instance.reference), animated: false)
+          
+          // Hide spinner with smooth delay
+          delay(seconds: 0.3) {
+            self.setLoadingSpinner(on: false)
+          }
         }
       } catch {
 #if DEBUG

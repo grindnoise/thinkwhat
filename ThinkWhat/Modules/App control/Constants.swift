@@ -13,6 +13,7 @@ struct Constants {
     static let updateStatsComments = 10.0
     static let updateStats = 10.0
     static let requestPublications = 5.0
+    static let bannerAutoDismiss = 2.0
   }
   
   struct Pagination {
@@ -21,6 +22,10 @@ struct Constants {
   
   struct DataControl{
     static let shareLinkArraySize = 2 // It should be hash and enc - last two params in deeplink https://www.thinkwhat.app/share/04bc64dd3146/eJzTyCkw4PI0NDPmSgwzNNIzNNAzMjAyVjA0sAIiUyOuAkOuRD0AmUAHyw==/ 
+  }
+  
+  struct UI {
+    static let padding: CGFloat = 8
   }
 }
 
