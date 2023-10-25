@@ -15,9 +15,9 @@ class Avatar: UIView {
     case Default, Editing, Choice, Selection
   }
   
-  struct Constants {
-    static let animationDuration = 0.4
-  }
+//  struct Constants {
+//    static let animationDuration = 0.4
+//  }
   //    @Published private var image: UIImage?
   
 //  override var debugDescription: String { "Avatar for: \(userprofile!.name)" }
@@ -114,7 +114,7 @@ class Avatar: UIView {
       layer.shadowColor = shadowColor.cgColor
     }
   }
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
     didSet {
       button.tintColor = color
     }
@@ -251,8 +251,6 @@ class Avatar: UIView {
   public let tapPublisher = PassthroughSubject<Userprofile, Never>()
   public let selectionPublisher = CurrentValueSubject<[Userprofile: Bool]?, Never>(nil)
   
-  
-  
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
@@ -285,7 +283,7 @@ class Avatar: UIView {
     instance.showsMenuAsPrimaryAction = true
     instance.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
     instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
-    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+    instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
     //        instance.isContextMenuInteractionEnabled = true
     //        instance.addInteraction(UIContextMenuInteraction(delegate: self))
@@ -584,7 +582,7 @@ class Avatar: UIView {
       progressLayer.add(Animations.get(property: .LineWidth,
                                        fromValue: progressLayer.lineWidth,
                                        toValue: progressLayer.lineWidth*1.25,
-                                       duration: Constants.animationDuration/2,
+                                       duration: 0.4/2,
                                        autoreverses: true,
                                        timingFunction: .linear,
                                        isRemovedOnCompletion: true), forKey: nil)
@@ -600,7 +598,7 @@ class Avatar: UIView {
       progressLayer.add(Animations.get(property: .StrokeEnd,
                                        fromValue: progressLayer.strokeEnd,
                                        toValue: strokeEnd,
-                                       duration: Constants.animationDuration,
+                                       duration: 0.4,
                                        timingFunction: .easeInEaseOut,
                                        delegate: self,
                                        isRemovedOnCompletion: false,

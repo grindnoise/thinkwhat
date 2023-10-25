@@ -47,7 +47,7 @@ class PollController: UIViewController {
                iconCategory: item.topic.iconCategory)
   }()
   private lazy var spinner: Logo = { Logo() }() // SpiralSpinner!
-  public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: traitCollection.userInterfaceStyle == .dark ? Colors.spiralDark : Colors.spiralLight) }()
+  public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.spiralDark : Constants.UI.Colors.spiralLight) }()
   
   
   // MARK: - Destructor
@@ -170,7 +170,7 @@ class PollController: UIViewController {
     super.viewWillAppear(animated)
     
     navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
-    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
     
     guard !item.isNil else { return }
     
@@ -194,7 +194,7 @@ class PollController: UIViewController {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
     navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
   }
   
@@ -226,7 +226,7 @@ private extension PollController {
     navigationController?.interactivePopGestureRecognizer?.delegate = self
 //    navigationController?.setBarShadow(on: traitCollection.userInterfaceStyle != .dark, animated: true)
     navigationController?.setBarTintColor(item.topic.tagColor)
-    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
     navigationItem.titleView = titleView
     setBarButtonItems()
   }
@@ -335,7 +335,7 @@ private extension PollController {
     }
     
     navigationController?.setNavigationBarHidden(true, animated: false)
-    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     controllerInput?.load(item, incrementViewCounter: true)
     
     // Show spinner
@@ -536,7 +536,7 @@ private extension PollController {
   /// Sets up loading view
   func setLoading() {
     navigationController?.setNavigationBarHidden(true, animated: false)
-    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    view.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     
     view.addSubview(spiral)
     view.addSubview(spinner)

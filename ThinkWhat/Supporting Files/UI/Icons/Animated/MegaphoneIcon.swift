@@ -58,7 +58,7 @@ class MegaphoneIcon: AnimatedIcon, CAAnimationDelegate {
     
     func setupProperties(){
         self.inactive = UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1)
-        self.active = Colors.main//UIColor(red:1.00, green: 0.49, blue:0.47, alpha:1.0)
+        self.active = Constants.UI.Colors.main//UIColor(red:1.00, green: 0.49, blue:0.47, alpha:1.0)
     }
     
     func setupLayers(){

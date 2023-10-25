@@ -64,7 +64,7 @@ class TextBannerContent: UIView {
     
     return instance
   }()
-  private let image: UIImage
+  private var image: UIImage?
   private let text: String
   private let imageTintColor: UIColor
   private let textColor: UIColor
@@ -90,7 +90,7 @@ class TextBannerContent: UIView {
   
   
   // MARK: - Initialization
-  init(image: UIImage = UIImage(),
+  init(image: UIImage? = nil,
        icon: Icon? = nil,
        text: String,
        attributedText: NSAttributedString? = nil,
@@ -98,7 +98,7 @@ class TextBannerContent: UIView {
        tintColor: UIColor = .clear,
        fontName: String = Fonts.Rubik.Regular,
        textStyle: UIFont.TextStyle = .headline,
-       textAlignment: NSTextAlignment = .center,
+       textAlignment: NSTextAlignment = .natural,
        cornerRadius: CGFloat = 0) {
     self.fontName = fontName
     self.image = image

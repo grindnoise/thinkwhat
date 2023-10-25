@@ -65,7 +65,7 @@ class UserprofilesView: UIView {
         guard let answer = viewInput?.answer else { return UserprofilesCollectionView() }
         
         instance.answer = answer
-        instance.color = Colors.getColor(forId: answer.order)
+        instance.color = Constants.UI.Colors.getColor(forId: answer.order)
       }
       
       gridItemSizePublisher.subscribe(instance.gridItemSizePublisher).store(in: &subscriptions)

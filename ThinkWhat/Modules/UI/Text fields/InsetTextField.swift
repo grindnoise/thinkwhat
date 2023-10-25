@@ -10,18 +10,22 @@ import UIKit
 
 class InsetTextField: UITextField {
   
-  public var rightViewVerticalScaleFactor: CGFloat = 1
-  public var insets: UIEdgeInsets = UIEdgeInsets.zero {// UIEdgeInsets(top: 0, left: 18, bottom: 0, right: 20) {
+  public var rightViewVerticalScaleFactor: CGFloat
+  public var insets: UIEdgeInsets {
     didSet {
+      guard oldValue != insets else { return }
+      
       setNeedsLayout()
       layoutIfNeeded()
     }
   }
   
-  init(rightViewVerticalScaleFactor: CGFloat = 1) {
-    super.init(frame: .zero)
-    
+  init(rightViewVerticalScaleFactor: CGFloat = 1,
+       insets: UIEdgeInsets = .zero) {
+    self.insets = insets
     self.rightViewVerticalScaleFactor = rightViewVerticalScaleFactor
+    
+    super.init(frame: .zero)
   }
   
   required init?(coder: NSCoder) {
@@ -45,7 +49,7 @@ class InsetTextField: UITextField {
     let yInset: CGFloat = bounds.height - bounds.height/rightViewVerticalScaleFactor
     let height = bounds.height - xInset
     
-    return CGRect(origin: CGPoint(x: bounds.width - (xInset + height), y: bounds.height - (yInset + height)),
+    return CGRect(origin: CGPoint(x: bounds.width - (xInset/2 + height), y: yInset/2/*bounds.height - (yInset + height)*/),
                   size: .uniform(size: height))
   }
 }

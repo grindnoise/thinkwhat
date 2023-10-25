@@ -213,7 +213,7 @@ private extension TopicsController {
         guard let self = self else { return }
         
         // Set nav bar tint color
-        self.tintColor = $0?.tagColor ?? Colors.main
+        self.tintColor = $0?.tagColor ?? Constants.UI.Colors.main
         
         // Update mode
         self.mode = $0.isNil ? .Default : .Topic
@@ -229,7 +229,7 @@ private extension TopicsController {
 //        guard let self = self else { return }
 //        
 //        // Set nav bar tint color
-//        self.tintColor = self.filter.topic?.tagColor ?? Colors.main
+//        self.tintColor = self.filter.topic?.tagColor ?? Constants.UI.Colors.main
 //        
 //        // Update mode
 //        self.mode = self.filter.topic.isNil ? .Default : .Topic
@@ -321,9 +321,9 @@ private extension TopicsController {
   
   func getGradientColors() -> [CGColor] {
     [
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : Colors.main.lighter(0.2).cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Constants.UI.Colors.main.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Constants.UI.Colors.main.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : Constants.UI.Colors.main.lighter(0.2).cgColor,
     ]
   }
   

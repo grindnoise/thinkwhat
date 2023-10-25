@@ -38,7 +38,7 @@ class SurveysCollectionView: UICollectionView {
   public let deinitPublisher = PassthroughSubject<Bool, Never>()
   public let emptyPublicationsPublisher = CurrentValueSubject<Bool?, Never>(nil)
   ///**UI**
-  public var color: UIColor = Colors.main {
+  public var color: UIColor = Constants.UI.Colors.main {
     didSet {
       guard oldValue != color else { return }
       

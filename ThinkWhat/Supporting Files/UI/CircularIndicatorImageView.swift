@@ -10,7 +10,7 @@ import UIKit
 
 class CircularIndicatorImageView: UIImageView {
     
-  public var color: UIColor = Colors.main {
+  public var color: UIColor = Constants.UI.Colors.main {
         didSet {
             progressIndicatorView.color = color
             layer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : color.withAlphaComponent(0.2).cgColor

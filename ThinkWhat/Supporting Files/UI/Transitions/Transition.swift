@@ -130,7 +130,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
 //        fakeAction.layer.zPosition = 100
 //        fakeAction.layer.shadowOpacity = 1
 //        fakeAction.layer.shadowPath = UIBezierPath(roundedRect: fakeAction.bounds, cornerRadius: fakeAction.bounds.height/2).cgPath
-//        fakeAction.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+//        fakeAction.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
 //        fakeAction.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
 //        fakeAction.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
 //
@@ -215,7 +215,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         logo.removeConstraints(logo.getAllConstraints())
         containerView.addSubview(logo)
         logo.layer.masksToBounds = false
-        logo.layer.shadowColor = Colors.main.cgColor
+        logo.layer.shadowColor = Constants.UI.Colors.main.cgColor
         logo.layer.shadowOffset = .zero
         logo.layer.shadowRadius = padding
         logo.layer.shadowOpacity = 0.5
@@ -235,7 +235,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           if #available(iOS 15, *) {
             var config = UIButton.Configuration.filled()
             config.cornerStyle = .capsule
-            config.baseBackgroundColor = Colors.main
+            config.baseBackgroundColor = Constants.UI.Colors.main
             config.attributedTitle = AttributedString("getStartedButton".localized.capitalized,
                                                       attributes: AttributeContainer([
                                                         .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
@@ -252,7 +252,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                                         for: .normal)
           }
           instance.layer.shadowOpacity = 1
-          instance.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+          instance.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
           instance.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
           instance.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
           
@@ -270,7 +270,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let loginTextField: UnderlinedSignTextField = {
             let instance = UnderlinedSignTextField()
             instance.backgroundColor = .clear
-            instance.tintColor = Colors.main
+            instance.tintColor = Constants.UI.Colors.main
             instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
             instance.clipsToBounds = false
             instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
@@ -304,7 +304,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let loginTextField: UnderlinedSignTextField = {
             let instance = UnderlinedSignTextField()
             instance.backgroundColor = .clear
-            instance.tintColor = Colors.main
+            instance.tintColor = Constants.UI.Colors.main
             instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
             instance.clipsToBounds = false
             instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
@@ -371,7 +371,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
                                                          attributes: [
                                                           .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
-                                                          .foregroundColor: Colors.main as Any
+                                                          .foregroundColor: Constants.UI.Colors.main as Any
                                                          ]),
                                       for: .normal)
 
@@ -536,7 +536,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           if #available(iOS 15, *) {
             var config = UIButton.Configuration.filled()
             config.cornerStyle = .capsule
-            config.baseBackgroundColor = Colors.main
+            config.baseBackgroundColor = Constants.UI.Colors.main
             config.attributedTitle = AttributedString("loginButton".localized,
                                                       attributes: AttributeContainer([
                                                         .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
@@ -544,7 +544,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                                                       ]))
             instance.configuration = config
           } else {
-            instance.backgroundColor = Colors.main
+            instance.backgroundColor = Constants.UI.Colors.main
             instance.cornerRadius = fromView.loginButton.cornerRadius
             instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized,
                                                            attributes: [
@@ -567,7 +567,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         // Draw shadow
         loginButton.layer.shadowOpacity = 1
         loginButton.layer.shadowPath = UIBezierPath(roundedRect: loginButton.bounds, cornerRadius: loginButton.bounds.height/2).cgPath
-        loginButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        loginButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
         loginButton.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
         loginButton.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
         loginButtonCoordinate.y = containerView.bounds.height
@@ -580,13 +580,14 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         apple.frame.size = fromView.apple.frame.size
         containerView.addSubview(apple)
         fromView.apple.alpha = 0
+        fromView.appleDark.alpha = 0
 
         let forgotButton: UIButton = {
           let instance = UIButton()
           instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
                                                          attributes: [
                                                           .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
-                                                          .foregroundColor: Colors.main as Any
+                                                          .foregroundColor: Constants.UI.Colors.main as Any
                                                          ]),
                                       for: .normal)
 
@@ -603,7 +604,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let loginTextField: UnderlinedSignTextField = {
             let instance = UnderlinedSignTextField()
             instance.backgroundColor = .clear
-            instance.tintColor = Colors.main
+            instance.tintColor = Constants.UI.Colors.main
             instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
             instance.clipsToBounds = false
             instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
@@ -639,7 +640,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let loginTextField: UnderlinedSignTextField = {
             let instance = UnderlinedSignTextField()
             instance.backgroundColor = .clear
-            instance.tintColor = Colors.main
+            instance.tintColor = Constants.UI.Colors.main
             instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
             instance.clipsToBounds = false
             instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
@@ -737,7 +738,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           opaque.clipsToBounds = false
           
           let instance = UIView()
-          instance.backgroundColor = Colors.main
+          instance.backgroundColor = Constants.UI.Colors.main
           instance.cornerRadius = fromView.loginButton.frame.height/2
           fakeButtonLabel.placeInCenter(of: instance)
           instance.place(inside: opaque)
@@ -753,7 +754,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         // Draw shadow
         fakeButton.layer.shadowOpacity = 1
         fakeButton.layer.shadowPath = UIBezierPath(roundedRect: fakeButton.bounds, cornerRadius: fakeButton.bounds.height/2).cgPath
-        fakeButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        fakeButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
         fakeButton.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
         fakeButton.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
         
@@ -798,6 +799,8 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
               fromView.loginContainer.alpha = 1
               fromView.passwordContainer.alpha = 1
               fromView.label.alpha = 1
+              fromView.appleDark.alpha = fromView.traitCollection.userInterfaceStyle == .dark ? 1 : 0
+              fromView.apple.alpha = fromView.traitCollection.userInterfaceStyle == .dark ? 0 : 1
             }
         }
         
@@ -834,7 +837,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         toView.layoutIfNeeded()
         toVC.navigationController?.navigationBar.setNeedsLayout()
         toVC.navigationController?.navigationBar.layoutIfNeeded()
-        toView.userSettingsView.alpha = 0
+//        toView.userSettingsView.alpha = 0
         toView.alpha = 1
         
         let padding: CGFloat = 8
@@ -845,7 +848,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                                   size: fromView.logoIcon.bounds.size)
           fromView.logoIcon.alpha = 0
           logoIcon.alpha = 0
-          instance.iconColor = Colors.main
+          instance.iconColor = Constants.UI.Colors.main
           instance.scaleMultiplicator = 1
           instance.category = .Logo
           
@@ -858,7 +861,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                                   size: fromView.logoText.bounds.size)
           fromView.logoIcon.alpha = 0
           logoText.alpha = 0
-          instance.iconColor = Colors.main
+          instance.iconColor = Constants.UI.Colors.main
           instance.scaleMultiplicator = 1
           instance.category = .LogoText
           
@@ -901,7 +904,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
             var config = UIButton.Configuration.filled()
             config.cornerStyle = .small
             config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
-            config.baseBackgroundColor = Colors.main
+            config.baseBackgroundColor = Constants.UI.Colors.main
             config.contentInsets.top = padding
             config.contentInsets.bottom = padding
             config.contentInsets.leading = 20
@@ -913,7 +916,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                                                       ]))
             instance.configuration = config
           } else {
-            instance.backgroundColor = Colors.main
+            instance.backgroundColor = Constants.UI.Colors.main
             instance.cornerRadius = fromView.loginButton.cornerRadius
             instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized.uppercased(),
                                                            attributes: [
@@ -948,7 +951,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           instance.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
                                                          attributes: [
                                                           .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
-                                                          .foregroundColor: Colors.main as Any
+                                                          .foregroundColor: Constants.UI.Colors.main as Any
                                                          ]),
                                       for: .normal)
           
@@ -969,7 +972,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
                                                          attributes: [
                                                           .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
-                                                          .foregroundColor: Colors.main as Any
+                                                          .foregroundColor: Constants.UI.Colors.main as Any
                                                          ]),
                                       for: .normal)
           
@@ -987,7 +990,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let loginTextField: UnderlinedSignTextField = {
             let instance = UnderlinedSignTextField()
             instance.backgroundColor = .clear
-            instance.tintColor = Colors.main
+            instance.tintColor = Constants.UI.Colors.main
             instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
             instance.clipsToBounds = false
             instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
@@ -1023,7 +1026,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let loginTextField: UnderlinedSignTextField = {
             let instance = UnderlinedSignTextField()
             instance.backgroundColor = .clear
-            instance.tintColor = Colors.main
+            instance.tintColor = Constants.UI.Colors.main
             instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
             instance.clipsToBounds = false
             instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
@@ -1125,7 +1128,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
               guard index == views.count - 1 else { return }
               
               UIView.animate(withDuration: 0.3, animations: {
-                toView.userSettingsView.alpha = 1
+//                toView.userSettingsView.alpha = 1
               }) { [weak self] _ in
                 guard let self = self else { return }
                 
@@ -1176,7 +1179,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
 //                                                                               to: containerView),
 //                                  size: fromView.logoIcon.bounds.size)
 //          fromView.logoIcon.alpha = 0
-//          instance.iconColor = Colors.main
+//          instance.iconColor = Constants.UI.Colors.main
 //          instance.scaleMultiplicator = 1
 //          instance.category = .Logo
 //
@@ -1188,7 +1191,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
 //                                                                               to: containerView),
 //                                  size: fromView.logoText.bounds.size)
 //          fromView.logoIcon.alpha = 0
-//          instance.iconColor = Colors.main
+//          instance.iconColor = Constants.UI.Colors.main
 //          instance.scaleMultiplicator = 1
 //          instance.category = .LogoText
 //
@@ -1200,7 +1203,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         fakeLogoIcon.removeConstraints(fakeLogoIcon.getAllConstraints())
         containerView.addSubview(fakeLogoIcon)
         fakeLogoIcon.layer.masksToBounds = false
-        fakeLogoIcon.layer.shadowColor = Colors.main.cgColor
+        fakeLogoIcon.layer.shadowColor = Constants.UI.Colors.main.cgColor
         fakeLogoIcon.layer.shadowOffset = .zero
         fakeLogoIcon.layer.shadowRadius = padding
         fakeLogoIcon.layer.shadowOpacity = 0.5
@@ -1247,7 +1250,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           opaque.clipsToBounds = false
           
           let instance = UIView()
-          instance.backgroundColor = Colors.main
+          instance.backgroundColor = Constants.UI.Colors.main
           instance.cornerRadius = fromView.loginButton.frame.height/2
           fakeButtonLabel.placeInCenter(of: instance)
           instance.place(inside: opaque)
@@ -1264,7 +1267,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
         // Draw shadow
         fakeButton.layer.shadowOpacity = 1
         fakeButton.layer.shadowPath = UIBezierPath(roundedRect: fakeButton.bounds, cornerRadius: fakeButton.bounds.height/2).cgPath
-        fakeButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        fakeButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
         fakeButton.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
         fakeButton.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
         
@@ -1281,7 +1284,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           instance.setAttributedTitle(NSAttributedString(string: "signupButton".localized,
                                                          attributes: [
                                                           .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
-                                                          .foregroundColor: Colors.main as Any
+                                                          .foregroundColor: Constants.UI.Colors.main as Any
                                                          ]),
                                       for: .normal)
           
@@ -1304,7 +1307,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
                                                          attributes: [
                                                           .font: UIFont.scaledFont(fontName: Fonts.Semibold, forTextStyle: .headline) as Any,
-                                                          .foregroundColor: Colors.main as Any
+                                                          .foregroundColor: Constants.UI.Colors.main as Any
                                                          ]),
                                       for: .normal)
           
@@ -1326,7 +1329,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let loginTextField: UnderlinedSignTextField = {
             let instance = UnderlinedSignTextField()
             instance.backgroundColor = .clear
-            instance.tintColor = Colors.main
+            instance.tintColor = Constants.UI.Colors.main
             instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
             instance.clipsToBounds = false
             instance.attributedPlaceholder = NSAttributedString(string: "mailTF".localized,
@@ -1372,7 +1375,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let loginTextField: UnderlinedSignTextField = {
             let instance = UnderlinedSignTextField()
             instance.backgroundColor = .clear
-            instance.tintColor = Colors.main
+            instance.tintColor = Constants.UI.Colors.main
             instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
             instance.clipsToBounds = false
             instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
@@ -1409,7 +1412,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           let loginTextField: UnderlinedSignTextField = {
             let instance = UnderlinedSignTextField()
             instance.backgroundColor = .clear
-            instance.tintColor = Colors.main
+            instance.tintColor = Constants.UI.Colors.main
             instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
             instance.clipsToBounds = false
             instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
@@ -1620,7 +1623,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
              if #available(iOS 15, *) {
                var config = UIButton.Configuration.filled()
                config.cornerStyle = .capsule
-               config.baseBackgroundColor = Colors.main
+               config.baseBackgroundColor = Constants.UI.Colors.main
                config.attributedTitle = AttributedString("loginButton".localized,
                                                          attributes: AttributeContainer([
                                                           .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
@@ -1628,7 +1631,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
                                                          ]))
                instance.configuration = config
              } else {
-               instance.backgroundColor = Colors.main
+               instance.backgroundColor = Constants.UI.Colors.main
                instance.cornerRadius = fromView.loginButton.cornerRadius
                instance.setAttributedTitle(NSAttributedString(string: "loginButton".localized,
                                                               attributes: [
@@ -1652,7 +1655,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
              let loginTextField: UnderlinedSignTextField = {
                let instance = UnderlinedSignTextField()
                instance.backgroundColor = .clear
-               instance.tintColor = Colors.main
+               instance.tintColor = Constants.UI.Colors.main
                instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
                instance.clipsToBounds = false
                instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
@@ -1687,7 +1690,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
             let loginTextField: UnderlinedSignTextField = {
               let instance = UnderlinedSignTextField()
               instance.backgroundColor = .clear
-              instance.tintColor = Colors.main
+              instance.tintColor = Constants.UI.Colors.main
               instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
               instance.clipsToBounds = false
               instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
@@ -1715,17 +1718,16 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           mailContainer.cornerRadius = mailContainer.bounds.width * 0.025
           containerView.addSubview(mailContainer)
           fromView.mailContainer.alpha = 0
-          mailDestination.x = containerView.bounds.width
-          
-          
-           let passwordContainer: UIStackView = {
-             let loginTextField: UnderlinedSignTextField = {
-               let instance = UnderlinedSignTextField()
-               instance.backgroundColor = .clear
-               instance.tintColor = Colors.main
-               instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
-               instance.clipsToBounds = false
-               instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
+        mailDestination.x = containerView.bounds.width
+        
+        let passwordContainer: UIStackView = {
+          let loginTextField: UnderlinedSignTextField = {
+            let instance = UnderlinedSignTextField()
+            instance.backgroundColor = .clear
+            instance.tintColor = Constants.UI.Colors.main
+            instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
+            instance.clipsToBounds = false
+            instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
                                                                    attributes: [
                                                                      .font: UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body) as Any
                                                                    ])
@@ -1882,7 +1884,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
     fakeLogoIcon.removeConstraints(fakeLogoIcon.getAllConstraints())
     containerView.addSubview(fakeLogoIcon)
     fakeLogoIcon.layer.masksToBounds = false
-    fakeLogoIcon.layer.shadowColor = Colors.main.cgColor
+    fakeLogoIcon.layer.shadowColor = Constants.UI.Colors.main.cgColor
     fakeLogoIcon.layer.shadowOffset = .zero
     fakeLogoIcon.layer.shadowRadius = padding
     fakeLogoIcon.layer.shadowOpacity = 0.5
@@ -1929,7 +1931,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
       opaque.clipsToBounds = false
       
       let instance = UIView()
-      instance.backgroundColor = Colors.main
+      instance.backgroundColor = Constants.UI.Colors.main
       instance.cornerRadius = fromView.loginButton.frame.height/2
       fakeButtonLabel.placeInCenter(of: instance)
       instance.place(inside: opaque)
@@ -1947,7 +1949,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
     // Draw shadow
     fakeButton.layer.shadowOpacity = 1
     fakeButton.layer.shadowPath = UIBezierPath(roundedRect: fakeButton.bounds, cornerRadius: fakeButton.bounds.height/2).cgPath
-    fakeButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    fakeButton.layer.shadowColor = navigationController.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
     fakeButton.layer.shadowRadius = navigationController.traitCollection.userInterfaceStyle == .dark ? 8 : 4
     fakeButton.layer.shadowOffset = navigationController.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
     
@@ -1962,7 +1964,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
       let loginTextField: UnderlinedSignTextField = {
         let instance = UnderlinedSignTextField()
         instance.backgroundColor = .clear
-        instance.tintColor = Colors.main
+        instance.tintColor = Constants.UI.Colors.main
         instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
         instance.clipsToBounds = false
         instance.attributedPlaceholder = NSAttributedString(string: "mailTF".localized,
@@ -1995,7 +1997,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
       let loginTextField: UnderlinedSignTextField = {
         let instance = UnderlinedSignTextField()
         instance.backgroundColor = .clear
-        instance.tintColor = Colors.main
+        instance.tintColor = Constants.UI.Colors.main
         instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
         instance.clipsToBounds = false
         instance.attributedPlaceholder = NSAttributedString(string: "usernameTF".localized,
@@ -2032,7 +2034,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
       let loginTextField: UnderlinedSignTextField = {
         let instance = UnderlinedSignTextField()
         instance.backgroundColor = .clear
-        instance.tintColor = Colors.main
+        instance.tintColor = Constants.UI.Colors.main
         instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
         instance.clipsToBounds = false
         instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
@@ -2103,7 +2105,7 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
       instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
                                                      attributes: [
                                                       .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
-                                                      .foregroundColor: Colors.main as Any
+                                                      .foregroundColor: Constants.UI.Colors.main as Any
                                                      ]),
                                   for: .normal)
 
@@ -2174,9 +2176,16 @@ class Transition: NSObject, UIViewControllerAnimatedTransitioning {
           } else if view === fakeLogoText {
             view.frame.size = toView.logoText.frame.size
           }
-        }) {  _ in
+        }) { [weak self] _ in
+          guard let self = self else { return }
+          
           destination.alpha = 1
           view.removeFromSuperview()
+          
+          if view === apple {
+            toView.appleDark.alpha = toView.traitCollection.userInterfaceStyle == .dark ? 1 : 0
+            toView.apple.alpha = toView.traitCollection.userInterfaceStyle == .dark ? 0 : 1
+          }
           
           guard index == views.count - 1 else { return }
           

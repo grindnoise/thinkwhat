@@ -31,7 +31,7 @@ class UserSettingsEmailCell: UICollectionViewListCell {
     }
   }
   ///`UI`
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
     didSet {
       confirmSign.tintColor = AppData.isEmailVerified ? color : traitCollection.userInterfaceStyle == .dark ? .tertiaryLabel : .systemGray4
       textField.tintColor = color
@@ -51,7 +51,7 @@ class UserSettingsEmailCell: UICollectionViewListCell {
   private lazy var backgroundLayer: CAShapeLayer = {
     let instance = CAShapeLayer()
     instance.path = UIBezierPath(roundedRect: .zero, cornerRadius: 0).cgPath
-    instance.fillColor = Colors.textField(color: .white, traitCollection: traitCollection).cgColor
+    instance.fillColor = Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection).cgColor
     
     return instance
   }()
@@ -163,7 +163,7 @@ class UserSettingsEmailCell: UICollectionViewListCell {
   private lazy var headerImage: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "envelope.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.tintColor = Colors.cellHeader
+    instance.tintColor = Constants.UI.Colors.cellHeader
     instance.contentMode = .scaleAspectFit
 //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
@@ -172,7 +172,7 @@ class UserSettingsEmailCell: UICollectionViewListCell {
   }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = Colors.cellHeader
+    instance.textColor = Constants.UI.Colors.cellHeader
     instance.text = "mailTF".localized.uppercased()
     instance.font = Fonts.cellHeader
 
@@ -232,7 +232,7 @@ class UserSettingsEmailCell: UICollectionViewListCell {
       override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
           super.traitCollectionDidChange(previousTraitCollection)
   
-        backgroundLayer.fillColor = Colors.textField(color: .white, traitCollection: traitCollection).cgColor
+        backgroundLayer.fillColor = Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection).cgColor
 //          facebookTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //          instagramTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //          tiktokTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
@@ -333,7 +333,7 @@ extension UserSettingsEmailCell: UITextFieldDelegate {
       let banner = NewPopup(padding: padding*2,
                             contentPadding: .uniform(size: padding*2))
       let content = AccountManagementPopupContent(mode: .EmailChange,
-                                                  color: Colors.main)
+                                                  color: Constants.UI.Colors.main)
       content.actionPublisher
         .receive(on: DispatchQueue.main)
         .sink { [weak self] in

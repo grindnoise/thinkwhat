@@ -647,7 +647,7 @@ extension UITextField {
     
     let toolbar: UIToolbar = UIToolbar()
     toolbar.barStyle = .default
-    toolbar.tintColor = Colors.main
+    toolbar.tintColor = Constants.UI.Colors.main
     toolbar.items = [
       UIBarButtonItem(title: "Cancel", style: .plain, target: onCancel.target, action: onCancel.action),
       UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil),

@@ -58,7 +58,7 @@ class LinkPreviewCell: UICollectionViewCell {
   //UI
   private lazy var headerImage: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "link", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.tintColor = Colors.cellHeader
+    instance.tintColor = Constants.UI.Colors.cellHeader
     instance.contentMode = .scaleAspectFit
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
     
@@ -66,7 +66,7 @@ class LinkPreviewCell: UICollectionViewCell {
   }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = Colors.cellHeader
+    instance.textColor = Constants.UI.Colors.cellHeader
     instance.text = "web_link".localized.uppercased()
     instance.font = Fonts.cellHeader
 
@@ -92,7 +92,7 @@ class LinkPreviewCell: UICollectionViewCell {
   private lazy var disclosureIndicator: UIImageView = {
     let instance = UIImageView()
     instance.image = UIImage(systemName: "chevron.down")
-    instance.tintColor = Colors.cellHeader
+    instance.tintColor = Constants.UI.Colors.cellHeader
     instance.contentMode = .center
     instance.preferredSymbolConfiguration = .init(textStyle: .body, scale: .small)
     

@@ -145,7 +145,9 @@ extension SignInModel: SignInControllerInput {
       }
     }
     
-    Task {
+    Task { [weak self] in
+      guard let self = self else { return }
+      
       do {
         ///API authorization
         try await API.shared.auth.loginViaProviderAsync(provider: provider, token: accessToken)
@@ -170,7 +172,7 @@ extension SignInModel: SignInControllerInput {
         // If provider is Apple - no need to request user's data
         if provider == .Apple {
           await MainActor.run {
-            modelOutput?.providerSignInCallback(result: .success(true))
+            self.modelOutput?.providerSignInCallback(result: .success(true))
           }
           return
         }
@@ -191,7 +193,7 @@ extension SignInModel: SignInControllerInput {
         providerLogout()
         
         await MainActor.run {
-          modelOutput?.providerSignInCallback(result: .success(true))
+          self.modelOutput?.providerSignInCallback(result: .success(true))
         }
       } catch let error {
 #if DEBUG
@@ -201,7 +203,7 @@ extension SignInModel: SignInControllerInput {
         KeychainService.deleteData()
         UserDefaults.clear()
         await MainActor.run {
-          modelOutput?.providerSignInCallback(result: .failure(error))
+          self.modelOutput?.providerSignInCallback(result: .failure(error))
         }
       }
     }

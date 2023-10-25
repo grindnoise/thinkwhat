@@ -29,7 +29,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
   public var openURLPublisher = PassthroughSubject<URL, Never>()
   public let keyboardWillAppear = PassthroughSubject<Bool, Never>()
   ///`UI`
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
     didSet {
       disclosureIndicator.tintColor = color
       textField.tintColor = color
@@ -48,7 +48,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
   private lazy var backgroundLayer: CAShapeLayer = {
     let instance = CAShapeLayer()
     instance.path = UIBezierPath(roundedRect: .zero, cornerRadius: 0).cgPath
-    instance.fillColor = Colors.textField(color: .white, traitCollection: traitCollection).cgColor
+    instance.fillColor = Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection).cgColor
     
     return instance
   }()
@@ -221,7 +221,7 @@ class UserSettingsSocialMediaCell: UICollectionViewListCell {
       override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
           super.traitCollectionDidChange(previousTraitCollection)
   
-        backgroundLayer.fillColor = Colors.textField(color: .white, traitCollection: traitCollection).cgColor
+        backgroundLayer.fillColor = Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection).cgColor
 //          facebookTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //          instagramTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
 //          tiktokTextField.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED

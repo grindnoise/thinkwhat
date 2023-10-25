@@ -36,7 +36,7 @@ class AnswersCell: UICollectionViewCell {
   private lazy var horizontalStack: UIStackView = {
     let headerLabel: UILabel = {
       let instance = UILabel()
-      instance.textColor = Colors.cellHeader
+      instance.textColor = Constants.UI.Colors.cellHeader
       instance.text = "poll_view_voting".localized.uppercased()
       instance.font = Fonts.cellHeader
 
@@ -63,7 +63,7 @@ class AnswersCell: UICollectionViewCell {
     let headerImage: UIImageView = {
       let instance = UIImageView(image: UIImage(systemName: "hand.point.right.fill",
                                                 withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-      instance.tintColor = Colors.cellHeader
+      instance.tintColor = Constants.UI.Colors.cellHeader
       instance.contentMode = .scaleAspectFit
   //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
       instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true

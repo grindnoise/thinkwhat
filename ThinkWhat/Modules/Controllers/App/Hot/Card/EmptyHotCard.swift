@@ -52,11 +52,11 @@ class EmptyHotCard: UIView, Card {
                                          showsButton: true,
                                          showsLogo: true,
                                          buttonText: "create_post",
-                                         buttonColor: Colors.main,
+                                         buttonColor: Constants.UI.Colors.main,
                                          backgroundLightColor: .systemBackground,
-                                         backgroundDarkColor: Colors.darkTheme,
+                                         backgroundDarkColor: Constants.UI.Colors.darkTheme,
                                          spiralLightColor: UIColor.white.blended(withFraction: 0.04, of: UIColor.lightGray),
-                                         spiralDarkColor: Colors.spiralDark)
+                                         spiralDarkColor: Constants.UI.Colors.spiralDark)
     instance.buttonTapEvent
       .sink { [unowned self] in self.buttonTapEvent.send() }
       .store(in: &subscriptions)

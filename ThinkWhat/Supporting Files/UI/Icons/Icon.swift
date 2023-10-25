@@ -338,7 +338,7 @@ class Icon: UIView {
     if let _frame = aDecoder.decodeCGRect(forKey: "frame") as? CGRect,  let colorData = aDecoder.decodeObject(forKey: "backgroundColor") as? Data, let categoryID = aDecoder.decodeInteger(forKey: "categoryID") as? Int, let text = aDecoder.decodeObject(forKey: "text") as? String {
       
       super.init(frame: _frame)
-      self.backgroundColor = NSKeyedUnarchiver.unarchiveObject(with: colorData) as? UIColor ?? Colors.main
+      self.backgroundColor = NSKeyedUnarchiver.unarchiveObject(with: colorData) as? UIColor ?? Constants.UI.Colors.main
       self.text = text
       self.category = Icon.Category(rawValue: categoryID) ?? .Null
       self.icon = getLayer()

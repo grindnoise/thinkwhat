@@ -67,7 +67,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
 
     return instance
   }()
-  public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: traitCollection.userInterfaceStyle == .dark ? Colors.spiralDark : Colors.spiralLight) }()
+  public private(set) lazy var spiral: Icon = { Icon(frame: .zero, category: .Spiral, scaleMultiplicator: 1, iconColor: traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.spiralDark : Constants.UI.Colors.spiralLight) }()
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -86,7 +86,10 @@ class MainController: UITabBarController {//}, StorageProtocol {
     }
   }
   private var appLaunched = false
-  private lazy var bannersQueue: QueueArray<NewBanner> = QueueArray()  // Store banners in queue
+  // Banners handlers
+  private var bannersQueue: QueueArray<NewBanner> = QueueArray() // Store banners in queue
+  private var isBannerOnScreen = false // Prevent banner overlay
+  
   // These properties are received from push notifications
   private var surveyId: Int?  // Used when app was opened from push notification in closed state
   private var replyId: Int?   // Used when app was opened from push notification in closed state
@@ -99,16 +102,16 @@ class MainController: UITabBarController {//}, StorageProtocol {
   private lazy var logoText: LogoText = { LogoText() }()
   private lazy var passthroughView: PassthroughView = {
     let instance = PassthroughView(color: .clear)
-    instance.frame = UIScreen.main.bounds
+    instance.frame = appDelegate.window!.bounds //??  UIScreen.main.bounds
     instance.layer.zPosition = 99
     
     return instance
   }()
   private var shareLink: ShareLink?
-  private var isBannerOnScreen = false // Prevent banner overlay
+  
   //    private lazy var logo: AppLogoWithText = {
-  //        let instance = AppLogoWithText(color: Colors.Logo.Flame.main,
-  //                                       minusToneColor: Colors.Logo.Flame.minusTone)
+  //        let instance = AppLogoWithText(color: Constants.UI.Colors.Logo.Flame.main,
+  //                                       minusToneColor: Constants.UI.Colors.Logo.Flame.minusTone)
   //        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 6/1).isActive = true
   //        instance.isOpaque = false
   //        instance.layer.zPosition = 100
@@ -263,11 +266,7 @@ class MainController: UITabBarController {//}, StorageProtocol {
         self.logoStack.alpha = on ? 1 : 0
         constraint.constant = on ? self.logoCenterY : -self.logoStack.bounds.height
         self.passthroughView.layoutIfNeeded()
-      }) { [weak self] _ in
-        guard let self = self else { return }
-        
-        completion?()
-      }
+      }) { _ in completion?() }
   }
   
   
@@ -428,6 +427,7 @@ private extension MainController {
     
     tasksReady = true
     
+    // Banner queue listener
     Timer
       .publish(every: 0.5, on: .main, in: .common)
       .autoconnect()
@@ -480,9 +480,6 @@ private extension MainController {
                                             useContentViewHeight: true,
                                             shouldPresent: false,
                                             shouldDismissAfter: 2))
-        //        banner.didDisappearPublisher
-        //          .sink { /*[unowned self]*/ _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
-        //          .store(in: &self.subscriptions)
       }, receiveValue: { [weak self] in
         guard let self = self else { return }
         
@@ -494,9 +491,6 @@ private extension MainController {
                                             useContentViewHeight: true,
                                             shouldPresent: false,
                                             shouldDismissAfter: 2))
-        //        banner.didDisappearPublisher
-        //          .sink { _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
-//          .store(in: &self.subscriptions)
       })
       .store(in: &subscriptions)
     
@@ -514,51 +508,42 @@ private extension MainController {
     userprofile.notificationPublisher
       .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
       .receive(on: DispatchQueue.main)
-      .sink {
-        guard let user = $0.keys.first,
+      .sink { [weak self] in
+        guard let self = self,
+              let user = $0.keys.first,
               let notify = $0.values.first
         else { return }
         
-        let banner = NewBanner(contentView: UserBannerContentView(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication,
-                                                                  userprofile: user),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 1)
-        banner.didDisappearPublisher
-          .sink {[unowned self] _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
-          .store(in: &self.subscriptions)
+        self.bannersQueue.enqueue(NewBanner(contentView: UserBannerContentView(mode: notify ? .NotifyOnPublication : .DontNotifyOnPublication, userprofile: user),
+                                            isModal: false,
+                                            useContentViewHeight: true,
+                                            shouldDismissAfter: 1))
       }
       .store(in: &subscriptions)
     
     Userprofiles.shared.newSubscriptionPublisher
       .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
       .receive(on: DispatchQueue.main)
-      .sink { [unowned self] in
-        let banner = NewBanner(contentView: UserBannerContentView(mode: .Subscribe,
-                                                                  userprofile: $0),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 1)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
-          .store(in: &self.subscriptions)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bannersQueue.enqueue(NewBanner(contentView: UserBannerContentView(mode: .Subscribe, userprofile: $0),
+                                            isModal: false,
+                                            useContentViewHeight: true,
+                                            shouldDismissAfter: 1))
       }
       .store(in: &subscriptions)
 
     Userprofiles.shared.removeSubscriptionPublisher
       .throttle(for: .seconds(0.1), scheduler: DispatchQueue.main, latest: false)
       .receive(on: DispatchQueue.main)
-      .sink { [unowned self] in
-        let banner = NewBanner(contentView: UserBannerContentView(mode: .Unsubscribe, userprofile: $0),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 1)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
-          .store(in: &self.subscriptions)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bannersQueue.enqueue(NewBanner(contentView: UserBannerContentView(mode: .Unsubscribe, userprofile: $0),
+                                            isModal: false,
+                                            useContentViewHeight: true,
+                                            shouldDismissAfter: 1))
       }
       .store(in: &subscriptions)
     
@@ -615,21 +600,17 @@ private extension MainController {
     
     ///Notify when survey is marked favorite
     SurveyReferences.shared.markedFavoritePublisher
-//      .filter { [unowned self] _ in !self.isBannerOnScreen }
+    //      .filter { [unowned self] _ in !self.isBannerOnScreen }
       .receive(on: DispatchQueue.main)
-      .sink { _ in
+      .sink { [weak self] _ in
+        guard let self = self else { return }
         
-//        self.isBannerOnScreen = true
-        let banner = NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
-                                                              text: "watch_survey_notification",
-                                                              tintColor: .label),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 2)
-        banner.didDisappearPublisher
-          .sink {[unowned self] _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
-          .store(in: &self.subscriptions)
+        self.bannersQueue.enqueue(NewBanner(contentView: TextBannerContent(image: UIImage(systemName: "binoculars.fill")!,
+                                                                           text: "watch_survey_notification",
+                                                                           tintColor: .label),
+                                            isModal: false,
+                                            useContentViewHeight: true,
+                                            shouldDismissAfter: 2))
       }
       .store(in: &subscriptions)
   }
@@ -698,58 +679,6 @@ private extension MainController {
   }
   
   func loadData() {
-//    guard AppData.isEmailVerified else {
-//      let banner = NewPopup(padding: 16,
-//                            contentPadding: .uniform(size: 16))
-//      let content = EmailVerificationPopupContent(code: code,
-//                                                  retryTimeout: 60,
-//                                                  email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
-//                                                  color: Colors.main)
-//      content.verifiedPublisher
-//        .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
-//        .sink { [weak self] in
-//          guard let self = self else { return }
-//
-//          AppData.isEmailVerified = true
-//          banner.dismiss()
-//        }
-//        .store(in: &banner.subscriptions)
-//      content.retryPublisher
-//        .sink { [unowned self] in self.viewInput?.sendVerificationCode { [unowned self] in
-//
-//          switch $0 {
-//          case .success(let dict):
-//            guard let code = dict["confirmation_code"] as? Int else { return }
-//
-//            content.onEmailSent(code)
-//          case.failure(let error):
-//#if DEBUG
-//            error.printLocalized(class: type(of: self), functionName: #function)
-//#endif
-//            let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-//                                                                  text: AppError.server.localizedDescription,
-//                                                                  tintColor: .systemRed,
-//                                                                  fontName: Fonts.Rubik.Regular,
-//                                                                  textStyle: .subheadline,
-//                                                                  textAlignment: .natural),
-//                                   contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-//                                   isModal: false,
-//                                   useContentViewHeight: true,
-//                                   shouldDismissAfter: 2)
-//            banner.didDisappearPublisher
-//              .sink { _ in banner.removeFromSuperview() }
-//              .store(in: &self.subscriptions)
-//          }
-//        }}
-//        .store(in: &banner.subscriptions)
-//      banner.setContent(content)
-//      banner.didDisappearPublisher
-//        .sink { [unowned self] _ in banner.removeFromSuperview() }
-//        .store(in: &self.subscriptions)
-//
-//      return
-//    }
-    
     Task {
       do {
         let json = try await API.shared.system.appLaunch()
@@ -809,7 +738,7 @@ private extension MainController {
               let content = EmailVerificationPopupContent(code: code,
                                                           retryTimeout: 60,
                                                           email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
-                                                          color: Colors.main)
+                                                          color: Constants.UI.Colors.main)
               content.verifiedPublisher
                 .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
                 .sink { [weak self] in
@@ -820,7 +749,8 @@ private extension MainController {
                 }
                 .store(in: &banner.subscriptions)
               content.retryPublisher
-                .sink { [unowned self] in
+                .sink { [weak self] in
+                  guard let self = self else { return }
                   
                   // Resend code via email
                   self.sendVerificationCode { [unowned self] in
@@ -834,18 +764,11 @@ private extension MainController {
 #if DEBUG
                       error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-//                      guard !self.isBannerOnScreen else { return }
-                      
-//                      self.isBannerOnScreen = true
-                      let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
-                                                                            text: AppError.server.localizedDescription),
-                                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                             isModal: false,
-                                             useContentViewHeight: true,
-                                             shouldDismissAfter: 2)
-                      banner.didDisappearPublisher
-                        .sink {[unowned self] _ in banner.removeFromSuperview()/*; self.isBannerOnScreen = false*/ }
-                        .store(in: &self.subscriptions)
+                      self.bannersQueue.enqueue(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                                                                         text: AppError.server.localizedDescription),
+                                                          isModal: false,
+                                                          useContentViewHeight: true,
+                                                          shouldDismissAfter: 2))
                     }
                   }}
                 .store(in: &banner.subscriptions)
@@ -893,12 +816,12 @@ private extension MainController {
       let spinner = Logo()
       let spiral = Icon(frame: .zero, category: .Spiral,
                         scaleMultiplicator: 1,
-                        iconColor: traitCollection.userInterfaceStyle == .dark ? Colors.spiralDark : Colors.spiralLight)
+                        iconColor: traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.spiralDark : Constants.UI.Colors.spiralLight)
       
       bgView.alpha = 0
       bgView.layer.zPosition = 2000
       bgView.accessibilityIdentifier = "loadingSpinner"
-      bgView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+      bgView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
       bgView.addSubview(spiral)
       bgView.addSubview(spinner)
       bgView.layer.masksToBounds = true
@@ -1077,31 +1000,31 @@ private extension MainController {
 //                                   title: "hot",
 //                                   image: UIImage(systemName: "flame"),
 //                                   selectedImage: UIImage(systemName: "flame.fill"),
-//                                   color: Colors.main))//Logo.Flame.rawValue),
+//                                   color: Constants.UI.Colors.main))//Logo.Flame.rawValue),
 //      } else {
 //        viewControllers?.append(createNavigationController(for: HotController(surveyId: commentId),
 //                                   title: "hot",
 //                                   image: UIImage(systemName: "flame"),
 //                                   selectedImage: UIImage(systemName: "flame.fill"),
-//                                   color: Colors.main))//Logo.Flame.rawValue),
+//                                   color: Constants.UI.Colors.main))//Logo.Flame.rawValue),
 //      }
 //    viewControllers?.append(createNavigationController(for: SubscriptionsController(),
 //                                 title: "subscriptions",
 //                                 image: UIImage(systemName: "bell"),
 //                                 selectedImage: UIImage(systemName: "bell.fill"),
-//                                 color: Colors.main))//Colors.Logo.CoolGray.rawValue),
+//                                 color: Constants.UI.Colors.main))//Constants.UI.Colors.Logo.CoolGray.rawValue),
 //    viewControllers?.append(createNavigationController(for: ListController(), title: "list",
 //                                 image: UIImage(systemName: "square.stack.3d.up"),
 //                                 selectedImage: UIImage(systemName: "square.stack.3d.up.fill"),
-//                                 color: Colors.main))//Colors.Logo.GreenMunshell.rawValue),
+//                                 color: Constants.UI.Colors.main))//Constants.UI.Colors.Logo.GreenMunshell.rawValue),
 //    viewControllers?.append(createNavigationController(for: TopicsController(), title: "topics",
 //                                 image: UIImage(systemName: "chart.bar.doc.horizontal"),
 //                                 selectedImage: UIImage(systemName: "chart.bar.doc.horizontal.fill"),
-//                                 color: Colors.main))//Colors.Logo.Marigold.rawValue),
+//                                 color: Constants.UI.Colors.main))//Constants.UI.Colors.Logo.Marigold.rawValue),
 //    viewControllers?.append(createNavigationController(for: SettingsController(), title: "settings",
 //                                 image: UIImage(systemName: "gearshape"),
 //                                 selectedImage: UIImage(systemName: "gearshape.fill"),
-//                                 color: Colors.main))//Colors.Logo.AirBlue.rawValue),
+//                                 color: Constants.UI.Colors.main))//Constants.UI.Colors.Logo.AirBlue.rawValue),
     
     viewControllers = [
 //      createNavigationController(for: surveyId.isNil ? HotController(surveyId: surveyId,
@@ -1115,37 +1038,37 @@ private extension MainController {
                                  title: "hot",
                                  image: UIImage(systemName: "flame", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//
                                  selectedImage: UIImage(systemName: "flame.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),
-                                 color: Colors.main),//Logo.Flame.rawValue),
+                                 color: Constants.UI.Colors.main),//Logo.Flame.rawValue),
       createNavigationController(for: SubscriptionsController(),
                                  title: "subscriptions",
                                  image: UIImage(systemName: "bell", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
                                  selectedImage: UIImage(systemName: "bell.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
-                                 color: Colors.main),//Colors.Logo.CoolGray.rawValue),
+                                 color: Constants.UI.Colors.main),//Constants.UI.Colors.Logo.CoolGray.rawValue),
       createNavigationController(for: ListController(), title: "list",
                                  image: UIImage(systemName: "square.stack.3d.up", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
                                  selectedImage: UIImage(systemName: "square.stack.3d.up.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
-                                 color: Colors.main),//Colors.Logo.GreenMunshell.rawValue),
+                                 color: Constants.UI.Colors.main),//Constants.UI.Colors.Logo.GreenMunshell.rawValue),
       createNavigationController(for: TopicsController(), title: "topics",
                                  image: UIImage(systemName: "chart.bar.doc.horizontal", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
                                  selectedImage: UIImage(systemName: "chart.bar.doc.horizontal.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
-                                 color: Colors.main),//Colors.Logo.Marigold.rawValue),
+                                 color: Constants.UI.Colors.main),//Constants.UI.Colors.Logo.Marigold.rawValue),
       createNavigationController(for: SettingsController(), title: "settings",
                                  image: UIImage(systemName: "gearshape", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
                                  selectedImage: UIImage(systemName: "gearshape.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 0, weight: .regular, scale: .medium)),//),
-                                 color: Colors.main),//Colors.Logo.AirBlue.rawValue),
+                                 color: Constants.UI.Colors.main),//Constants.UI.Colors.Logo.AirBlue.rawValue),
     ]
   }
   
   @MainActor
   func setupUI() {
-    spiral.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    spiral.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     
     navigationController?.navigationBar.prefersLargeTitles = false
     navigationController?.navigationItem.largeTitleDisplayMode = .never
 //    tabBarController?.view.backgroundColor = .white
     view.isUserInteractionEnabled = false
     tabBar.backgroundColor = .systemBackground
-    tabBar.tintColor = Colors.Logo.Flame.rawValue
+    tabBar.tintColor = Constants.UI.Colors.Logo.Flame.rawValue
     tabBar.shadowImage = UIImage()
     tabBar.backgroundImage = UIImage()
     tabBar.clipsToBounds = true
@@ -1193,7 +1116,7 @@ private extension MainController {
 //    loadingStack.placeInCenter(of: passthroughView,
 //                               widthMultiplier: 0.6)//,
 ////                               yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-////    animateLoaderColor(from: Colors.Logo.Main, to: Colors.Logo.Main.next())
+////    animateLoaderColor(from: Constants.UI.Colors.Logo.Main, to: Constants.UI.Colors.Logo.Main.next())
     
   }
   
@@ -1373,20 +1296,20 @@ extension MainController: UITabBarControllerDelegate {
       }
     }
   
-    tabBar.tintColor = traitCollection.userInterfaceStyle == .dark ? Colors.tabBarDark : Colors.tabBarLight//Colors.bannerDark
+    tabBar.tintColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.tabBarDark : Constants.UI.Colors.tabBarLight//Constants.UI.Colors.bannerDark
     if let nav = viewController as? UINavigationController,
        let controller = nav.viewControllers.first {
       switch controller.self {
       case is HotController:
-        tabBar.tintColor = Colors.Logo.Flame.rawValue
-//        setColors(Colors.main)//.Logo.Flame.rawValue)
+        tabBar.tintColor = Constants.UI.Colors.Logo.Flame.rawValue
+//        setColors(Constants.UI.Colors.main)//.Logo.Flame.rawValue)
         if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Hot ? .Repeat : .Primary ) }
         currentTab = .Hot
         setLogoCentered(animated: true)
         toggleLogo(on: true)
       case is SubscriptionsController:
-//        setColors(Colors.main)
-//        setColors(Colors.Logo.CoolGray.rawValue)
+//        setColors(Constants.UI.Colors.main)
+//        setColors(Constants.UI.Colors.Logo.CoolGray.rawValue)
         if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Subscriptions ? .Repeat : .Primary ) }
         currentTab = .Subscriptions
         let controller = controller as! SubscriptionsController
@@ -1400,8 +1323,8 @@ extension MainController: UITabBarControllerDelegate {
       case is TopicsController:
         if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Topics ? .Repeat : .Primary ) }
         currentTab = .Topics
-//        setColors(Colors.main)
-//setColors(Colors.Logo.Marigold.rawValue)
+//        setColors(Constants.UI.Colors.main)
+//setColors(Constants.UI.Colors.Logo.Marigold.rawValue)
         setLogoCentered(animated: true)
         guard let instance = controller as? TopicsController,
               instance.mode != .Default
@@ -1412,8 +1335,8 @@ extension MainController: UITabBarControllerDelegate {
       case is SettingsController:
         if controller is TabBarTappable { (controller as! TabBarTappable).tabBarTapped(currentTab == .Settings ? .Repeat : .Primary ) }
         currentTab = .Settings
-//        setColors(Colors.main)
-//setColors(Colors.Logo.AirBlue.rawValue)
+//        setColors(Constants.UI.Colors.main)
+//setColors(Constants.UI.Colors.Logo.AirBlue.rawValue)
         setLogoCentered(animated: true)
         //                setLogoLeading(constant: 10, animated: true)
         toggleLogo(on: true)

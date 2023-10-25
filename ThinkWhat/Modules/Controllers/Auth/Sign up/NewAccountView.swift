@@ -75,7 +75,7 @@ class NewAccountView: UIView {
     let instance = Logo()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     instance.layer.masksToBounds = false
-    instance.layer.shadowColor = Colors.main.cgColor
+    instance.layer.shadowColor = Constants.UI.Colors.main.cgColor
     instance.layer.shadowOffset = .zero
     instance.layer.shadowRadius = padding
     instance.layer.shadowOpacity = 0.5
@@ -156,7 +156,7 @@ class NewAccountView: UIView {
     let instance = UnderlinedSignTextField()
     instance.delegate = self
     instance.backgroundColor = .clear
-    instance.tintColor = Colors.main
+    instance.tintColor = Constants.UI.Colors.main
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
     instance.addTarget(self, action: #selector(self.editingChanged), for: .editingChanged)
@@ -212,7 +212,7 @@ class NewAccountView: UIView {
     instance.delegate = self
     instance.keyboardType = .emailAddress
     instance.backgroundColor = .clear
-    instance.tintColor = Colors.main
+    instance.tintColor = Constants.UI.Colors.main
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
     instance.addTarget(self, action: #selector(self.editingChanged), for: .editingChanged)
@@ -269,7 +269,7 @@ class NewAccountView: UIView {
     instance.isSecureTextEntry = true
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
-    instance.tintColor = Colors.main
+    instance.tintColor = Constants.UI.Colors.main
     instance.addTarget(self, action: #selector(self.editingChanged), for: .editingChanged)
     instance.keyboardType = .asciiCapable
     instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
@@ -290,7 +290,7 @@ class NewAccountView: UIView {
     if #available(iOS 15, *) {
       var config = UIButton.Configuration.filled()
       config.cornerStyle = .capsule
-      config.baseBackgroundColor = Colors.main
+      config.baseBackgroundColor = Constants.UI.Colors.main
       config.attributedTitle = AttributedString("signupButton".localized,
                                                 attributes: AttributeContainer([
                                                   .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
@@ -298,7 +298,7 @@ class NewAccountView: UIView {
                                                 ]))
       instance.configuration = config
     } else {
-      instance.backgroundColor = Colors.main
+      instance.backgroundColor = Constants.UI.Colors.main
       instance.publisher(for: \.bounds)
         .sink { instance.cornerRadius = $0.width * 0.025 }
         .store(in: &subscriptions)
@@ -314,7 +314,7 @@ class NewAccountView: UIView {
       .sink { [unowned self] in
         opaque.layer.shadowOpacity = 1
         opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
-        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
         opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
         opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
       }
@@ -348,7 +348,7 @@ class NewAccountView: UIView {
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
   }
 }
 
@@ -375,7 +375,7 @@ extension NewAccountView: NewAccountControllerOutput {
         let content = EmailVerificationPopupContent(code: code,
                                                     retryTimeout: 60,
                                                     email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
-                                                    color: Colors.main)
+                                                    color: Constants.UI.Colors.main)
         content.verifiedPublisher
           .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
           .sink { [weak self] in
@@ -496,7 +496,7 @@ extension NewAccountView: NewAccountControllerOutput {
 private extension NewAccountView {
   @MainActor
   func setupUI() {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     addGestureRecognizer(getTapRecogizer())
     addSubview(stack)
     stack.translatesAutoresizingMaskIntoConstraints = false

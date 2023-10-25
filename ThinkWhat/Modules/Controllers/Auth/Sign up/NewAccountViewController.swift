@@ -19,7 +19,7 @@ class NewAccountViewController: UIViewController {
   ///**UI**
 //  public private(set) lazy var tagCapsule: TagCapsule = { TagCapsule(text: "new_account".localized.uppercased(),
 //                                                                     padding: 4,
-//                                                                     color: Colors.main,
+//                                                                     color: Constants.UI.Colors.main,
 //                                                                     font: UIFont(name: Fonts.Bold, size: 20)!,
 //                                                                     iconCategory: .Logo) }()
   
@@ -77,8 +77,8 @@ class NewAccountViewController: UIViewController {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
-//    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
+//    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
   }
 }
 
@@ -158,8 +158,8 @@ private extension NewAccountViewController {
   func setupUI() {
 //    navigationController?.navigationBar.backItem?.title = ""
     navigationController?.setNavigationBarHidden(false, animated: false)
-    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
-//    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
+//    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
 //    navigationItem.titleView = tagCapsule
     
   }

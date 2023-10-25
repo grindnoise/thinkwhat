@@ -300,7 +300,7 @@ class PopupContent: UIView {
   //    }
   //
   init(parent: Popup,
-       color: UIColor = Colors.System.Red.rawValue,
+       color: UIColor = Constants.UI.Colors.System.Red.rawValue,
        systemImage: String,
        content: UIView? = nil,
        text: String? = nil,
@@ -323,7 +323,7 @@ class PopupContent: UIView {
   }
   
   init(parent: Popup,
-       color: UIColor = Colors.System.Red.rawValue,
+       color: UIColor = Constants.UI.Colors.System.Red.rawValue,
        iconCategory: Icon.Category,
        content: UIView? = nil,
        text: String? = nil,
@@ -346,7 +346,7 @@ class PopupContent: UIView {
   }
   
   init(parent: Popup,
-       color: UIColor = Colors.System.Red.rawValue,
+       color: UIColor = Constants.UI.Colors.System.Red.rawValue,
        image: UIImage,
        content: UIView? = nil,
        text: String? = nil,

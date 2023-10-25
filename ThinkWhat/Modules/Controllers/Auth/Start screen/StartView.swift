@@ -43,7 +43,7 @@ class StartView: UIView {
     if #available(iOS 15, *) {
       var config = UIButton.Configuration.filled()
       config.cornerStyle = .capsule
-      config.baseBackgroundColor = Colors.main
+      config.baseBackgroundColor = Constants.UI.Colors.main
       config.attributedTitle = AttributedString("getStartedButton".localized.capitalized,
                                                 attributes: AttributeContainer([
                                                   .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
@@ -51,7 +51,7 @@ class StartView: UIView {
                                                 ]))
       instance.configuration = config
     } else {
-      instance.backgroundColor = Colors.main
+      instance.backgroundColor = Constants.UI.Colors.main
       instance.publisher(for: \.bounds)
         .sink { instance.cornerRadius = $0.height/2 }
         .store(in: &subscriptions)
@@ -68,7 +68,7 @@ class StartView: UIView {
       .sink { [unowned self] in
         opaque.layer.shadowOpacity = 1 
         opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
-        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
         opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
         opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
       }
@@ -148,13 +148,13 @@ class StartView: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     label.textColor = traitCollection.userInterfaceStyle == .dark ? "#828487".hexColor : "#8C96A3".hexColor
     spiral.setIconColor("#1E1E1E".hexColor!.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.7 : 0.03))
     button.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 8 : 4
     button.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
-    button.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
-    logoText.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
+    button.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    logoText.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
   }
 }
 
@@ -221,7 +221,7 @@ extension StartView: StartControllerOutput {
 private extension StartView {
   @MainActor
   func setupUI() {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     
     stack.placeInCenter(of: self)
     
@@ -254,13 +254,13 @@ private extension StartView {
     stack.layer.masksToBounds = false
     logoText.layer.masksToBounds = false
     logoText.layer.shadowPath = UIBezierPath(roundedRect: logoText.bounds, cornerRadius: logoText.bounds.height/2).cgPath
-    logoText.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
+    logoText.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme.cgColor : UIColor.systemBackground.cgColor
     logoText.layer.shadowOffset = .zero
     logoText.layer.shadowRadius = logoText.bounds.height/2
     logoText.layer.shadowOpacity = 1
     
     logo.layer.masksToBounds = false
-    logo.layer.shadowColor = Colors.main.cgColor
+    logo.layer.shadowColor = Constants.UI.Colors.main.cgColor
     logo.layer.shadowOffset = .zero
     logo.layer.shadowRadius = padding
     logo.layer.shadowOpacity = 0.5

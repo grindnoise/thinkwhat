@@ -23,7 +23,7 @@ class NewPollChoiceCell: UICollectionViewCell {
       
       guard let toolBar = textView.inputAccessoryView as? UIToolbar else { return }
       
-      toolBar.tintColor = Colors.getColor(forId: order)
+      toolBar.tintColor = Constants.UI.Colors.getColor(forId: order)
     }
   }
   public var item: NewPollChoice! {
@@ -53,7 +53,7 @@ class NewPollChoiceCell: UICollectionViewCell {
   ///**UI**
   private let lineSpacing: CGFloat = 4
   private let padding: CGFloat = 8
-  private var color: UIColor { order.isNil ? .systemGray4 : Colors.getColor(forId: order) }
+  private var color: UIColor { order.isNil ? .systemGray4 : Constants.UI.Colors.getColor(forId: order) }
   private lazy var imageView: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "\(order + 1).circle.fill"))
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
@@ -81,7 +81,7 @@ class NewPollChoiceCell: UICollectionViewCell {
     let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
     toolBar.items = [space, doneButton]
     toolBar.barStyle = .default
-    toolBar.tintColor = Colors.getColor(forId: order)
+    toolBar.tintColor = Constants.UI.Colors.getColor(forId: order)
     instance.inputAccessoryView = toolBar
     instance.attributedText = NSAttributedString(string: "", attributes: attributes(inactive: order == 0))
     instance.publisher(for: \.bounds)

@@ -305,7 +305,7 @@ class SurveyCell: UICollectionViewListCell {
     let instance = UIImageView(image: UIImage(systemName: "star.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
                                                                                              scale: .medium)))
-    instance.tintColor = Colors.Logo.Marigold.rawValue//.systemGray//
+    instance.tintColor = Constants.UI.Colors.Logo.Marigold.rawValue//.systemGray//
     instance.contentMode = .center
     return instance
   }()
@@ -451,7 +451,7 @@ class SurveyCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCellDark : Colors.surveyCellLight
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.surveyCellDark : Constants.UI.Colors.surveyCellLight
     avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
     ratingLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
     viewsLabel.textColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .systemGray
@@ -510,7 +510,7 @@ class SurveyCell: UICollectionViewListCell {
 private extension SurveyCell {
   @MainActor
   func setupUI() {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCellDark : Colors.surveyCellLight//.white.blended(withFraction: 0.2, of: .gray)
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.surveyCellDark : Constants.UI.Colors.surveyCellLight//.white.blended(withFraction: 0.2, of: .gray)
     clipsToBounds = true
     
     let stackView = UIStackView(arrangedSubviews: [

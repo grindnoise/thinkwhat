@@ -148,7 +148,7 @@ extension TermsViewController: TermsViewInput {
     else { return }
 
 //    guard wasEdited else {
-      navigationController?.pushViewController(ProfileCreationViewController(), animated: true)
+      navigationController?.pushViewController(ProfileCreationViewController(userprofile: userprofile), animated: true)
 //      return
 //    }
 //    controllerOutput?.animateTransitionToApp {

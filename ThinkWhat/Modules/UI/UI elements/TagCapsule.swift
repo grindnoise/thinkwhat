@@ -211,9 +211,12 @@ class TagCapsule: UIView {
     instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.layer.masksToBounds = true
     instance.tintColor = .white
-    instance.publisher(for: \.bounds)
-      .sink { instance.cornerRadius = $0.height / 2 }
-      .store(in: &subscriptions)
+    // Rounded image only for avatar
+    if !userprofile.isNil {
+      instance.publisher(for: \.bounds)
+        .sink { instance.cornerRadius = $0.height / 2 }
+        .store(in: &subscriptions)
+    }
 
     return instance
   }()
@@ -267,7 +270,7 @@ class TagCapsule: UIView {
   init(text: String,
        padding: CGFloat = 4,
        textPadding: UIEdgeInsets = .zero,
-       color: UIColor = Colors.Logo.Flame.rawValue,
+       color: UIColor = Constants.UI.Colors.Logo.Flame.rawValue,
        font: UIFont,
        useGradient: Bool = true,
        isShadowed: Bool = false,

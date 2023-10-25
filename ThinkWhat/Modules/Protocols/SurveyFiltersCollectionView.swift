@@ -48,7 +48,7 @@ class SurveyFiltersCollectionView: UICollectionView {
   }
   
   // MARK: - Initialization
-  init(items: [SurveyFilterItem], color: UIColor = Colors.filterEnabled, contentInsets: UIEdgeInsets = .zero) {
+  init(items: [SurveyFilterItem], color: UIColor = Constants.UI.Colors.filterEnabled, contentInsets: UIEdgeInsets = .zero) {
     self.dataItems = items
     self.color = color
     self.contentInsets = contentInsets

@@ -43,7 +43,7 @@ class ClockIndicator: UIView, CAAnimationDelegate {
     }
     
     func setupProperties(){
-        self.main = Colors.main//UIColor.darkGray
+        self.main = Constants.UI.Colors.main//UIColor.darkGray
     }
     
     func setupLayers(){

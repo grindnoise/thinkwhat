@@ -193,12 +193,12 @@ class SubscriptionsController: UIViewController, TintColorable {
     if let shadow = navigationItem.rightBarButtonItems?.filter({ $0.customView?.accessibilityIdentifier == "subscribers" }).first?.customView,
        let btn = shadow.getSubview(type: UIButton.self) {
       shadow.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-      btn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
-      btn.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+      btn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .white
+      btn.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Constants.UI.Colors.main
       btn.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
                                                 attributes: [
                                                   .font: UIFont(name: Fonts.Rubik.Medium, size: 16) as Any,
-                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Constants.UI.Colors.main as Any
                                                 ]),
                              for: .normal)
     }
@@ -291,7 +291,7 @@ private extension SubscriptionsController {
 //        button.setAttributedTitle(NSAttributedString(string: "subscribers".localized,
 //                                                     attributes: [
 //                                                      .font: UIFont(name: Fonts.Rubik.Medium, size: 14) as Any,
-//                                                      .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+//                                                      .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Constants.UI.Colors.main as Any
 //                                                     ]),
 //                                  for: .normal)
 //        button.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
@@ -301,8 +301,8 @@ private extension SubscriptionsController {
 //        button.semanticContentAttribute = .forceRightToLeft
 //        button.adjustsImageWhenHighlighted = false
 //        button.setImage(UIImage(systemName: ("arrow.right"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
-//        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
-//        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+//        button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
+//        button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Constants.UI.Colors.main
 //        button.addTarget(self, action: #selector(self.onSubscribersTapped), for: .touchUpInside)
 //        button.publisher(for: \.bounds)
 //          .sink { button.cornerRadius = $0.height/2 }
@@ -319,7 +319,7 @@ private extension SubscriptionsController {
         instance.titleLabel?.numberOfLines = 1
         instance.addTarget(self, action: #selector(self.onSubscribersTapped), for: .touchUpInside)
         instance.tintColor = .white
-        instance.backgroundColor = Colors.SubscriptionsController.subscribersButton
+        instance.backgroundColor = Constants.UI.Colors.SubscriptionsController.subscribersButton
         instance.contentEdgeInsets = UIEdgeInsets(top: padding, left: padding*2, bottom: padding, right: padding*2)
         instance.semanticContentAttribute = .forceRightToLeft
         instance.setImage(.init(systemName: "person.2.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
@@ -526,9 +526,9 @@ private extension SubscriptionsController {
   
   func getGradientColors() -> [CGColor] {
     return [
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Colors.main.cgColor,
-      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : Colors.main.lighter(0.2).cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Constants.UI.Colors.main.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : Constants.UI.Colors.main.cgColor,
+      traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.lighter(0.2).cgColor : Constants.UI.Colors.main.lighter(0.2).cgColor,
     ]
   }
 }

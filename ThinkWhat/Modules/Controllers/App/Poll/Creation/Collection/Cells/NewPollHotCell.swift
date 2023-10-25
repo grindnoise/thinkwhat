@@ -140,7 +140,7 @@ class NewPollHotCell: UICollectionViewCell {
   }()
   private lazy var fgLine: Line = {
     let instance = Line()
-    instance.layer.strokeColor = Colors.Logo.Flame.rawValue.cgColor
+    instance.layer.strokeColor = Constants.UI.Colors.Logo.Flame.rawValue.cgColor
     
     return instance
   }()
@@ -187,7 +187,7 @@ class NewPollHotCell: UICollectionViewCell {
   }()
   private lazy var hotOnIcon: Icon = {
     let instance = Icon(category: .Hot)
-    instance.iconColor = !isHot.isNil ? Colors.Logo.Flame.rawValue : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
+    instance.iconColor = !isHot.isNil ? Constants.UI.Colors.Logo.Flame.rawValue : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1
@@ -201,7 +201,7 @@ class NewPollHotCell: UICollectionViewCell {
   }()
   private lazy var hotOffIcon: Icon = {
     let instance = Icon(category: .HotDisabled)
-    instance.iconColor = !isHot.isNil ? Colors.Logo.Flame.rawValue : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
+    instance.iconColor = !isHot.isNil ? Constants.UI.Colors.Logo.Flame.rawValue : UIColor.systemGray4//traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .secondarySystemBackground
     instance.isRounded = false
     instance.clipsToBounds = false
     instance.scaleMultiplicator = 1
@@ -410,7 +410,7 @@ private extension NewPollHotCell {
         
         let enableAnim  = Animations.get(property: .FillColor,
                                          fromValue: selectedIcon.iconColor.cgColor,
-                                         toValue: Colors.Logo.Flame.rawValue.cgColor,
+                                         toValue: Constants.UI.Colors.Logo.Flame.rawValue.cgColor,
                                          duration: 0.3,
                                          timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
                                          delegate: nil,
@@ -424,7 +424,7 @@ private extension NewPollHotCell {
                                          isRemovedOnCompletion: true)
         
         selectedIcon.icon.add(enableAnim, forKey: nil)
-        (selectedIcon.icon as! CAShapeLayer).fillColor = Colors.Logo.Flame.rawValue.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
+        (selectedIcon.icon as! CAShapeLayer).fillColor = Constants.UI.Colors.Logo.Flame.rawValue.cgColor//traitCollection.userInterfaceStyle == .dark ? UIColor.systemBlue.cgColor : K_COLOR_RED.cgColor
         deselectedIcon.icon.add(disableAnim, forKey: nil)
       (deselectedIcon.icon as! CAShapeLayer).fillColor = UIColor.systemGray4.cgColor// traitCollection.userInterfaceStyle == .dark ? UIColor.secondarySystemBackground.cgColor : UIColor.secondarySystemBackground.cgColor
         

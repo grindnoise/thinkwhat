@@ -95,7 +95,7 @@ final class UsernameInputTextField: UITextField {
         let instance = UIButton(type: .system)
         instance.isEnabled = true
 //        instance.setImage(UIImage(systemName: "checkmark", withConfiguration: UIImage.SymbolConfiguration(font: textViewFont, scale: .large)), for: .normal)
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
         instance.contentEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         instance.addTarget(self, action: #selector(self.handleSend), for: .touchUpInside)
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
@@ -245,7 +245,7 @@ final class UsernameInputTextField: UITextField {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
-        doneButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+        doneButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
     }
 }
 

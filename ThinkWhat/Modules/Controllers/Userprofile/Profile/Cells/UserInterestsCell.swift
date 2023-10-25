@@ -91,14 +91,14 @@ class UserInterestsCell: UICollectionViewListCell {
   }()
   private lazy var headerImage: Icon = {
     let width = "T".height(withConstrainedWidth: 100, font: headerLabel.font)
-    let instance = Icon(frame: CGRect(origin: .zero, size: .uniform(size: width)), category: .Logo, scaleMultiplicator: 1, iconColor: Colors.cellHeader)
+    let instance = Icon(frame: CGRect(origin: .zero, size: .uniform(size: width)), category: .Logo, scaleMultiplicator: 1, iconColor: Constants.UI.Colors.cellHeader)
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     
     return instance
   }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = Colors.cellHeader
+    instance.textColor = Constants.UI.Colors.cellHeader
     instance.text = "userprofile_community_contribution".localized.uppercased()
     instance.font = Fonts.cellHeader
     

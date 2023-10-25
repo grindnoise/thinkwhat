@@ -75,8 +75,8 @@ class Shimmer: UIView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    self.lightColor = traitCollection.userInterfaceStyle == .dark ? Colors.Shimmer.backgroundLightForDark : Colors.Shimmer.backgroundLightForLight
-    self.darkColor = traitCollection.userInterfaceStyle == .dark ? Colors.Shimmer.backgroundDarkForDark : Colors.Shimmer.backgroundDarkForLight
+    self.lightColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.Shimmer.backgroundLightForDark : Constants.UI.Colors.Shimmer.backgroundLightForLight
+    self.darkColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.Shimmer.backgroundDarkForDark : Constants.UI.Colors.Shimmer.backgroundDarkForLight
     
     backgroundColor = .clear
   }

@@ -83,7 +83,7 @@ class NewPollTopicCell: UICollectionViewCell {
   private let padding: CGFloat = 8
   private lazy var tagCapsule: TagCapsule = { TagCapsule(text: stage.title.uppercased(),
                                                          padding: 4,
-                                                         color: Colors.Logo.Flame.rawValue,
+                                                         color: Constants.UI.Colors.Logo.Flame.rawValue,
                                                          font: UIFont(name: Fonts.Bold, size: 20)!,
                                                          iconCategory: .Logo) }()
   private lazy var imageView: UIImageView = {
@@ -91,7 +91,7 @@ class NewPollTopicCell: UICollectionViewCell {
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "TEST".height(withConstrainedWidth: contentView.bounds.width,
                                                                     font: label.font)*1.5).isActive = true
-    instance.tintColor = Colors.Logo.Flame.rawValue
+    instance.tintColor = Constants.UI.Colors.Logo.Flame.rawValue
     instance.contentMode = .scaleAspectFit
     
     return instance
@@ -113,7 +113,7 @@ class NewPollTopicCell: UICollectionViewCell {
   }()
   private lazy var fgLine: Line = {
     let instance = Line()
-    instance.layer.strokeColor = Colors.Logo.Flame.rawValue.cgColor
+    instance.layer.strokeColor = Constants.UI.Colors.Logo.Flame.rawValue.cgColor
     
     return instance
   }()
@@ -155,7 +155,7 @@ class NewPollTopicCell: UICollectionViewCell {
   private lazy var fgLayer: CALayer = {
     let instance = CAShapeLayer()
     instance.opacity = 0
-    instance.backgroundColor = Colors.Logo.Flame.rawValue.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
+    instance.backgroundColor = Constants.UI.Colors.Logo.Flame.rawValue.withAlphaComponent(traitCollection.userInterfaceStyle == .dark ? 0.4 : 0.2).cgColor
     
     return instance
   }()
@@ -233,7 +233,7 @@ class NewPollTopicCell: UICollectionViewCell {
         let banner = NewPopup(padding: self.padding*2,
                               contentPadding: .uniform(size: self.padding))
         let content = TopicSelectionPopupContent(mode: self.topic.isNil ? .ForceSelect : .Default,
-                                                 color: Colors.Logo.Flame.rawValue)
+                                                 color: Constants.UI.Colors.Logo.Flame.rawValue)
         content.topicPublisher
           .sink { topic in
             banner.dismiss()

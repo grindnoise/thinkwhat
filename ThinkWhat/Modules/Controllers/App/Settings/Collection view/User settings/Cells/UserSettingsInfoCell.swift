@@ -23,7 +23,7 @@ class UserSettingsInfoCell: UICollectionViewListCell {
       collectionView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : isShadowed ? .systemBackground : .secondarySystemBackground
     }
   }
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
     didSet {
       collectionView.color = color
     }

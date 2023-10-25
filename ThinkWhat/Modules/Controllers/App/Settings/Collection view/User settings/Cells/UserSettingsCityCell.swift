@@ -181,7 +181,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
     instance.axis = .vertical
     instance.spacing = padding
 //    contentStack.backgroundColor = .secondarySystemFill
-    contentStack.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
+    contentStack.backgroundColor = userprofile.isCurrent ? Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection) : .clear
     contentStack.publisher(for: \.bounds, options: .new)
       .sink { contentStack.cornerRadius = $0.width*0.025 }
       .store(in: &subscriptions)
@@ -191,7 +191,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
   private lazy var headerImage: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "location.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.tintColor = Colors.cellHeader
+    instance.tintColor = Constants.UI.Colors.cellHeader
     instance.contentMode = .scaleAspectFit
 //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
@@ -200,7 +200,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
   }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = Colors.cellHeader
+    instance.textColor = Constants.UI.Colors.cellHeader
     instance.text = "location".localized.uppercased()
     instance.font = Fonts.cellHeader
 
@@ -299,7 +299,7 @@ class UserSettingsCityCell: UICollectionViewListCell {
 //    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     
     if let contentStack = stack.arrangedSubviews.filter({ $0.accessibilityIdentifier == "contentStack"}).first {
-      contentStack.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
+      contentStack.backgroundColor = userprofile.isCurrent ? Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection) : .clear
     }
     
     //Set dynamic font size

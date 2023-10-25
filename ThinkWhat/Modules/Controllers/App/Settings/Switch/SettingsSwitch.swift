@@ -133,7 +133,7 @@ class SettingsSwitch: UIView {
         }
     }
     //UI
-    public var color: UIColor = Colors.System.Red.rawValue {
+    public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
         didSet {
             gradient.colors = getGradientColors()
         }

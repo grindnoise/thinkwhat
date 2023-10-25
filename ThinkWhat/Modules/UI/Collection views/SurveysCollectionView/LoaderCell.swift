@@ -13,7 +13,7 @@ import TinyConstraints
 class LoaderCell: UICollectionReusableView {
   
   // MARK: - Public properties
-  public var color: UIColor = Colors.main {
+  public var color: UIColor = Constants.UI.Colors.main {
     didSet {
       guard color != oldValue else { return }
 

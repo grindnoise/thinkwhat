@@ -58,7 +58,7 @@ class AccountManagementPopupContent: UIView {
   private lazy var tagLabel: TagCapsule = {
     var text = ""
     var image: UIImage!
-    var color = Colors.main
+    var color = Constants.UI.Colors.main
     
     switch mode {
     case .Logout:
@@ -77,8 +77,8 @@ class AccountManagementPopupContent: UIView {
                       padding: padding,
                       textPadding: .init(top: padding, left: 0, bottom: padding, right: padding),
                       color: color,
-                      font: UIFont(name: Fonts.Rubik.SemiBold, size: 20)!,
-                      isShadowed: true,
+                      font: UIFont(name: Fonts.Rubik.SemiBold, size: 14)!,
+                      isShadowed: false,
                       iconCategory: nil,
                       image: image)
   }()
@@ -125,7 +125,7 @@ class AccountManagementPopupContent: UIView {
     instance.attributedText = NSAttributedString(string: text,
                                                  attributes: [
                                                   .paragraphStyle: paragraph,
-                                                  .font: UIFont(name: Fonts.Rubik.Regular, size: 20) as Any,
+                                                  .font: UIFont(name: Fonts.Rubik.Regular, size: 16) as Any,
                                                   .foregroundColor: UIColor.label
                                                  ])
     instance.isUserInteractionEnabled = false

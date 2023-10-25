@@ -127,7 +127,7 @@ class UserprofilesController: UIViewController, TintColorable {
   init(mode: Enums.UserprofilesViewMode, answer: Answer) {
     self.mode = .Voters
     self.answer = answer
-    self.tintColor = Colors.getColor(forId: answer.order)
+    self.tintColor = Constants.UI.Colors.getColor(forId: answer.order)
     
     super.init(nibName: nil, bundle: nil)
     

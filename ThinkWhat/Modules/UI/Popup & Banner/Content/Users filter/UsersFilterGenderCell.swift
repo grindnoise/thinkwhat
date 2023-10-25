@@ -27,7 +27,7 @@ class UsersFilterGenderCell: UICollectionViewCell {
     }
   }
   //UI
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
     didSet {
       genderControl.selectedSegmentTintColor = color
     }

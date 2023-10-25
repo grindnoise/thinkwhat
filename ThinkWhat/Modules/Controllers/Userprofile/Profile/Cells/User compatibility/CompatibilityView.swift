@@ -126,7 +126,7 @@ class CompatibilityView: UIView {
     button.setAttributedTitle(NSAttributedString(string: "show_details".localized.uppercased(),
                                                  attributes: [
                                                   .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
-                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Constants.UI.Colors.main as Any
                                                  ]),
                               for: .normal)
     button.contentEdgeInsets = UIEdgeInsets(top: padding/1.5, left: padding, bottom: padding/1.5, right: padding)
@@ -136,7 +136,7 @@ class CompatibilityView: UIView {
     button.adjustsImageWhenHighlighted = false
     button.setImage(UIImage(systemName: ("magnifyingglass"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
     button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
-    button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+    button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Constants.UI.Colors.main
     button.addTarget(self, action: #selector(self.handleTap), for: .touchUpInside)
     button.publisher(for: \.bounds)
       .sink { button.cornerRadius = $0.height/2 }

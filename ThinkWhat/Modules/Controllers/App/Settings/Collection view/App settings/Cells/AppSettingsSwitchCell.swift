@@ -29,7 +29,7 @@ class AppSettingsSwitchCell: UICollectionViewListCell {
     //Publishers
   public var valuePublisher = CurrentValueSubject<[Enums.PushNotificationsLanguagesSettings: Bool]?, Never>(nil)
     //UI
-    public var color: UIColor = Colors.System.Red.rawValue {
+    public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
         didSet {
             toggleSwitch.onTintColor = color
         }

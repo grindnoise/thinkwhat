@@ -24,7 +24,7 @@ class AppSettingsCollectionView: UICollectionView {
     public var contentLanguagePublisher = CurrentValueSubject<Bool?, Never>(nil)
     public var aboutPublisher = CurrentValueSubject<AppSettingsTextCell.Mode?, Never>(nil)
     //UI
-    public var color: UIColor = Colors.System.Red.rawValue {
+    public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
         didSet {
             setupUI()
         }
@@ -171,7 +171,7 @@ class AppSettingsCollectionView: UICollectionView {
             
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .clear
-          cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+          cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
             cell.backgroundConfiguration = backgroundConfig
             cell.mode = indexPath.row == 0 ? .languages(.App) : .languages(.Content)
         }
@@ -200,7 +200,7 @@ class AppSettingsCollectionView: UICollectionView {
             
             var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
             backgroundConfig.backgroundColor = .clear
-            cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+            cell.tintColor = self.traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
             cell.backgroundConfiguration = backgroundConfig
         }
         

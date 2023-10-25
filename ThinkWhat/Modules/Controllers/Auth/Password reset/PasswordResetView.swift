@@ -67,7 +67,7 @@ class PasswordResetView: UIView {
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
     fgLayer.backgroundColor = UIColor.systemBackground.blended(withFraction: traitCollection.userInterfaceStyle == .dark ? 0.3 : 0.2,
-                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Colors.main).cgColor
+                                                               of: traitCollection.userInterfaceStyle == .dark ? .white : Constants.UI.Colors.main).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.publisher(for: \.bounds)
@@ -91,7 +91,7 @@ class PasswordResetView: UIView {
     instance.delegate = self
     instance.keyboardType = .emailAddress
     instance.backgroundColor = .clear
-    instance.tintColor = Colors.main
+    instance.tintColor = Constants.UI.Colors.main
     instance.font = UIFont.scaledFont(fontName: Fonts.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
     
@@ -100,7 +100,7 @@ class PasswordResetView: UIView {
     let fgLayer = CAShapeLayer()
     fgLayer.name = "foreground"
     fgLayer.opacity = 0
-    fgLayer.backgroundColor = Colors.main.withAlphaComponent(0.1).cgColor
+    fgLayer.backgroundColor = Constants.UI.Colors.main.withAlphaComponent(0.1).cgColor
     instance.layer.insertSublayer(bgLayer, at: 0)
     instance.layer.insertSublayer(fgLayer, at: 1)
     instance.attributedPlaceholder = NSAttributedString(string: "mailTF".localized,
@@ -119,7 +119,7 @@ class PasswordResetView: UIView {
       var config = UIButton.Configuration.filled()
       config.cornerStyle = .small
       config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
-      config.baseBackgroundColor = Colors.main
+      config.baseBackgroundColor = Constants.UI.Colors.main
       config.contentInsets.top = padding
       config.contentInsets.bottom = padding
       config.contentInsets.leading = 20
@@ -131,7 +131,7 @@ class PasswordResetView: UIView {
                                                 ]))
       instance.configuration = config
     } else {
-      instance.backgroundColor = Colors.main
+      instance.backgroundColor = Constants.UI.Colors.main
       instance.publisher(for: \.bounds)
         .sink { instance.cornerRadius = $0.width * 0.025 }
         .store(in: &subscriptions)
@@ -224,7 +224,7 @@ extension PasswordResetView: PasswordResetControllerOutput {
       let banner = NewPopup(padding: padding*5,
                             contentPadding: .uniform(size: padding*3))
 
-      let content = PasswordResetPopup(color: Colors.main,
+      let content = PasswordResetPopup(color: Constants.UI.Colors.main,
                                        padding: padding)
       banner.setContent(content)
       content.dismissPublisher

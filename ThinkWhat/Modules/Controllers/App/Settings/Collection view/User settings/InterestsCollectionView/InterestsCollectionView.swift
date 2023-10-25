@@ -87,7 +87,7 @@ class InterestsCollectionView: UICollectionView {
       
       var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
       backgroundConfig.backgroundColor = .clear
-      cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+      cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
       cell.backgroundConfiguration = backgroundConfig
       
       guard cell.item.isNil else { return }

@@ -133,8 +133,8 @@ struct Enums {
     
     func getColor(traitCollection: UITraitCollection) -> UIColor {
       switch self {
-      case .Hot: return Colors.Logo.Flame.rawValue
-      default: return traitCollection.userInterfaceStyle == .dark ? Colors.tabBarDark : Colors.tabBarLight
+      case .Hot: return Constants.UI.Colors.Logo.Flame.rawValue
+      default: return traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.tabBarDark : Constants.UI.Colors.tabBarLight
       }
     }
   }

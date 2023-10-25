@@ -155,7 +155,7 @@ class UserSettingsCredentialsCell: UICollectionViewListCell {
   public var galleryPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var cameraPublisher = CurrentValueSubject<Bool?, Never>(nil)
   public var previewPublisher = CurrentValueSubject<UIImage?, Never>(nil)
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.main {
     didSet {
       setColors()
     }
@@ -571,17 +571,24 @@ private extension UserSettingsCredentialsCell {
   
   func setTasks() {
     //Hide keyboard
-    tasks.append( Task {@MainActor [weak self] in
-      for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
+    Notifications.System.hideKeyboardPublisher
+      .sink { [weak self] in
         guard let self = self else { return }
-        
-        if self.ageTextField.isFirstResponder {
-          let _ = self.ageTextField.resignFirstResponder()
-        } else {
-          let _ = self.credentialsTextField.resignFirstResponder()
-        }
+      
+        self.endEditing(true)
       }
-    })
+      .store(in: &subscriptions)
+//    tasks.append( Task {@MainActor [weak self] in
+//      for await _ in NotificationCenter.default.notifications(for: Notifications.System.HideKeyboard) {
+//        guard let self = self else { return }
+//        
+//        if self.ageTextField.isFirstResponder {
+//          let _ = self.ageTextField.resignFirstResponder()
+//        } else {
+//          let _ = self.credentialsTextField.resignFirstResponder()
+//        }
+//      }
+//    })
     
     //First name change
     tasks.append( Task { [weak self] in

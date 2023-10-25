@@ -172,9 +172,9 @@ class SurveysView: UIView {
   private lazy var emptyPublicationsView: EmptyPublicationsView = {
     let instance = EmptyPublicationsView(showsButton: false,
                                          backgroundLightColor: .systemBackground,
-                                         backgroundDarkColor: Colors.darkTheme,
-                                         spiralLightColor: Colors.spiralLight,
-                                         spiralDarkColor: Colors.spiralDark)
+                                         backgroundDarkColor: Constants.UI.Colors.darkTheme,
+                                         spiralLightColor: Constants.UI.Colors.spiralLight,
+                                         spiralDarkColor: Constants.UI.Colors.spiralDark)
     instance.alpha = 0
     instance.publisher(for: \.bounds)
       .sink { instance.cornerRadius = $0.width * 0.05 }
@@ -191,7 +191,7 @@ class SurveysView: UIView {
 //    instance.size(.uniform(size: 40))
     let bgLayer = CAGradientLayer()
     bgLayer.type = .radial
-    bgLayer.colors = CAGradientLayer.getGradientColors(color: Colors.main)
+    bgLayer.colors = CAGradientLayer.getGradientColors(color: Constants.UI.Colors.main)
     bgLayer.locations = [0, 0.5, 1.15]
     bgLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
     bgLayer.endPoint = CGPoint(x: 1, y: 1)
@@ -253,7 +253,7 @@ class SurveysView: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
    
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
   }
 }
 
@@ -323,10 +323,10 @@ extension SurveysView: SurveysControllerOutput {
 private extension SurveysView {
   @MainActor
   func setupUI() {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
 //    collectionView.place(inside: self)
     
-    filtersCollectionView.setColor(viewInput?.tintColor ?? Colors.filterEnabled)
+    filtersCollectionView.setColor(viewInput?.tintColor ?? Constants.UI.Colors.filterEnabled)
     collectionView.color = viewInput!.tintColor
     
     let views = [

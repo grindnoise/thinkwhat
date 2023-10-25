@@ -24,7 +24,7 @@ class AppSettingsLanguageCell: UICollectionViewListCell {
   public var appLanguagePublisher = CurrentValueSubject<[Enums.PushNotificationsLanguagesSettings: String]?, Never>(nil)
     public var contentLanguagePublisher = CurrentValueSubject<Bool?, Never>(nil)//CurrentValueSubject<[AppSettings: [String: Bool]]?, Never>(nil)
     //UI
-    public var color: UIColor = Colors.System.Red.rawValue {
+    public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
         didSet {
             disclosureButton.tintColor = color
         }
@@ -101,7 +101,7 @@ class AppSettingsLanguageCell: UICollectionViewListCell {
         instance.menu = prepareMenu()
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         instance.imageView?.contentMode = .center
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
                 instance.setImage(UIImage(systemName: "chevron.right", withConfiguration: UIImage.SymbolConfiguration(pointSize: rect.height*0.5)), for: .normal)

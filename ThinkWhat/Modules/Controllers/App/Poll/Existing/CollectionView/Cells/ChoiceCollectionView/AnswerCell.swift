@@ -21,7 +21,7 @@ class AnswerCell: UICollectionViewCell {
 //      setNeedsLayout()
 //      layoutIfNeeded()
       
-      color = Colors.getColor(forId: item.order)
+      color = Constants.UI.Colors.getColor(forId: item.order)
       
       setupUI()
       
@@ -381,8 +381,8 @@ class AnswerCell: UICollectionViewCell {
   private lazy var votersStack: VotersStack = {
     let instance = VotersStack(userprofiles: Array(item.voters.prefix(avatarsThreshold)),
                                capacity: avatarsThreshold,
-                               lightBorderColor: isChosen ? Colors.Poll.choiceSelectedBackgroundLight : Colors.Poll.choiceBackgroundLight,
-                               darkBorderColor: isChosen ? Colors.Poll.choiceSelectedBackgroundDark : Colors.Poll.choiceBackgroundDark,
+                               lightBorderColor: isChosen ? Constants.UI.Colors.Poll.choiceSelectedBackgroundLight : Constants.UI.Colors.Poll.choiceBackgroundLight,
+                               darkBorderColor: isChosen ? Constants.UI.Colors.Poll.choiceSelectedBackgroundDark : Constants.UI.Colors.Poll.choiceBackgroundDark,
                                height: statsHeight-padding)
     instance.tapPublisher
       .sink { [weak self] _ in
@@ -569,8 +569,8 @@ private extension AnswerCell {
   
   @MainActor
   func setChosen() {
-    votersStack.setColors(lightBorderColor: Colors.Poll.choiceSelectedBackgroundLight,
-                          darkBorderColor: Colors.Poll.choiceSelectedBackgroundDark)
+    votersStack.setColors(lightBorderColor: Constants.UI.Colors.Poll.choiceSelectedBackgroundLight,
+                          darkBorderColor: Constants.UI.Colors.Poll.choiceSelectedBackgroundDark)
     
     deselect()
     if let bgLayer = self.stackView.layer.getSublayer(name: "bgLayer"), isChosen || isAnswerSelected {

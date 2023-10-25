@@ -71,7 +71,7 @@ class LanguageCell: UICollectionViewListCell {
         instance.backgroundColor = .clear
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         instance.contentMode = .center
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
         
         instance.publisher(for: \.bounds, options: .new)
             .sink { rect in
@@ -136,7 +136,7 @@ class LanguageCell: UICollectionViewListCell {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
-      checkmark.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+      checkmark.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
     }
 
     override func prepareForReuse() {

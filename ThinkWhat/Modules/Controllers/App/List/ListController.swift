@@ -17,7 +17,7 @@ class ListController: UIViewController, TintColorable {
   ///**Logic**
   public var filter = SurveyFilter(main: .new, additional: .period, period: .unlimited)
   public var isDataReady: Bool = false
-  public var tintColor: UIColor = Colors.main
+  public var tintColor: UIColor = Constants.UI.Colors.main
   public var searchMode = Enums.SearchMode.off {
     didSet {
       guard oldValue != searchMode else { return }

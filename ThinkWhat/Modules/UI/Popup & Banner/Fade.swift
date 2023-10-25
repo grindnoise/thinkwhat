@@ -49,6 +49,7 @@ class Fade: UIView {
   
   @objc
   private func handleTap() {
+    Notifications.System.hideKeyboardPublisher.send()
     NotificationCenter.default.post(name: Notifications.System.HideKeyboard, object: self)
     dismiss()
   }

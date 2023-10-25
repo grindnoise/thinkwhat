@@ -38,8 +38,8 @@ protocol SignInControllerOutput: AnyObject {
   var viewInput: (UIViewController & SignInViewInput)? { get set }
   
   func mailSignInCallback(result: Result<Bool, Error>)
-  func providerSignInCallback(result: Result<Bool, Error>)
-  func startAuthorizationUI(provider: Enums.AuthProvider)
-  func animateTransitionToApp(_ completion: @escaping Closure) 
+  func stopLoadingAnim(completion: @escaping Closure)
+  func startLoadingAnim()
+  func animateTransitionToApp(_ completion: @escaping Closure)
 //  func stopAuthorizationUI(completion: @escaping Closure)
 }

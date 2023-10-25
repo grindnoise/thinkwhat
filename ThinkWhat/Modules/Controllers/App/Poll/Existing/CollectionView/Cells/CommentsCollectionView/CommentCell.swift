@@ -549,7 +549,7 @@ class CommentCell: UICollectionViewListCell {
     menuButton.tintColor = traitCollection.userInterfaceStyle == .dark ? .secondaryLabel : .darkGray
     setHeader()
     if mode == .Root {
-      backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : Colors.lightTheme
+      backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : Constants.UI.Colors.lightTheme
     }
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }
@@ -713,7 +713,7 @@ private extension CommentCell {
       if let usersChoice = avatar.userprofile!.answers[item.surveyId],
          let answer = Answers.shared[usersChoice],
          let image = UIImage(systemName: "\(answer.order+1).circle.fill") {
-        avatar.setChoiceBadge(image: image, color: Colors.getColor(forId: answer.order))
+        avatar.setChoiceBadge(image: image, color: Constants.UI.Colors.getColor(forId: answer.order))
       }
     } else {
       avatar.userprofile = Userprofile.anonymous

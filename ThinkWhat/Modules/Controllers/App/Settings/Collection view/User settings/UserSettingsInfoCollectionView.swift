@@ -30,7 +30,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
   public let twitterPublisher = PassthroughSubject<String, Never>()
   @Published public private(set) var scrollPublisher: CGPoint?
   ///**UI**
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
     didSet {
       colorPublisher.send(color)
     }
@@ -256,7 +256,7 @@ class UserSettingsInfoCollectionView: UICollectionView {
       
       var backgroundConfig = UIBackgroundConfiguration.listGroupedHeaderFooter()
       backgroundConfig.backgroundColor = .clear
-      cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+      cell.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
       cell.backgroundConfiguration = backgroundConfig
       
       self.colorPublisher

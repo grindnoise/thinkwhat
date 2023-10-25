@@ -164,7 +164,7 @@ class UserCredentialsCell: UICollectionViewListCell {
     
     avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
     subscriptionButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    subscriptionButton.getSubview(type: UIButton.self)?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+    subscriptionButton.getSubview(type: UIButton.self)?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .white
     
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }

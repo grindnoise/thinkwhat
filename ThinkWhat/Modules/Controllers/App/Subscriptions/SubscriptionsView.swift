@@ -115,11 +115,11 @@ class SubscriptionsView: UIView {
   private lazy var collectionEmptyPublicationsView: EmptyPublicationsView = {
     let instance = EmptyPublicationsView(showsButton: false,
                                          buttonText: "create_post",
-                                         buttonColor: viewInput?.tintColor ?? Colors.main,
+                                         buttonColor: viewInput?.tintColor ?? Constants.UI.Colors.main,
                                          backgroundLightColor: .systemBackground,
-                                         backgroundDarkColor: Colors.darkTheme,
-                                         spiralLightColor: Colors.spiralLight,
-                                         spiralDarkColor: Colors.spiralDark)
+                                         backgroundDarkColor: Constants.UI.Colors.darkTheme,
+                                         spiralLightColor: Constants.UI.Colors.spiralLight,
+                                         spiralDarkColor: Constants.UI.Colors.spiralDark)
     instance.alpha = 0
     instance.publisher(for: \.bounds)
       .sink { instance.cornerRadius = $0.width * 0.05 }
@@ -269,8 +269,8 @@ class SubscriptionsView: UIView {
           self.emptyPublicationsView = EmptyPublicationsView(mode: .subscriptions,
                                                              backgroundLightColor: .systemBackground,
                                                              backgroundDarkColor: .systemBackground,
-                                                             spiralLightColor: Colors.spiralLight,
-                                                             spiralDarkColor: Colors.spiralDark)
+                                                             spiralLightColor: Constants.UI.Colors.spiralLight,
+                                                             spiralDarkColor: Constants.UI.Colors.spiralDark)
           self.addSubview(self.emptyPublicationsView!)
           self.emptyPublicationsView?.translatesAutoresizingMaskIntoConstraints = false
           self.emptyPublicationsView?.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor).isActive = true
@@ -381,7 +381,7 @@ class SubscriptionsView: UIView {
     button.setAttributedTitle(NSAttributedString(string: "open_userprofile".localized.uppercased(),
                                                  attributes: [
                                                   .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
-                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+                                                  .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Constants.UI.Colors.main as Any
                                                  ]),
                               for: .normal)
     button.contentEdgeInsets = UIEdgeInsets(top: padding/1.5, left: padding, bottom: padding/1.5, right: padding)
@@ -391,7 +391,7 @@ class SubscriptionsView: UIView {
     button.adjustsImageWhenHighlighted = false
     button.setImage(UIImage(systemName: ("arrow.right"), withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
     button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
-    button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Colors.main
+    button.tintColor = traitCollection.userInterfaceStyle == .dark ? .white : Constants.UI.Colors.main
     button.addTarget(self, action: #selector(self.handleTap(_:)), for: .touchUpInside)
     button.publisher(for: \.bounds)
       .sink { button.cornerRadius = $0.height/2 }
@@ -484,7 +484,7 @@ class SubscriptionsView: UIView {
                    insets: UIEdgeInsets(top: 0, left: padding, bottom: 0, right: padding))
     let background = UIView()
     background.accessibilityIdentifier = "background"
-    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     background.place(inside: instance)
     instance.publisher(for: \.bounds)
       .sink { [weak self] in
@@ -560,7 +560,7 @@ class SubscriptionsView: UIView {
     let instance = UIView()
     instance.accessibilityIdentifier = "bg"
     instance.layer.masksToBounds = true
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.surveyCollectionDark : Constants.UI.Colors.surveyCollectionLight
     //        instance.addEquallyTo(to: shadowView)
     surveysCollectionView.place(inside: instance)
     instance.publisher(for: \.bounds)
@@ -605,7 +605,7 @@ class SubscriptionsView: UIView {
 //    instance.size(.uniform(size: 40))
     let bgLayer = CAGradientLayer()
     bgLayer.type = .radial
-    bgLayer.colors = CAGradientLayer.getGradientColors(color: Colors.main)
+    bgLayer.colors = CAGradientLayer.getGradientColors(color: Constants.UI.Colors.main)
     bgLayer.locations = [0, 0.5, 1.15]
     bgLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
     bgLayer.endPoint = CGPoint(x: 1, y: 1)
@@ -669,24 +669,24 @@ class SubscriptionsView: UIView {
 //    avatar.isShadowed = traitCollection.userInterfaceStyle != .dark
     userView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
+    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.surveyCollectionDark : Constants.UI.Colors.surveyCollectionLight
     profileButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     if let profileBtn = profileButton.getSubview(type: UIButton.self)  {
       profileBtn.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
       profileBtn.setAttributedTitle(NSAttributedString(string: "open_userprofile".localized.uppercased(),
                                                        attributes: [
                                                         .font: UIFont(name: Fonts.Rubik.SemiBold, size: 11) as Any,
-                                                        .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main as Any
+                                                        .foregroundColor: traitCollection.userInterfaceStyle == .dark ? UIColor.white : Constants.UI.Colors.main as Any
                                                        ]),
                                     for: .normal)
-      profileBtn.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : Colors.main
+      profileBtn.imageView?.tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : Constants.UI.Colors.main
     }
     if let bgLayer = scrollToTopButton.getLayer(identifier: "background") as? CAShapeLayer {
       bgLayer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     }
     subscriptionButton.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
     subscriptionButton.getSubview(type: UIButton.self)?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemFill : .systemBackground
-    userView.getSubview(type: UIView.self, identifier: "background")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    userView.getSubview(type: UIView.self, identifier: "background")?.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
   }
 }
 

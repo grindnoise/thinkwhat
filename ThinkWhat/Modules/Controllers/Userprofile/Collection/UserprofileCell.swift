@@ -134,7 +134,7 @@ class UserprofileCell: UICollectionViewCell {
   private lazy var footer: UIButton = {
     let instance = UIButton()
     instance.addTarget(self, action: #selector(self.onFooterTapped), for: .touchUpInside)
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
     instance.contentMode = .center
     instance.publisher(for: \.bounds)
       .sink { rect in
@@ -199,7 +199,7 @@ class UserprofileCell: UICollectionViewCell {
     
     guard isFooter else { return }
     
-    footer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+    footer.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
   }
   
   override func prepareForReuse() {

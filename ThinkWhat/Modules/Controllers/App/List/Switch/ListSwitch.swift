@@ -94,7 +94,7 @@ class ListSwitch: UIView {
     // MARK: - Private properties
     public let statePublisher = CurrentValueSubject<State?, Never>(nil)
     //UI
-    public var color: UIColor = Colors.System.Red.rawValue {
+    public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
         didSet {
             gradient.colors = getGradientColors()
         }

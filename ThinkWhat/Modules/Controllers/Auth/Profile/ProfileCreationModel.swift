@@ -17,6 +17,28 @@ class ProfileCreationModel {
 }
 
 extension ProfileCreationModel: ProfileCreationControllerInput {
+  func checkUsernameAvailability(_ username: String) {
+    Task { [weak self] in
+      guard let self = self else { return }
+      
+//      await MainActor.run {
+//        self.modelOutput?.usernameLoadingCallback()
+//      }
+      
+      do {
+        let response = try await API.shared.auth.checkUsernameAvailibilty(username)
+        
+        await MainActor.run {
+          self.modelOutput?.usernameAvailabilityCallback(.success(response))
+        }
+      } catch {
+        await MainActor.run {
+          self.modelOutput?.usernameAvailabilityCallback(.failure(error))
+        }
+      }
+    }
+  }
+  
   func updateUserprofile(parameters: [String: Any], image: UIImage? = nil) {
     Task {
       do {

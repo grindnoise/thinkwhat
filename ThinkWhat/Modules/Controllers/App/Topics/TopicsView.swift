@@ -270,7 +270,7 @@ class TopicsView: UIView {
     let instance = UIView()
     instance.accessibilityIdentifier = "bg"
     instance.layer.masksToBounds = true
-    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.surveyCollectionDark : Colors.surveyCollectionLight
+    instance.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.surveyCollectionDark : Constants.UI.Colors.surveyCollectionLight
     instance.publisher(for: \.bounds)
       .sink { instance.cornerRadius = $0.width *  0.05 }
       .store(in: &subscriptions)
@@ -330,7 +330,7 @@ class TopicsView: UIView {
     let instance = InsetTextField(rightViewVerticalScaleFactor: 1.25)
     instance.autocorrectionType = .no
     let v = UIActivityIndicatorView()
-    v.color = Colors.main
+    v.color = Constants.UI.Colors.main
     v.alpha = 0
     instance.rightView = v
     instance.rightViewMode = .always
@@ -341,7 +341,7 @@ class TopicsView: UIView {
     instance.delegate = self
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.backgroundColor = .secondarySystemBackground
-    instance.tintColor = Colors.main
+    instance.tintColor = Constants.UI.Colors.main
     instance.addTarget(self, action: #selector(TopicsView.textFieldDidChange(_:)), for: .editingChanged)
     instance.returnKeyType = .done
     instance.publisher(for: \.bounds)
@@ -366,7 +366,7 @@ class TopicsView: UIView {
     instance.setAttributedTitle(NSAttributedString(string: "cancel".localized.capitalized,
                                                   attributes: [
                                                     .font: UIFont(name: Fonts.Rubik.Regular, size: 16) as Any,
-                                                    .foregroundColor: Colors.main
+                                                    .foregroundColor: Constants.UI.Colors.main
                                                   ]), for: .normal)
     return instance
   }()
@@ -380,7 +380,7 @@ class TopicsView: UIView {
 //    instance.size(.uniform(size: 40))
     let bgLayer = CAGradientLayer()
     bgLayer.type = .radial
-    bgLayer.colors = CAGradientLayer.getGradientColors(color: Colors.main)
+    bgLayer.colors = CAGradientLayer.getGradientColors(color: Constants.UI.Colors.main)
     bgLayer.locations = [0, 0.5, 1.15]
     bgLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
     bgLayer.endPoint = CGPoint(x: 1, y: 1)
@@ -465,7 +465,7 @@ private extension TopicsView {
   func setupUI() {
     guard let contentView = self.fromNib() else { fatalError("View could not load from nib") }
     
-    filtersCollectionView.setColor(viewInput?.tintColor ?? Colors.filterEnabled)
+    filtersCollectionView.setColor(viewInput?.tintColor ?? Constants.UI.Colors.filterEnabled)
     
     addSubview(contentView)
     contentView.edgesToSuperview(usingSafeArea: true)
@@ -625,8 +625,8 @@ private extension TopicsView {
     UIView.animate(withDuration: 0.15) { [weak self] in
       guard let self = self else { return }
       
-      self.background.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
-      self.surveysCollectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .white
+      self.background.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .white
+      self.surveysCollectionView.backgroundColor = self.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .white
     }
   }
   

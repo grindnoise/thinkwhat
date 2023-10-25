@@ -127,7 +127,8 @@
 "passwordTF" = "Password";
 "username_is_busy" = "Username is already used";
 "username_is_empty" = "Username is not filled";
-"username_is_short" = "Username is too short";
+"username_is_short" = "Username is too short, minimum length is ";
+"username_is_correct" = "Username is free to use";
 "email_confirm_reminder" = "Confirm your email in case you forgot your password";
 "email_is_empty_reminder" = "Enter your email in case you forgot your password";
 "email_is_confirmed" = "Email is confirmed";
@@ -167,13 +168,19 @@
 //Recover VC
 "profile_fill" = "Fill in profile";
 
-//FillProfile VC
-"firstNameTF" = "First name";
-"lastNameTF" = "Last name";
-"birthDateTF" = "Birth date";
-"cityTF" = "City";
-"city_placeholder" = "Enter city";
-"fill_necessary_fields" = "Please, fill in the required fields: ";
+//Profile creation
+"new_profile_username" = "Username";
+"new_profile_gender" = "Gender";
+"new_profile_gender_placeholder" = "Select gender";
+"new_profile_gender_caution" = "Please, select your gender";
+"new_profile_first_name" = "First name";
+"new_profile_last_name" = "Last name";
+"new_profile_birth_date" = "Birth date";
+"new_profile_birth_date" = "Select birth date";
+"new_profile_birth_caution" = "Please, select your birth date";
+"new_profile_city" = "City";
+"new_profile_city_placeholder" = "Enter city";
+"new_profile_fill_necessary_fields" = "Please, fill in the required fields: ";
 
 //Hot VC
 "hot" = "Hot";

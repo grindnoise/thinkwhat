@@ -9,6 +9,7 @@
 import UIKit
 import Combine
 import AuthenticationServices
+import TinyConstraints
 
 class SignInView: UIView {
   
@@ -19,7 +20,7 @@ class SignInView: UIView {
     let instance = Logo()
     instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
     instance.layer.masksToBounds = false
-    instance.layer.shadowColor = Colors.main.cgColor
+    instance.layer.shadowColor = Constants.UI.Colors.main.cgColor
     instance.layer.shadowOffset = .zero
     instance.layer.shadowRadius = padding
     instance.layer.shadowOpacity = 0.5
@@ -111,7 +112,7 @@ class SignInView: UIView {
     let instance = UnderlinedSignTextField()
     instance.delegate = self
     instance.backgroundColor = .clear
-    instance.tintColor = Colors.main
+    instance.tintColor = Constants.UI.Colors.main
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.textContentType = .name
     instance.autocorrectionType = .no
@@ -172,7 +173,7 @@ class SignInView: UIView {
     instance.isSecureTextEntry = true
     instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
     instance.clipsToBounds = false
-    instance.tintColor = Colors.main
+    instance.tintColor = Constants.UI.Colors.main
     instance.attributedPlaceholder = NSAttributedString(string: "passwordTF".localized,
                                                         attributes: [
                                                           .font: UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body) as Any
@@ -191,7 +192,7 @@ class SignInView: UIView {
     if #available(iOS 15, *) {
       var config = UIButton.Configuration.filled()
       config.cornerStyle = .capsule
-      config.baseBackgroundColor = Colors.main
+      config.baseBackgroundColor = Constants.UI.Colors.main
       config.attributedTitle = AttributedString("loginButton".localized,
                                                 attributes: AttributeContainer([
                                                   .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
@@ -199,7 +200,7 @@ class SignInView: UIView {
                                                 ]))
       instance.configuration = config
     } else {
-      instance.backgroundColor = Colors.main
+      instance.backgroundColor = Constants.UI.Colors.main
       instance.publisher(for: \.bounds)
         .sink { instance.cornerRadius = $0.height/2 }
         .store(in: &subscriptions)
@@ -215,7 +216,7 @@ class SignInView: UIView {
       .sink { [unowned self] in
         opaque.layer.shadowOpacity = 1
         opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
-        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
         opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
         opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
       }
@@ -329,7 +330,7 @@ class SignInView: UIView {
     instance.setAttributedTitle(NSAttributedString(string: "registration".localized,
                                                    attributes: [
                                                     .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
-                                                    .foregroundColor: Colors.main as Any
+                                                    .foregroundColor: Constants.UI.Colors.main as Any
                                                    ]),
                                 for: .normal)
     
@@ -366,7 +367,7 @@ class SignInView: UIView {
     instance.setAttributedTitle(NSAttributedString(string: "forgotLabel".localized,
                                                    attributes: [
                                                     .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
-                                                    .foregroundColor: Colors.main as Any
+                                                    .foregroundColor: Constants.UI.Colors.main as Any
                                                    ]),
                                 for: .normal)
     
@@ -417,17 +418,15 @@ class SignInView: UIView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  
-  
   // MARK: - Overridden
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     label.textColor = traitCollection.userInterfaceStyle == .dark ? "#828487".hexColor : "#8C96A3".hexColor
     loginButton.layer.shadowRadius = traitCollection.userInterfaceStyle == .dark ? 8 : 4
     loginButton.layer.shadowOffset = traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
-    loginButton.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+    loginButton.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
     
     if let label = signupStack.arrangedSubviews.filter({ $0.accessibilityIdentifier == "label"}).first as? UILabel {
       label.textColor = traitCollection.userInterfaceStyle == .dark ? "#828487".hexColor : "#8C96A3".hexColor
@@ -458,127 +457,44 @@ class SignInView: UIView {
 }
 
 extension SignInView: SignInControllerOutput {
-  func providerSignInCallback(result: Result<Bool, Error>) {
-    stopLoader(success: false) { [weak self] in
-      guard let self = self,
-            case .success(_) = result
-      else  { return }
-      
-      self.viewInput?.nextScene()
-    }
-//    switch result {
-//    case .success(_):
-//      guard let userprofile = Userprofiles.shared.current,
-//            userprofile.wasEdited == false else {
-//        stopLoader(success: true) { [weak self] in
-//          guard let self = self else { return }
-//
-//          self.viewInput?.openApp()
-//        }
-//        return
-//      }
-//
-//      stopLoader(success: false) { [weak self] in
-//        guard let self = self else { return }
-//
-//        self.viewInput?.openProfile()
-//      }
-//    case .failure(_):
-//      stopLoader(success: false) {}
-//    }
-  }
-  
-  /**
-   Disable UI interaction and show loading animation.
-   */
-  func startAuthorizationUI(provider: Enums.AuthProvider) {
+  /// Animates sign in routine, disables UI interaction within
+  func startLoadingAnim() {
     isUserInteractionEnabled = false
-//    let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
-//    blurEffectView.effect = nil
-//    blurEffectView.addEquallyTo(to: self)
+    
     let bgView = UIView()
-    bgView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    bgView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     bgView.accessibilityIdentifier = "bgView"
     bgView.alpha = 0
     bgView.addEquallyTo(to: self)
     
     let fakeLogo = Logo(frame: CGRect(origin: self.stack.convert(logoIcon.frame.origin, to: self),
                                                                     size: logoIcon.bounds.size))
-//    let fakeLogo = {
-//      let instance = Icon()
     fakeLogo.removeConstraints(fakeLogo.getAllConstraints())
     fakeLogo.accessibilityIdentifier = "fakeLogo"
-//      //      instance.heightAnchor.constraint(equalTo: instance.widthAnchor).isActive = true
-//      instance.iconColor = Colors.main
-//      instance.frame = CGRect(origin: self.stack.convert(logoIcon.frame.origin, to: self),
-//                              size: logoIcon.bounds.size)
-//      instance.scaleMultiplicator = 1
-//      instance.category = .Logo
-//
-//      return instance
-//    }()
-    
     addSubview(fakeLogo)
     logoIcon.alpha = 0
     
-    let tempLogo = Logo()
-//    let spinner = LoadingIndicator(color: Colors.main,
-//                                   shouldSendCompletion: true,
-//                                   alpha: 1)
-    tempLogo.alpha = 0
-//    let label: UILabel = {
-//      let instance = UILabel()
-//      instance.font = UIFont(name: Fonts.Rubik.SemiBold, size: 14)
-//      instance.text = "provider_authorization_progress".localized
-//      instance.textAlignment = .center
-//      instance.textColor = traitCollection.userInterfaceStyle == .dark ? "#828487".hexColor : "#8C96A3".hexColor
-//      Timer
-//        .publish(every: 1, on: .main, in: .common)
-//        .autoconnect()
-//        .sink { [weak self] _ in
-//          guard let self = self else { return }
-//
-//          guard self.dots.count < 3 else {
-//            self.dots = ""
-//            UIView.setAnimationsEnabled(false)
-//            instance.text! = "provider_authorization_progress".localized
-//            UIView.setAnimationsEnabled(true)
-//
-//            return
-//          }
-//
-//          self.dots += "."
-//          UIView.setAnimationsEnabled(false)
-//          instance.text! = "provider_authorization_progress".localized + self.dots
-//          UIView.setAnimationsEnabled(true)
-//        }
-//        .store(in: &timerSubscription)
-//
-//      return instance
-//    }()
-    let stack: UIStackView = {
-      let instance = UIStackView(arrangedSubviews: [
-//        spinner,
-        tempLogo,
-//        label,
-      ])
-      instance.axis = .vertical
-      instance.spacing = padding
-      
-      return instance
-    }()
+    let spiral = Icon(frame: .zero,
+                      category: .Spiral,
+                      scaleMultiplicator: 1,
+                      iconColor: traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.spiralDark : Constants.UI.Colors.spiralLight)
+    bgView.insertSubview(spiral, belowSubview: fakeLogo)
+    spiral.aspectRatio(1)
+    spiral.widthToHeight(of: bgView, multiplier: 1.5)
+    spiral.centerInSuperview()
+    spiral.transform = .init(scaleX: 0.75, y: 0.75)
+    spiral.alpha = 0
     
-    stack.placeInCenter(of: bgView)//blurEffectView.contentView)//,
-//                        yOffset: -NavigationController.Constants.NavBarHeightSmallState)
-//    spinner.translatesAutoresizingMaskIntoConstraints = false
-//    spinner.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35).isActive = true
+    let tempLogo = Logo()
+    tempLogo.alpha = 0
+    tempLogo.placeInCenter(of: bgView)
     tempLogo.translatesAutoresizingMaskIntoConstraints = false
     tempLogo.widthAnchor.constraint(equalTo: tempLogo.heightAnchor).isActive = true
     tempLogo.widthAnchor.constraint(equalTo: bgView.widthAnchor, multiplier: 0.4).isActive = true
     
     bgView.setNeedsLayout()
     bgView.layoutIfNeeded()
-    let coordinate = stack.convert(tempLogo.frame.origin, to: bgView)
+    let coordinate = bgView.convert(tempLogo.frame.origin, to: bgView)
     
     UIView.animate(withDuration: 0.6,
                    delay: 0,
@@ -586,19 +502,71 @@ extension SignInView: SignInControllerOutput {
                    initialSpringVelocity: 0.3,
                    options: [.curveEaseInOut],
                    animations: {
-      bgView.alpha = 1//UIBlurEffect(style: .prominent)
+      bgView.alpha = 1
       fakeLogo.frame.origin = coordinate
       fakeLogo.frame.size = tempLogo.bounds.size
     }) { _ in
       tempLogo.alpha = 1
       fakeLogo.alpha = 0
       
+      // Spiral presentation anim
+      UIView.animate(withDuration: 0.2,
+                     delay: 0,
+                     options: .curveEaseInOut) {
+        spiral.startRotating(duration: 5)
+        spiral.alpha = 1
+        spiral.transform = .identity
+      } completion: { _ in /*spiral.startRotating(duration: 5)*/ }
+      
+      // Pulse animation
       UIView.animate(withDuration: 0.75, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut]) {
         tempLogo.transform = .init(scaleX: 0.95, y: 0.95)
         tempLogo.alpha = 0.95
       }
-      //      fakeLogo.removeFromSuperview()
-//      spinner.start(animated: false)
+    }
+  }
+  
+  /// Stops loading animation and enables UI interaction
+  /// - Parameter completion: executed instructions
+  func stopLoadingAnim(completion: @escaping Closure) {
+    isUserInteractionEnabled = true
+    
+    guard let bgView = getSubview(type: UIView.self, identifier: "bgView"),//let blurEffectView = getSubview(type: UIVisualEffectView.self),
+          let fakeLogo = getSubview(type: Logo.self, identifier: "fakeLogo"),
+          let tempLogo = bgView.getSubview(type: Logo.self),
+          let spiral = bgView.getSubview(type: Icon.self)
+    else { return }
+    
+    UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+      spiral.transform = .init(scaleX: 1.25, y: 1.25)
+      spiral.alpha = 0
+      tempLogo.transform = .identity
+      tempLogo.alpha = 1
+    }) { _ in
+      spiral.removeFromSuperview()
+      UIView.animate(withDuration: 0.6,
+                     delay: 0,
+                     usingSpringWithDamping: 0.7,
+                     initialSpringVelocity: 0.3,
+                     options: [.curveEaseInOut],
+                     animations: { [weak self] in
+        guard let self = self else { return }
+        
+        bgView.alpha = 0
+        fakeLogo.alpha = 1
+        fakeLogo.transform = .identity
+        fakeLogo.frame.origin = self.stack.convert(logoIcon.frame.origin, to: self)
+        fakeLogo.frame.size = self.logoIcon.frame.size
+        
+      }) { [weak self] _ in
+        guard let self = self else { return }
+        
+        self.logoIcon.alpha = 1
+        bgView.removeFromSuperview()
+        fakeLogo.removeFromSuperview()
+        tempLogo.removeFromSuperview()
+        completion()
+      }
     }
   }
   
@@ -643,7 +611,7 @@ extension SignInView: SignInControllerOutput {
       let instance = Icon()
       instance.accessibilityIdentifier = "loadingIcon"
       instance.category = Icon.Category.Logo
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.scaleMultiplicator = 1.2
       instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
       instance.alpha = 0
@@ -654,7 +622,7 @@ extension SignInView: SignInControllerOutput {
       let instance = Icon()
       instance.accessibilityIdentifier = "loadingText"
       instance.category = Icon.Category.LogoText
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.scaleMultiplicator = 1.1
       instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
       instance.alpha = 0
@@ -699,7 +667,7 @@ extension SignInView: SignInControllerOutput {
       let instance = Icon(frame: CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
                                                                             to: opaque),
                                         size: logoIcon.bounds.size))
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.scaleMultiplicator = 1
       instance.category = .Logo
       
@@ -710,7 +678,7 @@ extension SignInView: SignInControllerOutput {
                                                                             to: opaque),
                                         size: logoText.bounds.size))
       
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.scaleMultiplicator = 1
       instance.category = .LogoText
       
@@ -779,7 +747,7 @@ extension SignInView: SignInControllerOutput {
 private extension SignInView {
   @MainActor
   func setupUI() {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     
     addGestureRecognizer(getTapRecogizer())
     //    stack.placeCentered(inside: self, withMultiplier: 0.75)
@@ -900,190 +868,6 @@ private extension SignInView {
       viewInput?.resetPassword()
     } else if sender == apple || sender === appleDark {
       viewInput?.providerSignIn(provider: .Apple)
-    }
-  }
-  
-  /**
-   Enable UI interaction and hide loading animation.
-   - parameter success: Flag for success
-   - parameter completion: Callback closure
-   */
-  func stopLoader(success: Bool,
-                  completion: @escaping Closure) {
-    isUserInteractionEnabled = true
-    
-    guard let bgView = getSubview(type: UIView.self, identifier: "bgView"),//let blurEffectView = getSubview(type: UIVisualEffectView.self),
-          let fakeLogo = getSubview(type: Logo.self, identifier: "fakeLogo"),
-          let tempLogo = bgView.getSubview(type: Logo.self)
-//          let label = bgView.getSubview(type: UILabel.self)
-    else { return }
-    
-    
-    
-//    fakeLogo.alpha = spinner.logo.alpha
-//    fakeLogo.transform = spinner.logo.transform
-//    spinner.alpha = 0
-//
-    switch success {
-    case false:
-      UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
-        tempLogo.transform = .identity
-        tempLogo.alpha = 1
-      }) { _ in
-        UIView.animate(withDuration: 0.6,
-                       delay: 0,
-                       usingSpringWithDamping: 0.7,
-                       initialSpringVelocity: 0.3,
-                       options: [.curveEaseInOut],
-                       animations: { [weak self] in
-          guard let self = self else { return }
-          
-          bgView.alpha = 0
-//          label.alpha = 0
-//          label.transform = .init(scaleX: 0.75, y: 0.75)
-          fakeLogo.alpha = 1
-          fakeLogo.transform = .identity
-          fakeLogo.frame.origin = self.stack.convert(logoIcon.frame.origin, to: self)
-          fakeLogo.frame.size = self.logoIcon.frame.size
-          
-        }) { [weak self] _ in
-          guard let self = self else { return }
-          
-          self.logoIcon.alpha = 1
-          bgView.removeFromSuperview()
-          fakeLogo.removeFromSuperview()
-          tempLogo.removeFromSuperview()
-//          label.removeFromSuperview()
-//          self.timerSubscription.forEach { $0.cancel() }
-          completion()
-        }
-      }
-    case true:
-      print("")
-//      let loadingIcon: Icon = {
-//        let instance = Icon(category: Icon.Category.Logo)
-//        instance.iconColor = Colors.main
-//        instance.scaleMultiplicator = 1.2
-//        instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
-//
-//        return instance
-//      }()
-//      let loadingText: Icon = {
-//        let instance = Icon(category: Icon.Category.LogoText)
-//        instance.iconColor = Colors.main
-//        instance.isRounded = false
-//        instance.clipsToBounds = false
-//        instance.scaleMultiplicator = 1.1
-//        instance.alpha = 0
-//        instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
-//
-//        return instance
-//      }()
-//      let loadingStack: UIStackView = {
-//        let opaque = UIView()
-//        opaque.backgroundColor = .clear
-//
-//        let instance = UIStackView(arrangedSubviews: [
-//          opaque,
-//          loadingText
-//        ])
-//        instance.axis = .vertical
-//        instance.distribution = .equalCentering
-//        instance.spacing = 0
-//        instance.clipsToBounds = false
-//        instance.alpha = 0
-//
-//        loadingIcon.translatesAutoresizingMaskIntoConstraints = false
-//        opaque.translatesAutoresizingMaskIntoConstraints = false
-//        opaque.addSubview(loadingIcon)
-//
-//        NSLayoutConstraint.activate([
-//          loadingIcon.topAnchor.constraint(equalTo: opaque.topAnchor),
-//          loadingIcon.bottomAnchor.constraint(equalTo: opaque.bottomAnchor),
-//          loadingIcon.centerXAnchor.constraint(equalTo: opaque.centerXAnchor),
-//          opaque.heightAnchor.constraint(equalTo: loadingText.heightAnchor, multiplier: 2)
-//        ])
-//
-//        return instance
-//      }()
-//
-//      loadingStack.placeInCenter(of: bgView,//blurEffectView.contentView,
-//                                 widthMultiplier: 0.6)//,
-//      bgView.setNeedsLayout()
-//      bgView.layoutIfNeeded()
-//      loadingText.transform = .init(scaleX: 0.5, y: 0.5)
-//
-//      loadingText.icon.add(Animations.get(property: .FillColor,
-//                                          fromValue: Colors.main.cgColor as Any,
-//                                          toValue: Colors.Logo.Flame.next().rawValue as Any,
-//                                          duration: 0.3,
-//                                          delay: 0,
-//                                          repeatCount: 0,
-//                                          autoreverses: false,
-//                                          timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-//                                          delegate: nil,
-//                                          isRemovedOnCompletion: false),
-//                           forKey: nil)
-//      loadingIcon.icon.add(Animations.get(property: .FillColor,
-//                                          fromValue: Colors.main.cgColor as Any,
-//                                          toValue: Colors.Logo.Flame.next().rawValue as Any,
-//                                          duration: 0.3,
-//                                          delay: 0,
-//                                          repeatCount: 0,
-//                                          autoreverses: false,
-//                                          timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-//                                          delegate: self,
-//                                          isRemovedOnCompletion: false,
-//                                          completionBlocks: []),
-//                           forKey: nil)
-//      fakeLogo.icon.add(Animations.get(property: .Path,
-//                                       fromValue: (fakeLogo.icon as! CAShapeLayer).path as Any,
-//                                       toValue: (loadingIcon.icon as! CAShapeLayer).path as Any,
-//                                       duration: 0.3,
-//                                       delay: 0,
-//                                       repeatCount: 0,
-//                                       autoreverses: false,
-//                                       timingFunction: CAMediaTimingFunctionName.easeInEaseOut,
-//                                       delegate: self,
-//                                       isRemovedOnCompletion: false,
-//                                       completionBlocks: []),
-//                        forKey: nil)
-//
-//
-//      UIView.animate(withDuration: 0.6,
-//                     delay: 0,
-//                     usingSpringWithDamping: 0.7,
-//                     initialSpringVelocity: 0.3,
-//                     options: [.curveEaseInOut],
-//                     animations: { [weak self] in
-//        guard let self = self else { return }
-//
-////        blurEffectView.effect = nil
-//        label.alpha = 0
-//        label.transform = .init(scaleX: 0.75, y: 0.75)
-//        fakeLogo.alpha = 1
-//        fakeLogo.transform = .identity
-//        fakeLogo.frame.origin = loadingStack.convert(loadingIcon.frame.origin, to: bgView)
-//        fakeLogo.frame.size = loadingIcon.frame.size
-//        self.stack.alpha = 0
-//      }) { [weak self] _ in
-//        guard let self = self else { return }
-//
-//        loadingStack.alpha = 1
-////        blurEffectView.removeFromSuperview()
-//        fakeLogo.removeFromSuperview()
-//        spinner.removeFromSuperview()
-//        label.removeFromSuperview()
-//        self.timerSubscription.forEach { $0.cancel() }
-//
-//        UIView.animate(withDuration: 0.3,
-//                       animations: {
-//          loadingText.transform = .identity
-//          loadingText.alpha = 1
-//        }) { _ in
-//          completion()
-//        }
-//      }
     }
   }
   

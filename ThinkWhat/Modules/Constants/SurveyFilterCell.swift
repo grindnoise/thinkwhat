@@ -21,7 +21,7 @@ class SurveyFilterCell: UICollectionViewListCell {
   // MARK: - Public properties
   public var filterPublisher = PassthroughSubject<SurveyFilterItem, Never>()
   public var boundsPublisher = PassthroughSubject<Void, Never>()
-  public var color: UIColor = Colors.filterEnabled {
+  public var color: UIColor = Constants.UI.Colors.filterEnabled {
     didSet {
       guard oldValue != color else { return }
       
@@ -86,7 +86,7 @@ class SurveyFilterCell: UICollectionViewListCell {
   }()
   private lazy var bgLayer: CAShapeLayer = {
     let instance = CAShapeLayer()
-    instance.fillColor = traitCollection.userInterfaceStyle == .dark ? Colors.filterDisabledDark.cgColor : Colors.filterDisabledLight.cgColor
+    instance.fillColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.filterDisabledDark.cgColor : Constants.UI.Colors.filterDisabledLight.cgColor
     instance.masksToBounds = true
     
     return instance
@@ -149,7 +149,7 @@ class SurveyFilterCell: UICollectionViewListCell {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    bgLayer.fillColor = traitCollection.userInterfaceStyle == .dark ? Colors.filterDisabledDark.cgColor : Colors.filterDisabledLight.cgColor
+    bgLayer.fillColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.filterDisabledDark.cgColor : Constants.UI.Colors.filterDisabledLight.cgColor
   }
 }
 

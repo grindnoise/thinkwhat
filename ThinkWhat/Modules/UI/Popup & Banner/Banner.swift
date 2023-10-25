@@ -82,7 +82,7 @@ class NewBanner: UIView {
   private lazy var body: UIView = {
     let instance = UIView()
     instance.accessibilityIdentifier = "body"
-    instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? Colors.bannerLight : Colors.bannerDark
+    instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? Constants.UI.Colors.bannerLight : Constants.UI.Colors.bannerDark
     instance.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.viewPanned(recognizer:))))
     instance.publisher(for: \.bounds)
       .receive(on: DispatchQueue.main)
@@ -108,7 +108,7 @@ class NewBanner: UIView {
   // MARK: - Initialization
   init(contentView: UIView,
        padding: CGFloat = 8,
-       contentPadding: UIEdgeInsets = .uniform(size: 8),
+       contentPadding: UIEdgeInsets = UIEdgeInsets(top: Constants.UI.padding*2, left: Constants.UI.padding, bottom: Constants.UI.padding*2, right: Constants.UI.padding),
        isModal: Bool,
        isShadowed: Bool = true,
        useContentViewHeight: Bool = false,
@@ -221,7 +221,7 @@ class NewBanner: UIView {
     
     guard isShadowed && !isModal else { return }
     
-    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? Colors.bannerLight : Colors.bannerDark
+    body.backgroundColor = traitCollection.userInterfaceStyle != .dark ? Constants.UI.Colors.bannerLight : Constants.UI.Colors.bannerDark
     shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
   }
 

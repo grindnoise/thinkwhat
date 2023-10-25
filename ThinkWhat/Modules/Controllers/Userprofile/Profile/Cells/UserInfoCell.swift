@@ -27,7 +27,7 @@ class UserInfoCell: UICollectionViewListCell {
   ///**UI**
   public var padding: CGFloat = 8
   public var insets: UIEdgeInsets?
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
     didSet {
       textView.tintColor = color
       
@@ -81,7 +81,7 @@ class UserInfoCell: UICollectionViewListCell {
 //  }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = Colors.cellHeader
+    instance.textColor = Constants.UI.Colors.cellHeader
     instance.text = "userprofile_about".localized.uppercased()
     instance.font = Fonts.cellHeader
     
@@ -107,7 +107,7 @@ class UserInfoCell: UICollectionViewListCell {
   private lazy var headerImage: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "person.text.rectangle.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.tintColor = Colors.cellHeader
+    instance.tintColor = Constants.UI.Colors.cellHeader
     instance.contentMode = .scaleAspectFit
 //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
@@ -143,7 +143,7 @@ class UserInfoCell: UICollectionViewListCell {
       instance.font = UIFont.scaledFont(fontName: Fonts.Rubik.Regular, forTextStyle: .body)
       instance.text = userprofile.description
     }
-    instance.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
+    instance.backgroundColor = userprofile.isCurrent ? Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection) : .clear
     instance.isUserInteractionEnabled = userprofile.isCurrent ? true : false
     let toolBar = UIToolbar(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 44))
     toolBar.isTranslucent = true
@@ -216,7 +216,7 @@ class UserInfoCell: UICollectionViewListCell {
     super.traitCollectionDidChange(previousTraitCollection)
     
 //    background.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
-    textView.backgroundColor = userprofile.isCurrent ? Colors.textField(color: .white, traitCollection: traitCollection) : .clear
+    textView.backgroundColor = userprofile.isCurrent ? Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection) : .clear
     
     //Set dynamic font size
     guard previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory else { return }

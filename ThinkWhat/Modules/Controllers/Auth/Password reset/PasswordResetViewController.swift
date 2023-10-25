@@ -14,7 +14,7 @@ class PasswordResetViewController: UIViewController {
     let logoIcon: Icon = {
       let instance = Icon(category: Icon.Category.Logo)
       instance.accessibilityIdentifier = "logoIcon"
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.isRounded = false
       instance.clipsToBounds = false
       instance.scaleMultiplicator = 1.2
@@ -26,7 +26,7 @@ class PasswordResetViewController: UIViewController {
     let logoText: Icon = {
       let instance = Icon(category: Icon.Category.LogoText)
       instance.accessibilityIdentifier = "logoText"
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.isRounded = false
       instance.clipsToBounds = false
       instance.scaleMultiplicator = 1.1

@@ -40,7 +40,7 @@ class UserSettingsCollectionView: UICollectionView {
   @Published public private(set) var userprofileDescription: String?
   @Published public private(set) var email: String?
   ///**UI
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
     didSet {
       setupUI()
     }
@@ -76,7 +76,7 @@ class UserSettingsCollectionView: UICollectionView {
   // MARK: - Initialization
   init(mode: Mode = .Default,
        userprofile: Userprofile,
-       color: UIColor = Colors.main) {
+       color: UIColor = Constants.UI.Colors.main) {
     self.mode = mode
     self.userprofile = userprofile
     self.color = color

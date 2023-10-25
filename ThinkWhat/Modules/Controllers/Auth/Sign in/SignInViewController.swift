@@ -18,12 +18,14 @@ class SignInViewController: UIViewController {
   var controllerOutput: SignInControllerOutput?
   var controllerInput: SignInControllerInput?
   
-  
-  
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
+  ///**Logic**
+  // Banner handlers
+  private var bannersQueue: QueueArray<NewBanner> = QueueArray() // Store banners in queue
+  private var isBannerOnScreen = false // Prevent banner overlay
   ///**UI**
   private let padding: CGFloat = 8
   
@@ -57,6 +59,7 @@ class SignInViewController: UIViewController {
     
     self.view = view as UIView
     
+    setTasks()
     setupUI()
   }
   
@@ -65,14 +68,14 @@ class SignInViewController: UIViewController {
     
     navigationItem.setHidesBackButton(true, animated: false)
     navigationController?.setNavigationBarHidden(false, animated: false)
-    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
-//    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
+//    fillNavigationBar(with: traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
   }
 }
 
@@ -123,9 +126,18 @@ extension SignInViewController: SignInViewInput {
         switch result {
         case .success(let accessToken):
           self.controllerInput?.providerSignIn(provider: provider, accessToken: accessToken)
-          self.controllerOutput?.startAuthorizationUI(provider: provider)
+          self.controllerOutput?.startLoadingAnim()
         case .failure(let error):
-          self.controllerOutput?.providerSignInCallback(result: .failure(error))
+          self.controllerOutput?.stopLoadingAnim { [weak self] in
+            guard let self = self else { return }
+          
+            self.enqueueBanner(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                          text: AppError.server.localizedDescription)
+    #if DEBUG
+            error.printLocalized(class: type(of: self), functionName: #function)
+    #endif
+          }
+
         }
       })
 //    case .Facebook:
@@ -139,9 +151,17 @@ extension SignInViewController: SignInViewInput {
         switch result {
         case .success(let accessToken):
           self.controllerInput?.providerSignIn(provider: provider, accessToken: accessToken)
-          self.controllerOutput?.startAuthorizationUI(provider: provider)
+          self.controllerOutput?.startLoadingAnim()
         case .failure(let error):
-          self.controllerOutput?.providerSignInCallback(result: .failure(error))
+          self.controllerOutput?.stopLoadingAnim { [weak self] in
+            guard let self = self else { return }
+          
+            self.enqueueBanner(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                          text: AppError.server.localizedDescription)
+    #if DEBUG
+            error.printLocalized(class: type(of: self), functionName: #function)
+    #endif
+          }
         }
       }
     case .Apple:
@@ -157,7 +177,6 @@ extension SignInViewController: SignInViewInput {
 #if DEBUG
         fatalError("Not implemented")
 #endif
-//        throw "Not implemented"
     }
   }
   
@@ -177,25 +196,20 @@ extension SignInViewController: SignInViewInput {
 
 extension SignInViewController: SignInModelOutput {
   func providerSignInCallback(result: Result<Bool, Error>) {
-    if case .failure(let error) = result {
-      let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                            text: AppError.server.localizedDescription,
-                                                            tintColor: .systemRed,
-                                                            fontName: Fonts.Regular,
-                                                            textStyle: .subheadline,
-                                                            textAlignment: .natural),
-                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                             isModal: false,
-                             useContentViewHeight: true,
-                             shouldDismissAfter: 2)
-      banner.didDisappearPublisher
-        .sink { _ in banner.removeFromSuperview() }
-        .store(in: &subscriptions)
+    controllerOutput?.stopLoadingAnim() { [weak self] in
+      guard let self = self  else { return }
+      
+      switch result {
+      case .success(_):
+        self.nextScene()
+      case .failure(let error):
+        self.enqueueBanner(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                      text: AppError.server.localizedDescription)
 #if DEBUG
-      error.printLocalized(class: type(of: self), functionName: #function)
+        error.printLocalized(class: type(of: self), functionName: #function)
 #endif
+      }
     }
-    controllerOutput?.providerSignInCallback(result: result)
   }
   
   func mailSignInCallback(_ result: Result<Bool, Error>) {
@@ -219,7 +233,7 @@ extension SignInViewController: SignInModelOutput {
                                                       retryTimeout: 60,
                                                       email: email.replacingOccurrences(of: username,
                                                                                         with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
-                                                      color: Colors.main)
+                                                      color: Constants.UI.Colors.main)
           
           content.verifiedPublisher
             .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
@@ -232,32 +246,24 @@ extension SignInViewController: SignInModelOutput {
             }
             .store(in: &banner.subscriptions)
           content.retryPublisher
-            .sink { [unowned self] in self.controllerInput?.sendVerificationCode { [unowned self] in
+            .sink { [weak self] in
+              guard let self = self else { return }
               
-              switch $0 {
-              case .success(let dict):
-                guard let code = dict["confirmation_code"] as? Int else { return }
+              self.controllerInput?.sendVerificationCode { [unowned self] in
                 
-                content.onEmailSent(code)
-              case.failure(let error):
+                switch $0 {
+                case .success(let dict):
+                  guard let code = dict["confirmation_code"] as? Int else { return }
+                  
+                  content.onEmailSent(code)
+                case.failure(let error):
 #if DEBUG
-                error.printLocalized(class: type(of: self), functionName: #function)
+                  error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-                let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                                      text: AppError.server.localizedDescription,
-                                                                      tintColor: .systemRed,
-                                                                      fontName: Fonts.Regular,
-                                                                      textStyle: .subheadline,
-                                                                      textAlignment: .natural),
-                                       contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                       isModal: false,
-                                       useContentViewHeight: true,
-                                       shouldDismissAfter: 2)
-                banner.didDisappearPublisher
-                  .sink { _ in banner.removeFromSuperview() }
-                  .store(in: &self.subscriptions)
-              }
-            }}
+                  self.enqueueBanner(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                     text: AppError.server.localizedDescription)
+                }
+              }}
             .store(in: &banner.subscriptions)
           banner.setContent(content)
           banner.didDisappearPublisher
@@ -291,7 +297,7 @@ extension SignInViewController: SignInModelOutput {
             let content = EmailVerificationPopupContent(code: code,
                                                         retryTimeout: 60,
                                                         email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
-                                                        color: Colors.main)
+                                                        color: Constants.UI.Colors.main)
             content.verifiedPublisher
               .delay(for: .seconds(0.25), scheduler: DispatchQueue.main)
               .sink {
@@ -318,19 +324,8 @@ extension SignInViewController: SignInModelOutput {
 #if DEBUG
                   error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-                  let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                                        text: AppError.server.localizedDescription,
-                                                                        tintColor: .systemRed,
-                                                                        fontName: Fonts.Regular,
-                                                                        textStyle: .subheadline,
-                                                                        textAlignment: .natural),
-                                         contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                         isModal: false,
-                                         useContentViewHeight: true,
-                                         shouldDismissAfter: 2)
-                  banner.didDisappearPublisher
-                    .sink { _ in banner.removeFromSuperview() }
-                    .store(in: &self.subscriptions)
+                  self.enqueueBanner(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                                text: AppError.server.localizedDescription)
                 }
               }}
               .store(in: &banner.subscriptions)
@@ -346,21 +341,10 @@ extension SignInViewController: SignInModelOutput {
 #if DEBUG
             error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-            let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                                  text: AppError.server.localizedDescription,
-                                                                  tintColor: .systemRed,
-                                                                  fontName: Fonts.Regular,
-                                                                  textStyle: .subheadline,
-                                                                  textAlignment: .natural),
-                                   contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                   isModal: false,
-                                   useContentViewHeight: true,
-                                   shouldDismissAfter: 2)
-            banner.didDisappearPublisher
-              .sink { _ in banner.removeFromSuperview() }
-              .store(in: &self.subscriptions)
+            self.enqueueBanner(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                          text: AppError.server.localizedDescription)
             
-            controllerOutput?.mailSignInCallback(result: .failure(error))
+            self.controllerOutput?.mailSignInCallback(result: .failure(error))
           }
         }
       } else {
@@ -369,19 +353,8 @@ extension SignInViewController: SignInModelOutput {
     case .failure(let failure):
       if let apiError = failure as? APIError,
          let errorDescription = apiError.errorDescription {
-        let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "xmark.circle.fill")!,
-                                                              text: errorDescription,
-                                                              tintColor: .systemRed,
-                                                              fontName: Fonts.Regular,
-                                                              textStyle: .subheadline,
-                                                              textAlignment: .natural),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 2)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
-          .store(in: &subscriptions)
+        enqueueBanner(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                      text: AppError.server.localizedDescription)
       }
       controllerOutput?.mailSignInCallback(result: result)
     }
@@ -393,56 +366,96 @@ private extension SignInViewController {
   func setupUI() {
     navigationController?.setNavigationBarHidden(true, animated: false)
   }
+  
+  // Banner queue listener
+  func setTasks() {
+    Timer
+      .publish(every: 0.5, on: .main, in: .common)
+      .autoconnect()
+      .filter { [unowned self] _ in !self.isBannerOnScreen}
+      .sink { [weak self] _ in
+        guard let self = self else { return }
+        
+        if let banner = self.bannersQueue.dequeue() {
+          self.isBannerOnScreen = true
+          banner.present()
+          banner.didDisappearPublisher
+            .sink { [unowned self] _ in
+              banner.removeFromSuperview()
+              self.isBannerOnScreen = false
+            }
+            .store(in: &self.subscriptions)
+        }
+      }
+      .store(in: &subscriptions)
+  }
+  
+  func enqueueBanner(image: UIImage? = nil,
+                     icon: Icon? = nil,
+                     text: String,
+                     attributedText: NSAttributedString? = nil,
+                     isModal: Bool = false,
+                     shouldPresent: Bool = false,
+                     shouldDismissAfter: Double = 2.0) {
+    bannersQueue.enqueue(NewBanner(contentView: TextBannerContent(image: image, icon: icon, text: text, attributedText: attributedText),
+                                   contentPadding: UIEdgeInsets(top: Constants.UI.padding*2, left: Constants.UI.padding, bottom: Constants.UI.padding*2, right: Constants.UI.padding),
+                                   isModal: isModal,
+                                   useContentViewHeight: true,
+                                   shouldPresent: shouldPresent,
+                                   shouldDismissAfter: shouldDismissAfter))
+  }
 }
 
 extension SignInViewController: ASAuthorizationControllerPresentationContextProviding, ASAuthorizationControllerDelegate {
   func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-    return self.view.window!
+    return view.window!
   }
   
   func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
 #if DEBUG
     error.printLocalized(class: type(of: self), functionName: #function)
 #endif
-    controllerOutput?.providerSignInCallback(result: .failure(AppError.server))
+    enqueueBanner(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                  text: AppError.server.localizedDescription)
+//    controllerOutput?.stopLoadingAnim {}
   }
   
   func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-      switch authorization.credential {
-      case let appleIDCredential as ASAuthorizationAppleIDCredential:
-          
-          // Create an account in your system.
-        guard let authorizationCode = appleIDCredential.authorizationCode,
-              let code = String(data: authorizationCode, encoding: .utf8) else {
-          controllerOutput?.providerSignInCallback(result: .failure(AppError.server))
-          return
-        }
-        print("authorizationCode", code)
-        controllerOutput?.startAuthorizationUI(provider: .Apple)
-        controllerInput?.providerSignIn(provider: .Apple, accessToken: code)
-//        let userIdentifier = appleIDCredential.user
-//        let fullName = appleIDCredential.fullName
-//        let email = appleIDCredential.email
-//
-//        // For the purpose of this demo app, store the `userIdentifier` in the keychain.
-//        //          self.saveUserInKeychain(userIdentifier)
-//        //
-//        //          // For the purpose of this demo app, show the Apple ID credential information in the `ResultViewController`.
-//        //          self.showResultViewController(userIdentifier: userIdentifier, fullName: fullName, email: email)
-//
-//      case let passwordCredential as ASPasswordCredential:
-//
-//          // Sign in using an existing iCloud Keychain credential.
-//          let username = passwordCredential.user
-//          let password = passwordCredential.password
-//
-////          // For the purpose of this demo app, show the password credential as an alert.
-////          DispatchQueue.main.async {
-////              self.showPasswordCredentialAlert(username: username, password: password)
-////          }
-          
-      default:
-          break
-      }
+    guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
+          let authorizationCode = appleIDCredential.authorizationCode,
+          let code = String(data: authorizationCode, encoding: .utf8)
+    else {
+      enqueueBanner(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemRed),
+                    text: AppError.server.localizedDescription)
+      return
+    }
+    
+    // Smooth delay
+    delay(seconds: 0.5) { [weak self] in
+      guard let self = self else { return }
+     
+      self.controllerOutput?.startLoadingAnim()
+    }
+    controllerInput?.providerSignIn(provider: .Apple, accessToken: code)
+    //        let userIdentifier = appleIDCredential.user
+    //        let fullName = appleIDCredential.fullName
+    //        let email = appleIDCredential.email
+    //
+    //        // For the purpose of this demo app, store the `userIdentifier` in the keychain.
+    //        //          self.saveUserInKeychain(userIdentifier)
+    //        //
+    //        //          // For the purpose of this demo app, show the Apple ID credential information in the `ResultViewController`.
+    //        //          self.showResultViewController(userIdentifier: userIdentifier, fullName: fullName, email: email)
+    //
+    //      case let passwordCredential as ASPasswordCredential:
+    //
+    //          // Sign in using an existing iCloud Keychain credential.
+    //          let username = passwordCredential.user
+    //          let password = passwordCredential.password
+    //
+    ////          // For the purpose of this demo app, show the password credential as an alert.
+    ////          DispatchQueue.main.async {
+    ////              self.showPasswordCredentialAlert(username: username, password: password)
+    ////          }
   }
 }

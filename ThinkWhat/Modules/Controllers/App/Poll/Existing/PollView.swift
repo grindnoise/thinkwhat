@@ -52,9 +52,9 @@ class PollView: UIView {
         showButton(delay: 0, flag: false)
       }
       if #available(iOS 15, *) {
-        self.actionButton.getSubview(type: UIButton.self)?.configuration?.baseBackgroundColor = self.selectedAnswer.isNil ? .systemGray : Colors.getColor(forId: self.selectedAnswer!.order)
+        self.actionButton.getSubview(type: UIButton.self)?.configuration?.baseBackgroundColor = self.selectedAnswer.isNil ? .systemGray : Constants.UI.Colors.getColor(forId: self.selectedAnswer!.order)
       } else {
-        self.actionButton.getSubview(type: UIButton.self)?.backgroundColor = self.selectedAnswer.isNil ? .systemGray : Colors.getColor(forId: self.selectedAnswer!.order)
+        self.actionButton.getSubview(type: UIButton.self)?.backgroundColor = self.selectedAnswer.isNil ? .systemGray : Constants.UI.Colors.getColor(forId: self.selectedAnswer!.order)
       }
     }
   }
@@ -329,7 +329,7 @@ class PollView: UIView {
   }()
   private lazy var gradient: CAGradientLayer = {
     let instance = CAGradientLayer()
-    let clear = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0).cgColor : UIColor.systemBackground.withAlphaComponent(0).cgColor
+    let clear = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme.withAlphaComponent(0).cgColor : UIColor.systemBackground.withAlphaComponent(0).cgColor
     instance.colors = [clear, clear, clear]
     instance.locations = [0.0, 1, 1]
     instance.frame = frame
@@ -364,7 +364,7 @@ class PollView: UIView {
 //    instance.size(.uniform(size: 40))
     let bgLayer = CAGradientLayer()
     bgLayer.type = .radial
-    bgLayer.colors = CAGradientLayer.getGradientColors(color: item?.topic.tagColor ?? Colors.main)
+    bgLayer.colors = CAGradientLayer.getGradientColors(color: item?.topic.tagColor ?? Constants.UI.Colors.main)
     bgLayer.locations = [0, 0.5, 1.15]
     bgLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
     bgLayer.endPoint = CGPoint(x: 1, y: 1)
@@ -432,9 +432,9 @@ class PollView: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
-    let clear = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0).cgColor : UIColor.systemBackground.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0.975).cgColor : UIColor.systemBackground.withAlphaComponent(0.975).cgColor
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
+    let clear = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme.withAlphaComponent(0).cgColor : UIColor.systemBackground.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme.withAlphaComponent(0.975).cgColor : UIColor.systemBackground.withAlphaComponent(0.975).cgColor
 //    let feathered = UIColor.systemBackground.withAlphaComponent(0.975).cgColor
     gradient.colors = [clear, clear, feathered]
   }
@@ -444,7 +444,7 @@ class PollView: UIView {
 private extension PollView {
   @MainActor
   func setupUI() {
-    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground
+    backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
     layer.masksToBounds = true
     addSubviews([
       collectionView,
@@ -545,8 +545,8 @@ private extension PollView {
   
   func showButton(delay: Double, flag: Bool) {
     // Animate gradient
-    let clear = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0).cgColor : UIColor.systemBackground.withAlphaComponent(0).cgColor
-    let feathered = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.withAlphaComponent(0.975).cgColor : UIColor.systemBackground.withAlphaComponent(0.975).cgColor
+    let clear = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme.withAlphaComponent(0).cgColor : UIColor.systemBackground.withAlphaComponent(0).cgColor
+    let feathered = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme.withAlphaComponent(0.975).cgColor : UIColor.systemBackground.withAlphaComponent(0.975).cgColor
     
     let colorAnimation = Animations.get(property: .Colors,
                                         fromValue: gradient.colors as Any,

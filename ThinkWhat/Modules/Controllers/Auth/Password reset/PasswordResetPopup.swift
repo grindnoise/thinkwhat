@@ -64,7 +64,7 @@ class PasswordResetPopup: UIView {
       var config = UIButton.Configuration.filled()
       config.cornerStyle = .small
       config.contentInsets = .init(top: 0, leading: padding, bottom: 0, trailing: padding)
-      config.baseBackgroundColor = Colors.main
+      config.baseBackgroundColor = Constants.UI.Colors.main
       config.contentInsets.top = padding
       config.contentInsets.bottom = padding
       config.contentInsets.leading = 20
@@ -76,7 +76,7 @@ class PasswordResetPopup: UIView {
                                                 ]))
       instance.configuration = config
     } else {
-      instance.backgroundColor = Colors.main
+      instance.backgroundColor = Constants.UI.Colors.main
       instance.publisher(for: \.bounds)
         .sink { instance.cornerRadius = $0.width * 0.025 }
         .store(in: &subscriptions)

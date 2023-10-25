@@ -154,7 +154,7 @@ class Topic: Decodable {
       imageId         = try container.decode(Int.self, forKey: .imageId)
       title           = try container.decode(String.self, forKey: .title)
       description     = try container.decode(String.self, forKey: .description)
-      tagColor        = try container.decode(String.self, forKey: .tagColor).hexColor ?? Colors.main
+      tagColor        = try container.decode(String.self, forKey: .tagColor).hexColor ?? Constants.UI.Colors.main
       ageRestriction  = (try? container.decode(Int.self, forKey: .ageRestriction)) ?? 0
       children        = (try? container.decode([Topic].self, forKey: .children)) ?? []
       totalCount      = try container.decode(Int.self, forKey: .total)

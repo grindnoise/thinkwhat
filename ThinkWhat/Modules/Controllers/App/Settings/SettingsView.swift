@@ -12,8 +12,6 @@ import Agrume
 
 class SettingsView: UIView {
   
-  
-  
   // MARK: - Public properties
   weak var viewInput: (SettingsViewInput & TintColorable)? {
     didSet {
@@ -23,9 +21,7 @@ class SettingsView: UIView {
       appSettingsView.color = viewInput.tintColor
     }
   }
-  
-  
-  
+
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()
@@ -355,10 +351,7 @@ class SettingsView: UIView {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
-    userSettingsView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-    appSettingsView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-    
+    updateTraits()
   }
   
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -381,6 +374,15 @@ private extension SettingsView {
     
     let touch = UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard))
     addGestureRecognizer(touch)
+    
+    
+  }
+  
+  @MainActor
+  func updateTraits() {
+    shadowView.layer.shadowOpacity = traitCollection.userInterfaceStyle == .dark ? 0 : 1
+    userSettingsView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
+    appSettingsView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
   }
   
   func setTasks() {

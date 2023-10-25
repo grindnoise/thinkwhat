@@ -310,7 +310,7 @@ extension SettingsController: SettingsViewInput {
         let content = EmailVerificationPopupContent(code: code,
                                                     retryTimeout: 60,
                                                     email: email.replacingOccurrences(of: username, with: "\(firstLetter)\(String.init(repeating: "*", count: username.count-2))\(lastLetter)"),
-                                                    color: Colors.main,
+                                                    color: Constants.UI.Colors.main,
                                                     canCancel: true)
         content.cancelPublisher
           .sink { Userprofiles.shared.current?.email = Userprofiles.shared.current!.email; banner.dismiss() }
@@ -331,7 +331,7 @@ extension SettingsController: SettingsViewInput {
             
             let banner = NewBanner(contentView: TextBannerContent(image:  UIImage(systemName: "checkmark.circle.fill")!,
                                                                   text: "account_email_confirmed".localized,
-                                                                  tintColor: Colors.main,
+                                                                  tintColor: Constants.UI.Colors.main,
                                                                   fontName: Fonts.Rubik.Regular,
                                                                   textStyle: .subheadline,
                                                                   textAlignment: .natural),

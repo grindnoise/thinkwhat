@@ -78,7 +78,7 @@ class TopicSelectionPopupContent: UIView {
   }()
   private lazy var tagCapsule: TagCapsule = { TagCapsule(text: "new_poll_topic".localized.uppercased(),
                                                          padding: 4,
-                                                         color: Colors.Logo.Flame.rawValue,
+                                                         color: Constants.UI.Colors.Logo.Flame.rawValue,
                                                          font: UIFont(name: Fonts.Bold, size: 20)!,
                                                          iconCategory: .Logo) }()
   private lazy var label: UIStackView = {

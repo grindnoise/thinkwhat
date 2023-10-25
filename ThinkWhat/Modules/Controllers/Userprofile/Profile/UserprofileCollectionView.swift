@@ -45,8 +45,6 @@ class UserprofileCollectionView: UICollectionView {
     }
   }
   
-
-  
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
   private var subscriptions = Set<AnyCancellable>()

@@ -114,7 +114,7 @@ class NewPollHyperlinkCell: UICollectionViewCell {
   }()
   private lazy var fgLine: Line = {
     let instance = Line()
-    instance.layer.strokeColor = Colors.Logo.Flame.rawValue.cgColor
+    instance.layer.strokeColor = Constants.UI.Colors.Logo.Flame.rawValue.cgColor
     
     return instance
   }()

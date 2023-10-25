@@ -58,7 +58,7 @@ class FlameIcon: AnimatedIcon, CAAnimationDelegate {
     }
     
     func setupProperties(){
-        self.active = Colors.System.Red.rawValue//Colors.UpperButtons.MaximumRed//K_COLOR_RED//K_COLOR_RED//UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
+        self.active = Constants.UI.Colors.System.Red.rawValue//Colors.UpperButtons.MaximumRed//K_COLOR_RED//K_COLOR_RED//UIColor(red:1.00, green: 0.15, blue:0.00, alpha:1.0)
         self.inactive = UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1)
     }
     

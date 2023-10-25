@@ -28,8 +28,8 @@ class RangeSlider: UIControl {
         }
     }
     var trackTintColor = UIColor(white: 0.8, alpha: 1)
-    var trackHighlightTintColor = Colors.main.withAlphaComponent(0.6)
-    var color = Colors.main {
+    var trackHighlightTintColor = Constants.UI.Colors.main.withAlphaComponent(0.6)
+    var color = Constants.UI.Colors.main {
         didSet {
             trackHighlightTintColor = color.withAlphaComponent(0.6)
         }

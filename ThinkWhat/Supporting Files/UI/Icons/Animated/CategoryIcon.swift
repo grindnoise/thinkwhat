@@ -64,10 +64,10 @@ class CategoryIcon: AnimatedIcon, CAAnimationDelegate {
 //        self.active = UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)
 //        self.active1 = UIColor(red:0.664, green: 0.664, blue:0.664, alpha:1)
         self.inactive = UIColor(red:0.663, green: 0.663, blue:0.663, alpha:1)
-        self.violet = Colors.System.Red.rawValue//Colors.UpperButtons.VioletBlueCrayola//K_COLOR_RED//K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0.84, green: 0.51, blue:1.00, alpha:1.0)
-        self.blue = Colors.System.Red.rawValue//Colors.UpperButtons.VioletBlueCrayola//K_COLOR_RED//K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0.00, green: 0.59, blue:1.00, alpha:1.0)
-        self.cyan = Colors.System.Red.rawValue//Colors.UpperButtons.VioletBlueCrayola//K_COLOR_RED//K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0, green: 0.569, blue:0.576, alpha:1)
-        self.greeen = Colors.System.Red.rawValue//Colors.UpperButtons.VioletBlueCrayola//K_COLOR_RED//K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0, green: 0.565, blue:0.318, alpha:1)
+        self.violet = Constants.UI.Colors.System.Red.rawValue//Constants.UI.Colors.UpperButtons.VioletBlueCrayola//K_COLOR_RED//K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0.84, green: 0.51, blue:1.00, alpha:1.0)
+        self.blue = Constants.UI.Colors.System.Red.rawValue//Constants.UI.Colors.UpperButtons.VioletBlueCrayola//K_COLOR_RED//K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0.00, green: 0.59, blue:1.00, alpha:1.0)
+        self.cyan = Constants.UI.Colors.System.Red.rawValue//Constants.UI.Colors.UpperButtons.VioletBlueCrayola//K_COLOR_RED//K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0, green: 0.569, blue:0.576, alpha:1)
+        self.greeen = Constants.UI.Colors.System.Red.rawValue//Constants.UI.Colors.UpperButtons.VioletBlueCrayola//K_COLOR_RED//K_COLOR_RED//UIColor(red:0.754, green: 0.245, blue:0.27, alpha:1)//UIColor(red:0, green: 0.565, blue:0.318, alpha:1)
     }
     
     func setupLayers(){

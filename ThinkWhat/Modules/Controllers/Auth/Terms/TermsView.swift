@@ -67,7 +67,7 @@ class TermsView: UIView {
       .sink { [unowned self] in
         opaque.layer.shadowOpacity = 1
         opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
-        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
         opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
         opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
       }
@@ -94,9 +94,9 @@ class TermsView: UIView {
     didSet {
       if hasReadAgreement {
         if #available(iOS 15, *) {
-          acceptButton.getSubview(type: UIButton.self)!.configuration?.baseBackgroundColor = Colors.main
+          acceptButton.getSubview(type: UIButton.self)!.configuration?.baseBackgroundColor = Constants.UI.Colors.main
         } else {
-          acceptButton.getSubview(type: UIButton.self)!.backgroundColor = Colors.main
+          acceptButton.getSubview(type: UIButton.self)!.backgroundColor = Constants.UI.Colors.main
         }
       }
     }
@@ -146,7 +146,7 @@ extension TermsView: TermsControllerOutput {
       let instance = Icon()
       instance.accessibilityIdentifier = "loadingIcon"
       instance.category = Icon.Category.Logo
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.scaleMultiplicator = 1.2
       instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
       instance.alpha = 0
@@ -157,7 +157,7 @@ extension TermsView: TermsControllerOutput {
       let instance = Icon()
       instance.accessibilityIdentifier = "loadingText"
       instance.category = Icon.Category.LogoText
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.scaleMultiplicator = 1.1
       instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
       instance.alpha = 0
@@ -201,7 +201,7 @@ extension TermsView: TermsControllerOutput {
                                                                             to: opaque),
                                         size: titleIcon.bounds.size))
       instance.category = Icon.Category.Logo
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.scaleMultiplicator = 1.2
       instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
       
@@ -213,7 +213,7 @@ extension TermsView: TermsControllerOutput {
                                         size: titleText.bounds.size))
       
       instance.category = Icon.Category.LogoText
-      instance.iconColor = Colors.main
+      instance.iconColor = Constants.UI.Colors.main
       instance.scaleMultiplicator = 1.1
       instance.widthAnchor.constraint(equalTo: instance.heightAnchor, multiplier: 4.5).isActive = true
       
@@ -226,7 +226,7 @@ extension TermsView: TermsControllerOutput {
       if #available(iOS 15, *) {
         var config = UIButton.Configuration.filled()
         config.cornerStyle = .capsule
-        config.baseBackgroundColor = Colors.main
+        config.baseBackgroundColor = Constants.UI.Colors.main
         config.attributedTitle = AttributedString("acceptButton".localized,
                                                   attributes: AttributeContainer([
                                                     .font: UIFont(name: Fonts.Rubik.SemiBold, size: 14) as Any,
@@ -241,7 +241,7 @@ extension TermsView: TermsControllerOutput {
                                                         .foregroundColor: UIColor.white as Any
                                                        ]),
                                     for: .normal)
-        instance.backgroundColor = Colors.main
+        instance.backgroundColor = Constants.UI.Colors.main
       }
       
       

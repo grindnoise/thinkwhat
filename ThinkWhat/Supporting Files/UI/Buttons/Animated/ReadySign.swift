@@ -45,7 +45,7 @@ class ReadySign: UIView, CAAnimationDelegate {
     }
     
     func setupProperties(){
-      self.main = Colors.main//UIColor(red:1.00, green: 0.49, blue:0.47, alpha:1.0)
+      self.main = Constants.UI.Colors.main//UIColor(red:1.00, green: 0.49, blue:0.47, alpha:1.0)
     }
     
     func setupLayers(){

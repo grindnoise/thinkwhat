@@ -33,7 +33,7 @@ class UsersFilterAgeCell: UICollectionViewCell {
   //Publishers
   public var agePublisher = CurrentValueSubject<[Int: Int]?, Never>(nil)
   //UI
-  public var color: UIColor = Colors.System.Red.rawValue {
+  public var color: UIColor = Constants.UI.Colors.System.Red.rawValue {
     didSet {
       rangeSlider.handleColor = color
       rangeSlider.tintColorBetweenHandles = color

@@ -199,7 +199,7 @@ class PollTitleCell: UICollectionViewCell {
     let instance = UIImageView(image: UIImage(systemName: "star.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(textStyle: UIFont.TextStyle.subheadline,
                                                                                              scale: .medium)))
-    instance.tintColor = Colors.Logo.Marigold.rawValue
+    instance.tintColor = Constants.UI.Colors.Logo.Marigold.rawValue
     instance.contentMode = .center
     return instance
   }()

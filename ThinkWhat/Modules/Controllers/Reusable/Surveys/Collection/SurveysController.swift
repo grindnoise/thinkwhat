@@ -95,7 +95,7 @@ class SurveysController: UIViewController, TintColorable {
     let instance = InsetTextField(rightViewVerticalScaleFactor: 1.25)
     instance.autocorrectionType = .no
     let v = UIActivityIndicatorView()
-    v.color = Colors.main
+    v.color = Constants.UI.Colors.main
     v.alpha = 0
     instance.rightView = v
     instance.rightViewMode = .always
@@ -181,7 +181,7 @@ class SurveysController: UIViewController, TintColorable {
     navigationItem.largeTitleDisplayMode = .never
     //Set bar visible
     navigationController?.navigationBar.alpha = 1
-    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -261,7 +261,7 @@ class SurveysController: UIViewController, TintColorable {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme : .systemBackground)
+    navigationController?.setBarColor(traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground)
   }
 }
 

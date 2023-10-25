@@ -31,7 +31,7 @@ public class ScrollArrowStyleKit : NSObject {
         
         
         //// Color Declarations
-      let fillColor = Colors.main.withAlphaComponent(0.5)//UIColor(red: 0.538, green: 0.538, blue: 0.538, alpha: 1.000)
+      let fillColor = Constants.UI.Colors.main.withAlphaComponent(0.5)//UIColor(red: 0.538, green: 0.538, blue: 0.538, alpha: 1.000)
         
         //// Bezier Drawing
         let bezierPath = UIBezierPath()

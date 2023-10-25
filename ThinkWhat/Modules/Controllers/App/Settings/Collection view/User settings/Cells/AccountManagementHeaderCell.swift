@@ -75,7 +75,7 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
   private lazy var headerImage: UIImageView = {
     let instance = UIImageView(image: UIImage(systemName: "gearshape.fill",
                                               withConfiguration: UIImage.SymbolConfiguration(scale: .medium)))
-    instance.tintColor = Colors.cellHeader
+    instance.tintColor = Constants.UI.Colors.cellHeader
     instance.contentMode = .scaleAspectFit
 //    instance.widthAnchor.constraint(equalTo: instance.heightAnchor).isActive = true
     instance.heightAnchor.constraint(equalToConstant: "T".height(withConstrainedWidth: 100, font: headerLabel.font)).isActive = true
@@ -84,7 +84,7 @@ class AccountManagementHeaderCell: UICollectionViewListCell {
   }()
   private lazy var headerLabel: UILabel = {
     let instance = UILabel()
-    instance.textColor = Colors.cellHeader
+    instance.textColor = Constants.UI.Colors.cellHeader
     instance.text = "account_management".localized.uppercased()
     instance.font = Fonts.cellHeader
     

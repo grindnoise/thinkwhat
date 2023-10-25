@@ -114,7 +114,7 @@ class ProgressCapsule: UIView {
   init(placeholder: String = "",
        padding: CGFloat = 8,
        backgroundColor: UIColor = .systemGray4,
-       foregroundColor: UIColor = Colors.Logo.Flame.rawValue,
+       foregroundColor: UIColor = Constants.UI.Colors.Logo.Flame.rawValue,
        font: UIFont,
        iconCategory: Icon.Category) {
     self.placeholder = placeholder

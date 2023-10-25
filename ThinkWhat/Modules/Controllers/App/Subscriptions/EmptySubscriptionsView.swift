@@ -69,7 +69,7 @@ class EmptyPublicationsView: UIView {
   private lazy var logoIcon: Logo = {
     let instance = Logo()
     instance.layer.shadowOpacity = 1
-    instance.layer.shadowColor = Colors.main.withAlphaComponent(0.35).cgColor
+    instance.layer.shadowColor = Constants.UI.Colors.main.withAlphaComponent(0.35).cgColor
     instance.layer.shadowRadius = padding/2
     instance.layer.shadowOffset = .zero
     
@@ -159,7 +159,7 @@ class EmptyPublicationsView: UIView {
       .sink { [unowned self] in
         opaque.layer.shadowOpacity = 1
         opaque.layer.shadowPath = UIBezierPath(roundedRect: $0, cornerRadius: $0.height/2).cgPath
-        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
+        opaque.layer.shadowColor = self.traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.main.withAlphaComponent(0.25).cgColor : UIColor.black.withAlphaComponent(0.25).cgColor
         opaque.layer.shadowRadius = self.traitCollection.userInterfaceStyle == .dark ? 8 : 4
         opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
       }
@@ -190,11 +190,11 @@ class EmptyPublicationsView: UIView {
        showsButton: Bool = false,
        showsLogo: Bool = false,
        buttonText: String = "",
-       buttonColor: UIColor = Colors.main,
+       buttonColor: UIColor = Constants.UI.Colors.main,
        backgroundLightColor: UIColor = .clear,
        backgroundDarkColor: UIColor = .clear,
-       spiralLightColor: UIColor = Colors.spiralLight, // UIColor.white.blended(withFraction: 0.04, of: UIColor.lightGray),//"#1E1E1E".hexColor!.withAlphaComponent(0.04),
-       spiralDarkColor: UIColor = Colors.spiralDark) { // }"#1E1E1E".hexColor!.withAlphaComponent(0.7)) {
+       spiralLightColor: UIColor = Constants.UI.Colors.spiralLight, // UIColor.white.blended(withFraction: 0.04, of: UIColor.lightGray),//"#1E1E1E".hexColor!.withAlphaComponent(0.04),
+       spiralDarkColor: UIColor = Constants.UI.Colors.spiralDark) { // }"#1E1E1E".hexColor!.withAlphaComponent(0.7)) {
     self.mode = mode
     self.labelText = labelText
     self.showsLogo = showsLogo
@@ -283,7 +283,7 @@ private extension EmptyPublicationsView {
 //    }
     
     //    label.layer.masksToBounds = false
-    //    label.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Colors.darkTheme.cgColor : UIColor.lightGray.withAlphaComponent(0.25).cgColor
+    //    label.layer.shadowColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme.cgColor : UIColor.lightGray.withAlphaComponent(0.25).cgColor
     //    label.layer.shadowOffset = .zero
     //    label.layer.shadowRadius = padding
     //    label.layer.shadowOpacity = 1

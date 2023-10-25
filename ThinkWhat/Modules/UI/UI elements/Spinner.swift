@@ -12,7 +12,7 @@ public final class SpiralSpinner: UIView {
   
   private var color: UIColor
   
-  init(frame: CGRect = .zero, color: UIColor = Colors.main) {
+  init(frame: CGRect = .zero, color: UIColor = Constants.UI.Colors.main) {
     self.color = color
     
     super.init(frame: frame)

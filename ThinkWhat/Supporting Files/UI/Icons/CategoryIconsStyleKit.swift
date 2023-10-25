@@ -5956,7 +5956,7 @@ public class CategoryIconsStyleKit : NSObject {
         
         //// Color Declarations
         let innerColor = UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
-      let color = outerColor ?? Colors.main
+      let color = outerColor ?? Constants.UI.Colors.main
         color.setFill()
         
         //        if isFramed {

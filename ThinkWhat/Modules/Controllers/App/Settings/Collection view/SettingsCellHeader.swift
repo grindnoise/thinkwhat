@@ -100,7 +100,7 @@ class SettingsCellHeader: UICollectionReusableView {
         instance.backgroundColor = .clear
         instance.heightAnchor.constraint(equalTo: instance.widthAnchor, multiplier: 1/1).isActive = true
         instance.contentMode = .center
-        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+        instance.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
         
         instance.transform = isBadgeEnabled ? .identity : CGAffineTransform(scaleX: 0.5, y: 0.5)
         instance.alpha = isBadgeEnabled ? 1 : 0
@@ -294,7 +294,7 @@ class SettingsCellHeader: UICollectionReusableView {
         super.traitCollectionDidChange(previousTraitCollection)
         
         backgroundColor = traitCollection.userInterfaceStyle == .dark ? .secondarySystemBackground : .systemBackground
-        badge.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Colors.main
+        badge.tintColor = traitCollection.userInterfaceStyle == .dark ? .systemBlue : Constants.UI.Colors.main
         help.tintColor = .secondaryLabel//traitCollection.userInterfaceStyle == .dark ? .systemBlue : K_COLOR_RED
     }
 }

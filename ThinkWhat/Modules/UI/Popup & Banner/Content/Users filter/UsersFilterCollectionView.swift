@@ -65,7 +65,7 @@ class UsersFilterCollectionView: UICollectionView {
   
   // MARK: - Initialization
   init(userprofiles: [Userprofile],
-       color: UIColor = Colors.System.Red.rawValue,
+       color: UIColor = Constants.UI.Colors.System.Red.rawValue,
        filtered: [Userprofile] = [],
        selectedMinAge: Int,
        selectedMaxAge: Int,

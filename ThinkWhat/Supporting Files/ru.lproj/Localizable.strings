@@ -125,9 +125,10 @@
 "mailTF" = "Электронная почта";
 "mail_example_placeholder" = "yourmail@example.domain";
 "passwordTF" = "Пароль";
-"username_is_busy" = "Пользователь существует";
-"username_is_empty" = "Заполните поле";
-"username_is_short" = "Недостаточно символов";
+"username_is_busy" = "Имя уже используется, попробуйте другое";
+"username_is_empty" = "Имя пользователя не должно быть пустым";
+"username_is_short" = "Недостаточно символов в имени, минимальная длина ";
+"username_is_correct" = "Имя можно использовать";
 "email_confirm_reminder" = "Подтвердите электронную почту на случай утери пароля";
 "email_is_empty_reminder" = "Укажите электронную почту на случай утери пароля";
 "email_is_confirmed" = "Электронная почта подтверждена";
@@ -167,13 +168,19 @@
 //Recover VC
 "profile_fill" = "Заполните профиль";
 
-//FillProfile VC
-"firstNameTF" = "Имя";
-"lastNameTF" = "Фамилия";
-"birthDateTF" = "Дата рождения";
-"cityTF" = "Город";
-"city_placeholder" = "Введите город";
-"fill_necessary_fields" = "Пожалуйста, заполните нобходимые поля: ";
+//Profile creation
+"new_profile_username" = "Имя пользователя";
+"new_profile_gender" = "Пол";
+"new_profile_gender_placeholder" = "Выберите пол";
+"new_profile_gender_caution" = "Пожалуйста, выберите пол";
+"new_profile_first_name" = "Имя";
+"new_profile_last_name" = "Фамилия";
+"new_profile_birth_date" = "Дата рождения";
+"new_profile_birth_date_placeholder" = "Выберите дату рождения";
+"new_profile_birth_caution" = "Пожалуйста, выберите дату рождения";
+"new_profile_city" = "Город";
+"new_profile_city_placeholder" = "Введите город";
+"new_profile_fill_necessary_fields" = "Пожалуйста, заполните нобходимые поля: ";
 
 //Hot VC
 "hot" = "Горячие";
