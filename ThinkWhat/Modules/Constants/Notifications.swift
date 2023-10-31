@@ -15,6 +15,7 @@ class Notifications {
   struct UIEvents {
     static let tabItemPublisher = PassthroughSubject<[Enums.Tab: Enums.Tab], Never>() // [newValue: oldValue]
     static let topicSubscriptionPublisher = PassthroughSubject<Topic, Error>()
+    static let enqueueBannerPublisher = PassthroughSubject<NewBanner, Never>()
   }
   
   struct Network {

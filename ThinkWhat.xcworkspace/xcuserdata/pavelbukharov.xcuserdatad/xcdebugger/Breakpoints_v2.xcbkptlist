@@ -3847,8 +3847,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/MainController/MainController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "684"
-            endingLineNumber = "684"
+            startingLineNumber = "692"
+            endingLineNumber = "692"
             landmarkName = "loadData()"
             landmarkType = "7">
             <Locations>
@@ -4116,8 +4116,8 @@
             filePath = "ThinkWhat/Modules/Controllers/Auth/Sign in/SignInView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "791"
-            endingLineNumber = "791"
+            startingLineNumber = "781"
+            endingLineNumber = "781"
             landmarkName = "handleTap(_:)"
             landmarkType = "7">
             <Locations>
@@ -4399,8 +4399,8 @@
             filePath = "ThinkWhat/Modules/UI/Static/Avatar/Avatar.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "675"
-            endingLineNumber = "675"
+            startingLineNumber = "688"
+            endingLineNumber = "688"
             landmarkName = "setupUI()"
             landmarkType = "7">
          </BreakpointContent>
@@ -4415,8 +4415,8 @@
             filePath = "ThinkWhat/Modules/UI/Static/Avatar/Avatar.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "739"
-            endingLineNumber = "739"
+            startingLineNumber = "752"
+            endingLineNumber = "752"
             landmarkName = "setupUI()"
             landmarkType = "7">
          </BreakpointContent>
@@ -4431,8 +4431,8 @@
             filePath = "ThinkWhat/Modules/Models/User.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "725"
-            endingLineNumber = "725"
+            startingLineNumber = "731"
+            endingLineNumber = "731"
             landmarkName = "downloadImage()"
             landmarkType = "7">
             <Locations>
@@ -4700,8 +4700,8 @@
             filePath = "ThinkWhat/Modules/UI/Static/Avatar/Avatar.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "807"
-            endingLineNumber = "807"
+            startingLineNumber = "820"
+            endingLineNumber = "820"
             landmarkName = "setImage(for:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4716,8 +4716,8 @@
             filePath = "ThinkWhat/Modules/Models/User.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "328"
-            endingLineNumber = "328"
+            startingLineNumber = "332"
+            endingLineNumber = "332"
             landmarkName = "image"
             landmarkType = "24">
          </BreakpointContent>
@@ -5338,8 +5338,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "559"
-            endingLineNumber = "559"
+            startingLineNumber = "560"
+            endingLineNumber = "560"
             landmarkName = "setLoading()"
             landmarkType = "7">
          </BreakpointContent>
@@ -5354,8 +5354,8 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "451"
-            endingLineNumber = "451"
+            startingLineNumber = "453"
+            endingLineNumber = "453"
             landmarkName = "setBarButtonItems()"
             landmarkType = "7">
             <Locations>
@@ -5402,73 +5402,9 @@
             filePath = "ThinkWhat/Modules/Controllers/App/Poll/Existing/PollController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "411"
-            endingLineNumber = "411"
+            startingLineNumber = "413"
+            endingLineNumber = "413"
             landmarkName = "setBarButtonItems()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "59752FD0-C992-4E15-AD35-7BE591C3C303"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/MainController/MainController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "416"
-            endingLineNumber = "416"
-            landmarkName = "requestPublication(shareLink:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "6A5EC297-76A5-47A2-8E9A-AC77333EEE01"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/MainController/MainController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "420"
-            endingLineNumber = "420"
-            landmarkName = "requestPublication(shareLink:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "00CE4F93-3087-4D8E-B2C6-387ACC0BB6E9"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/MainController/MainController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "964"
-            endingLineNumber = "964"
-            landmarkName = "loadSharedLink()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "FA6DA172-1581-43EA-9EAA-9C89750895F4"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ThinkWhat/Modules/Controllers/App/MainController/MainController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "869"
-            endingLineNumber = "869"
-            landmarkName = "setLoadingSpinner(on:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -5693,6 +5629,292 @@
             endingLineNumber = "734"
             landmarkName = "editAge()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "050F7081-BE4E-4781-99C5-0C8C3F190C06 - 46086945bd966408"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.UserSettingsCredentialsCell.editAge() -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Settings/Collection%20view/User%20settings/Cells/UserSettingsCredentialsCell.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "734"
+                  endingLineNumber = "734"
+                  offsetFromSymbolStart = "164">
+               </Location>
+               <Location
+                  uuid = "050F7081-BE4E-4781-99C5-0C8C3F190C06 - af8533d869ba35bc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat.UserSettingsCredentialsCell.editAge() -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Settings/Collection%20view/User%20settings/Cells/UserSettingsCredentialsCell.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "734"
+                  endingLineNumber = "734"
+                  offsetFromSymbolStart = "224">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1F2C7C32-D1B2-4376-A7E8-DCAC1D8E84BD"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/MainController/MainController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "912"
+            endingLineNumber = "912"
+            landmarkName = "loadSharedLink()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "821EC9E7-A893-4A30-B896-B16D3679EB0C"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Models/Survey.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "90"
+            endingLineNumber = "90"
+            landmarkName = "shareLink"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "821EC9E7-A893-4A30-B896-B16D3679EB0C - 145197848babf3dc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat.Survey.shareLink.didset : ThinkWhat.ShareLink"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Models/Survey.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "90"
+                  endingLineNumber = "90"
+                  offsetFromSymbolStart = "292">
+               </Location>
+               <Location
+                  uuid = "821EC9E7-A893-4A30-B896-B16D3679EB0C - f570a6bd040a27f8"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.Survey.shareLink.didset : ThinkWhat__local_.ShareLink"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Models/Survey.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "90"
+                  endingLineNumber = "90"
+                  offsetFromSymbolStart = "292">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E240F47F-6042-4E9B-97A1-0EF7556E4956"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Models/SurveyReference.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "144"
+            endingLineNumber = "144"
+            landmarkName = "shareLink"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "E240F47F-6042-4E9B-97A1-0EF7556E4956 - 9db48187c87c693"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat.SurveyReference.shareLink.didset : ThinkWhat.ShareLink"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Models/SurveyReference.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "144"
+                  endingLineNumber = "144"
+                  offsetFromSymbolStart = "292">
+               </Location>
+               <Location
+                  uuid = "E240F47F-6042-4E9B-97A1-0EF7556E4956 - 6dd7f537794c5d01"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.SurveyReference.shareLink.didset : ThinkWhat__local_.ShareLink"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Models/SurveyReference.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "144"
+                  endingLineNumber = "144"
+                  offsetFromSymbolStart = "292">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0A1A062D-C121-4105-B201-2B8DF2C17783"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/Languages/LanguagesCollectionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
+            landmarkName = "collectionView(_:didSelectItemAt:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "0A1A062D-C121-4105-B201-2B8DF2C17783 - ae6b825f5d109e0f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.LanguagesCollectionView.collectionView(_: __C.UICollectionView, didSelectItemAt: Foundation.IndexPath) -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Settings/Collection%20view/Languages/LanguagesCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "172"
+                  endingLineNumber = "172"
+                  offsetFromSymbolStart = "436">
+               </Location>
+               <Location
+                  uuid = "0A1A062D-C121-4105-B201-2B8DF2C17783 - ae6b825f5d109e2e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.LanguagesCollectionView.collectionView(_: __C.UICollectionView, didSelectItemAt: Foundation.IndexPath) -&gt; ()"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Settings/Collection%20view/Languages/LanguagesCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "171"
+                  endingLineNumber = "171"
+                  offsetFromSymbolStart = "164">
+               </Location>
+               <Location
+                  uuid = "0A1A062D-C121-4105-B201-2B8DF2C17783 - 375573271f24b831"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat.LanguagesCollectionView.collectionView(_: __C.UICollectionView, didSelectItemAt: Foundation.IndexPath) -&gt; ()"
+                  moduleName = "ThinkWhat"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Settings/Collection%20view/Languages/LanguagesCollectionView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "171"
+                  endingLineNumber = "171"
+                  offsetFromSymbolStart = "184">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BA27CC90-EFAF-4F68-A3B2-E97A02163DC6"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/Languages/LanguagesCollectionView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "130"
+            endingLineNumber = "130"
+            landmarkName = "setupUI()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "514F9528-48FF-475E-BBE8-C4C1B414054B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ThinkWhat/Modules/Controllers/App/Settings/Collection view/Languages/LanguageCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "21"
+            endingLineNumber = "21"
+            landmarkName = "item"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "514F9528-48FF-475E-BBE8-C4C1B414054B - 77ef5fcb71e8967e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.LanguageCell.init(frame: __C.CGRect) -&gt; ThinkWhat__local_.LanguageCell"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Settings/Collection%20view/Languages/LanguageCell.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "34"
+                  endingLineNumber = "34"
+                  offsetFromSymbolStart = "476">
+               </Location>
+               <Location
+                  uuid = "514F9528-48FF-475E-BBE8-C4C1B414054B - fa36eeeffe33007c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.LanguageCell.init(coder: __C.NSCoder) -&gt; Swift.Optional&lt;ThinkWhat__local_.LanguageCell&gt;"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Settings/Collection%20view/Languages/LanguageCell.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "34"
+                  endingLineNumber = "34"
+                  offsetFromSymbolStart = "448">
+               </Location>
+               <Location
+                  uuid = "514F9528-48FF-475E-BBE8-C4C1B414054B - 41aeea591097181a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ThinkWhat__local_.LanguageCell.item.didset : Swift.Optional&lt;ThinkWhat__local_.LanguageItem&gt;"
+                  moduleName = "ThinkWhat (local)"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pavelbukharov/Documents/Dev/iOS/Projects/ThinkWhat/ThinkWhat/thinkwhat/ThinkWhat/Modules/Controllers/App/Settings/Collection%20view/Languages/LanguageCell.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "33"
+                  endingLineNumber = "33"
+                  offsetFromSymbolStart = "184">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

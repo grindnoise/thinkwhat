@@ -61,7 +61,7 @@ class VotersFilter: UIView {
                 rangeSlider.maxValue = Float(maxAge)
                 lowerAgeLabel.text = "\(lowerAge)"
                 upperAgeLabel.text = "\(upperAge)"
-              if let _gender = filters!["gender"] as? Enums.Gender {
+              if let _gender = filters!["gender"] as? Enums.User.Gender {
                     gender = _gender
                     switch _gender {
                     case .Male:
@@ -206,7 +206,7 @@ class VotersFilter: UIView {
     private var filtered: [Userprofile]? = []
     private var minAge = 18
     private var maxAge = 99
-  private var gender: Enums.Gender = .Unassigned {
+  private var gender: Enums.User.Gender = .Unassigned {
         didSet {
             if oldValue != gender {
                 filters!["gender"] = gender as AnyObject

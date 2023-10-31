@@ -32,7 +32,7 @@ class UsersFilterCollectionView: UICollectionView {
   public private(set) var filtered: [Userprofile] = []
   public private(set) var selectedMinAge: Int
   public private(set) var selectedMaxAge: Int
-  public private(set) var selectedGender: Enums.Gender
+  public private(set) var selectedGender: Enums.User.Gender
   
   
   
@@ -69,7 +69,7 @@ class UsersFilterCollectionView: UICollectionView {
        filtered: [Userprofile] = [],
        selectedMinAge: Int,
        selectedMaxAge: Int,
-       selectedGender: Enums.Gender) {//?, filters: [String : AnyObject]?) {
+       selectedGender: Enums.User.Gender) {//?, filters: [String : AnyObject]?) {
     self.color = color
     self.userprofiles = userprofiles
     self.selectedMinAge = selectedMinAge

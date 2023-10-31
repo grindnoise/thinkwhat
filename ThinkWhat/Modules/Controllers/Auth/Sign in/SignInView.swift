@@ -459,69 +459,59 @@ class SignInView: UIView {
 extension SignInView: SignInControllerOutput {
   /// Animates sign in routine, disables UI interaction within
   func startLoadingAnim() {
-    isUserInteractionEnabled = false
-    
-    let bgView = UIView()
-    bgView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
-    bgView.accessibilityIdentifier = "bgView"
-    bgView.alpha = 0
-    bgView.addEquallyTo(to: self)
-    
-    let fakeLogo = Logo(frame: CGRect(origin: self.stack.convert(logoIcon.frame.origin, to: self),
-                                                                    size: logoIcon.bounds.size))
-    fakeLogo.removeConstraints(fakeLogo.getAllConstraints())
-    fakeLogo.accessibilityIdentifier = "fakeLogo"
-    addSubview(fakeLogo)
-    logoIcon.alpha = 0
-    
-    let spiral = Icon(frame: .zero,
-                      category: .Spiral,
+    let spinner = Logo()
+    let spiral = Icon(frame: .zero, category: .Spiral,
                       scaleMultiplicator: 1,
                       iconColor: traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.spiralDark : Constants.UI.Colors.spiralLight)
-    bgView.insertSubview(spiral, belowSubview: fakeLogo)
+    let bgView = UIView()
+    bgView.alpha = 0
+    bgView.layer.zPosition = 2000
+    bgView.accessibilityIdentifier = "loadingSpinner"
+    bgView.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
+    bgView.addSubview(spiral)
+    bgView.addSubview(spinner)
+    bgView.layer.masksToBounds = true
+    appDelegate.window?.addSubview(bgView)
+    bgView.edgesToSuperview()
+    
     spiral.aspectRatio(1)
     spiral.widthToHeight(of: bgView, multiplier: 1.5)
     spiral.centerInSuperview()
     spiral.transform = .init(scaleX: 0.75, y: 0.75)
     spiral.alpha = 0
+    spinner.centerXToSuperview()
+    spinner.centerYToSuperview()
+    spinner.widthToSuperview(multiplier: 0.31)
+    spinner.alpha = 0
     
-    let tempLogo = Logo()
-    tempLogo.alpha = 0
-    tempLogo.placeInCenter(of: bgView)
-    tempLogo.translatesAutoresizingMaskIntoConstraints = false
-    tempLogo.widthAnchor.constraint(equalTo: tempLogo.heightAnchor).isActive = true
-    tempLogo.widthAnchor.constraint(equalTo: bgView.widthAnchor, multiplier: 0.4).isActive = true
+    let movingLogo = Logo(frame: CGRect(origin: self.stack.convert(logoIcon.frame.origin, to: self),
+                                                                    size: logoIcon.bounds.size))
+    movingLogo.removeConstraints(movingLogo.getAllConstraints())
+    movingLogo.accessibilityIdentifier = "movingLogo"
+    bgView.addSubview(movingLogo)
+    logoIcon.alpha = 0
     
     bgView.setNeedsLayout()
     bgView.layoutIfNeeded()
-    let coordinate = bgView.convert(tempLogo.frame.origin, to: bgView)
+    let coordinate = bgView.convert(spinner.frame.origin, to: bgView)
     
-    UIView.animate(withDuration: 0.6,
+    // Animations
+    spiral.startRotating(duration: 5)
+    UIView.animate(withDuration: 0.3,
                    delay: 0,
-                   usingSpringWithDamping: 0.7,
-                   initialSpringVelocity: 0.3,
-                   options: [.curveEaseInOut],
-                   animations: {
+                   options: .curveEaseInOut) {
       bgView.alpha = 1
-      fakeLogo.frame.origin = coordinate
-      fakeLogo.frame.size = tempLogo.bounds.size
-    }) { _ in
-      tempLogo.alpha = 1
-      fakeLogo.alpha = 0
-      
-      // Spiral presentation anim
-      UIView.animate(withDuration: 0.2,
+      movingLogo.frame.origin = coordinate
+      movingLogo.frame.size = spinner.bounds.size
+      spiral.alpha = 1
+      spiral.transform = .identity
+    } completion: { _ in
+      spinner.alpha = 1
+      movingLogo.alpha = 0
+      UIView.animate(withDuration: 1,
                      delay: 0,
-                     options: .curveEaseInOut) {
-        spiral.startRotating(duration: 5)
-        spiral.alpha = 1
-        spiral.transform = .identity
-      } completion: { _ in /*spiral.startRotating(duration: 5)*/ }
-      
-      // Pulse animation
-      UIView.animate(withDuration: 0.75, delay: 0, options: [.autoreverse, .repeat, .curveEaseInOut]) {
-        tempLogo.transform = .init(scaleX: 0.95, y: 0.95)
-        tempLogo.alpha = 0.95
+                     options: [.autoreverse, .repeat, .curveEaseInOut]) {
+        spinner.transform = .init(scaleX: 0.95, y: 0.95)
       }
     }
   }
@@ -529,21 +519,20 @@ extension SignInView: SignInControllerOutput {
   /// Stops loading animation and enables UI interaction
   /// - Parameter completion: executed instructions
   func stopLoadingAnim(completion: @escaping Closure) {
-    isUserInteractionEnabled = true
-    
-    guard let bgView = getSubview(type: UIView.self, identifier: "bgView"),//let blurEffectView = getSubview(type: UIVisualEffectView.self),
-          let fakeLogo = getSubview(type: Logo.self, identifier: "fakeLogo"),
-          let tempLogo = bgView.getSubview(type: Logo.self),
-          let spiral = bgView.getSubview(type: Icon.self)
+    guard let bgView = appDelegate.window?.getSubview(type: UIView.self, identifier: "loadingSpinner"),
+          let movingLogo = bgView.getSubview(type: Logo.self, identifier: "movingLogo"),
+          let spiral = bgView.getSubview(type: Icon.self),
+          let tempLogo = bgView.getSubview(type: Logo.self)
     else { return }
     
+
     UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
-      spiral.transform = .init(scaleX: 1.25, y: 1.25)
-      spiral.alpha = 0
       tempLogo.transform = .identity
       tempLogo.alpha = 1
     }) { _ in
       spiral.removeFromSuperview()
+      tempLogo.alpha = 0
+      movingLogo.alpha = 1
       UIView.animate(withDuration: 0.6,
                      delay: 0,
                      usingSpringWithDamping: 0.7,
@@ -552,18 +541,19 @@ extension SignInView: SignInControllerOutput {
                      animations: { [weak self] in
         guard let self = self else { return }
         
-        bgView.alpha = 0
-        fakeLogo.alpha = 1
-        fakeLogo.transform = .identity
-        fakeLogo.frame.origin = self.stack.convert(logoIcon.frame.origin, to: self)
-        fakeLogo.frame.size = self.logoIcon.frame.size
+        bgView.backgroundColor = .clear
+        spiral.transform = .init(scaleX: 1.25, y: 1.25)
+        spiral.alpha = 0
+        movingLogo.frame.origin = self.stack.convert(logoIcon.frame.origin, to: self)
+        movingLogo.frame.size = self.logoIcon.frame.size
         
       }) { [weak self] _ in
         guard let self = self else { return }
         
         self.logoIcon.alpha = 1
+        movingLogo.alpha = 0
         bgView.removeFromSuperview()
-        fakeLogo.removeFromSuperview()
+        movingLogo.removeFromSuperview()
         tempLogo.removeFromSuperview()
         completion()
       }
@@ -663,7 +653,7 @@ extension SignInView: SignInControllerOutput {
     
     
     ///Fake icons to animate
-    let fakeLogoIcon: Icon = {
+    let movingLogoIcon: Icon = {
       let instance = Icon(frame: CGRect(origin: logoIcon.superview!.convert(logoIcon.frame.origin,
                                                                             to: opaque),
                                         size: logoIcon.bounds.size))
@@ -673,7 +663,7 @@ extension SignInView: SignInControllerOutput {
       
       return instance
     }()
-    let fakeLogoText: Icon = {
+    let movingLogoText: Icon = {
       let instance = Icon(frame: CGRect(origin: logoText.superview!.convert(logoText.frame.origin,
                                                                             to: opaque),
                                         size: logoText.bounds.size))
@@ -685,12 +675,12 @@ extension SignInView: SignInControllerOutput {
       return instance
     }()
 
-    opaque.addSubviews([fakeLogoIcon, fakeLogoText])
+    opaque.addSubviews([movingLogoIcon, movingLogoText])
     logoIcon.alpha = 0
     logoText.alpha = 0
 
-    fakeLogoIcon.icon.add(Animations.get(property: .Path,
-                                     fromValue: (fakeLogoIcon.icon as! CAShapeLayer).path as Any,
+    movingLogoIcon.icon.add(Animations.get(property: .Path,
+                                     fromValue: (movingLogoIcon.icon as! CAShapeLayer).path as Any,
                                      toValue: (loadingIcon.icon as! CAShapeLayer).path as Any,
                                      duration: 0.3,
                                      delay: 0,
@@ -700,8 +690,8 @@ extension SignInView: SignInControllerOutput {
                                      delegate: self,
                                      isRemovedOnCompletion: false),
                       forKey: nil)
-    fakeLogoText.icon.add(Animations.get(property: .Path,
-                                     fromValue: (fakeLogoText.icon as! CAShapeLayer).path as Any,
+    movingLogoText.icon.add(Animations.get(property: .Path,
+                                     fromValue: (movingLogoText.icon as! CAShapeLayer).path as Any,
                                      toValue: (loadingText.icon as! CAShapeLayer).path as Any,
                                      duration: 0.3,
                                      delay: 0,
@@ -727,18 +717,18 @@ extension SignInView: SignInControllerOutput {
         $0.alpha = 0
         $0.transform = .init(scaleX: 0.75, y: 0.75)
       }
-      fakeLogoIcon.frame = CGRect(origin: loadingStack.convert(loadingIcon.frame.origin,
+      movingLogoIcon.frame = CGRect(origin: loadingStack.convert(loadingIcon.frame.origin,
                                                                       to: opaque),
                                   size: loadingIcon.bounds.size)
-      fakeLogoText.frame = CGRect(origin: loadingStack.convert(loadingText.frame.origin,
+      movingLogoText.frame = CGRect(origin: loadingStack.convert(loadingText.frame.origin,
                                                                       to: opaque),
                                   size: loadingText.bounds.size)
 
     }) { _ in
       loadingIcon.alpha = 1
       loadingText.alpha = 1
-      fakeLogoText.removeFromSuperview()
-      fakeLogoIcon.removeFromSuperview()
+      movingLogoText.removeFromSuperview()
+      movingLogoIcon.removeFromSuperview()
       completion()
     }
   }

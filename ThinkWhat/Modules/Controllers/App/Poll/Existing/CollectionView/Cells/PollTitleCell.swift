@@ -41,7 +41,7 @@ class PollTitleCell: UICollectionViewCell {
         .sink { [weak self] in
           guard let self = self else { return }
           
-          self.avatar.setProgress(value: Double($0), animated: true)
+          self.avatar.setProgress(value: Double($0), duration: 0.3)
         }
         .store(in: &subscriptions)
     }

@@ -53,6 +53,18 @@ struct Enums {
     case enabled, disabled
   }
   
+  
+  
+  struct User {
+    enum UsernameState { case correct, waiting, busy, error, empty, short }
+    enum GenderState { case filled, empty }
+    enum Gender: String, CaseIterable {
+      case Male           = "Male"
+      case Female         = "Female"
+      case Unassigned     = "all_genders"
+    }
+  }
+  
   //enum TokenState {
   //    case Received
   //    case Error
@@ -71,12 +83,6 @@ struct Enums {
   enum SessionType: String {
     case authorized     = "authorized"
     case unauthorized   = "unauthorized"
-  }
-  
-  enum Gender: String, CaseIterable {
-    case Male           = "Male"
-    case Female         = "Female"
-    case Unassigned     = "all_genders"
   }
   
   enum InternetConnection {
@@ -291,7 +297,7 @@ struct Enums {
         
         return allowed.filter { $0.topic == topic }
       case .user:
-        guard let userprofile = userprofile else { return [] }
+        guard let user = userprofile else { return [] }
         
         return allowed
           .filter { $0.owner == userprofile && !$0.isAnonymous }

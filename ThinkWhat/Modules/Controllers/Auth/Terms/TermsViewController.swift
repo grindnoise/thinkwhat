@@ -86,8 +86,6 @@ class TermsViewController: UIViewController {
 #endif
   }
   
-  
-  
   // MARK: - Overridden Methods
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -134,6 +132,14 @@ class TermsViewController: UIViewController {
     
     willMoveToParent = parent.isNil ? true : false
   }
+  
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    
+    if #unavailable(iOS 17) {
+      updateTraits()
+    }
+  }
 }
 
 extension TermsViewController: TermsViewInput {
@@ -167,13 +173,21 @@ private extension TermsViewController {
   @MainActor
   func setupUI() {
     navigationController?.setNavigationBarHidden(false, animated: false)
-//    setNavigationBarTintColor(Colors.main)
-//    fillNavigationBar()
+    navigationController?.setBarShadow(on: false)
     navigationController?.setBarColor()
-//    navigationItem.titleView = logoStack
+    
+    // Traits listener
+    if #available(iOS 17.0, *) {
+      registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(self.updateTraits))
+    }
     
     guard let navBar = navigationController?.navigationBar else { return }
     
     logoStack.placeInCenter(of: navBar)
+  }
+  
+  @objc
+  func updateTraits() {
+    navigationController?.setBarShadow(on: false)
   }
 }

@@ -12,7 +12,7 @@ import Combine
 class UsersFilterGenderCell: UICollectionViewCell {
   
   // MARK: - Public properties
-  public var selectedGender: Enums.Gender = .Unassigned {
+  public var selectedGender: Enums.User.Gender = .Unassigned {
     didSet {
       guard oldValue != selectedGender else { return }
       
@@ -33,9 +33,7 @@ class UsersFilterGenderCell: UICollectionViewCell {
     }
   }
   //Publishers
-  public let genderPublisher = CurrentValueSubject<Enums.Gender?, Never>(nil)
-  
-  
+  public let genderPublisher = CurrentValueSubject<Enums.User.Gender?, Never>(nil)
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []

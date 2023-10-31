@@ -144,7 +144,7 @@ final class VKWorker {
     parameters["owner.\(DjangoVariables.User.firstName)"] = firstName
     parameters["owner.\(DjangoVariables.User.lastName)"] = lastName
     parameters["owner.\(DjangoVariables.User.email)"] = email
-    parameters[DjangoVariables.UserProfile.gender] = gender == 1 ? Enums.Gender.Female.rawValue : Enums.Gender.Male.rawValue
+    parameters[DjangoVariables.UserProfile.gender] = gender == 1 ? Enums.User.Gender.Female.rawValue : Enums.User.Gender.Male.rawValue
     parameters[DjangoVariables.UserProfile.birthDate] = birthDate
     parameters[DjangoVariables.UserProfile.vkID] = id
     parameters[DjangoVariables.UserProfile.vkURL] = "https://vk.com/\(domain)"

@@ -14,16 +14,14 @@ class ProfileCreationCollectionView: UICollectionView {
   typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Int>
   
   enum Section: Int, CaseIterable { case username, gender, birthDate, locales }
-  enum UsernameState { case correct, waiting, busy, error, empty, short }
-  enum GenderState { case filled, empty }
   
   // MARK: - Public properties
   ///**Publishers
-  public let usernamePublisher = PassthroughSubject<String, Never>()
+  public let usernameEditingPublisher = PassthroughSubject<String, Never>() // While editing
+  public let usernamePublisher = PassthroughSubject<String, Never>() // Editing complete
   public let birthDatePublisher = PassthroughSubject<Date, Never>()
-  public let genderPublisher = PassthroughSubject<Enums.Gender, Never>()
-  public var localesPublisher = PassthroughSubject<[String], Never>()
-  public var bannerPublisher = PassthroughSubject<NewBanner, Never>()
+  public let genderPublisher = PassthroughSubject<Enums.User.Gender, Never>()
+  public let localePublisher = PassthroughSubject<Void, Never>() // Use just to send event, get values from container
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -31,14 +29,14 @@ class ProfileCreationCollectionView: UICollectionView {
   private var tasks: [Task<Void, Never>?] = []
   private var source: UICollectionViewDiffableDataSource<Section, Int>!
   ///**Logic**
-  private var usernameState: UsernameState = .correct {
+  private var usernameState: Enums.User.UsernameState = .correct {
     didSet {
       guard oldValue != usernameState else { return }
       
-      usernameStatePublisher.send(usernameState)
+      usernameCallbackPublisher.send(usernameState)
     }
   }
-  private var genderState: Enums.Gender {
+  private var genderState: Enums.User.Gender {
     didSet {
       guard oldValue != genderState else { return }
       
@@ -52,12 +50,12 @@ class ProfileCreationCollectionView: UICollectionView {
       birthDatePublisher.send(birthDateState)
     }
   }
-  //  private var usernameLoadingPublisher = PassthroughSubject<Void, Never>()
-  //  private var usernameBusyPublisher = PassthroughSubject<Void, Never>()
-  //  private var usernameCorrectPublisher = PassthroughSubject<Void, Never>()
-  //  private var usernameErrorPublisher = PassthroughSubject<Void, Never>()
-  private var usernameStatePublisher = PassthroughSubject<UsernameState, Never>()
+  private var usernameCallbackPublisher = PassthroughSubject<Enums.User.UsernameState, Never>()
+  ///**Data**
   private let userprofile: Userprofile
+  private let locales: [LanguageItem]
+  ///**Publishers
+  private let localesHeightPublisher = PassthroughSubject<CGFloat, Never>() // Use to set locales height constraint
   
   // MARK: - Destructor
   deinit {
@@ -71,10 +69,11 @@ class ProfileCreationCollectionView: UICollectionView {
   }
   
   // MARK: - Initialization
-  init(userprofile: Userprofile) {
+  init(userprofile: Userprofile, locales: [LanguageItem]) {
     self.userprofile = userprofile
     self.genderState = userprofile.gender
-    self.birthDateState = userprofile.birthDate ?? "01.01.1900".toDate()
+    self.birthDateState = userprofile.birthDate
+    self.locales = locales
     
     super.init(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     
@@ -88,9 +87,10 @@ class ProfileCreationCollectionView: UICollectionView {
   required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
   
   // MARK: - Public methods
-  public func setUsernameState(_ state: UsernameState) {
+  public func setUsernameState(_ state: Enums.User.UsernameState) {
     self.usernameState = state
   }
+  
   
 //  public func setUsernameWaiting() {
 //    usernameLoadingPublisher.send()
@@ -110,6 +110,9 @@ class ProfileCreationCollectionView: UICollectionView {
   
   // MARK: - Private methods
   private func setupUI() {
+    // Disable bouncing
+    bounces = false
+
     collectionViewLayout = UICollectionViewCompositionalLayout { section, environment -> NSCollectionLayoutSection in
       var configuration = UICollectionLayoutListConfiguration(appearance: .plain)
       configuration.backgroundColor = .clear
@@ -132,7 +135,7 @@ class ProfileCreationCollectionView: UICollectionView {
       guard let self = self else { return }
       
       // UI setup
-      cell.insets = .uniform(size: Constants.UI.padding*2)
+      cell.insets = .init(top: Constants.UI.padding, left: Constants.UI.padding*2, bottom: Constants.UI.padding*2, right: Constants.UI.padding*2)
       cell.backgroundConfiguration = UIBackgroundConfiguration.clear()
       cell.automaticallyUpdatesBackgroundConfiguration = false
       cell.setSign(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))!, color: .systemGreen, enabled: true, animated: true)
@@ -169,7 +172,7 @@ class ProfileCreationCollectionView: UICollectionView {
             text = "username_is_short".localized + String(describing: Constants.Validators.usernameMinLenth)
           }
           
-          self.bannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: color),
+          Notifications.UIEvents.enqueueBannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: color),
                                                                              text: text),
                                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                               isModal: false,
@@ -179,7 +182,17 @@ class ProfileCreationCollectionView: UICollectionView {
         }
         .store(in: &self.subscriptions)
       
-      cell.editingPublisher
+      // Validate username
+      cell.editingEndedPublisher
+        .sink { [weak self] in
+          guard let self = self else { return }
+          
+          self.usernameEditingPublisher.send($0)
+        }
+        .store(in: &self.subscriptions)
+      
+      // Editing ended
+      cell.editingEndedPublisher
         .sink { [weak self] in
           guard let self = self else { return }
           
@@ -188,7 +201,7 @@ class ProfileCreationCollectionView: UICollectionView {
         .store(in: &self.subscriptions)
       
       // Callbacks
-      self.usernameStatePublisher
+      self.usernameCallbackPublisher
         .receive(on: DispatchQueue.main)
         .throttle(for: .seconds(0.3), scheduler: DispatchQueue.main, latest: true)
         .sink {
@@ -200,26 +213,6 @@ class ProfileCreationCollectionView: UICollectionView {
           }
         }
         .store(in: &self.subscriptions)
-      
-//      self.usernameBusyPublisher
-//        .receive(on: DispatchQueue.main)
-//        .sink { cell.setSign(image: UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))!, enabled: true, animated: true) }
-//        .store(in: &self.subscriptions)
-//      
-//      self.usernameLoadingPublisher
-//        .receive(on: DispatchQueue.main)
-//        .sink { cell.setLoading(enabled: true, animated: true) }
-//        .store(in: &self.subscriptions)
-//      
-//      self.usernameCorrectPublisher
-//        .receive(on: DispatchQueue.main)
-//        .sink { cell.setSign(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))!, enabled: true, animated: true) }
-//        .store(in: &self.subscriptions)
-//      
-//      self.usernameErrorPublisher
-//        .receive(on: DispatchQueue.main)
-//        .sink { cell.clear() }
-//        .store(in: &self.subscriptions)
     }
     
     // Gender
@@ -227,7 +220,7 @@ class ProfileCreationCollectionView: UICollectionView {
       guard let self = self else { return }
       
       // UI setup
-      cell.insets = .uniform(size: Constants.UI.padding*2)
+      cell.insets = .init(top: Constants.UI.padding, left: Constants.UI.padding*2, bottom: Constants.UI.padding*2, right: Constants.UI.padding*2)
       cell.backgroundConfiguration = UIBackgroundConfiguration.clear()
       cell.automaticallyUpdatesBackgroundConfiguration = false
       
@@ -241,7 +234,7 @@ class ProfileCreationCollectionView: UICollectionView {
         .sink { [weak self] in
           guard let self = self else { return }
           
-          self.bannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemRed),
+          Notifications.UIEvents.enqueueBannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemRed),
                                                                              text: "new_profile_gender_caution".localized),
                                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                               isModal: false,
@@ -261,12 +254,12 @@ class ProfileCreationCollectionView: UICollectionView {
         .store(in: &self.subscriptions)
     }
     
-    // Gender
+    // Birth date
     let birthDateCellRegistration = UICollectionView.CellRegistration<UserSettingsBirthDateCell, AnyHashable> { [weak self] cell, indexPath, item in
       guard let self = self else { return }
       
       // UI setup
-      cell.insets = .uniform(size: Constants.UI.padding*2)
+      cell.insets = .init(top: Constants.UI.padding, left: Constants.UI.padding*2, bottom: Constants.UI.padding*2, right: Constants.UI.padding*2)
       cell.backgroundConfiguration = UIBackgroundConfiguration.clear()
       cell.automaticallyUpdatesBackgroundConfiguration = false
       
@@ -280,7 +273,7 @@ class ProfileCreationCollectionView: UICollectionView {
         .sink { [weak self] in
           guard let self = self else { return }
           
-          self.bannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemRed),
+          Notifications.UIEvents.enqueueBannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemRed),
                                                                              text: "new_profile_gender_caution".localized),
                                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
                                               isModal: false,
@@ -300,6 +293,43 @@ class ProfileCreationCollectionView: UICollectionView {
         .store(in: &self.subscriptions)
     }
     
+    // Content languages
+    let localesCellRegistration = UICollectionView.CellRegistration<UserSettingsLocalesCell, AnyHashable> { [weak self] cell, indexPath, item in
+      guard let self = self else { return }
+      
+      // UI setup
+      cell.insets = .init(top: Constants.UI.padding, left: Constants.UI.padding*2, bottom: Constants.UI.padding*2, right: Constants.UI.padding*2)
+      cell.backgroundConfiguration = UIBackgroundConfiguration.clear()
+      cell.automaticallyUpdatesBackgroundConfiguration = false
+      
+      // Data setup
+      cell.locales = self.locales
+      
+      // Listeners
+      // Get height for cell
+      cell.requestBoundsPublisher
+        .sink { [unowned self] in self.calcLocalesHeight() }
+        .store(in: &subscriptions)
+      
+      // Update collection view
+      cell.boundsPublisher
+        .eraseToAnyPublisher()
+        .receive(on: DispatchQueue.main)
+        .sink { [unowned self] in self.source.refresh(animatingDifferences: $0) }
+        .store(in: &self.subscriptions)
+      
+      // Selection event
+      cell.selectionPublisher
+        .sink { self.localePublisher.send() }
+        .store(in: &subscriptions)
+      
+      // Set cell height
+      self.localesHeightPublisher
+        .filter { !$0.isZero }
+        .sink { cell.setHeight($0) }
+        .store(in: &subscriptions)
+    }
+    
     source = Source(collectionView: self, cellProvider: { collectionView, indexPath, itemIdentifier in
       let section = Section(rawValue: indexPath.section)
       
@@ -317,7 +347,9 @@ class ProfileCreationCollectionView: UICollectionView {
                                                             for: indexPath,
                                                             item: itemIdentifier)
       case .locales:
-        return UICollectionViewCell()
+        return collectionView.dequeueConfiguredReusableCell(using: localesCellRegistration,
+                                                            for: indexPath,
+                                                            item: itemIdentifier)
       case nil:
         return UICollectionViewCell()
       }
@@ -326,17 +358,25 @@ class ProfileCreationCollectionView: UICollectionView {
     var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
     snapshot.appendSections([.username,
                              .gender,
-                             .birthDate])
+                             .birthDate,
+                             .locales])
     snapshot.appendItems([0], toSection: .username)
     snapshot.appendItems([1], toSection: .gender)
     snapshot.appendItems([2], toSection: .birthDate)
-//    snapshot.appendItems([1], toSection: .Info)
-//    if mode == .Default {
-//      snapshot.appendItems([2], toSection: .Stats)
-//      snapshot.appendItems([3], toSection: .Management)
-//    }
-//    
+    snapshot.appendItems([3], toSection: .locales)
     source.apply(snapshot, animatingDifferences: false)
+  }
+  
+  private func calcLocalesHeight() {
+    guard let usernameCell = cellForItem(at: .init(row: 0, section: Section.username.rawValue)),
+          let genderCell = cellForItem(at: .init(row: 0, section: Section.gender.rawValue)),
+          let birthdateCell = cellForItem(at: .init(row: 0, section: Section.birthDate.rawValue))
+    else { return }
+    
+    localesHeightPublisher.send(bounds.height - (usernameCell.bounds.height
+                                                 + genderCell.bounds.height
+                                                 + birthdateCell.bounds.height
+                                                 + Constants.UI.padding*2))
   }
 }
 

@@ -28,6 +28,7 @@ class UserSettingsUsernameCell: UICollectionViewListCell {
   public var editingPublisher = PassthroughSubject<String, Never>()
   public var signTapPublisher = PassthroughSubject<Void, Never>()
   public var usernamePublisher = PassthroughSubject<String, Never>()
+  public var editingEndedPublisher = PassthroughSubject<String, Never>()
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -125,16 +126,32 @@ class UserSettingsUsernameCell: UICollectionViewListCell {
 #endif
   }
   
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
+    if #available(iOS 17.0, *) {
+      registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(self.updateTraits))
+    }
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
+    if #unavailable(iOS 17) {
+      updateTraits()
+    }
   }
   
   override func prepareForReuse() {
     super.prepareForReuse()
     
     editingPublisher = PassthroughSubject<String, Never>()
+    editingEndedPublisher = PassthroughSubject<String, Never>()
     signTapPublisher = PassthroughSubject<Void, Never>()
     usernamePublisher = PassthroughSubject<String, Never>()
   }
@@ -317,6 +334,11 @@ private extension UserSettingsUsernameCell {
   func handleTap() {
     signTapPublisher.send()
   }
+  
+  @objc
+  func updateTraits() {
+    textField.backgroundColor = Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection)
+  }
 }
 
 extension UserSettingsUsernameCell: UITextFieldDelegate {
@@ -325,6 +347,10 @@ extension UserSettingsUsernameCell: UITextFieldDelegate {
     guard let text = textField.text else { return }
     
     editingPublisher.send(text)
+  }
+  
+  func textFieldDidEndEditing(_ textField: UITextField) {
+    editingEndedPublisher.send(textField.text ?? "")
   }
 }
 

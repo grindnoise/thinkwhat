@@ -289,15 +289,12 @@ private extension PollController {
       .sink { [weak self] _ in
         guard let self = self else { return }
         
-        let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: self.item.topic.iconCategory, scaleMultiplicator: 1.5, iconColor: self.item.topic.tagColor),
-                                                              text: self.item.isComplete ? "survey_finished_notification" : "survey_finished_vote_notification"),
-                               contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                               isModal: false,
-                               useContentViewHeight: true,
-                               shouldDismissAfter: 2)
-        banner.didDisappearPublisher
-          .sink { _ in banner.removeFromSuperview() }
-          .store(in: &self.subscriptions)
+        Notifications.UIEvents.enqueueBannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: self.item.topic.iconCategory, scaleMultiplicator: 1.5, iconColor: self.item.topic.tagColor),
+                                                                                                    text: self.item.isComplete ? "survey_finished_notification" : "survey_finished_vote_notification"),
+                                                                     contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                                                     isModal: false,
+                                                                     useContentViewHeight: true,
+                                                                     shouldDismissAfter: 2))
       }
       .store(in: &subscriptions)
     
@@ -393,15 +390,20 @@ private extension PollController {
                                       state: .off,
                                       handler: { [unowned self] _ in
       
-      guard (!self.item.shareLink.corrupted),
+      guard self.item.shareLink.isValid,
             let baseUrl = API_URLS.Surveys.share,
             let url = URL(string: baseUrl.absoluteString + self.item.shareLink.urlEncoding)
       else {
-#if DEBUG
-        fatalError("shareHash and shareEncryptedString are empty")
-#else
+        Notifications.UIEvents.enqueueBannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo,
+                                                                                                               scaleMultiplicator: 1.5,
+                                                                                                               iconColor: UIColor.systemRed),
+                                                                                               text: "banner_share_link_expired"),
+                                                                contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                                                isModal: false,
+                                                                useContentViewHeight: true,
+                                                                shouldDismissAfter: 2))
+        
         return
-#endif
       }
       
 //      // Setting description
@@ -462,15 +464,14 @@ private extension PollController {
                                          state: .off,
                                          handler: { [unowned self] _ in
         guard item.isComplete else {
-          let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemOrange),
-                                                                text: "finish_poll"),
-                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                 isModal: false,
-                                 useContentViewHeight: true,
-                                 shouldDismissAfter: 2)
-          banner.didDisappearPublisher
-            .sink { _ in banner.removeFromSuperview() }
-            .store(in: &self.subscriptions)
+          Notifications.UIEvents.enqueueBannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, 
+                                                                                                                      scaleMultiplicator: 1.5,
+                                                                                                                      iconColor: UIColor.systemOrange),
+                                                                                                      text: "finish_poll"),
+                                                                       contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                                                       isModal: false,
+                                                                       useContentViewHeight: true,
+                                                                       shouldDismissAfter: 2))
           return
         }
         self.controllerInput?.toggleFavorite(!self.item.isFavorite)
@@ -791,26 +792,23 @@ extension PollController: PollModelOutput {
         
         if details.isPopular {
           self.controllerOutput?.showCongratulations()
-          let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: UIColor.systemGreen),
-                                                                text: "most_popular_choice".localized + "🚀\n" + "got_points".localized + "\(String(describing: details.points)) " + "\("points".localized) 🥳"),
-                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                 isModal: false,
-                                 useContentViewHeight: true,
-                                 shouldDismissAfter: 2)
-          
-          banner.didDisappearPublisher
-            .sink { _ in banner.removeFromSuperview() }
-            .store(in: &self.subscriptions)
+          Notifications.UIEvents.enqueueBannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo,
+                                                                                                                      scaleMultiplicator: 1.5,
+                                                                                                                      iconColor: UIColor.systemGreen),
+                                                                                                      text: "most_popular_choice".localized + "🚀\n" + "got_points".localized + "\(String(describing: details.points)) " + "\("points".localized) 🥳"),
+                                                                       contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                                                       isModal: false,
+                                                                       useContentViewHeight: true,
+                                                                       shouldDismissAfter: 2))
         } else {
-          let banner = NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo, scaleMultiplicator: 1.5, iconColor: .systemGreen),
-                                                                text: "got_points".localized + "\(String(describing: details.points)) " + "points".localized),
-                                 contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-                                 isModal: false,
-                                 useContentViewHeight: true,
-                                 shouldDismissAfter: 2)
-          banner.didDisappearPublisher
-            .sink { _ in banner.removeFromSuperview() }
-            .store(in: &self.subscriptions)
+          Notifications.UIEvents.enqueueBannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo,
+                                                                                                                      scaleMultiplicator: 1.5,
+                                                                                                                      iconColor: .systemGreen),
+                                                                                                      text: "got_points".localized + "\(String(describing: details.points)) " + "points".localized),
+                                                                       contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                                                       isModal: false,
+                                                                       useContentViewHeight: true,
+                                                                       shouldDismissAfter: 2))
         }
       }
     case .failure(let error):

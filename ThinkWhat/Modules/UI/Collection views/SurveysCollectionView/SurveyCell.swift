@@ -605,7 +605,7 @@ private extension SurveyCell {
   
   @MainActor
   func updateProgress(animated: Bool = true) {
-    avatar.setProgress(value: Double(item.progress), animated: animated)
+    avatar.setProgress(value: Double(item.progress), duration: 0.3)
   }
   
   @MainActor

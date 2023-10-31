@@ -12,6 +12,6 @@ struct ShareLink: Equatable {
   var hash: String
   var enc: String
   
-  var corrupted: Bool { !hash.isEmpty && !enc.isEmpty }
+  var isValid: Bool { !(hash.isEmpty && enc.isEmpty) }
   var urlEncoding: String { "\(hash)/\(enc)/" }
 }

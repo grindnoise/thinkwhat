@@ -350,7 +350,8 @@ class Avatar: UIView {
     instance.fillColor = UIColor.clear.cgColor
 //    instance.strokeStart = 0
 //    instance.strokeEnd  = 1
-    instance.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.white.blended(withFraction: 0.1, of: UIColor.lightGray).cgColor
+//    instance.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.white.blended(withFraction: 0.1, of: UIColor.lightGray).cgColor
+    instance.strokeColor = traitCollection.userInterfaceStyle == .dark ? progressBgDarkColor.cgColor : progressBgLightColor.cgColor
     
     return instance
   }()
@@ -360,9 +361,11 @@ class Avatar: UIView {
       progressLayer.shadowColor = progressColor.withAlphaComponent(0.5).cgColor
     }
   }
+  private var progressBgLightColor: UIColor
+  private var progressBgDarkColor: UIColor
   private var progressValue: Double
-  private let progressLineWidthMultiplier: CGFloat = 0.09
-  private let progressBgLineWidthMultiplier: CGFloat = 0.15
+  private let progressLineWidthMultiplier: CGFloat 
+  private let progressBgLineWidthMultiplier: CGFloat
   
   
   
@@ -388,7 +391,11 @@ class Avatar: UIView {
        filter: String = "",
        showsProgress: Bool = false,
        progressColor: UIColor = .systemGray,
-       progressValue: Double = .zero) {
+       progressValue: Double = .zero,
+       progressBgLightColor: UIColor = .systemBackground,
+       progressBgDarkColor: UIColor = .systemBackground,
+       progressLineWidthMultiplier: CGFloat = 0.09,
+       progressBgLineWidthMultiplier: CGFloat = 0.15) {
     self.mode = mode
     self.isShadowed = isShadowed
     self.isBordered = isBordered
@@ -399,6 +406,11 @@ class Avatar: UIView {
     self.showsProgress = showsProgress
     self.progressColor = progressColor
     self.progressValue = progressValue
+    self.progressBgLightColor = progressBgLightColor
+    self.progressBgDarkColor = progressBgDarkColor
+    self.progressLineWidthMultiplier = progressLineWidthMultiplier
+    self.progressBgLineWidthMultiplier = progressBgLineWidthMultiplier
+    
     let frame = CGRect(origin: .zero, size: size)
     
     super.init(frame: frame)
@@ -570,19 +582,19 @@ class Avatar: UIView {
   /// Sets circular progress path
   /// - Parameters:
   ///   - value: percent
-  ///   - animated: animation flag
-  public func setProgress(value: Double, animated: Bool) {
+  ///   - duration: animation duration
+  public func setProgress(value: Double, duration: Double = .zero) {
     guard !value.isZero,
           value != progressValue
     else { return }
     
     let strokeEnd = value/100
     
-    if animated {
+    if !duration.isZero {
       progressLayer.add(Animations.get(property: .LineWidth,
                                        fromValue: progressLayer.lineWidth,
                                        toValue: progressLayer.lineWidth*1.25,
-                                       duration: 0.4/2,
+                                       duration: duration/2,
                                        autoreverses: true,
                                        timingFunction: .linear,
                                        isRemovedOnCompletion: true), forKey: nil)
@@ -598,7 +610,7 @@ class Avatar: UIView {
       progressLayer.add(Animations.get(property: .StrokeEnd,
                                        fromValue: progressLayer.strokeEnd,
                                        toValue: strokeEnd,
-                                       duration: 0.4,
+                                       duration: duration*1.1,
                                        timingFunction: .easeInEaseOut,
                                        delegate: self,
                                        isRemovedOnCompletion: false,
@@ -632,7 +644,8 @@ class Avatar: UIView {
     button.backgroundColor = traitCollection.userInterfaceStyle == .dark ? buttonBgDarkColor : buttonBgLightColor
     
     if showsProgress {
-      progressBackgroundLayer.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.white.blended(withFraction: 0.1, of: UIColor.lightGray).cgColor
+      progressBackgroundLayer.strokeColor = traitCollection.userInterfaceStyle == .dark ? progressBgDarkColor.cgColor : progressBgLightColor.cgColor
+//      progressBackgroundLayer.strokeColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.1).cgColor : UIColor.white.blended(withFraction: 0.1, of: UIColor.lightGray).cgColor
     }
     
     guard let coloredBg = background.getSubview(type: UIView.self, identifier: "coloredBg") else { return }

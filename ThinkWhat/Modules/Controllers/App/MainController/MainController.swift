@@ -425,12 +425,24 @@ private extension MainController {
   func setTasks() {
     guard !tasksReady else { return }
     
+    // Set data received flag
     tasksReady = true
+    
+    // Global banner listener
+    Notifications.UIEvents.enqueueBannerPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bannersQueue.enqueue($0)
+      }
+      .store(in: &subscriptions)
     
     // Banner queue listener
     Timer
       .publish(every: 0.5, on: .main, in: .common)
       .autoconnect()
+      .receive(on: DispatchQueue.main)
       .filter { [unowned self] _ in !self.isBannerOnScreen}
       .sink { [weak self] _ in
         guard let self = self else { return }
@@ -438,14 +450,10 @@ private extension MainController {
         if let banner = self.bannersQueue.dequeue() {
           self.isBannerOnScreen = true
           banner.present()
-//          if !banner.isModal {
-//            banner.dismiss()
-//          }
           banner.didDisappearPublisher
             .sink { [unowned self] _ in
               banner.removeFromSuperview()
               self.isBannerOnScreen = false
-//              self.bannersQueue.dequeue()
             }
             .store(in: &self.subscriptions)
         }
@@ -810,7 +818,7 @@ private extension MainController {
     }
   }
   
-  func setLoadingSpinner(on: Bool) {
+  func setLoadingSpinner(on: Bool, completion: Closure? = nil) {
     if on {
       let bgView = UIView()
       let spinner = Logo()
@@ -862,7 +870,10 @@ private extension MainController {
         } completion: { _ in
           UIView.animate(withDuration: 1,
                          delay: 0,
-                         options: [.autoreverse, .repeat, .curveEaseInOut]) { spinner.transform = .init(scaleX: 0.95, y: 0.95) }
+                         options: [.autoreverse, .repeat, .curveEaseInOut]) {
+            spinner.transform = .init(scaleX: 0.95, y: 0.95)
+            completion?()
+          }
         }
       }
     } else {
@@ -890,6 +901,7 @@ private extension MainController {
         spinner.removeFromSuperview()
         spiral.stopRotating()
         spiral.removeFromSuperview()
+        completion?()
       }
     }
   }
@@ -960,6 +972,19 @@ private extension MainController {
           }
         }
       } catch {
+        let closure = { Notifications.UIEvents.enqueueBannerPublisher.send(NewBanner(contentView: TextBannerContent(icon: Icon.init(category: .Logo,
+                                                                                                                                    scaleMultiplicator: 1.5,
+                                                                                                                                    iconColor: UIColor.systemRed),
+                                                                                                                    text: "banner_share_link_expired"),
+                                                                                     contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
+                                                                                     isModal: false,
+                                                                                     useContentViewHeight: true,
+                                                                                     shouldDismissAfter: 2)) }
+        if !self.appLaunched {
+          self.launch() { closure() }
+        } else {
+          self.setLoadingSpinner(on: false) { closure() }
+        }
 #if DEBUG
         error.printLocalized(class: type(of: self), functionName: #function)
 #endif

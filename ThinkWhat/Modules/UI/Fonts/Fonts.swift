@@ -50,6 +50,6 @@ struct Fonts {
 //    static let UserprofileCellHeader = "Rubik-Regular"
 //  }
   
-  static let cellHeader = UIFont(name: "Rubik-Regular", size: 11)
+  static let cellHeader = UIFont(name: "Rubik-Regular", size: 10)
   static let banner = UIFont(name: "Rubik-Regular", size: 14)
 }

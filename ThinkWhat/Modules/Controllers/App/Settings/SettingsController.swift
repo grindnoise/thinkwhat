@@ -619,7 +619,7 @@ extension SettingsController: SettingsViewInput {
     present(imagePicker, animated: true, completion: nil)
   }
   
-  func updateGender(_ gender: Enums.Gender) {
+  func updateGender(_ gender: Enums.User.Gender) {
     let parameters = API.prepareUserData(gender: gender)
     controllerInput?.updateUserprofile(parameters: parameters, image: nil)
   }

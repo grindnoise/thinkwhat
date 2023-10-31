@@ -15,24 +15,28 @@ class UserSettingsBirthDateCell: UICollectionViewListCell {
   // MARK: - Public properties
   public var birthDate: Date! {
     didSet {
-      guard let birthDate = birthDate else { return }
+      guard let birthDate = birthDate, oldValue != birthDate else { return }
       
-      setupUI()
+      // One timer
+      if oldValue.isNil {
+        setupUI()
+      }
       
-      datePicker.date = birthDate
-//      // Update text & sign
-//      if gender != .Unassigned {
-//        textField.text = gender.rawValue.localized.capitalized
-//        setSign(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))!, color: .systemGreen, enabled: true, animated: true)
-//      } else {
+      if Userprofiles.Validators.checkBirthDate(birthDate) {
+        datePicker.date = birthDate
+        setSign(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))!, color: .systemGreen, enabled: true, animated: true)
+        textField.text = datePicker.date.toDateString()
+      } else {
+        datePicker.date = Calendar.current.date(byAdding: .year, value: -18, to: Date())!
         setSign(image: UIImage(systemName: "exclamationmark.triangle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))!, color: .systemRed, enabled: true, animated: true)
-//      }
+        textField.text = ""
+      }
     }
   }
   public var insets: UIEdgeInsets = .uniform(Constants.UI.padding) {
     didSet {
       guard oldValue != insets else { return }
-      
+    
       setupUI()
     }
   }
@@ -44,6 +48,8 @@ class UserSettingsBirthDateCell: UICollectionViewListCell {
       setColors()
     }
   }
+   
+  // baranovaelni@mosreg.ru
   
   // MARK: - Private properties
   private var observers: [NSKeyValueObservation] = []
@@ -140,7 +146,7 @@ class UserSettingsBirthDateCell: UICollectionViewListCell {
   private lazy var datePicker: UIDatePicker = {
     let instance = UIDatePicker()
     instance.maximumDate = Calendar.current.date(byAdding: DateComponents(year: -18), to: Date())
-instance.datePickerMode = .date
+    instance.datePickerMode = .date
     instance.layer.zPosition = 10000
     instance.datePickerMode = .date
     instance.locale = .current
@@ -163,10 +169,14 @@ instance.datePickerMode = .date
 #endif
   }
   
+  // MARK: - Initialization
   override init(frame: CGRect) {
     super.init(frame: frame)
     
     setTasks()
+    if #available(iOS 17.0, *) {
+      registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(self.updateTraits))
+    }
   }
   
   required init?(coder: NSCoder) {
@@ -177,7 +187,9 @@ instance.datePickerMode = .date
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    updateTraits()
+    if #unavailable(iOS 17) {
+      updateTraits()
+    }
   }
   
   override func prepareForReuse() {
@@ -289,7 +301,6 @@ private extension UserSettingsBirthDateCell {
     btn.leadingToSuperview()
     btn.width(to: textField, multiplier: 0.9)
     btn.height(to: textField)
-//    btn.layer.zPosition = 1000
     
     if #available(iOS 17.0, *) {
       registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(self.updateTraits))
@@ -308,6 +319,7 @@ private extension UserSettingsBirthDateCell {
   
   @objc
   func updateTraits() {
+    textField.backgroundColor = Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection)
     datePicker.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
     toolBar.backgroundColor = traitCollection.userInterfaceStyle == .dark ? .tertiarySystemBackground : .secondarySystemBackground
   }
@@ -320,13 +332,13 @@ private extension UserSettingsBirthDateCell {
   func dateSelected() {
     textField.resignFirstResponder()
     Fade.shared.dismiss()
-    datePublisher.send(datePicker.date)
+    birthDate = datePicker.date
+    datePublisher.send(birthDate)
   }
   
   @objc
   func selectDate() {
     Fade.shared.present()
-    datePicker.date = birthDate
     textField.becomeFirstResponder()
   }
 }

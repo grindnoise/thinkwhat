@@ -113,7 +113,7 @@ class UserprofilesCollectionView: UICollectionView {
   }
   private var selectedMinAge: Int = 18
   private var selectedMaxAge: Int = 99
-  private var selectedGender: Enums.Gender = .Unassigned
+  private var selectedGender: Enums.User.Gender = .Unassigned
   private var filtered: [Userprofile] = [] {
     didSet {
       guard selectedGender == .Unassigned, selectedMaxAge == 99, selectedMinAge == 18 else {

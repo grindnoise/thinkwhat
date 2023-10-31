@@ -9,6 +9,7 @@
 import UIKit
 import Combine
 import SafariServices
+import L10n_swift
 
 class ProfileCreationViewController: UIViewController, UINavigationControllerDelegate {
 
@@ -24,8 +25,22 @@ class ProfileCreationViewController: UIViewController, UINavigationControllerDel
     return instance
   }()
   ///**Logic**
-  private var username: String
-  private var gender: Enums.Gender
+  private var username: String {
+    didSet {
+      updateProgress()
+    }
+  }
+  private var usernameState: Enums.User.UsernameState = .correct
+  private var gender: Enums.User.Gender {
+    didSet {
+      updateProgress()
+    }
+  }
+  private var birthDate: Date {
+    didSet {
+      updateProgress()
+    }
+  }
   // Banners
   private var bannersQueue: QueueArray<NewBanner> = QueueArray() // Store banners in queue
   private var isBannerOnScreen = false // Prevent banner overlay
@@ -35,6 +50,12 @@ class ProfileCreationViewController: UIViewController, UINavigationControllerDel
   var controllerInput: ProfileCreationControllerInput?
   ///**Logic**
   public private(set) var userprofile: Userprofile
+  public private(set) var locales = {
+    let instances = AppData.shared.locales
+      .map { LanguageItem(code: $0, selected: $0 == L10n.shared.language ) }
+    
+    return instances.filter({ $0.selected }) + instances.filter({ !$0.selected }).sorted { $0.code < $1.code }
+  }()
   ///**UI**
   public private(set) lazy var logoStack: UIStackView = {
     let logoIcon: Icon = {
@@ -89,6 +110,7 @@ class ProfileCreationViewController: UIViewController, UINavigationControllerDel
     self.userprofile = userprofile
     self.username = userprofile.username
     self.gender = userprofile.gender
+    self.birthDate = userprofile.birthDate
     
     super.init(nibName: nil, bundle: nil)
   }
@@ -108,11 +130,10 @@ class ProfileCreationViewController: UIViewController, UINavigationControllerDel
     self.controllerOutput?
       .viewInput = self
     self.controllerInput = model
-    self.controllerInput?
-      .modelOutput = self
+    self.controllerInput?.modelOutput = self
     
     self.view = view as UIView
-
+    
     setTasks()
     setupUI()
   }
@@ -120,29 +141,21 @@ class ProfileCreationViewController: UIViewController, UINavigationControllerDel
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
-//    delay(seconds: 0.5) { [weak self] in
-//      guard let self = self else { return }
-//      
-//      let banner = NewBanner(contentView: TextBannerContent(icon: Icon(category: .Logo, iconColor: Constants.UI.Colors.main),
-//                                                            text: "account_fill_in".localized,
-//                                                            tintColor: Constants.UI.Colors.main,
-//                                                            fontName: Fonts.Regular,
-//                                                            textStyle: .headline,
-//                                                            textAlignment: .natural),
-//                             contentPadding: UIEdgeInsets(top: 16, left: 8, bottom: 16, right: 8),
-//                             isModal: false,
-//                             useContentViewHeight: true,
-//                             shouldDismissAfter: 5)
-//      banner.didDisappearPublisher
-//        .sink { _ in banner.removeFromSuperview() }
-//        .store(in: &self.subscriptions)
-//    }
+    controllerOutput?.didAppear()
+    
+    delay(seconds: 0.5) { [weak self] in
+      guard let self = self else { return }
+      
+      self.updateProgress()
+    }
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    updateTraits()
+    if #unavailable(iOS 17) {
+      updateTraits()
+    }
   }
 }
 
@@ -166,10 +179,21 @@ private extension ProfileCreationViewController {
   }
   
   func setTasks() {
+    // Global banner listener
+    Notifications.UIEvents.enqueueBannerPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.bannersQueue.enqueue($0)
+      }
+      .store(in: &subscriptions)
+    
     // Banner queue listener
     Timer
       .publish(every: 0.5, on: .main, in: .common)
       .autoconnect()
+      .receive(on: DispatchQueue.main)
       .filter { [unowned self] _ in !self.isBannerOnScreen}
       .sink { [weak self] _ in
         guard let self = self else { return }
@@ -193,51 +217,59 @@ private extension ProfileCreationViewController {
     navigationController?.setBarShadow(on: false)
   }
   
-//  func enqueueBanner(image: UIImage? = nil,
-//                     icon: Icon? = nil,
-//                     text: String,
-//                     attributedText: NSAttributedString? = nil,
-//                     isModal: Bool = false,
-//                     shouldPresent: Bool = false,
-//                     shouldDismissAfter: Double = 2.0) {
-//    bannersQueue.enqueue(NewBanner(contentView: TextBannerContent(image: image, icon: icon, text: text, attributedText: attributedText),
-//                                   contentPadding: UIEdgeInsets(top: Constants.UI.padding*2, left: Constants.UI.padding, bottom: Constants.UI.padding*2, right: Constants.UI.padding),
-//                                   isModal: isModal,
-//                                   useContentViewHeight: true,
-//                                   shouldPresent: shouldPresent,
-//                                   shouldDismissAfter: shouldDismissAfter))
-//  }
+  /// Checks necessary data
+  /// - Returns: data is correct
+  func checkData() -> Bool {
+    
+    return true
+  }
+  
+  func updateProgress() {
+    var total: Double = 0
+    
+    total += usernameState == .correct ? 1 : 0
+    total += gender != .Unassigned ? 1 : 0
+    total += Userprofiles.Validators.checkBirthDate(birthDate) ? 1 : 0
+    total += locales.filter({ $0.selected }).isEmpty ? 0 : 1
+    controllerOutput?.setProgress(Double(max(0, (total/4)*100)))
+  }
 }
 
 extension ProfileCreationViewController: ProfileCreationViewInput {
+  func setUsernameState(_ state: Enums.User.UsernameState) {
+    usernameState = state
+  }
+  
+  func setLocales() {
+    updateProgress()
+  }
+  
+  func setBirthDate(_ birthDate: Date) {
+    self.birthDate = birthDate
+  }
+  
   func setUsername(_ username: String) {
     self.username = username
   }
   
-  func setGender(_ gender: Enums.Gender) {
+  func setGender(_ gender: Enums.User.Gender) {
     self.gender = gender
-  }
-  
-  func showBanner(_ banner: NewBanner) {
-    bannersQueue.enqueue(banner)
   }
   
   func checkUsernameAvailability(_ username: String) {
     controllerInput?.checkUsernameAvailability(username)
   }
   
-  func onContentLanguageTap() {
-    
-  }
-  
   func openApp() {
+    checkData()
+    
     appDelegate.window?.rootViewController = MainController(surveyId: nil)
   }
   
-  func updateDescription(_ string: String) {
-//    let parameters = API.prepareUserData(description: string)
-//    controllerInput?.updateUserprofile(parameters: parameters, image: nil)
-  }
+//  func updateDescription(_ string: String) {
+////    let parameters = API.prepareUserData(description: string)
+////    controllerInput?.updateUserprofile(parameters: parameters, image: nil)
+//  }
   
   func openCamera() {
     imagePicker.sourceType = UIImagePickerController.SourceType.camera
@@ -247,21 +279,6 @@ extension ProfileCreationViewController: ProfileCreationViewInput {
   func openGallery() {
     imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
     present(imagePicker, animated: true, completion: nil)
-  }
-  
-  func updateGender(_ gender: Enums.Gender) {
-//    let parameters = API.prepareUserData(gender: gender)
-//    controllerInput?.updateUserprofile(parameters: parameters, image: nil)
-  }
-  
-  func updateBirthDate(_ date: Date) {
-//    let parameters = API.prepareUserData(birthDate: dateFormatter.string(from: date))
-//    controllerInput?.updateUserprofile(parameters: parameters, image: nil)
-  }
-  
-  func updateUsername(_ dict: [String : String]) {
-//    let parameters = API.prepareUserData(firstName: dict.keys.first, lastName: dict.values.first)
-//    controllerInput?.updateUserprofile(parameters: parameters, image: nil)
   }
 }
 

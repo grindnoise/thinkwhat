@@ -19,7 +19,13 @@ class ProfileCreationView: UIView {
   private var tasks: [Task<Void, Never>?] = []
   ///**UI**
   private lazy var avatar: Avatar = {
-    let instance = Avatar(userprofile: viewInput!.userprofile, isShadowed: true, mode: .Editing)
+    let instance = Avatar(userprofile: viewInput!.userprofile, 
+//                          isShadowed: true,
+//                          mode: .Editing,
+                          showsProgress: true,
+                          progressColor: Constants.UI.Colors.main,
+                          progressLineWidthMultiplier: 0.05,
+                          progressBgLineWidthMultiplier: 0.075)
     instance.widthToHeight(of: instance)
     instance.isUserInteractionEnabled = true
     
@@ -50,29 +56,15 @@ class ProfileCreationView: UIView {
     return instance
   }()
   private lazy var dataView: ProfileCreationCollectionView = {
-    let instance = ProfileCreationCollectionView(userprofile: viewInput!.userprofile)
+    let instance = ProfileCreationCollectionView(userprofile: viewInput!.userprofile, locales: viewInput!.locales)
     instance.backgroundColor = traitCollection.userInterfaceStyle != .dark ? .secondarySystemBackground : .tertiarySystemBackground
     instance.publisher(for: \.bounds)
       .sink { instance.cornerRadius = $0.width * 0.05 }
       .store(in: &subscriptions)
     
-    // Set height constraint and update it when
-    // content height changes
-    let constraint = instance.height(10)
-    instance.publisher(for: \.contentSize)
-      .filter { !$0.height.isZero && constraint.constant != $0.height }
-      .sink { [weak self] in
-        guard let self = self else { return }
-        
-        self.setNeedsLayout()
-        constraint.constant = $0.height
-        self.setNeedsLayout()
-      }
-      .store(in: &subscriptions)
-    
     // Add listeners
     // Check username availability with sligth debounce
-    instance.usernamePublisher
+    instance.usernameEditingPublisher
       .receive(on: DispatchQueue.main)
       .debounce(for: .seconds(0.75), scheduler: DispatchQueue.main)
 //      .filter { $0.count >= Constants.Validators.usernameMinLenth }
@@ -83,33 +75,42 @@ class ProfileCreationView: UIView {
           self.viewInput?.checkUsernameAvailability($0)
         } else if $0.isEmpty {
           self.dataView.setUsernameState(.empty)
+          self.viewInput?.setUsernameState(.empty)
         } else {
           self.dataView.setUsernameState(.short)
+          self.viewInput?.setUsernameState(.short)
         }
       }
       .store(in: &subscriptions)
     
     // Loading indicator callback
-    instance.usernamePublisher
+    instance.usernameEditingPublisher
       .receive(on: DispatchQueue.main)
       .sink { [weak self] in
         guard let self = self else { return }
         
         
         if $0.count >= Constants.Validators.usernameMinLenth {
-          guard $0 != self.viewInput?.userprofile.username else { self.dataView.setUsernameState(.correct); return }
+          guard $0 != self.viewInput?.userprofile.username else {
+            instance.setUsernameState(.correct)
+            self.viewInput?.setUsernameState(.correct)
+            return
+          }
           
-          self.dataView.setUsernameState(.waiting)
+          instance.setUsernameState(.waiting)
+          self.viewInput?.setUsernameState(.waiting)
         } else if $0.isEmpty {
-          self.dataView.setUsernameState(.empty)
+          instance.setUsernameState(.empty)
+          self.viewInput?.setUsernameState(.empty)
         } else {
-          self.dataView.setUsernameState(.short)
+          instance.setUsernameState(.short)
+          self.viewInput?.setUsernameState(.short)
         }
       }
       .store(in: &subscriptions)
     
     // Show error sign if idle
-    instance.usernamePublisher
+    instance.usernameEditingPublisher
       .receive(on: DispatchQueue.main)
       .filter { $0.count < Constants.Validators.usernameMinLenth }
       .debounce(for: .seconds(1.5), scheduler: DispatchQueue.main)
@@ -118,9 +119,30 @@ class ProfileCreationView: UIView {
         
         if $0.isEmpty {
           self.dataView.setUsernameState(.empty)
+          self.viewInput?.setUsernameState(.empty)
         } else {
           self.dataView.setUsernameState(.short)
+          self.viewInput?.setUsernameState(.short)
         }
+      }
+      .store(in: &subscriptions)
+    
+    // Set username
+    instance.usernameEditingPublisher
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.setUsername($0)
+      }
+      .store(in: &subscriptions)
+    
+    // Set birth date
+    instance.birthDatePublisher
+      .sink { [weak self] in
+        guard let self = self else { return }
+        
+        self.viewInput?.setBirthDate($0)
       }
       .store(in: &subscriptions)
     
@@ -133,19 +155,18 @@ class ProfileCreationView: UIView {
       }
       .store(in: &subscriptions)
     
-    // Show banner on tap
-    instance.bannerPublisher
-      .receive(on: DispatchQueue.main)
+    // Locales listener
+    instance.localePublisher
       .sink { [weak self] in
         guard let self = self else { return }
         
-        self.viewInput?.showBanner($0)
+        self.viewInput?.setLocales()
       }
       .store(in: &subscriptions)
     
     return instance
   }()
-  public private(set) lazy var actionButton: UIView = {
+  public private(set) lazy var button: UIView = {
     let opaque = UIView.opaque()
     opaque.layer.masksToBounds = false
     
@@ -175,7 +196,7 @@ class ProfileCreationView: UIView {
                                                      ]),
                                   for: .normal)
     }
-    opaque.heightAnchor.constraint(equalTo: opaque.widthAnchor, multiplier: 52/188).isActive = true
+    opaque.heightToWidth(of: opaque, multiplier: 52/188)
     opaque.publisher(for: \.bounds)
       .filter { $0 != .zero && opaque.layer.shadowPath?.boundingBox != $0 }
       .sink { [unowned self] in
@@ -186,22 +207,11 @@ class ProfileCreationView: UIView {
         opaque.layer.shadowOffset = self.traitCollection.userInterfaceStyle == .dark ? .zero : .init(width: 0, height: 3)
       }
       .store(in: &subscriptions)
-    instance.place(inside: opaque)
+    opaque.addSubview(instance)
+    opaque.alpha = 0
+    instance.edgesToSuperview()
     
     return opaque
-  }()
-  private lazy var gradient: CAGradientLayer = {
-    let instance = CAGradientLayer()
-    let clear = UIColor.systemBackground.withAlphaComponent(0).cgColor
-    let feathered = UIColor.systemBackground.cgColor
-    instance.colors = [clear, clear, feathered]
-    instance.locations = [0.0, 0.875, 0.935]
-//    instance.frame = frame
-//    publisher(for: \.bounds)
-//      .sink { instance.bounds = $0 }
-//      .store(in: &subscriptions)
-    
-    return instance
   }()
   
   // MARK: - Public properties
@@ -225,77 +235,59 @@ class ProfileCreationView: UIView {
   }
   
   // MARK: - Overridden
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    
-    gradient.frame = bounds
-  }
+//  override func layoutSubviews() {
+//    super.layoutSubviews()
+//    
+//    gradient.frame = bounds
+//  }
 }
 
 extension ProfileCreationView: ProfileCreationControllerOutput {
+  func didAppear() {
+    guard let btnConstraint = button.getConstraint(identifier: "bottom"),
+          let colConstraint = dataView.getConstraint(identifier: "bottom")
+    else { return }
+    
+    button.alpha = 1
+
+    delay(seconds: 2) {
+      UIView.animate(withDuration: 0.3) { [weak self] in
+        guard let self = self else { return }
+        
+        self.setNeedsLayout()
+        colConstraint.constant -= Constants.UI.padding*2 + button.bounds.height
+        btnConstraint.constant = 0
+        self.layoutIfNeeded()
+      }
+    }
+  }
+  
   func usernameLoadingCallback() {
     dataView.setUsernameState(.waiting)
+    viewInput?.setUsernameState(.waiting)
   }
   
   func usernameAvailabilityCallback(_ res: Result<Bool, Error>) {
     switch res {
     case .success(let isAvailable):
       dataView.setUsernameState(!isAvailable ? .correct : .busy)
+      viewInput?.setUsernameState(!isAvailable ? .correct : .busy)
     case .failure(let error):
 #if DEBUG
       error.printLocalized(class: type(of: self), functionName: #function)
 #endif
       dataView.setUsernameState(.error)
-    }
-  }
-}
-
-private extension ProfileCreationView {
-  @MainActor
-  func setupUI() {
-    backgroundColor = .systemBackground
-    
-    // Add avatar and username on the top
-    addSubview(avatar)
-    avatar.topToSuperview(offset: Constants.UI.padding*2, usingSafeArea: true)
-    avatar.centerXToSuperview()
-    avatar.widthToSuperview(multiplier: 0.5)
-    
-    // Add collection view below
-    addSubview(dataView)
-    dataView.topToBottom(of: avatar, offset: Constants.UI.padding*4)
-    dataView.leadingToSuperview(offset: Constants.UI.padding*2)
-    dataView.trailingToSuperview(offset: Constants.UI.padding*2)
-    
-    // Force hide keyboard on screen tap
-    addGestureRecognizer(UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard)))
-    
-    // Traits listener
-    if #available(iOS 17.0, *) {
-      registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(self.updateTraits))
+      viewInput?.setUsernameState(.error)
     }
   }
   
-  @MainActor
-  @objc
-  func updateTraits() {
-    dataView.backgroundColor = self.traitCollection.userInterfaceStyle != .dark ? .secondarySystemBackground : .tertiarySystemBackground
-  }
-  
-  @objc
-  func handleTap() {
-    func checkData() -> Bool {
-      
-      return true
-    }
-    
-    guard checkData(),
-          let viewInput = viewInput,
+  func transitionToApp(_ completion: @escaping Closure) {
+    guard let viewInput = viewInput,
           let titleView = viewInput.navigationController?.navigationBar.subviews.filter({ $0 is UIStackView }).first as? UIStackView,
           let logoIcon = titleView.arrangedSubviews.filter({ $0 is Logo }).first as? Logo,
           let logoText = titleView.arrangedSubviews.filter({ $0.accessibilityIdentifier == "opaque" }).first?.subviews.filter({ $0 is LogoText }).first as? LogoText,
           let window = appDelegate.window,
-          let constraint = actionButton.getConstraint(identifier: "top")
+          let constraint = button.getConstraint(identifier: "top")
     else { return }
     
     let opaque = PassthroughView()
@@ -339,7 +331,7 @@ private extension ProfileCreationView {
     logoIcon.alpha = 0
     logoText.alpha = 0
     
-    let spiral = Icon(frame: .zero, 
+    let spiral = Icon(frame: .zero,
                       category: .Spiral,
                       scaleMultiplicator: 1,
                       iconColor: traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.spiralDark : Constants.UI.Colors.spiralLight)
@@ -350,13 +342,6 @@ private extension ProfileCreationView {
     spiral.centerXAnchor.constraint(equalTo: fakeLogo.centerXAnchor).isActive = true
     spiral.centerYAnchor.constraint(equalTo: fakeLogo.centerYAnchor).isActive = true
     spiral.alpha = 0
-
-    UIView.animate(withDuration: 0.2) { [weak self] in
-      guard let self = self else { return }
-      
-//      self.userSettingsView.alpha = 0
-//      self.userSettingsView.transform = .init(scaleX: 0.85, y: 0.85)
-    }
     
     setNeedsLayout()
     UIView.animate(withDuration: 0.6,
@@ -372,11 +357,9 @@ private extension ProfileCreationView {
       opaque.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Constants.UI.Colors.darkTheme : .systemBackground
       spiral.alpha = 1
       
-      fakeLogo.frame = CGRect(origin: loadingStack.convert(tempLogo.frame.origin,
-                                                                      to: opaque),
-                                  size: tempLogo.bounds.size)
-      fakeLogoText.frame = CGRect(origin: loadingStack.convert(tempLogoText.frame.origin,
-                                                                      to: opaque),
+      fakeLogo.frame = CGRect(origin: loadingStack.convert(tempLogo.frame.origin, to: opaque),
+                              size: tempLogo.bounds.size)
+      fakeLogoText.frame = CGRect(origin: loadingStack.convert(tempLogoText.frame.origin, to: opaque),
                                   size: tempLogoText.bounds.size)
       
     }) { _ in
@@ -384,8 +367,59 @@ private extension ProfileCreationView {
       tempLogoText.alpha = 1
       fakeLogoText.removeFromSuperview()
       fakeLogo.removeFromSuperview()
-      viewInput.openApp()
+      completion()
     }
+  }
+  
+  func setProgress(_ percent: Double) {
+    avatar.setProgress(value: percent, duration: 0.75)
+  }
+}
+
+private extension ProfileCreationView {
+  @MainActor
+  func setupUI() {
+    backgroundColor = .systemBackground
+    
+    // Add avatar and username on the top
+    addSubview(avatar)
+    avatar.topToSuperview(offset: Constants.UI.padding*2, usingSafeArea: true)
+    avatar.centerXToSuperview()
+    avatar.widthToSuperview(multiplier: 0.4)
+    
+    // Add collection view
+    addSubview(dataView)
+    dataView.topToBottom(of: avatar, offset: Constants.UI.padding*4)
+    dataView.leadingToSuperview(offset: Constants.UI.padding*2)
+    dataView.trailingToSuperview(offset: Constants.UI.padding*2)
+    let colConstraint = dataView.bottomToSuperview(usingSafeArea: true)
+    colConstraint.identifier = "bottom"
+    
+    // Add button
+    addSubview(button)
+    let btnConstraint = button.bottomToSuperview(offset: 100, usingSafeArea: true)
+    btnConstraint.identifier = "bottom"
+    button.centerXToSuperview()
+    button.widthToSuperview(multiplier: 0.5)
+    
+    // Force hide keyboard on screen tap
+    addGestureRecognizer(UITapGestureRecognizer(target: self, action:#selector(self.hideKeyboard)))
+    
+    // Traits listener
+    if #available(iOS 17.0, *) {
+      registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(self.updateTraits))
+    }
+  }
+  
+  @MainActor
+  @objc
+  func updateTraits() {
+    dataView.backgroundColor = self.traitCollection.userInterfaceStyle != .dark ? .secondarySystemBackground : .tertiarySystemBackground
+  }
+  
+  @objc
+  func handleTap() {
+    viewInput?.openApp()
   }
   
   @objc

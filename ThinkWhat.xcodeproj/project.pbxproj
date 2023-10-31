@@ -12,6 +12,7 @@
 		AB03946A2AE177EC00A9E91A /* UserSettingsGenderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0394692AE177EC00A9E91A /* UserSettingsGenderCell.swift */; };
 		AB03946C2AE2910C00A9E91A /* UserSettingsUsernameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB03946B2AE2910C00A9E91A /* UserSettingsUsernameCell.swift */; };
 		AB03946E2AE9608F00A9E91A /* UserSettingsBirthDateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB03946D2AE9608F00A9E91A /* UserSettingsBirthDateCell.swift */; };
+		AB0394702AEBD3A900A9E91A /* UserSettingsLocalesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB03946F2AEBD3A900A9E91A /* UserSettingsLocalesCell.swift */; };
 		AB04D4F92A24822F009FF46D /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = AB04D4F82A24822F009FF46D /* SwiftyJSON */; };
 		AB04D4FC2A248263009FF46D /* FlagKit in Frameworks */ = {isa = PBXBuildFile; productRef = AB04D4FB2A248263009FF46D /* FlagKit */; };
 		AB04D4FF2A2482D0009FF46D /* Agrume in Frameworks */ = {isa = PBXBuildFile; productRef = AB04D4FE2A2482D0009FF46D /* Agrume */; };
@@ -515,6 +516,7 @@
 		AB0394692AE177EC00A9E91A /* UserSettingsGenderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsGenderCell.swift; sourceTree = "<group>"; };
 		AB03946B2AE2910C00A9E91A /* UserSettingsUsernameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsUsernameCell.swift; sourceTree = "<group>"; };
 		AB03946D2AE9608F00A9E91A /* UserSettingsBirthDateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsBirthDateCell.swift; sourceTree = "<group>"; };
+		AB03946F2AEBD3A900A9E91A /* UserSettingsLocalesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsLocalesCell.swift; sourceTree = "<group>"; };
 		AB05FDD12A20FB8900A5986C /* ThinkWhatAlpha.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ThinkWhatAlpha.entitlements; sourceTree = "<group>"; };
 		AB090D7F2876EEAF00FAFAB0 /* ChoiceSectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceSectionCell.swift; sourceTree = "<group>"; };
 		AB090D822876F06D00FAFAB0 /* AnwersCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnwersCollectionView.swift; sourceTree = "<group>"; };
@@ -2113,6 +2115,7 @@
 				AB90FAF428D36E990096B147 /* UserSettingsSocialMediaCell.swift */,
 				AB03946B2AE2910C00A9E91A /* UserSettingsUsernameCell.swift */,
 				AB03946D2AE9608F00A9E91A /* UserSettingsBirthDateCell.swift */,
+				AB03946F2AEBD3A900A9E91A /* UserSettingsLocalesCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -2993,6 +2996,7 @@
 				AB72963427DB5EFB00D45B54 /* TopicsController.swift in Sources */,
 				AB94E35529B734F300BC1821 /* Transition.swift in Sources */,
 				ABBDC69A2A1261640011D87D /* PasswordResetPopup.swift in Sources */,
+				AB0394702AEBD3A900A9E91A /* UserSettingsLocalesCell.swift in Sources */,
 				ABAEEE5A27A5D4A100E4EF29 /* VKDelegate.swift in Sources */,
 				ABE912C929CB4E5200EABDFD /* NewPollImageCell.swift in Sources */,
 				ABF3DF17283BA4A200309AA9 /* Int.swift in Sources */,

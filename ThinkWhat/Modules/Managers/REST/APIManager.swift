@@ -72,7 +72,7 @@ class API {
                              lastName: String? = nil,
                              email: String? = nil,
                              description: String? = nil,
-                             gender: Enums.Gender? = nil,
+                             gender: Enums.User.Gender? = nil,
                              birthDate: String? = nil,
                              city: City? = nil,
                              image: UIImage? = nil,

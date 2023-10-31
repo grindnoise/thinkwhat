@@ -352,8 +352,6 @@
 "instagram_link" = "профиль в Instagram";
 "completed" = "Публикаций пройдено";
 "preferences" = "Мои предпочтения:";
-
-//"points" = "Баллов";
 "top_up" = "Пополнить";
 "interests" = "Интересы";
 "social_media_help" = "Прикрепите профиль в социальной сети, чтобы другие пользователи могли связаться с Вами (опционально)";
@@ -376,7 +374,7 @@
 "languages" = "Языки";
 "default_locale" = "Интерфейс";
 "locales" = "Контент";
-"content_language" = "Язык контента";
+"content_language" = "Языки контента";
 "content_language_hint" = "Контент будет предоставляться на выбранных языках";
 "about_app" = "О программе";
 "terms_privacy_policy" = "Условия использования";
@@ -529,3 +527,6 @@
 "filter_rated" = "топовые";
 "filter_own" = "свои";
 "filter_watchlist" = "отслеживаемые";
+
+// Banners & popups
+"banner_share_link_expired" = "Срок действия ссылки истек";

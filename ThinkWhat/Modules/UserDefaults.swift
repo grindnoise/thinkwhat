@@ -49,9 +49,9 @@ extension UserDefaults {
     @UserDefault(key: "date_joined", defaultValue: nil)
     static var dateJoined: Date?
     
-    static var gender: Enums.Gender? {
+    static var gender: Enums.User.Gender? {
       set { _gender = newValue?.rawValue }
-      get { return Enums.Gender(rawValue: _gender ?? "") }
+      get { return Enums.User.Gender(rawValue: _gender ?? "") }
     }
     @UserDefault(key: "gender", defaultValue: nil)
     private static var _gender: String?

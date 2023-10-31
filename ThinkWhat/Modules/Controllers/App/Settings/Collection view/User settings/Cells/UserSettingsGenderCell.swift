@@ -13,7 +13,7 @@ import TinyConstraints
 class UserSettingsGenderCell: UICollectionViewListCell {
   
   // MARK: - Public properties
-  public var gender: Enums.Gender! {
+  public var gender: Enums.User.Gender! {
     didSet {
       guard let gender = gender else { return }
       
@@ -36,7 +36,7 @@ class UserSettingsGenderCell: UICollectionViewListCell {
     }
   }
   ///**Publishers**
-  public var genderPublisher = PassthroughSubject<Enums.Gender, Never>()
+  public var genderPublisher = PassthroughSubject<Enums.User.Gender, Never>()
   public var signTapPublisher = PassthroughSubject<Void, Never>()
   
   // MARK: - Private properties
@@ -44,7 +44,7 @@ class UserSettingsGenderCell: UICollectionViewListCell {
   private var subscriptions = Set<AnyCancellable>()
   private var tasks: [Task<Void, Never>?] = []
   ///**Logic**
-  private var genders = [Enums.Gender.Male, Enums.Gender.Female]
+  private var genders = [Enums.User.Gender.Male, Enums.User.Gender.Female]
   ///**UI**
   private lazy var header: UIStackView = {
     // Header stack
@@ -130,17 +130,32 @@ class UserSettingsGenderCell: UICollectionViewListCell {
 #endif
   }
   
+  // MARK: - Initialization
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
+    if #available(iOS 17.0, *) {
+      registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(self.updateTraits))
+    }
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
   // MARK: - Overriden methods
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     
-    updateTraits()
+    if #unavailable(iOS 17) {
+      updateTraits()
+    }
   }
   
   override func prepareForReuse() {
     super.prepareForReuse()
     
-    genderPublisher = PassthroughSubject<Enums.Gender, Never>()
+    genderPublisher = PassthroughSubject<Enums.User.Gender, Never>()
     signTapPublisher = PassthroughSubject<Void, Never>()
   }
   
@@ -248,36 +263,37 @@ private extension UserSettingsGenderCell {
     btn.leadingToSuperview()
     btn.width(to: textField, multiplier: 0.9)
     btn.height(to: textField)
-//    btn.layer.zPosition = 1000
-    
-    if #available(iOS 17.0, *) {
-      registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(self.updateTraits))
-    }
   }
   
   @objc
   func updateTraits() {
-    
+    textField.backgroundColor = Constants.UI.Colors.textField(color: .white, traitCollection: traitCollection)
   }
 
   func prepareMenu() -> UIMenu {
     var actions: [UIAction]!
     
-    let male: UIAction = .init(title: Enums.Gender.Male.rawValue.localized.capitalized, image: UIImage(systemName: "mustache.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+    let male: UIAction = .init(title: Enums.User.Gender.Male.rawValue.localized.capitalized,
+                               image: UIImage(systemName: "mustache.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)),
+                               identifier: nil, 
+                               discoverabilityTitle: nil,
+                               attributes: .init(), 
+                               state: .off,
+                               handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.genderPublisher.send(Enums.Gender.Male)
-      self.textField.text = Enums.Gender.Male.rawValue.localized.capitalized
+      self.genderPublisher.send(Enums.User.Gender.Male)
+      self.textField.text = Enums.User.Gender.Male.rawValue.localized.capitalized
       if self.gender == .Unassigned {
         self.setSign(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))!, color: .systemGreen, enabled: true, animated: true)
       }
     })
     
-    let female: UIAction = .init(title: Enums.Gender.Female.rawValue.localized.capitalized, image: UIImage(systemName: "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
+    let female: UIAction = .init(title: Enums.User.Gender.Female.rawValue.localized.capitalized, image: UIImage(systemName: "mouth.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium)), identifier: nil, discoverabilityTitle: nil, attributes: .init(), state: .off, handler: { [weak self] _ in
       guard let self = self else { return }
       
-      self.genderPublisher.send(Enums.Gender.Female)
-      self.textField.text = Enums.Gender.Female.rawValue.localized.capitalized
+      self.genderPublisher.send(Enums.User.Gender.Female)
+      self.textField.text = Enums.User.Gender.Female.rawValue.localized.capitalized
       if self.gender == .Unassigned {
         self.setSign(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(scale: .medium))!, color: .systemGreen, enabled: true, animated: true)
       }

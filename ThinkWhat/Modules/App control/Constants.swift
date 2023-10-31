@@ -274,6 +274,7 @@ struct Constants {
       static let filterEnabled = UIColor(hexString: "#21A038")
       static let filterDisabledLight = UIColor.systemGray4
       static let filterDisabledDark = UIColor.systemGray4
+      static let deselected = UIColor.systemGray4
       
       struct SubscriptionsController {
         static let subscribersButton = UIColor(red: 0.416, green: 0.400, blue: 0.639, alpha: 1.000)
@@ -405,7 +406,7 @@ import SwiftyJSON
 import CoreData
 import UserNotifications
 
-typealias Closure = (()->())
+typealias Closure = (()->Void)
 
 var localhost: Bool {
     //    let dict = ProcessInfo.processInfo.environment

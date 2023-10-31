@@ -110,6 +110,15 @@ class Userprofiles {
     shared.all.removeAll()
     shared.current = nil
   }
+  
+  struct Validators {
+    /// Checks birth date validity
+    /// - Parameter date: date to check
+    /// - Returns: is correct
+    static func checkBirthDate(_ date: Date) -> Bool {
+      date.get(.year) != 1900
+    }
+  }
 
   //    func loadSubscribedFor(_ data: Data) {
   //        let decoder                                 = JSONDecoder()
@@ -232,20 +241,15 @@ class Userprofile: Decodable {
   @Published var email: String
   var description: String = ""
   var dateJoined: Date
-  @Published var birthDate: Date? {
+  @Published var birthDate: Date {
     didSet {
-      guard let birthDate = birthDate,
-            oldValue != birthDate,
-            isCurrent
-      else { return }
+      guard oldValue != birthDate, isCurrent else { return }
       
       NotificationCenter.default.post(name: Notifications.Userprofiles.BirthDateChanged, object: self)
     }
   }
-  var age: Int {
-    return birthDate?.age ?? 18
-  }
-  @Published var gender: Enums.Gender {
+  var age: Int { birthDate.age }
+  @Published var gender: Enums.User.Gender {
     didSet {
       guard oldValue != gender,
             isCurrent
@@ -501,11 +505,12 @@ class Userprofile: Decodable {
     subscribedToMe = false
     imageURL    = UserDefaults.Profile.imageURL
     notifyOnPublication = false
+    birthDate   = UserDefaults.Profile.birthDate ?? "01.01.1900".toDate()
     if let path = UserDefaults.Profile.imagePath, let _image = UIImage(contentsOfFile: path) {
       image = _image
     } else if let url = imageURL {  Task { image = try await API.shared.system.downloadImageAsync(from: url) } }
 //    cityTitle       = UserDefaults.Profile.city
-    birthDate       = UserDefaults.Profile.birthDate
+    
     instagramURL    = UserDefaults.Profile.instagramURL
     tiktokURL       = UserDefaults.Profile.tiktokURL
     vkURL           = UserDefaults.Profile.vkURL
@@ -524,9 +529,10 @@ class Userprofile: Decodable {
       lastName            = try container.decode(String.self, forKey: .lastName)
       email               = try container.decode(String.self, forKey: .email)
       lastVisit           = try container.decode(Date.self, forKey: .lastVisit)
-      if let _birthDate   = try container.decodeIfPresent(String.self, forKey: .birthDate) {
-        birthDate = _birthDate.toDate()
-      }
+      birthDate           = try container.decode(String.self, forKey: .birthDate).toDate()
+//      if let _birthDate   = try container.decodeIfPresent(String.self, forKey: .birthDate) {
+//        birthDate = _birthDate.toDate()
+//      }
       dateJoined          = try container.decode(Date.self, forKey: .dateJoined)
       imageURL            = URL(string: try container.decodeIfPresent(String.self, forKey: .imageURL) ?? "")
       votesReceivedTotal  = try container.decode(Int.self, forKey: .votesReceivedTotal)
@@ -548,7 +554,7 @@ class Userprofile: Decodable {
       subscribedAt        = try container.decode(Bool.self, forKey: .subscribedAt)
       subscribedToMe      = try container.decode(Bool.self, forKey: .subscribedToMe)
       notifyOnPublication = try container.decode(Bool.self, forKey: .notifyOnPublication)
-      gender              = Enums.Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
+      gender              = Enums.User.Gender(rawValue: try (container.decodeIfPresent(String.self, forKey: .gender) ?? "")) ?? .Unassigned
       ///City decoding
       if /*!isCurrent, */let decodedCity = try? container.decodeIfPresent(City.self, forKey: .city) {
         let cityInstance = Cities.shared.all.filter({ $0 == decodedCity }).first ?? decodedCity
